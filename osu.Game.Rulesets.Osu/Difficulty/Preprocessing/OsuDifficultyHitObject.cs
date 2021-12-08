@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
 
                 //
-                // There are two types of slider-to-object patterns to consider in order to better approximate the real movements a player will take.
+                // There are two types of slider-to-object patterns to consider in order to better approximate the real movement a player will take to jump between the hitobjects.
                 //
                 // 1. The anti-flow pattern, where players cut the slider short in order to move to the next hitobject.
                 //
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //             |     ← most natural jump path
                 //             o     ← a follow-up hitcircle
                 //
-                // In this case the most natural jump path (o--o) is approximated by LazyJumpDistance.
+                // In this case the most natural jump path is approximated by LazyJumpDistance.
                 //
                 // 2. The flow pattern, where players follow through the slider to its visual extent into the next hitobject.
                 //
@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //                  ↑
                 //        most natural jump path
                 //
-                // In this case the most natural movement path is better approximated by a new distance called "tailJumpDistance" - the distance between the slider's tail and the next hitobject.
+                // In this case the most natural jump path is better approximated by a new distance called "tailJumpDistance" - the distance between the slider's tail and the next hitobject.
                 //
                 // Thus, the player is assumed to jump the minimum of these two distances in all cases.
                 //
