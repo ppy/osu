@@ -335,6 +335,8 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 
+        public abstract Task RemovePlaylistItem(long playlistItemId);
+
         Task IMultiplayerClient.RoomStateChanged(MultiplayerRoomState state)
         {
             if (Room == null)
