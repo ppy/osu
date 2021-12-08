@@ -361,6 +361,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (item.OwnerID != userId)
                 throw new InvalidOperationException("Attempted to remove an item which is not owned by the user.");
 
+            if (item.Expired)
+                throw new InvalidOperationException("Attempted to remove an item which has already been played");
+
             serverSidePlaylist.Remove(item);
             await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItemId).ConfigureAwait(false);
 
