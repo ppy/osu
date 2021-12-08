@@ -119,6 +119,70 @@ namespace osu.Game.Graphics.UserInterface
             caretMovedSample?.Play();
         }
 
+        protected override void OnImeComposition(string newComposition, int removedTextLength, int addedTextLength, bool caretMoved)
+        {
+            base.OnImeComposition(newComposition, removedTextLength, addedTextLength, caretMoved);
+
+            if (string.IsNullOrEmpty(newComposition))
+            {
+                switch (removedTextLength)
+                {
+                    case 0:
+                        // empty composition event, composition wasn't changed, don't play anything.
+                        return;
+
+                    case 1:
+                        // composition probably ended by pressing backspace, or was cancelled.
+                        textRemovedSample?.Play();
+                        return;
+
+                    default:
+                        // longer text removed, composition ended because it was cancelled.
+                        // could be a different sample if desired.
+                        textRemovedSample?.Play();
+                        return;
+                }
+            }
+
+            if (addedTextLength > 0)
+            {
+                // some text was added, probably due to typing new text or by changing the candidate.
+                playTextAddedSample();
+                return;
+            }
+
+            if (removedTextLength > 0)
+            {
+                // text was probably removed by backspacing.
+                // it's also possible that a candidate that only removed text was changed to.
+                textRemovedSample?.Play();
+                return;
+            }
+
+            if (caretMoved)
+            {
+                // only the caret/selection was moved.
+                caretMovedSample?.Play();
+            }
+        }
+
+        protected override void OnImeResult(string result, bool successful)
+        {
+            base.OnImeResult(result, successful);
+
+            if (successful)
+            {
+                // composition was successfully completed, usually by pressing the enter key.
+                textCommittedSample?.Play();
+            }
+            else
+            {
+                // composition was prematurely ended, eg. by clicking inside the textbox.
+                // could be a different sample if desired.
+                textCommittedSample?.Play();
+            }
+        }
+
         protected override void OnFocus(FocusEvent e)
         {
             BorderThickness = 3;
