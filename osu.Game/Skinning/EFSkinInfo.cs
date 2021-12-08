@@ -57,5 +57,7 @@ namespace osu.Game.Skinning
             string author = Creator == null ? string.Empty : $"({Creator})";
             return $"{Name} {author}".Trim();
         }
+
+        public bool IsManaged => ID > 0;
     }
 }
