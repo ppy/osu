@@ -119,24 +119,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 MinimumJumpTime = Math.Max(StrainTime - lastTravelTime, min_delta_time);
 
                 //
-                // We'll try to better approximate the real movements a player will take in patterns following on from sliders. Consider the following slider-to-object patterns:
+                // There are two types of slider-to-object patterns to consider in order to better approximate the real movements a player will take.
                 //
-                // 1.  <======x==>
-                //            | /
-                //            x
+                // 1. The anti-flow pattern, where players cut the slider short in order to move to the next hitobject.
                 //
-                // 2.  <======x==>---x
-                //            |______|
+                //      <======o==>  ← slider
+                //             |     ← most natural jump path
+                //             o     ← a follow-up hitcircle
                 //
-                // Where "<==>" represents a slider, and "x" represents where the cursor needs to be for either hitobject (for a slider, this is the lazy cursor position).
+                // In this case the most natural jump path (o--o) is approximated by LazyJumpDistance.
                 //
-                // The pattern (x--x) has distance LazyJumpDistance.
-                // The pattern (>--x) is a new distance we'll call "tailJumpDistance".
+                // 2. The flow pattern, where players follow through the slider to its visual extent into the next hitobject.
                 //
-                // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The most natural jump pattern is (x--x).
-                // Case (2) is a flow pattern, where players will follow the slider through to its visual extent. The most natural jump pattern is (>--x).
+                //      <======o==>---o
+                //                  ↑
+                //        most natural jump path
                 //
-                // A lenience is applied by assuming that the player jumps the minimum of these two distances in all cases.
+                // In this case the most natural movement path is better approximated by a new distance called "tailJumpDistance" - the distance between the slider's tail and the next hitobject.
+                //
+                // Thus, the player is assumed to jump the minimum of these two distances in all cases.
                 //
 
                 float tailJumpDistance = Vector2.Subtract(lastSlider.TailCircle.StackedPosition, BaseObject.StackedPosition).Length * scalingFactor;
