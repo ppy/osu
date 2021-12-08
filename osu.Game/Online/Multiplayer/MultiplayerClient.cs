@@ -163,7 +163,7 @@ namespace osu.Game.Online.Multiplayer
                 Debug.Assert(joinedRoom != null);
 
                 // Populate playlist items.
-                var playlistItems = await Task.WhenAll(joinedRoom.Playlist.Select(createPlaylistItem)).ConfigureAwait(false);
+                var playlistItems = await Task.WhenAll(joinedRoom.Playlist.Select(item => createPlaylistItem(item, item.ID == joinedRoom.Settings.PlaylistItemId))).ConfigureAwait(false);
 
                 // Populate users.
                 Debug.Assert(joinedRoom.Users != null);
@@ -470,7 +470,32 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
         {
-            Scheduler.Add(() => updateLocalRoomSettings(newSettings));
+            Debug.Assert(APIRoom != null);
+            Debug.Assert(Room != null);
+
+            Scheduler.Add(() =>
+            {
+                // ensure the new selected item is populated immediately.
+                var playlistItem = APIRoom.Playlist.Single(p => p.ID == newSettings.PlaylistItemId);
+
+                if (playlistItem != null)
+                {
+                    GetAPIBeatmap(playlistItem.BeatmapID).ContinueWith(b =>
+                    {
+                        // Should be called outside of the `Scheduler` logic (and specifically accessing `Exception`) to suppress an exception from firing outwards.
+                        bool success = b.Exception == null;
+
+                        Scheduler.Add(() =>
+                        {
+                            if (success)
+                                playlistItem.Beatmap.Value = b.Result;
+
+                            updateLocalRoomSettings(newSettings);
+                        });
+                    });
+                }
+            });
+
             return Task.CompletedTask;
         }
 
@@ -629,7 +654,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            var playlistItem = await createPlaylistItem(item).ConfigureAwait(false);
+            var playlistItem = await createPlaylistItem(item, true).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -673,7 +698,7 @@ namespace osu.Game.Online.Multiplayer
             if (Room == null)
                 return;
 
-            var playlistItem = await createPlaylistItem(item).ConfigureAwait(false);
+            var playlistItem = await createPlaylistItem(item, true).ConfigureAwait(false);
 
             Scheduler.Add(() =>
             {
@@ -728,10 +753,8 @@ namespace osu.Game.Online.Multiplayer
             CurrentMatchPlayingItem.Value = APIRoom.Playlist.SingleOrDefault(p => p.ID == settings.PlaylistItemId);
         }
 
-        private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item)
+        private async Task<PlaylistItem> createPlaylistItem(MultiplayerPlaylistItem item, bool populateBeatmapImmediately)
         {
-            var apiBeatmap = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
-
             var ruleset = Rulesets.GetRuleset(item.RulesetID);
 
             Debug.Assert(ruleset != null);
@@ -741,8 +764,8 @@ namespace osu.Game.Online.Multiplayer
             var playlistItem = new PlaylistItem
             {
                 ID = item.ID,
+                BeatmapID = item.BeatmapID,
                 OwnerID = item.OwnerID,
-                Beatmap = { Value = apiBeatmap },
                 Ruleset = { Value = ruleset },
                 Expired = item.Expired,
                 PlaylistOrder = item.PlaylistOrder,
@@ -751,6 +774,9 @@ namespace osu.Game.Online.Multiplayer
 
             playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));
             playlistItem.AllowedMods.AddRange(item.AllowedMods.Select(m => m.ToMod(rulesetInstance)));
+
+            if (populateBeatmapImmediately)
+                playlistItem.Beatmap.Value = await GetAPIBeatmap(item.BeatmapID).ConfigureAwait(false);
 
             return playlistItem;
         }
