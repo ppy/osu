@@ -20,16 +20,6 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         public Action<PlaylistItem> DeletionRequested;
 
-        private readonly bool allowEdit;
-        private readonly bool allowSelection;
-        private readonly bool showItemOwner;
-
-        public DrawableRoomPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
-        {
-            this.allowEdit = allowEdit;
-            this.allowSelection = allowSelection;
-            this.showItemOwner = showItemOwner;
-        }
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
         {
@@ -41,10 +31,10 @@ namespace osu.Game.Screens.OnlinePlay
             Spacing = new Vector2(0, 2)
         };
 
-        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection, showItemOwner)
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item)
         {
             SelectedItem = { BindTarget = SelectedItem },
-            RequestDeletion = i => DeletionRequested?.Invoke(i)
+            RequestDeletion = i => DeletionRequested?.Invoke(i),
         };
     }
 }

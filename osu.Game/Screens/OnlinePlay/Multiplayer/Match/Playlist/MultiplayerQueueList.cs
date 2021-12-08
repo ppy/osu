@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -17,15 +18,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// </summary>
     public class MultiplayerQueueList : DrawableRoomPlaylist
     {
-        public MultiplayerQueueList()
-            : base(false, false, true)
-        {
-        }
-
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new QueueFillFlowContainer
         {
             Spacing = new Vector2(0, 2)
         };
+
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item)
+            => base.CreateOsuDrawable(item).With(d => ((DrawableRoomPlaylistItem)d).ShowItemOwner = true);
 
         private class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {

@@ -329,10 +329,26 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 
+            private readonly bool allowEdit;
+            private readonly bool allowSelection;
+            private readonly bool showItemOwner;
+
             public TestPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
-                : base(allowEdit, allowSelection, showItemOwner)
             {
+                this.allowEdit = allowEdit;
+                this.allowSelection = allowSelection;
+                this.showItemOwner = showItemOwner;
             }
+
+            protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => base.CreateOsuDrawable(item).With(d =>
+            {
+                var drawablePlaylistItem = (DrawableRoomPlaylistItem)d;
+
+                drawablePlaylistItem.AllowReordering = allowEdit;
+                drawablePlaylistItem.AllowDeletion = allowEdit;
+                drawablePlaylistItem.AllowSelection = allowSelection;
+                drawablePlaylistItem.ShowItemOwner = showItemOwner;
+            });
         }
     }
 }
