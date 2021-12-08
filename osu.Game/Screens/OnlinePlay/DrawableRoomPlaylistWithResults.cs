@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly bool showItemOwner;
 
         public DrawableRoomPlaylistWithResults(bool showItemOwner = false)
-            : base(false, true, showItemOwner: showItemOwner)
+            : base(false, true, showItemOwner)
         {
             this.showItemOwner = showItemOwner;
         }

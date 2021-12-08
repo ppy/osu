@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
+using System;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
@@ -16,6 +15,11 @@ namespace osu.Game.Screens.OnlinePlay
     {
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
+        /// <summary>
+        /// Invoked when an item is requested to be deleted.
+        /// </summary>
+        public Action<PlaylistItem> DeletionRequested;
+
         private readonly bool allowEdit;
         private readonly bool allowSelection;
         private readonly bool showItemOwner;
@@ -25,23 +29,6 @@ namespace osu.Game.Screens.OnlinePlay
             this.allowEdit = allowEdit;
             this.allowSelection = allowSelection;
             this.showItemOwner = showItemOwner;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // Scheduled since items are removed and re-added upon rearrangement
-            Items.CollectionChanged += (_, args) => Schedule(() =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Remove:
-                        if (allowSelection && args.OldItems.Contains(SelectedItem))
-                            SelectedItem.Value = null;
-                        break;
-                }
-            });
         }
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
@@ -57,20 +44,7 @@ namespace osu.Game.Screens.OnlinePlay
         protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection, showItemOwner)
         {
             SelectedItem = { BindTarget = SelectedItem },
-            RequestDeletion = requestDeletion
+            RequestDeletion = i => DeletionRequested?.Invoke(i)
         };
-
-        private void requestDeletion(PlaylistItem item)
-        {
-            if (allowSelection && SelectedItem.Value == item)
-            {
-                if (Items.Count == 1)
-                    SelectedItem.Value = null;
-                else
-                    SelectedItem.Value = Items.GetNext(item) ?? Items[^2];
-            }
-
-            Items.Remove(item);
-        }
     }
 }
