@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 //
                 // Where "<==>" represents a slider, and "x" represents where the cursor needs to be for either hitobject (for a slider, this is the lazy cursor position).
                 //
-                // The pattern (x--x) has distance JumpDistance.
+                // The pattern (x--x) has distance LazyJumpDistance.
                 // The pattern (>--x) is a new distance we'll call "tailJumpDistance".
                 //
                 // Case (1) is an anti-flow pattern, where players will cut the slider short in order to move to the next object. The most natural jump pattern is (x--x).
