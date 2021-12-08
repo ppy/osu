@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).Wait());
 
-            createPlaylist(beatmap);
+            createPlaylistWithBeatmaps(beatmap);
 
             assertDownloadButtonVisible(false);
 
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var byChecksum = CreateAPIBeatmap();
             byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
-            createPlaylist(byOnlineId, byChecksum);
+            createPlaylistWithBeatmaps(byOnlineId, byChecksum);
 
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadButton>().All(d => d.IsPresent));
         }
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             beatmap.BeatmapSet.HasExplicitContent = true;
 
-            createPlaylist(beatmap);
+            createPlaylistWithBeatmaps(beatmap);
         }
 
         [Test]
@@ -246,7 +246,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
                 () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
 
-        private void createPlaylist(Action<TestPlaylist> setupPlaylist)
+        private void createPlaylist(Action<TestPlaylist> setupPlaylist = null)
         {
             AddStep("create playlist", () =>
             {
@@ -256,6 +256,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300)
                 };
+
+                setupPlaylist?.Invoke(playlist);
 
                 for (int i = 0; i < 20; i++)
                 {
@@ -292,7 +294,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylist(params IBeatmapInfo[] beatmaps)
+        private void createPlaylistWithBeatmaps(params IBeatmapInfo[] beatmaps)
         {
             AddStep("create playlist", () =>
             {
