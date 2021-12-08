@@ -29,7 +29,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             Spacing = new Vector2(0, 2)
         };
 
-        protected override DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new QueuePlaylistItem(item);
+        protected override DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new QueuePlaylistItem(item)
+        {
+            Items = { BindTarget = Items }
+        };
 
         private class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
@@ -47,6 +50,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private class QueuePlaylistItem : DrawableRoomPlaylistItem
         {
+            public readonly IBindableList<PlaylistItem> Items = new BindableList<PlaylistItem>();
+
             [Resolved]
             private IAPIProvider api { get; set; }
 
@@ -55,9 +60,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
             [Resolved(typeof(Room), nameof(Room.QueueMode))]
             private Bindable<QueueMode> queueMode { get; set; }
-
-            [Resolved(typeof(Room), nameof(Room.Playlist))]
-            private BindableList<PlaylistItem> playlist { get; set; }
 
             public QueuePlaylistItem(PlaylistItem item)
                 : base(item)
@@ -70,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID);
 
-                playlist.BindCollectionChanged((_, __) => updateDeleteButtonVisibility());
+                Items.BindCollectionChanged((_, __) => updateDeleteButtonVisibility());
                 queueMode.BindValueChanged(_ => updateDeleteButtonVisibility());
                 SelectedItem.BindValueChanged(_ => updateDeleteButtonVisibility(), true);
             }
@@ -78,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             private void updateDeleteButtonVisibility()
             {
                 AllowDeletion = queueMode.Value != QueueMode.HostOnly
-                                && playlist.Count > 1
+                                && Items.Count > 1
                                 && Item.OwnerID == api.LocalUser.Value.OnlineID
                                 && SelectedItem.Value != Item;
             }
