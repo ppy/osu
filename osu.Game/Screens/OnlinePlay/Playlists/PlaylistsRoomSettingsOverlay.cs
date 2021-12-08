@@ -205,7 +205,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 {
                                                                     new Drawable[]
                                                                     {
-                                                                        playlist = new PlaylistsRoomPlaylist
+                                                                        playlist = new PlaylistsRoomSettingsPlaylist
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         }

@@ -6,9 +6,12 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Screens.OnlinePlay.Playlists
 {
-    public class PlaylistsRoomPlaylist : DrawableRoomPlaylist
+    /// <summary>
+    /// A <see cref="DrawableRoomPlaylist"/> which is displayed during the setup stage of a playlists room.
+    /// </summary>
+    public class PlaylistsRoomSettingsPlaylist : DrawableRoomPlaylist
     {
-        public PlaylistsRoomPlaylist()
+        public PlaylistsRoomSettingsPlaylist()
         {
             AllowReordering = true;
             AllowDeletion = true;

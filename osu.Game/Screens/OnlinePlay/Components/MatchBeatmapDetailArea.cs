@@ -44,7 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Bottom = 10 },
-                                Child = playlist = new PlaylistsRoomPlaylist
+                                Child = playlist = new PlaylistsRoomSettingsPlaylist
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     AllowSelection = true,
