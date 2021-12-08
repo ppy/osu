@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets
     {
         public RulesetInfo RulesetInfo { get; internal set; }
 
-        private static readonly ConcurrentDictionary<int, IMod[]> mod_reference_cache = new ConcurrentDictionary<int, IMod[]>();
+        private static readonly ConcurrentDictionary<string, IMod[]> mod_reference_cache = new ConcurrentDictionary<string, IMod[]>();
 
         /// <summary>
         /// A queryable source containing all available mods.
@@ -49,11 +49,12 @@ namespace osu.Game.Rulesets
         {
             get
             {
-                if (!(RulesetInfo.ID is int id))
+                // Is the case for many test usages.
+                if (string.IsNullOrEmpty(ShortName))
                     return CreateAllMods();
 
-                if (!mod_reference_cache.TryGetValue(id, out var mods))
-                    mod_reference_cache[id] = mods = CreateAllMods().Cast<IMod>().ToArray();
+                if (!mod_reference_cache.TryGetValue(ShortName, out var mods))
+                    mod_reference_cache[ShortName] = mods = CreateAllMods().Cast<IMod>().ToArray();
 
                 return mods;
             }
@@ -182,7 +183,7 @@ namespace osu.Game.Rulesets
             {
                 Name = Description,
                 ShortName = ShortName,
-                ID = (this as ILegacyRuleset)?.LegacyID,
+                OnlineID = (this as ILegacyRuleset)?.LegacyID ?? -1,
                 InstantiationInfo = GetType().GetInvariantInstantiationInfo(),
                 Available = true,
             };

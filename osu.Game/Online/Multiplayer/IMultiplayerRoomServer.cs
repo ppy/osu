@@ -76,5 +76,11 @@ namespace osu.Game.Online.Multiplayer
         /// <exception cref="NotJoinedRoomException">If the user is not in a room.</exception>
         /// <exception cref="InvalidStateException">If an attempt to start the game occurs when the game's (or users') state disallows it.</exception>
         Task StartMatch();
+
+        /// <summary>
+        /// Adds an item to the playlist.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
+        Task AddPlaylistItem(MultiplayerPlaylistItem item);
     }
 }

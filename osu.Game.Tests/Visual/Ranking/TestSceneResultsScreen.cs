@@ -338,7 +338,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 : base(score, true)
             {
                 Score.BeatmapInfo.OnlineID = 0;
-                Score.BeatmapInfo.Status = BeatmapSetOnlineStatus.Pending;
+                Score.BeatmapInfo.Status = BeatmapOnlineStatus.Pending;
             }
 
             protected override void LoadComplete()

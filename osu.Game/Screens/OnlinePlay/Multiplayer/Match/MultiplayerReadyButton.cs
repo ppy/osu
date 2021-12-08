@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
 using osuTK;
@@ -24,9 +23,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             set => button.Action = value;
         }
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -106,7 +102,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     break;
             }
 
-            bool enableButton = Room?.State == MultiplayerRoomState.Open && !operationInProgress.Value;
+            bool enableButton =
+                Room?.State == MultiplayerRoomState.Open
+                && Client.CurrentMatchPlayingItem.Value?.Expired == false
+                && !operationInProgress.Value;
 
             // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
             if (localUser?.State == MultiplayerUserState.Spectating)

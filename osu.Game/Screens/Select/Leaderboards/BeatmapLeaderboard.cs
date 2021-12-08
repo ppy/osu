@@ -65,9 +65,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScoreManager scoreManager { get; set; }
 
         [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
@@ -154,7 +151,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;

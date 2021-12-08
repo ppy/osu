@@ -38,7 +38,7 @@ jobs:
         run: dotnet build -c Debug -warnaserror osu.Desktop.slnf
 
       - name: Test
-        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --blame-crash --blame-hang --blame-hang-timeout 5m --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
+        run: dotnet test $pwd/*.Tests/bin/Debug/*/*.Tests.dll --logger "trx;LogFileName=TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx"
         shell: pwsh
 
       # Attempt to upload results even if test fails.
@@ -48,7 +48,7 @@ jobs:
         if: ${{ always() }}
         with:
           name: osu-test-results-${{matrix.os.prettyname}}-${{matrix.threadingMode}}
-          path: ${{github.workspace}}/TestResults/**/*
+          path: ${{github.workspace}}/TestResults/TestResults-${{matrix.os.prettyname}}-${{matrix.threadingMode}}.trx
 
   build-only-android:
     name: Build only (Android)
@@ -77,10 +77,6 @@ jobs:
         run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
 
   build-only-ios:
-    # While this workflow technically *can* run, it fails as iOS builds are blocked by multiple issues.
-    # See https://github.com/ppy/osu-framework/issues/4677 for the details.
-    # The job can be unblocked once those issues are resolved and game deployments can happen again.
-    if: false
     name: Build only (iOS)
     runs-on: macos-latest
     timeout-minutes: 60

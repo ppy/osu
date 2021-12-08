@@ -11,6 +11,7 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -76,7 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
             AddAssert("user state arrived", () => client.Room?.Users.FirstOrDefault()?.MatchState is TeamVersusUserState);
         }
 
@@ -119,6 +120,33 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSettingsUpdatedWhenChangingMatchType()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Type = { Value = MatchType.HeadToHead },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddUntilStep("match type head to head", () => client.APIRoom?.Type.Value == MatchType.HeadToHead);
+
+            AddStep("change match type", () => client.ChangeSettings(new MultiplayerRoomSettings
+            {
+                MatchType = MatchType.TeamVersus
+            }));
+
+            AddUntilStep("api room updated to team versus", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
+        }
+
+        [Test]
         public void TestChangeTypeViaMatchSettings()
         {
             createRoom(() => new Room
@@ -134,13 +162,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddAssert("room type is head to head", () => client.Room?.Settings.MatchType == MatchType.HeadToHead);
+            AddUntilStep("room type is head to head", () => client.Room?.Settings.MatchType == MatchType.HeadToHead);
 
             AddUntilStep("team displays are not displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam == null));
 
             AddStep("change to team vs", () => client.ChangeSettings(matchType: MatchType.TeamVersus));
 
-            AddAssert("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
+            AddUntilStep("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
 
             AddUntilStep("team displays are displaying teams", () => multiplayerScreenStack.ChildrenOfType<TeamDisplay>().All(d => d.DisplayedTeam != null));
         }
@@ -152,13 +180,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);
 
+            AddUntilStep("create room button enabled", () => this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single().Enabled.Value);
             AddStep("create room", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => client.Room != null);
+            AddUntilStep("wait for join", () => multiplayerScreenStack.RoomManager.RoomJoined);
         }
     }
 }

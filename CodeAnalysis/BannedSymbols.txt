@@ -8,4 +8,8 @@ M:osu.Framework.Graphics.Sprites.SpriteText.#ctor;Use OsuSpriteText.
 M:osu.Framework.Bindables.IBindableList`1.GetBoundCopy();Fails on iOS. Use manual ctor + BindTo instead. (see https://github.com/mono/mono/issues/19900)
 T:Microsoft.EntityFrameworkCore.Internal.EnumerableExtensions;Don't use internal extension methods.
 T:Microsoft.EntityFrameworkCore.Internal.TypeExtensions;Don't use internal extension methods.
+T:NuGet.Packaging.CollectionExtensions;Don't use internal extension methods.
 M:System.Enum.HasFlag(System.Enum);Use osu.Framework.Extensions.EnumExtensions.HasFlagFast<T>() instead.
+M:Realms.IRealmCollection`1.SubscribeForNotifications`1(Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IRealmCollection<T>,NotificationCallbackDelegate<T>) instead.
+M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Linq.IQueryable{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IQueryable<T>,NotificationCallbackDelegate<T>) instead.
+M:Realms.CollectionExtensions.SubscribeForNotifications`1(System.Collections.Generic.IList{``0},Realms.NotificationCallbackDelegate{``0});Use osu.Game.Database.RealmObjectExtensions.QueryAsyncWithNotifications(IList<T>,NotificationCallbackDelegate<T>) instead.
