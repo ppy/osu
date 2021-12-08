@@ -25,6 +25,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 using osu.Game.Stores;
+using Realms;
 using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
@@ -59,24 +60,22 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
 
-        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
+        public BeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, GameHost host = null)
+            : base(storage, contextFactory)
         {
             this.rulesets = rulesets;
 
-            beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-            beatmaps.ItemRemoved += b => WorkingBeatmapCache?.Invalidate(b);
-            beatmaps.ItemUpdated += obj => WorkingBeatmapCache?.Invalidate(obj);
+            // beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            // beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
+            // beatmaps.ItemRemoved += b => WorkingBeatmapCache?.Invalidate(b);
+            // beatmaps.ItemUpdated += obj => WorkingBeatmapCache?.Invalidate(obj);
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
-        protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
+        protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken)
         {
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet.Files));
