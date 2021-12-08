@@ -347,9 +347,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (Room.Settings.QueueMode == QueueMode.HostOnly)
                 throw new InvalidOperationException("Items cannot be removed in host-only mode.");
 
-            if (Room.Playlist.Count == 1)
-                throw new InvalidOperationException("The singular item in the room cannot be removed.");
-
             var item = serverSidePlaylist.Find(i => i.ID == playlistItemId);
 
             if (item == null)
@@ -362,7 +359,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 throw new InvalidOperationException("Attempted to remove an item which is not owned by the user.");
 
             if (item.Expired)
-                throw new InvalidOperationException("Attempted to remove an item which has already been played");
+                throw new InvalidOperationException("Attempted to remove an item which has already been played.");
 
             serverSidePlaylist.Remove(item);
             await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItemId).ConfigureAwait(false);
@@ -471,11 +468,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await updatePlaylistOrder(Room).ConfigureAwait(false);
         }
 
+        private IEnumerable<MultiplayerPlaylistItem> upcomingItems => serverSidePlaylist.Where(i => !i.Expired).OrderBy(i => i.PlaylistOrder);
+
         private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
         {
             // Pick the next non-expired playlist item by playlist order, or default to the most-recently-expired item.
-            MultiplayerPlaylistItem nextItem = serverSidePlaylist.Where(i => !i.Expired).OrderBy(i => i.PlaylistOrder).FirstOrDefault()
-                                               ?? serverSidePlaylist.OrderByDescending(i => i.PlayedAt).First();
+            MultiplayerPlaylistItem nextItem = upcomingItems.FirstOrDefault() ?? serverSidePlaylist.OrderByDescending(i => i.PlayedAt).First();
 
             currentIndex = serverSidePlaylist.IndexOf(nextItem);
 
