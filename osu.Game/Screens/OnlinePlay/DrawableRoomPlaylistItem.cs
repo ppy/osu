@@ -40,10 +40,29 @@ namespace osu.Game.Screens.OnlinePlay
         public const float HEIGHT = 50;
         public const float ICON_HEIGHT = 34;
 
+        /// <summary>
+        /// Invoked when this item requests to be deleted.
+        /// </summary>
         public Action<PlaylistItem> RequestDeletion;
+
+        /// <summary>
+        /// Invoked when this item requests its results to be shown.
+        /// </summary>
         public Action<PlaylistItem> ShowResultsRequested;
 
+        /// <summary>
+        /// The currently-selected item, used to show a border around this item.
+        /// May be updated by this item if <see cref="AllowSelection"/> is <c>true</c>.
+        /// </summary>
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
+        public readonly PlaylistItem Item;
+
+        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
+        private readonly IBindable<bool> valid = new Bindable<bool>();
+        private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
+        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
+        private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
 
         private Container maskingContainer;
         private Container difficultyIconContainer;
@@ -55,14 +74,8 @@ namespace osu.Game.Screens.OnlinePlay
         private UpdateableAvatar ownerAvatar;
         private Drawable removeButton;
         private Drawable showResultsButton;
-
-        private readonly IBindable<bool> valid = new Bindable<bool>();
-
-        private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
-        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
-        private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
-
-        public readonly PlaylistItem Item;
+        private PanelBackground panelBackground;
+        private FillFlowContainer mainFillFlow;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -72,12 +85,6 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
-
-        private PanelBackground panelBackground;
-
-        private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
-
-        private FillFlowContainer mainFillFlow;
 
         protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
 
@@ -157,8 +164,14 @@ namespace osu.Game.Screens.OnlinePlay
             refresh();
         }
 
+        /// <summary>
+        /// Whether this item can be selected.
+        /// </summary>
         public bool AllowSelection { get; set; }
 
+        /// <summary>
+        /// Whether this item can be reordered in the playlist.
+        /// </summary>
         public bool AllowReordering
         {
             get => ShowDragHandle.Value;
@@ -167,6 +180,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         private bool allowDeletion;
 
+        /// <summary>
+        /// Whether this item can be deleted.
+        /// </summary>
         public bool AllowDeletion
         {
             get => allowDeletion;
@@ -181,6 +197,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         private bool allowShowingResults;
 
+        /// <summary>
+        /// Whether this item can have results shown.
+        /// </summary>
         public bool AllowShowingResults
         {
             get => allowShowingResults;
@@ -195,6 +214,9 @@ namespace osu.Game.Screens.OnlinePlay
 
         private bool showItemOwner;
 
+        /// <summary>
+        /// Whether to display the avatar of the user which owns this playlist item.
+        /// </summary>
         public bool ShowItemOwner
         {
             get => showItemOwner;
