@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -53,6 +52,7 @@ namespace osu.Game.Screens.OnlinePlay
         private ModDisplay modDisplay;
         private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
+        private Drawable removeButton;
 
         private readonly IBindable<bool> valid = new Bindable<bool>();
 
@@ -75,30 +75,19 @@ namespace osu.Game.Screens.OnlinePlay
 
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
 
-        private readonly bool allowEdit;
-        private readonly bool allowSelection;
-        private readonly bool showItemOwner;
-
         private FillFlowContainer mainFillFlow;
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || !allowSelection || SelectedItem.Value == Model;
+        protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
 
-        public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection, bool showItemOwner)
+        public DrawableRoomPlaylistItem(PlaylistItem item)
             : base(item)
         {
             Item = item;
-
-            // TODO: edit support should be moved out into a derived class
-            this.allowEdit = allowEdit;
-            this.allowSelection = allowSelection;
-            this.showItemOwner = showItemOwner;
 
             beatmap.BindTo(item.Beatmap);
             valid.BindTo(item.Valid);
             ruleset.BindTo(item.Ruleset);
             requiredMods.BindTo(item.RequiredMods);
-
-            ShowDragHandle.Value = allowEdit;
 
             if (item.Expired)
                 Colour = OsuColour.Gray(0.5f);
@@ -107,9 +96,6 @@ namespace osu.Game.Screens.OnlinePlay
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (!allowEdit)
-                HandleColour = HandleColour.Opacity(0);
-
             maskingContainer.BorderColour = colours.Yellow;
         }
 
@@ -167,6 +153,42 @@ namespace osu.Game.Screens.OnlinePlay
             };
 
             refresh();
+        }
+
+        public bool AllowSelection { get; set; }
+
+        public bool AllowReordering
+        {
+            get => ShowDragHandle.Value;
+            set => ShowDragHandle.Value = value;
+        }
+
+        private bool allowDeletion;
+
+        public bool AllowDeletion
+        {
+            get => allowDeletion;
+            set
+            {
+                allowDeletion = value;
+
+                if (removeButton != null)
+                    removeButton.Alpha = value ? 1 : 0;
+            }
+        }
+
+        private bool showItemOwner;
+
+        public bool ShowItemOwner
+        {
+            get => showItemOwner;
+            set
+            {
+                showItemOwner = value;
+
+                if (ownerAvatar != null)
+                    ownerAvatar.Alpha = value ? 1 : 0;
+            }
         }
 
         private void refresh()
@@ -336,7 +358,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     Margin = new MarginPadding { Right = 8 },
                                     Masking = true,
                                     CornerRadius = 4,
-                                    Alpha = showItemOwner ? 1 : 0
+                                    Alpha = ShowItemOwner ? 1 : 0
                                 },
                             }
                         }
@@ -349,11 +371,11 @@ namespace osu.Game.Screens.OnlinePlay
             new[]
             {
                 Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
-                new PlaylistRemoveButton
+                removeButton = new PlaylistRemoveButton
                 {
                     Size = new Vector2(30, 30),
-                    Alpha = allowEdit ? 1 : 0,
-                    Action = () => RequestDeletion?.Invoke(Model),
+                    Alpha = AllowDeletion ? 1 : 0,
+                    Action = () => RequestDeletion?.Invoke(Item),
                 },
             };
 
@@ -374,7 +396,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (allowSelection && valid.Value)
+            if (AllowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
         }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -15,15 +16,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     /// </summary>
     public class MultiplayerHistoryList : DrawableRoomPlaylist
     {
-        public MultiplayerHistoryList()
-            : base(false, false, true)
-        {
-        }
-
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new HistoryFillFlowContainer
         {
             Spacing = new Vector2(0, 2)
         };
+
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item)
+            => base.CreateOsuDrawable(item).With(d => ((DrawableRoomPlaylistItem)d).ShowItemOwner = true);
 
         private class HistoryFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {

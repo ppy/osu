@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             PlaylistItem selectedItem = null;
 
-            createPlaylist(true, true);
+            createPlaylist();
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestNextItemSelectedAfterDeletion()
         {
-            createPlaylist(true, true);
+            createPlaylist();
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestLastItemSelectedAfterLastItemDeleted()
         {
-            createPlaylist(true, true);
+            createPlaylist();
 
             AddWaitStep("wait for flow", 5); // Items may take 1 update frame to flow. A wait count of 5 is guaranteed to result in the flow being updated as desired.
             AddStep("scroll to bottom", () => playlist.ChildrenOfType<ScrollContainer<Drawable>>().First().ScrollToEnd(false));
@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSelectionResetWhenAllItemsDeleted()
         {
-            createPlaylist(true, true);
+            createPlaylist();
 
             AddStep("remove all but one item", () =>
             {
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         // [Test]
         public void TestNextItemSelectedAfterExternalDeletion()
         {
-            createPlaylist(true, true);
+            createPlaylist();
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestChangeBeatmapAndRemove()
         {
-            createPlaylist(true, true);
+            createPlaylist();
 
             AddStep("change beatmap of first item", () => playlist.Items[0].BeatmapID = 30);
             moveToDeleteButton(0);
@@ -129,11 +129,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0), offset);
         });
 
-        private void createPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
+        private void createPlaylist()
         {
             AddStep("create playlist", () =>
             {
-                Child = playlist = new TestPlaylist(allowEdit, allowSelection, showItemOwner)
+                Child = playlist = new TestPlaylist
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -179,8 +179,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             public new IReadOnlyDictionary<PlaylistItem, RearrangeableListItem<PlaylistItem>> ItemMap => base.ItemMap;
 
-            public TestPlaylist(bool allowEdit, bool allowSelection, bool showItemOwner = false)
-                : base(allowEdit, allowSelection, showItemOwner)
+            public TestPlaylist()
+                : base(true, true, true)
             {
             }
         }

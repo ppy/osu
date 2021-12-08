@@ -248,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     Spacing = new Vector2(5),
                                                     Children = new Drawable[]
                                                     {
-                                                        drawablePlaylist = new DrawableRoomPlaylist(false, false)
+                                                        drawablePlaylist = new DrawableRoomPlaylist
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT
