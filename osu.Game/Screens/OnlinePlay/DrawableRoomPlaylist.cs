@@ -26,12 +26,12 @@ namespace osu.Game.Screens.OnlinePlay
         /// <summary>
         /// Invoked when an item is requested to be deleted.
         /// </summary>
-        public Action<PlaylistItem> DeletionRequested;
+        public Action<PlaylistItem> RequestDeletion;
 
         /// <summary>
         /// Invoked when an item requests its results to be shown.
         /// </summary>
-        public Action<PlaylistItem> ShowResultsRequested;
+        public Action<PlaylistItem> RequestResults;
 
         private bool allowReordering;
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         /// <summary>
         /// Whether to allow deleting items from the playlist.
-        /// If <c>true</c>, requests to delete items may be satisfied via <see cref="DeletionRequested"/>.
+        /// If <c>true</c>, requests to delete items may be satisfied via <see cref="RequestDeletion"/>.
         /// </summary>
         public bool AllowDeletion
         {
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         /// <summary>
         /// Whether to allow items to request their results to be shown.
-        /// If <c>true</c>, requests to show the results may be satisfied via <see cref="ShowResultsRequested"/>.
+        /// If <c>true</c>, requests to show the results may be satisfied via <see cref="RequestResults"/>.
         /// </summary>
         public bool AllowShowingResults
         {
@@ -134,13 +134,13 @@ namespace osu.Game.Screens.OnlinePlay
         protected sealed override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => CreateDrawablePlaylistItem(item).With(d =>
         {
             d.SelectedItem.BindTarget = SelectedItem;
-            d.RequestDeletion = i => DeletionRequested?.Invoke(i);
+            d.RequestDeletion = i => RequestDeletion?.Invoke(i);
             d.AllowReordering = AllowReordering;
             d.AllowDeletion = AllowDeletion;
             d.AllowSelection = AllowSelection;
             d.AllowShowingResults = AllowShowingResults;
             d.ShowItemOwner = ShowItemOwners;
-            d.ShowResultsRequested = i => ShowResultsRequested?.Invoke(i);
+            d.RequestResults = i => RequestResults?.Invoke(i);
         });
 
         protected virtual DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new DrawableRoomPlaylistItem(item);

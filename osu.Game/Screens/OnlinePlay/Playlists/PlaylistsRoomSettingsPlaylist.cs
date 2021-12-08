@@ -16,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             AllowReordering = true;
             AllowDeletion = true;
 
-            DeletionRequested = item =>
+            RequestDeletion = item =>
             {
                 var nextItem = Items.GetNext(item);
 
