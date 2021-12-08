@@ -86,8 +86,6 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Color4 SelectionColour => selectionColour;
 
-        private void playTextAddedSample() => textAddedSamples[RNG.Next(0, textAddedSamples.Length)]?.Play();
-
         protected override void OnUserTextAdded(string added)
         {
             base.OnUserTextAdded(added);
@@ -207,6 +205,8 @@ namespace osu.Game.Graphics.UserInterface
             CaretWidth = CaretWidth,
             SelectionColour = SelectionColour,
         };
+
+        private void playTextAddedSample() => textAddedSamples[RNG.Next(0, textAddedSamples.Length)]?.Play();
 
         private class OsuCaret : Caret
         {
