@@ -309,31 +309,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
 
+            bool isNewAddition = item.ID == 0;
+
             if (Room.Settings.QueueMode == QueueMode.HostOnly && Room.Host?.UserID != LocalUser?.UserID)
                 throw new InvalidOperationException("Local user is not the room host.");
 
             item.OwnerID = userId;
 
-            switch (Room.Settings.QueueMode)
+            if (isNewAddition)
             {
-                case QueueMode.HostOnly:
-                    // In host-only mode, the current item is re-used.
-                    item.ID = currentItem.ID;
-                    item.PlaylistOrder = currentItem.PlaylistOrder;
+                await addItem(item).ConfigureAwait(false);
+                await updateCurrentItem(Room).ConfigureAwait(false);
+            }
+            else
+            {
+                var existingItem = serverSidePlaylist.SingleOrDefault(i => i.ID == item.ID);
 
-                    serverSidePlaylist[currentIndex] = item;
-                    await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
+                if (existingItem == null)
+                    throw new InvalidOperationException("Attempted to change an item that doesn't exist.");
 
-                    // Note: Unlike the server, this is the easiest way to update the current item at this point.
-                    await updateCurrentItem(Room, false).ConfigureAwait(false);
-                    break;
+                if (existingItem.OwnerID != userId && Room.Host?.UserID != LocalUser?.UserID)
+                    throw new InvalidOperationException("Attempted to change an item which is not owned by the user.");
 
-                default:
-                    await addItem(item).ConfigureAwait(false);
+                if (existingItem.Expired)
+                    throw new InvalidOperationException("Attempted to change an item which has already been played.");
 
-                    // The current item can change as a result of an item being added. For example, if all items earlier in the queue were expired.
-                    await updateCurrentItem(Room).ConfigureAwait(false);
-                    break;
+                // Ensure the playlist order doesn't change.
+                item.PlaylistOrder = existingItem.PlaylistOrder;
+
+                serverSidePlaylist[serverSidePlaylist.IndexOf(existingItem)] = item;
+                await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
             }
         }
 
