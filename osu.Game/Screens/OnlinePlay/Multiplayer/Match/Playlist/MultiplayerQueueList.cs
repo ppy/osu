@@ -18,8 +18,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     public class MultiplayerQueueList : DrawableRoomPlaylist
     {
         public MultiplayerQueueList()
-            : base(false, false, true)
         {
+            ShowItemOwners = true;
         }
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new QueueFillFlowContainer

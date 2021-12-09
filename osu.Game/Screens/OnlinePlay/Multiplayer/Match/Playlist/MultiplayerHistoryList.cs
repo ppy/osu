@@ -16,8 +16,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     public class MultiplayerHistoryList : DrawableRoomPlaylist
     {
         public MultiplayerHistoryList()
-            : base(false, false, true)
         {
+            ShowItemOwners = true;
         }
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new HistoryFillFlowContainer
