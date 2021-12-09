@@ -82,5 +82,11 @@ namespace osu.Game.Online.Multiplayer
         /// </summary>
         /// <param name="item">The item to add.</param>
         Task AddPlaylistItem(MultiplayerPlaylistItem item);
+
+        /// <summary>
+        /// Removes an item from the playlist.
+        /// </summary>
+        /// <param name="playlistItemId">The item to remove.</param>
+        Task RemovePlaylistItem(long playlistItemId);
     }
 }
