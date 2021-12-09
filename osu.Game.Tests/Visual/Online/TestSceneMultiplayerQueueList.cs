@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep($"move mouse to delete button {index}", () =>
             {
                 item = playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index);
-                InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(0).RemoveButton);
+                InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0));
             });
 
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -164,6 +164,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private void assertDeleteButtonVisibility(int index, bool visible)
             => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible",
-                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(index).RemoveButton.Alpha > 0) == visible);
+                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(index).Alpha > 0) == visible);
     }
 }
