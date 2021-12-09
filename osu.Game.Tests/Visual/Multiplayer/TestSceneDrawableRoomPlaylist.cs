@@ -62,7 +62,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEditable()
         {
-            createPlaylist(p => p.AllowReordering = p.AllowDeletion = true);
+            createPlaylist(p =>
+            {
+                p.AllowReordering = true;
+                p.AllowDeletion = true;
+            });
 
             moveToItem(0);
             assertHandleVisibility(0, true);
@@ -75,7 +79,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestMarkInvalid()
         {
-            createPlaylist(p => p.AllowReordering = p.AllowDeletion = p.AllowSelection = true);
+            createPlaylist(p =>
+            {
+                p.AllowReordering = true;
+                p.AllowDeletion = true;
+                p.AllowSelection = true;
+            });
 
             AddStep("mark item 0 as invalid", () => playlist.Items[0].MarkInvalid());
 
@@ -102,7 +111,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestEditableSelectable()
         {
-            createPlaylist(p => p.AllowReordering = p.AllowDeletion = p.AllowSelection = true);
+            createPlaylist(p =>
+            {
+                p.AllowReordering = true;
+                p.AllowDeletion = true;
+                p.AllowSelection = true;
+            });
 
             moveToItem(0);
             assertHandleVisibility(0, true);
@@ -116,7 +130,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestSelectionNotLostAfterRearrangement()
         {
-            createPlaylist(p => p.AllowReordering = p.AllowDeletion = p.AllowSelection = true);
+            createPlaylist(p =>
+            {
+                p.AllowReordering = true;
+                p.AllowDeletion = true;
+                p.AllowSelection = true;
+            });
 
             moveToItem(0);
             AddStep("click", () => InputManager.Click(MouseButton.Left));

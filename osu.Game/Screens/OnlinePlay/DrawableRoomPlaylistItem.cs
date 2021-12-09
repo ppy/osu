@@ -38,7 +38,8 @@ namespace osu.Game.Screens.OnlinePlay
     public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
     {
         public const float HEIGHT = 50;
-        public const float ICON_HEIGHT = 34;
+
+        private const float icon_height = 34;
 
         /// <summary>
         /// Invoked when this item requests to be deleted.
@@ -238,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             if (Item.Beatmap.Value != null)
-                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(ICON_HEIGHT) };
+                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(icon_height) };
             else
                 difficultyIconContainer.Clear();
 
@@ -392,7 +393,7 @@ namespace osu.Game.Screens.OnlinePlay
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Size = new Vector2(ICON_HEIGHT),
+                                    Size = new Vector2(icon_height),
                                     Margin = new MarginPadding { Right = 8 },
                                     Masking = true,
                                     CornerRadius = 4,
@@ -405,22 +406,21 @@ namespace osu.Game.Screens.OnlinePlay
             };
         }
 
-        private IEnumerable<Drawable> createButtons() =>
-            new[]
+        private IEnumerable<Drawable> createButtons() => new[]
+        {
+            showResultsButton = new ShowResultsButton
             {
-                showResultsButton = new ShowResultsButton
-                {
-                    Action = () => RequestResults?.Invoke(Item),
-                    Alpha = AllowShowingResults ? 1 : 0,
-                },
-                Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
-                removeButton = new PlaylistRemoveButton
-                {
-                    Size = new Vector2(30, 30),
-                    Alpha = AllowDeletion ? 1 : 0,
-                    Action = () => RequestDeletion?.Invoke(Item),
-                },
-            };
+                Action = () => RequestResults?.Invoke(Item),
+                Alpha = AllowShowingResults ? 1 : 0,
+            },
+            Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
+            removeButton = new PlaylistRemoveButton
+            {
+                Size = new Vector2(30, 30),
+                Alpha = AllowDeletion ? 1 : 0,
+                Action = () => RequestDeletion?.Invoke(Item),
+            },
+        };
 
         public class PlaylistRemoveButton : GrayButton
         {

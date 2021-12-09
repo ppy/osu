@@ -13,13 +13,13 @@ using osuTK;
 namespace osu.Game.Screens.OnlinePlay
 {
     /// <summary>
-    /// A list scrollable list which displays the <see cref="PlaylistItem"/>s in a <see cref="Room"/>.
+    /// A scrollable list which displays the <see cref="PlaylistItem"/>s in a <see cref="Room"/>.
     /// </summary>
     public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>
     {
         /// <summary>
-        /// The currently-selected item, used to show a border around items.
-        /// May be updated by playlist items if <see cref="AllowSelection"/> is <c>true</c>.
+        /// The currently-selected item. Selection is visually represented with a border.
+        /// May be updated by clicking playlist items if <see cref="AllowSelection"/> is <c>true</c>.
         /// </summary>
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
