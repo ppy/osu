@@ -7,6 +7,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osuTK;
 
@@ -27,6 +30,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             Spacing = new Vector2(0, 2)
         };
 
+        protected override DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new QueuePlaylistItem(item);
+
         private class QueueFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
             [Resolved(typeof(Room), nameof(Room.Playlist))]
@@ -39,6 +44,43 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             }
 
             public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.OfType<RearrangeableListItem<PlaylistItem>>().OrderBy(item => item.Model.PlaylistOrder);
+        }
+
+        private class QueuePlaylistItem : DrawableRoomPlaylistItem
+        {
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            [Resolved]
+            private MultiplayerClient multiplayerClient { get; set; }
+
+            [Resolved(typeof(Room), nameof(Room.Host))]
+            private Bindable<APIUser> host { get; set; }
+
+            [Resolved(typeof(Room), nameof(Room.QueueMode))]
+            private Bindable<QueueMode> queueMode { get; set; }
+
+            public QueuePlaylistItem(PlaylistItem item)
+                : base(item)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID);
+
+                host.BindValueChanged(_ => updateDeleteButtonVisibility());
+                queueMode.BindValueChanged(_ => updateDeleteButtonVisibility());
+                SelectedItem.BindValueChanged(_ => updateDeleteButtonVisibility(), true);
+            }
+
+            private void updateDeleteButtonVisibility()
+            {
+                AllowDeletion = (Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost)
+                                && SelectedItem.Value != Item;
+            }
         }
     }
 }

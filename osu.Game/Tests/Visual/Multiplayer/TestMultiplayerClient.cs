@@ -339,6 +339,36 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item) => AddUserPlaylistItem(api.LocalUser.Value.OnlineID, item);
 
+        public async Task RemoveUserPlaylistItem(int userId, long playlistItemId)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(APIRoom != null);
+
+            if (Room.Settings.QueueMode == QueueMode.HostOnly)
+                throw new InvalidOperationException("Items cannot be removed in host-only mode.");
+
+            var item = serverSidePlaylist.Find(i => i.ID == playlistItemId);
+
+            if (item == null)
+                throw new InvalidOperationException("Item does not exist in the room.");
+
+            if (item == currentItem)
+                throw new InvalidOperationException("The room's current item cannot be removed.");
+
+            if (item.OwnerID != userId)
+                throw new InvalidOperationException("Attempted to remove an item which is not owned by the user.");
+
+            if (item.Expired)
+                throw new InvalidOperationException("Attempted to remove an item which has already been played.");
+
+            serverSidePlaylist.Remove(item);
+            await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItemId).ConfigureAwait(false);
+
+            await updateCurrentItem(Room).ConfigureAwait(false);
+        }
+
+        public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, playlistItemId);
+
         protected override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
         {
             IBeatmapSetInfo? set = roomManager.ServerSideRooms.SelectMany(r => r.Playlist)
@@ -438,11 +468,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await updatePlaylistOrder(Room).ConfigureAwait(false);
         }
 
+        private IEnumerable<MultiplayerPlaylistItem> upcomingItems => serverSidePlaylist.Where(i => !i.Expired).OrderBy(i => i.PlaylistOrder);
+
         private async Task updateCurrentItem(MultiplayerRoom room, bool notify = true)
         {
             // Pick the next non-expired playlist item by playlist order, or default to the most-recently-expired item.
-            MultiplayerPlaylistItem nextItem = serverSidePlaylist.Where(i => !i.Expired).OrderBy(i => i.PlaylistOrder).FirstOrDefault()
-                                               ?? serverSidePlaylist.OrderByDescending(i => i.PlayedAt).First();
+            MultiplayerPlaylistItem nextItem = upcomingItems.FirstOrDefault() ?? serverSidePlaylist.OrderByDescending(i => i.PlayedAt).First();
 
             currentIndex = serverSidePlaylist.IndexOf(nextItem);
 
