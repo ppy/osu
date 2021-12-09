@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void moveToDeleteButton(int index, Vector2? offset = null) => AddStep($"move mouse to delete button {index}", () =>
         {
             var item = playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index);
-            InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0), offset);
+            InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(0).RemoveButton, offset);
         });
 
         private void createPlaylist()
