@@ -248,6 +248,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("owner visible", () => playlist.ChildrenOfType<UpdateableAvatar>().All(a => a.IsPresent == withOwner));
         }
 
+        [Test]
+        public void TestWithAllButtonsEnabled()
+        {
+            createPlaylist(p =>
+            {
+                p.AllowDeletion = true;
+                p.AllowShowingResults = true;
+            });
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
 
@@ -263,7 +273,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void assertDeleteButtonVisibility(int index, bool visible)
             => AddAssert($"delete button {index} {(visible ? "is" : "is not")} visible",
-                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(2 + index * 2).Alpha > 0) == visible);
+                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(2 + index * 2).RemoveButton.Alpha > 0) == visible);
 
         private void createPlaylist(Action<TestPlaylist> setupPlaylist = null)
         {
