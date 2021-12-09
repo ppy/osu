@@ -330,6 +330,21 @@ namespace osu.Game.Screens.Select
                 addInfoLabels();
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                mods.BindValueChanged(m =>
+                {
+                    settingChangeTracker?.Dispose();
+
+                    refreshBPMLabel();
+
+                    settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
+                    settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
+                }, true);
+            }
+
             private void setMetadata(string source)
             {
                 ArtistLabel.Text = artistBinding.Value;
@@ -360,16 +375,6 @@ namespace osu.Game.Screens.Select
                         Children = getRulesetInfoLabels()
                     }
                 };
-
-                mods.BindValueChanged(m =>
-                {
-                    settingChangeTracker?.Dispose();
-
-                    refreshBPMLabel();
-
-                    settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
-                    settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
-                }, true);
             }
 
             private InfoLabel[] getRulesetInfoLabels()
