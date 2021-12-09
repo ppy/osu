@@ -24,17 +24,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        private readonly PlaylistItem itemToEdit;
+
         private LoadingLayer loadingLayer;
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
         /// </summary>
         /// <param name="room">The room.</param>
+        /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
         /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
         /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+        public MultiplayerMatchSongSelect(Room room, PlaylistItem itemToEdit = null, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
             : base(room)
         {
+            this.itemToEdit = itemToEdit;
+
             if (beatmap != null || ruleset != null)
             {
                 Schedule(() =>
@@ -61,6 +66,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 client.AddPlaylistItem(new MultiplayerPlaylistItem
                 {
+                    ID = itemToEdit?.ID ?? 0,
                     BeatmapID = item.BeatmapID,
                     BeatmapChecksum = item.Beatmap.Value.MD5Hash,
                     RulesetID = item.RulesetID,
