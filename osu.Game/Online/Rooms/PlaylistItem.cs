@@ -113,7 +113,7 @@ namespace osu.Game.Online.Rooms
         }
 
         public bool ShouldSerializeID() => false;
-        public bool ShouldSerializeapiBeatmap() => false;
+        public bool ShouldSerializeAPIBeatmap() => false;
 
         public bool Equals(PlaylistItem other)
             => ID == other?.ID
