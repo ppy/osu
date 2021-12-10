@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges.Events;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
@@ -37,6 +38,17 @@ namespace osu.Game.Rulesets.Osu
             if ((e is MouseMoveEvent || e is TouchMoveEvent) && !AllowUserCursorMovement) return false;
 
             return base.Handle(e);
+        }
+
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
+        {
+            if (!AllowUserCursorMovement)
+            {
+                // Still allow for forwarding of the "touch" part, but block the positional data.
+                e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, null);
+            }
+
+            return base.HandleMouseTouchStateChange(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
