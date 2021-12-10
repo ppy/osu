@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
     public abstract class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
         [Cached(typeof(IBindable<PlaylistItem>))]
-        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool? AllowTrackAdjustments => true;
 

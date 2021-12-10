@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -66,8 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
@@ -147,7 +146,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     new MultiplayerPlaylist
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        RequestEdit = OpenSongSelection
+                                        RequestEdit = item => OpenSongSelection(item.ID)
                                     }
                                 },
                                 new[]
@@ -224,7 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Opens the song selection screen to add or edit an item.
         /// </summary>
         /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
-        internal void OpenSongSelection([CanBeNull] PlaylistItem itemToEdit = null)
+        internal void OpenSongSelection(long? itemToEdit = null)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -389,9 +388,46 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
+            updateCurrentItem();
+
             addItemButton.Alpha = client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
+        }
+
+        private void updateCurrentItem()
+        {
+            Debug.Assert(client.Room != null);
+
+            var expectedSelectedItem = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
+
+            if (expectedSelectedItem == null)
+                return;
+
+            if (SelectedItem.Value?.Equals(expectedSelectedItem) == true && expectedSelectedItem.Beatmap.Value != null)
+                return;
+
+            SelectedItem.Value = null;
+
+            if (expectedSelectedItem.Beatmap.Value == null)
+            {
+                Task.Run(async () =>
+                {
+                    var beatmap = await client.GetAPIBeatmap(expectedSelectedItem.BeatmapID).ConfigureAwait(false);
+
+                    Schedule(() =>
+                    {
+                        expectedSelectedItem.Beatmap.Value = beatmap;
+
+                        if (Room.Playlist.SingleOrDefault(i => i.ID == client.Room?.Settings.PlaylistItemId)?.Equals(expectedSelectedItem) == true)
+                            applyCurrentItem();
+                    });
+                });
+            }
+            else
+                applyCurrentItem();
+
+            void applyCurrentItem() => SelectedItem.Value = expectedSelectedItem;
         }
 
         private void handleRoomLost() => Schedule(() =>
@@ -446,6 +482,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!this.IsCurrentScreen())
                 return;
 
+            if (client.Room == null)
+                return;
+
             if (!client.IsHost)
             {
                 // todo: should handle this when the request queue is implemented.
@@ -454,7 +493,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            this.Push(new MultiplayerMatchSongSelect(Room, SelectedItem.Value, beatmap, ruleset));
+            this.Push(new MultiplayerMatchSongSelect(Room, client.Room.Settings.PlaylistItemId, beatmap, ruleset));
         }
 
         protected override void Dispose(bool isDisposing)
