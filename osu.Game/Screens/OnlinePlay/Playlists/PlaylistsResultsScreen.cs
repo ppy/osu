@@ -186,12 +186,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Schedule(() =>
                     {
                         // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
+                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.OnlineID == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
                     });
                 }
 
                 // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-                callback.Invoke(scoreInfos.Where(s => s.OnlineScoreID != Score?.OnlineScoreID));
+                callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
 
                 hideLoadingSpinners(pivot);
             }));

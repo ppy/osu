@@ -66,6 +66,6 @@ namespace osu.Game.Scoring
 
         protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
             => base.CheckLocalAvailability(model, items)
-               || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
+               || (model.OnlineID > 0 && items.Any(i => i.OnlineID == model.OnlineID));
     }
 }

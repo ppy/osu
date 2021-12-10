@@ -237,8 +237,8 @@ namespace osu.Game.Scoring
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineScoreID.HasValue && other.OnlineScoreID.HasValue)
-                return OnlineScoreID == other.OnlineScoreID;
+            if (OnlineID > 0)
+                return OnlineID == other.OnlineID;
 
             if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
                 return Hash == other.Hash;
