@@ -416,8 +416,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Enter song select", () =>
             {
                 var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerScreenStack.CurrentScreen).CurrentSubScreen;
-
-                ((MultiplayerMatchSubScreen)currentSubScreen).SelectBeatmap();
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(client.CurrentMatchPlayingItem.Value);
             });
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);

@@ -314,38 +314,45 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             item.OwnerID = userId;
 
-            switch (Room.Settings.QueueMode)
-            {
-                case QueueMode.HostOnly:
-                    // In host-only mode, the current item is re-used.
-                    item.ID = currentItem.ID;
-                    item.PlaylistOrder = currentItem.PlaylistOrder;
-
-                    serverSidePlaylist[currentIndex] = item;
-                    await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
-
-                    // Note: Unlike the server, this is the easiest way to update the current item at this point.
-                    await updateCurrentItem(Room, false).ConfigureAwait(false);
-                    break;
-
-                default:
-                    await addItem(item).ConfigureAwait(false);
-
-                    // The current item can change as a result of an item being added. For example, if all items earlier in the queue were expired.
-                    await updateCurrentItem(Room).ConfigureAwait(false);
-                    break;
-            }
+            await addItem(item).ConfigureAwait(false);
+            await updateCurrentItem(Room).ConfigureAwait(false);
         }
 
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item) => AddUserPlaylistItem(api.LocalUser.Value.OnlineID, item);
+
+        public async Task EditUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(APIRoom != null);
+            Debug.Assert(currentItem != null);
+
+            item.OwnerID = userId;
+
+            var existingItem = serverSidePlaylist.SingleOrDefault(i => i.ID == item.ID);
+
+            if (existingItem == null)
+                throw new InvalidOperationException("Attempted to change an item that doesn't exist.");
+
+            if (existingItem.OwnerID != userId && Room.Host?.UserID != LocalUser?.UserID)
+                throw new InvalidOperationException("Attempted to change an item which is not owned by the user.");
+
+            if (existingItem.Expired)
+                throw new InvalidOperationException("Attempted to change an item which has already been played.");
+
+            // Ensure the playlist order doesn't change.
+            item.PlaylistOrder = existingItem.PlaylistOrder;
+
+            serverSidePlaylist[serverSidePlaylist.IndexOf(existingItem)] = item;
+
+            await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
+        }
+
+        public override Task EditPlaylistItem(MultiplayerPlaylistItem item) => EditUserPlaylistItem(api.LocalUser.Value.OnlineID, item);
 
         public async Task RemoveUserPlaylistItem(int userId, long playlistItemId)
         {
             Debug.Assert(Room != null);
             Debug.Assert(APIRoom != null);
-
-            if (Room.Settings.QueueMode == QueueMode.HostOnly)
-                throw new InvalidOperationException("Items cannot be removed in host-only mode.");
 
             var item = serverSidePlaylist.Find(i => i.ID == playlistItemId);
 
