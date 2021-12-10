@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestFirstItemSelectedByDefault()
         {
-            AddAssert("first item selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[0].ID);
+            AddAssert("first item selected", () => Client.Room?.Settings.PlaylistItemId == Client.APIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => InitialBeatmap);
 
-            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[0].ID);
+            AddAssert("playlist item still selected", () => Client.Room?.Settings.PlaylistItemId == Client.APIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             selectNewItem(() => OtherBeatmap);
 
-            AddAssert("playlist item still selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[0].ID);
+            AddAssert("playlist item still selected", () => Client.Room?.Settings.PlaylistItemId == Client.APIRoom?.Playlist[0].ID);
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("playlist contains two items", () => Client.APIRoom?.Playlist.Count == 2);
             AddAssert("first playlist item expired", () => Client.APIRoom?.Playlist[0].Expired == true);
             AddAssert("second playlist item not expired", () => Client.APIRoom?.Playlist[1].Expired == false);
-            AddAssert("second playlist item selected", () => Client.CurrentMatchPlayingItem.Value?.ID == Client.APIRoom?.Playlist[1].ID);
+            AddAssert("second playlist item selected", () => Client.Room?.Settings.PlaylistItemId == Client.APIRoom?.Playlist[1].ID);
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(otherBeatmap = beatmap()));
 
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
-            AddUntilStep("selected item is new beatmap", () => Client.CurrentMatchPlayingItem.Value?.Beatmap.Value?.OnlineID == otherBeatmap.OnlineID);
+            AddUntilStep("selected item is new beatmap", () => (CurrentSubScreen as MultiplayerMatchSubScreen)?.SelectedItem.Value.BeatmapID == otherBeatmap.OnlineID);
         }
 
         private void addItem(Func<BeatmapInfo> beatmap)
