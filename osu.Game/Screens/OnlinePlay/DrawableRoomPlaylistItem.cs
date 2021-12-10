@@ -73,8 +73,8 @@ namespace osu.Game.Screens.OnlinePlay
         private ModDisplay modDisplay;
         private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
-        private Drawable removeButton;
         private Drawable showResultsButton;
+        private Drawable removeButton;
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
 
@@ -408,10 +408,12 @@ namespace osu.Game.Screens.OnlinePlay
 
         private IEnumerable<Drawable> createButtons() => new[]
         {
-            showResultsButton = new ShowResultsButton
+            showResultsButton = new GrayButton(FontAwesome.Solid.ChartPie)
             {
+                Size = new Vector2(30, 30),
                 Action = () => RequestResults?.Invoke(Item),
                 Alpha = AllowShowingResults ? 1 : 0,
+                TooltipText = "View results"
             },
             Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
             removeButton = new PlaylistRemoveButton
@@ -419,29 +421,23 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Alpha = AllowDeletion ? 1 : 0,
                 Action = () => RequestDeletion?.Invoke(Item),
+                TooltipText = "Remove from playlist"
             },
         };
-
-        public class PlaylistRemoveButton : GrayButton
-        {
-            public PlaylistRemoveButton()
-                : base(FontAwesome.Solid.MinusSquare)
-            {
-                TooltipText = "Remove from playlist";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Icon.Scale = new Vector2(0.8f);
-            }
-        }
 
         protected override bool OnClick(ClickEvent e)
         {
             if (AllowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
+        }
+
+        public class PlaylistRemoveButton : GrayButton
+        {
+            public PlaylistRemoveButton()
+                : base(FontAwesome.Solid.MinusSquare)
+            {
+            }
         }
 
         private sealed class PlaylistDownloadButton : BeatmapDownloadButton
@@ -494,23 +490,6 @@ namespace osu.Game.Screens.OnlinePlay
                             .FadeTo(1, 500);
                         break;
                 }
-            }
-        }
-
-        private class ShowResultsButton : IconButton
-        {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Icon = FontAwesome.Solid.ChartPie;
-                TooltipText = "View results";
-
-                Add(new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue,
-                    Colour = colours.Gray4,
-                });
             }
         }
 
