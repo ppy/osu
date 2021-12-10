@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
@@ -64,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 loadingLayer.Show();
 
-                client.AddPlaylistItem(new MultiplayerPlaylistItem
+                var multiplayerItem = new MultiplayerPlaylistItem
                 {
                     ID = itemToEdit?.ID ?? 0,
                     BeatmapID = item.BeatmapID,
@@ -72,7 +73,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
-                }).ContinueWith(t =>
+                };
+
+                Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
+
+                task.ContinueWith(t =>
                 {
                     Schedule(() =>
                     {
