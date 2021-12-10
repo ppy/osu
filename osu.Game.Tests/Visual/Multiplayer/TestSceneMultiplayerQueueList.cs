@@ -20,11 +20,10 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Tests.Resources;
-using osu.Game.Tests.Visual.Multiplayer;
 using osuTK;
 using osuTK.Input;
 
-namespace osu.Game.Tests.Visual.Online
+namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
