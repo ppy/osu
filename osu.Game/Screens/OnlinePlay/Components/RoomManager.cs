@@ -13,7 +13,6 @@ using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
-using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
