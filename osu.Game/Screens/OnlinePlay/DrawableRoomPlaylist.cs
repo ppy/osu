@@ -33,6 +33,11 @@ namespace osu.Game.Screens.OnlinePlay
         /// </summary>
         public Action<PlaylistItem> RequestResults;
 
+        /// <summary>
+        /// Invoked when an item requests to be edited.
+        /// </summary>
+        public Action<PlaylistItem> RequestEdit;
+
         private bool allowReordering;
 
         /// <summary>
@@ -104,6 +109,24 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
+        private bool allowEditing;
+
+        /// <summary>
+        /// Whether to allow items to be edited.
+        /// If <c>true</c>, requests to edit items may be satisfied via <see cref="RequestEdit"/>.
+        /// </summary>
+        public bool AllowEditing
+        {
+            get => allowEditing;
+            set
+            {
+                allowEditing = value;
+
+                foreach (var item in ListContainer.OfType<DrawableRoomPlaylistItem>())
+                    item.AllowEditing = value;
+            }
+        }
+
         private bool showItemOwners;
 
         /// <summary>
@@ -135,12 +158,14 @@ namespace osu.Game.Screens.OnlinePlay
         {
             d.SelectedItem.BindTarget = SelectedItem;
             d.RequestDeletion = i => RequestDeletion?.Invoke(i);
+            d.RequestResults = i => RequestResults?.Invoke(i);
+            d.RequestEdit = i => RequestEdit?.Invoke(i);
             d.AllowReordering = AllowReordering;
             d.AllowDeletion = AllowDeletion;
             d.AllowSelection = AllowSelection;
             d.AllowShowingResults = AllowShowingResults;
+            d.AllowEditing = AllowEditing;
             d.ShowItemOwner = ShowItemOwners;
-            d.RequestResults = i => RequestResults?.Invoke(i);
         });
 
         protected virtual DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new DrawableRoomPlaylistItem(item);
