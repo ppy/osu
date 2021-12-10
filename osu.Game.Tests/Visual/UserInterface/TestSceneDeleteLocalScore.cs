@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scoreBeingDeleted.OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != importedScores[0].OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
     }
 }

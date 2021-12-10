@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Scores.IO
                     Assert.AreEqual(toImport.Combo, imported.Combo);
                     Assert.AreEqual(toImport.User.Username, imported.User.Username);
                     Assert.AreEqual(toImport.Date, imported.Date);
-                    Assert.AreEqual(toImport.OnlineScoreID, imported.OnlineScoreID);
+                    Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
                 }
                 finally
                 {
