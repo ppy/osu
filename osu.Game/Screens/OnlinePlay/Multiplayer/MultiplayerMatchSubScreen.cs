@@ -138,7 +138,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         RelativeSizeAxes = Axes.X,
                                         Height = 40,
                                         Text = "Add item",
-                                        Action = () => OpenSongSelection(null)
+                                        Action = () => OpenSongSelection()
                                     },
                                 },
                                 null,
@@ -220,7 +220,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         };
 
-        internal void OpenSongSelection(PlaylistItem itemToEdit)
+        /// <summary>
+        /// Opens the song selection screen to add or edit an item.
+        /// </summary>
+        /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
+        internal void OpenSongSelection([CanBeNull] PlaylistItem itemToEdit = null)
         {
             if (!this.IsCurrentScreen())
                 return;
