@@ -248,6 +248,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("owner visible", () => playlist.ChildrenOfType<UpdateableAvatar>().All(a => a.IsPresent == withOwner));
         }
 
+        [Test]
+        public void TestWithAllButtonsEnabled()
+        {
+            createPlaylist(p =>
+            {
+                p.AllowDeletion = true;
+                p.AllowShowingResults = true;
+            });
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
 
