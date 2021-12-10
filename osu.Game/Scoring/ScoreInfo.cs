@@ -248,7 +248,12 @@ namespace osu.Game.Scoring
 
         #region Implementation of IHasOnlineID
 
-        public long OnlineID => OnlineScoreID ?? -1;
+        [NotMapped]
+        public long OnlineID
+        {
+            get => OnlineScoreID ?? -1;
+            set => OnlineScoreID = value;
+        }
 
         #endregion
 
