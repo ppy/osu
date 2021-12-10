@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
 
@@ -113,7 +114,7 @@ namespace osu.Game.Online
                 UpdateState(DownloadState.NotDownloaded);
         });
 
-        private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.OnlineID == y.OnlineID;
+        private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.MatchesOnlineID(y);
 
         #region Disposal
 
