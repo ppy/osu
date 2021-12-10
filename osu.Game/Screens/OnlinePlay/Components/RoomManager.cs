@@ -7,11 +7,13 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
@@ -107,6 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public void AddOrUpdateRoom(Room room)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
             Debug.Assert(room.RoomID.Value != null);
 
             if (ignoredRooms.Contains(room.RoomID.Value.Value))
@@ -136,12 +139,16 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         public void RemoveRoom(Room room)
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             rooms.Remove(room);
             notifyRoomsUpdated();
         }
 
         public void ClearRooms()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             rooms.Clear();
             notifyRoomsUpdated();
         }
