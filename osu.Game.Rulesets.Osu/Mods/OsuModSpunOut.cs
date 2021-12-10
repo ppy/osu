@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Spun Out";
         public override string Acronym => "SO";
-        public override IconUsage? Icon => OsuIcon.ModSpunout;
+        public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
         public override string Description => @"Spinners will be automatically completed.";
         public override double ScoreMultiplier => 0.9;

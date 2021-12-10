@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoam
+                    Colour = colours.GreySeaFoam
                 },
                 CreateContent()
             });
