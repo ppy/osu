@@ -16,7 +16,7 @@ using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScoreInfo : IScoreInfo
+    public class APIScore : IScoreInfo
     {
         [JsonProperty(@"score")]
         public long TotalScore { get; set; }
