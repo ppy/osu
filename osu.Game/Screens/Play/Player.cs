@@ -1031,7 +1031,7 @@ namespace osu.Game.Screens.Play
             //
             // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
             // conflicts across various systems (ie. solo and multiplayer).
-            long onlineScoreId = score.ScoreInfo.OnlineID;
+            long? onlineScoreId = score.ScoreInfo.OnlineID;
             score.ScoreInfo.OnlineID = -1;
 
             await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);

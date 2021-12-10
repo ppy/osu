@@ -137,7 +137,14 @@ namespace osu.Game.Scoring
         [Column("Beatmap")]
         public BeatmapInfo BeatmapInfo { get; set; }
 
-        public long? OnlineScoreID { get; set; }
+        private long? onlineID;
+
+        [Column("OnlineScoreID")]
+        public long? OnlineID
+        {
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
+        }
 
         public DateTimeOffset Date { get; set; }
 
@@ -243,12 +250,7 @@ namespace osu.Game.Scoring
 
         #region Implementation of IHasOnlineID
 
-        [NotMapped]
-        public long OnlineID
-        {
-            get => OnlineScoreID ?? -1;
-            set => OnlineScoreID = value;
-        }
+        long IHasOnlineID<long>.OnlineID => OnlineID ?? -1;
 
         #endregion
 
