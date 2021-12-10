@@ -232,19 +232,13 @@ namespace osu.Game.Scoring
 
         public bool Equals(ScoreInfo other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineID > 0)
-                return OnlineID == other.OnlineID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            return false;
         }
 
         #region Implementation of IHasOnlineID
