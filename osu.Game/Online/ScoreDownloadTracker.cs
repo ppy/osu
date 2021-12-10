@@ -35,7 +35,7 @@ namespace osu.Game.Online
             var scoreInfo = new ScoreInfo
             {
                 ID = TrackedItem.ID,
-                OnlineScoreID = TrackedItem.OnlineScoreID
+                OnlineID = TrackedItem.OnlineID
             };
 
             if (Manager.IsAvailableLocally(scoreInfo))

@@ -101,7 +101,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 BeatmapInfo = beatmap,
                 User = User,
                 Accuracy = Accuracy,
-                OnlineScoreID = OnlineID,
+                OnlineID = OnlineID,
                 Date = Date,
                 PP = PP,
                 RulesetID = RulesetID,
