@@ -9,7 +9,8 @@ namespace osu.Game.Database
     /// A wrapper to provide access to database backed classes in a thread-safe manner.
     /// </summary>
     /// <typeparam name="T">The databased type.</typeparam>
-    public interface ILive<out T> where T : class // TODO: Add IHasGuidPrimaryKey once we don't need EF support any more.
+    public interface ILive<T> : IEquatable<ILive<T>>
+        where T : class // TODO: Add IHasGuidPrimaryKey once we don't need EF support any more.
     {
         Guid ID { get; }
 
@@ -32,10 +33,15 @@ namespace osu.Game.Database
         void PerformWrite(Action<T> perform);
 
         /// <summary>
-        /// Resolve the value of this instance on the current thread's context.
+        /// Whether this instance is tracking data which is managed by the database backing.
+        /// </summary>
+        bool IsManaged { get; }
+
+        /// <summary>
+        /// Resolve the value of this instance on the update thread.
         /// </summary>
         /// <remarks>
-        /// After resolving the data should not be passed between threads.
+        /// After resolving, the data should not be passed between threads.
         /// </remarks>
         T Value { get; }
     }

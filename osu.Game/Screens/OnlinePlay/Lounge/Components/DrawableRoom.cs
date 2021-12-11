@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -29,9 +30,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private const float height = 100;
 
         public readonly Room Room;
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
 
         protected Container ButtonsContainer { get; private set; }
 
@@ -187,20 +185,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5),
-                                            Children = new Drawable[]
-                                            {
-                                                new PlaylistCountPill
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                },
-                                                new StarRatingRangeDisplay
-                                                {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    Scale = new Vector2(0.8f)
-                                                }
-                                            }
+                                            ChildrenEnumerable = CreateBottomDetails()
                                         }
                                     }
                                 },
@@ -289,6 +274,37 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         }
 
         protected virtual Drawable CreateBackground() => new OnlinePlayBackgroundSprite();
+
+        protected virtual IEnumerable<Drawable> CreateBottomDetails()
+        {
+            var pills = new List<Drawable>();
+
+            if (Room.Type.Value != MatchType.Playlists)
+            {
+                pills.AddRange(new OnlinePlayComposite[]
+                {
+                    new MatchTypePill(),
+                    new QueueModePill(),
+                });
+            }
+
+            pills.AddRange(new Drawable[]
+            {
+                new PlaylistCountPill
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                new StarRatingRangeDisplay
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Scale = new Vector2(0.8f)
+                }
+            });
+
+            return pills;
+        }
 
         private class RoomNameText : OsuSpriteText
         {

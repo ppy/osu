@@ -6,11 +6,11 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<BeatmapSetInfo>
+    public class DownloadBeatmapSetRequest : ArchiveDownloadRequest<IBeatmapSetInfo>
     {
         private readonly bool noVideo;
 
-        public DownloadBeatmapSetRequest(BeatmapSetInfo set, bool noVideo)
+        public DownloadBeatmapSetRequest(IBeatmapSetInfo set, bool noVideo)
             : base(set)
         {
             this.noVideo = noVideo;
@@ -25,6 +25,6 @@ namespace osu.Game.Online.API.Requests
 
         protected override string FileExtension => ".osz";
 
-        protected override string Target => $@"beatmapsets/{Model.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
+        protected override string Target => $@"beatmapsets/{Model.OnlineID}/download{(noVideo ? "?noVideo=1" : "")}";
     }
 }

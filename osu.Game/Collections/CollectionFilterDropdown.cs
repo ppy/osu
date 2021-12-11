@@ -13,7 +13,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
@@ -39,7 +38,7 @@ namespace osu.Game.Collections
         }
 
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
-        private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
+        private readonly IBindableList<IBeatmapInfo> beatmaps = new BindableList<IBeatmapInfo>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved(CanBeNull = true)]
@@ -194,13 +193,10 @@ namespace osu.Game.Collections
             protected new CollectionFilterMenuItem Item => ((DropdownMenuItem<CollectionFilterMenuItem>)base.Item).Value;
 
             [Resolved]
-            private OsuColour colours { get; set; }
-
-            [Resolved]
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [CanBeNull]
-            private readonly BindableList<BeatmapInfo> collectionBeatmaps;
+            private readonly BindableList<IBeatmapInfo> collectionBeatmaps;
 
             [NotNull]
             private readonly Bindable<string> collectionName;

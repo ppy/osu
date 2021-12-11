@@ -15,13 +15,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
@@ -64,12 +64,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 ID = 1,
                                 Title = "TestSong",
                                 Artist = "TestArtist",
-                                Author = new User
+                                Author = new APIUser
                                 {
                                     Username = "TestAuthor"
                                 },
                             },
-                            Version = "Insane"
+                            DifficultyName = "Insane"
                         },
                     }
                 },
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory, Scheduler));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
 
             beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).Result.Value.Beatmaps[0];
 
@@ -91,14 +91,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 var score = new ScoreInfo
                 {
-                    OnlineScoreID = i,
+                    OnlineID = i,
                     BeatmapInfo = beatmapInfo,
                     BeatmapInfoID = beatmapInfo.ID,
                     Accuracy = RNG.NextDouble(),
                     TotalScore = RNG.Next(1, 1000000),
                     MaxCombo = RNG.Next(1, 1000),
                     Rank = ScoreRank.XH,
-                    User = new User { Username = "TestUser" },
+                    User = new APIUser { Username = "TestUser" },
                 };
 
                 importedScores.Add(scoreManager.Import(score).Result.Value);
@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scoreBeingDeleted.OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != importedScores[0].OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
     }
 }

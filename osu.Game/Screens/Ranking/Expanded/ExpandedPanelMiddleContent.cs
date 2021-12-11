@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = score.BeatmapInfo;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
-            string creator = metadata.Author?.Username;
+            string creator = metadata.Author.Username;
 
             var topStatistics = new List<StatisticDisplay>
             {
@@ -143,14 +143,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(5, 0),
-                                Children = new Drawable[]
-                                {
-                                    new StarRatingDisplay(starDifficulty)
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft
-                                    },
-                                }
                             },
                             new FillFlowContainer
                             {
@@ -164,7 +156,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = beatmap.Version,
+                                        Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
@@ -230,6 +222,15 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
+
+            if (starDifficulty != null)
+            {
+                starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft
+                });
+            }
 
             if (score.Mods.Any())
             {

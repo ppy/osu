@@ -15,12 +15,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
@@ -34,7 +33,7 @@ namespace osu.Game.Overlays
 
         private Drawable currentContent;
         private Container panelTarget;
-        private FillFlowContainer<BeatmapPanel> foundContent;
+        private FillFlowContainer<BeatmapCard> foundContent;
         private NotFoundDrawable notFoundContent;
         private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
@@ -69,7 +68,7 @@ namespace osu.Game.Overlays
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = ColourProvider.Background4,
+                                Colour = ColourProvider.Background5,
                             },
                             panelTarget = new Container
                             {
@@ -79,7 +78,7 @@ namespace osu.Game.Overlays
                                 Padding = new MarginPadding { Horizontal = 20 },
                                 Children = new Drawable[]
                                 {
-                                    foundContent = new FillFlowContainer<BeatmapPanel>(),
+                                    foundContent = new FillFlowContainer<BeatmapCard>(),
                                     notFoundContent = new NotFoundDrawable(),
                                     supporterRequiredContent = new SupporterRequiredDrawable(),
                                 }
@@ -136,7 +135,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var newPanels = searchResult.Results.Select<APIBeatmapSet, BeatmapPanel>(b => new GridBeatmapPanel(b)
+            var newPanels = searchResult.Results.Select(b => new BeatmapCard(b)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
@@ -152,7 +151,8 @@ namespace osu.Game.Overlays
                 }
 
                 // spawn new children with the contained so we only clear old content at the last moment.
-                var content = new FillFlowContainer<BeatmapPanel>
+                // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
+                var content = new ReverseChildIDFillFlowContainer<BeatmapCard>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

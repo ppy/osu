@@ -8,10 +8,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Match
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private readonly IBindable<User> host = new Bindable<User>();
+        private readonly IBindable<APIUser> host = new Bindable<APIUser>();
         private readonly bool allowEdit;
 
         [CanBeNull]

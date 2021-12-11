@@ -11,10 +11,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using User = osu.Game.Users.User;
 
 namespace osu.Desktop
 {
@@ -27,7 +27,7 @@ namespace osu.Desktop
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
 
         private readonly IBindable<UserStatus> status = new Bindable<UserStatus>();
         private readonly IBindable<UserActivity> activity = new Bindable<UserActivity>();
@@ -108,7 +108,10 @@ namespace osu.Desktop
                 presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.GlobalRank > 0 ? $" (rank #{user.Value.Statistics.GlobalRank:N0})" : string.Empty);
 
             // update ruleset
-            presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
+            int onlineID = ruleset.Value.OnlineID;
+            bool isLegacyRuleset = onlineID >= 0 && onlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID;
+
+            presence.Assets.SmallImageKey = isLegacyRuleset ? $"mode_{onlineID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);

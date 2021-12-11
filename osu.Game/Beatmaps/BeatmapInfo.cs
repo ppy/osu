@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -17,25 +16,28 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo, IBeatmapOnlineInfo
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public int BeatmapVersion;
 
-        private int? onlineBeatmapID;
+        private int? onlineID;
 
         [JsonProperty("id")]
-        public int? OnlineBeatmapID
+        [Column("OnlineBeatmapID")]
+        public int? OnlineID
         {
-            get => onlineBeatmapID;
-            set => onlineBeatmapID = value > 0 ? value : null;
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
         }
 
         [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
+        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
         [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
@@ -103,28 +105,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public int CountdownOffset { get; set; }
 
-        // Editor
-        // This bookmarks stuff is necessary because DB doesn't know how to store int[]
-        [JsonIgnore]
-        public string StoredBookmarks
-        {
-            get => string.Join(',', Bookmarks);
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    Bookmarks = Array.Empty<int>();
-                    return;
-                }
-
-                Bookmarks = value.Split(',').Select(v =>
-                {
-                    bool result = int.TryParse(v, out int val);
-                    return new { result, val };
-                }).Where(p => p.result).Select(p => p.val).ToArray();
-            }
-        }
-
         [NotMapped]
         public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
@@ -134,12 +114,12 @@ namespace osu.Game.Beatmaps
         public double TimelineZoom { get; set; }
 
         // Metadata
-        public string Version { get; set; }
-
-        private string versionString => string.IsNullOrEmpty(Version) ? string.Empty : $"[{Version}]";
+        [Column("Version")]
+        public string DifficultyName { get; set; }
 
         [JsonProperty("difficulty_rating")]
-        public double StarDifficulty { get; set; }
+        [Column("StarDifficulty")]
+        public double StarRating { get; set; }
 
         /// <summary>
         /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
@@ -147,19 +127,22 @@ namespace osu.Game.Beatmaps
         public List<ScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarDifficulty);
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
 
         public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(BeatmapInfo other)
         {
-            if (ID == 0 || other?.ID == 0)
-                // one of the two BeatmapInfos we are comparing isn't sourced from a database.
-                // fall back to reference equality.
-                return ReferenceEquals(this, other);
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            return ID == other?.ID;
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
+
+            return false;
         }
+
+        public bool Equals(IBeatmapInfo other) => other is BeatmapInfo b && Equals(b);
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
                                                       BeatmapSet.Hash == other.BeatmapSet.Hash &&
@@ -176,14 +159,11 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IHasOnlineID
 
-        public int OnlineID => OnlineBeatmapID ?? -1;
+        int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
 
         #endregion
 
         #region Implementation of IBeatmapInfo
-
-        [JsonIgnore]
-        string IBeatmapInfo.DifficultyName => Version;
 
         [JsonIgnore]
         IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();
@@ -196,28 +176,6 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
-
-        [JsonIgnore]
-        double IBeatmapInfo.StarRating => StarDifficulty;
-
-        #endregion
-
-        #region Implementation of IBeatmapOnlineInfo
-
-        [JsonIgnore]
-        public int CircleCount => OnlineInfo.CircleCount;
-
-        [JsonIgnore]
-        public int SliderCount => OnlineInfo.SliderCount;
-
-        [JsonIgnore]
-        public int PlayCount => OnlineInfo.PlayCount;
-
-        [JsonIgnore]
-        public int PassCount => OnlineInfo.PassCount;
-
-        [JsonIgnore]
-        public APIFailTimes FailTimes => OnlineInfo.FailTimes;
 
         #endregion
     }

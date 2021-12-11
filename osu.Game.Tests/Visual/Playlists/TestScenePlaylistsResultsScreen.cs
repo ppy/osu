@@ -14,6 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -21,7 +22,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.Playlists
         private const int scores_per_result = 10;
 
         private TestResultsScreen resultsScreen;
+
         private int currentScoreId;
         private bool requestComplete;
         private int totalCount;
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            currentScoreId = 0;
+            currentScoreId = 1;
             requestComplete = false;
             totalCount = 0;
             bindHandler();
@@ -50,13 +51,13 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
                 bindHandler(userScore: userScore);
             });
 
             createResults(() => userScore);
 
-            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
+            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
         }
 
         [Test]
@@ -74,14 +75,14 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
                 bindHandler(true, userScore);
             });
 
             createResults(() => userScore);
 
             AddAssert("more than 1 panel displayed", () => this.ChildrenOfType<ScorePanel>().Count() > 1);
-            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
+            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
         }
 
         [Test]
@@ -123,7 +124,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
                 bindHandler(userScore: userScore);
             });
 
@@ -230,7 +231,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             var multiplayerUserScore = new MultiplayerScore
             {
-                ID = (int)(userScore.OnlineScoreID ?? currentScoreId++),
+                ID = (int)(userScore.OnlineID > 0 ? userScore.OnlineID : currentScoreId++),
                 Accuracy = userScore.Accuracy,
                 EndedAt = userScore.Date,
                 Passed = userScore.Passed,
@@ -260,7 +261,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
                     TotalScore = userScore.TotalScore - i,
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
@@ -278,7 +279,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
                     TotalScore = userScore.TotalScore + i,
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
@@ -314,7 +315,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     Rank = ScoreRank.X,
                     MaxCombo = 1000,
                     TotalScore = startTotalScore + (sort == "score_asc" ? i : -i),
-                    User = new User
+                    User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",

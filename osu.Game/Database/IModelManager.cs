@@ -3,10 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using osu.Framework.Bindables;
-using osu.Game.IO;
 
 namespace osu.Game.Database
 {
@@ -14,38 +10,18 @@ namespace osu.Game.Database
     /// Represents a model manager that publishes events when <typeparamref name="TModel"/>s are added or removed.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
-    public interface IModelManager<TModel> : IModelImporter<TModel>
+    public interface IModelManager<TModel>
         where TModel : class
     {
         /// <summary>
-        /// A bindable which contains a weak reference to the last item that was updated.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// Fired when an item is updated.
         /// </summary>
-        IBindable<WeakReference<TModel>> ItemUpdated { get; }
+        event Action<TModel> ItemUpdated;
 
         /// <summary>
-        /// A bindable which contains a weak reference to the last item that was removed.
-        /// This is not thread-safe and should be scheduled locally if consumed from a drawable component.
+        /// Fired when an item is removed.
         /// </summary>
-        IBindable<WeakReference<TModel>> ItemRemoved { get; }
-
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
-        Task ImportFromStableAsync(StableStorage stableStorage);
-
-        /// <summary>
-        /// Exports an item to a legacy (.zip based) package.
-        /// </summary>
-        /// <param name="item">The item to export.</param>
-        void Export(TModel item);
-
-        /// <summary>
-        /// Exports an item to the given output stream.
-        /// </summary>
-        /// <param name="model">The item to export.</param>
-        /// <param name="outputStream">The output stream to export to.</param>
-        void ExportModelTo(TModel model, Stream outputStream);
+        event Action<TModel> ItemRemoved;
 
         /// <summary>
         /// Perform an update of the specified item.

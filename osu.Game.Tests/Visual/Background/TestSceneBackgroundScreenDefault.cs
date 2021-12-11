@@ -8,12 +8,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Background
 {
@@ -113,7 +114,7 @@ namespace osu.Game.Tests.Visual.Background
             AddStep($"set background mode to {source}", () => config.SetValue(OsuSetting.MenuBackgroundSource, source));
 
         private void setSupporter(bool isSupporter) =>
-            AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new User
+            AddStep($"set supporter {isSupporter}", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
             {
                 IsSupporter = isSupporter,
                 Id = API.LocalUser.Value.Id + 1,
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Visual.Background
         private void setCustomSkin()
         {
             // feign a skin switch. this doesn't do anything except force CurrentSkin to become a LegacySkin.
-            AddStep("set custom skin", () => skins.CurrentSkinInfo.Value = new SkinInfo { ID = 5 });
+            AddStep("set custom skin", () => skins.CurrentSkinInfo.Value = new SkinInfo().ToLive());
         }
 
         private void setDefaultSkin() => AddStep("set default skin", () => skins.CurrentSkinInfo.SetDefault());

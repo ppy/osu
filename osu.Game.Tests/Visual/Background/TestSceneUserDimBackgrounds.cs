@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -29,7 +30,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -231,7 +231,7 @@ namespace osu.Game.Tests.Visual.Background
 
             AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
             {
-                User = new User { Username = "osu!" },
+                User = new APIUser { Username = "osu!" },
                 BeatmapInfo = new TestBeatmap(Ruleset.Value).BeatmapInfo,
                 Ruleset = Ruleset.Value,
             })));
@@ -428,7 +428,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public float CurrentDim => dimmable.DimLevel;
 
-            public Vector2 CurrentBlur => Background.BlurSigma;
+            public Vector2 CurrentBlur => Background?.BlurSigma ?? Vector2.Zero;
 
             private TestDimmableBackground dimmable;
 

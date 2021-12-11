@@ -16,9 +16,6 @@ namespace osu.Game.Screens.Play.HUD
             Origin = Anchor.TopCentre;
         }
 
-        [Resolved(canBeNull: true)]
-        private HUDOverlay hud { get; set; }
-
         public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]

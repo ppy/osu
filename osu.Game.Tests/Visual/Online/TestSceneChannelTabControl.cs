@@ -11,9 +11,9 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Tabs;
-using osu.Game.Users;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         private void addRandomPrivateChannel() =>
-            channelTabControl.AddChannel(new Channel(new User
+            channelTabControl.AddChannel(new Channel(new APIUser
             {
                 Id = RNG.Next(1000, 10000000),
                 Username = "Test User " + RNG.Next(1000)

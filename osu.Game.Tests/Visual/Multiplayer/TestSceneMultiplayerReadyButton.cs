@@ -9,17 +9,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Input;
 
@@ -108,7 +109,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add second user as host", () =>
             {
-                Client.AddUser(new User { Id = 2, Username = "Another user" });
+                Client.AddUser(new APIUser { Id = 2, Username = "Another user" });
                 Client.TransferHost(2);
             });
 
@@ -128,7 +129,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.TransferHost(Client.Room?.Users[0].UserID ?? 0);
 
                 if (!allReady)
-                    Client.AddUser(new User { Id = 2, Username = "Another user" });
+                    Client.AddUser(new APIUser { Id = 2, Username = "Another user" });
             });
 
             addClickButtonStep();
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add host", () =>
             {
-                Client.AddUser(new User { Id = 2, Username = "Another user" });
+                Client.AddUser(new APIUser { Id = 2, Username = "Another user" });
                 Client.TransferHost(2);
             });
 
@@ -158,7 +159,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("setup", () =>
             {
                 Client.TransferHost(Client.Room?.Users[0].UserID ?? 0);
-                Client.AddUser(new User { Id = 2, Username = "Another user" });
+                Client.AddUser(new APIUser { Id = 2, Username = "Another user" });
             });
 
             addClickButtonStep();
@@ -177,7 +178,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Client.TransferHost(Client.Room?.Users[0].UserID ?? 0);
                 for (int i = 0; i < users; i++)
-                    Client.AddUser(new User { Id = i, Username = "Another user" });
+                    Client.AddUser(new APIUser { Id = i, Username = "Another user" });
             });
 
             if (!isHost)
@@ -198,11 +199,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }, users);
         }
 
-        private void addClickButtonStep() => AddStep("click button", () =>
+        private void addClickButtonStep()
         {
-            InputManager.MoveMouseTo(button);
-            InputManager.Click(MouseButton.Left);
-        });
+            AddUntilStep("wait for button to be ready", () => button.ChildrenOfType<Button>().Single().Enabled.Value);
+            AddStep("click button", () =>
+            {
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
 
         private void verifyGameplayStartFlow()
         {

@@ -105,6 +105,9 @@ namespace osu.Game.Tests.Mods
             testMod.ResetSettingsToDefaults();
 
             Assert.That(testMod.DrainRate.Value, Is.Null);
+
+            // ReSharper disable once HeuristicUnreachableCode
+            // see https://youtrack.jetbrains.com/issue/RIDER-70159.
             Assert.That(testMod.OverallDifficulty.Value, Is.Null);
 
             var applied = applyDifficulty(new BeatmapDifficulty
@@ -153,7 +156,7 @@ namespace osu.Game.Tests.Mods
                 throw new System.NotImplementedException();
             }
 
-            public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap)
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap)
             {
                 throw new System.NotImplementedException();
             }

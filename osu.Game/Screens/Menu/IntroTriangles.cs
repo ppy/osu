@@ -393,6 +393,7 @@ namespace osu.Game.Screens.Menu
                 public class OutlineTriangle : BufferedContainer
                 {
                     public OutlineTriangle(bool outlineOnly, float size)
+                        : base(cachedFrameBuffer: true)
                     {
                         Size = new Vector2(size);
 
@@ -414,7 +415,6 @@ namespace osu.Game.Screens.Menu
                         }
 
                         Blending = BlendingParameters.Additive;
-                        CacheDrawnFrameBuffer = true;
                     }
                 }
             }

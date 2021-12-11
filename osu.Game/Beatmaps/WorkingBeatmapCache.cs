@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps
         [CanBeNull]
         private readonly GameHost host;
 
-        public WorkingBeatmapCache([NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
+        public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null, GameHost host = null)
         {
             DefaultBeatmap = defaultBeatmap;
 
@@ -50,13 +50,11 @@ namespace osu.Game.Beatmaps
             this.host = host;
             this.files = files;
             largeTextureStore = new LargeTextureStore(host?.CreateTextureLoaderStore(files));
-            trackStore = audioManager.GetTrackStore(files);
+            this.trackStore = trackStore;
         }
 
         public void Invalidate(BeatmapSetInfo info)
         {
-            if (info.Beatmaps == null) return;
-
             foreach (var b in info.Beatmaps)
                 Invalidate(b);
         }
@@ -65,7 +63,7 @@ namespace osu.Game.Beatmaps
         {
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+                var working = workingCache.FirstOrDefault(w => info.Equals(w.BeatmapInfo));
 
                 if (working != null)
                 {
@@ -89,7 +87,7 @@ namespace osu.Game.Beatmaps
 
             lock (workingCache)
             {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                var working = workingCache.FirstOrDefault(w => beatmapInfo.Equals(w.BeatmapInfo));
 
                 if (working != null)
                     return working;

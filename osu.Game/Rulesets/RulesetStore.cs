@@ -7,14 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework;
-using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetStore : DatabaseBackedStore, IDisposable
+    public class RulesetStore : DatabaseBackedStore, IRulesetStore, IDisposable
     {
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
@@ -129,12 +128,15 @@ namespace osu.Game.Rulesets
                 {
                     try
                     {
-                        var instanceInfo = ((Ruleset)Activator.CreateInstance(Type.GetType(r.InstantiationInfo).AsNonNull())).RulesetInfo;
+                        var resolvedType = Type.GetType(r.InstantiationInfo)
+                                           ?? throw new RulesetLoadException(@"Type could not be resolved");
+
+                        var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
+                                           ?? throw new RulesetLoadException(@"Instantiation failure");
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
-
                         r.Available = true;
                     }
                     catch
@@ -234,5 +236,13 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
+
+        #region Implementation of IRulesetStore
+
+        IRulesetInfo IRulesetStore.GetRuleset(int id) => GetRuleset(id);
+        IRulesetInfo IRulesetStore.GetRuleset(string shortName) => GetRuleset(shortName);
+        IEnumerable<IRulesetInfo> IRulesetStore.AvailableRulesets => AvailableRulesets;
+
+        #endregion
     }
 }

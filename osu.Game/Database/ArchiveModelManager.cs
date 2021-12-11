@@ -10,17 +10,16 @@ using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
-using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Database
 {
@@ -30,7 +29,7 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
+    public abstract class ArchiveModelManager<TModel, TFileModel> : IModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, TFileModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : class, INamedFileInfo, IHasPrimaryKey, new()
     {
@@ -63,17 +62,13 @@ namespace osu.Game.Database
         /// Fired when a new or updated <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemUpdated => itemUpdated;
-
-        private readonly Bindable<WeakReference<TModel>> itemUpdated = new Bindable<WeakReference<TModel>>();
+        public event Action<TModel> ItemUpdated;
 
         /// <summary>
         /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public IBindable<WeakReference<TModel>> ItemRemoved => itemRemoved;
-
-        private readonly Bindable<WeakReference<TModel>> itemRemoved = new Bindable<WeakReference<TModel>>();
+        public event Action<TModel> ItemRemoved;
 
         public virtual IEnumerable<string> HandledExtensions => new[] { @".zip" };
 
@@ -86,17 +81,13 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly Storage exportStorage;
-
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemUpdated += item => handleEvent(() => itemUpdated.Value = new WeakReference<TModel>(item));
-            ModelStore.ItemRemoved += item => handleEvent(() => itemRemoved.Value = new WeakReference<TModel>(item));
-
-            exportStorage = storage.GetStorageForDirectory(@"exports");
+            ModelStore.ItemUpdated += item => handleEvent(() => ItemUpdated?.Invoke(item));
+            ModelStore.ItemRemoved += item => handleEvent(() => ItemRemoved?.Invoke(item));
 
             Files = new FileStore(contextFactory, storage);
 
@@ -197,7 +188,7 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First().Value}!"
+                    ? $"Imported {imported.First().Value.GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PostImport != null)
@@ -268,7 +259,7 @@ namespace osu.Game.Database
                 model = CreateModel(archive);
 
                 if (model == null)
-                    return Task.FromResult<ILive<TModel>>(new EntityFrameworkLive<TModel>(null));
+                    return Task.FromResult<ILive<TModel>>(null);
             }
             catch (TaskCanceledException)
             {
@@ -329,7 +320,7 @@ namespace osu.Game.Database
 
                 foreach (TFileModel file in hashableFiles)
                 {
-                    using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                    using (Stream s = Files.Store.GetStream(file.FileInfo.GetStoragePath()))
                         s.CopyTo(hashable);
                 }
 
@@ -396,7 +387,8 @@ namespace osu.Game.Database
             {
                 LogForModel(item, @"Beginning import...");
 
-                item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                if (archive != null)
+                    item.Files.AddRange(createFileInfos(archive, Files));
                 item.Hash = ComputeHash(item);
 
                 await Populate(item, archive, cancellationToken).ConfigureAwait(false);
@@ -456,53 +448,17 @@ namespace osu.Game.Database
         }, cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap().ConfigureAwait(false);
 
         /// <summary>
-        /// Exports an item to a legacy (.zip based) package.
-        /// </summary>
-        /// <param name="item">The item to export.</param>
-        public void Export(TModel item)
-        {
-            var retrievedItem = ModelStore.ConsumableItems.FirstOrDefault(s => s.ID == item.ID);
-
-            if (retrievedItem == null)
-                throw new ArgumentException(@"Specified model could not be found", nameof(item));
-
-            string filename = $"{GetValidFilename(item.ToString())}{HandledExtensions.First()}";
-
-            using (var stream = exportStorage.GetStream(filename, FileAccess.Write, FileMode.Create))
-                ExportModelTo(retrievedItem, stream);
-
-            exportStorage.PresentFileExternally(filename);
-        }
-
-        /// <summary>
-        /// Exports an item to the given output stream.
-        /// </summary>
-        /// <param name="model">The item to export.</param>
-        /// <param name="outputStream">The output stream to export to.</param>
-        public virtual void ExportModelTo(TModel model, Stream outputStream)
-        {
-            using (var archive = ZipArchive.Create())
-            {
-                foreach (var file in model.Files)
-                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
-
-                archive.SaveTo(outputStream);
-            }
-        }
-
-        /// <summary>
         /// Replace an existing file with a new version.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be replaced.</param>
         /// <param name="contents">The new file contents.</param>
-        /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
-        public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
+        public void ReplaceFile(TModel model, TFileModel file, Stream contents)
         {
             using (ContextFactory.GetForWrite())
             {
                 DeleteFile(model, file);
-                AddFile(model, contents, filename ?? file.Filename);
+                AddFile(model, contents, file.Filename);
             }
         }
 
@@ -520,7 +476,7 @@ namespace osu.Game.Database
                 {
                     Files.Dereference(file.FileInfo);
 
-                    if (file.ID > 0)
+                    if (file.IsManaged)
                     {
                         // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
                         // Definitely can be removed once we rework the database backend.
@@ -549,7 +505,7 @@ namespace osu.Game.Database
                 });
             }
 
-            if (model.ID > 0)
+            if (model.IsManaged)
                 Update(model);
         }
 
@@ -732,45 +688,11 @@ namespace osu.Game.Database
         #region osu-stable import
 
         /// <summary>
-        /// The relative path from osu-stable's data directory to import items from.
-        /// </summary>
-        protected virtual string ImportFromStablePath => null;
-
-        /// <summary>
-        /// Select paths to import from stable where all paths should be absolute. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
-        /// </summary>
-        protected virtual IEnumerable<string> GetStableImportPaths(Storage storage) => storage.GetDirectories(ImportFromStablePath)
-                                                                                              .Select(path => storage.GetFullPath(path));
-
-        /// <summary>
         /// Whether this specified path should be removed after successful import.
         /// </summary>
         /// <param name="path">The path for consideration. May be a file or a directory.</param>
         /// <returns>Whether to perform deletion.</returns>
         protected virtual bool ShouldDeleteArchive(string path) => false;
-
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            var storage = PrepareStableStorage(stableStorage);
-
-            // Handle situations like when the user does not have a Skins folder.
-            if (!storage.ExistsDirectory(ImportFromStablePath))
-            {
-                string fullPath = storage.GetFullPath(ImportFromStablePath);
-
-                Logger.Log(@$"Folder ""{fullPath}"" not available in the target osu!stable installation to import {HumanisedModelName}s.", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            return Task.Run(async () => await Import(GetStableImportPaths(storage).ToArray()).ConfigureAwait(false));
-        }
-
-        /// <summary>
-        /// Run any required traversal operations on the stable storage location before performing operations.
-        /// </summary>
-        /// <param name="stableStorage">The stable storage.</param>
-        /// <returns>The usable storage. Return the unchanged <paramref name="stableStorage"/> if no traversal is required.</returns>
-        protected virtual Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage;
 
         #endregion
 
@@ -815,7 +737,7 @@ namespace osu.Game.Database
         /// <param name="items">The usable items present in the store.</param>
         /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
         protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
-            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
+            => model.IsManaged && items.Any(i => i.ID == model.ID && i.Files.Any());
 
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.
@@ -911,19 +833,6 @@ namespace osu.Game.Database
             // therefore, let's use a guaranteed unique hash.
             // this doesn't follow the SHA2 hashing schema intentionally, so such entries on the data store can be identified.
             return Guid.NewGuid().ToString();
-        }
-
-        private readonly char[] invalidFilenameCharacters = Path.GetInvalidFileNameChars()
-                                                                // Backslash is added to avoid issues when exporting to zip.
-                                                                // See SharpCompress filename normalisation https://github.com/adamhathcock/sharpcompress/blob/a1e7c0068db814c9aa78d86a94ccd1c761af74bd/src/SharpCompress/Writers/Zip/ZipWriter.cs#L143.
-                                                                .Append('\\')
-                                                                .ToArray();
-
-        protected string GetValidFilename(string filename)
-        {
-            foreach (char c in invalidFilenameCharacters)
-                filename = filename.Replace(c, '_');
-            return filename;
         }
     }
 }

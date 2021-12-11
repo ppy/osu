@@ -7,13 +7,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Users
 {
     public class UserBrickPanel : UserPanel
     {
-        public UserBrickPanel(User user)
+        public UserBrickPanel(APIUser user)
             : base(user)
         {
             AutoSizeAxes = Axes.Both;

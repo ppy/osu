@@ -11,6 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osu.Framework.Input.Events;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Users
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Users
         private SpriteIcon statusIcon;
         private OsuSpriteText statusMessage;
 
-        protected ExtendedUserPanel(User user)
+        protected ExtendedUserPanel(APIUser user)
             : base(user)
         {
         }

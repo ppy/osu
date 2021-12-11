@@ -24,7 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
-        private double currentStrain = 1;
+
+        private double currentStrain;
 
         private double strainValueOf(int index, DifficultyHitObject current)
         {
@@ -56,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
 
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
-                    double stackNerf = Math.Min(1.0, (osuPrevious.JumpDistance / scalingFactor) / 25.0);
+                    double stackNerf = Math.Min(1.0, (osuPrevious.LazyJumpDistance / scalingFactor) / 25.0);
 
                     result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }

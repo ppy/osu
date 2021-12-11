@@ -214,7 +214,8 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            beatmap.BindDisabledChanged(beatmapDisabledChanged, true);
+            beatmap.BindDisabledChanged(_ => Scheduler.AddOnce(beatmapDisabledChanged));
+            beatmapDisabledChanged();
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
@@ -318,8 +319,10 @@ namespace osu.Game.Overlays
             };
         }
 
-        private void beatmapDisabledChanged(bool disabled)
+        private void beatmapDisabledChanged()
         {
+            bool disabled = beatmap.Disabled;
+
             if (disabled)
                 playlist?.Hide();
 
@@ -366,13 +369,12 @@ namespace osu.Game.Overlays
             private readonly WorkingBeatmap beatmap;
 
             public Background(WorkingBeatmap beatmap = null)
+                : base(cachedFrameBuffer: true)
             {
                 this.beatmap = beatmap;
 
                 Depth = float.MaxValue;
                 RelativeSizeAxes = Axes.Both;
-
-                CacheDrawnFrameBuffer = true;
 
                 Children = new Drawable[]
                 {

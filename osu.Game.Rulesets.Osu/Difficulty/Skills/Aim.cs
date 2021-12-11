@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
         protected override int HistoryLength => 2;
 
-        private double currentStrain = 1;
+        private double currentStrain;
 
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;

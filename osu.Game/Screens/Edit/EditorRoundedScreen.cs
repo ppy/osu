@@ -5,16 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
 {
     public class EditorRoundedScreen : EditorScreen
     {
         public const int HORIZONTAL_PADDING = 100;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         private Container roundedContent;
 
@@ -26,7 +23,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             base.Content.Add(new Container
             {
@@ -41,7 +38,7 @@ namespace osu.Game.Screens.Edit
                     {
                         new Box
                         {
-                            Colour = ColourProvider.Background3,
+                            Colour = colourProvider.Background3,
                             RelativeSizeAxes = Axes.Both,
                         },
                         roundedContent = new Container

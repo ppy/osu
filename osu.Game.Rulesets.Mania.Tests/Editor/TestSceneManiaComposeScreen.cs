@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Screens.Edit;
@@ -21,6 +22,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
     {
         [Resolved]
         private SkinManager skins { get; set; }
+
+        [Cached]
+        private EditorClipboard clipboard = new EditorClipboard();
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -52,13 +56,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestDefaultSkin()
         {
-            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = SkinInfo.Default);
+            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = DefaultSkin.CreateInfo().ToLive());
         }
 
         [Test]
         public void TestLegacySkin()
         {
-            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
+            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.CreateInfo().ToLive());
         }
     }
 }

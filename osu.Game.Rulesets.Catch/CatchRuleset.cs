@@ -133,6 +133,7 @@ namespace osu.Game.Rulesets.Catch
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new CatchModFloatingFruits(),
                         new CatchModMuted(),
+                        new CatchModNoScope(),
                     };
 
                 default:
@@ -177,7 +178,7 @@ namespace osu.Game.Rulesets.Catch
             return base.GetDisplayNameForHitResult(result);
         }
 
-        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new CatchDifficultyCalculator(RulesetInfo, beatmap);
 
         public override ISkin CreateLegacySkinProvider(ISkin skin, IBeatmap beatmap) => new CatchLegacySkinTransformer(skin);
 
@@ -188,5 +189,7 @@ namespace osu.Game.Rulesets.Catch
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
 
         public override HitObjectComposer CreateHitObjectComposer() => new CatchHitObjectComposer(this);
+
+        public override IBeatmapVerifier CreateBeatmapVerifier() => new CatchBeatmapVerifier();
     }
 }

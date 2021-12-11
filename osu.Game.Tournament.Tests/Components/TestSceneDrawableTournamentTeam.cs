@@ -3,13 +3,13 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using osu.Game.Users;
 
 namespace osu.Game.Tournament.Tests.Components
 {
@@ -24,13 +24,13 @@ namespace osu.Game.Tournament.Tests.Components
                 FullName = { Value = "Australia" },
                 Players =
                 {
-                    new User { Username = "ASecretBox" },
-                    new User { Username = "Dereban" },
-                    new User { Username = "mReKk" },
-                    new User { Username = "uyghti" },
-                    new User { Username = "Parkes" },
-                    new User { Username = "Shiroha" },
-                    new User { Username = "Jordan The Bear" },
+                    new APIUser { Username = "ASecretBox" },
+                    new APIUser { Username = "Dereban" },
+                    new APIUser { Username = "mReKk" },
+                    new APIUser { Username = "uyghti" },
+                    new APIUser { Username = "Parkes" },
+                    new APIUser { Username = "Shiroha" },
+                    new APIUser { Username = "Jordan The Bear" },
                 }
             };
 

@@ -12,9 +12,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Changelog
 
             if (entry.GithubUser.UserId != null)
             {
-                title.AddUserLink(new User
+                title.AddUserLink(new APIUser
                 {
                     Username = entry.GithubUser.OsuUsername,
                     Id = entry.GithubUser.UserId.Value

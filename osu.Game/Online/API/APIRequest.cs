@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API
 {
@@ -38,7 +38,12 @@ namespace osu.Game.Online.API
         protected override void PostProcess()
         {
             base.PostProcess();
-            Response = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+
+            if (WebRequest != null)
+            {
+                Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
+                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
+            }
         }
 
         internal void TriggerSuccess(T result)
@@ -69,7 +74,7 @@ namespace osu.Game.Online.API
         /// <summary>
         /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
         /// </summary>
-        protected User User { get; private set; }
+        protected APIUser User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
@@ -15,7 +16,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osu.Game.Tests.Visual.Spectator;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -61,8 +61,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineBeatmapID ?? 0);
-                    var roomUser = OnlinePlayDependencies.Client.AddUser(new User { Id = user }, true);
+                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID ?? 0);
+                    var roomUser = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = user }, true);
 
                     roomUser.MatchState = new TeamVersusUserState
                     {

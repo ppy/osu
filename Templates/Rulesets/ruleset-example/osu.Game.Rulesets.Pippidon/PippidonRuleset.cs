@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Pippidon
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) =>
             new PippidonBeatmapConverter(beatmap, this);
 
-        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) =>
-            new PippidonDifficultyCalculator(this, beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) =>
+            new PippidonDifficultyCalculator(RulesetInfo, beatmap);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

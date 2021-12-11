@@ -54,7 +54,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
-                effectiveMissCount += countOk + countMeh;
+                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
+                effectiveMissCount = Math.Min(effectiveMissCount + countOk + countMeh, totalHits);
+
                 multiplier *= 0.6;
             }
 
@@ -109,13 +111,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = Attributes.ApproachRate - 10.33;
+                approachRateFactor = 0.3 * (Attributes.ApproachRate - 10.33);
             else if (Attributes.ApproachRate < 8.0)
-                approachRateFactor = 0.025 * (8.0 - Attributes.ApproachRate);
+                approachRateFactor = 0.1 * (8.0 - Attributes.ApproachRate);
 
-            double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
-
-            double approachRateBonus = 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
+            aimValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModBlinds))
                 aimValue *= 1.3 + (totalHits * (0.0016 / (1 + 2 * effectiveMissCount)) * Math.Pow(accuracy, 16)) * (1 - 0.003 * Attributes.DrainRate * Attributes.DrainRate);
@@ -125,10 +125,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
             }
 
-            aimValue *= approachRateBonus;
+            // We assume 15% of sliders in a map are difficult since there's no way to tell from the performance calculator.
+            double estimateDifficultSliders = Attributes.SliderCount * 0.15;
 
-            // Scale the aim value with accuracy _slightly_.
-            aimValue *= 0.5 + accuracy / 2.0;
+            if (Attributes.SliderCount > 0)
+            {
+                double estimateSliderEndsDropped = Math.Clamp(Math.Min(countOk + countMeh + countMiss, Attributes.MaxCombo - scoreMaxCombo), 0, estimateDifficultSliders);
+                double sliderNerfFactor = (1 - Attributes.SliderFactor) * Math.Pow(1 - estimateSliderEndsDropped / estimateDifficultSliders, 3) + Attributes.SliderFactor;
+                aimValue *= sliderNerfFactor;
+            }
+
+            aimValue *= accuracy;
             // It is important to also consider accuracy difficulty when doing that.
             aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
@@ -154,11 +161,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = Attributes.ApproachRate - 10.33;
+                approachRateFactor = 0.3 * (Attributes.ApproachRate - 10.33);
 
-            double approachRateTotalHitsFactor = 1.0 / (1.0 + Math.Exp(-(0.007 * (totalHits - 400))));
-
-            speedValue *= 1.0 + (0.03 + 0.37 * approachRateTotalHitsFactor) * approachRateFactor;
+            speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
             if (mods.Any(m => m is OsuModBlinds))
             {
@@ -255,7 +260,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private int calculateEffectiveMissCount()
         {
-            // guess the number of misses + slider breaks from combo
+            // Guess the number of misses + slider breaks from combo
             double comboBasedMissCount = 0.0;
 
             if (Attributes.SliderCount > 0)
@@ -265,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
-            // we're clamping misscount because since its derived from combo it can be higher than total hits and that breaks some calculations
+            // Clamp misscount since it's derived from combo and can be higher than total hits and that breaks some calculations
             comboBasedMissCount = Math.Min(comboBasedMissCount, totalHits);
 
             return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
