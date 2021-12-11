@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double currentRhythm;
 
-        private readonly double greatWindow;
-
         private readonly SpeedRhythmBonus speedRhythmBonus;
 
         private readonly SpeedStrainTime speedStrainTime;
@@ -37,8 +35,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Speed(Mod[] mods, double greatWindow)
             : base(mods)
         {
-            this.greatWindow = greatWindow;
-
             speedRhythmBonus = new SpeedRhythmBonus(mods, greatWindow);
             speedStrainTime = new SpeedStrainTime(mods, greatWindow);
             speedBonus = new SpeedBonus(mods, speedStrainTime);
