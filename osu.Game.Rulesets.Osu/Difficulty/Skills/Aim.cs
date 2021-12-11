@@ -16,13 +16,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-
-        private double currentStrain;
-
         private double skillMultiplier => 23.25;
         private double strainDecayBase => 0.15;
 
+        private double currentStrain;
+
         private readonly AimVelocity aimVelocity;
+
         private readonly AimAngleBonus aimAngleBonus;
 
         public Aim(Mod[] mods, bool withSliders)
