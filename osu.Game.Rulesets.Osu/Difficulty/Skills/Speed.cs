@@ -17,6 +17,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : OsuStrainSkill
     {
+        private const double single_spacing_threshold = 125;
+        private const double rhythm_multiplier = 0.75;
+        private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
+        private const double min_speed_bonus = 75; // ~200BPM
+        private const double speed_balancing_factor = 40;
+
         private double skillMultiplier => 1375;
         private double strainDecayBase => 0.3;
         protected override int ReducedSectionCount => 5;
@@ -43,16 +49,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             speedStrainTime = new SpeedStrainTime(mods, greatWindow);
             speedBonus = new SpeedBonus(mods, speedStrainTime);
         }
-
         private double strainValueOf(int index, DifficultyHitObject current)
         {
-            speedRhythmBonus.ProcessInternal(index, current);
             speedStrainTime.ProcessInternal(index, current);
             speedBonus.ProcessInternal(index, current);
 
-            currentRhythm = speedRhythmBonus[index];
-
-            return speedBonus[index] * currentRhythm;
+            return speedBonus[index];
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
@@ -61,10 +63,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
+            speedRhythmBonus.ProcessInternal(index, current);
+
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += strainValueOf(index, current) * skillMultiplier;
 
-            return currentStrain;
+            currentRhythm = speedRhythmBonus[index];
+
+            return currentStrain * currentRhythm;
         }
     }
 }
