@@ -391,9 +391,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddStep("set user ready", () => client.ChangeState(MultiplayerUserState.Ready));
-            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+            pressReadyButton();
 
+            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
             AddUntilStep("user state is idle", () => client.LocalUser?.State == MultiplayerUserState.Idle);
         }
 
@@ -412,6 +412,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 }
             });
+
+            pressReadyButton();
 
             AddStep("Enter song select", () =>
             {
@@ -592,19 +594,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
-
-            AddStep("click ready button", () =>
-            {
-                InputManager.MoveMouseTo(readyButton);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddUntilStep("wait for player to be ready", () => client.Room?.Users[0].State == MultiplayerUserState.Ready);
-            AddUntilStep("wait for ready button to be enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value);
-
-            AddStep("click start button", () => InputManager.Click(MouseButton.Left));
-
+            pressReadyButton();
+            pressReadyButton();
             AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player);
 
             // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
@@ -665,7 +656,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        private MultiplayerReadyButton readyButton => this.ChildrenOfType<MultiplayerReadyButton>().Single();
+        private ReadyButton readyButton => this.ChildrenOfType<ReadyButton>().Single();
+
+        private void pressReadyButton()
+        {
+            AddUntilStep("wait for ready button to be enabled", () => readyButton.Enabled.Value);
+
+            MultiplayerUserState lastState = MultiplayerUserState.Idle;
+
+            AddStep("click ready button", () =>
+            {
+                lastState = client.LocalUser?.State ?? MultiplayerUserState.Idle;
+
+                InputManager.MoveMouseTo(readyButton);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for state change", () => client.LocalUser?.State != lastState);
+        }
 
         private void createRoom(Func<Room> room)
         {
