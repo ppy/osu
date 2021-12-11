@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -326,10 +327,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (client.LocalUser?.State == MultiplayerUserState.Ready)
                     client.ChangeState(MultiplayerUserState.Idle);
             }
-            else
+        }
+
+        protected override void UpdateWorkingBeatmap()
+        {
+            var lastBeatmap = Beatmap.Value;
+
+            base.UpdateWorkingBeatmap();
+
+            if (Beatmap.Value.BeatmapInfo.MatchesOnlineID(lastBeatmap.BeatmapInfo))
+                return;
+
+            if (!Beatmap.Value.BeatmapInfo.MatchesOnlineID(SelectedItem.Value?.Beatmap.Value))
+                return;
+
+            if (client.LocalUser?.State == MultiplayerUserState.Spectating
+                && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
             {
-                if (client.LocalUser?.State == MultiplayerUserState.Spectating && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
-                    onLoadRequested();
+                onLoadRequested();
             }
         }
 

@@ -302,7 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            updateWorkingBeatmap();
+            UpdateWorkingBeatmap();
             beginHandlingTrack();
             Scheduler.AddOnce(UpdateMods);
         }
@@ -345,7 +345,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         private void selectedItemChanged()
         {
-            updateWorkingBeatmap();
+            UpdateWorkingBeatmap();
 
             var selected = SelectedItem.Value;
 
@@ -374,9 +374,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
-        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(updateWorkingBeatmap);
+        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(UpdateWorkingBeatmap);
 
-        private void updateWorkingBeatmap()
+        protected virtual void UpdateWorkingBeatmap()
         {
             var beatmap = SelectedItem.Value?.Beatmap.Value;
 
