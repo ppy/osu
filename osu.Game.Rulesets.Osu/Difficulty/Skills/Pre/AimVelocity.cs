@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             this.withSliders = withSliders;
         }
 
-
         protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count == 0)

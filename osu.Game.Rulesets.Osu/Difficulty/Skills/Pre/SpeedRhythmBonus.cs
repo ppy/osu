@@ -27,7 +27,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             this.greatWindow = greatWindow;
         }
 
-
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
