@@ -327,6 +327,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (client.LocalUser?.State == MultiplayerUserState.Ready)
                     client.ChangeState(MultiplayerUserState.Idle);
             }
+
+            UpdateWorkingBeatmap();
         }
 
         protected override void UpdateWorkingBeatmap()
