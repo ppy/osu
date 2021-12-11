@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private readonly AimVelocity aimVelocity;
         private readonly AimAngleBonus aimAngleBonus;
 
-        public Aim(Mod[] mods)
+        public Aim(Mod[] mods, bool withSliders)
             : base(mods)
         {
-            aimVelocity = new AimVelocity(mods);
-            aimAngleBonus = new AimAngleBonus(aimVelocity, mods);
+            aimVelocity = new AimVelocity(mods, withSliders);
+            aimAngleBonus = new AimAngleBonus(mods, withSliders, aimVelocity);
         }
 
         private double strainValueOf(int index, DifficultyHitObject current)

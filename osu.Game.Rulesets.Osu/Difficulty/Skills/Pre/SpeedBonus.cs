@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             var osuCurrObj = (OsuDifficultyHitObject)current;
+            var osuPrevObj = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
 
             double strainTime = speedStrainTime[index];
 
@@ -36,7 +37,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             if (strainTime < min_speed_bonus)
                 speedBonus = 1 + 0.75 * Math.Pow((min_speed_bonus - strainTime) / speed_balancing_factor, 2);
 
-            double distance = Math.Min(single_spacing_threshold, osuCurrObj.TravelDistance + osuCurrObj.JumpDistance);
+            double travelDistance = osuPrevObj?.TravelDistance ?? 0;
+            double distance = Math.Min(single_spacing_threshold, travelDistance + osuCurrObj.MinimumJumpDistance);
 
             return (speedBonus + speedBonus * Math.Pow(distance / single_spacing_threshold, 3.5)) / strainTime;
         }

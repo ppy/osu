@@ -15,8 +15,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
         protected override double StrainDecayBase => 0.0;
 
-        public AimVelocity(Mod[] mods) : base(mods)
+        private bool withSliders;
+
+        public AimVelocity(Mod[] mods, bool withSliders) : base(mods)
         {
+            this.withSliders = withSliders;
         }
 
 
@@ -28,13 +31,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)Previous[0];
 
-            double currVelocity = osuCurrObj.JumpDistance / osuCurrObj.StrainTime;
+            double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj.BaseObject is Slider)
+            if (osuLastObj.BaseObject is Slider && withSliders)
             {
-                double movementVelocity = osuCurrObj.MovementDistance / osuCurrObj.MovementTime; // calculate the movement velocity from slider end to current object
-                double travelVelocity = osuCurrObj.TravelDistance / osuCurrObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
+                double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object
 
                 currVelocity = Math.Max(currVelocity, movementVelocity + travelVelocity); // take the larger total combined velocity.
             }
