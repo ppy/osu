@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -378,6 +379,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected virtual void UpdateWorkingBeatmap()
         {
+            if (BeatmapAvailability.Value.State != DownloadState.LocallyAvailable)
+            {
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(null);
+                return;
+            }
+
             var beatmap = SelectedItem.Value?.Beatmap.Value;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
