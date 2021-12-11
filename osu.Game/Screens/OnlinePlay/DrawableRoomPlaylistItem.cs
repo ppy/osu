@@ -52,6 +52,11 @@ namespace osu.Game.Screens.OnlinePlay
         public Action<PlaylistItem> RequestResults;
 
         /// <summary>
+        /// Invoked when this item requests to be edited.
+        /// </summary>
+        public Action<PlaylistItem> RequestEdit;
+
+        /// <summary>
         /// The currently-selected item, used to show a border around this item.
         /// May be updated by this item if <see cref="AllowSelection"/> is <c>true</c>.
         /// </summary>
@@ -74,6 +79,7 @@ namespace osu.Game.Screens.OnlinePlay
         private FillFlowContainer buttonsFlow;
         private UpdateableAvatar ownerAvatar;
         private Drawable showResultsButton;
+        private Drawable editButton;
         private Drawable removeButton;
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
@@ -210,6 +216,23 @@ namespace osu.Game.Screens.OnlinePlay
 
                 if (showResultsButton != null)
                     showResultsButton.Alpha = value ? 1 : 0;
+            }
+        }
+
+        private bool allowEditing;
+
+        /// <summary>
+        /// Whether this item can be edited.
+        /// </summary>
+        public bool AllowEditing
+        {
+            get => allowEditing;
+            set
+            {
+                allowEditing = value;
+
+                if (editButton != null)
+                    editButton.Alpha = value ? 1 : 0;
             }
         }
 
@@ -416,6 +439,13 @@ namespace osu.Game.Screens.OnlinePlay
                 TooltipText = "View results"
             },
             Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
+            editButton = new PlaylistEditButton
+            {
+                Size = new Vector2(30, 30),
+                Alpha = AllowEditing ? 1 : 0,
+                Action = () => RequestEdit?.Invoke(Item),
+                TooltipText = "Edit"
+            },
             removeButton = new PlaylistRemoveButton
             {
                 Size = new Vector2(30, 30),
@@ -430,6 +460,14 @@ namespace osu.Game.Screens.OnlinePlay
             if (AllowSelection && valid.Value)
                 SelectedItem.Value = Model;
             return true;
+        }
+
+        public class PlaylistEditButton : GrayButton
+        {
+            public PlaylistEditButton()
+                : base(FontAwesome.Solid.Edit)
+            {
+            }
         }
 
         public class PlaylistRemoveButton : GrayButton

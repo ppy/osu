@@ -255,6 +255,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 p.AllowDeletion = true;
                 p.AllowShowingResults = true;
+                p.AllowEditing = true;
             });
         }
 
