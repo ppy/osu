@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit
             base.LoadComplete();
 
             // will be restored via lease, see `DisallowExternalBeatmapRulesetChanges`.
-            Mods.Value = ArraySegment<Mod>.Empty;
+            Mods.Value = Array.Empty<Mod>();
         }
 
         protected virtual Editor CreateEditor() => new Editor(this);
