@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] preSkills, Skill[] skills, double clockRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
                 return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
@@ -111,14 +111,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 new Aim(mods),
                 new Speed(mods, hitWindowGreat),
                 new Flashlight(mods)
-            };
-        }
-
-        protected override Skill[] CreatePreSkills(IBeatmap beatmap, Mod[] mods, double clockRate)
-        {
-            return new Skill[]
-            {
-
             };
         }
 

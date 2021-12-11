@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         protected virtual int SectionLength => 400;
 
-        private double currentSectionPeak; // We also keep track of the peak strain level in the current section.
+        protected double currentSectionPeak; // We also keep track of the peak strain level in the current section.
 
-        private double currentSectionEnd;
+        protected double currentSectionEnd;
 
-        private readonly List<double> strainPeaks = new List<double>();
+        protected readonly List<double> strainPeaks = new List<double>();
 
         protected StrainSkill(Mod[] mods)
             : base(mods)
@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueAt(Skill[] preSkills, int index, DifficultyHitObject current);
+        protected abstract double StrainValueAt(int index, DifficultyHitObject current);
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        protected sealed override void Process(Skill[] preSkills, int index, DifficultyHitObject current)
+        protected override void Process(int index, DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (Previous.Count == 0)
@@ -57,13 +57,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 currentSectionEnd += SectionLength;
             }
 
-            currentSectionPeak = Math.Max(StrainValueAt(preSkills, index, current), currentSectionPeak);
+            currentSectionPeak = Math.Max(StrainValueAt(index, current), currentSectionPeak);
         }
 
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        private void saveCurrentPeak()
+        protected void saveCurrentPeak()
         {
             strainPeaks.Add(currentSectionPeak);
         }
