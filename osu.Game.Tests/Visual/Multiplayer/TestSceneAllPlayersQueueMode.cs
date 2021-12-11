@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestCorrectItemSelectedAfterNewItemAdded()
         {
             addItem(() => OtherBeatmap);
-            AddAssert("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
+            AddUntilStep("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
         }
 
         private void addItem(Func<BeatmapInfo> beatmap)
