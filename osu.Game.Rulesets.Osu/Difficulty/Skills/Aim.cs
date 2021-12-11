@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : OsuStrainSkill
     {
-        protected override int HistoryLength => 2;
 
         private double currentStrain;
 
@@ -35,13 +34,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(int index, DifficultyHitObject current)
         {
-            aimVelocity.ProcessPre(index, current);
-            aimAngleBonus.ProcessPre(index, current);
+            aimVelocity.ProcessInternal(index, current);
+            aimAngleBonus.ProcessInternal(index, current);
 
             double aimStrain = aimVelocity[index] + aimAngleBonus[index]; // Start strain with regular velocity.
 
             return aimStrain;
         }
+
 
         //private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
 

@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
         protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
+
             if (current.BaseObject is Spinner || Previous.Count == 0)
                 return 0;
-
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuLastObj = (OsuDifficultyHitObject)Previous[0];
 

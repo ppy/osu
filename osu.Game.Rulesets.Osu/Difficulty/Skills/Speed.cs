@@ -46,9 +46,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(int index, DifficultyHitObject current)
         {
-            speedRhythmBonus.ProcessPre(index, current);
-            speedStrainTime.ProcessPre(index, current);
-            speedBonus.ProcessPre(index, current);
+            speedRhythmBonus.ProcessInternal(index, current);
+            speedStrainTime.ProcessInternal(index, current);
+            speedBonus.ProcessInternal(index, current);
 
             currentRhythm = speedRhythmBonus[index];
 

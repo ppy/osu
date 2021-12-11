@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
         protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner || Previous.Count <= 1 || Previous[0].BaseObject is Spinner)
+            if (current.BaseObject is Spinner || Previous.Count < 2 || Previous[0].BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;

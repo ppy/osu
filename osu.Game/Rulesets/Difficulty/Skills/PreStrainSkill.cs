@@ -16,13 +16,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         protected override void Process(int index, DifficultyHitObject current)
         {
-            currentSectionPeak = StrainValueAt(index, current);
+            currentSectionPeak *= StrainDecayBase;
+            currentSectionPeak += StrainValueAt(index, current);
             saveCurrentPeak();
-        }
-
-        public void ProcessPre(int index, DifficultyHitObject current)
-        {
-            Process(index, current);
         }
 
         public double this[int i] => strainPeaks[i];
