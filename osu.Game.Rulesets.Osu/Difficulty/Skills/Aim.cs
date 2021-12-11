@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return aimStrain;
         }
 
-
         //private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);

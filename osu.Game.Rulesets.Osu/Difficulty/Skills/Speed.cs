@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             speedStrainTime = new SpeedStrainTime(mods, greatWindow);
             speedBonus = new SpeedBonus(mods, speedStrainTime);
         }
+
         private double strainValueOf(int index, DifficultyHitObject current)
         {
             speedStrainTime.ProcessInternal(index, current);
