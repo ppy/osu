@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.Playlists
         private const int scores_per_result = 10;
 
         private TestResultsScreen resultsScreen;
+
         private int currentScoreId;
         private bool requestComplete;
         private int totalCount;
@@ -37,7 +38,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            currentScoreId = 0;
+            currentScoreId = 1;
             requestComplete = false;
             totalCount = 0;
             bindHandler();
@@ -50,13 +51,13 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
                 bindHandler(userScore: userScore);
             });
 
             createResults(() => userScore);
 
-            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
+            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
         }
 
         [Test]
@@ -74,14 +75,14 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
                 bindHandler(true, userScore);
             });
 
             createResults(() => userScore);
 
             AddAssert("more than 1 panel displayed", () => this.ChildrenOfType<ScorePanel>().Count() > 1);
-            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
+            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
         }
 
         [Test]
@@ -123,7 +124,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
                 bindHandler(userScore: userScore);
             });
 
@@ -230,7 +231,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             var multiplayerUserScore = new MultiplayerScore
             {
-                ID = (int)(userScore.OnlineScoreID ?? currentScoreId++),
+                ID = (int)(userScore.OnlineID > 0 ? userScore.OnlineID : currentScoreId++),
                 Accuracy = userScore.Accuracy,
                 EndedAt = userScore.Date,
                 Passed = userScore.Passed,

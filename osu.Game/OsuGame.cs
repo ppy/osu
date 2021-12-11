@@ -487,8 +487,8 @@ namespace osu.Game
             // to ensure all the required data for presenting a replay are present.
             ScoreInfo databasedScoreInfo = null;
 
-            if (score.OnlineScoreID != null)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            if (score.OnlineID > 0)
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
 
             databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
 
