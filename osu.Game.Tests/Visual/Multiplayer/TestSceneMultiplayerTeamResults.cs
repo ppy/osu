@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     BeatmapInfo = beatmapInfo,
                     User = new APIUser { Username = "Test user" },
                     Date = DateTimeOffset.Now,
-                    OnlineScoreID = 12345,
+                    OnlineID = 12345,
                     Ruleset = rulesetInfo,
                 };
 

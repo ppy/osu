@@ -159,8 +159,8 @@ namespace osu.Game.Tests.Visual.Ranking
             var firstScore = new TestScoreInfo(new OsuRuleset().RulesetInfo);
             var secondScore = new TestScoreInfo(new OsuRuleset().RulesetInfo);
 
-            firstScore.User.Username = "A";
-            secondScore.User.Username = "B";
+            firstScore.UserString = "A";
+            secondScore.UserString = "B";
 
             createListStep(() => new ScorePanelList());
 
