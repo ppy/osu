@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(otherBeatmap = beatmap()));
 
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
-            AddUntilStep("selected item is new beatmap", () => (CurrentSubScreen as MultiplayerMatchSubScreen)?.SelectedItem.Value.BeatmapID == otherBeatmap.OnlineID);
+            AddUntilStep("selected item is new beatmap", () => (CurrentSubScreen as MultiplayerMatchSubScreen)?.SelectedItem.Value?.BeatmapID == otherBeatmap.OnlineID);
         }
 
         private void addItem(Func<BeatmapInfo> beatmap)
