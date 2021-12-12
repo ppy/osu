@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             Previous = new ReverseQueue<DifficultyHitObject>(HistoryLength + 1);
         }
 
-        protected void ProcessInternal(int index, DifficultyHitObject current)
+        internal void ProcessInternal(int index, DifficultyHitObject current)
         {
             while (Previous.Count > HistoryLength)
                 Previous.Dequeue();
