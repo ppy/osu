@@ -9,11 +9,16 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
-    public abstract class PreStrainSkill : StrainDecaySkill
+    public abstract class PreStrainSkill : StrainSkill
     {
+        protected abstract double StrainDecayBase { get; }
+
+        protected abstract double SkillMultiplier { get; }
+
         public PreStrainSkill(Mod[] mods) : base(mods)
         {
         }
+
 
         public List<double> GetAllStrainPeaks() => strainPeaks;
 
@@ -22,6 +27,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             currentSectionPeak *= StrainDecayBase;
             currentSectionPeak += StrainValueAt(index, current);
             saveCurrentPeak();
+        }
+
+        protected override double CalculateInitialStrain(double time) => 0;
+
+        public void ProcessPre(int index, DifficultyHitObject current)
+        {
+            ProcessInternal(index, current);
         }
 
         public double this[int i] => strainPeaks[i];

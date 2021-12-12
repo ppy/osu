@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             this.aimVelocity = aimVelocity;
         }
 
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count < 2 || Previous[0].BaseObject is Spinner)
                 return 0;
@@ -125,5 +125,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         private double calcWideAngleBonus(double angle) => Math.Pow(Math.Sin(3.0 / 4 * (Math.Min(5.0 / 6 * Math.PI, Math.Max(Math.PI / 6, angle)) - Math.PI / 6)), 2);
 
         private double calcAcuteAngleBonus(double angle) => 1 - calcWideAngleBonus(angle);
+
     }
 }

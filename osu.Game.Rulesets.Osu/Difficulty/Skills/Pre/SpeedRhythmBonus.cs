@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         /// <summary>
         /// Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner)
                 return 0;
