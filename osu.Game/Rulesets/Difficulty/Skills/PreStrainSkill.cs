@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
         }
 
-
         public List<double> GetAllStrainPeaks() => strainPeaks;
 
         protected override void Process(int index, DifficultyHitObject current)
