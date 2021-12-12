@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -18,9 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
         protected override double StrainDecayBase => 0.0;
 
-        private bool withSliders;
+        private readonly bool withSliders;
 
-        public AimVelocity(Mod[] mods, bool withSliders) : base(mods)
+        public AimVelocity(Mod[] mods, bool withSliders)
+            : base(mods)
         {
             this.withSliders = withSliders;
         }
@@ -36,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
 
             // But if the last object is a slider, then we extend the travel velocity through the slider into the current object.
-            if (osuLastObj != null && osuLastObj.BaseObject is Slider && withSliders)
+            if (osuLastObj?.BaseObject is Slider && withSliders)
             {
                 double travelVelocity = osuLastObj.TravelDistance / osuLastObj.TravelTime; // calculate the slider velocity from slider head to slider end.
                 double movementVelocity = osuCurrObj.MinimumJumpDistance / osuCurrObj.MinimumJumpTime; // calculate the movement velocity from slider end to current object

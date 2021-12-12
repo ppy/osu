@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -17,15 +15,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
         private const double rhythm_multiplier = 0.75;
 
-        private double greatWindow;
-
         protected override double SkillMultiplier => 1.0;
 
         protected override double StrainDecayBase => 0.0;
 
         protected override int HistoryLength => 32;
 
-        public SpeedRhythmBonus(Mod[] mods, double greatWindow) : base(mods)
+        private readonly double greatWindow;
+
+        public SpeedRhythmBonus(Mod[] mods, double greatWindow)
+            : base(mods)
         {
             this.greatWindow = greatWindow;
         }

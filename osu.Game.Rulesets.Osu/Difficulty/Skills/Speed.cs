@@ -4,10 +4,6 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Framework.Utils;
-using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Skills.Pre;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills

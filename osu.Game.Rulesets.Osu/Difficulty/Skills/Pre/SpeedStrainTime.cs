@@ -14,8 +14,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 {
     public class SpeedStrainTime : PreStrainSkill
     {
-        private double greatWindow;
-        public SpeedStrainTime(Mod[] mods, double greatWindow) : base(mods)
+        private readonly double greatWindow;
+
+        public SpeedStrainTime(Mod[] mods, double greatWindow)
+            : base(mods)
         {
             this.greatWindow = greatWindow;
         }

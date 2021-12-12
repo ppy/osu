@@ -25,8 +25,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
         protected override int HistoryLength => 2;
 
-        private bool withSliders;
-        private AimVelocity aimVelocity;
+        private readonly bool withSliders;
+
+        private readonly AimVelocity aimVelocity;
 
         public AimAngleBonus(Mod[] mods, bool withSliders, AimVelocity aimVelocity) : base(mods)
         {

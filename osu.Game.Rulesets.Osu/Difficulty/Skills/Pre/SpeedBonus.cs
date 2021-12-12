@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -17,9 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
-        private SpeedStrainTime speedStrainTime;
+        private readonly SpeedStrainTime speedStrainTime;
 
-        public SpeedBonus(Mod[] mods, SpeedStrainTime speedStrainTime) : base(mods)
+        public SpeedBonus(Mod[] mods, SpeedStrainTime speedStrainTime)
+            : base(mods)
         {
             this.speedStrainTime = speedStrainTime;
         }

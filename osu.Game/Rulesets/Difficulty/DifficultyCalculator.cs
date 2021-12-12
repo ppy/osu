@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Difficulty
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
 
             int index = 0;
+
             foreach (var hitObject in getDifficultyHitObjects())
             {
                 foreach (var skill in skills)
@@ -104,6 +105,7 @@ namespace osu.Game.Rulesets.Difficulty
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
             int index = 0;
+
             foreach (var hitObject in getDifficultyHitObjects())
             {
                 progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
