@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual.Playlists
     public class TestScenePlaylistsResultsScreen : ScreenTestScene
     {
         private const int scores_per_result = 10;
+        private const int real_user_position = 200;
 
         private TestResultsScreen resultsScreen;
 
@@ -58,6 +59,8 @@ namespace osu.Game.Tests.Visual.Playlists
             createResults(() => userScore);
 
             AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
+            AddAssert($"score panel position is {real_user_position}",
+                () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).ScorePosition.Value == real_user_position);
         }
 
         [Test]
@@ -236,7 +239,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 EndedAt = userScore.Date,
                 Passed = userScore.Passed,
                 Rank = userScore.Rank,
-                Position = 200,
+                Position = real_user_position,
                 MaxCombo = userScore.MaxCombo,
                 TotalScore = userScore.TotalScore,
                 User = userScore.User,
