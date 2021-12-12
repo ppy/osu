@@ -34,8 +34,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(int index, DifficultyHitObject current)
         {
-            aimVelocity.ProcessInternal(index, current);
-            aimAngleBonus.ProcessInternal(index, current);
+            aimVelocity.ProcessPre(index, current);
+            aimAngleBonus.ProcessPre(index, current);
 
             double aimStrain = aimVelocity[index] + aimAngleBonus[index]; // Start strain with regular velocity.
 
