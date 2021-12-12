@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
@@ -29,7 +27,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 
         private readonly AimVelocity aimVelocity;
 
-        public AimAngleBonus(Mod[] mods, bool withSliders, AimVelocity aimVelocity) : base(mods)
+        public AimAngleBonus(Mod[] mods, bool withSliders, AimVelocity aimVelocity)
+            : base(mods)
         {
             this.withSliders = withSliders;
             this.aimVelocity = aimVelocity;

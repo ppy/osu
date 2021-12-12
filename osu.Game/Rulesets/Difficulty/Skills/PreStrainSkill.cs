@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         {
             CurrentSectionPeak *= StrainDecayBase;
             CurrentSectionPeak += StrainValueAt(index, current);
-            saveCurrentPeak();
+            SaveCurrentPeak();
         }
 
         protected override double CalculateInitialStrain(double time) => 0;

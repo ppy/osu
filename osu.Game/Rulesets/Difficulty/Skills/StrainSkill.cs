@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             while (current.StartTime > CurrentSectionEnd)
             {
-                saveCurrentPeak();
+                SaveCurrentPeak();
                 startNewSectionFrom(CurrentSectionEnd);
                 CurrentSectionEnd += SectionLength;
             }
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
-        protected void saveCurrentPeak()
+        protected void SaveCurrentPeak()
         {
             StrainPeaks.Add(CurrentSectionPeak);
         }
