@@ -337,9 +337,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             base.UpdateWorkingBeatmap();
 
+            // Nothing to do if the beatmap hasn't changed.
             if (Beatmap.Value.BeatmapInfo.MatchesOnlineID(lastBeatmap.BeatmapInfo))
                 return;
 
+            // The selected item is nulled during the beatmap query. During this, the working beatmap will be the dummy beatmap.
+            // We don't want to enter spectate mode with the dummy beatmap.
             if (!Beatmap.Value.BeatmapInfo.MatchesOnlineID(SelectedItem.Value?.Beatmap.Value))
                 return;
 
@@ -421,9 +424,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (expectedSelectedItem == null)
                 return;
 
+            // There's no reason to renew the selected item if its content hasn't changed.
             if (SelectedItem.Value?.Equals(expectedSelectedItem) == true && expectedSelectedItem.Beatmap.Value != null)
                 return;
 
+            // Clear the selected item while the lookup is performed, so components like the ready button can enter their disabled states.
             SelectedItem.Value = null;
 
             if (expectedSelectedItem.Beatmap.Value == null)
