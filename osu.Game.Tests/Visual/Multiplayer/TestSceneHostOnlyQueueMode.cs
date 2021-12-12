@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -85,6 +86,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void selectNewItem(Func<BeatmapInfo> beatmap)
         {
+            AddUntilStep("wait for playlist panels to load", () =>
+            {
+                var queueList = this.ChildrenOfType<MultiplayerQueueList>().Single();
+                return queueList.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == queueList.Items.Count;
+            });
+
             AddStep("click edit button", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistEditButton>().First());
