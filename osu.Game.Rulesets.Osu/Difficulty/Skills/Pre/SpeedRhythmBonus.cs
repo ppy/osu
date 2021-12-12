@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         private const int history_time_max = 5000; // 5 seconds of calculatingRhythmBonus max.
         private const double rhythm_multiplier = 0.75;
 
-        protected override double SkillMultiplier => 1.0;
-
         protected override double StrainDecayBase => 0.0;
+
+        protected override double SkillMultiplier => 1.0;
 
         protected override int HistoryLength => 32;
 

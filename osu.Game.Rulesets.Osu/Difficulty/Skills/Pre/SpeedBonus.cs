@@ -15,6 +15,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         private const double min_speed_bonus = 75; // ~200BPM
         private const double speed_balancing_factor = 40;
 
+        protected override double StrainDecayBase => 0.0;
+
+        protected override double SkillMultiplier => 1.0;
+
         private readonly SpeedStrainTime speedStrainTime;
 
         public SpeedBonus(Mod[] mods, SpeedStrainTime speedStrainTime)
@@ -22,10 +26,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         {
             this.speedStrainTime = speedStrainTime;
         }
-
-        protected override double SkillMultiplier => 1.0;
-
-        protected override double StrainDecayBase => 0.0;
 
         protected override double StrainValueAt(int index, DifficultyHitObject current)
         {

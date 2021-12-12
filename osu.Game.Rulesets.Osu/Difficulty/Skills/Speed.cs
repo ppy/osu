@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(int index, DifficultyHitObject current)
         {
-            speedStrainTime.ProcessPre(index, current);
-            speedBonus.ProcessPre(index, current);
+            speedStrainTime.ProcessInternal(index, current);
+            speedBonus.ProcessInternal(index, current);
 
             return speedBonus[index];
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double StrainValueAt(int index, DifficultyHitObject current)
         {
-            speedRhythmBonus.ProcessPre(index, current);
+            speedRhythmBonus.ProcessInternal(index, current);
 
             currentStrain *= strainDecay(current.DeltaTime);
             currentStrain += strainValueOf(index, current) * skillMultiplier;

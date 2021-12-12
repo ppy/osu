@@ -14,15 +14,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
     {
         private readonly double greatWindow;
 
+        protected override double StrainDecayBase => 0.0;
+
+        protected override double SkillMultiplier => 1.0;
+
         public SpeedStrainTime(Mod[] mods, double greatWindow)
             : base(mods)
         {
             this.greatWindow = greatWindow;
         }
-
-        protected override double SkillMultiplier => 1.0;
-
-        protected override double StrainDecayBase => 0.0;
 
         protected override double StrainValueAt(int index, DifficultyHitObject current)
         {

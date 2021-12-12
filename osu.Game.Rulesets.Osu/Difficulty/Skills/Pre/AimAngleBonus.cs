@@ -17,11 +17,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
         private const double velocity_change_multiplier = 0.75;
         private const double slider_multiplier = 1.5;
 
-        protected override double SkillMultiplier => 1.0;
+        protected override int HistoryLength => 2;
 
         protected override double StrainDecayBase => 0.0;
 
-        protected override int HistoryLength => 2;
+        protected override double SkillMultiplier => 1.0;
 
         private readonly bool withSliders;
 

@@ -12,11 +12,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
 {
     public class AimVelocity : PreStrainSkill
     {
-        protected override double SkillMultiplier => 1.0;
+        private readonly bool withSliders;
 
         protected override double StrainDecayBase => 0.0;
 
-        private readonly bool withSliders;
+        protected override double SkillMultiplier => 1.0;
 
         public AimVelocity(Mod[] mods, bool withSliders)
             : base(mods)
