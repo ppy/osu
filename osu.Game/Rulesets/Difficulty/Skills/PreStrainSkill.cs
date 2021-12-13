@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             SaveCurrentPeak();
         }
 
-        public double GetCurrentStrain() => StrainPeaks[StrainPeaks.Count - 1];
+        public double GetCurrentStrain() => this[0];
 
-        public double GetLastStrain() => StrainPeaks[StrainPeaks.Count - 2];
+        public double GetLastStrain() => this[1];
 
         public double this[int i] => StrainPeaks[StrainPeaks.Count - 1 - i];
 
