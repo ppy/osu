@@ -55,7 +55,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             bool firstDeltaSwitch = false;
 
-            for (int i = Previous.Count - 2; i > 0; i--)
+            int rhythmStart = Math.Min(Previous.Count - 2, 0);
+
+            while (rhythmStart < Previous.Count - 2 && current.StartTime - Previous[rhythmStart].StartTime < history_time_max)
+                rhythmStart++;
+
+            for (int i = rhythmStart; i > 0; i--)
             {
                 OsuDifficultyHitObject currObj = (OsuDifficultyHitObject)Previous[i - 1];
                 OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)Previous[i];
