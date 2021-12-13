@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -44,14 +45,27 @@ namespace osu.Game.Scoring
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = null!;
 
-        public IUser User
+        // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
+        // Eventually we should either persist enough information to realm to not require the API lookups, or perform the API lookups locally.
+        private APIUser? user;
+
+        public APIUser User
         {
-            get => RealmUser;
-            set => RealmUser = new RealmUser
+            get => user ??= new APIUser
             {
-                OnlineID = value.OnlineID,
-                Username = value.Username
+                Username = RealmUser.Username,
+                Id = RealmUser.OnlineID,
             };
+            set
+            {
+                user = value;
+
+                RealmUser = new RealmUser
+                {
+                    OnlineID = user.OnlineID,
+                    Username = user.Username
+                };
+            }
         }
 
         public long TotalScore { get; set; }
@@ -72,6 +86,7 @@ namespace osu.Game.Scoring
         {
             get => new BeatmapInfo();
             // .. todo
+            // ReSharper disable once ValueParameterNotUsed
             set => Beatmap = new RealmBeatmap(new RealmRuleset("osu", "osu!", "wangs", 0), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
         }
 
@@ -89,6 +104,8 @@ namespace osu.Game.Scoring
 
                 return JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson) ?? new Dictionary<HitResult, int>();
             }
+            // .. todo
+            // ReSharper disable once ValueParameterNotUsed
             set => JsonConvert.SerializeObject(StatisticsJson);
         }
 

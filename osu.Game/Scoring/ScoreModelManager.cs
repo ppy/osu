@@ -11,7 +11,6 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
-using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Stores;
 using Realms;
@@ -26,10 +25,10 @@ namespace osu.Game.Scoring
 
         protected override string[] HashableFileTypes => new[] { ".osr" };
 
-        private readonly RulesetStore rulesets;
+        private readonly RealmRulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmContextFactory contextFactory)
+        public ScoreModelManager(RealmRulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmContextFactory contextFactory)
             : base(storage, contextFactory)
         {
             this.rulesets = rulesets;

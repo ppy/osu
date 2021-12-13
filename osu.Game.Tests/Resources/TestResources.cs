@@ -164,7 +164,6 @@ namespace osu.Game.Tests.Resources
             },
             BeatmapInfo = beatmap,
             Ruleset = beatmap.Ruleset,
-            RulesetID = beatmap.Ruleset.ID ?? 0,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
             TotalScore = 2845370,
             Accuracy = 0.95,

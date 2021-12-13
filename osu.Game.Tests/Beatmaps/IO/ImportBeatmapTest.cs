@@ -12,7 +12,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Scoring;
 using osu.Game.Tests.Resources;
+using osu.Game.Tests.Scores.IO;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -59,6 +61,15 @@ namespace osu.Game.Tests.Beatmaps.IO
             checkSingleReferencedFileCount(osu, 0);
 
             Assert.IsTrue(manager.QueryBeatmapSets(_ => true).First().DeletePending);
+        }
+
+        private static Task createScoreForBeatmap(OsuGameBase osu, BeatmapInfo beatmapInfo)
+        {
+            return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
+            {
+                OnlineID = 2,
+                BeatmapInfo = beatmapInfo,
+            }, new ImportScoreTest.TestArchiveReader());
         }
 
         private static void checkBeatmapSetCount(OsuGameBase osu, int expected, bool includeDeletePending = false)

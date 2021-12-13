@@ -6,14 +6,14 @@ using System.Linq;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
-using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Stores;
 
 namespace osu.Game.Scoring
 {
     public class LegacyDatabasedScore : Score
     {
-        public LegacyDatabasedScore(ScoreInfo score, RulesetStore rulesets, BeatmapManager beatmaps, IResourceStore<byte[]> store)
+        public LegacyDatabasedScore(ScoreInfo score, RealmRulesetStore rulesets, BeatmapManager beatmaps, IResourceStore<byte[]> store)
         {
             ScoreInfo = score;
 

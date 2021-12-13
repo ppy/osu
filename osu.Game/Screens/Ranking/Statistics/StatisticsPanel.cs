@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     LoadComponentAsync(rows, d =>
                     {
-                        if (Score.Value != newScore)
+                        if (!Score.Value.Equals(newScore))
                             return;
 
                         spinner.Hide();
