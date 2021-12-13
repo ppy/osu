@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestDeserialiseSubmittableScoreWithEmptyMods()
         {
-            var score = new SubmittableScore(new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo });
+            var score = new SubmittableScore(new ScoreInfo());
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
@@ -106,7 +106,6 @@ namespace osu.Game.Tests.Online
         {
             var score = new SubmittableScore(new ScoreInfo
             {
-                Ruleset = new OsuRuleset().RulesetInfo,
                 Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
             });
 
