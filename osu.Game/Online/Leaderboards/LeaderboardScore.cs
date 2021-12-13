@@ -399,7 +399,7 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Files.Count > 0)
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
 
-                if (Score.ID != 0)
+                if (Score.IsManaged)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();

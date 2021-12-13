@@ -20,6 +20,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Stores;
 
 namespace osu.Game.Scoring
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Scoring
             this.difficulties = difficulties;
             this.configManager = configManager;
 
-            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory, importHost);
+            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory);
         }
 
         public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
@@ -125,8 +126,9 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
-            if (score.Beatmap == null)
-                return score.TotalScore;
+            // TODO: ??
+            // if (score.Beatmap == null)
+            //     return score.TotalScore;
 
             int beatmapMaxCombo;
             double accuracy = score.Accuracy;
@@ -150,7 +152,7 @@ namespace osu.Game.Scoring
                     beatmapMaxCombo = score.Beatmap.MaxCombo.Value;
                 else
                 {
-                    if (score.Beatmap.ID == 0 || difficulties == null)
+                    if (!score.Beatmap.IsManaged || difficulties == null)
                     {
                         // We don't have enough information (max combo) to compute the score, so use the provided score.
                         return score.TotalScore;

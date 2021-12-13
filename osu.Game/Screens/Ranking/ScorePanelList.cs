@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Ranking
 
                             trackingContainer.Show();
 
-                            if (SelectedScore.Value == score)
+                            if (SelectedScore.Value.Equals(score))
                             {
                                 SelectedScore.TriggerChange();
                             }
@@ -185,10 +185,10 @@ namespace osu.Game.Screens.Ranking
         private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
             // avoid contracting panels unnecessarily when TriggerChange is fired manually.
-            if (score.OldValue != score.NewValue)
+            if (!score.OldValue.Equals(score.NewValue))
             {
                 // Contract the old panel.
-                foreach (var t in flow.Where(t => t.Panel.Score == score.OldValue))
+                foreach (var t in flow.Where(t => t.Panel.Score.Equals(score.OldValue)))
                 {
                     t.Panel.State = PanelState.Contracted;
                     t.Margin = new MarginPadding();
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.Ranking
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to find the corresponding <see cref="ScorePanel"/> for.</param>
         /// <returns>The <see cref="ScorePanel"/>.</returns>
-        public ScorePanel GetPanelForScore(ScoreInfo score) => flow.Single(t => t.Panel.Score == score).Panel;
+        public ScorePanel GetPanelForScore(ScoreInfo score) => flow.Single(t => t.Panel.Score.Equals(score)).Panel;
 
         /// <summary>
         /// Detaches a <see cref="ScorePanel"/> from its <see cref="ScorePanelTrackingContainer"/>, allowing the panel to be moved elsewhere in the hierarchy.
@@ -332,13 +332,13 @@ namespace osu.Game.Screens.Ranking
         {
             public override IEnumerable<Drawable> FlowingChildren => applySorting(AliveInternalChildren);
 
-            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).Count();
+            public int GetPanelIndex(ScoreInfo score) => applySorting(Children).TakeWhile(s => !s.Panel.Score.Equals(score)).Count();
 
             [CanBeNull]
-            public ScoreInfo GetPreviousScore(ScoreInfo score) => applySorting(Children).TakeWhile(s => s.Panel.Score != score).LastOrDefault()?.Panel.Score;
+            public ScoreInfo GetPreviousScore(ScoreInfo score) => applySorting(Children).TakeWhile(s => !s.Panel.Score.Equals(score)).LastOrDefault()?.Panel.Score;
 
             [CanBeNull]
-            public ScoreInfo GetNextScore(ScoreInfo score) => applySorting(Children).SkipWhile(s => s.Panel.Score != score).ElementAtOrDefault(1)?.Panel.Score;
+            public ScoreInfo GetNextScore(ScoreInfo score) => applySorting(Children).SkipWhile(s => !s.Panel.Score.Equals(score)).ElementAtOrDefault(1)?.Panel.Score;
 
             private IEnumerable<ScorePanelTrackingContainer> applySorting(IEnumerable<Drawable> drawables) => drawables.OfType<ScorePanelTrackingContainer>()
                                                                                                                        .OrderByDescending(GetLayoutPosition)
