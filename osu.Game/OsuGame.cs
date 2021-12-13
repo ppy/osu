@@ -103,7 +103,7 @@ namespace osu.Game
 
         private Container topMostOverlayContent;
 
-        private ScalingContainer screenContainer;
+        protected ScalingContainer ScreenContainer { get; private set; }
 
         protected Container ScreenOffsetContainer { get; private set; }
 
@@ -179,7 +179,7 @@ namespace osu.Game
         }
 
         private void updateBlockingOverlayFade() =>
-            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
@@ -698,7 +698,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                        ScreenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
@@ -801,7 +801,7 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
