@@ -147,18 +147,16 @@ namespace osu.Game.Tests.Resources
         /// Create a test score model.
         /// </summary>
         /// <param name="ruleset">The ruleset for which the score was set against.</param>
-        /// <param name="excessMods">Whether to include an excessive number of mods. If <c>false</c>, only two will be added.</param>
         /// <returns></returns>
-        public static ScoreInfo CreateTestScoreInfo(RulesetInfo ruleset = null, bool excessMods = false) =>
-            CreateTestScoreInfo(CreateTestBeatmapSetInfo(1, new[] { ruleset ?? new OsuRuleset().RulesetInfo }).Beatmaps.First(), excessMods);
+        public static ScoreInfo CreateTestScoreInfo(RulesetInfo ruleset = null) =>
+            CreateTestScoreInfo(CreateTestBeatmapSetInfo(1, new[] { ruleset ?? new OsuRuleset().RulesetInfo }).Beatmaps.First());
 
         /// <summary>
         /// Create a test score model.
         /// </summary>
         /// <param name="beatmap">The beatmap for which the score was set against.</param>
-        /// <param name="excessMods">Whether to include an excessive number of mods. If <c>false</c>, only two will be added.</param>
         /// <returns></returns>
-        public static ScoreInfo CreateTestScoreInfo(BeatmapInfo beatmap, bool excessMods = false) => new ScoreInfo
+        public static ScoreInfo CreateTestScoreInfo(BeatmapInfo beatmap) => new ScoreInfo
         {
             User = new APIUser
             {
@@ -169,9 +167,7 @@ namespace osu.Game.Tests.Resources
             BeatmapInfo = beatmap,
             Ruleset = beatmap.Ruleset,
             RulesetID = beatmap.Ruleset.ID ?? 0,
-            Mods = excessMods
-                ? beatmap.Ruleset.CreateInstance().CreateAllMods().ToArray()
-                : new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
+            Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
             TotalScore = 2845370,
             Accuracy = 0.95,
             MaxCombo = 999,
