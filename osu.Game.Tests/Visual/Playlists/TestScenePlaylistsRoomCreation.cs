@@ -109,42 +109,6 @@ namespace osu.Game.Tests.Visual.Playlists
             AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
         }
 
-        [Test]
-        public void TestBeatmapUpdatedOnReImport()
-        {
-            BeatmapSetInfo importedSet = null;
-
-            AddStep("import altered beatmap", () =>
-            {
-                IBeatmap beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
-
-                beatmap.BeatmapInfo.BaseDifficulty.CircleSize = 1;
-
-                // intentionally increment online IDs to clash with import below.
-                beatmap.BeatmapInfo.OnlineID++;
-                beatmap.BeatmapInfo.BeatmapSet.OnlineID++;
-
-                importedSet = manager.Import(beatmap.BeatmapInfo.BeatmapSet).Result.Value;
-            });
-
-            setupAndCreateRoom(room =>
-            {
-                room.Name.Value = "my awesome room";
-                room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem
-                {
-                    Beatmap = { Value = importedSet.Beatmaps[0] },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
-                });
-            });
-
-            AddAssert("match has altered beatmap", () => match.Beatmap.Value.Beatmap.Difficulty.CircleSize == 1);
-
-            importBeatmap();
-
-            AddAssert("match has original beatmap", () => match.Beatmap.Value.Beatmap.Difficulty.CircleSize != 1);
-        }
-
         private void setupAndCreateRoom(Action<Room> room)
         {
             AddStep("setup room", () => room(SelectedRoom.Value));
