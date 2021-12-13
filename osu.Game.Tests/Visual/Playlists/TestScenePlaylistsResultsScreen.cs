@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+                userScore = TestResources.CreateTestScoreInfo();
                 userScore.OnlineID = currentScoreId++;
 
                 bindHandler(userScore: userScore);
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+                userScore = TestResources.CreateTestScoreInfo();
                 userScore.OnlineID = currentScoreId++;
 
                 bindHandler(true, userScore);
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+                userScore = TestResources.CreateTestScoreInfo();
                 userScore.OnlineID = currentScoreId++;
 
                 bindHandler(userScore: userScore);

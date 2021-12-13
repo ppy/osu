@@ -23,13 +23,13 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestShowPanel()
         {
-            AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo)));
+            AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo()));
         }
 
         [Test]
         public void TestExcessMods()
         {
-            AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo, true)));
+            AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo(excessMods: true)));
         }
 
         private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)

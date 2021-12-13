@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Rulesets.Osu.Objects;
@@ -39,7 +38,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestScoreWithoutStatistics()
         {
-            loadPanel(TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo));
+            loadPanel(TestResources.CreateTestScoreInfo());
         }
 
         [Test]
