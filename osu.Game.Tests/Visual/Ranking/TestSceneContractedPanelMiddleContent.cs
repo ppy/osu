@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Contracted;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -22,13 +23,13 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestShowPanel()
         {
-            AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo)));
+            AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo)));
         }
 
         [Test]
         public void TestExcessMods()
         {
-            AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo, true)));
+            AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo, true)));
         }
 
         private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)
