@@ -499,12 +499,14 @@ namespace osu.Game.Screens.Play
 
         private int restartCount;
 
+        private const double volume_requirement = 0.05;
+
         private void showMuteWarningIfNeeded()
         {
             if (!muteWarningShownOnce.Value)
             {
                 // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= volume_requirement || audioManager.VolumeTrack.Value <= volume_requirement)
                 {
                     notificationOverlay?.Post(new MutedNotification());
                     muteWarningShownOnce.Value = true;
@@ -518,7 +520,7 @@ namespace osu.Game.Screens.Play
 
             public MutedNotification()
             {
-                Text = "你的音乐音量被设置为了0%! 点击这里重置";
+                Text = "游戏音量太低！点击这里重置";
             }
 
             [BackgroundDependencyLoader]
@@ -532,8 +534,12 @@ namespace osu.Game.Screens.Play
                     notificationOverlay.Hide();
 
                     volumeOverlay.IsMuted.Value = false;
-                    audioManager.Volume.SetDefault();
-                    audioManager.VolumeTrack.SetDefault();
+
+                    // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
+                    if (audioManager.Volume.Value <= volume_requirement)
+                        audioManager.Volume.SetDefault();
+                    if (audioManager.VolumeTrack.Value <= volume_requirement)
+                        audioManager.VolumeTrack.SetDefault();
 
                     return true;
                 };
