@@ -13,7 +13,6 @@ using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
