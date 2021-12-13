@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Aim : OsuStrainSkill
     {
         private double skillMultiplier => 23.25;
+
         private double strainDecayBase => 0.15;
 
         private double currentStrain;
@@ -29,12 +30,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             aimAngleBonus = new AimAngleBonus(mods, withSliders, aimVelocity);
         }
 
-        private double strainValueOf(int index, DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObject current)
         {
-            aimVelocity.ProcessInternal(index, current);
-            aimAngleBonus.ProcessInternal(index, current);
+            aimVelocity.ProcessInternal(current);
+            aimAngleBonus.ProcessInternal(current);
 
-            double aimStrain = aimVelocity[index] + aimAngleBonus[index]; // Start strain with regular velocity.
+            double aimStrain = aimVelocity.GetCurrentStrain() + aimAngleBonus.GetCurrentStrain(); // Start strain with regular velocity.
 
             return aimStrain;
         }
@@ -45,10 +46,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(index, current) * skillMultiplier;
+            currentStrain += strainValueOf(current) * skillMultiplier;
 
             return currentStrain;
         }

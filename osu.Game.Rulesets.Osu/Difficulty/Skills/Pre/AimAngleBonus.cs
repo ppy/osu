@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             this.aimVelocity = aimVelocity;
         }
 
-        protected override double StrainValueOf(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count < 2 || Previous[0].BaseObject is Spinner)
                 return 0;
@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             var osuLastObj = (OsuDifficultyHitObject)Previous[0];
             var osuLastLastObj = (OsuDifficultyHitObject)Previous[1];
 
-            double currVelocity = aimVelocity[index];
-            double prevVelocity = aimVelocity[index - 1];
+            double currVelocity = aimVelocity.GetCurrentStrain();
+            double prevVelocity = aimVelocity.GetLastStrain();
 
             double wideAngleBonus = 0;
             double acuteAngleBonus = 0;

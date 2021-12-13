@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueAt(int index, DifficultyHitObject current);
+        protected abstract double StrainValueAt(DifficultyHitObject current);
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        protected override void Process(int index, DifficultyHitObject current)
+        protected override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (Previous.Count == 0)
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 CurrentSectionEnd += SectionLength;
             }
 
-            CurrentSectionPeak = Math.Max(StrainValueAt(index, current), CurrentSectionPeak);
+            CurrentSectionPeak = Math.Max(StrainValueAt(current), CurrentSectionPeak);
         }
 
         /// <summary>

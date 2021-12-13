@@ -36,26 +36,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             speedBonus = new SpeedBonus(mods, speedStrainTime);
         }
 
-        private double strainValueOf(int index, DifficultyHitObject current)
+        private double strainValueOf(DifficultyHitObject current)
         {
-            speedStrainTime.ProcessInternal(index, current);
-            speedBonus.ProcessInternal(index, current);
+            speedStrainTime.ProcessInternal(current);
+            speedBonus.ProcessInternal(current);
 
-            return speedBonus[index];
+            return speedBonus.GetCurrentStrain();
         }
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
         protected override double CalculateInitialStrain(double time) => (currentStrain * currentRhythm) * strainDecay(time - Previous[0].StartTime);
 
-        protected override double StrainValueAt(int index, DifficultyHitObject current)
+        protected override double StrainValueAt(DifficultyHitObject current)
         {
-            speedRhythmBonus.ProcessInternal(index, current);
+            speedRhythmBonus.ProcessInternal(current);
 
             currentStrain *= strainDecay(current.DeltaTime);
-            currentStrain += strainValueOf(index, current) * skillMultiplier;
+            currentStrain += strainValueOf(current) * skillMultiplier;
 
-            currentRhythm = speedRhythmBonus[index];
+            currentRhythm = speedRhythmBonus.GetCurrentStrain();
 
             return currentStrain * currentRhythm;
         }
