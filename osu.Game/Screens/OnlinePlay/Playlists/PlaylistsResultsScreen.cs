@@ -87,6 +87,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             {
                 var allScores = new List<MultiplayerScore> { userScore };
 
+                // Other scores could have arrived between score submission and entering the results screen. Ensure the local player score position is up to date.
+                if (Score != null)
+                {
+                    Score.Position = userScore.Position;
+                    ScorePanelList.GetPanelForScore(Score).ScorePosition.Value = userScore.Position;
+                }
+
                 if (userScore.ScoresAround?.Higher != null)
                 {
                     allScores.AddRange(userScore.ScoresAround.Higher.Scores);
