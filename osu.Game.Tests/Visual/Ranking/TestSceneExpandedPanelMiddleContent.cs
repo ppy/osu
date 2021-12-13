@@ -20,6 +20,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Expanded;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -34,10 +35,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var author = new APIUser { Username = "mapper_name" };
 
-            AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                BeatmapInfo = createTestBeatmap(author)
-            }));
+            AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(author))));
         }
 
         [Test]
@@ -45,10 +43,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             var author = new APIUser { Username = "mapper_name" };
 
-            AddStep("show excess mods score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo, true)
-            {
-                BeatmapInfo = createTestBeatmap(author)
-            }));
+            AddStep("show excess mods score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(author), true)));
 
             AddAssert("mapper name present", () => this.ChildrenOfType<OsuSpriteText>().Any(spriteText => spriteText.Current.Value == "mapper_name"));
         }
@@ -56,10 +51,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithUnknownMapper()
         {
-            AddStep("show example score", () => showPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                BeatmapInfo = createTestBeatmap(new APIUser())
-            }));
+            AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(new APIUser()))));
 
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
@@ -77,12 +69,12 @@ namespace osu.Game.Tests.Visual.Ranking
                 var mods = new Mod[] { ruleset.GetAutoplayMod() };
                 var beatmap = createTestBeatmap(new APIUser());
 
-                showPanel(new TestScoreInfo(ruleset.RulesetInfo)
-                {
-                    Mods = mods,
-                    BeatmapInfo = beatmap,
-                    Date = default,
-                });
+                var score = TestResources.CreateTestScoreInfo(beatmap);
+
+                score.Mods = mods;
+                score.Date = default;
+
+                showPanel(score);
             });
 
             AddAssert("play time not displayed", () => !this.ChildrenOfType<ExpandedPanelMiddleContent.PlayedOnText>().Any());

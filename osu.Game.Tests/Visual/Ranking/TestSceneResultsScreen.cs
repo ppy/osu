@@ -21,6 +21,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
 
@@ -72,11 +73,10 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                Accuracy = accuracy,
-                Rank = rank
-            };
+            var score = TestResources.CreateTestScoreInfo();
+
+            score.Accuracy = accuracy;
+            score.Rank = rank;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen(score)));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             DelayedFetchResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo), 3000)));
+            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo), 3000)));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddStep("click expanded panel", () =>
             {
@@ -237,9 +237,9 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
         }
 
-        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? new TestScoreInfo(new OsuRuleset().RulesetInfo));
+        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo));
 
-        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo));
 
         private class TestResultsContainer : Container
         {
@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 for (int i = 0; i < 20; i++)
                 {
-                    var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+                    var score = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
                     score.TotalScore += 10 - i;
                     score.Hash = $"test{i}";
                     scores.Add(score);
@@ -316,7 +316,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                     for (int i = 0; i < 20; i++)
                     {
-                        var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+                        var score = TestResources.CreateTestScoreInfo();
                         score.TotalScore += 10 - i;
                         scores.Add(score);
                     }
