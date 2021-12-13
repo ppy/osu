@@ -7,6 +7,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -54,7 +58,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void fetchAndLoadTopScore()
         {
-            var rank = fetchTopScore()?.Rank;
+            var rank = fetchTopScoreRank();
             scheduledRankUpdate = Schedule(() =>
             {
                 Rank = rank;
@@ -67,14 +71,18 @@ namespace osu.Game.Screens.Select.Carousel
         // We're present if a rank is set, or if there is a pending rank update (IsPresent = true is required for the scheduler to run).
         public override bool IsPresent => base.IsPresent && (Rank != null || scheduledRankUpdate?.Completed == false);
 
-        private ScoreInfo fetchTopScore()
+        private ScoreRank? fetchTopScoreRank()
         {
-            if (scores == null || beatmapInfo == null || ruleset?.Value == null || api?.LocalUser.Value == null)
+            if (realmFactory == null || beatmapInfo == null || ruleset?.Value == null || api?.LocalUser.Value == null)
                 return null;
 
-            return scores.QueryScores(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
-                         .OrderByDescending(s => s.TotalScore)
-                         .FirstOrDefault();
+            using (var realm = realmFactory.CreateContext())
+            {
+                return realm.All<ScoreInfo>().Where(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
+                            .OrderByDescending(s => s.TotalScore)
+                            .FirstOrDefault()
+                            ?.Rank;
+            }
         }
 
         protected override void Dispose(bool isDisposing)

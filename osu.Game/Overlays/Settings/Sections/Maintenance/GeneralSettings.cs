@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteScoresButton.Enabled.Value = false;
-                        Task.Run(() => scores.Delete(scores.GetAllUsableScores())).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
+                        Task.Run(() => scores.Delete()).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
                     }));
                 }
             });
