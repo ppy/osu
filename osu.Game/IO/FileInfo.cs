@@ -9,6 +9,8 @@ namespace osu.Game.IO
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public string Hash { get; set; }
 
         public int ReferenceCount { get; set; }

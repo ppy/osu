@@ -14,7 +14,6 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -44,8 +43,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public override string ShortTitle => "多人游戏";
 
-        public OsuButton AddOrEditPlaylistButton { get; private set; }
-
         [Resolved]
         private MultiplayerClient client { get; set; }
 
@@ -56,6 +53,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         [CanBeNull]
         private IDisposable readyClickOperation;
+
+        private AddItemButton addItemButton;
 
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
@@ -134,12 +133,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 new Drawable[] { new OverlinedHeader("谱面") },
                                 new Drawable[]
                                 {
-                                    AddOrEditPlaylistButton = new PurpleTriangleButton
+                                    addItemButton = new AddItemButton
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 40,
-                                        Action = SelectBeatmap,
-                                        Alpha = 0
+                                        Text = "Add item",
+                                        Action = () => OpenSongSelection()
                                     },
                                 },
                                 null,
@@ -147,7 +146,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 {
                                     new MultiplayerPlaylist
                                     {
-                                        RelativeSizeAxes = Axes.Both
+                                        RelativeSizeAxes = Axes.Both,
+                                        RequestEdit = OpenSongSelection
                                     }
                                 },
                                 new[]
@@ -220,12 +220,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         };
 
-        internal void SelectBeatmap()
+        /// <summary>
+        /// Opens the song selection screen to add or edit an item.
+        /// </summary>
+        /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
+        internal void OpenSongSelection([CanBeNull] PlaylistItem itemToEdit = null)
         {
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(new MultiplayerMatchSongSelect(Room));
+            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter
@@ -385,23 +389,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            switch (client.Room.Settings.QueueMode)
-            {
-                case QueueMode.HostOnly:
-                    AddOrEditPlaylistButton.Text = "Edit beatmap";
-                    AddOrEditPlaylistButton.Alpha = client.IsHost ? 1 : 0;
-                    break;
-
-                case QueueMode.AllPlayers:
-                case QueueMode.AllPlayersRoundRobin:
-                    AddOrEditPlaylistButton.Text = "Add beatmap";
-                    AddOrEditPlaylistButton.Alpha = 1;
-                    break;
-
-                default:
-                    AddOrEditPlaylistButton.Alpha = 0;
-                    break;
-            }
+            addItemButton.Alpha = client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly ? 1 : 0;
 
             Scheduler.AddOnce(UpdateMods);
         }
@@ -466,7 +454,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            this.Push(new MultiplayerMatchSongSelect(Room, beatmap, ruleset));
+            this.Push(new MultiplayerMatchSongSelect(Room, SelectedItem.Value, beatmap, ruleset));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -480,6 +468,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             modSettingChangeTracker?.Dispose();
+        }
+
+        public class AddItemButton : PurpleTriangleButton
+        {
         }
     }
 }
