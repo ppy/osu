@@ -166,6 +166,8 @@ namespace osu.Game.Screens.OnlinePlay
                             IBeatmapInfo foundBeatmap;
 
                             if (multiplayerClient != null)
+                                // This call can eventually go away (and use the else case below).
+                                // Currently required only due to the method being overridden to provide special behaviour in tests.
                                 foundBeatmap = await multiplayerClient.GetAPIBeatmap(Item.BeatmapID).ConfigureAwait(false);
                             else
                                 foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
