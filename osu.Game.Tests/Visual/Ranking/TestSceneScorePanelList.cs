@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
@@ -30,14 +29,14 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             createListStep(() => new ScorePanelList
             {
-                SelectedScore = { Value = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo) }
+                SelectedScore = { Value = TestResources.CreateTestScoreInfo() }
             });
         }
 
         [Test]
         public void TestAddPanelAfterSelectingScore()
         {
-            var score = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var score = TestResources.CreateTestScoreInfo();
 
             createListStep(() => new ScorePanelList
             {
@@ -53,7 +52,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAddPanelBeforeSelectingScore()
         {
-            var score = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var score = TestResources.CreateTestScoreInfo();
 
             createListStep(() => new ScorePanelList());
 
@@ -76,7 +75,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("add many scores", () =>
             {
                 for (int i = 0; i < 20; i++)
-                    list.AddScore(TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo));
+                    list.AddScore(TestResources.CreateTestScoreInfo());
             });
 
             assertFirstPanelCentred();
@@ -85,7 +84,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAddManyScoresAfterExpandedPanel()
         {
-            var initialScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var initialScore = TestResources.CreateTestScoreInfo();
 
             createListStep(() => new ScorePanelList());
 
@@ -108,7 +107,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAddManyScoresBeforeExpandedPanel()
         {
-            var initialScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var initialScore = TestResources.CreateTestScoreInfo();
 
             createListStep(() => new ScorePanelList());
 
@@ -131,7 +130,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAddManyPanelsOnBothSidesOfExpandedPanel()
         {
-            var initialScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var initialScore = TestResources.CreateTestScoreInfo();
 
             createListStep(() => new ScorePanelList());
 
@@ -157,8 +156,8 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestSelectMultipleScores()
         {
-            var firstScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
-            var secondScore = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var firstScore = TestResources.CreateTestScoreInfo();
+            var secondScore = TestResources.CreateTestScoreInfo();
 
             firstScore.UserString = "A";
             secondScore.UserString = "B";
@@ -191,7 +190,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestAddScoreImmediately()
         {
-            var score = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+            var score = TestResources.CreateTestScoreInfo();
 
             createListStep(() =>
             {

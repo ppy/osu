@@ -15,7 +15,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -204,7 +203,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             DelayedFetchResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo), 3000)));
+            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), 3000)));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddStep("click expanded panel", () =>
             {
@@ -237,9 +236,9 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
         }
 
-        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo));
+        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo());
 
-        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo));
+        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo());
 
         private class TestResultsContainer : Container
         {
@@ -282,7 +281,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 for (int i = 0; i < 20; i++)
                 {
-                    var score = TestResources.CreateTestScoreInfo(new OsuRuleset().RulesetInfo);
+                    var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
                     score.Hash = $"test{i}";
                     scores.Add(score);
