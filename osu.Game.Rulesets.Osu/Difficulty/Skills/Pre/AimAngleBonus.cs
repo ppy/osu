@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             this.aimVelocity = aimVelocity;
         }
 
-        protected override double StrainValueAt(int index, DifficultyHitObject current)
+        protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             if (current.BaseObject is Spinner || Previous.Count < 2 || Previous[0].BaseObject is Spinner)
                 return 0;

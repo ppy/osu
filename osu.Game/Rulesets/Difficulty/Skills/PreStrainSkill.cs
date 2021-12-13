@@ -3,37 +3,50 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty.Skills
 {
-    public abstract class PreStrainSkill : StrainSkill
+    public abstract class PreStrainSkill : Skill
     {
+        protected readonly ReverseQueue<double> PreviousValue;
+
         protected abstract double StrainDecayBase { get; }
 
         protected abstract double SkillMultiplier { get; }
 
+        protected double CurrentStrain { get; private set; }
+
         protected PreStrainSkill(Mod[] mods)
             : base(mods)
         {
+            PreviousValue = new ReverseQueue<double>(HistoryLength + 1);
         }
-
-        public List<double> GetAllStrainPeaks() => StrainPeaks;
 
         protected override void Process(int index, DifficultyHitObject current)
         {
-            CurrentSectionPeak *= StrainDecayBase;
-            CurrentSectionPeak += StrainValueAt(index, current);
-            SaveCurrentPeak();
+            while (PreviousValue.Count > HistoryLength)
+                PreviousValue.Dequeue();
+
+            CurrentStrain *= StrainDecayBase;
+            CurrentStrain += StrainValueOf(index, current);
+
+            PreviousValue.Enqueue(CurrentStrain);
         }
 
-        protected override double CalculateInitialStrain(double time) => 0;
+        protected abstract double StrainValueOf(int index, DifficultyHitObject current);
 
         public void ProcessPre(int index, DifficultyHitObject current)
         {
             ProcessInternal(index, current);
         }
 
-        public double this[int i] => StrainPeaks[i];
+        public double this[int i] => PreviousValue[i];
+
+        public override double DifficultyValue()
+        {
+            return 0;
+        }
     }
 }

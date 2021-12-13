@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills.Pre
             this.greatWindow = greatWindow;
         }
 
-        protected override double StrainValueAt(int index, DifficultyHitObject current)
+        protected override double StrainValueOf(int index, DifficultyHitObject current)
         {
             var osuCurrObj = (OsuDifficultyHitObject)current;
             var osuPrevObj = Previous.Count > 0 ? (OsuDifficultyHitObject)Previous[0] : null;
