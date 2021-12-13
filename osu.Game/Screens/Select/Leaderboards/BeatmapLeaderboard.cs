@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Leaderboards;
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
 
         private BeatmapInfo beatmapInfo;
 
@@ -126,26 +130,28 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
-
-                if (filterMods && !mods.Value.Any())
+                using (var realm = realmFactory.CreateContext())
                 {
-                    // we need to filter out all scores that have any mods to get all local nomod scores
-                    scores = scores.Where(s => !s.Mods.Any());
-                }
-                else if (filterMods)
-                {
-                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
-                    // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                    var selectedMods = mods.Value.Select(m => m.Acronym);
-                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
-                }
+                    var scores = realm.All<ScoreInfo>().Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
 
-                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                            .ContinueWith(task => scoresCallback?.Invoke(task.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
+                    if (filterMods && !mods.Value.Any())
+                    {
+                        // we need to filter out all scores that have any mods to get all local nomod scores
+                        scores = scores.Where(s => !s.Mods.Any());
+                    }
+                    else if (filterMods)
+                    {
+                        // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
+                        // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
+                        var selectedMods = mods.Value.Select(m => m.Acronym);
+                        scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+                    }
 
-                return null;
+                    scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
+                                .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                    return null;
+                }
             }
 
             if (api?.IsLoggedIn != true)

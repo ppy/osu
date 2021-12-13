@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Scores.IO
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 
                     beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.BeatmapInfo.ID)));
-                    Assert.That(scoreManager.Query(s => s.Equals(imported)).DeletePending, Is.EqualTo(true));
+                    Assert.That(scoreManager.Query(s => s.Equals(imported)).Value.DeletePending, Is.EqualTo(true));
 
                     var secondImport = await LoadScoreIntoOsu(osu, imported);
                     Assert.That(secondImport, Is.Null);
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Scores.IO
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             await scoreManager.Import(score, archive);
 
-            return scoreManager.GetAllUsableScores().FirstOrDefault();
+            return scoreManager.Query(_ => true).Value;
         }
 
         internal class TestArchiveReader : ArchiveReader

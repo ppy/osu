@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void clearScores()
         {
-            AddStep("Clear all scores", () => scoreManager.Delete(scoreManager.GetAllUsableScores()));
+            AddStep("Clear all scores", () => scoreManager.Delete());
         }
 
         private void checkCount(int expected) =>
