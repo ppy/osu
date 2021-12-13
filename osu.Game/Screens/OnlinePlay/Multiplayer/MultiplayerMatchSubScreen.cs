@@ -15,7 +15,6 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Online;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -327,27 +326,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (client.LocalUser?.State == MultiplayerUserState.Ready)
                     client.ChangeState(MultiplayerUserState.Idle);
             }
-
-            UpdateWorkingBeatmap();
-        }
-
-        protected override void UpdateWorkingBeatmap()
-        {
-            var lastBeatmap = Beatmap.Value;
-
-            base.UpdateWorkingBeatmap();
-
-            // Nothing to do if the beatmap hasn't changed.
-            if (Beatmap.Value.BeatmapInfo.MatchesOnlineID(lastBeatmap.BeatmapInfo))
-                return;
-
-            // The selected item is nulled during the beatmap query. During this, the working beatmap will be the dummy beatmap.
-            // We don't want to enter spectate mode with the dummy beatmap.
-            if (!Beatmap.Value.BeatmapInfo.MatchesOnlineID(SelectedItem.Value?.Beatmap.Value))
-                return;
-
-            if (client.LocalUser?.State == MultiplayerUserState.Spectating
-                && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
+            else if (client.LocalUser?.State == MultiplayerUserState.Spectating
+                     && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
             {
                 onLoadRequested();
             }
