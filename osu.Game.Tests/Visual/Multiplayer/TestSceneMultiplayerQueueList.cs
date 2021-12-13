@@ -162,7 +162,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible",
-                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(index).Alpha > 0) == visible);
+            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible", () =>
+            {
+                var button = playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAtOrDefault(index);
+                return button != null && (button.Alpha > 0) == visible;
+            });
     }
 }
