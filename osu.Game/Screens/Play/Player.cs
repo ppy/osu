@@ -921,6 +921,8 @@ namespace osu.Game.Screens.Play
                 b.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+
+                failAnimationLayer.Background = b;
             });
 
             HUDOverlay.IsBreakTime.BindTo(breakTracker.IsBreakTime);
