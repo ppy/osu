@@ -16,6 +16,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
+    [Table(@"BeatmapInfo")]
     public class EFBeatmapInfo : IEquatable<EFBeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
@@ -124,7 +125,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
         /// </summary>
-        public List<ScoreInfo> Scores { get; set; }
+        public List<EFScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
         public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);

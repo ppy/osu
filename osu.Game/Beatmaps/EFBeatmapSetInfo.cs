@@ -14,6 +14,8 @@ using osu.Game.Extensions;
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
+    [Serializable]
+    [Table(@"BeatmapSetInfo")]
     public class EFBeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<EFBeatmapSetInfo>, IBeatmapSetInfo
     {
         public int ID { get; set; }

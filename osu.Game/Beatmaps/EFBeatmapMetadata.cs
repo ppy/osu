@@ -16,6 +16,7 @@ namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
     [Serializable]
+    [Table(@"BeatmapMetadata")]
     public class EFBeatmapMetadata : IEquatable<EFBeatmapMetadata>, IHasPrimaryKey, IBeatmapMetadataInfo
     {
         public int ID { get; set; }

@@ -19,6 +19,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
+    [Table(@"ScoreInfo")]
     public class EFScoreInfo : IScoreInfo, IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<EFScoreInfo>, IDeepCloneable<EFScoreInfo>
     {
         public int ID { get; set; }
@@ -45,7 +46,7 @@ namespace osu.Game.Scoring
         [NotMapped]
         public bool Passed { get; set; } = true;
 
-        public RulesetInfo Ruleset { get; set; }
+        public EFRulesetInfo Ruleset { get; set; }
 
         private APIMod[] localAPIMods;
 
@@ -135,9 +136,17 @@ namespace osu.Game.Scoring
         public int BeatmapInfoID { get; set; }
 
         [Column("Beatmap")]
-        public BeatmapInfo BeatmapInfo { get; set; }
+        public EFBeatmapInfo BeatmapInfo { get; set; }
 
-        public long? OnlineScoreID { get; set; }
+        private long? onlineID;
+
+        [JsonProperty("id")]
+        [Column("OnlineScoreID")]
+        public long? OnlineID
+        {
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
+        }
 
         public DateTimeOffset Date { get; set; }
 
@@ -232,24 +241,18 @@ namespace osu.Game.Scoring
 
         public bool Equals(EFScoreInfo other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineScoreID.HasValue && other.OnlineScoreID.HasValue)
-                return OnlineScoreID == other.OnlineScoreID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            return false;
         }
 
         #region Implementation of IHasOnlineID
 
-        public long OnlineID => OnlineScoreID ?? -1;
+        long IHasOnlineID<long>.OnlineID => OnlineID ?? -1;
 
         #endregion
 

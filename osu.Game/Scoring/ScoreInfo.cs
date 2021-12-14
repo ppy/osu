@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
@@ -213,14 +212,6 @@ namespace osu.Game.Scoring
                 // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
                 mods = null;
             }
-        }
-
-        // Used for database serialisation/deserialisation.
-        [Column("Mods")]
-        public string ModsJson
-        {
-            get => JsonConvert.SerializeObject(APIMods);
-            set => APIMods = JsonConvert.DeserializeObject<APIMod[]>(value) ?? Array.Empty<APIMod>();
         }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
