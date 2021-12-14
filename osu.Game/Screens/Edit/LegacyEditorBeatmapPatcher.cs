@@ -114,11 +114,11 @@ namespace osu.Game.Screens.Edit
 
             protected override IBeatmap GetBeatmap() => beatmap;
 
-            protected override Texture GetBackground() => Background;
+            protected override Texture GetBackground() => throw new NotImplementedException();
 
-            protected override Track GetBeatmapTrack() => Track;
+            protected override Track GetBeatmapTrack() => throw new NotImplementedException();
 
-            protected internal override ISkin GetSkin() => Skin;
+            protected internal override ISkin GetSkin() => throw new NotImplementedException();
 
             public override Stream GetStream(string storagePath) => throw new NotImplementedException();
         }
