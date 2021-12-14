@@ -15,9 +15,11 @@ using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK.Input;
 
@@ -109,7 +111,87 @@ namespace osu.Game.Tests.Visual.Playlists
             AddAssert("first playlist item selected", () => match.SelectedItem.Value == SelectedRoom.Value.Playlist[0]);
         }
 
+        [Test]
+        public void TestBeatmapUpdatedOnReImport()
+        {
+            string realHash = null;
+            int realOnlineId = 0;
+            int realOnlineSetId = 0;
+
+            AddStep("store real beatmap values", () =>
+            {
+                realHash = importedBeatmap.Value.Beatmaps[0].MD5Hash;
+                realOnlineId = importedBeatmap.Value.Beatmaps[0].OnlineID ?? -1;
+                realOnlineSetId = importedBeatmap.Value.OnlineID ?? -1;
+            });
+
+            AddStep("import modified beatmap", () =>
+            {
+                var modifiedBeatmap = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo =
+                    {
+                        OnlineID = realOnlineId,
+                        BeatmapSet =
+                        {
+                            OnlineID = realOnlineSetId
+                        }
+                    },
+                };
+
+                modifiedBeatmap.HitObjects.Clear();
+                modifiedBeatmap.HitObjects.Add(new HitCircle { StartTime = 5000 });
+
+                manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet).Wait();
+            });
+
+            // Create the room using the real beatmap values.
+            setupAndCreateRoom(room =>
+            {
+                room.Name.Value = "my awesome room";
+                room.Host.Value = API.LocalUser.Value;
+                room.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap =
+                    {
+                        Value = new BeatmapInfo
+                        {
+                            MD5Hash = realHash,
+                            OnlineID = realOnlineId,
+                            BeatmapSet = new BeatmapSetInfo
+                            {
+                                OnlineID = realOnlineSetId,
+                            }
+                        }
+                    },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                });
+            });
+
+            AddAssert("match has default beatmap", () => match.Beatmap.IsDefault);
+
+            AddStep("reimport original beatmap", () =>
+            {
+                var originalBeatmap = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                {
+                    BeatmapInfo =
+                    {
+                        OnlineID = realOnlineId,
+                        BeatmapSet =
+                        {
+                            OnlineID = realOnlineSetId
+                        }
+                    },
+                };
+
+                manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet).Wait();
+            });
+
+            AddUntilStep("match has correct beatmap", () => realHash == match.Beatmap.Value.BeatmapInfo.MD5Hash);
+        }
+
         private void setupAndCreateRoom(Action<Room> room)
+
         {
             AddStep("setup room", () => room(SelectedRoom.Value));
 
