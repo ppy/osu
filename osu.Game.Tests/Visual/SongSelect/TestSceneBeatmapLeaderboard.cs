@@ -20,7 +20,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Stores;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
@@ -45,7 +44,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RealmRulesetStore>(), () => beatmapManager, LocalStorage, dependencies.Get<RealmContextFactory>(), Scheduler));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, dependencies.Get<RealmContextFactory>(), Scheduler));
 
             return dependencies;
         }

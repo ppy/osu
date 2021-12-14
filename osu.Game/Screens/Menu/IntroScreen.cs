@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Menu
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+                var sets = beatmaps.GetAllUsableBeatmapSets();
 
                 if (sets.Count > 0)
                 {
@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Menu
 
             bool loadThemedIntro()
             {
-                setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash, IncludedDetails.AllButRuleset).FirstOrDefault();
+                setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash).FirstOrDefault();
 
                 if (setInfo == null)
                     return false;

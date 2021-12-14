@@ -20,7 +20,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Stores;
 
 namespace osu.Game.Scoring
 {

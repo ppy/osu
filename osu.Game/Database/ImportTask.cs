@@ -5,13 +5,14 @@
 
 using System.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Stores;
 using osu.Game.Utils;
 using SharpCompress.Common;
 
 namespace osu.Game.Database
 {
     /// <summary>
-    /// An encapsulated import task to be imported to an <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+    /// An encapsulated import task to be imported to an <see cref="RealmArchiveModelManager{TModel}"/>.
     /// </summary>
     public class ImportTask
     {

@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AvailabilityTracker.SelectedItem.BindTo(selectedItem);
 
-            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+            importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable().First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
             selectedItem.Value = new PlaylistItem
             {

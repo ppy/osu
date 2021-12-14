@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
         public EFBeatmapMetadata Metadata { get; set; }
 
         [NotNull]
-        public List<BeatmapInfo> Beatmaps { get; } = new List<BeatmapInfo>();
+        public List<EFBeatmapInfo> Beatmaps { get; } = new List<EFBeatmapInfo>();
 
         public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IBeatmapSetInfo
 
-        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new EFBeatmapMetadata();
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 

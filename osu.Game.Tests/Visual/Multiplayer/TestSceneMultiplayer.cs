@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable().First();
             });
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));
@@ -588,7 +588,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("restore beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable().First();
             });
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is SpectatorScreen);

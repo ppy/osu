@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps
             beatmap.BeatmapInfo.Ruleset = rulesetProvider(beatmap.BeatmapInfo.RulesetID).RulesetInfo;
 
             if (beatmapId.HasValue)
-                beatmap.BeatmapInfo.OnlineID = beatmapId;
+                beatmap.BeatmapInfo.OnlineID = beatmapId.Value;
         }
 
         private static Beatmap readFromFile(string filename)
