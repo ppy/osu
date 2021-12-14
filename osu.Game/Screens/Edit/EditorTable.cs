@@ -82,11 +82,6 @@ namespace osu.Game.Screens.Edit
                         Alpha = 0,
                     },
                 };
-
-                // todo delete
-                Action = () =>
-                {
-                };
             }
 
             private Color4 colourHover;
