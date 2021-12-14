@@ -119,34 +119,33 @@ namespace osu.Game.Rulesets.UI
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 
-            public IEnumerable<string> GetAvailableResources() => primary.GetAvailableResources() ?? fallback.GetAvailableResources();
+            public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => primary.AddAdjustment(type, adjustBindable);
+            public void AddAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
-            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => primary.RemoveAdjustment(type, adjustBindable);
+            public void RemoveAdjustment(AdjustableProperty type, IBindable<double> adjustBindable) => throw new NotSupportedException();
 
-            //TODO: These voids don't accept ?? fallback.Name;
+            public void RemoveAllAdjustments(AdjustableProperty type) => throw new NotSupportedException();
 
-            public void RemoveAllAdjustments(AdjustableProperty type) => primary.RemoveAllAdjustments(type);
+            public void BindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
-            public void BindAdjustments(IAggregateAudioAdjustment component) => primary.BindAdjustments(component);
+            public void UnbindAdjustments(IAggregateAudioAdjustment component) => throw new NotImplementedException();
 
-            public void UnbindAdjustments(IAggregateAudioAdjustment component) => primary.UnbindAdjustments(component);
+            public BindableNumber<double> Volume => throw new NotSupportedException();
 
-            public BindableNumber<double> Volume => primary.Volume ?? fallback.Volume;
+            public BindableNumber<double> Balance => throw new NotSupportedException();
 
-            public BindableNumber<double> Balance => primary.Balance ?? fallback.Balance;
+            public BindableNumber<double> Frequency => throw new NotSupportedException();
 
-            public BindableNumber<double> Frequency => primary.Frequency ?? fallback.Frequency;
-            public BindableNumber<double> Tempo => primary.Tempo ?? fallback.Tempo;
+            public BindableNumber<double> Tempo => throw new NotSupportedException();
 
-            public IBindable<double> AggregateVolume => primary.AggregateVolume ?? fallback.AggregateVolume;
+            public IBindable<double> AggregateVolume => throw new NotSupportedException();
 
-            public IBindable<double> AggregateBalance => primary.AggregateBalance ?? fallback.AggregateBalance;
+            public IBindable<double> AggregateBalance => throw new NotSupportedException();
 
-            public IBindable<double> AggregateFrequency => primary.AggregateFrequency ?? fallback.AggregateFrequency;
+            public IBindable<double> AggregateFrequency => throw new NotSupportedException();
 
-            public IBindable<double> AggregateTempo => primary.AggregateTempo ?? fallback.AggregateTempo;
+            public IBindable<double> AggregateTempo => throw new NotSupportedException();
 
             public int PlaybackConcurrency
             {
