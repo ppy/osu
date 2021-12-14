@@ -10,6 +10,7 @@ using osu.Framework.Testing;
 namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
+    [Table(@"RulesetInfo")]
     public sealed class EFRulesetInfo : IEquatable<EFRulesetInfo>, IRulesetInfo
     {
         public int? ID { get; set; }

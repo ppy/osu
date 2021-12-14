@@ -147,7 +147,7 @@ namespace osu.Game.Database
 
             modelBuilder.Entity<EFBeatmapInfo>().HasOne(b => b.BaseDifficulty);
 
-            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
+            modelBuilder.Entity<EFScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory

@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
+    [Table(@"BeatmapDifficulty")]
     public class EFBeatmapDifficulty : IHasPrimaryKey, IBeatmapDifficultyInfo
     {
         /// <summary>
