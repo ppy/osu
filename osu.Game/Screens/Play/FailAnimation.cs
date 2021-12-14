@@ -145,6 +145,7 @@ namespace osu.Game.Screens.Play
             Content.RotateTo(1, duration, Easing.OutQuart);
             Content.FadeColour(Color4.Gray, duration);
 
+            // Will be restored by `ApplyToBackground` logic in `SongSelect`.
             Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
