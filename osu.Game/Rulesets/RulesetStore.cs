@@ -16,7 +16,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetStore : IDisposable
+    public class RulesetStore : IDisposable, IRulesetStore
     {
         private readonly RealmContextFactory realmFactory;
 
@@ -259,8 +259,8 @@ namespace osu.Game.Rulesets
 
         #region Implementation of IRulesetStore
 
-        IRulesetInfo IRulesetStore.GetRuleset(int id) => GetRuleset(id);
-        IRulesetInfo IRulesetStore.GetRuleset(string shortName) => GetRuleset(shortName);
+        IRulesetInfo? IRulesetStore.GetRuleset(int id) => GetRuleset(id);
+        IRulesetInfo? IRulesetStore.GetRuleset(string shortName) => GetRuleset(shortName);
         IEnumerable<IRulesetInfo> IRulesetStore.AvailableRulesets => AvailableRulesets;
 
         #endregion
