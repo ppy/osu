@@ -135,7 +135,8 @@ namespace osu.Game.Overlays.Rankings
             Children = new Drawable[]
             {
                 new ScoresTable(1, response.Users),
-                new FillFlowContainer
+                // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
+                new ReverseChildIDFillFlowContainer<BeatmapCard>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,

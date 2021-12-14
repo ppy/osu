@@ -35,6 +35,16 @@ namespace osu.Game.Database
 
         private void migrateSkins(DatabaseWriteUsage db)
         {
+            // can be removed 20220530.
+            var existingSkins = db.Context.SkinInfo
+                                  .Include(s => s.Files)
+                                  .ThenInclude(f => f.FileInfo)
+                                  .ToList();
+
+            // previous entries in EF are removed post migration.
+            if (!existingSkins.Any())
+                return;
+
             var userSkinChoice = config.GetBindable<string>(OsuSetting.Skin);
             int.TryParse(userSkinChoice.Value, out int userSkinInt);
 
@@ -48,16 +58,6 @@ namespace osu.Game.Database
                     userSkinChoice.Value = SkinInfo.CLASSIC_SKIN.ToString();
                     break;
             }
-
-            // migrate ruleset settings. can be removed 20220530.
-            var existingSkins = db.Context.SkinInfo
-                                  .Include(s => s.Files)
-                                  .ThenInclude(f => f.FileInfo)
-                                  .ToList();
-
-            // previous entries in EF are removed post migration.
-            if (!existingSkins.Any())
-                return;
 
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())

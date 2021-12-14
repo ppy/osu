@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private ScoreInfo getScoreInfo(bool replayAvailable)
         {
-            return new APIScoreInfo
+            return new APIScore
             {
                 OnlineID = 2553163309,
                 RulesetID = 0,
