@@ -48,16 +48,19 @@ namespace osu.Game.Screens.Backgrounds
 
             AddInternal(seasonalBackgroundLoader);
 
-            user.ValueChanged += _ => Next();
-            skin.ValueChanged += _ => Next();
-            mode.ValueChanged += _ => Next();
-            beatmap.ValueChanged += _ => Next();
-            introSequence.ValueChanged += _ => Next();
-            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Next();
+            user.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            skin.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            mode.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            beatmap.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            introSequence.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(loadNextIfRequired);
 
             currentDisplay = RNG.Next(0, background_count);
 
             Next();
+
+            // helper function required for AddOnce usage.
+            void loadNextIfRequired() => Next();
         }
 
         private ScheduledDelegate nextTask;
