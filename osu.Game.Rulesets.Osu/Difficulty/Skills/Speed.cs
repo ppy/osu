@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             bool firstDeltaSwitch = false;
 
-            int rhythmStart = Math.Min(Previous.Count - 2, 0);
+            int rhythmStart = 0;
 
             while (rhythmStart < Previous.Count - 2 && current.StartTime - Previous[rhythmStart].StartTime < history_time_max)
                 rhythmStart++;
