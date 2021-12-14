@@ -191,7 +191,6 @@ namespace osu.Game.Tests.Visual.Playlists
         }
 
         private void setupAndCreateRoom(Action<Room> room)
-
         {
             AddStep("setup room", () => room(SelectedRoom.Value));
 
