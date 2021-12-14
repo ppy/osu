@@ -166,19 +166,13 @@ namespace osu.Game.Tests.Visual.Background
         [TestCase(BackgroundSource.Skin, typeof(SkinBackground))]
         public void TestBackgroundDoesntReloadOnNoChange(BackgroundSource source, Type backgroundType)
         {
-            Graphics.Backgrounds.Background last = null;
-
             setSourceMode(source);
             setSupporter(true);
             if (source == BackgroundSource.Skin)
                 setCustomSkin();
 
-            AddUntilStep("wait for beatmap background to be loaded", () => (last = getCurrentBackground())?.GetType() == backgroundType);
+            AddUntilStep("wait for beatmap background to be loaded", () => (getCurrentBackground())?.GetType() == backgroundType);
             AddAssert("next doesn't load new background", () => screen.Next() == false);
-
-            // doesn't really need to be checked but might as well.
-            AddWaitStep("wait a bit", 5);
-            AddUntilStep("ensure same background instance", () => last == getCurrentBackground());
         }
 
         [Test]
@@ -190,10 +184,6 @@ namespace osu.Game.Tests.Visual.Background
 
             AddUntilStep("wait for beatmap background to be loaded", () => (getCurrentBackground())?.GetType() == typeof(Graphics.Backgrounds.Background));
             AddAssert("next cycles background", () => screen.Next());
-
-            // doesn't really need to be checked but might as well.
-            AddWaitStep("wait a bit", 5);
-            AddUntilStep("ensure different background instance", () => last != getCurrentBackground());
         }
 
         private void setSourceMode(BackgroundSource source) =>
