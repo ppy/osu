@@ -22,6 +22,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
@@ -52,7 +53,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = currentScoreId++;
+
                 bindHandler(userScore: userScore);
             });
 
@@ -78,7 +81,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = currentScoreId++;
+
                 bindHandler(true, userScore);
             });
 
@@ -127,7 +132,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineID = currentScoreId++ };
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = currentScoreId++;
+
                 bindHandler(userScore: userScore);
             });
 
