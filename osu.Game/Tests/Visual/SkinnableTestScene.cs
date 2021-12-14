@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.IO;
 using osu.Game.Rulesets;
@@ -158,6 +159,7 @@ namespace osu.Game.Tests.Visual
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
 
         #endregion
 
