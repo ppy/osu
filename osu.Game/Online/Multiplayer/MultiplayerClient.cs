@@ -333,7 +333,7 @@ namespace osu.Game.Online.Multiplayer
 
         public abstract Task StartMatch();
 
-        public abstract Task AbortLoad();
+        public abstract Task AbortGameplay();
 
         public abstract Task AddPlaylistItem(MultiplayerPlaylistItem item);
 

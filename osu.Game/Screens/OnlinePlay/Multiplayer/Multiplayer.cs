@@ -30,7 +30,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     break;
 
                 case MultiplayerUserState.WaitingForLoad:
-                    client.AbortLoad();
+                case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.Playing:
+                    client.AbortGameplay();
                     break;
 
                 default:
