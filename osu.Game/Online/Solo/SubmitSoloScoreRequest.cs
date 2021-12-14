@@ -31,6 +31,7 @@ namespace osu.Game.Online.Solo
 
             req.ContentType = "application/json";
             req.Method = HttpMethod.Put;
+            req.Timeout = 30000;
 
             req.AddRaw(JsonConvert.SerializeObject(score, new JsonSerializerSettings
             {
