@@ -20,6 +20,8 @@ namespace osu.Game.Beatmaps
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public string Title { get; set; } = string.Empty;
 
         [JsonProperty("title_unicode")]

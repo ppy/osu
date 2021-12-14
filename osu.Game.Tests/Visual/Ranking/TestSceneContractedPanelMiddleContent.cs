@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +14,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Ranking.Contracted;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -22,13 +24,18 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestShowPanel()
         {
-            AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo)));
+            AddStep("show example score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), TestResources.CreateTestScoreInfo()));
         }
 
         [Test]
         public void TestExcessMods()
         {
-            AddStep("show excess mods score", () => showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new TestScoreInfo(new OsuRuleset().RulesetInfo, true)));
+            AddStep("show excess mods score", () =>
+            {
+                var score = TestResources.CreateTestScoreInfo();
+                score.Mods = score.BeatmapInfo.Ruleset.CreateInstance().CreateAllMods().ToArray();
+                showPanel(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), score);
+            });
         }
 
         private void showPanel(WorkingBeatmap workingBeatmap, ScoreInfo score)
