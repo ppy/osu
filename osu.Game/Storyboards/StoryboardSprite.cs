@@ -33,8 +33,8 @@ namespace osu.Game.Storyboards
 
                 foreach (var l in loops)
                 {
-                    if (l.EarliestDisplayedTime != null)
-                        earliestStartTime = Math.Min(earliestStartTime, l.StartTime);
+                    if (l.EarliestDisplayedTime is double loopEarliestDisplayTime)
+                        earliestStartTime = Math.Min(earliestStartTime, l.LoopStartTime + loopEarliestDisplayTime);
                 }
 
                 if (earliestStartTime < double.MaxValue)
