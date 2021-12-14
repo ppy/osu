@@ -66,66 +66,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 OsuDifficultyHitObject prevObj = (OsuDifficultyHitObject)Previous[i];
                 OsuDifficultyHitObject lastObj = (OsuDifficultyHitObject)Previous[i + 1];
 
-                double currHistoricalDecay = Math.Max(0, (history_time_max - (current.StartTime - currObj.StartTime))) / history_time_max; // scales note 0 to 1 from history to now
+                double currHistoricalDecay = (history_time_max - (current.StartTime - currObj.StartTime)) / history_time_max; // scales note 0 to 1 from history to now
 
-                if (currHistoricalDecay != 0)
+                currHistoricalDecay = Math.Min((double)(Previous.Count - i) / Previous.Count, currHistoricalDecay); // either we're limited by time or limited by object count.
+
+                double currDelta = currObj.StrainTime;
+                double prevDelta = prevObj.StrainTime;
+                double lastDelta = lastObj.StrainTime;
+                double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
+
+                double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - greatWindow * 0.6) / (greatWindow * 0.6));
+
+                windowPenalty = Math.Min(1, windowPenalty);
+
+                double effectiveRatio = windowPenalty * currRatio;
+
+                if (firstDeltaSwitch)
                 {
-                    currHistoricalDecay = Math.Min((double)(Previous.Count - i) / Previous.Count, currHistoricalDecay); // either we're limited by time or limited by object count.
-
-                    double currDelta = currObj.StrainTime;
-                    double prevDelta = prevObj.StrainTime;
-                    double lastDelta = lastObj.StrainTime;
-                    double currRatio = 1.0 + 6.0 * Math.Min(0.5, Math.Pow(Math.Sin(Math.PI / (Math.Min(prevDelta, currDelta) / Math.Max(prevDelta, currDelta))), 2)); // fancy function to calculate rhythmbonuses.
-
-                    double windowPenalty = Math.Min(1, Math.Max(0, Math.Abs(prevDelta - currDelta) - greatWindow * 0.6) / (greatWindow * 0.6));
-
-                    windowPenalty = Math.Min(1, windowPenalty);
-
-                    double effectiveRatio = windowPenalty * currRatio;
-
-                    if (firstDeltaSwitch)
+                    if (!(prevDelta > 1.25 * currDelta || prevDelta * 1.25 < currDelta))
                     {
-                        if (!(prevDelta > 1.25 * currDelta || prevDelta * 1.25 < currDelta))
-                        {
-                            if (islandSize < 7)
-                                islandSize++; // island is still progressing, count size.
-                        }
-                        else
-                        {
-                            if (Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
-                                effectiveRatio *= 0.125;
-
-                            if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
-                                effectiveRatio *= 0.25;
-
-                            if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
-                                effectiveRatio *= 0.25;
-
-                            if (previousIslandSize % 2 == islandSize % 2) // repeated island polartiy (2 -> 4, 3 -> 5)
-                                effectiveRatio *= 0.50;
-
-                            if (lastDelta > prevDelta + 10 && prevDelta > currDelta + 10) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
-                                effectiveRatio *= 0.125;
-
-                            rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay * Math.Sqrt(4 + islandSize) / 2 * Math.Sqrt(4 + previousIslandSize) / 2;
-
-                            startRatio = effectiveRatio;
-
-                            previousIslandSize = islandSize; // log the last island size.
-
-                            if (prevDelta * 1.25 < currDelta) // we're slowing down, stop counting
-                                firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
-
-                            islandSize = 1;
-                        }
+                        if (islandSize < 7)
+                            islandSize++; // island is still progressing, count size.
                     }
-                    else if (prevDelta > 1.25 * currDelta) // we want to be speeding up.
+                    else
                     {
-                        // Begin counting island until we change speed again.
-                        firstDeltaSwitch = true;
+                        if (Previous[i - 1].BaseObject is Slider) // bpm change is into slider, this is easy acc window
+                            effectiveRatio *= 0.125;
+
+                        if (Previous[i].BaseObject is Slider) // bpm change was from a slider, this is easier typically than circle -> circle
+                            effectiveRatio *= 0.25;
+
+                        if (previousIslandSize == islandSize) // repeated island size (ex: triplet -> triplet)
+                            effectiveRatio *= 0.25;
+
+                        if (previousIslandSize % 2 == islandSize % 2) // repeated island polartiy (2 -> 4, 3 -> 5)
+                            effectiveRatio *= 0.50;
+
+                        if (lastDelta > prevDelta + 10 && prevDelta > currDelta + 10) // previous increase happened a note ago, 1/1->1/2-1/4, dont want to buff this.
+                            effectiveRatio *= 0.125;
+
+                        rhythmComplexitySum += Math.Sqrt(effectiveRatio * startRatio) * currHistoricalDecay * Math.Sqrt(4 + islandSize) / 2 * Math.Sqrt(4 + previousIslandSize) / 2;
+
                         startRatio = effectiveRatio;
+
+                        previousIslandSize = islandSize; // log the last island size.
+
+                        if (prevDelta * 1.25 < currDelta) // we're slowing down, stop counting
+                            firstDeltaSwitch = false; // if we're speeding up, this stays true and  we keep counting island size.
+
                         islandSize = 1;
                     }
+                }
+                else if (prevDelta > 1.25 * currDelta) // we want to be speeding up.
+                {
+                    // Begin counting island until we change speed again.
+                    firstDeltaSwitch = true;
+                    startRatio = effectiveRatio;
+                    islandSize = 1;
                 }
             }
 
