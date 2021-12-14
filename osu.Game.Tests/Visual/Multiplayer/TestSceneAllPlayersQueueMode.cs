@@ -87,9 +87,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addItem(Func<BeatmapInfo> beatmap)
         {
-            AddStep("click edit button", () =>
+            AddStep("click add button", () =>
             {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSubScreen>().Single().AddOrEditPlaylistButton);
+                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSubScreen.AddItemButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 

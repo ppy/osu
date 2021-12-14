@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -227,7 +229,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new BasicScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new FillFlowContainer
+                        Child = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -248,6 +250,17 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
-        public void TestNormal() => createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+        public void TestNormal()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+
+            AddToggleStep("toggle expanded state", expanded =>
+            {
+                var card = this.ChildrenOfType<BeatmapCard>().Last();
+                if (!card.Expanded.Disabled)
+                    card.Expanded.Value = expanded;
+            });
+            AddToggleStep("disable/enable expansion", disabled => this.ChildrenOfType<BeatmapCard>().ForEach(card => card.Expanded.Disabled = disabled));
+        }
     }
 }
