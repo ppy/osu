@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Backgrounds
         /// Request loading the next background.
         /// </summary>
         /// <returns>Whether a new background was queued for load. May return false if the current background is still valid.</returns>
-        public bool Next()
+        public virtual bool Next()
         {
             var nextBackground = createBackground();
 
