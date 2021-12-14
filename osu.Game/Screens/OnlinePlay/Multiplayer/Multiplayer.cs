@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
@@ -18,8 +19,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.OnResuming(last);
 
-            if (client.Room != null && client.LocalUser?.State != MultiplayerUserState.Spectating)
-                client.ChangeState(MultiplayerUserState.Idle);
+            if (client.Room == null)
+                return;
+
+            Debug.Assert(client.LocalUser != null);
+
+            switch (client.LocalUser.State)
+            {
+                case MultiplayerUserState.Spectating:
+                    break;
+
+                case MultiplayerUserState.WaitingForLoad:
+                    client.AbortLoad();
+                    break;
+
+                default:
+                    client.ChangeState(MultiplayerUserState.Idle);
+                    break;
+            }
         }
 
         protected override string ScreenTitle => "Multiplayer";
