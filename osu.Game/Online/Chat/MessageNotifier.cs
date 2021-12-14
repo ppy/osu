@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -121,7 +120,7 @@ namespace osu.Game.Online.Chat
 
         private void checkForMentions(Channel channel, Message message)
         {
-            if (!notifyOnUsername.Value || !checkContainsUsername(message.Content, localUser.Value.Username)) return;
+            if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
 
             notifications.Post(new MentionNotification(message.Sender.Username, channel));
         }
@@ -130,7 +129,7 @@ namespace osu.Game.Online.Chat
         /// Checks if <paramref name="message"/> mentions <paramref name="username"/>.
         /// This will match against the case where underscores are used instead of spaces (which is how osu-stable handles usernames with spaces).
         /// </summary>
-        public static bool checkContainsUsername(string message, string username)
+        public static bool CheckContainsUsername(string message, string username)
         {
             string fullName = Regex.Escape(username);
             string underscoreName = Regex.Escape(username.Replace(' ', '_'));
