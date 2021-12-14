@@ -222,6 +222,7 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
+            dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realmFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
