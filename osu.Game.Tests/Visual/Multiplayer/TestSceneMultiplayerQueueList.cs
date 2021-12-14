@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -27,11 +28,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
-        private MultiplayerQueueList playlist;
+        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
 
         [Cached(typeof(UserLookupCache))]
         private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
+        private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
@@ -50,12 +52,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
+                selectedItem.Value = null;
+
                 Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                    SelectedItem = { BindTarget = Client.CurrentMatchPlayingItem },
+                    SelectedItem = { BindTarget = selectedItem },
                     Items = { BindTarget = Client.APIRoom!.Playlist }
                 };
             });
@@ -107,22 +111,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set all players queue mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }));
             AddUntilStep("wait for queue mode change", () => Client.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
 
-            assertDeleteButtonVisibility(0, false);
-
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
+
+            AddStep("select item 0", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(0).Model);
             assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, true);
 
-            // Run through gameplay.
-            AddStep("set state to ready", () => Client.ChangeUserState(API.LocalUser.Value.Id, MultiplayerUserState.Ready));
-            AddUntilStep("local state is ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
-            AddStep("start match", () => Client.StartMatch());
-            AddUntilStep("match started", () => Client.LocalUser?.State == MultiplayerUserState.WaitingForLoad);
-            AddStep("set state to loaded", () => Client.ChangeUserState(API.LocalUser.Value.Id, MultiplayerUserState.Loaded));
-            AddUntilStep("local state is playing", () => Client.LocalUser?.State == MultiplayerUserState.Playing);
-            AddStep("set state to finished play", () => Client.ChangeUserState(API.LocalUser.Value.Id, MultiplayerUserState.FinishedPlay));
-            AddUntilStep("local state is results", () => Client.LocalUser?.State == MultiplayerUserState.Results);
-
+            AddStep("select item 1", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(1).Model);
+            assertDeleteButtonVisibility(0, true);
             assertDeleteButtonVisibility(1, false);
         }
 
