@@ -96,13 +96,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = Math.Pow(5.0 * Math.Max(1.0, rawAim / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Longer maps are worth more.
-            double lengthBonus = 0.95 + 0.25 * Math.Min(1.0, totalHits / 2000.0) +
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
 
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= Math.Pow(0.97, effectiveMissCount);
+                aimValue *= Math.Pow(0.96, effectiveMissCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -142,12 +142,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Longer maps are worth more.
-            double lengthBonus = 0.95 + 0.25 * Math.Min(1.0, totalHits / 2000.0) +
+            double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
                                  (totalHits > 2000 ? Math.Log10(totalHits / 2000.0) * 0.5 : 0.0);
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                speedValue *= Math.Pow(0.97, effectiveMissCount);
+                speedValue *= Math.Pow(0.96, effectiveMissCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -229,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightValue *= 1.3;
 
             if (effectiveMissCount > 0)
-                flashlightValue *= Math.Pow(0.97, effectiveMissCount);
+                flashlightValue *= Math.Pow(0.96, effectiveMissCount);
 
             // Combo scaling.
             if (Attributes.MaxCombo > 0)
