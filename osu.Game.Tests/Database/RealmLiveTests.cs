@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Models;
 using Realms;
@@ -26,6 +27,33 @@ namespace osu.Game.Tests.Database
                 ILive<RealmBeatmap> beatmap2 = realmFactory.CreateContext().All<RealmBeatmap>().First().ToLive();
 
                 Assert.AreEqual(beatmap, beatmap2);
+            });
+        }
+
+        [Test]
+        public void TestAccessAfterStorageMigrate()
+        {
+            RunTestWithRealm((realmFactory, storage) =>
+            {
+                var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+
+                ILive<RealmBeatmap> liveBeatmap;
+
+                using (var context = realmFactory.CreateContext())
+                {
+                    context.Write(r => r.Add(beatmap));
+
+                    liveBeatmap = beatmap.ToLive();
+                }
+
+                using (var migratedStorage = new TemporaryNativeStorage("realm-test-migration-target"))
+                {
+                    migratedStorage.DeleteDirectory(string.Empty);
+
+                    storage.Migrate(migratedStorage);
+
+                    Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+                }
             });
         }
 
