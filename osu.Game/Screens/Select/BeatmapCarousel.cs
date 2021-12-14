@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Select
                 loadBeatmapSets(GetLoadableBeatmaps());
         }
 
-        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.AllButFiles);
+        protected virtual IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => beatmaps.GetAllUsableBeatmapSetsEnumerable();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {

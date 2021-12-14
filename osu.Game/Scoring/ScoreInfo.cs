@@ -80,17 +80,9 @@ namespace osu.Game.Scoring
 
         public double? PP { get; set; }
 
-        public RealmBeatmap Beatmap { get; set; } = null!;
+        public BeatmapInfo Beatmap { get; set; } = null!;
 
-        public BeatmapInfo BeatmapInfo
-        {
-            get => new BeatmapInfo();
-            // .. todo
-            // ReSharper disable once ValueParameterNotUsed
-            set => Beatmap = new RealmBeatmap(new RealmRuleset("osu", "osu!", "wangs", 0), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
-        }
-
-        public RealmRuleset Ruleset { get; set; } = null!;
+        public RulesetInfo Ruleset { get; set; } = null!;
 
         [Ignored]
         public Dictionary<HitResult, int> Statistics
@@ -132,7 +124,13 @@ namespace osu.Game.Scoring
 
         private Mod[]? mods;
 
-        public int BeatmapInfoID => BeatmapInfo.ID;
+        public Guid BeatmapInfoID => Beatmap.ID;
+
+        public BeatmapInfo BeatmapInfo
+        {
+            get => Beatmap;
+            set => Beatmap = value;
+        }
 
         public int UserID => RealmUser.OnlineID;
 

@@ -10,8 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
-using osu.Game.IO;
 using osu.Game.Screens.Play;
+using osu.Game.Stores;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -76,7 +76,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken, GameHost host)
+        private void load(RealmFileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken, GameHost host)
         {
             if (clock != null)
                 Clock = clock;

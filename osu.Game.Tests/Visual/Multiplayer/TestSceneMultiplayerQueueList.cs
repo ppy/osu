@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable().First();
                 importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
             });
 
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap },
-                    BeatmapID = importedBeatmap.OnlineID ?? -1,
+                    BeatmapID = importedBeatmap.OnlineID,
                 });
 
                 Client.AddUserPlaylistItem(userId(), item);

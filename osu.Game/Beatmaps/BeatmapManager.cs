@@ -16,7 +16,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Online.API;
@@ -43,21 +42,18 @@ namespace osu.Game.Beatmaps
 
         public BeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
         {
+            if (performOnlineLookups)
+                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+
             var userResources = new RealmFileStore(contextFactory, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host);
+            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, onlineBeatmapLookupQueue);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
-
-            if (performOnlineLookups)
-            {
-                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
-                beatmapModelManager.OnlineLookupQueue = onlineBeatmapLookupQueue;
-            }
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
@@ -65,8 +61,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host) =>
-            new BeatmapModelManager(storage, contextFactory, rulesets, host);
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, [CanBeNull] BeatmapOnlineLookupQueue onlineLookupQueue) =>
+            new BeatmapModelManager(contextFactory, storage, onlineLookupQueue);
 
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
@@ -97,9 +93,9 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var imported = beatmapModelManager.Import(set).GetResultSafely().Value;
+            var imported = beatmapModelManager.Import(set).GetResultSafely()?.Value;
 
-            return GetWorkingBeatmap(imported.Beatmaps.First());
+            return GetWorkingBeatmap(imported?.Beatmaps.First());
         }
 
         #region Delegation to BeatmapModelManager (methods which previously existed locally).
@@ -135,23 +131,21 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All, bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSets(includes, includeProtected);
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSets(includeProtected);
 
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
         /// </summary>
-        /// <param name="includes">The level of detail to include in the returned objects.</param>
         /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSetsEnumerable(includes, includeProtected);
+        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSetsEnumerable(includeProtected);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
-        /// <param name="includes">The level of detail to include in the returned objects.</param>
         /// <returns>Results from the provided query.</returns>
-        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query, IncludedDetails includes = IncludedDetails.All) => beatmapModelManager.QueryBeatmapSets(query, includes);
+        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSets(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.

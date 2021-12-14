@@ -34,7 +34,7 @@ namespace osu.Game.Stores
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapImporter : RealmArchiveModelImporter<BeatmapSetInfo>, IDisposable
+    public abstract class BeatmapImporter : RealmArchiveModelManager<BeatmapSetInfo>, IDisposable
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
@@ -45,7 +45,7 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        public BeatmapImporter(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+        protected BeatmapImporter(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
             : base(storage, contextFactory)
         {
             this.onlineLookupQueue = onlineLookupQueue;

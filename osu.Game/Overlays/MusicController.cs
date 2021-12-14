@@ -71,7 +71,7 @@ namespace osu.Game.Overlays
             beatmaps.ItemUpdated += beatmapUpdated;
             beatmaps.ItemRemoved += beatmapRemoved;
 
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(true).OrderBy(_ => RNG.Next()));
 
             // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
             // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().

@@ -11,6 +11,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
@@ -141,7 +142,8 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Mode":
-                    beatmap.BeatmapInfo.RulesetID = Parsing.ParseInt(pair.Value);
+                    // TODO: ha ha ha.
+                    beatmap.BeatmapInfo.Ruleset = new RulesetInfo(Parsing.ParseInt(pair.Value), "some ruleset", "wangs", true /* probably not */);
 
                     switch (beatmap.BeatmapInfo.RulesetID)
                     {
