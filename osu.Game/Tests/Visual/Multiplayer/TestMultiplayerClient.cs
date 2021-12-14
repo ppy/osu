@@ -317,7 +317,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return ((IMultiplayerClient)this).LoadRequested();
         }
 
-        public override Task AbortLoad()
+        public override Task AbortGameplay()
         {
             Debug.Assert(Room != null);
             Debug.Assert(LocalUser != null);

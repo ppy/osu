@@ -80,7 +80,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Aborts an ongoing gameplay load.
         /// </summary>
-        Task AbortLoad();
+        Task AbortGameplay();
 
         /// <summary>
         /// Adds an item to the playlist.
