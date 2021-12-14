@@ -242,6 +242,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task ChangeState(MultiplayerUserState newState)
         {
+            Debug.Assert(Room != null);
+
+            if (newState == MultiplayerUserState.Idle && LocalUser?.State == MultiplayerUserState.WaitingForLoad)
+                return Task.CompletedTask;
+
             ChangeUserState(api.LocalUser.Value.Id, newState);
             return Task.CompletedTask;
         }
@@ -301,6 +306,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
             return ((IMultiplayerClient)this).LoadRequested();
+        }
+
+        public override Task AbortLoad()
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(LocalUser != null);
+
+            ChangeUserState(LocalUser.UserID, MultiplayerUserState.Idle);
+
+            return Task.CompletedTask;
         }
 
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)

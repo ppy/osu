@@ -154,6 +154,14 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
         }
 
+        public override Task AbortLoad()
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.AbortLoad));
+        }
+
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item)
         {
             if (!IsConnected.Value)
