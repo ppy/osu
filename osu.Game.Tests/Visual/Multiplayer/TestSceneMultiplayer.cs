@@ -30,6 +30,7 @@ using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Spectate;
@@ -594,9 +595,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 }
             });
 
-            pressReadyButton();
-            pressReadyButton();
-            AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player);
+            enterGameplay();
 
             // Gameplay runs in real-time, so we need to incrementally check if gameplay has finished in order to not time out.
             for (double i = 1000; i < TestResources.QUICK_BEATMAP_LENGTH; i += 1000)
@@ -654,6 +653,44 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 return localRoom.Name.Value == roomManager.ServerSideRooms[0].Name.Value
                        && localRoom.Playlist.SequenceEqual(roomManager.ServerSideRooms[0].Playlist);
             });
+        }
+
+        [Test]
+        public void TestItemAddedAndDeletedByOtherUserDuringGameplay()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                QueueMode = { Value = QueueMode.AllPlayers },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            enterGameplay();
+
+            AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
+            AddStep("add item as other user", () => client.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(new PlaylistItem
+            {
+                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
+            })));
+            AddStep("delete item as other user", () => client.RemoveUserPlaylistItem(1234, 2));
+
+            AddUntilStep("wait for item to be deleted", () => client.Room?.Playlist.Count == 1);
+            AddStep("exit gameplay as initial user", () => multiplayerScreenStack.MultiplayerScreen.MakeCurrent());
+            AddUntilStep("queue is empty", () => this.ChildrenOfType<MultiplayerQueueList>().Single().Items.Count == 0);
+        }
+
+        private void enterGameplay()
+        {
+            pressReadyButton();
+            pressReadyButton();
+            AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player);
         }
 
         private ReadyButton readyButton => this.ChildrenOfType<ReadyButton>().Single();
