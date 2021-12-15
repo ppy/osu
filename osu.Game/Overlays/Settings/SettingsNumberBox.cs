@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Settings
 
         private class OutlinedNumberBox : OutlinedTextBox
         {
-            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
+            protected override bool CanAddCharacter(char character) => character.IsAsciiDigit();
 
             public new void NotifyInputError() => base.NotifyInputError();
         }
