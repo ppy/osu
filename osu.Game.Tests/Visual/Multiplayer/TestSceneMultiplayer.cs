@@ -679,9 +679,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
             })));
-            AddStep("delete item as other user", () => client.RemoveUserPlaylistItem(1234, 2));
 
-            AddUntilStep("wait for item to be deleted", () => client.Room?.Playlist.Count == 1);
+            AddUntilStep("item arrived in playlist", () => client.Room?.Playlist.Count == 2);
+
+            AddStep("delete item as other user", () => client.RemoveUserPlaylistItem(1234, 2));
+            AddUntilStep("item removed from playlist", () => client.Room?.Playlist.Count == 1);
+
             AddStep("exit gameplay as initial user", () => multiplayerScreenStack.MultiplayerScreen.MakeCurrent());
             AddUntilStep("queue is empty", () => this.ChildrenOfType<MultiplayerQueueList>().Single().Items.Count == 0);
         }
