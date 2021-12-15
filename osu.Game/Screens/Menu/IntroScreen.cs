@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Menu
                 if (sets.Count > 0)
                 {
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo?.Beatmaps[0]);
                 }
             }
 
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Menu
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
                     var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
-                    import.PerformWrite(b =>
+                    import?.PerformWrite(b =>
                     {
                         b.Protected = true;
                         beatmaps.Update(b);
