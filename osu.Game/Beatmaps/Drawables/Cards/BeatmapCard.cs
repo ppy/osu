@@ -284,7 +284,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                 {
                                                     Hovered = _ =>
                                                     {
-                                                        content.ScheduleShow();
+                                                        content.ExpandAfterDelay();
                                                         return false;
                                                     },
                                                     Unhovered = _ =>
@@ -292,7 +292,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                         // This hide should only trigger if the expanded content has not shown yet.
                                                         // ie. if the user has not shown intent to want to see it (quickly moved over the info row area).
                                                         if (!Expanded.Value)
-                                                            content.ScheduleHide();
+                                                            content.CollapseAfterDelay();
                                                     }
                                                 }
                                             }
@@ -368,7 +368,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            content.ScheduleHide();
+            content.CollapseAfterDelay();
 
             updateState();
             base.OnHoverLost(e);
