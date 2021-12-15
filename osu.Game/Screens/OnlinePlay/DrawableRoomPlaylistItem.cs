@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -24,6 +25,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.Chat;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
@@ -89,6 +91,10 @@ namespace osu.Game.Screens.OnlinePlay
 
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
+
+        [CanBeNull]
+        [Resolved(CanBeNull = true)]
+        private MultiplayerClient multiplayerClient { get; set; }
 
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
@@ -157,7 +163,15 @@ namespace osu.Game.Screens.OnlinePlay
 
                         if (Item.Beatmap.Value == null)
                         {
-                            var foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
+                            IBeatmapInfo foundBeatmap;
+
+                            if (multiplayerClient != null)
+                                // This call can eventually go away (and use the else case below).
+                                // Currently required only due to the method being overridden to provide special behaviour in tests.
+                                foundBeatmap = await multiplayerClient.GetAPIBeatmap(Item.BeatmapID).ConfigureAwait(false);
+                            else
+                                foundBeatmap = await beatmapLookupCache.GetBeatmapAsync(Item.BeatmapID).ConfigureAwait(false);
+
                             Schedule(() => Item.Beatmap.Value = foundBeatmap);
                         }
                     }
