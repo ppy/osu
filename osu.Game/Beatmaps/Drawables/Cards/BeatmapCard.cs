@@ -368,8 +368,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            content.CollapseAfterDelay();
-
             updateState();
             base.OnHoverLost(e);
         }
