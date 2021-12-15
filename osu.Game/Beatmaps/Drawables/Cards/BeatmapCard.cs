@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
 
-        public Bindable<bool> Expanded { get; } = new BindableBool();
+        public IBindable<bool> Expanded { get; }
 
         private const float width = 408;
         private const float height = 100;
@@ -64,9 +64,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapCard(APIBeatmapSet beatmapSet)
+        public BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
             : base(HoverSampleSet.Submit)
         {
+            Expanded = new BindableBool { Disabled = !allowExpansion };
+
             this.beatmapSet = beatmapSet;
             favouriteState = new Bindable<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
