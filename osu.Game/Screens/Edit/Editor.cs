@@ -776,7 +776,7 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
-            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
 
             Debug.Assert(beatmapSet != null);
 
