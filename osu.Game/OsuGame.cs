@@ -437,7 +437,7 @@ namespace osu.Game
         /// </remarks>
         public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            BeatmapSetInfo databasedSet = null;
+            ILive<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
                 databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
@@ -453,27 +453,30 @@ namespace osu.Game
 
             PerformFromScreen(screen =>
             {
-                // Find beatmaps that match our predicate.
-                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
-
-                // Use all beatmaps if predicate matched nothing
-                if (beatmaps.Count == 0)
-                    beatmaps = databasedSet.Beatmaps.ToList();
-
-                // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
-                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
-                                ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
-                                ?? beatmaps.First();
-
-                if (screen is IHandlePresentBeatmap presentableScreen)
+                databasedSet.PerformRead(set =>
                 {
-                    presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
-                }
-                else
-                {
-                    Ruleset.Value = selection.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
-                }
+                    // Find beatmaps that match our predicate.
+                    var beatmaps = set.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
+
+                    // Use all beatmaps if predicate matched nothing
+                    if (beatmaps.Count == 0)
+                        beatmaps = set.Beatmaps.ToList();
+
+                    // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
+                    var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
+                                    ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
+                                    ?? beatmaps.First();
+
+                    if (screen is IHandlePresentBeatmap presentableScreen)
+                    {
+                        presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
+                    }
+                    else
+                    {
+                        Ruleset.Value = selection.Ruleset;
+                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                    }
+                });
             }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
         }
 

@@ -88,7 +88,6 @@ namespace osu.Game.Overlays
             if (changes == null)
             {
                 beatmapSets.AddRange(sender);
-                return;
             }
 
             // beatmaps.ItemUpdated += set => Schedule(() =>

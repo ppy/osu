@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.Menu
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
             seeya = audio.Samples.Get(SeeyaSampleName);
 
-            BeatmapSetInfo setInfo = null;
+            ILive<BeatmapSetInfo> setInfo = null;
 
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Menu
                 if (sets.Count > 0)
                 {
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo?.Beatmaps[0]);
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo?.PerformRead(s => s.Beatmaps[0].ToLive()));
                 }
             }
 
@@ -130,7 +131,7 @@ namespace osu.Game.Screens.Menu
                 if (setInfo == null)
                     return false;
 
-                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.PerformRead(s => s.Beatmaps[0].ToLive()));
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
