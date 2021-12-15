@@ -100,50 +100,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
-        {
-            using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive();
-        }
-
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool includeProtected = false) =>
-            GetAllUsableBeatmapSetsEnumerable(includeProtected).ToList();
-
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
-        /// </summary>
-        /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(bool includeProtected = false)
-        {
-            using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending && (includeProtected || !b.Protected));
-        }
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
-        {
-            using (var context = ContextFactory.CreateContext())
-            {
-                return context.All<BeatmapSetInfo>()
-                              .Where(b => !b.DeletePending)
-                              .Where(query);
-            }
-        }
-
-        /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
@@ -152,20 +108,6 @@ namespace osu.Game.Beatmaps
         {
             using (var context = ContextFactory.CreateContext())
                 return context.All<BeatmapInfo>().FirstOrDefault(query); // TODO: ?.ToLive();
-        }
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
-        {
-            using (var context = ContextFactory.CreateContext())
-            {
-                return context.All<BeatmapInfo>()
-                              .Where(query);
-            }
         }
     }
 }
