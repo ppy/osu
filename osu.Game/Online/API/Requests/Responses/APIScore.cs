@@ -13,10 +13,11 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScoreInfo : IScoreInfo
+    public class APIScore : IScoreInfo
     {
         [JsonProperty(@"score")]
         public long TotalScore { get; set; }
@@ -101,7 +102,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 BeatmapInfo = beatmap,
                 User = User,
                 Accuracy = Accuracy,
-                OnlineScoreID = OnlineID,
+                OnlineID = OnlineID,
                 Date = Date,
                 PP = PP,
                 RulesetID = RulesetID,
@@ -150,6 +151,11 @@ namespace osu.Game.Online.API.Requests.Responses
         public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => throw new NotImplementedException();
 
+        #region Implementation of IScoreInfo
+
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
+        IUser IScoreInfo.User => User;
+
+        #endregion
     }
 }

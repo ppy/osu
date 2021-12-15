@@ -83,7 +83,9 @@ namespace osu.Game.Screens.Edit.Compose
         {
             base.LoadComplete();
             EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
-            clipboard.BindValueChanged(_ => updateClipboardActionAvailability(), true);
+            clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
+            composer.OnLoadComplete += _ => updateClipboardActionAvailability();
+            updateClipboardActionAvailability();
         }
 
         #region Clipboard operations
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Edit.Compose
         private void updateClipboardActionAvailability()
         {
             CanCut.Value = CanCopy.Value = EditorBeatmap.SelectedHitObjects.Any();
-            CanPaste.Value = !string.IsNullOrEmpty(clipboard.Value);
+            CanPaste.Value = composer.IsLoaded && !string.IsNullOrEmpty(clipboard.Value);
         }
 
         private string formatSelectionAsString()

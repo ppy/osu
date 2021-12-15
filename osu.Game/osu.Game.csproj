@@ -20,7 +20,7 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="DiffPlex" Version="1.7.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.38" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.39" />
     <PackageReference Include="Humanizer" Version="2.13.14" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.11" />
@@ -31,15 +31,15 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.LocalisationAnalyser" Version="2021.725.0">
+    <PackageReference Include="ppy.LocalisationAnalyser" Version="2021.1210.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="10.7.1" />
     <PackageReference Include="ppy.osu.Framework" Version="2021.1215.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.1215.0" />
-    <PackageReference Include="Sentry" Version="3.11.1" />
-    <PackageReference Include="SharpCompress" Version="0.30.0" />
+    <PackageReference Include="Sentry" Version="3.12.1" />
+    <PackageReference Include="SharpCompress" Version="0.30.1" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="TagLibSharp" Version="2.2.0" />
