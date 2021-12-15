@@ -78,6 +78,11 @@ namespace osu.Game.Online.Multiplayer
         Task StartMatch();
 
         /// <summary>
+        /// Aborts an ongoing gameplay load.
+        /// </summary>
+        Task AbortGameplay();
+
+        /// <summary>
         /// Adds an item to the playlist.
         /// </summary>
         /// <param name="item">The item to add.</param>
