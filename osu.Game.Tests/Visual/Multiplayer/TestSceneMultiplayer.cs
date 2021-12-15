@@ -656,6 +656,37 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestItemAddedByOtherUserDuringGameplay()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                QueueMode = { Value = QueueMode.AllPlayers },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            enterGameplay();
+
+            AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
+            AddStep("add item as other user", () => client.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(new PlaylistItem
+            {
+                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
+            })));
+
+            AddUntilStep("item arrived in playlist", () => client.Room?.Playlist.Count == 2);
+
+            AddStep("exit gameplay as initial user", () => multiplayerScreenStack.MultiplayerScreen.MakeCurrent());
+            AddUntilStep("queue contains item", () => this.ChildrenOfType<MultiplayerQueueList>().Single().Items.Single().ID == 2);
+        }
+
+        [Test]
         public void TestItemAddedAndDeletedByOtherUserDuringGameplay()
         {
             createRoom(() => new Room
