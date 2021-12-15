@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
     public abstract class RoomSubScreen : OnlinePlaySubScreen, IPreviewTrackOwner
     {
         [Cached(typeof(IBindable<PlaylistItem>))]
-        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         public override bool? AllowTrackAdjustments => true;
 
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected OnlinePlayScreen ParentScreen { get; private set; }
 
         [Cached]
-        private OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker { get; set; }
+        private readonly OnlinePlayBeatmapAvailabilityTracker beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
 
         protected IBindable<BeatmapAvailability> BeatmapAvailability => beatmapAvailabilityTracker.Availability;
 
@@ -89,11 +89,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             this.allowEdit = allowEdit;
 
             Padding = new MarginPadding { Top = Header.HEIGHT };
-
-            beatmapAvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
-            {
-                SelectedItem = { BindTarget = SelectedItem }
-            };
 
             RoomId.BindTo(room.RoomID);
         }
@@ -247,10 +242,10 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }, true);
 
             SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
-
-            beatmapManager.ItemUpdated += beatmapUpdated;
-
             UserMods.BindValueChanged(_ => Scheduler.AddOnce(UpdateMods));
+
+            beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
+            beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateWorkingBeatmap());
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -374,8 +369,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
             }
         }
 
-        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(updateWorkingBeatmap);
-
         private void updateWorkingBeatmap()
         {
             var beatmap = SelectedItem.Value?.Beatmap.Value;
@@ -442,14 +435,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
         /// </summary>
         /// <param name="room">The room to change the settings of.</param>
         protected abstract RoomSettingsOverlay CreateRoomSettingsOverlay(Room room);
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmapManager != null)
-                beatmapManager.ItemUpdated -= beatmapUpdated;
-        }
 
         public class UserModSelectButton : PurpleTriangleButton
         {

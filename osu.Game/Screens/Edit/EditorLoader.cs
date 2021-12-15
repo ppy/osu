@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 
@@ -51,6 +53,14 @@ namespace osu.Game.Screens.Edit
                     State = { Value = Visibility.Visible },
                 }
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // will be restored via lease, see `DisallowExternalBeatmapRulesetChanges`.
+            Mods.Value = Array.Empty<Mod>();
         }
 
         protected virtual Editor CreateEditor() => new Editor(this);

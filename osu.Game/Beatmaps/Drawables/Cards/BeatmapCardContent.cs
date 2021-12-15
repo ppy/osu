@@ -45,6 +45,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             RelativeSizeAxes = Axes.X;
             Height = height;
 
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
             InternalChild = content = new HoverHandlingContainer
             {
                 RelativeSizeAxes = Axes.X,
