@@ -21,22 +21,9 @@ using osu.Game.Stores;
 
 namespace osu.Game.Beatmaps
 {
-    /// <summary>
-    /// Handles ef-core storage of beatmaps.
-    /// </summary>
     [ExcludeFromDynamicCompile]
     public class BeatmapModelManager : BeatmapImporter
     {
-        /// <summary>
-        /// Fired when a single difficulty has been hidden.
-        /// </summary>
-        public event Action<BeatmapInfo>? BeatmapHidden;
-
-        /// <summary>
-        /// Fired when a single difficulty has been restored.
-        /// </summary>
-        public event Action<BeatmapInfo>? BeatmapRestored;
-
         /// <summary>
         /// The game working beatmap cache, used to invalidate entries on changes.
         /// </summary>
@@ -52,38 +39,6 @@ namespace osu.Game.Beatmaps
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
-
-        /// <summary>
-        /// Delete a beatmap difficulty.
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmapInfo)
-        {
-            using (var realm = ContextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
-            {
-                beatmapInfo.Hidden = true;
-                transaction.Commit();
-
-                BeatmapHidden?.Invoke(beatmapInfo);
-            }
-        }
-
-        /// <summary>
-        /// Restore a beatmap difficulty.
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmapInfo)
-        {
-            using (var realm = ContextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
-            {
-                beatmapInfo.Hidden = false;
-                transaction.Commit();
-
-                BeatmapRestored?.Invoke(beatmapInfo);
-            }
-        }
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
