@@ -56,7 +56,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 AutoSizeAxes = Axes.Y,
                 CornerRadius = BeatmapCard.CORNER_RADIUS,
                 Masking = true,
-                Unhovered = _ => collapseIfNotHovered(),
+                Unhovered = _ => updateFromHoverChange(),
                 Children = new Drawable[]
                 {
                     background = new Box
@@ -78,10 +78,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Alpha = 0,
                         Hovered = _ =>
                         {
-                            queueExpandedStateChange(true);
+                            updateFromHoverChange();
                             return true;
                         },
-                        Unhovered = _ => collapseIfNotHovered(),
+                        Unhovered = _ => updateFromHoverChange(),
                         Child = dropdownScroll = new ExpandedContentScrollContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -125,11 +125,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public void CancelExpand() => scheduledExpandedChange?.Cancel();
 
-        private void collapseIfNotHovered()
-        {
-            if (!content.IsHovered && !dropdownContent.IsHovered)
-                queueExpandedStateChange(false);
-        }
+        private void updateFromHoverChange() =>
+            queueExpandedStateChange(content.IsHovered || dropdownContent.IsHovered, 100);
 
         private void queueExpandedStateChange(bool newState, int delay = 0)
         {
