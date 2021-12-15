@@ -31,6 +31,7 @@ using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Spectate;
@@ -656,6 +657,81 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestSpectatingStateResetOnBackButtonDuringGameplay()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                QueueMode = { Value = QueueMode.AllPlayers },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddStep("set spectating state", () => client.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
+            AddUntilStep("state set to spectating", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
+
+            AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
+            AddStep("set other user ready", () => client.ChangeUserState(1234, MultiplayerUserState.Ready));
+
+            pressReadyButton(1234);
+            AddUntilStep("wait for gameplay", () => (multiplayerScreenStack.CurrentScreen as MultiSpectatorScreen)?.IsLoaded == true);
+
+            AddStep("press back button and exit", () =>
+            {
+                multiplayerScreenStack.OnBackButton();
+                multiplayerScreenStack.Exit();
+            });
+
+            AddUntilStep("wait for return to match subscreen", () => multiplayerScreenStack.MultiplayerScreen.IsCurrentScreen());
+            AddUntilStep("user state is idle", () => client.LocalUser?.State == MultiplayerUserState.Idle);
+        }
+
+        [Test]
+        public void TestSpectatingStateNotResetOnBackButtonOutsideOfGameplay()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                QueueMode = { Value = QueueMode.AllPlayers },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            AddStep("set spectating state", () => client.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
+            AddUntilStep("state set to spectating", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
+
+            AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
+            AddStep("set other user ready", () => client.ChangeUserState(1234, MultiplayerUserState.Ready));
+
+            pressReadyButton(1234);
+            AddUntilStep("wait for gameplay", () => (multiplayerScreenStack.CurrentScreen as MultiSpectatorScreen)?.IsLoaded == true);
+            AddStep("set other user loaded", () => client.ChangeUserState(1234, MultiplayerUserState.Loaded));
+            AddStep("set other user finished play", () => client.ChangeUserState(1234, MultiplayerUserState.FinishedPlay));
+
+            AddStep("press back button and exit", () =>
+            {
+                multiplayerScreenStack.OnBackButton();
+                multiplayerScreenStack.Exit();
+            });
+
+            AddUntilStep("wait for return to match subscreen", () => multiplayerScreenStack.MultiplayerScreen.IsCurrentScreen());
+            AddWaitStep("wait for possible state change", 5);
+            AddUntilStep("user state is spectating", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
+        }
+
+        [Test]
         public void TestItemAddedByOtherUserDuringGameplay()
         {
             createRoom(() => new Room
@@ -729,21 +805,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private ReadyButton readyButton => this.ChildrenOfType<ReadyButton>().Single();
 
-        private void pressReadyButton()
+        private void pressReadyButton(int? playingUserId = null)
         {
             AddUntilStep("wait for ready button to be enabled", () => readyButton.Enabled.Value);
 
             MultiplayerUserState lastState = MultiplayerUserState.Idle;
+            MultiplayerRoomUser user = null;
 
             AddStep("click ready button", () =>
             {
-                lastState = client.LocalUser?.State ?? MultiplayerUserState.Idle;
+                user = playingUserId == null ? client.LocalUser : client.Room?.Users.Single(u => u.UserID == playingUserId);
+                lastState = user?.State ?? MultiplayerUserState.Idle;
 
                 InputManager.MoveMouseTo(readyButton);
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for state change", () => client.LocalUser?.State != lastState);
+            AddUntilStep("wait for state change", () => user?.State != lastState);
         }
 
         private void createRoom(Func<Room> room)

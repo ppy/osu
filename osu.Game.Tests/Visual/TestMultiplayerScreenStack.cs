@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
             ((DummyAPIAccess)api).HandleRequest = request => multiplayerScreen.RequestsHandler.HandleRequest(request, api.LocalUser.Value, game);
         }
 
-        public override bool OnBackButton() => multiplayerScreen.OnBackButton();
+        public override bool OnBackButton() => (screenStack.CurrentScreen as OsuScreen)?.OnBackButton() ?? base.OnBackButton();
 
         public override bool OnExiting(IScreen next)
         {
