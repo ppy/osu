@@ -56,7 +56,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 AutoSizeAxes = Axes.Y,
                 CornerRadius = BeatmapCard.CORNER_RADIUS,
                 Masking = true,
-                Unhovered = _ => checkForHide(),
+                Unhovered = _ => collapseIfNotHovered(),
                 Children = new Drawable[]
                 {
                     background = new Box
@@ -78,10 +78,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Alpha = 0,
                         Hovered = _ =>
                         {
-                            keep();
+                            queueExpandedStateChange(true);
                             return true;
                         },
-                        Unhovered = _ => checkForHide(),
+                        Unhovered = _ => collapseIfNotHovered(),
                         Child = dropdownScroll = new ExpandedContentScrollContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -121,51 +121,23 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private ScheduledDelegate? scheduledExpandedChange;
 
-        public void ScheduleShow()
-        {
-            scheduledExpandedChange?.Cancel();
-            if (Expanded.Disabled || Expanded.Value)
-                return;
+        public void ExpandAfterDelay() => queueExpandedStateChange(true, 100);
 
-            scheduledExpandedChange = Scheduler.AddDelayed(() =>
-            {
-                if (!Expanded.Disabled)
-                    expanded.Value = true;
-            }, 100);
+        public void CollapseAfterDelay() => queueExpandedStateChange(false, 500);
+
+        private void collapseIfNotHovered()
+        {
+            if (!content.IsHovered && !dropdownContent.IsHovered)
+                queueExpandedStateChange(false);
         }
 
-        public void ScheduleHide()
-        {
-            scheduledExpandedChange?.Cancel();
-            if (Expanded.Disabled || !Expanded.Value)
-                return;
-
-            scheduledExpandedChange = Scheduler.AddDelayed(() =>
-            {
-                if (!Expanded.Disabled)
-                    expanded.Value = false;
-            }, 500);
-        }
-
-        private void checkForHide()
-        {
-            if (Expanded.Disabled)
-                return;
-
-            if (content.IsHovered || dropdownContent.IsHovered)
-                return;
-
-            scheduledExpandedChange?.Cancel();
-            expanded.Value = false;
-        }
-
-        private void keep()
+        private void queueExpandedStateChange(bool newState, int delay = 0)
         {
             if (Expanded.Disabled)
                 return;
 
             scheduledExpandedChange?.Cancel();
-            expanded.Value = true;
+            scheduledExpandedChange = Scheduler.AddDelayed(() => expanded.Value = newState, delay);
         }
 
         private void updateState()
