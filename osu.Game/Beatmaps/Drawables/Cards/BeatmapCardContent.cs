@@ -31,7 +31,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             set => dropdownScroll.Child = value;
         }
 
-        public Bindable<bool> Expanded { get; } = new BindableBool();
+        public IBindable<bool> Expanded => expanded;
+
+        private readonly BindableBool expanded = new BindableBool();
 
         private readonly Box background;
         private readonly Container content;
@@ -128,7 +130,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             scheduledExpandedChange = Scheduler.AddDelayed(() =>
             {
                 if (!Expanded.Disabled)
-                    Expanded.Value = true;
+                    expanded.Value = true;
             }, 100);
         }
 
@@ -141,7 +143,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             scheduledExpandedChange = Scheduler.AddDelayed(() =>
             {
                 if (!Expanded.Disabled)
-                    Expanded.Value = false;
+                    expanded.Value = false;
             }, 500);
         }
 
@@ -154,7 +156,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 return;
 
             scheduledExpandedChange?.Cancel();
-            Expanded.Value = false;
+            expanded.Value = false;
         }
 
         private void keep()
@@ -163,7 +165,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 return;
 
             scheduledExpandedChange?.Cancel();
-            Expanded.Value = true;
+            expanded.Value = true;
         }
 
         private void updateState()
