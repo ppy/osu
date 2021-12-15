@@ -289,10 +289,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     },
                                                     Unhovered = _ =>
                                                     {
-                                                        // This hide should only trigger if the expanded content has not shown yet.
-                                                        // ie. if the user has not shown intent to want to see it (quickly moved over the info row area).
+                                                        // Handles the case where a user has not shown explicit intent to view expanded info.
+                                                        // ie. quickly moved over the info row area but didn't remain within it.
                                                         if (!Expanded.Value)
-                                                            content.CollapseAfterDelay();
+                                                            content.CancelExpand();
                                                     }
                                                 }
                                             }
