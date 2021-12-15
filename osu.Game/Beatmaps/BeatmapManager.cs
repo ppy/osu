@@ -147,47 +147,59 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
-        /// </summary>
-        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
-        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
-        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
-            beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
-
-        /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSets(includeProtected);
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool includeProtected = false)
+        {
+            using (var context = contextFactory.CreateContext())
+                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending && (includeProtected || !b.Protected)).ToList();
+        }
 
         /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated. TODO: do we still need this? or rather, should we have the non-enumerable version in the first place?
         /// </summary>
         /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSetsEnumerable(includeProtected);
+        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(bool includeProtected = false) => GetAllUsableBeatmapSets(includeProtected);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<ILive<BeatmapSetInfo>> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSets(query).ToLive();
+        public List<ILive<BeatmapSetInfo>> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
+        {
+            using (var context = contextFactory.CreateContext())
+            {
+                return context.All<BeatmapSetInfo>()
+                              .Where(b => !b.DeletePending)
+                              .Where(query)
+                              .ToLive();
+            }
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSet(query);
+        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
+        {
+            using (var context = contextFactory.CreateContext())
+                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive();
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmaps(query);
+        public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
+        {
+            using (var context = contextFactory.CreateContext())
+                return context.All<BeatmapInfo>().Where(query);
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
@@ -195,6 +207,15 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmap(query);
+
+        /// <summary>
+        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
+        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
+        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin? beatmapSkin = null) =>
+            beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -288,6 +309,15 @@ namespace osu.Game.Beatmaps
         #region Implementation of IWorkingBeatmapCache
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo? importedBeatmap) => workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
+
+        public WorkingBeatmap GetWorkingBeatmap(ILive<BeatmapInfo>? importedBeatmap)
+        {
+            WorkingBeatmap working = workingBeatmapCache.GetWorkingBeatmap(null);
+
+            importedBeatmap?.PerformRead(b => working = workingBeatmapCache.GetWorkingBeatmap(b));
+
+            return working;
+        }
 
         void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
         void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
