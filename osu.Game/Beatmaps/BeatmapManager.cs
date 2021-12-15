@@ -173,7 +173,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSets(query);
+        public ILive<IEnumerable<BeatmapSetInfo>> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSets(query).ToLive(contextFactory);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
