@@ -123,7 +123,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public void ExpandAfterDelay() => queueExpandedStateChange(true, 100);
 
-        public void CollapseAfterDelay() => queueExpandedStateChange(false, 500);
+        public void CancelExpand() => scheduledExpandedChange?.Cancel();
 
         private void collapseIfNotHovered()
         {
