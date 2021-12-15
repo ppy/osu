@@ -104,10 +104,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
+        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
             using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().FirstOrDefault(query); // TODO: ?.ToLive();
+                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive();
         }
 
         /// <summary>

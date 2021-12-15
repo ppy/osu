@@ -173,14 +173,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public ILive<IEnumerable<BeatmapSetInfo>> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSets(query).ToLive(contextFactory);
+        public List<ILive<BeatmapSetInfo>> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSets(query).ToLive();
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSet(query);
+        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSet(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
