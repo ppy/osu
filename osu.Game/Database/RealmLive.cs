@@ -24,20 +24,16 @@ namespace osu.Game.Database
         /// </summary>
         private readonly T data;
 
-        private readonly RealmContextFactory? realmFactory;
+        private readonly RealmContextFactory realmFactory;
 
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
         /// <param name="data">The realm data.</param>
         /// <param name="realmFactory">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
-        public RealmLive(T data, RealmContextFactory? realmFactory)
+        public RealmLive(T data, RealmContextFactory realmFactory)
         {
             this.data = data;
-
-            if (IsManaged && realmFactory == null)
-                throw new ArgumentException(@"Realm factory must be provided for a managed instance", nameof(realmFactory));
-
             this.realmFactory = realmFactory;
 
             ID = data.ID;
@@ -55,9 +51,6 @@ namespace osu.Game.Database
                 return;
             }
 
-            if (realmFactory == null)
-                throw new ArgumentException(@"Realm factory must be provided for a managed instance", nameof(realmFactory));
-
             using (var realm = realmFactory.CreateContext())
                 perform(realm.Find<T>(ID));
         }
@@ -73,9 +66,6 @@ namespace osu.Game.Database
 
             if (!IsManaged)
                 return perform(data);
-
-            if (realmFactory == null)
-                throw new ArgumentException(@"Realm factory must be provided for a managed instance", nameof(realmFactory));
 
             using (var realm = realmFactory.CreateContext())
                 return perform(realm.Find<T>(ID));
@@ -108,7 +98,7 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                return realmFactory!.Context.Find<T>(ID);
+                return realmFactory.Context.Find<T>(ID);
             }
         }
 

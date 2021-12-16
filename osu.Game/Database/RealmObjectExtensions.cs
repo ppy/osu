@@ -56,13 +56,13 @@ namespace osu.Game.Database
         public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l, null)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
         }
 
         public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return new RealmLive<T>(realmObject, null);
+            return new RealmLiveUnmanaged<T>(realmObject);
         }
 
         public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmContextFactory realmContextFactory)
