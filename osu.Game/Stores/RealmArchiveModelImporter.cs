@@ -352,7 +352,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return existing.ToLive();
+                            return existing.ToLive(ContextFactory);
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -387,7 +387,7 @@ namespace osu.Game.Stores
                                 existing.DeletePending = false;
                                 transaction.Commit();
 
-                                return existing.ToLive();
+                                return existing.ToLive(ContextFactory);
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -416,7 +416,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return item.ToLive();
+                return item.ToLive(ContextFactory);
             }
         }
 
