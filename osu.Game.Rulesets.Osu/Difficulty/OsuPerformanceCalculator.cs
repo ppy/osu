@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= Math.Pow(0.96, effectiveMissCount);
+                aimValue *= calculateMissPenalty(effectiveMissCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                speedValue *= Math.Pow(0.96, effectiveMissCount);
+                speedValue *= calculateMissPenalty(effectiveMissCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -229,7 +229,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 flashlightValue *= 1.3;
 
             if (effectiveMissCount > 0)
-                flashlightValue *= Math.Pow(0.96, effectiveMissCount);
+                flashlightValue *= calculateMissPenalty(effectiveMissCount);
 
             // Combo scaling.
             if (Attributes.MaxCombo > 0)
@@ -265,6 +265,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
         }
 
+        private double calculateMissPenalty(double missCount)
+        {
+            double leniency = 2.0;
+
+            if (missCount > totalHits - leniency)
+                return 0;
+
+            double missApprox = erfInvApprox((totalHits - leniency - missCount) / totalHits);
+            double fcApprox = erfInvApprox((totalHits - leniency) / totalHits);
+
+            return Math.Pow(missApprox / fcApprox, 1.5);
+        }
+
+        private double logit(double x) => Math.Log(x / (1 - x));
+        private double erfInvApprox(double x) => (Math.Sqrt(Math.PI) / 4) * logit((x + 1) / 2);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
