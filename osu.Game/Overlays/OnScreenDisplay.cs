@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
             DisplayTemporarily(box);
         });
 
-        private void displayTrackedSettingChange(SettingDescription description) => Display(new TrackedSettingToast(description));
+        private void displayTrackedSettingChange(SettingDescription description) => Scheduler.AddOnce(Display, new TrackedSettingToast(description));
 
         private TransformSequence<Drawable> fadeIn;
         private ScheduledDelegate fadeOut;
