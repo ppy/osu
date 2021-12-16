@@ -237,10 +237,7 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
-                channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-
-                foreach (Channel channel in channelManager.JoinedChannels)
-                    ChannelTabControl.AddChannel(channel);
+                channelManager.JoinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
 
                 channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
                 availableChannelsChanged(null, null);
@@ -436,12 +433,19 @@ namespace osu.Game.Overlays
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (Channel channel in args.NewItems.Cast<Channel>())
-                        ChannelTabControl.AddChannel(channel);
+                    {
+                        if (channel.Type != ChannelType.Multiplayer)
+                            ChannelTabControl.AddChannel(channel);
+                    }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (Channel channel in args.OldItems.Cast<Channel>())
                     {
+                        if (!ChannelTabControl.Items.Contains(channel))
+                            continue;
+
                         ChannelTabControl.RemoveChannel(channel);
 
                         var loaded = loadedChannels.Find(c => c.Channel == channel);
