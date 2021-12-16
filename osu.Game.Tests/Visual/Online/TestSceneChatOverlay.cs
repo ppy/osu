@@ -393,6 +393,25 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
         }
 
+        [Test]
+        public void TestMultiplayerChannelIsNotShown()
+        {
+            Channel multiplayerChannel = null;
+
+            AddStep("join multiplayer channel", () => channelManager.JoinChannel(multiplayerChannel = new Channel(new APIUser())
+            {
+                Name = "#mp_1",
+                Type = ChannelType.Multiplayer,
+            }));
+
+            AddAssert("channel joined", () => channelManager.JoinedChannels.Contains(multiplayerChannel));
+            AddAssert("channel not present in overlay", () => !chatOverlay.TabMap.ContainsKey(multiplayerChannel));
+            AddAssert("multiplayer channel is not current", () => channelManager.CurrentChannel.Value != multiplayerChannel);
+
+            AddStep("leave channel", () => channelManager.LeaveChannel(multiplayerChannel));
+            AddAssert("channel left", () => !channelManager.JoinedChannels.Contains(multiplayerChannel));
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
