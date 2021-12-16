@@ -47,9 +47,9 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLive())
+        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
         {
-            Default = Skinning.DefaultSkin.CreateInfo().ToLive()
+            Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
         };
 
         private readonly SkinModelManager skinModelManager;
@@ -119,13 +119,13 @@ namespace osu.Game.Skinning
 
                 if (randomChoices.Length == 0)
                 {
-                    CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLive();
+                    CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged();
                     return;
                 }
 
                 var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
 
-                CurrentSkinInfo.Value = chosen.ToLive();
+                CurrentSkinInfo.Value = chosen.ToLive(contextFactory);
             }
         }
 
@@ -182,7 +182,7 @@ namespace osu.Game.Skinning
         public ILive<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
         {
             using (var context = contextFactory.CreateContext())
-                return context.All<SkinInfo>().FirstOrDefault(query)?.ToLive();
+                return context.All<SkinInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
         }
 
         public event Action SourceChanged;
@@ -237,6 +237,7 @@ namespace osu.Game.Skinning
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<byte[]> IStorageResourceProvider.Files => userFiles;
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => contextFactory;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
@@ -302,7 +303,7 @@ namespace osu.Game.Skinning
                 Guid currentUserSkin = CurrentSkinInfo.Value.ID;
 
                 if (items.Any(s => s.ID == currentUserSkin))
-                    scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLive());
+                    scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
 
                 skinModelManager.Delete(items.ToList(), silent);
             }
