@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
 
-        public Bindable<bool> Expanded { get; } = new BindableBool();
+        public IBindable<bool> Expanded { get; }
 
         private const float width = 408;
         private const float height = 100;
@@ -64,9 +64,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapCard(APIBeatmapSet beatmapSet)
+        public BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
             : base(HoverSampleSet.Submit)
         {
+            Expanded = new BindableBool { Disabled = !allowExpansion };
+
             this.beatmapSet = beatmapSet;
             favouriteState = new Bindable<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
@@ -282,15 +284,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                 {
                                                     Hovered = _ =>
                                                     {
-                                                        content.ScheduleShow();
+                                                        content.ExpandAfterDelay();
                                                         return false;
                                                     },
                                                     Unhovered = _ =>
                                                     {
-                                                        // This hide should only trigger if the expanded content has not shown yet.
-                                                        // ie. if the user has not shown intent to want to see it (quickly moved over the info row area).
+                                                        // Handles the case where a user has not shown explicit intent to view expanded info.
+                                                        // ie. quickly moved over the info row area but didn't remain within it.
                                                         if (!Expanded.Value)
-                                                            content.ScheduleHide();
+                                                            content.CancelExpand();
                                                     }
                                                 }
                                             }
@@ -366,8 +368,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            content.ScheduleHide();
-
             updateState();
             base.OnHoverLost(e);
         }

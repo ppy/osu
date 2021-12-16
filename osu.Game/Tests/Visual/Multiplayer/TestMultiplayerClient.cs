@@ -128,6 +128,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case MultiplayerRoomState.WaitingForLoad:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.WaitingForLoad))
                         {
+                            var loadedUsers = Room.Users.Where(u => u.State == MultiplayerUserState.Loaded).ToArray();
+
+                            if (loadedUsers.Length == 0)
+                            {
+                                // all users have bailed from the load sequence. cancel the game start.
+                                ChangeRoomState(MultiplayerRoomState.Open);
+                                return;
+                            }
+
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.Loaded))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Playing);
 
@@ -143,8 +152,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.FinishedPlay))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Results);
-                            ChangeRoomState(MultiplayerRoomState.Open);
 
+                            ChangeRoomState(MultiplayerRoomState.Open);
                             ((IMultiplayerClient)this).ResultsReady();
 
                             FinishCurrentItem().Wait();
@@ -242,6 +251,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task ChangeState(MultiplayerUserState newState)
         {
+            Debug.Assert(Room != null);
+
+            if (newState == MultiplayerUserState.Idle && LocalUser?.State == MultiplayerUserState.WaitingForLoad)
+                return Task.CompletedTask;
+
             ChangeUserState(api.LocalUser.Value.Id, newState);
             return Task.CompletedTask;
         }
@@ -301,6 +315,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
             return ((IMultiplayerClient)this).LoadRequested();
+        }
+
+        public override Task AbortGameplay()
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(LocalUser != null);
+
+            ChangeUserState(LocalUser.UserID, MultiplayerUserState.Idle);
+
+            return Task.CompletedTask;
         }
 
         public async Task AddUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
