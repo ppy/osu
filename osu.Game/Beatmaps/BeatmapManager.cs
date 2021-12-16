@@ -102,8 +102,6 @@ namespace osu.Game.Beatmaps
             return GetWorkingBeatmap(imported?.Beatmaps.First());
         }
 
-        #region Delegation to BeatmapModelManager (methods which previously existed locally).
-
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
@@ -150,18 +148,11 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool includeProtected = false)
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
             using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending && (includeProtected || !b.Protected)).ToList();
+                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending).ToList();
         }
-
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated. TODO: do we still need this? or rather, should we have the non-enumerable version in the first place?
-        /// </summary>
-        /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(bool includeProtected = false) => GetAllUsableBeatmapSets(includeProtected);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
@@ -200,6 +191,8 @@ namespace osu.Game.Beatmaps
             using (var context = contextFactory.CreateContext())
                 return context.All<BeatmapInfo>().Where(query);
         }
+
+        #region Delegation to BeatmapModelManager (methods which previously existed locally).
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
