@@ -256,6 +256,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
+        public void TestExtra()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardExtra(beatmapSetInfo));
+        }
+
+        [Test]
         public void TestHoverState()
         {
             AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCard(s)));
@@ -279,20 +285,6 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
 
             BeatmapCard firstCard() => this.ChildrenOfType<BeatmapCard>().First();
-        }
-
-        [Test]
-        public void TestExtra()
-        {
-            createTestCase(beatmapSetInfo => new BeatmapCardExtra(beatmapSetInfo));
-
-            AddToggleStep("toggle expanded state", expanded =>
-            {
-                var card = this.ChildrenOfType<BeatmapCardExtra>().Last();
-                if (!card.Expanded.Disabled)
-                    card.Expanded.Value = expanded;
-            });
-            AddToggleStep("disable/enable expansion", disabled => this.ChildrenOfType<BeatmapCardExtra>().ForEach(card => card.Expanded.Disabled = disabled));
         }
     }
 }
