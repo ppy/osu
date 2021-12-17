@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("visit message is not visible", () => !evast.LastVisitMessage.IsPresent);
         }
 
-        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId));
+        private UserActivity soloGameStatusForRuleset(int rulesetId) => new UserActivity.InSoloGame(null, rulesetStore.GetRuleset(rulesetId), 0);
 
         private class TestUserListPanel : UserListPanel
         {

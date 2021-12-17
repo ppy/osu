@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
-        protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
+        protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value, RestartCount);
 
         public override float BackgroundParallaxAmount => 0.1f;
 

@@ -93,7 +93,7 @@ namespace osu.Desktop
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
                 presence.State = truncate(activity.Value.Status);
-                presence.Details = truncate(getDetails(activity.Value));
+                presence.Details = truncate(activity.Value.GetDetails(privacyMode.Value));
             }
             else
             {
@@ -136,23 +136,6 @@ namespace osu.Desktop
                 mem.Span.CopyTo(span);
                 span[^1] = '…';
             });
-        }
-
-        private string getDetails(UserActivity activity)
-        {
-            switch (activity)
-            {
-                case UserActivity.InGame game:
-                    return game.BeatmapInfo.ToString();
-
-                case UserActivity.Editing edit:
-                    return edit.BeatmapInfo.ToString();
-
-                case UserActivity.InLobby lobby:
-                    return privacyMode.Value == DiscordRichPresenceMode.Limited ? string.Empty : lobby.Room.Name.Value;
-            }
-
-            return string.Empty;
         }
 
         protected override void Dispose(bool isDisposing)
