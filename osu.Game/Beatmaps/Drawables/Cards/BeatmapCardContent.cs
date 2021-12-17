@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                CornerRadius = BeatmapCard.CORNER_RADIUS,
+                CornerRadius = BeatmapCardBase.CORNER_RADIUS,
                 Masking = true,
                 Unhovered = _ => updateFromHoverChange(),
                 Children = new Drawable[]
@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = height,
-                        CornerRadius = BeatmapCard.CORNER_RADIUS,
+                        CornerRadius = BeatmapCardBase.CORNER_RADIUS,
                         Masking = true,
                     },
                     dropdownContent = new HoverHandlingContainer
@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     borderContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CornerRadius = BeatmapCard.CORNER_RADIUS,
+                        CornerRadius = BeatmapCardBase.CORNER_RADIUS,
                         Masking = true,
                         BorderThickness = 3,
                         Child = new Box
@@ -139,9 +139,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
-            background.FadeTo(Expanded.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            dropdownContent.FadeTo(Expanded.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            borderContainer.FadeTo(Expanded.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeTo(Expanded.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
+            dropdownContent.FadeTo(Expanded.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
+            borderContainer.FadeTo(Expanded.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
 
             content.TweenEdgeEffectTo(new EdgeEffectParameters
             {
@@ -150,7 +150,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 Radius = 10,
                 Colour = Colour4.Black.Opacity(Expanded.Value ? 0.3f : 0f),
                 Hollow = true,
-            }, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            }, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
         }
 
         private class ExpandedContentScrollContainer : OsuScrollContainer

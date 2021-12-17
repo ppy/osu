@@ -78,7 +78,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             RelativeSizeAxes = Axes.Y;
             Masking = true;
-            CornerRadius = BeatmapCard.CORNER_RADIUS;
+            CornerRadius = BeatmapCardBase.CORNER_RADIUS;
 
             InternalChildren = new Drawable[]
             {
@@ -133,7 +133,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Name = @"Main content",
                     RelativeSizeAxes = Axes.Y,
-                    CornerRadius = BeatmapCard.CORNER_RADIUS,
+                    CornerRadius = BeatmapCardBase.CORNER_RADIUS,
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -169,10 +169,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             float targetWidth = Width - (ShowDetails.Value ? ButtonsExpandedWidth : ButtonsCollapsedWidth);
 
-            mainArea.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            mainArea.ResizeWidthTo(targetWidth, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
 
-            background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            buttons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
+            buttons.FadeTo(ShowDetails.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
 
             foreach (var button in buttons)
             {
