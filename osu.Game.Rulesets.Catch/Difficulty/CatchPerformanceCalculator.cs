@@ -90,6 +90,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModNoFail))
                 value *= 0.90;
 
+            if (categoryDifficulty != null)
+            {
+                categoryDifficulty.Add("AR", Attributes.ApproachRate);
+                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
+            }
+
             return value;
         }
 
