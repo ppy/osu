@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,9 +21,6 @@ namespace osu.Game.Screens.Select.Carousel
         private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private ScoreManager scores { get; set; }
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
@@ -40,26 +38,34 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader]
         private void load()
         {
-            scores.ItemUpdated += scoreChanged;
-            scores.ItemRemoved += scoreChanged;
-
             ruleset.ValueChanged += _ => fetchAndLoadTopScore();
 
             fetchAndLoadTopScore();
         }
 
-        private void scoreChanged(ScoreInfo score)
+        protected override void LoadComplete()
         {
-            if (score.BeatmapInfoID == beatmapInfo.ID)
-                fetchAndLoadTopScore();
+            base.LoadComplete();
+
+            scoreSubscription = realmFactory.Context.All<ScoreInfo>().Where(s => s.BeatmapInfo.ID == beatmapInfo.ID).QueryAsyncWithNotifications((_, changes, ___) =>
+            {
+                if (changes == null)
+                    return;
+
+                fetchTopScoreRank();
+            });
         }
+
+        private IDisposable scoreSubscription;
 
         private ScheduledDelegate scheduledRankUpdate;
 
         private void fetchAndLoadTopScore()
         {
+            // TODO: this lookup likely isn't required, we can use the results of the subscription directly.
             var rank = fetchTopScoreRank();
-            scheduledRankUpdate = Schedule(() =>
+
+            scheduledRankUpdate = Scheduler.Add(() =>
             {
                 Rank = rank;
 
@@ -89,11 +95,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Dispose(isDisposing);
 
-            if (scores != null)
-            {
-                scores.ItemUpdated -= scoreChanged;
-                scores.ItemRemoved -= scoreChanged;
-            }
+            scoreSubscription?.Dispose();
         }
     }
 }
