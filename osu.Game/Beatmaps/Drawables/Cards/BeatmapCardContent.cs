@@ -139,6 +139,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState()
         {
+            // Scale value is intentionally chosen to fit in the spacing of listing displays, as to not overlap horizontally with adjacent cards.
+            // This avoids depth issues where a hovered (scaled) card to the right of another card would be beneath the card to the left.
+            this.ScaleTo(Expanded.Value ? 1.03f : 1, 500, Easing.OutQuint);
+
             background.FadeTo(Expanded.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
             dropdownContent.FadeTo(Expanded.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
             borderContainer.FadeTo(Expanded.Value ? 1 : 0, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
