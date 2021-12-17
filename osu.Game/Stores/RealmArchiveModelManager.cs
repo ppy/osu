@@ -187,6 +187,7 @@ namespace osu.Game.Stores
             item.Realm.Write(r => item.DeletePending = false);
         }
 
+        // TODO: delete or abstract
         public virtual bool IsAvailableLocally(TModel model) => false; // Not relevant for skins since they can't be downloaded yet.
 
         public void Update(TModel skin)
