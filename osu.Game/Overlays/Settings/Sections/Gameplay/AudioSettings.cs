@@ -20,11 +20,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         private FillFlowContainer<SettingsSlider<float>> positionalHitsoundsSettings;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config,OsuConfigManager osuConfig)
+        private void load(OsuConfigManager config, OsuConfigManager osuConfig)
         {
             positionalHitsoundsLevel = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel);
             Children = new Drawable[]
-            {                
+            {
                 positionalHitsoundsSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
                     Direction = FillDirection.Vertical,
@@ -38,15 +38,15 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                             LabelText = AudioSettingsStrings.PositionalLevel,
                             Current = positionalHitsoundsLevel,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true,
-                        },
+                            DisplayAsPercentage = true
+                        }
                     }
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
-                },
+                }
             };
         }
     }

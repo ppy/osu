@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Master"
         /// </summary>
-        public static LocalisableString PositionalLevel => new TranslatableString(getKey(@"positional_hitsound_audio_level"), @"Positional hitsound audio level");
+        public static LocalisableString PositionalLevel => new TranslatableString(getKey(@"positional_hitsound_audio_level"), @"Hitsound stereo separation");
 
         /// <summary>
         /// "Level"
