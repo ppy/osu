@@ -62,10 +62,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private void updateState() => Schedule(() =>
         {
-            background.FadeColour(Dimmed.Value ? colourProvider.Background4 : colourProvider.Background2, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            background.FadeColour(Dimmed.Value ? colourProvider.Background4 : colourProvider.Background2, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
 
             var gradient = ColourInfo.GradientHorizontal(Colour4.White.Opacity(0), Colour4.White.Opacity(0.2f));
-            cover.FadeColour(gradient, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+            cover.FadeColour(gradient, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
         });
     }
 }
