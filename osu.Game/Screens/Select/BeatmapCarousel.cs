@@ -144,9 +144,13 @@ namespace osu.Game.Screens.Select
 
         private CarouselRoot root;
 
+        private IDisposable subscriptionSets;
+        private IDisposable subscriptionBeatmaps;
+
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
         public BeatmapCarousel()
+
         {
             root = new CarouselRoot(this);
             InternalChild = new OsuContextMenuContainer
@@ -163,10 +167,7 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
@@ -183,12 +184,9 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending).QueryAsyncWithNotifications(beatmapSetsChanged);
-            realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+            subscriptionSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending).QueryAsyncWithNotifications(beatmapSetsChanged);
+            subscriptionBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
         }
-
-        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
-        private void beatmapUpdated(BeatmapSetInfo item) => UpdateBeatmapSet(item);
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
         {
@@ -921,11 +919,8 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            if (beatmaps != null)
-            {
-                beatmaps.ItemUpdated -= beatmapUpdated;
-                beatmaps.ItemRemoved -= beatmapRemoved;
-            }
+            subscriptionSets?.Dispose();
+            subscriptionBeatmaps?.Dispose();
         }
     }
 }
