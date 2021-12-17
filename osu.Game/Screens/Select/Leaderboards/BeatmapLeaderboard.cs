@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             get => beatmapInfo;
             set
             {
-                if (beatmapInfo.Equals(value))
+                if (beatmapInfo?.Equals(value) == true)
                     return;
 
                 beatmapInfo = value;
