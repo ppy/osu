@@ -15,6 +15,7 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -108,6 +109,7 @@ namespace osu.Game.Beatmaps
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
