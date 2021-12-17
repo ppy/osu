@@ -24,22 +24,6 @@ namespace osu.Game.Stores
     public abstract class RealmArchiveModelManager<TModel> : RealmArchiveModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
-        public event Action<TModel>? ItemUpdated
-        {
-            // This may be brought back for beatmaps to ease integration.
-            // The eventual goal would be not requiring this and using realm subscriptions in its place.
-            add => throw new NotImplementedException();
-            remove => throw new NotImplementedException();
-        }
-
-        public event Action<TModel>? ItemRemoved
-        {
-            // This may be brought back for beatmaps to ease integration.
-            // The eventual goal would be not requiring this and using realm subscriptions in its place.
-            add => throw new NotImplementedException();
-            remove => throw new NotImplementedException();
-        }
-
         private readonly RealmFileStore realmFileStore;
 
         protected RealmArchiveModelManager(Storage storage, RealmContextFactory contextFactory)
