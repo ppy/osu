@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("import beatmap", () =>
             {
-                importedBeatmap = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
+                importedBeatmap = BeatmapImportHelper.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
                 importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.RulesetID == 0).OnlineID;
             });
         }

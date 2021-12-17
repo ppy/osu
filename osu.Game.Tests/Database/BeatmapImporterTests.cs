@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Database
                 using (var stream = File.OpenRead(tempPath))
                 {
                     importedSet = await importer.Import(new ImportTask(stream, Path.GetFileName(tempPath)));
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
                 }
 
                 Assert.NotNull(importedSet);
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Database
 
                     var importedSecondTime = await importer.Import(new ImportTask(temp));
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
 
                     Assert.NotNull(importedSecondTime);
                     Debug.Assert(importedSecondTime != null);
@@ -242,7 +242,7 @@ namespace osu.Game.Tests.Database
 
                     var importedSecondTime = await importer.Import(new ImportTask(temp));
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
 
                     // check the newly "imported" beatmap is not the original.
                     Assert.NotNull(importedSecondTime);
@@ -291,7 +291,7 @@ namespace osu.Game.Tests.Database
 
                     var importedSecondTime = await importer.Import(new ImportTask(temp));
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
 
                     Assert.NotNull(importedSecondTime);
                     Debug.Assert(importedSecondTime != null);
@@ -339,7 +339,7 @@ namespace osu.Game.Tests.Database
 
                     var importedSecondTime = await importer.Import(new ImportTask(temp));
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
 
                     Assert.NotNull(importedSecondTime);
                     Debug.Assert(importedSecondTime != null);
@@ -606,7 +606,7 @@ namespace osu.Game.Tests.Database
                 string? temp = TestResources.GetTestBeatmapForImport();
                 using (File.OpenRead(temp))
                     await importer.Import(temp);
-                ensureLoaded(realmFactory.Context);
+                EnsureLoaded(realmFactory.Context);
                 File.Delete(temp);
                 Assert.IsFalse(File.Exists(temp), "We likely held a read lock on the file when we shouldn't");
             });
@@ -639,7 +639,7 @@ namespace osu.Game.Tests.Database
 
                     await importer.Import(temp);
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
                 }
                 finally
                 {
@@ -679,7 +679,7 @@ namespace osu.Game.Tests.Database
                     Assert.NotNull(imported);
                     Debug.Assert(imported != null);
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
 
                     Assert.IsFalse(imported.PerformRead(s => s.Files.Any(f => f.Filename.Contains("subfolder"))), "Files contain common subfolder");
                 }
@@ -729,7 +729,7 @@ namespace osu.Game.Tests.Database
                     Assert.NotNull(imported);
                     Debug.Assert(imported != null);
 
-                    ensureLoaded(realmFactory.Context);
+                    EnsureLoaded(realmFactory.Context);
 
                     Assert.IsFalse(imported.PerformRead(s => s.Files.Any(f => f.Filename.Contains("__MACOSX"))), "Files contain resource fork folder, which should be ignored");
                     Assert.IsFalse(imported.PerformRead(s => s.Files.Any(f => f.Filename.Contains("actual_data"))), "Files contain common subfolder");
@@ -772,7 +772,7 @@ namespace osu.Game.Tests.Database
 
             Assert.NotNull(importedSet);
 
-            ensureLoaded(realm);
+            EnsureLoaded(realm);
 
             waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
 
@@ -788,7 +788,7 @@ namespace osu.Game.Tests.Database
             Assert.NotNull(importedSet);
             Debug.Assert(importedSet != null);
 
-            ensureLoaded(realm);
+            EnsureLoaded(realm);
 
             waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
 
@@ -849,7 +849,7 @@ namespace osu.Game.Tests.Database
             Assert.AreEqual(expected, singleReferencedCount);
         }
 
-        private static void ensureLoaded(Realm realm, int timeout = 60000)
+        internal static void EnsureLoaded(Realm realm, int timeout = 60000)
         {
             IQueryable<BeatmapSetInfo>? resultSets = null;
 
