@@ -409,13 +409,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             statisticsContainer.Content[1][0] = withMargin(new PlayCountStatistic(beatmapSet));
 
-            if (beatmapSet.HypeStatus != null)
-                statisticsContainer.Content[0][1] = withMargin(new HypesStatistic(beatmapSet.HypeStatus));
+            var hypesStatistic = HypesStatistic.CreateFor(beatmapSet);
+            if (hypesStatistic != null)
+                statisticsContainer.Content[0][1] = withMargin(hypesStatistic);
 
-            // web does not show nominations unless hypes are also present.
-            // see: https://github.com/ppy/osu-web/blob/8ed7d071fd1d3eaa7e43cf0e4ff55ca2fef9c07c/resources/assets/lib/beatmapset-panel.tsx#L443
-            if (beatmapSet.HypeStatus != null && beatmapSet.NominationStatus != null)
-                statisticsContainer.Content[1][1] = withMargin(new NominationsStatistic(beatmapSet.NominationStatus));
+            var nominationsStatistic = NominationsStatistic.CreateFor(beatmapSet);
+            if (nominationsStatistic != null)
+                statisticsContainer.Content[1][1] = withMargin(nominationsStatistic);
 
             var dateStatistic = BeatmapCardDateStatistic.CreateFor(beatmapSet);
             if (dateStatistic != null)

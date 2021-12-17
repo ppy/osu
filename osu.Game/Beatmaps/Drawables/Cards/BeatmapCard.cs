@@ -380,13 +380,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private IEnumerable<BeatmapCardStatistic> createStatistics()
         {
-            if (beatmapSet.HypeStatus != null)
-                yield return new HypesStatistic(beatmapSet.HypeStatus);
+            var hypesStatistic = HypesStatistic.CreateFor(beatmapSet);
+            if (hypesStatistic != null)
+                yield return hypesStatistic;
 
-            // web does not show nominations unless hypes are also present.
-            // see: https://github.com/ppy/osu-web/blob/8ed7d071fd1d3eaa7e43cf0e4ff55ca2fef9c07c/resources/assets/lib/beatmapset-panel.tsx#L443
-            if (beatmapSet.HypeStatus != null && beatmapSet.NominationStatus != null)
-                yield return new NominationsStatistic(beatmapSet.NominationStatus);
+            var nominationsStatistic = NominationsStatistic.CreateFor(beatmapSet);
+            if (nominationsStatistic != null)
+                yield return nominationsStatistic;
 
             yield return new FavouritesStatistic(beatmapSet) { Current = favouriteState };
             yield return new PlayCountStatistic(beatmapSet);
