@@ -7,11 +7,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps.Drawables.Cards.Buttons;
 using osu.Game.Beatmaps.Drawables.Cards.Statistics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -23,7 +21,6 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osuTK;
 using osu.Game.Resources.Localisation.Web;
-using DownloadButton = osu.Game.Beatmaps.Drawables.Cards.Buttons.DownloadButton;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
@@ -31,7 +28,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
     {
         private const float width = 475;
         private const float height = 140;
-        private const float icon_area_width = 30;
 
         public Bindable<bool> Expanded { get; } = new BindableBool();
 
@@ -44,19 +40,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         private readonly BeatmapCardContent content;
 
         private BeatmapCardThumbnail thumbnail = null!;
+        private CollapsibleButtonContainer buttonContainer = null!;
 
-        private Container rightAreaBackground = null!;
-        private Container<BeatmapCardIconButton> rightAreaButtons = null!;
-
-        private Container mainContent = null!;
-        private BeatmapCardContentBackground mainContentBackground = null!;
         private GridContainer statisticsContainer = null!;
 
         private FillFlowContainer idleBottomContent = null!;
         private BeatmapCardDownloadProgressBar downloadProgressBar = null!;
-
-        [Resolved]
-        private OsuColour colours { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -88,21 +77,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Children = new Drawable[]
                     {
                         downloadTracker,
-                        rightAreaBackground = new Container
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Width = icon_area_width + 2 * BeatmapCard.CORNER_RADIUS,
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            // workaround for masking artifacts at the top & bottom of card,
-                            // which become especially visible on downloaded beatmaps (when the icon area has a lime background).
-                            Padding = new MarginPadding { Vertical = 1 },
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Colour4.White
-                            },
-                        },
                         thumbnail = new BeatmapCardThumbnail(beatmapSet)
                         {
                             Name = @"Left (icon) area",
@@ -116,61 +90,19 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Spacing = new Vector2(1)
                             }
                         },
-                        new Container
+                        buttonContainer = new CollapsibleButtonContainer(beatmapSet)
                         {
-                            Name = @"Right (button) area",
-                            Width = 30,
-                            RelativeSizeAxes = Axes.Y,
-                            Origin = Anchor.TopRight,
-                            Anchor = Anchor.TopRight,
-                            Padding = new MarginPadding { Vertical = 35 },
-                            Child = rightAreaButtons = new Container<BeatmapCardIconButton>
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new BeatmapCardIconButton[]
-                                {
-                                    new FavouriteButton(beatmapSet)
-                                    {
-                                        Current = favouriteState,
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre
-                                    },
-                                    new DownloadButton(beatmapSet)
-                                    {
-                                        Anchor = Anchor.BottomCentre,
-                                        Origin = Anchor.BottomCentre,
-                                        State = { BindTarget = downloadTracker.State }
-                                    },
-                                    new GoToBeatmapButton(beatmapSet)
-                                    {
-                                        Anchor = Anchor.BottomCentre,
-                                        Origin = Anchor.BottomCentre,
-                                        State = { BindTarget = downloadTracker.State }
-                                    }
-                                }
-                            }
-                        },
-                        mainContent = new Container
-                        {
-                            Name = @"Main content",
                             X = height - BeatmapCard.CORNER_RADIUS,
-                            Height = height,
-                            CornerRadius = BeatmapCard.CORNER_RADIUS,
-                            Masking = true,
+                            Width = width - height + BeatmapCard.CORNER_RADIUS,
+                            FavouriteState = { BindTarget = favouriteState },
+                            ButtonsCollapsedWidth = BeatmapCard.CORNER_RADIUS,
+                            ButtonsExpandedWidth = 30,
+                            ButtonsPadding = new MarginPadding { Vertical = 35 },
                             Children = new Drawable[]
                             {
-                                mainContentBackground = new BeatmapCardContentBackground(beatmapSet)
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
-                                    {
-                                        Horizontal = 10,
-                                        Vertical = 4
-                                    },
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
@@ -248,11 +180,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                     AutoSizeAxes = Axes.Y,
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Padding = new MarginPadding
-                                    {
-                                        Horizontal = 10,
-                                        Vertical = 4
-                                    },
                                     Children = new Drawable[]
                                     {
                                         idleBottomContent = new FillFlowContainer
@@ -414,27 +341,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         {
             bool showDetails = IsHovered || Expanded.Value;
 
-            float targetWidth = width - height;
-            if (showDetails)
-                targetWidth = targetWidth - icon_area_width + BeatmapCard.CORNER_RADIUS;
-
+            buttonContainer.ShowDetails.Value = showDetails;
             thumbnail.Dimmed.Value = showDetails;
 
             // Scale value is intentionally chosen to fit in the spacing of listing displays, as to not overlap horizontally with adjacent cards.
             // This avoids depth issues where a hovered (scaled) card to the right of another card would be beneath the card to the left.
             content.ScaleTo(Expanded.Value ? 1.03f : 1, 500, Easing.OutQuint);
-
-            mainContent.ResizeWidthTo(targetWidth, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            mainContentBackground.Dimmed.Value = showDetails;
-
-            rightAreaBackground.FadeColour(downloadTracker.State.Value == DownloadState.LocallyAvailable ? colours.Lime0 : colourProvider.Background3, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-            rightAreaButtons.FadeTo(showDetails ? 1 : 0, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
-
-            foreach (var button in rightAreaButtons)
-            {
-                button.IdleColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Light1 : colourProvider.Background3;
-                button.HoverColour = downloadTracker.State.Value != DownloadState.LocallyAvailable ? colourProvider.Content1 : colourProvider.Foreground1;
-            }
 
             bool showProgress = downloadTracker.State.Value == DownloadState.Downloading || downloadTracker.State.Value == DownloadState.Importing;
 
