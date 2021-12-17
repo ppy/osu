@@ -43,7 +43,11 @@ namespace osu.Game.Skinning
 
         protected Skin(SkinInfo skin, IStorageResourceProvider resources, [CanBeNull] Stream configurationStream = null)
         {
-            SkinInfo = skin.ToLive();
+            SkinInfo = resources?.RealmContextFactory != null
+                ? skin.ToLive(resources.RealmContextFactory)
+                // This path should only be used in some tests.
+                : skin.ToLiveUnmanaged();
+
             this.resources = resources;
 
             configurationStream ??= getConfigurationStream();

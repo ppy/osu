@@ -65,8 +65,10 @@ namespace osu.Game.Graphics
 
         public void SetContent(DateTimeOffset date)
         {
-            dateText.Text = $"{date:d MMMM yyyy} ";
-            timeText.Text = $"{date:HH:mm:ss \"UTC\"z}";
+            DateTimeOffset localDate = date.ToLocalTime();
+
+            dateText.Text = $"{localDate:d MMMM yyyy} ";
+            timeText.Text = $"{localDate:HH:mm:ss \"UTC\"z}";
         }
 
         public void Move(Vector2 pos) => Position = pos;
