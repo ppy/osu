@@ -232,10 +232,6 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.IsAvailableLocally(model);
         }
 
-        public event Action<BeatmapSetInfo>? ItemUpdated;
-
-        public event Action<BeatmapSetInfo>? ItemRemoved;
-
         public void Update(BeatmapSetInfo item)
         {
             beatmapModelManager.Update(item);

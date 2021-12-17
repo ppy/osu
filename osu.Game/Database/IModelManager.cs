@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Database
@@ -13,16 +12,6 @@ namespace osu.Game.Database
     public interface IModelManager<TModel>
         where TModel : class
     {
-        /// <summary>
-        /// Fired when an item is updated.
-        /// </summary>
-        event Action<TModel> ItemUpdated;
-
-        /// <summary>
-        /// Fired when an item is removed.
-        /// </summary>
-        event Action<TModel> ItemRemoved;
-
         /// <summary>
         /// Perform an update of the specified item.
         /// TODO: Support file additions/removals.
