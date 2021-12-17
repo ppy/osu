@@ -53,16 +53,28 @@ namespace osu.Game.Database
             return mapper.Map<T>(item);
         }
 
-        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList)
+        public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
         }
 
-        public static ILive<T> ToLive<T>(this T realmObject)
+        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return new RealmLive<T>(realmObject);
+            return new RealmLiveUnmanaged<T>(realmObject);
+        }
+
+        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmContextFactory realmContextFactory)
+            where T : RealmObject, IHasGuidPrimaryKey
+        {
+            return realmList.Select(l => new RealmLive<T>(l, realmContextFactory)).Cast<ILive<T>>().ToList();
+        }
+
+        public static ILive<T> ToLive<T>(this T realmObject, RealmContextFactory realmContextFactory)
+            where T : RealmObject, IHasGuidPrimaryKey
+        {
+            return new RealmLive<T>(realmObject, realmContextFactory);
         }
 
         /// <summary>
