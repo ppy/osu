@@ -312,10 +312,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
             buttonContainer.ShowDetails.Value = showDetails;
             thumbnail.Dimmed.Value = showDetails;
-
-            // Scale value is intentionally chosen to fit in the spacing of listing displays, as to not overlap horizontally with adjacent cards.
-            // This avoids depth issues where a hovered (scaled) card to the right of another card would be beneath the card to the left.
-            content.ScaleTo(Expanded.Value ? 1.03f : 1, 500, Easing.OutQuint);
         }
     }
 }
