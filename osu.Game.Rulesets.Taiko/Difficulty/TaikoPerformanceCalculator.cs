@@ -44,43 +44,46 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (mods.Any(m => m is ModHidden))
                 multiplier *= 1.10;
 
-            double strainValue = computeStrainValue();
+            double difficultyValue = computeDifficultyValue();
             double accuracyValue = computeAccuracyValue();
             double totalValue =
                 Math.Pow(
-                    Math.Pow(strainValue, 1.1) +
+                    Math.Pow(difficultyValue, 1.1) +
                     Math.Pow(accuracyValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
             if (categoryDifficulty != null)
             {
-                categoryDifficulty["Strain"] = strainValue;
-                categoryDifficulty["Accuracy"] = accuracyValue;
+                categoryDifficulty.Add("Difficulty", difficultyValue);
+                categoryDifficulty.Add("Accuracy", accuracyValue);
+                categoryDifficulty.Add("AR", Attributes.ApproachRate);
+                categoryDifficulty.Add("Great Hit Window", Attributes.GreatHitWindow);
+                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
             }
 
             return totalValue;
         }
 
-        private double computeStrainValue()
+        private double computeDifficultyValue()
         {
-            double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.0) / 100000.0;
+            double difficultyValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more
             double lengthBonus = 1 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
-            strainValue *= lengthBonus;
+            difficultyValue *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            strainValue *= Math.Pow(0.985, countMiss);
+            difficultyValue *= Math.Pow(0.985, countMiss);
 
             if (mods.Any(m => m is ModHidden))
-                strainValue *= 1.025;
+                difficultyValue *= 1.025;
 
             if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
-                strainValue *= 1.05 * lengthBonus;
+                difficultyValue *= 1.05 * lengthBonus;
 
             // Scale the speed value with accuracy _slightly_
-            return strainValue * Score.Accuracy;
+            return difficultyValue * Score.Accuracy;
         }
 
         private double computeAccuracyValue()

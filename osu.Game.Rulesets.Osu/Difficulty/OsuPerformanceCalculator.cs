@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryRatings = null)
+        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
             mods = Score.Mods;
             accuracy = Score.Accuracy;
@@ -72,15 +72,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
-            if (categoryRatings != null)
+            if (categoryDifficulty != null)
             {
-                categoryRatings.Add("Aim", aimValue);
-                categoryRatings.Add("Speed", speedValue);
-                categoryRatings.Add("Accuracy", accuracyValue);
-                categoryRatings.Add("Flashlight", flashlightValue);
-                categoryRatings.Add("OD", Attributes.OverallDifficulty);
-                categoryRatings.Add("AR", Attributes.ApproachRate);
-                categoryRatings.Add("Max Combo", Attributes.MaxCombo);
+                categoryDifficulty.Add("Aim", aimValue);
+                categoryDifficulty.Add("Speed", speedValue);
+                categoryDifficulty.Add("Accuracy", accuracyValue);
+                categoryDifficulty.Add("Flashlight", flashlightValue);
+                categoryDifficulty.Add("OD", Attributes.OverallDifficulty);
+                categoryDifficulty.Add("AR", Attributes.ApproachRate);
+                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
+                categoryDifficulty.Add("Effective Miss Count", effectiveMissCount);
             }
 
             return totalValue;
@@ -88,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double rawAim = Attributes.AimStrain;
+            double rawAim = Attributes.AimDifficulty;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawAim = Math.Pow(rawAim, 0.8);
@@ -144,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
-            double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedStrain / 0.0675) - 4.0, 3.0) / 100000.0;
+            double speedValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.SpeedDifficulty / 0.0675) - 4.0, 3.0) / 100000.0;
 
             // Longer maps are worth more.
             double lengthBonus = 0.95 + 0.4 * Math.Min(1.0, totalHits / 2000.0) +
@@ -227,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!mods.Any(h => h is OsuModFlashlight))
                 return 0.0;
 
-            double rawFlashlight = Attributes.FlashlightRating;
+            double rawFlashlight = Attributes.FlashlightDifficulty;
 
             if (mods.Any(m => m is OsuModTouchDevice))
                 rawFlashlight = Math.Pow(rawFlashlight, 0.8);

@@ -74,9 +74,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                AimStrain = aimRating,
-                SpeedStrain = speedRating,
-                FlashlightRating = flashlightRating,
+                AimDifficulty = aimRating,
+                SpeedDifficulty = speedRating,
+                FlashlightDifficulty = flashlightRating,
                 SliderFactor = sliderFactor,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
