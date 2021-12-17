@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 Scores = null;
 
                 UpdateScores();
+                if (IsLoaded)
+                    refreshRealmSubscription();
             }
         }
 
@@ -78,6 +80,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private RealmContextFactory realmContextFactory { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -87,9 +92,32 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     UpdateScores();
             };
+        }
 
-            scoreManager.ItemRemoved += scoreStoreChanged;
-            scoreManager.ItemUpdated += scoreStoreChanged;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            refreshRealmSubscription();
+        }
+
+        private IDisposable scoreSubscription;
+
+        private void refreshRealmSubscription()
+        {
+            scoreSubscription?.Dispose();
+            scoreSubscription = null;
+
+            if (beatmapInfo == null)
+                return;
+
+            scoreSubscription = realmContextFactory.Context.All<ScoreInfo>().Where(s => s.BeatmapInfo.ID == beatmapInfo.ID).QueryAsyncWithNotifications((_, changes, ___) =>
+            {
+                if (changes == null)
+                    return;
+
+                RefreshScores();
+            });
         }
 
         protected override void Reset()
@@ -212,11 +240,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             base.Dispose(isDisposing);
 
-            if (scoreManager != null)
-            {
-                scoreManager.ItemRemoved -= scoreStoreChanged;
-                scoreManager.ItemUpdated -= scoreStoreChanged;
-            }
+            scoreSubscription?.Dispose();
         }
     }
 }
