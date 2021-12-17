@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -54,6 +55,11 @@ namespace osu.Game.Screens.Spectate
             this.users.AddRange(users);
         }
 
+        [Resolved]
+        private RealmContextFactory realmContextFactory { get; set; }
+
+        private IDisposable realmSubscription;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -73,7 +79,17 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                beatmaps.ItemUpdated += beatmapUpdated;
+                realmSubscription = realmContextFactory.Context
+                                                       .All<BeatmapSetInfo>()
+                                                       .Where(s => !s.DeletePending)
+                                                       .QueryAsyncWithNotifications((items, changes, ___) =>
+                                                       {
+                                                           if (changes?.InsertedIndices == null)
+                                                               return;
+
+                                                           foreach (int c in changes.InsertedIndices)
+                                                               beatmapUpdated(items[c]);
+                                                       });
 
                 foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
@@ -219,8 +235,7 @@ namespace osu.Game.Screens.Spectate
                     spectatorClient.StopWatchingUser(userId);
             }
 
-            if (beatmaps != null)
-                beatmaps.ItemUpdated -= beatmapUpdated;
+            realmSubscription?.Dispose();
         }
     }
 }
