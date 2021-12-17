@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 
 namespace osu.Game.Online.Rooms
 {
@@ -29,6 +31,9 @@ namespace osu.Game.Online.Rooms
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
+        [Resolved]
+        private RealmContextFactory realmContextFactory { get; set; } = null!;
+
         /// <summary>
         /// The availability state of the currently selected playlist item.
         /// </summary>
@@ -44,6 +49,8 @@ namespace osu.Game.Online.Rooms
         /// The beatmap matching the required hash (and providing a final <see cref="BeatmapAvailability.LocallyAvailable"/> state).
         /// </summary>
         private BeatmapInfo matchingHash;
+
+        private IDisposable realmSubscription;
 
         protected override void LoadComplete()
         {
@@ -75,26 +82,23 @@ namespace osu.Game.Online.Rooms
                     if (progressUpdate?.Completed != false)
                         progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
                 }, true);
+
+                // These events are needed for a fringe case where a modified/altered beatmap is imported with matching OnlineIDs.
+                // During the import process this will cause the existing beatmap set to be silently deleted and replaced with the new one.
+                // This is not exposed to us via `BeatmapDownloadTracker` so we have to take it into our own hands (as we care about the hash matching).
+                realmSubscription?.Dispose();
+                realmSubscription = realmContextFactory.Context
+                                                       .All<BeatmapSetInfo>()
+                                                       .Where(s => s.OnlineID == SelectedItem.Value.BeatmapID || (matchingHash != null && s.ID == matchingHash.ID))
+                                                       .QueryAsyncWithNotifications((items, changes, ___) =>
+                                                       {
+                                                           if (changes == null)
+                                                               return;
+
+                                                           Schedule(updateAvailability);
+                                                       });
             }, true);
-
-            // These events are needed for a fringe case where a modified/altered beatmap is imported with matching OnlineIDs.
-            // During the import process this will cause the existing beatmap set to be silently deleted and replaced with the new one.
-            // This is not exposed to us via `BeatmapDownloadTracker` so we have to take it into our own hands (as we care about the hash matching).
-            beatmapManager.ItemUpdated += itemUpdated;
-            beatmapManager.ItemRemoved += itemRemoved;
         }
-
-        private void itemUpdated(BeatmapSetInfo item) => Schedule(() =>
-        {
-            if (matchingHash?.BeatmapSet.ID == item.ID || SelectedItem.Value?.Beatmap.Value.BeatmapSet?.OnlineID == item.OnlineID)
-                updateAvailability();
-        });
-
-        private void itemRemoved(BeatmapSetInfo item) => Schedule(() =>
-        {
-            if (matchingHash?.BeatmapSet.ID == item.ID)
-                updateAvailability();
-        });
 
         private void updateAvailability()
         {
@@ -148,11 +152,7 @@ namespace osu.Game.Online.Rooms
         {
             base.Dispose(isDisposing);
 
-            if (beatmapManager != null)
-            {
-                beatmapManager.ItemUpdated -= itemUpdated;
-                beatmapManager.ItemRemoved -= itemRemoved;
-            }
+            realmSubscription?.Dispose();
         }
     }
 }
