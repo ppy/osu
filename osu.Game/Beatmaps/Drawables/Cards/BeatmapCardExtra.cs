@@ -40,7 +40,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         private readonly BeatmapDownloadTracker downloadTracker;
 
-        private BeatmapCardContent content = null!;
+        [Cached]
+        private readonly BeatmapCardContent content;
 
         private BeatmapCardThumbnail thumbnail = null!;
 
@@ -66,6 +67,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             this.beatmapSet = beatmapSet;
             favouriteState = new Bindable<BeatmapSetFavouriteState>(new BeatmapSetFavouriteState(beatmapSet.HasFavourited, beatmapSet.FavouriteCount));
             downloadTracker = new BeatmapDownloadTracker(beatmapSet);
+            content = new BeatmapCardContent(height);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -74,13 +76,13 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             Width = width;
             Height = height;
 
-            FillFlowContainer leftIconArea;
-            GridContainer titleContainer;
-            GridContainer artistContainer;
+            FillFlowContainer leftIconArea = null!;
+            GridContainer titleContainer = null!;
+            GridContainer artistContainer = null!;
 
-            InternalChild = content = new BeatmapCardContent(height)
+            InternalChild = content.With(c =>
             {
-                MainContent = new Container
+                c.MainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -295,20 +297,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     }
                                                 },
                                                 new BeatmapCardExtraInfoRow(beatmapSet)
-                                                {
-                                                    Hovered = _ =>
-                                                    {
-                                                        content.ExpandAfterDelay();
-                                                        return false;
-                                                    },
-                                                    Unhovered = _ =>
-                                                    {
-                                                        // This hide should only trigger if the expanded content has not shown yet.
-                                                        // ie. if the user has not shown intent to want to see it (quickly moved over the info row area).
-                                                        if (!Expanded.Value)
-                                                            content.CancelExpand();
-                                                    }
-                                                }
                                             }
                                         },
                                         downloadProgressBar = new BeatmapCardDownloadProgressBar
@@ -325,16 +313,16 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             }
                         }
                     }
-                },
-                ExpandedContent = new Container
+                };
+                c.ExpandedContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = 10, Vertical = 13 },
                     Child = new BeatmapCardDifficultyList(beatmapSet)
-                },
-                Expanded = { BindTarget = Expanded }
-            };
+                };
+                c.Expanded.BindTarget = Expanded;
+            });
 
             if (beatmapSet.HasVideo)
                 leftIconArea.Add(new IconPill(FontAwesome.Solid.Film) { IconSize = new Vector2(20) });
