@@ -24,13 +24,17 @@ namespace osu.Game.Database
         /// </summary>
         private readonly T data;
 
+        private readonly RealmContextFactory realmFactory;
+
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
         /// <param name="data">The realm data.</param>
-        public RealmLive(T data)
+        /// <param name="realmFactory">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
+        public RealmLive(T data, RealmContextFactory realmFactory)
         {
             this.data = data;
+            this.realmFactory = realmFactory;
 
             ID = data.ID;
         }
@@ -47,7 +51,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            using (var realm = Realm.GetInstance(data.Realm.Config))
+            using (var realm = realmFactory.CreateContext())
                 perform(realm.Find<T>(ID));
         }
 
@@ -58,12 +62,12 @@ namespace osu.Game.Database
         public TReturn PerformRead<TReturn>(Func<T, TReturn> perform)
         {
             if (typeof(RealmObjectBase).IsAssignableFrom(typeof(TReturn)))
-                throw new InvalidOperationException($"Realm live objects should not exit the scope of {nameof(PerformRead)}.");
+                throw new InvalidOperationException(@$"Realm live objects should not exit the scope of {nameof(PerformRead)}.");
 
             if (!IsManaged)
                 return perform(data);
 
-            using (var realm = Realm.GetInstance(data.Realm.Config))
+            using (var realm = realmFactory.CreateContext())
                 return perform(realm.Find<T>(ID));
         }
 
@@ -74,7 +78,7 @@ namespace osu.Game.Database
         public void PerformWrite(Action<T> perform)
         {
             if (!IsManaged)
-                throw new InvalidOperationException("Can't perform writes on a non-managed underlying value");
+                throw new InvalidOperationException(@"Can't perform writes on a non-managed underlying value");
 
             PerformRead(t =>
             {
@@ -94,11 +98,7 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                // When using Value, we rely on garbage collection for the realm instance used to retrieve the instance.
-                // As we are sure that this is on the update thread, there should always be an open and constantly refreshing realm instance to ensure file size growth is a non-issue.
-                var realm = Realm.GetInstance(data.Realm.Config);
-
-                return realm.Find<T>(ID);
+                return realmFactory.Context.Find<T>(ID);
             }
         }
 
