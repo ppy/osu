@@ -835,12 +835,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 // this beatmap change should be overridden by the present.
                 Beatmap.Value = manager.GetWorkingBeatmap(getSwitchBeatmap());
 
-                songSelect.PresentScore(new ScoreInfo
-                {
-                    User = new APIUser { Username = "woo" },
-                    BeatmapInfo = getPresentBeatmap(),
-                    Ruleset = getPresentBeatmap().Ruleset
-                });
+                songSelect.PresentScore(TestResources.CreateTestScoreInfo(getPresentBeatmap()));
             });
 
             AddUntilStep("wait for results screen presented", () => !songSelect.IsCurrentScreen());

@@ -62,6 +62,7 @@ namespace osu.Game.Online.Rooms
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
+            OwnerID = item.OwnerID;
             BeatmapID = item.BeatmapID;
             BeatmapChecksum = item.Beatmap.Value?.MD5Hash ?? string.Empty;
             RulesetID = item.RulesetID;

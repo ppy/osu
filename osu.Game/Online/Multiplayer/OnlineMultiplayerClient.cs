@@ -154,6 +154,14 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.StartMatch));
         }
 
+        public override Task AbortGameplay()
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.AbortGameplay));
+        }
+
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item)
         {
             if (!IsConnected.Value)
@@ -162,7 +170,23 @@ namespace osu.Game.Online.Multiplayer
             return connection.InvokeAsync(nameof(IMultiplayerServer.AddPlaylistItem), item);
         }
 
-        protected override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
+        public override Task EditPlaylistItem(MultiplayerPlaylistItem item)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.EditPlaylistItem), item);
+        }
+
+        public override Task RemovePlaylistItem(long playlistItemId)
+        {
+            if (!IsConnected.Value)
+                return Task.CompletedTask;
+
+            return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
+        }
+
+        public override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
         {
             return beatmapLookupCache.GetBeatmapAsync(beatmapId, cancellationToken);
         }

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,6 +19,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     public class MultiplayerPlaylist : MultiplayerRoomComposite
     {
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
+
+        /// <summary>
+        /// Invoked when an item requests to be edited.
+        /// </summary>
+        public Action<PlaylistItem> RequestEdit;
 
         private MultiplayerQueueList queueList;
         private MultiplayerHistoryList historyList;
@@ -46,7 +52,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                         queueList = new MultiplayerQueueList
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = { BindTarget = SelectedItem }
+                            SelectedItem = { BindTarget = SelectedItem },
+                            RequestEdit = item => RequestEdit?.Invoke(item)
                         },
                         historyList = new MultiplayerHistoryList
                         {
@@ -114,7 +121,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private void addItemToLists(MultiplayerPlaylistItem item)
         {
-            var apiItem = Playlist.Single(i => i.ID == item.ID);
+            var apiItem = Playlist.SingleOrDefault(i => i.ID == item.ID);
+
+            // Item could have been removed from the playlist while the local player was in gameplay.
+            if (apiItem == null)
+                return;
 
             if (item.Expired)
                 historyList.Items.Add(apiItem);
