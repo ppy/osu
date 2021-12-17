@@ -1149,16 +1149,11 @@ namespace osu.Game
             }
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen)
-        {
-            ScreenChanged(lastScreen, newScreen);
-            Logger.Log($"Screen changed → {newScreen}");
-        }
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => ScreenChanged(lastScreen, newScreen);
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
             ScreenChanged(lastScreen, newScreen);
-            Logger.Log($"Screen changed ← {newScreen}");
 
             if (newScreen == null)
                 Exit();
