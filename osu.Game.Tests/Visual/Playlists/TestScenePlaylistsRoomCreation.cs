@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -39,7 +40,7 @@ namespace osu.Game.Tests.Visual.Playlists
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
         }
 
         [SetUpSteps]
@@ -122,8 +123,8 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("store real beatmap values", () =>
             {
                 realHash = importedBeatmap.Value.Beatmaps[0].MD5Hash;
-                realOnlineId = importedBeatmap.Value.Beatmaps[0].OnlineID ?? -1;
-                realOnlineSetId = importedBeatmap.Value.OnlineID ?? -1;
+                realOnlineId = importedBeatmap.Value.Beatmaps[0].OnlineID;
+                realOnlineSetId = importedBeatmap.Value.OnlineID;
             });
 
             AddStep("import modified beatmap", () =>
@@ -185,6 +186,8 @@ namespace osu.Game.Tests.Visual.Playlists
                     },
                 };
 
+                Debug.Assert(originalBeatmap.BeatmapInfo.BeatmapSet != null);
+
                 manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet).WaitSafely();
             });
 
@@ -202,7 +205,14 @@ namespace osu.Game.Tests.Visual.Playlists
             });
         }
 
-        private void importBeatmap() => AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).GetResultSafely());
+        private void importBeatmap() => AddStep("import beatmap", () =>
+        {
+            var beatmap = CreateBeatmap(new OsuRuleset().RulesetInfo);
+
+            Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
+
+            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet).GetResultSafely();
+        });
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {
