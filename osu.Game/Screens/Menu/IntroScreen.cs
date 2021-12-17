@@ -82,9 +82,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game, RealmContextFactory realmContextFactory)
         {
-            // prevent user from changing beatmap while the intro is still runnning.
+            // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
 
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Menu
                 if (sets.Count > 0)
                 {
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo?.PerformRead(s => s.Beatmaps[0].ToLive()));
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo?.PerformRead(s => s.Beatmaps[0].ToLive(realmContextFactory)));
                 }
             }
 
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Menu
                 if (setInfo == null)
                     return false;
 
-                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.PerformRead(s => s.Beatmaps[0].ToLive()));
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.PerformRead(s => s.Beatmaps[0].ToLive(realmContextFactory)));
 
                 return UsingThemedIntro = initialBeatmap != null;
             }

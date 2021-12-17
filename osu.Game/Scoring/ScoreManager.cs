@@ -52,7 +52,7 @@ namespace osu.Game.Scoring
         public ILive<ScoreInfo> Query(Expression<Func<ScoreInfo, bool>> query)
         {
             using (var context = contextFactory.CreateContext())
-                return context.All<ScoreInfo>().FirstOrDefault(query)?.ToLive();
+                return context.All<ScoreInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
         }
 
         /// <summary>

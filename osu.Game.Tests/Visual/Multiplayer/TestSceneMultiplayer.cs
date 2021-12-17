@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
         }
 
         public override void SetUpSteps()
@@ -827,7 +827,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
             AddStep("add item as other user", () => client.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(new PlaylistItem
             {
-                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
+                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID
             })));
 
             AddUntilStep("item arrived in playlist", () => client.Room?.Playlist.Count == 2);
@@ -858,7 +858,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
             AddStep("add item as other user", () => client.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(new PlaylistItem
             {
-                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
+                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID
             })));
 
             AddUntilStep("item arrived in playlist", () => client.Room?.Playlist.Count == 2);

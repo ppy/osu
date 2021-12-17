@@ -166,7 +166,7 @@ namespace osu.Game.Beatmaps
                 return context.All<BeatmapSetInfo>()
                               .Where(b => !b.DeletePending)
                               .Where(query)
-                              .ToLive();
+                              .ToLive(contextFactory);
             }
         }
 
@@ -178,7 +178,7 @@ namespace osu.Game.Beatmaps
         public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
             using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive();
+                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
         }
 
         /// <summary>
