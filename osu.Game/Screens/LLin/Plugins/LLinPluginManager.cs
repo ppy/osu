@@ -44,7 +44,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
         public int PluginVersion => 9;
         public int MinimumPluginVersion => 8;
-        private const bool experimental = true;
+        private const bool experimental = false;
 
         public readonly IProvideAudioControlPlugin DefaultAudioController = new OsuMusicControllerWrapper();
         public readonly IFunctionBarProvider DummyFunctionBar = new DummyFunctionBar();
