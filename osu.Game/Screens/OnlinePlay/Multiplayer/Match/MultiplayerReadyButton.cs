@@ -63,6 +63,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             sampleUnready = audio.Samples.Get(@"Multiplayer/player-unready");
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            SelectedItem.BindValueChanged(_ => updateState());
+        }
+
         protected override void OnRoomUpdated()
         {
             base.OnRoomUpdated();
@@ -104,7 +111,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             bool enableButton =
                 Room?.State == MultiplayerRoomState.Open
-                && Client.CurrentMatchPlayingItem.Value?.Expired == false
+                && SelectedItem.Value?.ID == Room.Settings.PlaylistItemId
+                && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
                 && !operationInProgress.Value;
 
             // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.

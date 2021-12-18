@@ -32,14 +32,14 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.PaintBrush
         };
 
-        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLive() };
+        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLiveUnmanaged() };
         private readonly Bindable<string> configBindable = new Bindable<string>();
 
         private static readonly ILive<SkinInfo> random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
             Name = "<随机皮肤>",
-        }.ToLive();
+        }.ToLiveUnmanaged();
 
         private List<ILive<SkinInfo>> skinItems;
 
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             int protectedCount = realmSkins.Count(s => s.Protected);
 
-            skinItems = realmSkins.ToLive();
+            skinItems = realmSkins.ToLive(realmFactory);
 
             skinItems.Insert(protectedCount, random_skin_info);
 

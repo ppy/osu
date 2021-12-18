@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestCultureInvariance()
         {
             var ruleset = new OsuRuleset().RulesetInfo;
-            var scoreInfo = new TestScoreInfo(ruleset);
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
             var beatmap = new TestBeatmap(ruleset);
             var score = new Score
             {
