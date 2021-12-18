@@ -18,7 +18,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -28,7 +27,6 @@ using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Graphics;
@@ -229,12 +227,7 @@ namespace osu.Game.Tests.Visual.Background
 
             FadeAccessibleResults results = null;
 
-            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(new ScoreInfo
-            {
-                User = new APIUser { Username = "osu!" },
-                BeatmapInfo = new TestBeatmap(Ruleset.Value).BeatmapInfo,
-                Ruleset = Ruleset.Value,
-            })));
+            AddStep("Transition to Results", () => player.Push(results = new FadeAccessibleResults(TestResources.CreateTestScoreInfo())));
 
             AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
 

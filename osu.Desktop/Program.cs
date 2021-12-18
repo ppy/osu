@@ -90,7 +90,6 @@ namespace osu.Desktop
                         Logger.Log("Starting legacy IPC provider...");
                         legacyIpc = new LegacyTcpIpcProvider();
                         legacyIpc.Bind();
-                        legacyIpc.StartAsync();
                     }
                     catch (Exception ex)
                     {

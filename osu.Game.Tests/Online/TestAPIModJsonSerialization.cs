@@ -13,7 +13,6 @@ using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -94,7 +93,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestDeserialiseSubmittableScoreWithEmptyMods()
         {
-            var score = new SubmittableScore(new ScoreInfo { Ruleset = new OsuRuleset().RulesetInfo });
+            var score = new SubmittableScore(new ScoreInfo());
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
@@ -106,7 +105,6 @@ namespace osu.Game.Tests.Online
         {
             var score = new SubmittableScore(new ScoreInfo
             {
-                Ruleset = new OsuRuleset().RulesetInfo,
                 Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
             });
 
