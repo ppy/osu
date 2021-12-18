@@ -64,9 +64,11 @@ namespace osu.Game.Screens.Play.HUD
         private OsuConfigManager config { get; set; }
 
         private Bindable<float> activationDelay;
+        private Bindable<HUDVisibilityMode> hudVisibility;
 
         protected override void LoadComplete()
         {
+            hudVisibility = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode);
             activationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             activationDelay.BindValueChanged(v =>
             {
@@ -81,11 +83,19 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private float positionalAdjust;
+        private bool canHideFully;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             positionalAdjust = Vector2.Distance(e.ScreenSpaceMousePosition, button.ScreenSpaceDrawQuad.Centre) / 200;
             return base.OnMouseMove(e);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (hudVisibility.Value != HUDVisibilityMode.Always)
+                canHideFully = true;
+            return base.OnKeyDown(e);
         }
 
         protected override void Update()
@@ -98,7 +108,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 Alpha = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Alpha, Math.Clamp(1 - positionalAdjust, canHideFully ? 0 : 0.04f, 1), 0, 200, Easing.OutQuint);
             }
         }
 
