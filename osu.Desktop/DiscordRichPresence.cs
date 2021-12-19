@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
@@ -93,7 +94,7 @@ namespace osu.Desktop
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
                 presence.State = truncate(activity.Value.Status);
-                presence.Details = truncate(activity.Value.GetDetails(privacyMode.Value));
+                presence.Details = truncate(getDetails(activity.Value));
             }
             else
             {
@@ -136,6 +137,26 @@ namespace osu.Desktop
                 mem.Span.CopyTo(span);
                 span[^1] = '…';
             });
+        }
+
+        private string getDetails(UserActivity activity)
+        {
+            switch (activity)
+            {
+                case UserActivity.InGame game:
+                    if (game is UserActivity.InSoloGame soloGame && soloGame.RestartCount != 0)
+                        return $"({soloGame.RestartCount + 1}x) {soloGame.BeatmapInfo.GetDisplayString()}";
+                    else
+                        return game.BeatmapInfo.GetDisplayString();
+
+                case UserActivity.Editing edit:
+                    return edit.BeatmapInfo.GetDisplayString();
+
+                case UserActivity.InLobby lobby:
+                    return privacyMode.Value != DiscordRichPresenceMode.Full ? string.Empty : lobby.Room.Name.Value;
+            }
+
+            return string.Empty;
         }
 
         protected override void Dispose(bool isDisposing)

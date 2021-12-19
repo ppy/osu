@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -14,8 +13,6 @@ namespace osu.Game.Users
     {
         public abstract string Status { get; }
         public virtual Color4 GetAppropriateColour(OsuColour colours) => colours.GreenDarker;
-
-        public virtual string GetDetails(DiscordRichPresenceMode privacyMode) => string.Empty;
 
         public class Modding : UserActivity
         {
@@ -41,11 +38,6 @@ namespace osu.Game.Users
             }
 
             public override string Status => Ruleset.CreateInstance().PlayingVerb;
-
-            public override string GetDetails(DiscordRichPresenceMode privacyMode)
-            {
-                return BeatmapInfo.ToString();
-            }
         }
 
         public class InMultiplayerGame : InGame
@@ -68,17 +60,12 @@ namespace osu.Game.Users
 
         public class InSoloGame : InGame
         {
-            private readonly int restartCount;
+            public readonly int RestartCount;
 
             public InSoloGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset, int restartCount)
                 : base(beatmapInfo, ruleset)
             {
-                this.restartCount = restartCount;
-            }
-
-            public override string GetDetails(DiscordRichPresenceMode privacyMode)
-            {
-                return (restartCount == 0 ? string.Empty : $"({restartCount + 1}x) ") + BeatmapInfo;
+                RestartCount = restartCount;
             }
         }
 
@@ -92,11 +79,6 @@ namespace osu.Game.Users
             }
 
             public override string Status => @"Editing a beatmap";
-
-            public override string GetDetails(DiscordRichPresenceMode privacyMode)
-            {
-                return BeatmapInfo.ToString();
-            }
         }
 
         public class Spectating : UserActivity
@@ -118,11 +100,6 @@ namespace osu.Game.Users
             public InLobby(Room room)
             {
                 Room = room;
-            }
-
-            public override string GetDetails(DiscordRichPresenceMode privacyMode)
-            {
-                return privacyMode == DiscordRichPresenceMode.Limited ? string.Empty : Room.Name.Value;
             }
         }
     }
