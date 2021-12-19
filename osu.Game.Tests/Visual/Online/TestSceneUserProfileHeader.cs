@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -47,6 +49,43 @@ namespace osu.Game.Tests.Visual.Online
                 Username = "IAmOffline",
                 LastVisit = DateTimeOffset.Now.AddDays(-10),
                 IsOnline = false,
+            });
+        }
+
+        [Test]
+        public void TestRankedState()
+        {
+            AddStep("Show ranked user", () => header.User.Value = new APIUser
+            {
+                Id = 2001,
+                Username = "RankedUser",
+                Statistics = new UserStatistics
+                {
+                    IsRanked = true,
+                    GlobalRank = 15000,
+                    CountryRank = 1500,
+                    RankHistory = new APIRankHistory
+                    {
+                        Mode = @"osu",
+                        Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                    },
+                }
+            });
+
+            AddStep("Show unranked user", () => header.User.Value = new APIUser
+            {
+                Id = 2002,
+                Username = "UnrankedUser",
+                Statistics = new UserStatistics
+                {
+                    IsRanked = false,
+                    // web will sometimes return non-empty rank history even for unranked users.
+                    RankHistory = new APIRankHistory
+                    {
+                        Mode = @"osu",
+                        Data = Enumerable.Range(2345, 85).ToArray()
+                    },
+                }
             });
         }
     }
