@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("Press select", () => InputManager.Key(Key.Enter));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
-            AddUntilStep("wait for join", () => roomManager.RoomJoined);
+            AddUntilStep("wait for join", () => client.RoomJoined);
         }
 
         [Test]
@@ -295,7 +295,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join room", () => InputManager.Key(Key.Enter));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
-            AddUntilStep("wait for join", () => roomManager.RoomJoined);
+            AddUntilStep("wait for join", () => client.RoomJoined);
 
             AddAssert("Check participant count correct", () => client.APIRoom?.ParticipantCount.Value == 1);
             AddAssert("Check participant list contains user", () => client.APIRoom?.RecentParticipants.Count(u => u.Id == API.LocalUser.Value.Id) == 1);
@@ -353,7 +353,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("press join room button", () => passwordEntryPopover.ChildrenOfType<OsuButton>().First().TriggerClick());
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
-            AddUntilStep("wait for join", () => roomManager.RoomJoined);
+            AddUntilStep("wait for join", () => client.RoomJoined);
         }
 
         [Test]
@@ -646,7 +646,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join room", () => InputManager.Key(Key.Enter));
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
-            AddUntilStep("wait for join", () => roomManager.RoomJoined);
+            AddUntilStep("wait for join", () => client.RoomJoined);
 
             AddAssert("local room has correct settings", () =>
             {
@@ -838,7 +838,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => roomManager.RoomJoined);
+            AddUntilStep("wait for join", () => client.RoomJoined);
         }
     }
 }
