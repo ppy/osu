@@ -147,11 +147,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Button)
             {
                 case MouseButton.Left:
-                    if (!IsSelected.Value)
-                    {
-                        RequestSelection.Invoke(this, e);
-                        keepSelection = true;
-                    }
+                    // if control is pressed, do not do anything as the user may be adding to current selection
+                    // or dragging all currently selected control points.
+                    // if it isn't and the user's intent is to deselect, deselection will happen on mouse up.
+                    if (e.ControlPressed && IsSelected.Value)
+                        return true;
+
+                    RequestSelection.Invoke(this, e);
+                    keepSelection = true;
 
                     return true;
 
