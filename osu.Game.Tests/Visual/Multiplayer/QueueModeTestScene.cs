@@ -41,7 +41,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayerScreenStack multiplayerScreenStack;
 
         protected TestMultiplayerClient Client => multiplayerScreenStack.Client;
-        protected TestMultiplayerRoomManager RoomManager => multiplayerScreenStack.RoomManager;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -93,7 +92,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => RoomManager.RoomJoined);
+            AddUntilStep("wait for join", () => Client.RoomJoined);
         }
 
         [Test]
