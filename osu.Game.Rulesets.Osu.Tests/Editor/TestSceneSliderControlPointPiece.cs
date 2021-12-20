@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -76,8 +78,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             moveMouseToControlPoint(2);
             AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
             addMovementStep(new Vector2(450, 50));
             AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
 
             assertControlPointPosition(2, new Vector2(450, 50));
             assertControlPointType(2, PathType.PerfectCurve);
@@ -87,6 +94,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPosition(4, new Vector2(550, 200));
 
             AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
+
+            moveMouseToControlPoint(3);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            AddAssert("only one control point piece selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 1);
         }
 
         [Test]
