@@ -61,6 +61,34 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestDragMultipleControlPoints()
+        {
+            moveMouseToControlPoint(2);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("hold control", () => InputManager.PressKey(Key.LControl));
+
+            moveMouseToControlPoint(3);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(4);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(2);
+            addMovementStep(new Vector2(450, 50));
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            assertControlPointPosition(2, new Vector2(450, 50));
+            assertControlPointType(2, PathType.PerfectCurve);
+
+            assertControlPointPosition(3, new Vector2(550, 50));
+
+            assertControlPointPosition(4, new Vector2(550, 200));
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
+        }
+
+        [Test]
         public void TestDragControlPointAlmostLinearlyExterior()
         {
             moveMouseToControlPoint(1);
