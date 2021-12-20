@@ -77,7 +77,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             else
             {
                 // Remove panels for users no longer in the room.
-                panels.RemoveAll(p => !Room.Users.Contains(p.User));
+                foreach (var p in panels)
+                {
+                    // Note that we *must* use reference equality here, as this call is scheduled and a user may have left and joined since it was last run.
+                    if (Room.Users.All(u => !ReferenceEquals(p.User, u)))
+                        p.Expire();
+                }
 
                 // Add panels for all users new to the room.
                 foreach (var user in Room.Users.Except(panels.Select(p => p.User)))

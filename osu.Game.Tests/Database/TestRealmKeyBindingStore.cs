@@ -52,6 +52,45 @@ namespace osu.Game.Tests.Database
             Assert.That(queryCount(GlobalAction.Select), Is.EqualTo(2));
         }
 
+        [Test]
+        public void TestDefaultsPopulationRemovesExcess()
+        {
+            Assert.That(queryCount(), Is.EqualTo(0));
+
+            KeyBindingContainer testContainer = new TestKeyBindingContainer();
+
+            // Add some excess bindings for an action which only supports 1.
+            using (var realm = realmContextFactory.CreateContext())
+            using (var transaction = realm.BeginWrite())
+            {
+                realm.Add(new RealmKeyBinding
+                {
+                    Action = GlobalAction.Back,
+                    KeyCombination = new KeyCombination(InputKey.A)
+                });
+
+                realm.Add(new RealmKeyBinding
+                {
+                    Action = GlobalAction.Back,
+                    KeyCombination = new KeyCombination(InputKey.S)
+                });
+
+                realm.Add(new RealmKeyBinding
+                {
+                    Action = GlobalAction.Back,
+                    KeyCombination = new KeyCombination(InputKey.D)
+                });
+
+                transaction.Commit();
+            }
+
+            Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(3));
+
+            keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
+
+            Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(1));
+        }
+
         private int queryCount(GlobalAction? match = null)
         {
             using (var realm = realmContextFactory.CreateContext())

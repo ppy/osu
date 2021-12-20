@@ -83,9 +83,6 @@ namespace osu.Game.Tests.Visual.Navigation
         [Resolved]
         private OsuGameBase gameBase { get; set; }
 
-        [Resolved]
-        private GameHost host { get; set; }
-
         [Test]
         public void TestNullRulesetHandled()
         {

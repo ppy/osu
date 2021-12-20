@@ -11,17 +11,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCard : OsuTestScene
+    public class TestSceneBeatmapCard : OsuManualInputManagerTestScene
     {
         /// <summary>
         /// All cards on this scene use a common online ID to ensure that map download, preview tracks, etc. can be tested manually with online sources.
@@ -227,7 +228,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new BasicScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new FillFlowContainer
+                        Child = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -248,6 +249,35 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
-        public void TestNormal() => createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+        public void TestNormal()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+        }
+
+        [Test]
+        public void TestHoverState()
+        {
+            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCard(s)));
+
+            AddStep("Hover card", () => InputManager.MoveMouseTo(firstCard()));
+            AddWaitStep("wait for potential state change", 5);
+            AddAssert("card is not expanded", () => !firstCard().Expanded.Value);
+
+            AddStep("Hover spectrum display", () => InputManager.MoveMouseTo(firstCard().ChildrenOfType<DifficultySpectrumDisplay>().Single()));
+            AddUntilStep("card is expanded", () => firstCard().Expanded.Value);
+
+            AddStep("Hover difficulty content", () => InputManager.MoveMouseTo(firstCard().ChildrenOfType<BeatmapCardDifficultyList>().Single()));
+            AddWaitStep("wait for potential state change", 5);
+            AddAssert("card is still expanded", () => firstCard().Expanded.Value);
+
+            AddStep("Hover main content again", () => InputManager.MoveMouseTo(firstCard()));
+            AddWaitStep("wait for potential state change", 5);
+            AddAssert("card is still expanded", () => firstCard().Expanded.Value);
+
+            AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCard>().Last()));
+            AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
+
+            BeatmapCard firstCard() => this.ChildrenOfType<BeatmapCard>().First();
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace osu.Game.Database
         void DeleteFile(TModel model, TFileModel file);
 
         /// <summary>
-        /// Add a new file.
+        /// Add a new file. If the file already exists, it is overwritten.
         /// </summary>
         /// <param name="model">The item to operate on.</param>
         /// <param name="contents">The new file contents.</param>

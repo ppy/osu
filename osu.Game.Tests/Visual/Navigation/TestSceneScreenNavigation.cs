@@ -336,12 +336,12 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestPushMatchSubScreenAndPressBackButtonImmediately()
         {
-            TestMultiplayerScreenStack multiplayerScreenStack = null;
+            TestMultiplayerComponents multiplayerComponents = null;
 
-            PushAndConfirm(() => multiplayerScreenStack = new TestMultiplayerScreenStack());
+            PushAndConfirm(() => multiplayerComponents = new TestMultiplayerComponents());
 
-            AddUntilStep("wait for lounge", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
-            AddStep("open room", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().Single().Open());
+            AddUntilStep("wait for lounge", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open());
             AddStep("press back button", () => Game.ChildrenOfType<BackButton>().First().Action());
             AddWaitStep("wait two frames", 2);
         }

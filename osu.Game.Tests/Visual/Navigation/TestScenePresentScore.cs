@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 imported = Game.ScoreManager.Import(new ScoreInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineScoreID = i,
+                    OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                 }).Result.Value;

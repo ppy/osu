@@ -25,7 +25,7 @@ namespace osu.Game.Database
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
-        public DbSet<SkinInfo> SkinInfo { get; set; }
+        public DbSet<EFSkinInfo> SkinInfo { get; set; }
         public DbSet<ScoreInfo> ScoreInfo { get; set; }
 
         // migrated to realm
@@ -133,8 +133,9 @@ namespace osu.Game.Database
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.Hash).IsUnique();
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasMany(s => s.Files).WithOne(f => f.SkinInfo);
 
             modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
@@ -146,7 +147,7 @@ namespace osu.Game.Database
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
 
-            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
+            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory

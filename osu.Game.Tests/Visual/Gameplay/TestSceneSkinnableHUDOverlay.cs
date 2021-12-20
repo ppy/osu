@@ -10,7 +10,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -35,9 +34,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
         private FillFlowContainer<KeyCounter> keyCounterFlow => hudOverlay.KeyCounter.ChildrenOfType<FillFlowContainer<KeyCounter>>().First();
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
 
         [Test]
         public void TestComboCounterIncrementing()

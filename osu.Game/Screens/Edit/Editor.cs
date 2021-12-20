@@ -109,9 +109,6 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private MusicController music { get; set; }
-
         [Cached]
         public readonly EditorClipboard Clipboard = new EditorClipboard();
 
