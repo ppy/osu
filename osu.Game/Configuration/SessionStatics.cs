@@ -13,15 +13,25 @@ namespace osu.Game.Configuration
     /// </summary>
     public class SessionStatics : InMemoryConfigManager<Static>
     {
-        protected override void InitialiseDefaults() => ResetValues();
-
-        public void ResetValues()
+        protected override void InitialiseDefaults()
         {
             ensureDefault(SetDefault(Static.LoginOverlayDisplayed, false));
             ensureDefault(SetDefault(Static.MutedAudioNotificationShownOnce, false));
             ensureDefault(SetDefault(Static.LowBatteryNotificationShownOnce, false));
             ensureDefault(SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null));
             ensureDefault(SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null));
+        }
+
+        /// <summary>
+        /// Used to revert statics to their defaults after being idle for appropiate amount of time.
+        /// Does not affect loaded seasonal backgrounds.
+        /// </summary>
+        public void ResetValues()
+        {
+            ensureDefault(GetBindable<bool>(Static.LoginOverlayDisplayed));
+            ensureDefault(GetBindable<bool>(Static.MutedAudioNotificationShownOnce));
+            ensureDefault(GetBindable<bool>(Static.LowBatteryNotificationShownOnce));
+            ensureDefault(GetBindable<double?>(Static.LastHoverSoundPlaybackTime));
         }
 
         private void ensureDefault<T>(Bindable<T> bindable) => bindable.SetDefault();
