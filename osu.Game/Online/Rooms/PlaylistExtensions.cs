@@ -15,10 +15,18 @@ namespace osu.Game.Online.Rooms
     {
         /// <summary>
         /// Returns the first non-expired <see cref="PlaylistItem"/> in playlist order from the supplied <paramref name="playlist"/>,
-        /// or <see langword="null"/> if all items are expired.
+        /// or the last-played <see cref="PlaylistItem"/> if all items are expired,
+        /// or <see langword="null"/> if <paramref name="playlist"/> was empty.
         /// </summary>
-        public static PlaylistItem? GetCurrentItem(this IEnumerable<PlaylistItem> playlist) =>
-            playlist.OrderBy(item => item.PlaylistOrder).FirstOrDefault(item => !item.Expired);
+        public static PlaylistItem? GetCurrentItem(this ICollection<PlaylistItem> playlist)
+        {
+            if (playlist.Count == 0)
+                return null;
+
+            return playlist.All(item => item.Expired)
+                ? playlist.OrderByDescending(item => item.PlaylistOrder).First()
+                : playlist.OrderBy(item => item.PlaylistOrder).First(item => !item.Expired);
+        }
 
         public static string GetTotalDuration(this BindableList<PlaylistItem> playlist) =>
             playlist.Select(p => p.Beatmap.Value.Length).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);

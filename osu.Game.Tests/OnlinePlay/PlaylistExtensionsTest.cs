@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Online.Rooms;
 
@@ -9,6 +10,17 @@ namespace osu.Game.Tests.OnlinePlay
     [TestFixture]
     public class PlaylistExtensionsTest
     {
+        [Test]
+        public void TestEmpty()
+        {
+            // mostly an extreme edge case, i.e. during room creation.
+            var items = Array.Empty<PlaylistItem>();
+
+            var currentItem = items.GetCurrentItem();
+
+            Assert.That(currentItem, Is.Null);
+        }
+
         [Test]
         public void TestPlaylistItemsInOrder()
         {
@@ -19,9 +31,9 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var nextItem = items.GetCurrentItem();
+            var currentItem = items.GetCurrentItem();
 
-            Assert.That(nextItem, Is.EqualTo(items[0]));
+            Assert.That(currentItem, Is.EqualTo(items[0]));
         }
 
         [Test]
@@ -34,9 +46,9 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var nextItem = items.GetCurrentItem();
+            var currentItem = items.GetCurrentItem();
 
-            Assert.That(nextItem, Is.EqualTo(items[1]));
+            Assert.That(currentItem, Is.EqualTo(items[1]));
         }
 
         [Test]
@@ -49,9 +61,9 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var nextItem = items.GetCurrentItem();
+            var currentItem = items.GetCurrentItem();
 
-            Assert.That(nextItem, Is.EqualTo(items[2]));
+            Assert.That(currentItem, Is.EqualTo(items[2]));
         }
 
         [Test]
@@ -64,9 +76,10 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3, Expired = true },
             };
 
-            var nextItem = items.GetCurrentItem();
+            var currentItem = items.GetCurrentItem();
 
-            Assert.That(nextItem, Is.Null);
+            // if all items are expired, the last-played item is expected to be returned.
+            Assert.That(currentItem, Is.EqualTo(items[2]));
         }
     }
 }
