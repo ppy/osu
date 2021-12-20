@@ -163,10 +163,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             addClickButtonStep();
+            AddUntilStep("user is ready", () => Client.Room?.Users[0].State == MultiplayerUserState.Ready);
+
             AddStep("transfer host", () => Client.TransferHost(Client.Room?.Users[1].UserID ?? 0));
 
             addClickButtonStep();
-            AddAssert("match not started", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
+            AddUntilStep("user is idle (match not started)", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
+            AddAssert("ready button enabled", () => button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
 
         [TestCase(true)]
