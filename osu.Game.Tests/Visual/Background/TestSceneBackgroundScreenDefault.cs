@@ -85,6 +85,7 @@ namespace osu.Game.Tests.Visual.Background
             // of note, this needs to be a type that doesn't match BackgroundScreenDefault else it is silently not pushed by the background stack.
             AddStep("push new background to stack", () => stack.Push(nestedScreen = new BackgroundScreenBeatmap(Beatmap.Value)));
             AddUntilStep("wait for screen to load", () => nestedScreen.IsLoaded && nestedScreen.IsCurrentScreen());
+            AddUntilStep("previous background hidden", () => !screen.IsAlive);
 
             AddAssert("top level background hasn't changed yet", () => screen.CheckLastLoadChange() == null);
 
