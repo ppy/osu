@@ -883,7 +883,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
 
-                for (int i = 0; i < 100; i += 10)
+                for (int i = 0; i < 10; i++)
                     manager.Import(TestResources.CreateTestBeatmapSetInfo(rulesets: usableRulesets)).Wait();
             });
         }
