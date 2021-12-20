@@ -168,12 +168,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 }));
             });
 
+            AddUntilStep("wait for screen to load", () => resultsScreen.IsLoaded);
             waitForDisplay();
         }
 
         private void waitForDisplay()
         {
-            AddUntilStep("wait for load to complete", () =>
+            AddUntilStep("wait for scores loaded", () =>
                 requestComplete
                 && resultsScreen.ScorePanelList.GetScorePanels().Count() == totalCount
                 && resultsScreen.ScorePanelList.AllPanelsVisible);

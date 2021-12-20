@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.Online
             ProfileOrder = new[] { "me" },
             Statistics = new UserStatistics
             {
+                IsRanked = true,
                 GlobalRank = 2148,
                 CountryRank = 1,
                 PP = 4567.89m,
