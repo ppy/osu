@@ -49,7 +49,11 @@ namespace osu.Game.Tests.Visual
             InternalChildren = new Drawable[]
             {
                 Client = new TestMultiplayerClient(RoomManager),
-                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both }
+                screenStack = new OsuScreenStack
+                {
+                    Name = nameof(TestMultiplayerScreenStack),
+                    RelativeSizeAxes = Axes.Both
+                }
             };
 
             screenStack.Push(multiplayerScreen);
