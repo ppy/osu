@@ -213,26 +213,28 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         #region Drag handling
 
-        private Vector2 dragStartPosition;
-        private PathType? dragPathType;
+        private Vector2[] dragStartPositions;
+        private PathType?[] dragPathTypes;
+        private HashSet<PathControlPoint> draggedControlPoints;
 
-        private void dragStarted(PathControlPoint controlPoint)
+        private void dragStarted()
         {
-            dragStartPosition = controlPoint.Position;
-            dragPathType = slider.Path.PointsInSegment(controlPoint).First().Type;
+            dragStartPositions = slider.Path.ControlPoints.Select(point => point.Position).ToArray();
+            dragPathTypes = slider.Path.ControlPoints.Select(point => point.Type).ToArray();
+            draggedControlPoints = new HashSet<PathControlPoint>(Pieces.Where(piece => piece.IsSelected.Value).Select(piece => piece.ControlPoint));
 
             changeHandler?.BeginChange();
         }
 
-        private void dragInProgress(PathControlPoint controlPoint, DragEvent e)
+        private void dragInProgress(DragEvent e)
         {
             Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position).ToArray();
             var oldPosition = slider.Position;
             double oldStartTime = slider.StartTime;
 
-            if (controlPoint == slider.Path.ControlPoints[0])
+            if (draggedControlPoints.Contains(slider.Path.ControlPoints[0]))
             {
-                // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
+                // Special handling for selections containing head control point - the position of the slider changes which means the snapped position and time have to be taken into account
                 var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
 
                 Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
@@ -240,12 +242,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 slider.Position += movementDelta;
                 slider.StartTime = result?.Time ?? slider.StartTime;
 
-                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
                 for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
-                    slider.Path.ControlPoints[i].Position -= movementDelta;
+                {
+                    var controlPoint = slider.Path.ControlPoints[i];
+                    // Since control points are relative to the position of the slider, all points that are _not_ selected
+                    // need to be offset _back_ by the delta corresponding to the movement of the head point.
+                    // All other selected control points (if any) will move together with the head point
+                    // (and so they will not move at all, relative to each other).
+                    if (!draggedControlPoints.Contains(controlPoint))
+                        controlPoint.Position -= movementDelta;
+                }
             }
             else
-                controlPoint.Position = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+            {
+                for (int i = 0; i < controlPoints.Count; ++i)
+                {
+                    var controlPoint = controlPoints[i];
+                    if (draggedControlPoints.Contains(controlPoint))
+                        controlPoint.Position = dragStartPositions[i] + (e.MousePosition - e.MouseDownPosition);
+                }
+            }
 
             if (!slider.Path.HasValidLength)
             {
@@ -257,8 +273,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return;
             }
 
-            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
-            slider.Path.PointsInSegment(controlPoint).First().Type = dragPathType;
+            // Maintain the path types in case they got defaulted to bezier at some point during the drag.
+            for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
+                slider.Path.ControlPoints[i].Type = dragPathTypes[i];
         }
 
         private void dragEnded() => changeHandler?.EndChange();
