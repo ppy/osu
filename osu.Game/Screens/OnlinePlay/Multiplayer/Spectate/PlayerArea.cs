@@ -87,7 +87,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             gameplayContent.Child = new PlayerIsolationContainer(beatmapManager.GetWorkingBeatmap(Score.ScoreInfo.BeatmapInfo), Score.ScoreInfo.Ruleset, Score.ScoreInfo.Mods)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = stack = new OsuScreenStack()
+                Child = stack = new OsuScreenStack
+                {
+                    Name = nameof(PlayerArea),
+                }
             };
 
             stack.Push(new MultiSpectatorPlayerLoader(Score, () => new MultiSpectatorPlayer(Score, GameplayClock)));

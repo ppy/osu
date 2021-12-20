@@ -72,18 +72,21 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            // only trigger animation for main mouse buttons
-            activeCursor.Scale = new Vector2(1);
-            activeCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
-
-            activeCursor.AdditiveLayer.Alpha = 0;
-            activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
-
-            if (cursorRotate.Value && dragRotationState != DragRotationState.Rotating)
+            if (State.Value == Visibility.Visible)
             {
-                // if cursor is already rotating don't reset its rotate origin
-                dragRotationState = DragRotationState.DragStarted;
-                positionMouseDown = e.MousePosition;
+                // only trigger animation for main mouse buttons
+                activeCursor.Scale = new Vector2(1);
+                activeCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
+
+                activeCursor.AdditiveLayer.Alpha = 0;
+                activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
+
+                if (cursorRotate.Value && dragRotationState != DragRotationState.Rotating)
+                {
+                    // if cursor is already rotating don't reset its rotate origin
+                    dragRotationState = DragRotationState.DragStarted;
+                    positionMouseDown = e.MousePosition;
+                }
             }
 
             return base.OnMouseDown(e);

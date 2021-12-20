@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Tests.Components
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private FillFlowContainer<TournamentBeatmapPanel> fillFlow;
 

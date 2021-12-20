@@ -18,9 +18,6 @@ namespace osu.Game.Audio
 
         private readonly BindableDouble muteBindable = new BindableDouble();
 
-        [Resolved]
-        private AudioManager audio { get; set; }
-
         private ITrackStore trackStore;
 
         protected TrackManagerPreviewTrack CurrentTrack;

@@ -103,7 +103,7 @@ namespace osu.Game
 
         private Container topMostOverlayContent;
 
-        private ScalingContainer screenContainer;
+        protected ScalingContainer ScreenContainer { get; private set; }
 
         protected Container ScreenOffsetContainer { get; private set; }
 
@@ -161,7 +161,7 @@ namespace osu.Game
 
         private Bindable<float> uiScale;
 
-        private Bindable<int> configSkin;
+        private Bindable<string> configSkin;
 
         private readonly string[] args;
 
@@ -179,7 +179,7 @@ namespace osu.Game
         }
 
         private void updateBlockingOverlayFade() =>
-            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
@@ -243,27 +243,22 @@ namespace osu.Game
             Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
             // bind config int to database SkinInfo
-            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
+            configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
+            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                var skinInfo = SkinManager.Query(s => s.ID == skinId.NewValue);
+                ILive<SkinInfo> skinInfo = null;
+
+                if (Guid.TryParse(skinId.NewValue, out var guid))
+                    skinInfo = SkinManager.Query(s => s.ID == guid);
 
                 if (skinInfo == null)
                 {
-                    switch (skinId.NewValue)
-                    {
-                        case -1:
-                            skinInfo = DefaultLegacySkin.Info;
-                            break;
-
-                        default:
-                            skinInfo = SkinInfo.Default;
-                            break;
-                    }
+                    if (guid == SkinInfo.CLASSIC_SKIN)
+                        skinInfo = DefaultLegacySkin.CreateInfo().ToLiveUnmanaged();
                 }
 
-                SkinManager.CurrentSkinInfo.Value = skinInfo;
+                SkinManager.CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.CreateInfo().ToLiveUnmanaged();
             };
             configSkin.TriggerChange();
 
@@ -492,8 +487,8 @@ namespace osu.Game
             // to ensure all the required data for presenting a replay are present.
             ScoreInfo databasedScoreInfo = null;
 
-            if (score.OnlineScoreID != null)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            if (score.OnlineID > 0)
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
 
             databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
 
@@ -664,7 +659,7 @@ namespace osu.Game
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
+            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
 
             LocalConfig.LookupKeyBindings = l =>
             {
@@ -703,7 +698,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                        ScreenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
@@ -806,7 +801,7 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -1154,16 +1149,11 @@ namespace osu.Game
             }
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen)
-        {
-            ScreenChanged(lastScreen, newScreen);
-            Logger.Log($"Screen changed → {newScreen}");
-        }
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => ScreenChanged(lastScreen, newScreen);
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
             ScreenChanged(lastScreen, newScreen);
-            Logger.Log($"Screen changed ← {newScreen}");
 
             if (newScreen == null)
                 Exit();

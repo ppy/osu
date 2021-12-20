@@ -15,6 +15,8 @@ namespace osu.Game.Beatmaps
 
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = DEFAULT_DIFFICULTY;
         public float OverallDifficulty { get; set; } = DEFAULT_DIFFICULTY;

@@ -38,10 +38,10 @@ namespace osu.Game.Database
         bool IsManaged { get; }
 
         /// <summary>
-        /// Resolve the value of this instance on the current thread's context.
+        /// Resolve the value of this instance on the update thread.
         /// </summary>
         /// <remarks>
-        /// After resolving the data should not be passed between threads.
+        /// After resolving, the data should not be passed between threads.
         /// </remarks>
         T Value { get; }
     }
