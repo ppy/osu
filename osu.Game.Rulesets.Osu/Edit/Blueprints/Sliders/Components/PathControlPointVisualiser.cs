@@ -16,6 +16,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -39,6 +40,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private InputManager inputManager;
 
         public Action<List<PathControlPoint>> RemoveControlPointsRequested;
+
+        [Resolved(CanBeNull = true)]
+        private IPositionSnapProvider snapProvider { get; set; }
 
         public PathControlPointVisualiser(Slider slider, bool allowSelection)
         {
@@ -88,6 +92,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         {
                             if (allowSelection)
                                 d.RequestSelection = selectPiece;
+
+                            d.DragStarted = dragStarted;
+                            d.DragInProgress = dragInProgress;
+                            d.DragEnded = dragEnded;
                         }));
 
                         Connections.Add(new PathControlPointConnectionPiece(slider, e.NewStartingIndex + i));
@@ -202,6 +210,60 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             return true;
         }
+
+        #region Drag handling
+
+        private Vector2 dragStartPosition;
+        private PathType? dragPathType;
+
+        private void dragStarted(PathControlPoint controlPoint)
+        {
+            dragStartPosition = controlPoint.Position;
+            dragPathType = slider.Path.PointsInSegment(controlPoint).First().Type;
+
+            changeHandler?.BeginChange();
+        }
+
+        private void dragInProgress(PathControlPoint controlPoint, DragEvent e)
+        {
+            Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position).ToArray();
+            var oldPosition = slider.Position;
+            double oldStartTime = slider.StartTime;
+
+            if (controlPoint == slider.Path.ControlPoints[0])
+            {
+                // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
+
+                slider.Position += movementDelta;
+                slider.StartTime = result?.Time ?? slider.StartTime;
+
+                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
+                for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position -= movementDelta;
+            }
+            else
+                controlPoint.Position = dragStartPosition + (e.MousePosition - e.MouseDownPosition);
+
+            if (!slider.Path.HasValidLength)
+            {
+                for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position = oldControlPoints[i];
+
+                slider.Position = oldPosition;
+                slider.StartTime = oldStartTime;
+                return;
+            }
+
+            // Maintain the path type in case it got defaulted to bezier at some point during the drag.
+            slider.Path.PointsInSegment(controlPoint).First().Type = dragPathType;
+        }
+
+        private void dragEnded() => changeHandler?.EndChange();
+
+        #endregion
 
         public MenuItem[] ContextMenuItems
         {
