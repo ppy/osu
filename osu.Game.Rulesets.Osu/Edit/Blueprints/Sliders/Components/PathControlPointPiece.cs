@@ -135,6 +135,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             updateMarkerDisplay();
         }
 
+        // Used to pair up mouse down events which caused this piece to be selected
+        // with their corresponding mouse up events.
+        private bool selectionPerformed;
+
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (RequestSelection == null)
@@ -143,7 +147,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Button)
             {
                 case MouseButton.Left:
-                    RequestSelection.Invoke(this, e);
+                    if (!IsSelected.Value)
+                    {
+                        RequestSelection.Invoke(this, e);
+                        selectionPerformed = true;
+                    }
+
                     return true;
 
                 case MouseButton.Right:
@@ -153,6 +162,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
 
             return false;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+
+            // ctrl+click deselects this piece, but only if this event
+            // wasn't immediately preceded by a matching mouse down.
+            if (IsSelected.Value && e.ControlPressed && !selectionPerformed)
+                IsSelected.Value = false;
+
+            selectionPerformed = false;
         }
 
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
