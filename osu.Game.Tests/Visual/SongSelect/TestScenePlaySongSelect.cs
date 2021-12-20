@@ -466,7 +466,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestExternalBeatmapChangeWhileFiltered(bool differentRuleset)
         {
             createSongSelect();
-            addManyTestMaps();
+            // ensure there is at least 1 difficulty for each of the rulesets
+            // (catch is excluded inside of addManyTestMaps).
+            addManyTestMaps(3);
 
             changeRuleset(0);
 
@@ -519,7 +521,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestExternalBeatmapChangeWhileFilteredThenRefilter()
         {
             createSongSelect();
-            addManyTestMaps();
+            // ensure there is at least 1 difficulty for each of the rulesets
+            // (catch is excluded inside of addManyTestMaps).
+            addManyTestMaps(3);
 
             changeRuleset(0);
 
@@ -880,14 +884,21 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("wait for carousel loaded", () => songSelect.Carousel.IsAlive);
         }
 
-        private void addManyTestMaps()
+        /// <summary>
+        /// Imports test beatmap sets to show in the carousel.
+        /// </summary>
+        /// <param name="difficultyCountPerSet">
+        /// The exact count of difficulties to create for each beatmap set.
+        /// A <see langword="null"/> value causes the count of difficulties to be selected randomly.
+        /// </param>
+        private void addManyTestMaps(int? difficultyCountPerSet = null)
         {
             AddStep("import test maps", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
 
                 for (int i = 0; i < 10; i++)
-                    manager.Import(TestResources.CreateTestBeatmapSetInfo(rulesets: usableRulesets)).Wait();
+                    manager.Import(TestResources.CreateTestBeatmapSetInfo(difficultyCountPerSet, usableRulesets)).Wait();
             });
         }
 
