@@ -135,9 +135,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             updateMarkerDisplay();
         }
 
-        // Used to pair up mouse down events which caused this piece to be selected
-        // with their corresponding mouse up events.
-        private bool selectionPerformed;
+        // Used to pair up mouse down/drag events with their corresponding mouse up events,
+        // to avoid deselecting the piece by accident when the mouse up corresponding to the mouse down/drag fires.
+        private bool keepSelection;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     if (!IsSelected.Value)
                     {
                         RequestSelection.Invoke(this, e);
-                        selectionPerformed = true;
+                        keepSelection = true;
                     }
 
                     return true;
@@ -169,11 +169,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.OnMouseUp(e);
 
             // ctrl+click deselects this piece, but only if this event
-            // wasn't immediately preceded by a matching mouse down.
-            if (IsSelected.Value && e.ControlPressed && !selectionPerformed)
+            // wasn't immediately preceded by a matching mouse down or drag.
+            if (IsSelected.Value && e.ControlPressed && !keepSelection)
                 IsSelected.Value = false;
 
-            selectionPerformed = false;
+            keepSelection = false;
         }
 
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
@@ -186,6 +186,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (e.Button == MouseButton.Left)
             {
                 DragStarted?.Invoke();
+                keepSelection = true;
                 return true;
             }
 
