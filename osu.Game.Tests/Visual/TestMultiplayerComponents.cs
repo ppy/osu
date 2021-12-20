@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
     /// </list>
     /// </p>
     /// </summary>
-    public class TestMultiplayerScreenStack : OsuScreen
+    public class TestMultiplayerComponents : OsuScreen
     {
         public Screens.OnlinePlay.Multiplayer.Multiplayer MultiplayerScreen => multiplayerScreen;
 
@@ -42,14 +42,18 @@ namespace osu.Game.Tests.Visual
         private readonly OsuScreenStack screenStack;
         private readonly TestMultiplayer multiplayerScreen;
 
-        public TestMultiplayerScreenStack()
+        public TestMultiplayerComponents()
         {
             multiplayerScreen = new TestMultiplayer();
 
             InternalChildren = new Drawable[]
             {
                 Client = new TestMultiplayerClient(RoomManager),
-                screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both }
+                screenStack = new OsuScreenStack
+                {
+                    Name = nameof(TestMultiplayerComponents),
+                    RelativeSizeAxes = Axes.Both
+                }
             };
 
             screenStack.Push(multiplayerScreen);
