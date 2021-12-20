@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using Humanizer;
 using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -50,6 +51,46 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         });
 
         [Test]
+        public void TestSelection()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(1);
+            assertSelected(0);
+
+            moveMouseToControlPoint(3);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(1);
+            assertSelected(3);
+
+            AddStep("press control", () => InputManager.PressKey(Key.ControlLeft));
+            moveMouseToControlPoint(2);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(2);
+            assertSelected(2);
+            assertSelected(3);
+
+            moveMouseToControlPoint(0);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(3);
+            assertSelected(0);
+            assertSelected(2);
+            assertSelected(3);
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.ControlLeft));
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(1);
+            assertSelected(0);
+
+            void assertSelectionCount(int count) =>
+                AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
+
+            void assertSelected(int index) =>
+                AddAssert($"{(index + 1).ToOrdinalWords()} control point piece selected",
+                    () => this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
+        }
+
+        [Test]
         public void TestDragControlPoint()
         {
             moveMouseToControlPoint(1);
@@ -94,10 +135,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertControlPointPosition(4, new Vector2(550, 200));
 
             AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
-
-            moveMouseToControlPoint(3);
-            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
-            AddAssert("only one control point piece selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 1);
         }
 
         [Test]
