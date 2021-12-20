@@ -31,8 +31,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly Bindable<bool> isConnected = new Bindable<bool>(true);
 
         public new Room? APIRoom => base.APIRoom;
-
         public Action<MultiplayerRoom>? RoomSetupAction;
+
+        public bool RoomJoined { get; private set; }
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
@@ -49,7 +50,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private MultiplayerPlaylistItem? currentItem => Room?.Playlist[currentIndex];
         private int currentIndex;
-
         private long lastPlaylistItemId;
 
         public TestMultiplayerClient(TestMultiplayerRoomManager roomManager)
@@ -217,9 +217,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
             changeMatchType(Room.Settings.MatchType).Wait();
+
+            RoomJoined = true;
         }
 
-        protected override Task LeaveRoomInternal() => Task.CompletedTask;
+        protected override Task LeaveRoomInternal()
+        {
+            RoomJoined = false;
+            return Task.CompletedTask;
+        }
 
         public override Task TransferHost(int userId) => ((IMultiplayerClient)this).HostChanged(userId);
 

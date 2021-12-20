@@ -31,17 +31,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected BeatmapInfo InitialBeatmap { get; private set; }
         protected BeatmapInfo OtherBeatmap { get; private set; }
 
-        protected IScreen CurrentScreen => multiplayerScreenStack.CurrentScreen;
-        protected IScreen CurrentSubScreen => multiplayerScreenStack.MultiplayerScreen.CurrentSubScreen;
+        protected IScreen CurrentScreen => multiplayerComponents.CurrentScreen;
+        protected IScreen CurrentSubScreen => multiplayerComponents.MultiplayerScreen.CurrentSubScreen;
 
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
         private BeatmapSetInfo importedSet;
 
-        private TestMultiplayerScreenStack multiplayerScreenStack;
+        private TestMultiplayerComponents multiplayerComponents;
 
-        protected TestMultiplayerClient Client => multiplayerScreenStack.Client;
-        protected TestMultiplayerRoomManager RoomManager => multiplayerScreenStack.RoomManager;
+        protected TestMultiplayerClient Client => multiplayerComponents.Client;
 
         [Cached(typeof(UserLookupCache))]
         private UserLookupCache lookupCache = new TestUserLookupCache();
@@ -65,12 +64,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 OtherBeatmap = importedSet.Beatmaps.Last(b => b.RulesetID == 0);
             });
 
-            AddStep("load multiplayer", () => LoadScreen(multiplayerScreenStack = new TestMultiplayerScreenStack()));
-            AddUntilStep("wait for multiplayer to load", () => multiplayerScreenStack.IsLoaded);
+            AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));
+            AddUntilStep("wait for multiplayer to load", () => multiplayerComponents.IsLoaded);
             AddUntilStep("wait for lounge to load", () => this.ChildrenOfType<MultiplayerLoungeSubScreen>().FirstOrDefault()?.IsLoaded == true);
 
-            AddUntilStep("wait for lounge", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
-            AddStep("open room", () => multiplayerScreenStack.ChildrenOfType<LoungeSubScreen>().Single().Open(new Room
+            AddUntilStep("wait for lounge", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().SingleOrDefault()?.IsLoaded == true);
+            AddStep("open room", () => multiplayerComponents.ChildrenOfType<LoungeSubScreen>().Single().Open(new Room
             {
                 Name = { Value = "Test Room" },
                 QueueMode = { Value = Mode },
@@ -93,7 +92,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for join", () => RoomManager.RoomJoined);
+            AddUntilStep("wait for join", () => Client.RoomJoined);
         }
 
         [Test]
@@ -110,8 +109,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
             clickReadyButton();
 
-            AddUntilStep("wait for player", () => multiplayerScreenStack.CurrentScreen is Player player && player.IsLoaded);
-            AddStep("exit player", () => multiplayerScreenStack.MultiplayerScreen.MakeCurrent());
+            AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player player && player.IsLoaded);
+            AddStep("exit player", () => multiplayerComponents.MultiplayerScreen.MakeCurrent());
         }
 
         private void clickReadyButton()
