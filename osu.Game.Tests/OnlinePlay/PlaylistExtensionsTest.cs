@@ -19,7 +19,7 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var nextItem = items.GetNextItem();
+            var nextItem = items.GetCurrentItem();
 
             Assert.That(nextItem, Is.EqualTo(items[0]));
         }
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var nextItem = items.GetNextItem();
+            var nextItem = items.GetCurrentItem();
 
             Assert.That(nextItem, Is.EqualTo(items[1]));
         }
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var nextItem = items.GetNextItem();
+            var nextItem = items.GetCurrentItem();
 
             Assert.That(nextItem, Is.EqualTo(items[2]));
         }
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3, Expired = true },
             };
 
-            var nextItem = items.GetNextItem();
+            var nextItem = items.GetCurrentItem();
 
             Assert.That(nextItem, Is.Null);
         }

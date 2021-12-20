@@ -14,10 +14,10 @@ namespace osu.Game.Online.Rooms
     public static class PlaylistExtensions
     {
         /// <summary>
-        /// Returns the next <see cref="PlaylistItem"/> to be played from the supplied <paramref name="playlist"/>,
+        /// Returns the first non-expired <see cref="PlaylistItem"/> in playlist order from the supplied <paramref name="playlist"/>,
         /// or <see langword="null"/> if all items are expired.
         /// </summary>
-        public static PlaylistItem? GetNextItem(this IEnumerable<PlaylistItem> playlist) =>
+        public static PlaylistItem? GetCurrentItem(this IEnumerable<PlaylistItem> playlist) =>
             playlist.OrderBy(item => item.PlaylistOrder).FirstOrDefault(item => !item.Expired);
 
         public static string GetTotalDuration(this BindableList<PlaylistItem> playlist) =>
