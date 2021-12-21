@@ -203,14 +203,22 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             DelayedFetchResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), 3000)));
+            var tcs = new TaskCompletionSource();
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task)));
+
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
+
             AddStep("click expanded panel", () =>
             {
                 var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
                 InputManager.MoveMouseTo(expandedPanel);
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddAssert("no fetch yet", () => !screen.FetchCompleted);
+
+            AddStep("allow fetch", () => tcs.SetResult());
 
             AddUntilStep("wait for fetch", () => screen.FetchCompleted);
             AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);
@@ -295,21 +303,21 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class DelayedFetchResultsScreen : TestResultsScreen
         {
+            private readonly Task fetchWaitTask;
+
             public bool FetchCompleted { get; private set; }
 
-            private readonly double delay;
-
-            public DelayedFetchResultsScreen(ScoreInfo score, double delay)
+            public DelayedFetchResultsScreen(ScoreInfo score, Task fetchWaitTask = null)
                 : base(score)
             {
-                this.delay = delay;
+                this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
             }
 
             protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
             {
                 Task.Run(async () =>
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(delay));
+                    await fetchWaitTask;
 
                     var scores = new List<ScoreInfo>();
 
