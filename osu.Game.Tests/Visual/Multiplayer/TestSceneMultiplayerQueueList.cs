@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -26,8 +25,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-
         [Cached(typeof(UserLookupCache))]
         private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
@@ -50,14 +47,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                selectedItem.Value = null;
-
                 Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                    SelectedItem = { BindTarget = selectedItem },
                     Items = { BindTarget = Client.APIRoom!.Playlist }
                 };
             });
@@ -111,12 +105,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
-            AddStep("select item 0", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(0).Model);
             assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, true);
 
-            AddStep("select item 1", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(1).Model);
-            assertDeleteButtonVisibility(0, true);
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddUntilStep("wait for next item to be selected", () => Client.Room?.Settings.PlaylistItemId == 2);
+
+            assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, false);
         }
 
