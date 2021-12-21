@@ -435,7 +435,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void handleRoomLost() => Schedule(() =>
         {
-            Logger.Log($"{nameof(MultiplayerMatchSubScreen)} exiting due to loss of room or connection");
+            Logger.Log($"{this} exiting due to loss of room or connection");
 
             if (this.IsCurrentScreen())
                 this.Exit();
