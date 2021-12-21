@@ -16,9 +16,12 @@ namespace osu.Game.Tests.OnlinePlay
             // mostly an extreme edge case, i.e. during room creation.
             var items = Array.Empty<PlaylistItem>();
 
-            var currentItem = items.GetCurrentItem();
-
-            Assert.That(currentItem, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.GetHistoricalItems(), Is.Empty);
+                Assert.That(items.GetCurrentItem(), Is.Null);
+                Assert.That(items.GetUpcomingItems(), Is.Empty);
+            });
         }
 
         [Test]
@@ -31,9 +34,12 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var currentItem = items.GetCurrentItem();
-
-            Assert.That(currentItem, Is.EqualTo(items[0]));
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.GetHistoricalItems(), Is.Empty);
+                Assert.That(items.GetCurrentItem(), Is.EqualTo(items[0]));
+                Assert.That(items.GetUpcomingItems(), Is.EquivalentTo(items));
+            });
         }
 
         [Test]
@@ -46,9 +52,12 @@ namespace osu.Game.Tests.OnlinePlay
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var currentItem = items.GetCurrentItem();
-
-            Assert.That(currentItem, Is.EqualTo(items[1]));
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.GetHistoricalItems(), Is.Empty);
+                Assert.That(items.GetCurrentItem(), Is.EqualTo(items[1]));
+                Assert.That(items.GetUpcomingItems(), Is.EquivalentTo(new[] { items[1], items[0], items[2] }));
+            });
         }
 
         [Test]
@@ -56,14 +65,17 @@ namespace osu.Game.Tests.OnlinePlay
         {
             var items = new[]
             {
-                new PlaylistItem { ID = 2, BeatmapID = 1002, PlaylistOrder = 2, Expired = true },
-                new PlaylistItem { ID = 1, BeatmapID = 1001, PlaylistOrder = 1, Expired = true },
+                new PlaylistItem { ID = 1, BeatmapID = 1001, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 55, 0, TimeSpan.Zero) },
+                new PlaylistItem { ID = 2, BeatmapID = 1002, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 53, 0, TimeSpan.Zero) },
                 new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3 },
             };
 
-            var currentItem = items.GetCurrentItem();
-
-            Assert.That(currentItem, Is.EqualTo(items[2]));
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.GetHistoricalItems(), Is.EquivalentTo(new[] { items[1], items[0] }));
+                Assert.That(items.GetCurrentItem(), Is.EqualTo(items[2]));
+                Assert.That(items.GetUpcomingItems(), Is.EquivalentTo(new[] { items[2] }));
+            });
         }
 
         [Test]
@@ -71,15 +83,18 @@ namespace osu.Game.Tests.OnlinePlay
         {
             var items = new[]
             {
-                new PlaylistItem { ID = 2, BeatmapID = 1002, PlaylistOrder = 2, Expired = true },
-                new PlaylistItem { ID = 1, BeatmapID = 1001, PlaylistOrder = 1, Expired = true },
-                new PlaylistItem { ID = 3, BeatmapID = 1003, PlaylistOrder = 3, Expired = true },
+                new PlaylistItem { ID = 1, BeatmapID = 1001, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 55, 0, TimeSpan.Zero) },
+                new PlaylistItem { ID = 2, BeatmapID = 1002, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 53, 0, TimeSpan.Zero) },
+                new PlaylistItem { ID = 3, BeatmapID = 1002, Expired = true, PlayedAt = new DateTimeOffset(2021, 12, 21, 7, 57, 0, TimeSpan.Zero) },
             };
 
-            var currentItem = items.GetCurrentItem();
-
-            // if all items are expired, the last-played item is expected to be returned.
-            Assert.That(currentItem, Is.EqualTo(items[2]));
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.GetHistoricalItems(), Is.EquivalentTo(new[] { items[1], items[0], items[2] }));
+                // if all items are expired, the last-played item is expected to be returned.
+                Assert.That(items.GetCurrentItem(), Is.EqualTo(items[2]));
+                Assert.That(items.GetUpcomingItems(), Is.Empty);
+            });
         }
     }
 }
