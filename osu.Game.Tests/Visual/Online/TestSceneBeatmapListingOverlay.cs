@@ -127,6 +127,7 @@ namespace osu.Game.Tests.Visual.Online
         public void TestUserWithoutSupporterUsesSupporterOnlyFiltersWithoutResults()
         {
             AddStep("fetch for 0 beatmaps", () => fetchFor());
+
             AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
 
             // only Rank Achieved filter
@@ -187,6 +188,9 @@ namespace osu.Game.Tests.Visual.Online
         public void TestUserWithoutSupporterUsesSupporterOnlyFiltersWithResults()
         {
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateAPIBeatmapSet(Ruleset.Value)));
+
+            noPlaceholderShown();
+
             AddStep("set dummy as non-supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = false);
 
             // only Rank Achieved filter
@@ -217,6 +221,9 @@ namespace osu.Game.Tests.Visual.Online
         public void TestUserWithSupporterUsesSupporterOnlyFiltersWithResults()
         {
             AddStep("fetch for 1 beatmap", () => fetchFor(CreateAPIBeatmapSet(Ruleset.Value)));
+
+            noPlaceholderShown();
+
             AddStep("set dummy as supporter", () => ((DummyAPIAccess)API).LocalUser.Value.IsSupporter = true);
 
             // only Rank Achieved filter
@@ -280,9 +287,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private void noPlaceholderShown()
         {
-            AddUntilStep("no placeholder shown", () =>
-                !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any(d => d.IsPresent)
-                && !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
+            AddUntilStep("\"supporter required\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.SupporterRequiredDrawable>().Any(d => d.IsPresent));
+            AddUntilStep("\"no maps found\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
         }
     }
 }
