@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
@@ -35,8 +34,6 @@ namespace osu.Game.Configuration
             GetBindable<bool>(Static.LowBatteryNotificationShownOnce).SetDefault();
             GetBindable<double?>(Static.LastHoverSoundPlaybackTime).SetDefault();
         }
-
-        private void ensureDefault<T>(Bindable<T> bindable) => bindable.SetDefault();
     }
 
     public enum Static
