@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             this.hidden = mods.Any(m => m is OsuModHidden);
         }
 
-        private double skillMultiplier => 0.1;
+        private double skillMultiplier => 0.05;
         private double strainDecayBase => 0.15;
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
