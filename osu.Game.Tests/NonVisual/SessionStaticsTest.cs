@@ -31,7 +31,8 @@ namespace osu.Game.Tests.NonVisual
             Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LoginOverlayDisplayed).IsDefault);
             Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).IsDefault);
             Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).IsDefault);
-            Assert.IsTrue(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
+            // some statics should not reset despite inactivity.
+            Assert.IsFalse(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
         }
     }
 }
