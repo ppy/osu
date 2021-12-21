@@ -15,7 +15,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public abstract class BeatmapCardBase : OsuClickableContainer
+    public abstract class BeatmapCard : OsuClickableContainer
     {
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         protected readonly BeatmapDownloadTracker DownloadTracker;
 
-        protected BeatmapCardBase(APIBeatmapSet beatmapSet, bool allowExpansion = true)
+        protected BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
             : base(HoverSampleSet.Submit)
         {
             Expanded = new BindableBool { Disabled = !allowExpansion };

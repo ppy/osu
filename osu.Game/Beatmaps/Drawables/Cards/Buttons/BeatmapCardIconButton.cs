@@ -115,7 +115,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
             bool isHovered = IsHovered && Enabled.Value;
 
             content.ScaleTo(isHovered ? 1.2f : 1, 500, Easing.OutQuint);
-            content.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
+            content.FadeColour(isHovered ? HoverColour : IdleColour, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
     }
 }
