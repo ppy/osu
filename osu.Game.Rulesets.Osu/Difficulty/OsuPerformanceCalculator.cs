@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using MathNet.Numerics;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -228,8 +229,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModHidden))
                 flashlightValue *= 1.3;
 
+            // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                flashlightValue *= calculateMissPenalty(effectiveMissCount);
+                flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow((double)effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
             // Combo scaling.
             if (Attributes.MaxCombo > 0)
@@ -267,19 +269,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double calculateMissPenalty(double missCount)
         {
-            double leniency = 2.0;
+            double leniency = 4.3;
 
             if (missCount > totalHits - leniency)
                 return 0;
 
-            double missApprox = erfInvApprox((totalHits - leniency - missCount) / totalHits);
-            double fcApprox = erfInvApprox((totalHits - leniency) / totalHits);
+            double missApprox = SpecialFunctions.ErfInv((totalHits - leniency - missCount) / totalHits);
+            double fcApprox = SpecialFunctions.ErfInv((totalHits - leniency) / totalHits);
 
-            return Math.Pow(missApprox / fcApprox, 1.5);
+            return Math.Pow(missApprox / fcApprox, 3.5);
         }
 
-        private double logit(double x) => Math.Log(x / (1 - x));
-        private double erfInvApprox(double x) => (Math.Sqrt(Math.PI) / 4) * logit((x + 1) / 2);
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
