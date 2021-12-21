@@ -53,13 +53,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 LayoutEasing = Easing.OutQuint;
             }
 
-            public void Push(Color4 colour) => Schedule(() =>
+            public void Push(Color4 colour)
             {
                 Add(new HitErrorCircle(colour, drawable_judgement_size));
 
                 if (Children.Count > max_available_judgements)
                     Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
-            });
+            }
         }
 
         internal class HitErrorCircle : Container

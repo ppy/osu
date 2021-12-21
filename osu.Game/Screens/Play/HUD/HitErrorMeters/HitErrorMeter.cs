@@ -40,9 +40,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (gameplayClockContainer != null)
                 gameplayClockContainer.OnSeek += Clear;
 
-            processor.NewJudgement += OnNewJudgement;
+            // Scheduled as meter implementations are likely going to change/add drawables when reacting to this.
+            processor.NewJudgement += j => Schedule(() => OnNewJudgement(j));
         }
 
+        /// <summary>
+        /// Fired when a new judgement arrives.
+        /// </summary>
+        /// <param name="judgement">The new judgement.</param>
         protected abstract void OnNewJudgement(JudgementResult judgement);
 
         protected Color4 GetColourForHitResult(HitResult result)
