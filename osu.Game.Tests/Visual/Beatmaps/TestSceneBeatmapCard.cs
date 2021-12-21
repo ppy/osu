@@ -252,7 +252,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
         [Test]
         public void TestNormal()
         {
-            createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+            createTestCase(beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo));
         }
 
         [Test]
@@ -264,7 +264,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
         [Test]
         public void TestHoverState()
         {
-            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCard(s)));
+            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCardNormal(s)));
 
             AddStep("Hover card", () => InputManager.MoveMouseTo(firstCard()));
             AddWaitStep("wait for potential state change", 5);
@@ -281,10 +281,10 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddWaitStep("wait for potential state change", 5);
             AddAssert("card is still expanded", () => firstCard().Expanded.Value);
 
-            AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCard>().Last()));
+            AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCardNormal>().Last()));
             AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
 
-            BeatmapCard firstCard() => this.ChildrenOfType<BeatmapCard>().First();
+            BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
         }
     }
 }
