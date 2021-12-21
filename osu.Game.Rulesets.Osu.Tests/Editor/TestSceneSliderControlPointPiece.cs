@@ -138,6 +138,49 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         }
 
         [Test]
+        public void TestDragMultipleControlPointsIncludingHead()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("hold control", () => InputManager.PressKey(Key.LControl));
+
+            moveMouseToControlPoint(3);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(4);
+            AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(3);
+            AddStep("hold left mouse", () => InputManager.PressButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
+            addMovementStep(new Vector2(550, 50));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+
+            AddAssert("three control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == 3);
+
+            // note: if the head is part of the selection being moved, the entire slider is moved.
+            // the unselected nodes will therefore change position relative to the slider head.
+
+            AddAssert("slider moved", () => Precision.AlmostEquals(slider.Position, new Vector2(256, 192) + new Vector2(150, 50)));
+
+            assertControlPointPosition(0, Vector2.Zero);
+            assertControlPointType(0, PathType.PerfectCurve);
+
+            assertControlPointPosition(1, new Vector2(0, 100));
+
+            assertControlPointPosition(2, new Vector2(150, -50));
+
+            assertControlPointPosition(3, new Vector2(400, 0));
+
+            assertControlPointPosition(4, new Vector2(400, 150));
+
+            AddStep("release control", () => InputManager.ReleaseKey(Key.LControl));
+        }
+
+        [Test]
         public void TestDragControlPointAlmostLinearlyExterior()
         {
             moveMouseToControlPoint(1);
