@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                 case DownloadState.LocallyAvailable:
                     Action = null;
                     TooltipText = string.Empty;
-                    this.FadeOut(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                    this.FadeOut(BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
                     break;
 
                 case DownloadState.NotDownloaded:
@@ -81,7 +81,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                     }
 
                     Action = () => beatmaps.Download(beatmapSet, preferNoVideo.Value);
-                    this.FadeIn(BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                    this.FadeIn(BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
                     spinner.Hide();
                     Icon.Show();
 
