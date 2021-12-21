@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -215,13 +216,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private Vector2[] dragStartPositions;
         private PathType?[] dragPathTypes;
-        private HashSet<PathControlPoint> draggedControlPoints;
+        private int draggedControlPointIndex;
+        private HashSet<PathControlPoint> selectedControlPoints;
 
-        private void dragStarted()
+        private void dragStarted(PathControlPoint controlPoint)
         {
             dragStartPositions = slider.Path.ControlPoints.Select(point => point.Position).ToArray();
             dragPathTypes = slider.Path.ControlPoints.Select(point => point.Type).ToArray();
-            draggedControlPoints = new HashSet<PathControlPoint>(Pieces.Where(piece => piece.IsSelected.Value).Select(piece => piece.ControlPoint));
+            draggedControlPointIndex = slider.Path.ControlPoints.IndexOf(controlPoint);
+            selectedControlPoints = new HashSet<PathControlPoint>(Pieces.Where(piece => piece.IsSelected.Value).Select(piece => piece.ControlPoint));
+
+            Debug.Assert(draggedControlPointIndex >= 0);
 
             changeHandler?.BeginChange();
         }
@@ -232,12 +237,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             var oldPosition = slider.Position;
             double oldStartTime = slider.StartTime;
 
-            if (draggedControlPoints.Contains(slider.Path.ControlPoints[0]))
+            if (selectedControlPoints.Contains(slider.Path.ControlPoints[0]))
             {
                 // Special handling for selections containing head control point - the position of the slider changes which means the snapped position and time have to be taken into account
-                var result = snapProvider?.SnapScreenSpacePositionToValidTime(e.ScreenSpaceMousePosition);
+                Vector2 newHeadPosition = Parent.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(newHeadPosition);
 
-                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? e.ScreenSpaceMousePosition) - slider.Position;
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - slider.Position;
 
                 slider.Position += movementDelta;
                 slider.StartTime = result?.Time ?? slider.StartTime;
@@ -249,7 +255,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     // need to be offset _back_ by the delta corresponding to the movement of the head point.
                     // All other selected control points (if any) will move together with the head point
                     // (and so they will not move at all, relative to each other).
-                    if (!draggedControlPoints.Contains(controlPoint))
+                    if (!selectedControlPoints.Contains(controlPoint))
                         controlPoint.Position -= movementDelta;
                 }
             }
@@ -258,7 +264,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 for (int i = 0; i < controlPoints.Count; ++i)
                 {
                     var controlPoint = controlPoints[i];
-                    if (draggedControlPoints.Contains(controlPoint))
+                    if (selectedControlPoints.Contains(controlPoint))
                         controlPoint.Position = dragStartPositions[i] + (e.MousePosition - e.MouseDownPosition);
                 }
             }
