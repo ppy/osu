@@ -54,5 +54,7 @@ namespace osu.Game.Beatmaps
         }
 
         #endregion
+
+        public override string ToString() => this.GetDisplayTitle();
     }
 }
