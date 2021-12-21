@@ -50,11 +50,11 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public bool Protected { get; set; }
 
-        public double MaxStarDifficulty => Beatmaps.Max(b => b.StarRating);
+        public double MaxStarDifficulty => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.StarRating);
 
-        public double MaxLength => Beatmaps.Max(b => b.Length);
+        public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);
 
-        public double MaxBPM => Beatmaps.Max(b => b.BPM);
+        public double MaxBPM => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.BPM);
 
         /// <summary>
         /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.
