@@ -78,9 +78,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
             private void updateDeleteButtonVisibility()
             {
+                if (multiplayerClient.Room == null)
+                    return;
+
                 bool isItemOwner = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost;
 
-                AllowDeletion = isItemOwner && SelectedItem.Value != Item;
+                AllowDeletion = isItemOwner && Item.ID != multiplayerClient.Room.Settings.PlaylistItemId;
                 AllowEditing = isItemOwner;
             }
         }
