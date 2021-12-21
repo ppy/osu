@@ -463,11 +463,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
 
-            AddStep("click spectate button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
 
             AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
 
@@ -501,11 +497,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 client.ChangeUserState(MultiplayerTestScene.PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 
-            AddStep("click spectate button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerSpectateButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
 
             AddUntilStep("wait for spectating user state", () => client.LocalUser?.State == MultiplayerUserState.Spectating);
 
@@ -832,11 +824,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);
 
-            AddStep("create room", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => client.RoomJoined);
         }
