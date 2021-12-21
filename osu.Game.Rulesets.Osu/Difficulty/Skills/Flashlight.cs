@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     // Bonus based on how visible the object is.
                     double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.Opacity(currentHitObject.StartTime, hidden));
 
-                    result += stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
+                    result += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
 
                 lastObj = currentObj;
