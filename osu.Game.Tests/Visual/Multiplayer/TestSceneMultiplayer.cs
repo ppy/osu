@@ -799,6 +799,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void pressReadyButton(int? playingUserId = null)
         {
+            // Can't use ClickButtonWhenEnabled<> due to needing to store the state after the button is enabled.
+
             AddUntilStep("wait for ready button to be enabled", () => readyButton.Enabled.Value);
 
             MultiplayerUserState lastState = MultiplayerUserState.Idle;
