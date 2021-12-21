@@ -13,7 +13,6 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -22,7 +21,6 @@ using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Tests.Resources;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -140,21 +138,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("item arrived in playlist", () => playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().Any(i => i.Model.ID == itemId));
-        }
-
-        private void deleteItem(int index)
-        {
-            OsuRearrangeableListItem<PlaylistItem> item = null;
-
-            AddStep($"move mouse to delete button {index}", () =>
-            {
-                item = playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index);
-                InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0));
-            });
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-
-            AddUntilStep("item removed from playlist", () => !playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().Contains(item));
         }
 
         private void assertDeleteButtonVisibility(int index, bool visible)
