@@ -83,8 +83,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 bool isItemOwner = Item.OwnerID == api.LocalUser.Value.OnlineID || multiplayerClient.IsHost;
 
-                AllowDeletion = isItemOwner && Item.ID != multiplayerClient.Room.Settings.PlaylistItemId;
-                AllowEditing = isItemOwner;
+                AllowDeletion = isItemOwner && !Item.Expired && Item.ID != multiplayerClient.Room.Settings.PlaylistItemId;
+                AllowEditing = isItemOwner && !Item.Expired;
             }
         }
     }
