@@ -32,7 +32,6 @@ namespace osu.Game.Configuration
             GetBindable<bool>(Static.LoginOverlayDisplayed).SetDefault();
             GetBindable<bool>(Static.MutedAudioNotificationShownOnce).SetDefault();
             GetBindable<bool>(Static.LowBatteryNotificationShownOnce).SetDefault();
-            GetBindable<double?>(Static.LastHoverSoundPlaybackTime).SetDefault();
         }
     }
 
