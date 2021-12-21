@@ -21,7 +21,7 @@ using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCard : BeatmapCardBase
+    public class BeatmapCardNormal : BeatmapCardBase
     {
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
@@ -43,7 +43,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public BeatmapCard(APIBeatmapSet beatmapSet, bool allowExpansion = true)
+        public BeatmapCardNormal(APIBeatmapSet beatmapSet, bool allowExpansion = true)
             : base(beatmapSet, allowExpansion)
         {
             content = new BeatmapCardContent(height);
