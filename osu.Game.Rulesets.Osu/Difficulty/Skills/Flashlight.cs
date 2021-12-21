@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var currentObj = (OsuDifficultyHitObject)Previous[i];
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
-                lastObj ??= currentObj;
+                lastObj ??= osuCurrent;
 
                 if (!(currentObj.BaseObject is Spinner))
                 {
