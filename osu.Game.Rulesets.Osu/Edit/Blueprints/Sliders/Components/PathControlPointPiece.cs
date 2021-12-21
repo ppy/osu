@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
-        public Action DragStarted;
+        public Action<PathControlPoint> DragStarted;
         public Action<DragEvent> DragInProgress;
         public Action DragEnded;
 
@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (e.Button == MouseButton.Left)
             {
-                DragStarted?.Invoke();
+                DragStarted?.Invoke(ControlPoint);
                 keepSelection = true;
                 return true;
             }
