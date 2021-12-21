@@ -40,15 +40,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double result = 0.0;
 
-            OsuDifficultyHitObject lastObj = null;
+            OsuDifficultyHitObject lastObj = osuCurrent;
 
             // This is iterating backwards in time from the current object.
             for (int i = 0; i < Previous.Count; i++)
             {
                 var currentObj = (OsuDifficultyHitObject)Previous[i];
                 var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
-
-                lastObj ??= osuCurrent;
 
                 if (!(currentObj.BaseObject is Spinner))
                 {
