@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Handlers;
@@ -42,6 +45,11 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new BindingSettings(keyConfig),
             };
+
+            if (RuntimeInfo.OS == RuntimeInfo.Platform.Android)
+            {
+                Add(new AndroidKeyboardSection());
+            }
 
             foreach (var handler in host.AvailableInputHandlers)
             {
@@ -103,6 +111,36 @@ namespace osu.Game.Overlays.Settings.Sections
             }
 
             protected override LocalisableString Header => handler.Description;
+        }
+
+        private class AndroidKeyboardSection : SettingsSubsection
+        {
+            private Bindable<bool> keyboardFix = new Bindable<bool>();
+
+            private SettingsCheckbox checkbox;
+
+            [BackgroundDependencyLoader]
+            private void load(FrameworkConfigManager config)
+            {
+                keyboardFix = config.GetBindable<bool>(FrameworkSetting.AndroidKeyboardFix);
+
+                Children = new Drawable[]
+                {
+                    checkbox = new SettingsCheckbox
+                    {
+                        LabelText = "Enforce character based text input",
+                        Current = keyboardFix
+                    },
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                checkbox.WarningText = "Enable this and restart the game if you can't enter text with the keyboard.";
+            }
+
+            protected override LocalisableString Header => "Keyboard";
         }
     }
 }
