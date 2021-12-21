@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
 
                     // Bonus based on how visible the object is.
-                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.Opacity(osuPreviousHitObject.StartTime, hidden));
+                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.Opacity(currentHitObject.StartTime, hidden));
 
                     result += stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
