@@ -44,15 +44,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
 
-            // Longer maps are worth more
             double lengthBonus =
                 0.95 + 0.3 * Math.Min(1.0, numTotalHits / 2500.0) +
                 (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
-
-            // Longer maps are worth more
             value *= lengthBonus;
 
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             value *= Math.Pow(0.97, misses);
 
             // Combo scaling
@@ -80,13 +76,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             if (mods.Any(m => m is ModFlashlight))
-                // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 value *= 1.35 * lengthBonus;
 
-            // Scale the aim value with accuracy _slightly_
             value *= Math.Pow(accuracy(), 5.5);
 
-            // Custom multipliers for NoFail. SpunOut is not applicable.
             if (mods.Any(m => m is ModNoFail))
                 value *= 0.90;
 
