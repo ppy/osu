@@ -40,26 +40,31 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double result = 0.0;
 
+            OsuDifficultyHitObject lastObj = osuCurrent;
+
+            // This is iterating backwards in time from the current object.
             for (int i = 0; i < Previous.Count; i++)
             {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[i];
-                var osuPreviousHitObject = (OsuHitObject)(osuPrevious.BaseObject);
+                var currentObj = (OsuDifficultyHitObject)Previous[i];
+                var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
-                if (!(osuPrevious.BaseObject is Spinner))
+                if (!(currentObj.BaseObject is Spinner))
                 {
-                    double jumpDistance = (osuHitObject.StackedPosition - osuPreviousHitObject.EndPosition).Length;
+                    double jumpDistance = (osuHitObject.StackedPosition - currentHitObject.EndPosition).Length;
 
-                    cumulativeStrainTime += osuPrevious.StrainTime;
+                    cumulativeStrainTime += lastObj.StrainTime;
 
                     // We want to nerf objects that can be easily seen within the Flashlight circle radius.
                     if (i == 0)
                         smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
 
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
-                    double stackNerf = Math.Min(1.0, (osuPrevious.LazyJumpDistance / scalingFactor) / 25.0);
+                    double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
 
                     result += stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
+
+                lastObj = currentObj;
             }
 
             return Math.Pow(smallDistNerf * result, 2.0);
