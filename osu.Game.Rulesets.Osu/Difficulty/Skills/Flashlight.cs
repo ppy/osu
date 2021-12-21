@@ -19,8 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public Flashlight(Mod[] mods)
             : base(mods)
         {
-            this.mods = mods;
-            this.hidden = mods.Any(m => m is OsuModHidden);
+            hidden = mods.Any(m => m is OsuModHidden);
         }
 
         private double skillMultiplier => 0.05;
@@ -28,8 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double DecayWeight => 1.0;
         protected override int HistoryLength => 10; // Look back for 10 notes is added for the sake of flashlight calculations.
 
-        private readonly Mod[] mods;
-        private bool hidden;
+        private readonly bool hidden;
 
         private const double max_opacity_bonus = 0.4;
         private const double hidden_bonus = 0.2;
