@@ -15,23 +15,25 @@ namespace osu.Game.Configuration
     {
         protected override void InitialiseDefaults()
         {
-            ensureDefault(SetDefault(Static.LoginOverlayDisplayed, false));
-            ensureDefault(SetDefault(Static.MutedAudioNotificationShownOnce, false));
-            ensureDefault(SetDefault(Static.LowBatteryNotificationShownOnce, false));
-            ensureDefault(SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null));
-            ensureDefault(SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null));
+            SetDefault(Static.LoginOverlayDisplayed, false);
+            SetDefault(Static.MutedAudioNotificationShownOnce, false);
+            SetDefault(Static.LowBatteryNotificationShownOnce, false);
+            SetDefault(Static.LastHoverSoundPlaybackTime, (double?)null);
+            SetDefault<APISeasonalBackgrounds>(Static.SeasonalBackgrounds, null);
         }
 
         /// <summary>
-        /// Used to revert statics to their defaults after being idle for appropiate amount of time.
-        /// Does not affect loaded seasonal backgrounds.
+        /// Revert statics to their defaults after being idle for appropriate amount of time.
         /// </summary>
-        public void ResetValues()
+        /// <remarks>
+        /// This only affects a subset of statics which the user would expect to have reset after a break.
+        /// </remarks>
+        public void ResetAfterInactivity()
         {
-            ensureDefault(GetBindable<bool>(Static.LoginOverlayDisplayed));
-            ensureDefault(GetBindable<bool>(Static.MutedAudioNotificationShownOnce));
-            ensureDefault(GetBindable<bool>(Static.LowBatteryNotificationShownOnce));
-            ensureDefault(GetBindable<double?>(Static.LastHoverSoundPlaybackTime));
+            GetBindable<bool>(Static.LoginOverlayDisplayed).SetDefault();
+            GetBindable<bool>(Static.MutedAudioNotificationShownOnce).SetDefault();
+            GetBindable<bool>(Static.LowBatteryNotificationShownOnce).SetDefault();
+            GetBindable<double?>(Static.LastHoverSoundPlaybackTime).SetDefault();
         }
 
         private void ensureDefault<T>(Bindable<T> bindable) => bindable.SetDefault();

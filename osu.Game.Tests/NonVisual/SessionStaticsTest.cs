@@ -27,7 +27,7 @@ namespace osu.Game.Tests.NonVisual
             sessionIdleTracker.IsIdle.BindValueChanged(e =>
             {
                 if (e.NewValue)
-                    sessionStatics.ResetValues();
+                    sessionStatics.ResetAfterInactivity();
             });
         }
 
