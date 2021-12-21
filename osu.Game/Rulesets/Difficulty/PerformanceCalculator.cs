@@ -37,6 +37,6 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = track.Rate;
         }
 
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        public abstract PerformanceAttributes Calculate();
     }
 }

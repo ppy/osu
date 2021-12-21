@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override PerformanceAttributes Calculate()
         {
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
@@ -69,16 +69,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                     Math.Pow(accValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
-            if (categoryDifficulty != null)
+            return new ManiaPerformanceAttributes
             {
-                categoryDifficulty.Add("Difficulty", difficultyValue);
-                categoryDifficulty.Add("Accuracy", accValue);
-                categoryDifficulty.Add("Scaled Score", scaledScore);
-                categoryDifficulty.Add("Great Hit Window", Attributes.GreatHitWindow);
-                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
-            }
-
-            return totalValue;
+                Difficulty = difficultyValue,
+                Accuracy = accValue,
+                ScaledScore = scaledScore,
+                Total = totalValue
+            };
         }
 
         private double computeDifficultyValue()
