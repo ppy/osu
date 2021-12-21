@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -20,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 
@@ -83,12 +81,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             [Resolved]
             private MultiplayerClient client { get; set; }
-
-            [Resolved]
-            private Bindable<WorkingBeatmap> beatmap { get; set; }
-
-            [Resolved]
-            private Bindable<RulesetInfo> ruleset { get; set; }
 
             [Resolved]
             private OngoingOperationTracker ongoingOperationTracker { get; set; }
@@ -256,7 +248,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     Spacing = new Vector2(5),
                                                     Children = new Drawable[]
                                                     {
-                                                        drawablePlaylist = new DrawableRoomPlaylist(false, false)
+                                                        drawablePlaylist = new DrawableRoomPlaylist
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = DrawableRoomPlaylistItem.HEIGHT

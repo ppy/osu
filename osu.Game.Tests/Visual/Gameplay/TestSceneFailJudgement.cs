@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("total number of results == 1", () =>
             {
                 var score = new ScoreInfo();
+
                 ((FailPlayer)Player).ScoreProcessor.PopulateScore(score);
 
                 return score.Statistics.Values.Sum() == 1;

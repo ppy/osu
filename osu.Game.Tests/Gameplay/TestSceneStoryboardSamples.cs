@@ -15,6 +15,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -167,7 +168,7 @@ namespace osu.Game.Tests.Gameplay
         private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, IStorageResourceProvider resources)
-                : base(DefaultLegacySkin.Info, new TestResourceStore(resourceName), resources, "skin.ini")
+                : base(DefaultLegacySkin.CreateInfo(), new TestResourceStore(resourceName), resources, "skin.ini")
             {
             }
         }
@@ -220,6 +221,7 @@ namespace osu.Game.Tests.Gameplay
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
+        public RealmContextFactory RealmContextFactory => null;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion

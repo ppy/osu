@@ -9,9 +9,6 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class DefaultAccuracyCounter : GameplayAccuracyCounter, ISkinnableDrawable
     {
-        [Resolved(canBeNull: true)]
-        private HUDOverlay hud { get; set; }
-
         public bool UsesFixedAnchor { get; set; }
 
         [BackgroundDependencyLoader]

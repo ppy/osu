@@ -184,9 +184,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private SamplePointPiece sampleOverrideDisplay;
         private DifficultyPointPiece difficultyOverrideDisplay;
 
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
-
         private DifficultyControlPoint difficultyControlPoint;
         private SampleControlPoint sampleControlPoint;
 

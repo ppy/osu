@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("create slider", () =>
             {
-                var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
+                var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
                 tintingSkin.Configuration.ConfigDictionary["AllowSliderBallTint"] = "1";
 
                 Child = new SkinProvidingContainer(tintingSkin)

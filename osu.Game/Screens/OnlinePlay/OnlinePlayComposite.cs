@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -73,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
 
         /// <summary>
-        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the last item from <see cref="Playlist"/>
+        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the current item from <see cref="Playlist"/>
         /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
         /// </summary>
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
@@ -88,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected virtual void UpdateSelectedItem()
             => SelectedItem.Value = RoomID.Value == null || subScreenSelectedItem == null
-                ? Playlist.LastOrDefault()
+                ? Playlist.GetCurrentItem()
                 : subScreenSelectedItem.Value;
     }
 }
