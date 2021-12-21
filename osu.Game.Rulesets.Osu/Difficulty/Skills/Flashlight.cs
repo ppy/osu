@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             : base(mods)
         {
             this.mods = mods;
+            this.hidden = mods.Any(m => m is OsuModHidden);
         }
 
         private double skillMultiplier => 0.1;
@@ -39,8 +40,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             if (current.BaseObject is Spinner)
                 return 0;
-
-            hidden = mods.Any(m => m is OsuModHidden);
 
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuHitObject = (OsuHitObject)(osuCurrent.BaseObject);
