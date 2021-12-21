@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osuTK;
@@ -54,12 +53,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             [Resolved]
             private MultiplayerClient multiplayerClient { get; set; }
 
-            [Resolved(typeof(Room), nameof(Room.Host))]
-            private Bindable<APIUser> host { get; set; }
-
-            [Resolved(typeof(Room), nameof(Room.QueueMode))]
-            private Bindable<QueueMode> queueMode { get; set; }
-
             public QueuePlaylistItem(PlaylistItem item)
                 : base(item)
             {
@@ -71,10 +64,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID);
 
-                host.BindValueChanged(_ => updateDeleteButtonVisibility());
-                queueMode.BindValueChanged(_ => updateDeleteButtonVisibility());
-                SelectedItem.BindValueChanged(_ => updateDeleteButtonVisibility(), true);
+                multiplayerClient.RoomUpdated += onRoomUpdated;
+                onRoomUpdated();
             }
+
+            private void onRoomUpdated() => Scheduler.AddOnce(updateDeleteButtonVisibility);
 
             private void updateDeleteButtonVisibility()
             {
@@ -85,6 +79,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
                 AllowDeletion = isItemOwner && !Item.Expired && Item.ID != multiplayerClient.Room.Settings.PlaylistItemId;
                 AllowEditing = isItemOwner && !Item.Expired;
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                if (multiplayerClient != null)
+                    multiplayerClient.RoomUpdated -= onRoomUpdated;
             }
         }
     }
