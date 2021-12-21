@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override PerformanceAttributes Calculate()
         {
             mods = Score.Mods;
 
@@ -90,13 +90,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModNoFail))
                 value *= 0.90;
 
-            if (categoryDifficulty != null)
+            return new CatchPerformanceAttributes
             {
-                categoryDifficulty.Add("AR", Attributes.ApproachRate);
-                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
-            }
-
-            return value;
+                Total = value
+            };
         }
 
         private double accuracy() => totalHits() == 0 ? 0 : Math.Clamp((double)totalSuccessfulHits() / totalHits(), 0, 1);

@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override PerformanceAttributes Calculate()
         {
             mods = Score.Mods;
             accuracy = Score.Accuracy;
@@ -72,19 +72,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(flashlightValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
-            if (categoryDifficulty != null)
+            return new OsuPerformanceAttributes
             {
-                categoryDifficulty.Add("Aim", aimValue);
-                categoryDifficulty.Add("Speed", speedValue);
-                categoryDifficulty.Add("Accuracy", accuracyValue);
-                categoryDifficulty.Add("Flashlight", flashlightValue);
-                categoryDifficulty.Add("OD", Attributes.OverallDifficulty);
-                categoryDifficulty.Add("AR", Attributes.ApproachRate);
-                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
-                categoryDifficulty.Add("Effective Miss Count", effectiveMissCount);
-            }
-
-            return totalValue;
+                Aim = aimValue,
+                Speed = speedValue,
+                Accuracy = accuracyValue,
+                Flashlight = flashlightValue,
+                EffectiveMissCount = effectiveMissCount,
+                Total = totalValue
+            };
         }
 
         private double computeAimValue()

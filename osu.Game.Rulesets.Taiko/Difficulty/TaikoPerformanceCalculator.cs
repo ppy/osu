@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override PerformanceAttributes Calculate()
         {
             mods = Score.Mods;
             countGreat = Score.Statistics.GetValueOrDefault(HitResult.Great);
@@ -52,16 +52,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     Math.Pow(accuracyValue, 1.1), 1.0 / 1.1
                 ) * multiplier;
 
-            if (categoryDifficulty != null)
+            return new TaikoPerformanceAttributes
             {
-                categoryDifficulty.Add("Difficulty", difficultyValue);
-                categoryDifficulty.Add("Accuracy", accuracyValue);
-                categoryDifficulty.Add("AR", Attributes.ApproachRate);
-                categoryDifficulty.Add("Great Hit Window", Attributes.GreatHitWindow);
-                categoryDifficulty.Add("Max Combo", Attributes.MaxCombo);
-            }
-
-            return totalValue;
+                Difficulty = difficultyValue,
+                Accuracy = accuracyValue,
+                Total = totalValue
+            };
         }
 
         private double computeDifficultyValue()
