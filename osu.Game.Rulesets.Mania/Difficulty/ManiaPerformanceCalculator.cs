@@ -80,10 +80,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue()
         {
-            // Obtain difficulty
             double difficultyValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
-            // Longer maps are worth more
             difficultyValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
 
             if (scaledScore <= 500000)
@@ -112,9 +110,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
                                    * difficultyValue
                                    * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
-
-            // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
-            // accuracyValue *= Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
 
             return accuracyValue;
         }
