@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Threading;
+using osu.Framework.Development;
 using Realms;
 
 #nullable enable
@@ -19,27 +19,22 @@ namespace osu.Game.Database
 
         public bool IsManaged => data.IsManaged;
 
-        private readonly SynchronizationContext? fetchedContext;
-        private readonly int fetchedThreadId;
-
         /// <summary>
         /// The original live data used to create this instance.
         /// </summary>
         private readonly T data;
 
+        private readonly RealmContextFactory realmFactory;
+
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
         /// <param name="data">The realm data.</param>
-        public RealmLive(T data)
+        /// <param name="realmFactory">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
+        public RealmLive(T data, RealmContextFactory realmFactory)
         {
             this.data = data;
-
-            if (data.IsManaged)
-            {
-                fetchedContext = SynchronizationContext.Current;
-                fetchedThreadId = Thread.CurrentThread.ManagedThreadId;
-            }
+            this.realmFactory = realmFactory;
 
             ID = data.ID;
         }
@@ -50,13 +45,13 @@ namespace osu.Game.Database
         /// <param name="perform">The action to perform.</param>
         public void PerformRead(Action<T> perform)
         {
-            if (originalDataValid)
+            if (!IsManaged)
             {
                 perform(data);
                 return;
             }
 
-            using (var realm = Realm.GetInstance(data.Realm.Config))
+            using (var realm = realmFactory.CreateContext())
                 perform(realm.Find<T>(ID));
         }
 
@@ -67,12 +62,12 @@ namespace osu.Game.Database
         public TReturn PerformRead<TReturn>(Func<T, TReturn> perform)
         {
             if (typeof(RealmObjectBase).IsAssignableFrom(typeof(TReturn)))
-                throw new InvalidOperationException($"Realm live objects should not exit the scope of {nameof(PerformRead)}.");
+                throw new InvalidOperationException(@$"Realm live objects should not exit the scope of {nameof(PerformRead)}.");
 
-            if (originalDataValid)
+            if (!IsManaged)
                 return perform(data);
 
-            using (var realm = Realm.GetInstance(data.Realm.Config))
+            using (var realm = realmFactory.CreateContext())
                 return perform(realm.Find<T>(ID));
         }
 
@@ -83,7 +78,7 @@ namespace osu.Game.Database
         public void PerformWrite(Action<T> perform)
         {
             if (!IsManaged)
-                throw new InvalidOperationException("Can't perform writes on a non-managed underlying value");
+                throw new InvalidOperationException(@"Can't perform writes on a non-managed underlying value");
 
             PerformRead(t =>
             {
@@ -97,27 +92,18 @@ namespace osu.Game.Database
         {
             get
             {
-                if (originalDataValid)
+                if (!IsManaged)
                     return data;
 
-                T retrieved;
+                if (!ThreadSafety.IsUpdateThread)
+                    throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                using (var realm = Realm.GetInstance(data.Realm.Config))
-                    retrieved = realm.Find<T>(ID);
-
-                if (!retrieved.IsValid)
-                    throw new InvalidOperationException("Attempted to access value without an open context");
-
-                return retrieved;
+                return realmFactory.Context.Find<T>(ID);
             }
         }
 
-        private bool originalDataValid => !IsManaged || (isCorrectThread && data.IsValid);
-
-        // this matches realm's internal thread validation (see https://github.com/realm/realm-dotnet/blob/903b4d0b304f887e37e2d905384fb572a6496e70/Realm/Realm/Native/SynchronizationContextScheduler.cs#L72)
-        private bool isCorrectThread
-            => (fetchedContext != null && SynchronizationContext.Current == fetchedContext) || fetchedThreadId == Thread.CurrentThread.ManagedThreadId;
-
         public bool Equals(ILive<T>? other) => ID == other?.ID;
+
+        public override string ToString() => PerformRead(i => i.ToString());
     }
 }

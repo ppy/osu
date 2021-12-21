@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Platform;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
@@ -18,9 +17,6 @@ namespace osu.Game.Updater
     public class NoActionUpdateManager : UpdateManager
     {
         private string version;
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)

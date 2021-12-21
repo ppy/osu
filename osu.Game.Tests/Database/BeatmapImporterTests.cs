@@ -809,7 +809,7 @@ namespace osu.Game.Tests.Database
             // TODO: reimplement when we have score support in realm.
             // return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
             // {
-            //     OnlineScoreID = 2,
+            //     OnlineID = 2,
             //     Beatmap = beatmap,
             //     BeatmapInfoID = beatmap.ID
             // }, new ImportScoreTest.TestArchiveReader());
@@ -852,7 +852,11 @@ namespace osu.Game.Tests.Database
         {
             IQueryable<RealmBeatmapSet>? resultSets = null;
 
-            waitForOrAssert(() => (resultSets = realm.All<RealmBeatmapSet>().Where(s => !s.DeletePending && s.OnlineID == 241526)).Any(),
+            waitForOrAssert(() =>
+                {
+                    realm.Refresh();
+                    return (resultSets = realm.All<RealmBeatmapSet>().Where(s => !s.DeletePending && s.OnlineID == 241526)).Any();
+                },
                 @"BeatmapSet did not import to the database in allocated time.", timeout);
 
             // ensure we were stored to beatmap database backing...
@@ -865,16 +869,16 @@ namespace osu.Game.Tests.Database
             // ReSharper disable once PossibleUnintendedReferenceComparison
             IEnumerable<RealmBeatmap> queryBeatmaps() => realm.All<RealmBeatmap>().Where(s => s.BeatmapSet != null && s.BeatmapSet == set);
 
-            waitForOrAssert(() => queryBeatmaps().Count() == 12, @"Beatmaps did not import to the database in allocated time", timeout);
-            waitForOrAssert(() => queryBeatmapSets().Count() == 1, @"BeatmapSet did not import to the database in allocated time", timeout);
+            Assert.AreEqual(12, queryBeatmaps().Count(), @"Beatmap count was not correct");
+            Assert.AreEqual(1, queryBeatmapSets().Count(), @"Beatmapset count was not correct");
 
-            int countBeatmapSetBeatmaps = 0;
-            int countBeatmaps = 0;
+            int countBeatmapSetBeatmaps;
+            int countBeatmaps;
 
-            waitForOrAssert(() =>
-                    (countBeatmapSetBeatmaps = queryBeatmapSets().First().Beatmaps.Count) ==
-                    (countBeatmaps = queryBeatmaps().Count()),
-                $@"Incorrect database beatmap count post-import ({countBeatmaps} but should be {countBeatmapSetBeatmaps}).", timeout);
+            Assert.AreEqual(
+                countBeatmapSetBeatmaps = queryBeatmapSets().First().Beatmaps.Count,
+                countBeatmaps = queryBeatmaps().Count(),
+                $@"Incorrect database beatmap count post-import ({countBeatmaps} but should be {countBeatmapSetBeatmaps}).");
 
             foreach (RealmBeatmap b in set.Beatmaps)
                 Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineID == b.OnlineID));

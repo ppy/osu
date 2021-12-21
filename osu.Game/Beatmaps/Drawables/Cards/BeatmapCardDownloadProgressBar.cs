@@ -82,14 +82,14 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     break;
 
                 case DownloadState.Importing:
-                    foregroundFill.FadeColour(colours.Yellow, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
+                    foregroundFill.FadeColour(colours.Yellow, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
                     break;
             }
         }
 
         private void progressChanged()
         {
-            foreground.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCard.TRANSITION_DURATION : 0, Easing.OutQuint);
+            foreground.ResizeWidthTo((float)progress.Value, progress.Value > 0 ? BeatmapCardBase.TRANSITION_DURATION : 0, Easing.OutQuint);
         }
     }
 }
