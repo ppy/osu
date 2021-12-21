@@ -140,8 +140,21 @@ namespace osu.Game.Beatmaps
 
         #region Compatibility properties
 
+        private int rulesetID;
+
         [Ignored]
-        public int RulesetID => Ruleset.OnlineID;
+        public int RulesetID
+        {
+            // ReSharper disable once ConstantConditionalAccessQualifier
+            get => Ruleset?.OnlineID ?? rulesetID;
+            set
+            {
+                if (Ruleset != null)
+                    throw new InvalidOperationException($"Cannot set a {nameof(RulesetID)} when {nameof(Ruleset)} is non-null");
+
+                rulesetID = value;
+            }
+        }
 
         [Ignored]
         public Guid BeatmapSetInfoID => BeatmapSet?.ID ?? Guid.Empty;
