@@ -116,7 +116,10 @@ namespace osu.Game.Database
             }
 
             if (nextTaskBatch.Count == 0)
+            {
+                finishPendingTask();
                 return;
+            }
 
             // Query the values.
             var request = CreateRequest(nextTaskBatch.Keys.ToArray());
@@ -125,13 +128,7 @@ namespace osu.Game.Database
             // todo: we probably want retry logic here.
             api.Perform(request);
 
-            // Create a new request task if there's still more values to query.
-            lock (taskAssignmentLock)
-            {
-                pendingRequestTask = null;
-                if (pendingTasks.Count > 0)
-                    createNewTask();
-            }
+            finishPendingTask();
 
             var foundValues = RetrieveResults(request);
 
@@ -154,6 +151,17 @@ namespace osu.Game.Database
             {
                 foreach (var task in tasks)
                     task.SetResult(null);
+            }
+        }
+
+        private void finishPendingTask()
+        {
+            // Create a new request task if there's still more values to query.
+            lock (taskAssignmentLock)
+            {
+                pendingRequestTask = null;
+                if (pendingTasks.Count > 0)
+                    createNewTask();
             }
         }
 
