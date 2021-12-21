@@ -40,32 +40,33 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double result = 0.0;
 
+            OsuDifficultyHitObject lastObj = null;
+
+            // This is iterating backwards in time from the current object.
             for (int i = 0; i < Previous.Count; i++)
             {
-                var osuLoop = (OsuDifficultyHitObject)Previous[i];
-                var osuLoopHitObject = (OsuHitObject)(osuLoop.BaseObject);
+                var currentObj = (OsuDifficultyHitObject)Previous[i];
+                var currentHitObject = (OsuHitObject)(currentObj.BaseObject);
 
-                OsuDifficultyHitObject osuLoopNext;
-                if (i == 0)
-                    osuLoopNext = osuCurrent;
-                else
-                    osuLoopNext = (OsuDifficultyHitObject)Previous[i - 1];
+                lastObj ??= currentObj;
 
-                if (!(osuLoop.BaseObject is Spinner))
+                if (!(currentObj.BaseObject is Spinner))
                 {
-                    double jumpDistance = (osuHitObject.StackedPosition - osuLoopHitObject.EndPosition).Length;
+                    double jumpDistance = (osuHitObject.StackedPosition - currentHitObject.EndPosition).Length;
 
-                    cumulativeStrainTime += osuLoopNext.StrainTime;
+                    cumulativeStrainTime += lastObj.StrainTime;
 
                     // We want to nerf objects that can be easily seen within the Flashlight circle radius.
                     if (i == 0)
                         smallDistNerf = Math.Min(1.0, jumpDistance / 75.0);
 
                     // We also want to nerf stacks so that only the first object of the stack is accounted for.
-                    double stackNerf = Math.Min(1.0, (osuLoop.LazyJumpDistance / scalingFactor) / 25.0);
+                    double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
 
                     result += Math.Pow(0.8, i) * stackNerf * scalingFactor * jumpDistance / cumulativeStrainTime;
                 }
+
+                lastObj = currentObj;
             }
 
             return Math.Pow(smallDistNerf * result, 2.0);
