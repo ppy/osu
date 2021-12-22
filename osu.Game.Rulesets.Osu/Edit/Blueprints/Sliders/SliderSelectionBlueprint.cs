@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -167,9 +166,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnDrag(DragEvent e)
         {
-            Debug.Assert(placementControlPoint != null);
-
-            placementControlPoint.Position = e.MousePosition - HitObject.Position;
+            if (placementControlPoint != null)
+                placementControlPoint.Position = e.MousePosition - HitObject.Position;
         }
 
         protected override void OnDragEnd(DragEndEvent e)
