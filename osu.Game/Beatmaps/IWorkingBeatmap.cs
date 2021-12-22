@@ -15,13 +15,12 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// Provides access to the multiple resources offered by a beatmap model (textures, skins, playable beatmaps etc.)
+    /// </summary>
     public interface IWorkingBeatmap
     {
         IBeatmapInfo BeatmapInfo { get; }
-
-        IBeatmapSetInfo BeatmapSetInfo { get; }
-
-        IBeatmapMetadataInfo Metadata { get; }
 
         /// <summary>
         /// Whether the Beatmap has finished loading.
