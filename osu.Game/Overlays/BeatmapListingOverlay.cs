@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
@@ -89,6 +90,12 @@ namespace osu.Game.Overlays
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            filterControl.CardSize.BindValueChanged(_ => onCardSizeChanged());
+        }
+
         public void ShowWithSearch(string query)
         {
             filterControl.Search(query);
@@ -135,44 +142,52 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var newPanels = searchResult.Results.Select(b => BeatmapCard.Create(b, filterControl.CardSize.Value).With(card =>
-            {
-                card.Anchor = Anchor.TopCentre;
-                card.Origin = Anchor.TopCentre;
-            }));
+            var newCards = createCardsFor(searchResult.Results);
 
             if (filterControl.CurrentPage == 0)
             {
                 //No matches case
-                if (!newPanels.Any())
+                if (!newCards.Any())
                 {
                     addContentToPlaceholder(notFoundContent);
                     return;
                 }
 
-                // spawn new children with the contained so we only clear old content at the last moment.
-                // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
-                var content = new ReverseChildIDFillFlowContainer<BeatmapCard>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(10),
-                    Alpha = 0,
-                    Margin = new MarginPadding { Vertical = 15 },
-                    ChildrenEnumerable = newPanels
-                };
+                var content = createCardContainerFor(newCards);
 
                 panelLoadDelegate = LoadComponentAsync(foundContent = content, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
             }
             else
             {
-                panelLoadDelegate = LoadComponentsAsync(newPanels, loaded =>
+                panelLoadDelegate = LoadComponentsAsync(newCards, loaded =>
                 {
                     lastFetchDisplayedTime = Time.Current;
                     foundContent.AddRange(loaded);
                     loaded.ForEach(p => p.FadeIn(200, Easing.OutQuint));
                 });
             }
+        }
+
+        private BeatmapCard[] createCardsFor(IEnumerable<APIBeatmapSet> beatmapSets) => beatmapSets.Select(set => BeatmapCard.Create(set, filterControl.CardSize.Value).With(c =>
+        {
+            c.Anchor = Anchor.TopCentre;
+            c.Origin = Anchor.TopCentre;
+        })).ToArray();
+
+        private static ReverseChildIDFillFlowContainer<BeatmapCard> createCardContainerFor(IEnumerable<BeatmapCard> newCards)
+        {
+            // spawn new children with the contained so we only clear old content at the last moment.
+            // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
+            var content = new ReverseChildIDFillFlowContainer<BeatmapCard>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(10),
+                Alpha = 0,
+                Margin = new MarginPadding { Vertical = 15 },
+                ChildrenEnumerable = newCards
+            };
+            return content;
         }
 
         private void addContentToPlaceholder(Drawable content)
@@ -195,8 +210,14 @@ namespace osu.Game.Overlays
                 // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
                 var sequence = lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
 
-                if (lastContent != notFoundContent && lastContent != supporterRequiredContent)
-                    sequence.Then().Schedule(() => lastContent.Expire());
+                if (lastContent == foundContent)
+                {
+                    sequence.Then().Schedule(() =>
+                    {
+                        foundContent.Expire();
+                        foundContent = null;
+                    });
+                }
             }
 
             if (!content.IsAlive)
@@ -207,6 +228,23 @@ namespace osu.Game.Overlays
             // currentContent may be one of the placeholders, and still have BypassAutoSizeAxes set to Y from the last fade-out.
             // restore to the initial state.
             currentContent.BypassAutoSizeAxes = Axes.None;
+        }
+
+        private void onCardSizeChanged()
+        {
+            if (foundContent == null || !foundContent.Any())
+                return;
+
+            Loading.Show();
+
+            var newCards = createCardsFor(foundContent.Reverse().Select(card => card.BeatmapSet));
+
+            panelLoadDelegate = LoadComponentsAsync(newCards, cards =>
+            {
+                foundContent.Clear();
+                foundContent.AddRange(cards);
+                Loading.Hide();
+            }, (cancellationToken = new CancellationTokenSource()).Token);
         }
 
         protected override void Dispose(bool isDisposing)
