@@ -28,7 +28,9 @@ namespace osu.Game.Beatmaps
     {
         public readonly BeatmapInfo BeatmapInfo;
         public readonly BeatmapSetInfo BeatmapSetInfo;
-        public readonly BeatmapMetadata Metadata;
+
+        // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
         protected AudioManager AudioManager { get; }
 
@@ -37,7 +39,6 @@ namespace osu.Game.Beatmaps
             AudioManager = audioManager;
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
-            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
