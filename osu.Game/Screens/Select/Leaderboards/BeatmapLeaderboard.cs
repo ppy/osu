@@ -115,7 +115,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var cancellationToken = loadCancellationSource.Token;
 
-            if (BeatmapInfo == null)
+            var fetchBeatmapInfo = BeatmapInfo;
+
+            if (fetchBeatmapInfo == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
                 return null;
@@ -124,7 +126,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == BeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
+                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
 
                 if (filterMods && !mods.Value.Any())
                 {
@@ -151,7 +153,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapOnlineStatus.Pending)
+            if (fetchBeatmapInfo.OnlineID == null || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
@@ -171,18 +173,18 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(BeatmapInfo, ruleset.Value ?? BeatmapInfo.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(fetchBeatmapInfo, ruleset.Value ?? fetchBeatmapInfo.Ruleset, Scope, requestMods);
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, BeatmapInfo)).ToArray(), cancellationToken)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
                             .ContinueWith(ordered => Schedule(() =>
                             {
                                 if (cancellationToken.IsCancellationRequested)
                                     return;
 
                                 scoresCallback?.Invoke(ordered.Result);
-                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, BeatmapInfo);
+                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
 
