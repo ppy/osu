@@ -32,11 +32,16 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-        protected AudioManager AudioManager { get; }
+        private AudioManager audioManager { get; }
+
+        private CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
+
+        private readonly object beatmapFetchLock = new object();
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
-            AudioManager = audioManager;
+            this.audioManager = audioManager;
+
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
 
@@ -46,7 +51,7 @@ namespace osu.Game.Beatmaps
             skin = new RecyclableLazy<ISkin>(GetSkin);
         }
 
-        protected virtual Track GetVirtualTrack(double emptyLength = 0)
+        protected Track GetVirtualTrack(double emptyLength = 0)
         {
             const double excess_length = 1000;
 
@@ -69,7 +74,7 @@ namespace osu.Game.Beatmaps
                     break;
             }
 
-            return AudioManager.Tracks.GetVirtual(length);
+            return audioManager.Tracks.GetVirtual(length);
         }
 
         /// <summary>
@@ -170,23 +175,19 @@ namespace osu.Game.Beatmaps
             return converted;
         }
 
-        private CancellationTokenSource loadCancellation = new CancellationTokenSource();
-
         public void BeginAsyncLoad() => loadBeatmapAsync();
 
         public void CancelAsyncLoad()
         {
             lock (beatmapFetchLock)
             {
-                loadCancellation?.Cancel();
-                loadCancellation = new CancellationTokenSource();
+                loadCancellationSource?.Cancel();
+                loadCancellationSource = new CancellationTokenSource();
 
                 if (beatmapLoadTask?.IsCompleted != true)
                     beatmapLoadTask = null;
             }
         }
-
-        private readonly object beatmapFetchLock = new object();
 
         private Task<IBeatmap> loadBeatmapAsync()
         {
@@ -204,7 +205,7 @@ namespace osu.Game.Beatmaps
                     b.BeatmapInfo = BeatmapInfo;
 
                     return b;
-                }, loadCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                }, loadCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }
         }
 
