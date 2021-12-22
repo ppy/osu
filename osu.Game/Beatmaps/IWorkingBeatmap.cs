@@ -30,26 +30,6 @@ namespace osu.Game.Beatmaps
         public bool BeatmapLoaded { get; }
 
         /// <summary>
-        /// Whether the Background has finished loading.
-        ///</summary>
-        public bool BackgroundLoaded { get; }
-
-        /// <summary>
-        /// Whether the Waveform has finished loading.
-        ///</summary>
-        public bool WaveformLoaded { get; }
-
-        /// <summary>
-        /// Whether the Storyboard has finished loading.
-        ///</summary>
-        public bool StoryboardLoaded { get; }
-
-        /// <summary>
-        /// Whether the Skin has finished loading.
-        ///</summary>
-        public bool SkinLoaded { get; }
-
-        /// <summary>
         /// Whether the Track has finished loading.
         ///</summary>
         public bool TrackLoaded { get; }
