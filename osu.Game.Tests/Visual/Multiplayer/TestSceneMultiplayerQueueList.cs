@@ -110,6 +110,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("finish current item", () => Client.FinishCurrentItem());
             AddUntilStep("wait for next item to be selected", () => Client.Room?.Settings.PlaylistItemId == 2);
+            AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
 
             assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, false);
@@ -136,7 +137,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible",
-                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(index).Alpha > 0) == visible);
+            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible", () =>
+            {
+                var button = playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAtOrDefault(index);
+                return (button?.Alpha > 0) == visible;
+            });
     }
 }
