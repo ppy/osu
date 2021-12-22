@@ -54,10 +54,6 @@ namespace osu.Game.Beatmaps
         #region Load checks
 
         public virtual bool TrackLoaded => loadedTrack != null;
-        public bool WaveformLoaded => waveform.IsResultAvailable;
-        public bool StoryboardLoaded => storyboard.IsResultAvailable;
-        public bool SkinLoaded => skin.IsResultAvailable;
-        public bool BackgroundLoaded => background.IsResultAvailable;
         public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
         #endregion
