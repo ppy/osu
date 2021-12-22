@@ -41,6 +41,7 @@ namespace osu.Game.Beatmaps
         private readonly Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
         private readonly Lazy<ISkin> skin;
+        private Track track; // track is not Lazy as we allow transferring and loading multiple times.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
@@ -58,13 +59,6 @@ namespace osu.Game.Beatmaps
         public Storyboard Storyboard => storyboard.Value;
         public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
         public ISkin Skin => skin.Value;
-
-        #region Load checks
-
-        public virtual bool TrackLoaded => loadedTrack != null;
-        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
-
-        #endregion
 
         #region Resource getters
 
@@ -107,9 +101,9 @@ namespace osu.Game.Beatmaps
 
         #region Track
 
-        private Track loadedTrack;
+        public virtual bool TrackLoaded => track != null;
 
-        public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
+        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
         public void PrepareTrackForPreviewLooping()
         {
@@ -133,7 +127,7 @@ namespace osu.Game.Beatmaps
         /// across difficulties in the same beatmap set.
         /// </summary>
         /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => loadedTrack = track ?? throw new ArgumentNullException(nameof(track));
+        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
@@ -146,7 +140,7 @@ namespace osu.Game.Beatmaps
                 if (!TrackLoaded)
                     throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
 
-                return loadedTrack;
+                return track;
             }
         }
 
@@ -179,6 +173,8 @@ namespace osu.Game.Beatmaps
         #endregion
 
         #region Beatmap
+
+        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
         public IBeatmap Beatmap
         {
