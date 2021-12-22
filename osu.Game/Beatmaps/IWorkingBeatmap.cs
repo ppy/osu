@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -99,7 +101,7 @@ namespace osu.Game.Beatmaps
         /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null);
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod>? mods = null);
 
         /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.

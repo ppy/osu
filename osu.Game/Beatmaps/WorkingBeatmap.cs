@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap([NotNull] IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
+        public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
         {
             try
             {
@@ -251,7 +251,6 @@ namespace osu.Game.Beatmaps
 
         private Track loadedTrack;
 
-        [NotNull]
         public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
         public void PrepareTrackForPreviewLooping()
