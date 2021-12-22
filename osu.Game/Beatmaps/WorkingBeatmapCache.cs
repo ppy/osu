@@ -145,8 +145,6 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
-
             protected override Texture GetBackground()
             {
                 if (string.IsNullOrEmpty(Metadata?.BackgroundFile))

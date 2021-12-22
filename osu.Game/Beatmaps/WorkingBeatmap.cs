@@ -38,6 +38,10 @@ namespace osu.Game.Beatmaps
 
         private readonly object beatmapFetchLock = new object();
 
+        private readonly Lazy<Waveform> waveform;
+        private readonly Lazy<Storyboard> storyboard;
+        private readonly Lazy<ISkin> skin;
+
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
             this.audioManager = audioManager;
@@ -45,11 +49,15 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
 
-            background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
-            waveform = new RecyclableLazy<Waveform>(GetWaveform);
-            storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
-            skin = new RecyclableLazy<ISkin>(GetSkin);
+            waveform = new Lazy<Waveform>(GetWaveform);
+            storyboard = new Lazy<Storyboard>(GetStoryboard);
+            skin = new Lazy<ISkin>(GetSkin);
         }
+
+        public Waveform Waveform => waveform.Value;
+        public Storyboard Storyboard => storyboard.Value;
+        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
+        public ISkin Skin => skin.Value;
 
         #region Load checks
 
@@ -94,15 +102,6 @@ namespace osu.Game.Beatmaps
                     beatmapLoadTask = null;
             }
         }
-
-        #endregion
-
-        #region Background
-
-        public Texture Background => background.Value;
-        private readonly RecyclableLazy<Texture> background;
-
-        protected virtual bool BackgroundStillValid(Texture b) => b == null || b.Available;
 
         #endregion
 
@@ -176,28 +175,6 @@ namespace osu.Game.Beatmaps
 
             return audioManager.Tracks.GetVirtual(length);
         }
-
-        #endregion
-
-        #region Waveform
-
-        public Waveform Waveform => waveform.Value;
-        private readonly RecyclableLazy<Waveform> waveform;
-
-        #endregion
-
-        #region Storyboard
-
-        public Storyboard Storyboard => storyboard.Value;
-        private readonly RecyclableLazy<Storyboard> storyboard;
-
-        #endregion
-
-        #region Skin
-
-        private readonly RecyclableLazy<ISkin> skin;
-
-        public ISkin Skin => skin.Value;
 
         #endregion
 
@@ -356,53 +333,9 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        IBeatmapInfo IWorkingBeatmap.BeatmapInfo => BeatmapInfo;
-
         public abstract Stream GetStream(string storagePath);
 
-        public class RecyclableLazy<T>
-        {
-            private Lazy<T> lazy;
-            private readonly Func<T> valueFactory;
-            private readonly Func<T, bool> stillValidFunction;
-
-            private readonly object fetchLock = new object();
-
-            public RecyclableLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
-            {
-                this.valueFactory = valueFactory;
-                this.stillValidFunction = stillValidFunction;
-
-                recreate();
-            }
-
-            public void Recycle()
-            {
-                if (!IsResultAvailable) return;
-
-                (lazy.Value as IDisposable)?.Dispose();
-                recreate();
-            }
-
-            public bool IsResultAvailable => stillValid;
-
-            public T Value
-            {
-                get
-                {
-                    lock (fetchLock)
-                    {
-                        if (!stillValid)
-                            recreate();
-                        return lazy.Value;
-                    }
-                }
-            }
-
-            private bool stillValid => lazy.IsValueCreated && (stillValidFunction?.Invoke(lazy.Value) ?? true);
-
-            private void recreate() => lazy = new Lazy<T>(valueFactory, LazyThreadSafetyMode.ExecutionAndPublication);
-        }
+        IBeatmapInfo IWorkingBeatmap.BeatmapInfo => BeatmapInfo;
 
         private class BeatmapLoadTimeoutException : TimeoutException
         {
