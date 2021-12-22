@@ -126,17 +126,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             TopScore = null;
         }
 
-        private void scoreStoreChanged(ScoreInfo score)
-        {
-            if (Scope != BeatmapLeaderboardScope.Local)
-                return;
-
-            if (BeatmapInfo?.ID != score.BeatmapInfoID)
-                return;
-
-            RefreshScores();
-        }
-
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
         private CancellationTokenSource loadCancellationSource;
