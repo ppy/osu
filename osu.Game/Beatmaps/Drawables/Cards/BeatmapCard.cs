@@ -23,7 +23,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 
         public IBindable<bool> Expanded { get; }
 
-        protected readonly APIBeatmapSet BeatmapSet;
+        public readonly APIBeatmapSet BeatmapSet;
+
         protected readonly Bindable<BeatmapSetFavouriteState> FavouriteState;
 
         protected abstract Drawable IdleContent { get; }
