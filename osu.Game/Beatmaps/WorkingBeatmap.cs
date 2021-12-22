@@ -32,6 +32,14 @@ namespace osu.Game.Beatmaps
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
         public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
+        public Waveform Waveform => waveform.Value;
+
+        public Storyboard Storyboard => storyboard.Value;
+
+        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
+
+        public ISkin Skin => skin.Value;
+
         private AudioManager audioManager { get; }
 
         private CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
@@ -54,11 +62,6 @@ namespace osu.Game.Beatmaps
             storyboard = new Lazy<Storyboard>(GetStoryboard);
             skin = new Lazy<ISkin>(GetSkin);
         }
-
-        public Waveform Waveform => waveform.Value;
-        public Storyboard Storyboard => storyboard.Value;
-        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
-        public ISkin Skin => skin.Value;
 
         #region Resource getters
 
