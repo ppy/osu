@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -21,6 +20,8 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
+#nullable enable
+
 namespace osu.Game.Beatmaps
 {
     [ExcludeFromDynamicCompile]
@@ -30,28 +31,28 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
-        public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo.Metadata;
 
         public Waveform Waveform => waveform.Value;
 
         public Storyboard Storyboard => storyboard.Value;
 
-        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
+        public Texture? Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
 
-        public ISkin Skin => skin.Value;
+        public ISkin? Skin => skin.Value;
 
-        private AudioManager audioManager { get; }
+        private AudioManager? audioManager { get; }
 
-        private CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
+        private CancellationTokenSource? loadCancellationSource;
 
         private readonly object beatmapFetchLock = new object();
 
         private readonly Lazy<Waveform> waveform;
         private readonly Lazy<Storyboard> storyboard;
-        private readonly Lazy<ISkin> skin;
-        private Track track; // track is not Lazy as we allow transferring and loading multiple times.
+        private readonly Lazy<ISkin?> skin;
+        private Track? track; // track is not Lazy as we allow transferring and loading multiple times.
 
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager? audioManager)
         {
             this.audioManager = audioManager;
 
@@ -60,7 +61,7 @@ namespace osu.Game.Beatmaps
 
             waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
-            skin = new Lazy<ISkin>(GetSkin);
+            skin = new Lazy<ISkin?>(GetSkin);
         }
 
         #region Resource getters
@@ -68,9 +69,9 @@ namespace osu.Game.Beatmaps
         protected virtual Waveform GetWaveform() => new Waveform(null);
         protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
-        protected abstract IBeatmap GetBeatmap();
-        protected abstract Texture GetBackground();
-        protected abstract Track GetBeatmapTrack();
+        protected abstract IBeatmap? GetBeatmap();
+        protected abstract Texture? GetBackground();
+        protected abstract Track? GetBeatmapTrack();
 
         /// <summary>
         /// Creates a new skin instance for this beatmap.
@@ -80,7 +81,7 @@ namespace osu.Game.Beatmaps
         /// (e.g. for editing purposes, to avoid state pollution).
         /// For standard reading purposes, <see cref="Skin"/> should always be used directly.
         /// </remarks>
-        protected internal abstract ISkin GetSkin();
+        protected internal abstract ISkin? GetSkin();
 
         #endregion
 
@@ -93,7 +94,6 @@ namespace osu.Game.Beatmaps
             lock (beatmapFetchLock)
             {
                 loadCancellationSource?.Cancel();
-                loadCancellationSource = new CancellationTokenSource();
 
                 if (beatmapLoadTask?.IsCompleted != true)
                     beatmapLoadTask = null;
@@ -130,7 +130,7 @@ namespace osu.Game.Beatmaps
         /// across difficulties in the same beatmap set.
         /// </summary>
         /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
+        public void TransferTrack(Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
@@ -142,6 +142,9 @@ namespace osu.Game.Beatmaps
             {
                 if (!TrackLoaded)
                     throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
+
+                // Covered by TrackLoaded call above.
+                Debug.Assert(track != null);
 
                 return track;
             }
@@ -170,7 +173,7 @@ namespace osu.Game.Beatmaps
                     break;
             }
 
-            return audioManager.Tracks.GetVirtual(length);
+            return audioManager?.Tracks.GetVirtual(length) ?? throw new InvalidOperationException($"Attempted to get virtual track without providing an {nameof(AudioManager)}");
         }
 
         #endregion
@@ -179,7 +182,7 @@ namespace osu.Game.Beatmaps
 
         public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
-        public IBeatmap Beatmap
+        public IBeatmap? Beatmap
         {
             get
             {
@@ -204,7 +207,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private Task<IBeatmap> beatmapLoadTask;
+        private Task<IBeatmap>? beatmapLoadTask;
 
         private Task<IBeatmap> loadBeatmapAsync()
         {
@@ -222,7 +225,7 @@ namespace osu.Game.Beatmaps
                     b.BeatmapInfo = BeatmapInfo;
 
                     return b;
-                }, loadCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                }, (loadCancellationSource = new CancellationTokenSource()).Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }
         }
 
@@ -230,7 +233,7 @@ namespace osu.Game.Beatmaps
 
         #region Playable beatmap
 
-        public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
+        public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod>? mods = null)
         {
             try
             {
@@ -252,6 +255,9 @@ namespace osu.Game.Beatmaps
 
             if (rulesetInstance == null)
                 throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
+
+            if (Beatmap == null)
+                throw new InvalidOperationException("Beatmap could not be loaded.");
 
             IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
@@ -332,7 +338,7 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public abstract Stream GetStream(string storagePath);
+        public abstract Stream? GetStream(string storagePath);
 
         IBeatmapInfo IWorkingBeatmap.BeatmapInfo => BeatmapInfo;
 
