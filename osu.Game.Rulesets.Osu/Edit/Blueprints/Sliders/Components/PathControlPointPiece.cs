@@ -161,6 +161,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case MouseButton.Right:
                     if (!IsSelected.Value)
                         RequestSelection.Invoke(this, e);
+
+                    keepSelection = true;
                     return false; // Allow context menu to show
             }
 
