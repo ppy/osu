@@ -92,6 +92,21 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertSelectionCount(1);
             assertSelected(0);
 
+            AddStep("move mouse to new point position", () =>
+            {
+                Vector2 position = slider.Position + (slider.Path.ControlPoints[2].Position + slider.Path.ControlPoints[3].Position) / 2;
+                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+            });
+            AddStep("ctrl+click to create new point", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            AddAssert("slider has 6 control points", () => slider.Path.ControlPoints.Count == 6);
+            assertSelectionCount(1);
+            assertSelected(3);
+
             void assertSelectionCount(int count) =>
                 AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
 
