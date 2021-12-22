@@ -58,6 +58,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertSelectionCount(1);
             assertSelected(0);
 
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
+            assertSelectionCount(1);
+            assertSelected(0);
+
             moveMouseToControlPoint(3);
             AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
             assertSelectionCount(1);
@@ -72,6 +76,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             moveMouseToControlPoint(0);
             AddStep("click left mouse", () => InputManager.Click(MouseButton.Left));
+            assertSelectionCount(3);
+            assertSelected(0);
+            assertSelected(2);
+            assertSelected(3);
+
+            AddStep("click right mouse", () => InputManager.Click(MouseButton.Right));
             assertSelectionCount(3);
             assertSelected(0);
             assertSelected(2);
