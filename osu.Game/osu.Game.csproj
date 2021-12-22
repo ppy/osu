@@ -36,7 +36,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Realm" Version="10.7.1" />
-    <PackageReference Include="ppy.osu.Framework" Version="2021.1217.1" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.1221.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2021.1215.0" />
     <PackageReference Include="Sentry" Version="3.12.1" />
     <PackageReference Include="SharpCompress" Version="0.30.1" />
