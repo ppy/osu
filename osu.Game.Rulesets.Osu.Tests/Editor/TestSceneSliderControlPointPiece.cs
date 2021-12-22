@@ -100,10 +100,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("ctrl+click to create new point", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
-                InputManager.Click(MouseButton.Left);
-                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.PressButton(MouseButton.Left);
             });
             AddAssert("slider has 6 control points", () => slider.Path.ControlPoints.Count == 6);
+            assertSelectionCount(1);
+            assertSelected(3);
+
+            AddStep("release ctrl+click", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
             assertSelectionCount(1);
             assertSelected(3);
 
