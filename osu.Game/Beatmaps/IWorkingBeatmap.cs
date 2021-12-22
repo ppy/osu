@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -37,12 +35,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Retrieves the <see cref="IBeatmap"/> which this <see cref="IWorkingBeatmap"/> represents.
         /// </summary>
-        IBeatmap? Beatmap { get; }
+        IBeatmap Beatmap { get; }
 
         /// <summary>
         /// Retrieves the background for this <see cref="IWorkingBeatmap"/>.
         /// </summary>
-        Texture? Background { get; }
+        Texture Background { get; }
 
         /// <summary>
         /// Retrieves the <see cref="Waveform"/> for the <see cref="Track"/> of this <see cref="IWorkingBeatmap"/>.
@@ -57,12 +55,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Retrieves the <see cref="Skin"/> which this <see cref="IWorkingBeatmap"/> provides.
         /// </summary>
-        ISkin? Skin { get; }
+        ISkin Skin { get; }
 
         /// <summary>
         /// Retrieves the <see cref="Track"/> which this <see cref="IWorkingBeatmap"/> has loaded.
         /// </summary>
-        Track? Track { get; }
+        Track Track { get; }
 
         /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
@@ -81,7 +79,7 @@ namespace osu.Game.Beatmaps
         /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
         /// <returns>The converted <see cref="IBeatmap"/>.</returns>
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
-        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod>? mods = null);
+        IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null);
 
         /// <summary>
         /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
@@ -114,7 +112,7 @@ namespace osu.Game.Beatmaps
         /// Returns the stream of the file from the given storage path.
         /// </summary>
         /// <param name="storagePath">The storage path to the file.</param>
-        Stream? GetStream(string storagePath);
+        Stream GetStream(string storagePath);
 
         /// <summary>
         /// Beings loading the contents of this <see cref="IWorkingBeatmap"/> asynchronously.
