@@ -140,7 +140,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case MouseButton.Left:
                     if (e.ControlPressed && IsSelected)
                     {
-                        placementControlPointIndex = addControlPoint(e.MousePosition);
+                        placementControlPoint = addControlPoint(e.MousePosition);
+                        ControlPointVisualiser?.SetSelectionTo(placementControlPoint);
                         return true; // Stop input from being handled and modifying the selection
                     }
 
@@ -150,11 +151,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return false;
         }
 
-        private int? placementControlPointIndex;
+        [CanBeNull]
+        private PathControlPoint placementControlPoint;
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (placementControlPointIndex != null)
+            if (placementControlPoint != null)
             {
                 changeHandler?.BeginChange();
                 return true;
@@ -165,16 +167,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override void OnDrag(DragEvent e)
         {
-            Debug.Assert(placementControlPointIndex != null);
+            Debug.Assert(placementControlPoint != null);
 
-            HitObject.Path.ControlPoints[placementControlPointIndex.Value].Position = e.MousePosition - HitObject.Position;
+            placementControlPoint.Position = e.MousePosition - HitObject.Position;
         }
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            if (placementControlPointIndex != null)
+            if (placementControlPoint != null)
             {
-                placementControlPointIndex = null;
+                placementControlPoint = null;
                 changeHandler?.EndChange();
             }
         }
@@ -193,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return false;
         }
 
-        private int addControlPoint(Vector2 position)
+        private PathControlPoint addControlPoint(Vector2 position)
         {
             position -= HitObject.Position;
 
@@ -211,10 +213,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
             }
 
-            // Move the control points from the insertion index onwards to make room for the insertion
-            controlPoints.Insert(insertionIndex, new PathControlPoint { Position = position });
+            var pathControlPoint = new PathControlPoint { Position = position };
 
-            return insertionIndex;
+            // Move the control points from the insertion index onwards to make room for the insertion
+            controlPoints.Insert(insertionIndex, pathControlPoint);
+
+            return pathControlPoint;
         }
 
         private void removeControlPoints(List<PathControlPoint> toRemove)

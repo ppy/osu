@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         Pieces.Add(new PathControlPointPiece(slider, point).With(d =>
                         {
                             if (allowSelection)
-                                d.RequestSelection = selectPiece;
+                                d.RequestSelection = selectionRequested;
 
                             d.DragStarted = dragStarted;
                             d.DragInProgress = dragInProgress;
@@ -128,6 +128,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnClick(ClickEvent e)
         {
+            if (Pieces.Any(piece => piece.IsHovered))
+                return false;
+
             foreach (var piece in Pieces)
             {
                 piece.IsSelected.Value = false;
@@ -151,15 +154,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
         }
 
-        private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
+        private void selectionRequested(PathControlPointPiece piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
                 piece.IsSelected.Toggle();
             else
-            {
-                foreach (var p in Pieces)
-                    p.IsSelected.Value = p == piece;
-            }
+                SetSelectionTo(piece.ControlPoint);
+        }
+
+        /// <summary>
+        /// Selects the <see cref="PathControlPointPiece"/> corresponding to the given <paramref name="pathControlPoint"/>,
+        /// and deselects all other <see cref="PathControlPointPiece"/>s.
+        /// </summary>
+        public void SetSelectionTo(PathControlPoint pathControlPoint)
+        {
+            foreach (var p in Pieces)
+                p.IsSelected.Value = p.ControlPoint == pathControlPoint;
         }
 
         /// <summary>
