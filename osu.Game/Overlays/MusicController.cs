@@ -71,33 +71,37 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmContextFactory realmFactory { get; set; }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
-            beatmapSubscription = realmFactory.Context.All<BeatmapSetInfo>().QueryAsyncWithNotifications(beatmapsChanged);
-
             // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
             // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // ensure we're ready before completing async load.
+            // probably not a good way of handling this (as there is a period we aren't watching for changes until the realm subscription finishes up.
+            foreach (var s in realmFactory.Context.All<BeatmapSetInfo>())
+                beatmapSets.Add(s);
+
+            beatmapSubscription = realmFactory.Context.All<BeatmapSetInfo>().QueryAsyncWithNotifications(beatmapsChanged);
+        }
+
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
         {
             if (changes == null)
-            {
-                beatmapSets.AddRange(sender);
-            }
+                return;
 
-            // beatmaps.ItemUpdated += set => Schedule(() =>
-            // {
-            //     beatmapSets.Remove(set);
-            //     beatmapSets.Add(set);
-            // });
-            // beatmaps.ItemRemoved += set => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
-            //
-            // beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
+            foreach (int i in changes.InsertedIndices)
+                beatmapSets.Insert(i, sender[i]);
+
+            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+                beatmapSets.RemoveAt(i);
         }
 
         /// <summary>

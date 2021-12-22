@@ -12,7 +12,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
@@ -86,23 +85,11 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
-            lock (workingCache)
-            {
-                var working = workingCache.FirstOrDefault(w => beatmapInfo.Equals(w.BeatmapInfo));
+            WorkingBeatmap working = null;
 
-                if (working != null)
-                    return working;
+            working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this);
 
-                // TODO: is this still required..?
-                //beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
-
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
-
-                // best effort; may be higher than expected.
-                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
-
-                return working;
-            }
+            return working;
         }
 
         #region IResourceStorageProvider

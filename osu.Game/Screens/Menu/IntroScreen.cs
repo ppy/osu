@@ -81,8 +81,11 @@ namespace osu.Game.Screens.Menu
             this.createNextScreen = createNextScreen;
         }
 
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game, RealmContextFactory realmContextFactory)
+        private void load(OsuConfigManager config, SkinManager skinManager, Framework.Game game, RealmContextFactory realmContextFactory)
         {
             // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
@@ -101,7 +104,13 @@ namespace osu.Game.Screens.Menu
                 if (sets.Count > 0)
                 {
                     setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo?.PerformRead(s => s.Beatmaps[0].ToLive(realmContextFactory)));
+                    setInfo?.PerformRead(s =>
+                    {
+                        if (s.Beatmaps.Count == 0)
+                            return;
+
+                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0].ToLive(realmContextFactory));
+                    });
                 }
             }
 
@@ -131,10 +140,27 @@ namespace osu.Game.Screens.Menu
                 if (setInfo == null)
                     return false;
 
-                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.PerformRead(s => s.Beatmaps[0].ToLive(realmContextFactory)));
+                setInfo.PerformRead(s =>
+                {
+                    if (s.Beatmaps.Count == 0)
+                        return;
+
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0].ToLive(realmContextFactory));
+                });
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // TODO: This is temporary to get the setInfo on the update thread, to make things work "better" without using ILive everywhere.
+            var setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash).FirstOrDefault();
+
+            if (setInfo?.Value.Beatmaps.Count > 0)
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Value.Beatmaps.First());
         }
 
         public override void OnResuming(IScreen last)
