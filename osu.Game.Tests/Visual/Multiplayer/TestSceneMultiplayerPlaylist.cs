@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("finish current item", () => Client.FinishCurrentItem());
 
             AddStep("leave room", () => RoomManager.PartRoom());
-            AddUntilStep("wait for room part", () => Client.Room == null);
+            AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddUntilStep("item 0 not in lists", () => !inHistoryList(0) && !inQueueList(0));
             AddUntilStep("item 1 not in lists", () => !inHistoryList(0) && !inQueueList(0));
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
             AddStep("leave room", () => RoomManager.PartRoom());
-            AddUntilStep("wait for room part", () => Client.Room == null);
+            AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddStep("join room with items", () =>
             {
