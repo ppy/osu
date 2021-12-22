@@ -96,6 +96,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var longName = CreateAPIBeatmapSet(Ruleset.Value);
             longName.Title = longName.TitleUnicode = "this track has an incredibly and implausibly long title";
             longName.Artist = longName.ArtistUnicode = "and this artist! who would have thunk it. it's really such a long name.";
+            longName.Source = "wow. even the source field has an impossibly long string in it. this really takes the cake, doesn't it?";
             longName.HasExplicitContent = true;
             longName.TrackId = 444;
 
@@ -251,13 +252,19 @@ namespace osu.Game.Tests.Visual.Beatmaps
         [Test]
         public void TestNormal()
         {
-            createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+            createTestCase(beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo));
+        }
+
+        [Test]
+        public void TestExtra()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardExtra(beatmapSetInfo));
         }
 
         [Test]
         public void TestHoverState()
         {
-            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCard(s)));
+            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCardNormal(s)));
 
             AddStep("Hover card", () => InputManager.MoveMouseTo(firstCard()));
             AddWaitStep("wait for potential state change", 5);
@@ -274,10 +281,10 @@ namespace osu.Game.Tests.Visual.Beatmaps
             AddWaitStep("wait for potential state change", 5);
             AddAssert("card is still expanded", () => firstCard().Expanded.Value);
 
-            AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCard>().Last()));
+            AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCardNormal>().Last()));
             AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
 
-            BeatmapCard firstCard() => this.ChildrenOfType<BeatmapCard>().First();
+            BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
         }
     }
 }

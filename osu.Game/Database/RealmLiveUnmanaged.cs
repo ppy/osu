@@ -26,6 +26,8 @@ namespace osu.Game.Database
 
         public bool Equals(ILive<T>? other) => ID == other?.ID;
 
+        public override string ToString() => Value.ToString();
+
         public Guid ID => Value.ID;
 
         public void PerformRead(Action<T> perform) => perform(Value);
