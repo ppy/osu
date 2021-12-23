@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     public class TestSceneTimingBasedNoteColouring : OsuTestScene
     {
         [Resolved]
-        private RulesetConfigCache configCache { get; set; }
+        private IRulesetConfigCache configCache { get; set; }
 
         private Bindable<bool> configTimingBasedNoteColouring;
 
@@ -48,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
             AddStep("retrieve config bindable", () =>
             {
-                var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance());
+                var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
                 configTimingBasedNoteColouring = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring);
             });
         }
