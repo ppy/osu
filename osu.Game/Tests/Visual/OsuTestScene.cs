@@ -31,6 +31,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
@@ -118,6 +119,13 @@ namespace osu.Game.Tests.Visual
             RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
+
+            // to isolate ruleset configs in tests from the actual database and avoid state pollution problems,
+            // as well as problems due to the implementation details of the "real" implementation (the configs only being available at `LoadComplete()`),
+            // cache a test implementation of the ruleset config cache over the "real" one.
+            var isolatedBaseDependencies = new DependencyContainer(baseDependencies);
+            isolatedBaseDependencies.CacheAs<IRulesetConfigCache>(new TestRulesetConfigCache());
+            baseDependencies = isolatedBaseDependencies;
 
             var providedRuleset = CreateRuleset();
             if (providedRuleset != null)
