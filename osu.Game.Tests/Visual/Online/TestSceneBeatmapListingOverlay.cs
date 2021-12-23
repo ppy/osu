@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -110,17 +111,25 @@ namespace osu.Game.Tests.Visual.Online
         public void TestNoBeatmapsPlaceholder()
         {
             AddStep("fetch for 0 beatmaps", () => fetchFor());
-            AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
+            placeholderShown();
 
-            AddStep("fetch for 1 beatmap", () => fetchFor(CreateAPIBeatmapSet(Ruleset.Value)));
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            AddUntilStep("wait for loaded", () => this.ChildrenOfType<BeatmapCard>().Count() == 100);
             AddUntilStep("placeholder hidden", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
 
             AddStep("fetch for 0 beatmaps", () => fetchFor());
-            AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
+            placeholderShown();
 
             // fetch once more to ensure nothing happens in displaying placeholder again when it already is present.
             AddStep("fetch for 0 beatmaps again", () => fetchFor());
-            AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
+            placeholderShown();
+
+            void placeholderShown() =>
+                AddUntilStep("placeholder shown", () =>
+                {
+                    var notFoundDrawable = overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault();
+                    return notFoundDrawable != null && notFoundDrawable.IsPresent && notFoundDrawable.Parent.DrawHeight > 0;
+                });
         }
 
         [Test]

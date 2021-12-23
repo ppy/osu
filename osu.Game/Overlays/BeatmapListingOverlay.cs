@@ -217,6 +217,10 @@ namespace osu.Game.Overlays
 
         public class NotFoundDrawable : CompositeDrawable
         {
+            // required for scheduled tasks to complete correctly
+            // (see `addContentToPlaceholder()` and the scheduled `BypassAutoSizeAxes` set during fade-out in outer class above)
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             public NotFoundDrawable()
             {
                 RelativeSizeAxes = Axes.X;
@@ -261,6 +265,10 @@ namespace osu.Game.Overlays
         // (https://github.com/ppy/osu-framework/issues/4530)
         public class SupporterRequiredDrawable : CompositeDrawable
         {
+            // required for scheduled tasks to complete correctly
+            // (see `addContentToPlaceholder()` and the scheduled `BypassAutoSizeAxes` set during fade-out in outer class above)
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             private LinkFlowContainer supporterRequiredText;
 
             public SupporterRequiredDrawable()
