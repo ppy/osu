@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+            Config = dependencies.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (Config != null)
                 dependencies.Cache(Config);
 

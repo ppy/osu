@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(RulesetConfigCache),
+            typeof(IRulesetConfigCache),
             typeof(OsuColour),
             typeof(IBindable<WorkingBeatmap>),
             typeof(Bindable<WorkingBeatmap>),
