@@ -92,17 +92,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             assertSelectionCount(1);
             assertSelected(0);
 
-            AddStep("move mouse to new point position", () =>
-            {
-                Vector2 position = slider.Position + (slider.Path.ControlPoints[2].Position + slider.Path.ControlPoints[3].Position) / 2;
-                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
-            });
+            moveMouseToRelativePosition(new Vector2(350, 0));
             AddStep("ctrl+click to create new point", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
                 InputManager.PressButton(MouseButton.Left);
             });
-            AddAssert("slider has 6 control points", () => slider.Path.ControlPoints.Count == 6);
             assertSelectionCount(1);
             assertSelected(3);
 
@@ -113,14 +108,67 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
             assertSelectionCount(1);
             assertSelected(3);
-
-            void assertSelectionCount(int count) =>
-                AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
-
-            void assertSelected(int index) =>
-                AddAssert($"{(index + 1).ToOrdinalWords()} control point piece selected",
-                    () => this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
         }
+
+        [Test]
+        public void TestNewControlPointCreation()
+        {
+            moveMouseToRelativePosition(new Vector2(350, 0));
+            AddStep("ctrl+click to create new point", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddAssert("slider has 6 control points", () => slider.Path.ControlPoints.Count == 6);
+            AddStep("release ctrl+click", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            // ensure that the next drag doesn't attempt to move the placement that just finished.
+            moveMouseToRelativePosition(new Vector2(0, 50));
+            AddStep("press left mouse", () => InputManager.PressButton(MouseButton.Left));
+            moveMouseToRelativePosition(new Vector2(0, 100));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertControlPointPosition(3, new Vector2(350, 0));
+
+            moveMouseToRelativePosition(new Vector2(400, 75));
+            AddStep("ctrl+click to create new point", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressButton(MouseButton.Left);
+            });
+            AddAssert("slider has 7 control points", () => slider.Path.ControlPoints.Count == 7);
+            moveMouseToRelativePosition(new Vector2(350, 75));
+            AddStep("release ctrl+click", () =>
+            {
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            assertControlPointPosition(5, new Vector2(350, 75));
+
+            // ensure that the next drag doesn't attempt to move the placement that just finished.
+            moveMouseToRelativePosition(new Vector2(0, 50));
+            AddStep("press left mouse", () => InputManager.PressButton(MouseButton.Left));
+            moveMouseToRelativePosition(new Vector2(0, 100));
+            AddStep("release left mouse", () => InputManager.ReleaseButton(MouseButton.Left));
+            assertControlPointPosition(5, new Vector2(350, 75));
+        }
+
+        private void assertSelectionCount(int count) =>
+            AddAssert($"{count} control point pieces selected", () => this.ChildrenOfType<PathControlPointPiece>().Count(piece => piece.IsSelected.Value) == count);
+
+        private void assertSelected(int index) =>
+            AddAssert($"{(index + 1).ToOrdinalWords()} control point piece selected",
+                () => this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[index]).IsSelected.Value);
+
+        private void moveMouseToRelativePosition(Vector2 relativePosition) =>
+            AddStep($"move mouse to {relativePosition}", () =>
+            {
+                Vector2 position = slider.Position + relativePosition;
+                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+            });
 
         [Test]
         public void TestDragControlPoint()
