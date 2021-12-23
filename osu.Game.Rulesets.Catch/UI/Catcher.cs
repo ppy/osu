@@ -210,6 +210,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catchResult.CatcherAnimationState = CurrentState;
             catchResult.CatcherHyperDash = HyperDashing;
 
+            // Ignore JuiceStreams and BananaShowers
             if (!(drawableObject is DrawablePalpableCatchHitObject palpableObject)) return;
 
             var hitObject = palpableObject.HitObject;
@@ -244,6 +245,14 @@ namespace osu.Game.Rulesets.Catch.UI
                 CurrentState = hitObject.Kiai ? CatcherAnimationState.Kiai : CatcherAnimationState.Idle;
             else if (!(hitObject is Banana))
                 CurrentState = CatcherAnimationState.Fail;
+
+            if (palpableObject.HitObject.LastInCombo)
+            {
+                if (result.Judgement is CatchJudgement catchJudgement && catchJudgement.ShouldExplodeFor(result))
+                    Explode();
+                else
+                    Drop();
+            }
         }
 
         public void OnRevertResult(DrawableCatchHitObject drawableObject, JudgementResult result)

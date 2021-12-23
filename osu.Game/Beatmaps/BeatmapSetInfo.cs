@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Extensions;
 
 namespace osu.Game.Beatmaps
 {
@@ -15,6 +17,8 @@ namespace osu.Game.Beatmaps
     public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         public int ID { get; set; }
+
+        public bool IsManaged => ID > 0;
 
         private int? onlineID;
 
@@ -29,27 +33,30 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; }
 
-        public List<BeatmapInfo> Beatmaps { get; set; }
-
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
-
         [NotNull]
-        public List<BeatmapSetFileInfo> Files { get; set; } = new List<BeatmapSetFileInfo>();
+        public List<BeatmapInfo> Beatmaps { get; } = new List<BeatmapInfo>();
+
+        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
+
+        public List<BeatmapSetFileInfo> Files { get; } = new List<BeatmapSetFileInfo>();
 
         /// <summary>
         /// The maximum star difficulty of all beatmaps in this set.
         /// </summary>
-        public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarRating) ?? 0;
+        [JsonIgnore]
+        public double MaxStarDifficulty => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.StarRating);
 
         /// <summary>
         /// The maximum playable length in milliseconds of all beatmaps in this set.
         /// </summary>
-        public double MaxLength => Beatmaps?.Max(b => b.Length) ?? 0;
+        [JsonIgnore]
+        public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);
 
         /// <summary>
         /// The maximum BPM of all beatmaps in this set.
         /// </summary>
-        public double MaxBPM => Beatmaps?.Max(b => b.BPM) ?? 0;
+        [JsonIgnore]
+        public double MaxBPM => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.BPM);
 
         [NotMapped]
         public bool DeletePending { get; set; }
@@ -61,7 +68,7 @@ namespace osu.Game.Beatmaps
         /// The path returned is relative to the user file storage.
         /// </summary>
         /// <param name="filename">The name of the file to get the storage path of.</param>
-        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+        public string GetPathForFile(string filename) => Files.SingleOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.GetStoragePath();
 
         public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
@@ -88,9 +95,9 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IBeatmapSetInfo
 
-        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata;
+        IBeatmapMetadataInfo IBeatmapSetInfo.Metadata => Metadata ?? Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
-        IEnumerable<INamedFileUsage> IBeatmapSetInfo.Files => Files;
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #endregion
     }

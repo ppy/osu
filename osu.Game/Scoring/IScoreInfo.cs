@@ -4,14 +4,14 @@
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
-    public interface IScoreInfo : IHasOnlineID<long>
+    public interface IScoreInfo : IHasOnlineID<long>, IHasNamedFiles
     {
-        APIUser User { get; }
+        IUser User { get; }
 
         long TotalScore { get; }
 

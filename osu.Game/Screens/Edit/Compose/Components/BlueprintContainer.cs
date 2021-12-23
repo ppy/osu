@@ -239,6 +239,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case PlatformAction.SelectAll:

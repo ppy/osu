@@ -14,6 +14,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -64,7 +66,7 @@ namespace osu.Game.Online.Leaderboards
         private SongSelect songSelect { get; set; }
 
         [Resolved]
-        private ScoreManager scoreManager { get; set; }
+        private Storage storage { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
@@ -109,7 +111,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
+                                    Colour = user.OnlineID == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -394,8 +396,8 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
                     items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
 
-                if (Score.Files?.Count > 0)
-                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => scoreManager.Export(Score)));
+                if (Score.Files.Count > 0)
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
 
                 if (Score.ID != 0)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));

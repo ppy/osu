@@ -8,13 +8,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
-using NuGet.Packaging;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
@@ -253,7 +253,7 @@ namespace osu.Game.Stores
             var scheduledImport = Task.Factory.StartNew(async () => await Import(model, archive, lowPriority, cancellationToken).ConfigureAwait(false),
                 cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap();
 
-            return await scheduledImport.ConfigureAwait(true);
+            return await scheduledImport.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -294,18 +294,14 @@ namespace osu.Game.Stores
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        protected virtual string ComputeHash(TModel item, ArchiveReader? reader = null)
+        protected virtual string ComputeHash(TModel item)
         {
-            if (reader != null)
-                // fast hashing for cases where the item's files may not be populated.
-                return computeHashFast(reader);
-
             // for now, concatenate all hashable files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
             foreach (RealmNamedFileUsage file in item.Files.Where(f => HashableFileTypes.Any(ext => f.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase))).OrderBy(f => f.Filename))
             {
-                using (Stream s = Files.Store.GetStream(file.File.StoragePath))
+                using (Stream s = Files.Store.GetStream(file.File.GetStoragePath()))
                     s.CopyTo(hashable);
             }
 
@@ -356,7 +352,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return existing.ToLive();
+                            return existing.ToLive(ContextFactory);
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -374,7 +370,7 @@ namespace osu.Game.Stores
                             // TODO: look into rollback of file additions (or delayed commit).
                             item.Files.AddRange(createFileInfos(archive, Files, realm));
 
-                        item.Hash = ComputeHash(item, archive);
+                        item.Hash = ComputeHash(item);
 
                         // TODO: we may want to run this outside of the transaction.
                         await Populate(item, archive, realm, cancellationToken).ConfigureAwait(false);
@@ -387,9 +383,11 @@ namespace osu.Game.Stores
                             if (CanReuseExisting(existing, item))
                             {
                                 LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-                                existing.DeletePending = false;
 
-                                return existing.ToLive();
+                                existing.DeletePending = false;
+                                transaction.Commit();
+
+                                return existing.ToLive(ContextFactory);
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -418,7 +416,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return item.ToLive();
+                return item.ToLive(ContextFactory);
             }
         }
 

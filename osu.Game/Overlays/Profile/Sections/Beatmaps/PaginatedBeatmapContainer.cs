@@ -6,10 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osuTK;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
         protected override Drawable CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
-            ? new GridBeatmapPanel(model)
+            ? new BeatmapCardNormal(model)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

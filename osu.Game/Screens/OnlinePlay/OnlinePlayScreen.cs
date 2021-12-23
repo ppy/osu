@@ -40,17 +40,8 @@ namespace osu.Game.Screens.OnlinePlay
         [Cached]
         private readonly OngoingOperationTracker ongoingOperationTracker = new OngoingOperationTracker();
 
-        [Resolved(CanBeNull = true)]
-        private MusicController music { get; set; }
-
-        [Resolved]
-        private OsuGameBase game { get; set; }
-
         [Resolved]
         protected IAPIProvider API { get; private set; }
-
-        [Resolved(CanBeNull = true)]
-        private OsuLogo logo { get; set; }
 
         protected OnlinePlayScreen()
         {
@@ -104,6 +95,8 @@ namespace osu.Game.Screens.OnlinePlay
 
         private void forcefullyExit()
         {
+            Logger.Log($"{this} forcefully exiting due to loss of API connection");
+
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
             {
@@ -211,7 +204,7 @@ namespace osu.Game.Screens.OnlinePlay
                 ((IBindable<UserActivity>)Activity).BindTo(newOsuScreen.Activity);
         }
 
-        protected IScreen CurrentSubScreen => screenStack.CurrentScreen;
+        public IScreen CurrentSubScreen => screenStack.CurrentScreen;
 
         protected abstract string ScreenTitle { get; }
 

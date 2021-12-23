@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -20,6 +19,8 @@ namespace osu.Game.Beatmaps
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
+
+        public bool IsManaged => ID > 0;
 
         public int BeatmapVersion;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
+        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
         [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
@@ -103,28 +104,6 @@ namespace osu.Game.Beatmaps
         /// The number of beats to move the countdown backwards (compared to its default location).
         /// </summary>
         public int CountdownOffset { get; set; }
-
-        // Editor
-        // This bookmarks stuff is necessary because DB doesn't know how to store int[]
-        [JsonIgnore]
-        public string StoredBookmarks
-        {
-            get => string.Join(',', Bookmarks);
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    Bookmarks = Array.Empty<int>();
-                    return;
-                }
-
-                Bookmarks = value.Split(',').Select(v =>
-                {
-                    bool result = int.TryParse(v, out int val);
-                    return new { result, val };
-                }).Where(p => p.result).Select(p => p.val).ToArray();
-            }
-        }
 
         [NotMapped]
         public int[] Bookmarks { get; set; } = Array.Empty<int>();

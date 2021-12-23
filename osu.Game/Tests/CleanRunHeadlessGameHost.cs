@@ -17,9 +17,10 @@ namespace osu.Game.Tests
         /// <param name="gameSuffix">An optional suffix which will isolate this host from others called from the same method source.</param>
         /// <param name="bindIPC">Whether to bind IPC channels.</param>
         /// <param name="realtime">Whether the host should be forced to run in realtime, rather than accelerated test time.</param>
+        /// <param name="bypassCleanup">Whether to bypass directory cleanup on host disposal. Should be used only if a subsequent test relies on the files still existing.</param>
         /// <param name="callingMethodName">The name of the calling method, used for test file isolation and clean-up.</param>
-        public CleanRunHeadlessGameHost(string gameSuffix = @"", bool bindIPC = false, bool realtime = true, [CallerMemberName] string callingMethodName = @"")
-            : base(callingMethodName + gameSuffix, bindIPC, realtime)
+        public CleanRunHeadlessGameHost(string gameSuffix = @"", bool bindIPC = false, bool realtime = true, bool bypassCleanup = false, [CallerMemberName] string callingMethodName = @"")
+            : base(callingMethodName + gameSuffix, bindIPC, realtime, bypassCleanup: bypassCleanup)
         {
         }
 

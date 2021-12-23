@@ -18,6 +18,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
@@ -31,7 +32,7 @@ namespace osu.Game.Beatmaps
     /// Handles ef-core storage of beatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>, IBeatmapModelManager
+    public class BeatmapModelManager : ArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
     {
         /// <summary>
         /// Fired when a single difficulty has been hidden.
@@ -57,10 +58,6 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        protected override string ImportFromStablePath => ".";
-
-        protected override Storage PrepareStableStorage(StableStorage stableStorage) => stableStorage.GetSongStorage();
-
         private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
 
@@ -81,7 +78,7 @@ namespace osu.Game.Beatmaps
         protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
-                beatmapSet.Beatmaps = createBeatmapDifficulties(beatmapSet.Files);
+                beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet.Files));
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -207,7 +204,7 @@ namespace osu.Game.Beatmaps
 
                 using (ContextFactory.GetForWrite())
                 {
-                    beatmapInfo = setInfo.Beatmaps.Single(b => b.ID == beatmapInfo.ID);
+                    beatmapInfo = setInfo.Beatmaps.Single(b => b.Equals(beatmapInfo));
 
                     var metadata = beatmapInfo.Metadata ?? setInfo.Metadata;
 
@@ -215,7 +212,7 @@ namespace osu.Game.Beatmaps
                     var fileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase)) ?? new BeatmapSetFileInfo();
 
                     // metadata may have changed; update the path with the standard format.
-                    beatmapInfo.Path = GetValidFilename($"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu");
+                    beatmapInfo.Path = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
 
                     beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
 
@@ -369,7 +366,6 @@ namespace osu.Game.Beatmaps
             return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID,
-                Beatmaps = new List<BeatmapInfo>(),
                 Metadata = beatmap.Metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
@@ -384,7 +380,7 @@ namespace osu.Game.Beatmaps
 
             foreach (var file in files.Where(f => f.Filename.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
             {
-                using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
+                using (var raw = Files.Store.GetStream(file.FileInfo.GetStoragePath()))
                 using (var ms = new MemoryStream()) // we need a memory stream so we can seek
                 using (var sr = new LineBufferedReader(ms))
                 {

@@ -69,7 +69,10 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu);
 
-            PushAndConfirm(() => new PlaySongSelect());
+            Screens.Select.SongSelect songSelect = null;
+
+            PushAndConfirm(() => songSelect = new PlaySongSelect());
+            AddUntilStep("wait for carousel load", () => songSelect.BeatmapSetsLoaded);
 
             AddUntilStep("Wait for beatmap selected", () => !Game.Beatmap.IsDefault);
             AddStep("Open options", () => InputManager.Key(Key.F3));

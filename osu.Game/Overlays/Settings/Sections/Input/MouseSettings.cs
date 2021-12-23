@@ -67,7 +67,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = MouseSettingsStrings.DisableMouseWheel,
+                    LabelText = MouseSettingsStrings.DisableMouseWheelVolumeAdjust,
+                    TooltipText = MouseSettingsStrings.DisableMouseWheelVolumeAdjustTooltip,
                     Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox

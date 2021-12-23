@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineBeatmapSetID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty("checksum")]
         public string Checksum { get; set; } = string.Empty;
@@ -98,7 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string MD5Hash => Checksum;
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();

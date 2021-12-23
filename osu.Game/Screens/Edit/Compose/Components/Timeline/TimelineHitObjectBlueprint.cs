@@ -177,15 +177,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             else
                 circle.Colour = colour;
 
-            var col = circle.Colour.TopLeft.Linear;
-            colouredComponents.Colour = OsuColour.ForegroundTextColourFor(col);
+            var averageColour = Interpolation.ValueAt(0.5, circle.Colour.TopLeft, circle.Colour.TopRight, 0, 1);
+            colouredComponents.Colour = OsuColour.ForegroundTextColourFor(averageColour);
         }
 
         private SamplePointPiece sampleOverrideDisplay;
         private DifficultyPointPiece difficultyOverrideDisplay;
-
-        [Resolved]
-        private EditorBeatmap beatmap { get; set; }
 
         private DifficultyControlPoint difficultyControlPoint;
         private SampleControlPoint sampleControlPoint;

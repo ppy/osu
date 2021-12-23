@@ -11,6 +11,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     /// <summary>
     /// A bare minimal abstract skill for fully custom skill implementations.
     /// </summary>
+    /// <remarks>
+    /// This class should be considered a "processing" class and not persisted, as it keeps references to
+    /// gameplay objects after processing is run (see <see cref="Previous"/>).
+    /// </remarks>
     public abstract class Skill
     {
         /// <summary>

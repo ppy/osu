@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTokenResponse(true);
 
-            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { ID = rulesetId } });
+            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { OnlineID = rulesetId ?? -1 } });
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 

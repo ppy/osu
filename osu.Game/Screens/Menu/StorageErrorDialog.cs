@@ -15,9 +15,6 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private DialogOverlay dialogOverlay { get; set; }
 
-        [Resolved]
-        private OsuGameBase osuGame { get; set; }
-
         public StorageErrorDialog(OsuStorage storage, OsuStorageError error)
         {
             HeaderText = "osu! storage error";

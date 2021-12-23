@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Screens;
@@ -41,7 +40,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = 1,
                     Metadata = metadata,
-                    Beatmaps = new List<BeatmapInfo>
+                    Beatmaps =
                     {
                         new BeatmapInfo
                         {
@@ -129,7 +128,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 imported = Game.ScoreManager.Import(new ScoreInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
-                    OnlineScoreID = i,
+                    OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                 }).Result.Value;
@@ -155,15 +154,15 @@ namespace osu.Game.Tests.Visual.Navigation
                 case ScorePresentType.Results:
                     AddUntilStep("wait for results", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ResultsScreen);
                     AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
-                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.ID == getImport().ID);
-                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Ruleset.ID);
+                    AddUntilStep("correct score displayed", () => ((ResultsScreen)Game.ScreenStack.CurrentScreen).Score.Equals(getImport()));
+                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Ruleset));
                     break;
 
                 case ScorePresentType.Gameplay:
                     AddUntilStep("wait for player loader", () => lastWaitedScreen != Game.ScreenStack.CurrentScreen && Game.ScreenStack.CurrentScreen is ReplayPlayerLoader);
                     AddStep("store last waited screen", () => lastWaitedScreen = Game.ScreenStack.CurrentScreen);
-                    AddUntilStep("correct score displayed", () => ((ReplayPlayerLoader)Game.ScreenStack.CurrentScreen).Score.ID == getImport().ID);
-                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.ID == getImport().Ruleset.ID);
+                    AddUntilStep("correct score displayed", () => ((ReplayPlayerLoader)Game.ScreenStack.CurrentScreen).Score.Equals(getImport()));
+                    AddAssert("correct ruleset selected", () => Game.Ruleset.Value.Equals(getImport().Ruleset));
                     break;
             }
         }

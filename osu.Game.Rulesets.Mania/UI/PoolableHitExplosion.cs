@@ -15,9 +15,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public JudgementResult Result { get; private set; }
 
-        [Resolved]
-        private Column column { get; set; }
-
         private SkinnableDrawable skinnableExplosion;
 
         public PoolableHitExplosion()

@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
-        protected virtual bool DisplayStableImportPrompt => stableImportManager?.SupportsImportFromStable == true;
+        protected virtual bool DisplayStableImportPrompt => legacyImportManager?.SupportsImportFromStable == true;
 
         public override bool? AllowTrackAdjustments => true;
 
@@ -76,6 +76,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public virtual bool AllowEditing => true;
 
+        public bool BeatmapSetsLoaded => IsLoaded && Carousel?.BeatmapSetsLoaded == true;
+
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
@@ -90,7 +92,7 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private StableImportManager stableImportManager { get; set; }
+        private LegacyImportManager legacyImportManager { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
@@ -297,7 +299,7 @@ namespace osu.Game.Screens.Select
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            Task.Run(() => stableImportManager.ImportFromStableAsync(StableContent.All));
+                            Task.Run(() => legacyImportManager.ImportFromStableAsync(StableContent.All));
                         }));
                     }
                 });
@@ -805,14 +807,14 @@ namespace osu.Game.Screens.Select
 
         private void delete(BeatmapSetInfo beatmap)
         {
-            if (beatmap == null || beatmap.ID <= 0) return;
+            if (beatmap == null || !beatmap.IsManaged) return;
 
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
         private void clearScores(BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo == null || beatmapInfo.ID <= 0) return;
+            if (beatmapInfo == null || !beatmapInfo.IsManaged) return;
 
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmapInfo, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
@@ -821,6 +823,9 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (!this.IsCurrentScreen()) return false;
 
             switch (e.Action)
