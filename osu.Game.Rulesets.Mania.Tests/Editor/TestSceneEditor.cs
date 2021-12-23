@@ -25,9 +25,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         }
 
         [BackgroundDependencyLoader]
-        private void load(IRulesetConfigCache configCache)
+        private void load()
         {
-            var config = (ManiaRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
+            var config = (ManiaRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(ManiaRulesetSetting.ScrollDirection, direction);
         }
     }
