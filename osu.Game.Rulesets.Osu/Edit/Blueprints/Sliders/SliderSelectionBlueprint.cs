@@ -139,6 +139,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case MouseButton.Left:
                     if (e.ControlPressed && IsSelected)
                     {
+                        changeHandler?.BeginChange();
                         placementControlPoint = addControlPoint(e.MousePosition);
                         ControlPointVisualiser?.SetSelectionTo(placementControlPoint);
                         return true; // Stop input from being handled and modifying the selection
@@ -153,16 +154,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         [CanBeNull]
         private PathControlPoint placementControlPoint;
 
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            if (placementControlPoint != null)
-            {
-                changeHandler?.BeginChange();
-                return true;
-            }
-
-            return false;
-        }
+        protected override bool OnDragStart(DragStartEvent e) => placementControlPoint != null;
 
         protected override void OnDrag(DragEvent e)
         {
