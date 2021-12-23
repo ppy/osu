@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -352,7 +353,7 @@ namespace osu.Game.Tests.Visual
 
                 public Track Get(string name) => throw new NotImplementedException();
 
-                public Task<Track> GetAsync(string name) => throw new NotImplementedException();
+                public Task<Track> GetAsync(string name, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
                 public Stream GetStream(string name) => throw new NotImplementedException();
 
