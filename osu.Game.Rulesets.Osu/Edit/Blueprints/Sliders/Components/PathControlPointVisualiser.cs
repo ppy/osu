@@ -69,6 +69,39 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             controlPoints.BindTo(slider.Path.ControlPoints);
         }
 
+        /// <summary>
+        /// Selects the <see cref="PathControlPointPiece"/> corresponding to the given <paramref name="pathControlPoint"/>,
+        /// and deselects all other <see cref="PathControlPointPiece"/>s.
+        /// </summary>
+        public void SetSelectionTo(PathControlPoint pathControlPoint)
+        {
+            foreach (var p in Pieces)
+                p.IsSelected.Value = p.ControlPoint == pathControlPoint;
+        }
+
+        /// <summary>
+        /// Delete all visually selected <see cref="PathControlPoint"/>s.
+        /// </summary>
+        /// <returns></returns>
+        public bool DeleteSelected()
+        {
+            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
+
+            // Ensure that there are any points to be deleted
+            if (toRemove.Count == 0)
+                return false;
+
+            changeHandler?.BeginChange();
+            RemoveControlPointsRequested?.Invoke(toRemove);
+            changeHandler?.EndChange();
+
+            // Since pieces are re-used, they will not point to the deleted control points while remaining selected
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = false;
+
+            return true;
+        }
+
         private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -163,16 +196,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         /// <summary>
-        /// Selects the <see cref="PathControlPointPiece"/> corresponding to the given <paramref name="pathControlPoint"/>,
-        /// and deselects all other <see cref="PathControlPointPiece"/>s.
-        /// </summary>
-        public void SetSelectionTo(PathControlPoint pathControlPoint)
-        {
-            foreach (var p in Pieces)
-                p.IsSelected.Value = p.ControlPoint == pathControlPoint;
-        }
-
-        /// <summary>
         /// Attempts to set the given control point piece to the given path type.
         /// If that would fail, try to change the path such that it instead succeeds
         /// in a UX-friendly way.
@@ -202,25 +225,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
-
-        public bool DeleteSelected()
-        {
-            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
-
-            // Ensure that there are any points to be deleted
-            if (toRemove.Count == 0)
-                return false;
-
-            changeHandler?.BeginChange();
-            RemoveControlPointsRequested?.Invoke(toRemove);
-            changeHandler?.EndChange();
-
-            // Since pieces are re-used, they will not point to the deleted control points while remaining selected
-            foreach (var piece in Pieces)
-                piece.IsSelected.Value = false;
-
-            return true;
-        }
 
         #region Drag handling
 
