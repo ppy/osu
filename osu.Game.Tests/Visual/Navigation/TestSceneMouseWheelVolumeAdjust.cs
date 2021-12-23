@@ -25,8 +25,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestAdjustVolumeFromMainMenu()
         {
             // First scroll makes volume controls appear, second adjusts volume.
-            AddRepeatStep("Adjust volume using mouse wheel", () => InputManager.ScrollVerticalBy(5), 2);
-            AddUntilStep("Volume is above zero", () => Game.Audio.AggregateVolume.Value > 0);
+            AddUntilStep("Adjust volume using mouse wheel", () =>
+            {
+                InputManager.ScrollVerticalBy(5);
+                return Game.Audio.AggregateVolume.Value > 0;
+            });
         }
 
         [Test]
@@ -35,7 +38,11 @@ namespace osu.Game.Tests.Visual.Navigation
             loadToPlayerNonBreakTime();
 
             // First scroll makes volume controls appear, second adjusts volume.
-            AddRepeatStep("Adjust volume using mouse wheel", () => InputManager.ScrollVerticalBy(5), 2);
+            AddUntilStep("Adjust volume using mouse wheel", () =>
+            {
+                InputManager.ScrollVerticalBy(5);
+                return Game.Audio.AggregateVolume.Value > 0;
+            });
             AddAssert("Volume is above zero", () => Game.Audio.Volume.Value > 0);
         }
 
@@ -47,7 +54,7 @@ namespace osu.Game.Tests.Visual.Navigation
             loadToPlayerNonBreakTime();
 
             // First scroll makes volume controls appear, second adjusts volume.
-            AddRepeatStep("Adjust volume using mouse wheel", () => InputManager.ScrollVerticalBy(5), 2);
+            AddRepeatStep("Adjust volume using mouse wheel", () => InputManager.ScrollVerticalBy(5), 10);
             AddAssert("Volume is still zero", () => Game.Audio.Volume.Value == 0);
         }
 
@@ -59,14 +66,13 @@ namespace osu.Game.Tests.Visual.Navigation
             loadToPlayerNonBreakTime();
 
             // First scroll makes volume controls appear, second adjusts volume.
-            AddRepeatStep("Adjust volume using mouse wheel holding alt", () =>
+            AddUntilStep("Adjust volume using mouse wheel holding alt", () =>
             {
                 InputManager.PressKey(Key.AltLeft);
                 InputManager.ScrollVerticalBy(5);
                 InputManager.ReleaseKey(Key.AltLeft);
-            }, 2);
-
-            AddAssert("Volume is above zero", () => Game.Audio.Volume.Value > 0);
+                return Game.Audio.AggregateVolume.Value > 0;
+            });
         }
 
         private void loadToPlayerNonBreakTime()
