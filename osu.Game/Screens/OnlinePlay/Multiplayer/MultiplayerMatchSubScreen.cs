@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -434,6 +435,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void handleRoomLost() => Schedule(() =>
         {
+            Logger.Log($"{this} exiting due to loss of room or connection");
+
             if (this.IsCurrentScreen())
                 this.Exit();
             else

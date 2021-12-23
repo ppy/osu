@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
 
         private Drawable currentContent;
         private Container panelTarget;
-        private FillFlowContainer<BeatmapCard> foundContent;
+        private FillFlowContainer<BeatmapCardNormal> foundContent;
         private NotFoundDrawable notFoundContent;
         private SupporterRequiredDrawable supporterRequiredContent;
         private BeatmapListingFilterControl filterControl;
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
                                 Padding = new MarginPadding { Horizontal = 20 },
                                 Children = new Drawable[]
                                 {
-                                    foundContent = new FillFlowContainer<BeatmapCard>(),
+                                    foundContent = new FillFlowContainer<BeatmapCardNormal>(),
                                     notFoundContent = new NotFoundDrawable(),
                                     supporterRequiredContent = new SupporterRequiredDrawable(),
                                 }
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            var newPanels = searchResult.Results.Select(b => new BeatmapCard(b)
+            var newPanels = searchResult.Results.Select(b => new BeatmapCardNormal(b)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
 
                 // spawn new children with the contained so we only clear old content at the last moment.
                 // reverse ID flow is required for correct Z-ordering of the cards' expandable content (last card should be front-most).
-                var content = new ReverseChildIDFillFlowContainer<BeatmapCard>
+                var content = new ReverseChildIDFillFlowContainer<BeatmapCardNormal>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -217,6 +217,10 @@ namespace osu.Game.Overlays
 
         public class NotFoundDrawable : CompositeDrawable
         {
+            // required for scheduled tasks to complete correctly
+            // (see `addContentToPlaceholder()` and the scheduled `BypassAutoSizeAxes` set during fade-out in outer class above)
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             public NotFoundDrawable()
             {
                 RelativeSizeAxes = Axes.X;
@@ -261,6 +265,10 @@ namespace osu.Game.Overlays
         // (https://github.com/ppy/osu-framework/issues/4530)
         public class SupporterRequiredDrawable : CompositeDrawable
         {
+            // required for scheduled tasks to complete correctly
+            // (see `addContentToPlaceholder()` and the scheduled `BypassAutoSizeAxes` set during fade-out in outer class above)
+            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
             private LinkFlowContainer supporterRequiredText;
 
             public SupporterRequiredDrawable()

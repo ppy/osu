@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_OVERALL_DIFFICULTY = 5;
         protected const int ATTRIB_ID_APPROACH_RATE = 7;
         protected const int ATTRIB_ID_MAX_COMBO = 9;
-        protected const int ATTRIB_ID_STRAIN = 11;
+        protected const int ATTRIB_ID_DIFFICULTY = 11;
         protected const int ATTRIB_ID_GREAT_HIT_WINDOW = 13;
         protected const int ATTRIB_ID_SCORE_MULTIPLIER = 15;
         protected const int ATTRIB_ID_FLASHLIGHT = 17;

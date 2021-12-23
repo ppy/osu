@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -20,7 +19,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Resources;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -86,11 +84,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);
             AddWaitStep("wait for transition", 2);
 
-            AddStep("create room", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => Client.RoomJoined);
         }
@@ -104,24 +98,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected void RunGameplay()
         {
             AddUntilStep("wait for idle", () => Client.LocalUser?.State == MultiplayerUserState.Idle);
-            clickReadyButton();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             AddUntilStep("wait for ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
-            clickReadyButton();
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player player && player.IsLoaded);
             AddStep("exit player", () => multiplayerComponents.MultiplayerScreen.MakeCurrent());
-        }
-
-        private void clickReadyButton()
-        {
-            AddUntilStep("wait for ready button to be enabled", () => this.ChildrenOfType<MultiplayerReadyButton>().Single().ChildrenOfType<Button>().Single().Enabled.Value);
-
-            AddStep("click ready button", () =>
-            {
-                InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerReadyButton>().Single());
-                InputManager.Click(MouseButton.Left);
-            });
         }
     }
 }
