@@ -535,7 +535,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     var itemsByPriority = new List<(MultiplayerPlaylistItem item, int priority)>();
 
                     // Assign a priority for items from each user, starting from 0 and increasing in order which the user added the items.
-                    foreach (var group in room.Playlist.Where(item => !item.Expired).OrderBy(item => item.ID).GroupBy(item => item.OwnerID))
+                    foreach (var group in serverSidePlaylist.Where(item => !item.Expired).OrderBy(item => item.ID).GroupBy(item => item.OwnerID))
                     {
                         int priority = 0;
                         itemsByPriority.AddRange(group.Select(item => (item, priority++)));
