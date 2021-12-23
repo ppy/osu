@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -166,7 +167,7 @@ namespace osu.Game.Tests.Beatmaps
                 return Array.Empty<byte>();
             }
 
-            public Task<byte[]> GetAsync(string name)
+            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
             {
                 markLookup(name);
                 return Task.FromResult(Array.Empty<byte>());
