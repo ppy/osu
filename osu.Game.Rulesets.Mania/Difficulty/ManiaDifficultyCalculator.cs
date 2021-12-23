@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
+                return new ManiaDifficultyAttributes { Mods = mods };
 
             HitWindows hitWindows = new ManiaHitWindows();
             hitWindows.SetDifficulty(beatmap.Difficulty.OverallDifficulty);
@@ -51,7 +51,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 GreatHitWindow = Math.Ceiling(getHitWindow300(mods) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
-                Skills = skills
             };
         }
 

@@ -24,6 +24,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
+        public bool RoomJoined => Client.RoomJoined;
+
         private readonly bool joinRoom;
 
         protected MultiplayerTestScene(bool joinRoom = true)
@@ -61,7 +63,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             if (joinRoom)
             {
                 AddStep("join room", () => RoomManager.CreateRoom(SelectedRoom.Value));
-                AddUntilStep("wait for room join", () => Client.Room != null);
+                AddUntilStep("wait for room join", () => RoomJoined);
             }
         }
 

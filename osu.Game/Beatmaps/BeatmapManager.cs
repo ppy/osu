@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
@@ -30,24 +29,22 @@ namespace osu.Game.Beatmaps
     /// Handles general operations related to global beatmap management.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapManager : IModelDownloader<IBeatmapSetInfo>, IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
+    public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
 
         private readonly BeatmapModelManager beatmapModelManager;
-        private readonly BeatmapModelDownloader beatmapModelDownloader;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false, AudioMixer mainTrackMixer = null)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
         {
             var userResources = new FileStore(contextFactory, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
             beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host);
-            beatmapModelDownloader = CreateBeatmapModelDownloader(beatmapModelManager, api, host);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
@@ -58,11 +55,6 @@ namespace osu.Game.Beatmaps
                 onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
                 beatmapModelManager.OnlineLookupQueue = onlineBeatmapLookupQueue;
             }
-        }
-
-        protected virtual BeatmapModelDownloader CreateBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> modelManager, IAPIProvider api, GameHost host)
-        {
-            return new BeatmapModelDownloader(modelManager, api, host);
         }
 
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
@@ -86,7 +78,7 @@ namespace osu.Game.Beatmaps
             var set = new BeatmapSetInfo
             {
                 Metadata = metadata,
-                Beatmaps = new List<BeatmapInfo>
+                Beatmaps =
                 {
                     new BeatmapInfo
                     {
@@ -186,11 +178,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Action<Notification> PostNotification
         {
-            set
-            {
-                beatmapModelManager.PostNotification = value;
-                beatmapModelDownloader.PostNotification = value;
-            }
+            set => beatmapModelManager.PostNotification = value;
         }
 
         /// <summary>
@@ -226,21 +214,6 @@ namespace osu.Game.Beatmaps
             remove => beatmapModelManager.ItemRemoved -= value;
         }
 
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            return beatmapModelManager.ImportFromStableAsync(stableStorage);
-        }
-
-        public void Export(BeatmapSetInfo item)
-        {
-            beatmapModelManager.Export(item);
-        }
-
-        public void ExportModelTo(BeatmapSetInfo model, Stream outputStream)
-        {
-            beatmapModelManager.ExportModelTo(model, outputStream);
-        }
-
         public void Update(BeatmapSetInfo item)
         {
             beatmapModelManager.Update(item);
@@ -265,28 +238,6 @@ namespace osu.Game.Beatmaps
         {
             beatmapModelManager.Undelete(item);
         }
-
-        #endregion
-
-        #region Implementation of IModelDownloader<BeatmapSetInfo>
-
-        public event Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadBegan
-        {
-            add => beatmapModelDownloader.DownloadBegan += value;
-            remove => beatmapModelDownloader.DownloadBegan -= value;
-        }
-
-        public event Action<ArchiveDownloadRequest<IBeatmapSetInfo>> DownloadFailed
-        {
-            add => beatmapModelDownloader.DownloadFailed += value;
-            remove => beatmapModelDownloader.DownloadFailed -= value;
-        }
-
-        public bool Download(IBeatmapSetInfo model, bool minimiseDownloadSize = false) =>
-            beatmapModelDownloader.Download(model, minimiseDownloadSize);
-
-        public ArchiveDownloadRequest<IBeatmapSetInfo> GetExistingDownload(IBeatmapSetInfo model) =>
-            beatmapModelDownloader.GetExistingDownload(model);
 
         #endregion
 
@@ -337,9 +288,9 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelFileManager<in BeatmapSetInfo,in BeatmapSetFileInfo>
 
-        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents, string filename = null)
+        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents)
         {
-            beatmapModelManager.ReplaceFile(model, file, contents, filename);
+            beatmapModelManager.ReplaceFile(model, file, contents);
         }
 
         public void DeleteFile(BeatmapSetInfo model, BeatmapSetFileInfo file)

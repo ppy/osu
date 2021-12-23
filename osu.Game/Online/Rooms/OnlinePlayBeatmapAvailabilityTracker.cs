@@ -40,6 +40,11 @@ namespace osu.Game.Online.Rooms
 
         private BeatmapDownloadTracker downloadTracker;
 
+        /// <summary>
+        /// The beatmap matching the required hash (and providing a final <see cref="BeatmapAvailability.LocallyAvailable"/> state).
+        /// </summary>
+        private BeatmapInfo matchingHash;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -71,12 +76,33 @@ namespace osu.Game.Online.Rooms
                         progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
                 }, true);
             }, true);
+
+            // These events are needed for a fringe case where a modified/altered beatmap is imported with matching OnlineIDs.
+            // During the import process this will cause the existing beatmap set to be silently deleted and replaced with the new one.
+            // This is not exposed to us via `BeatmapDownloadTracker` so we have to take it into our own hands (as we care about the hash matching).
+            beatmapManager.ItemUpdated += itemUpdated;
+            beatmapManager.ItemRemoved += itemRemoved;
         }
+
+        private void itemUpdated(BeatmapSetInfo item) => Schedule(() =>
+        {
+            if (matchingHash?.BeatmapSet.ID == item.ID || SelectedItem.Value?.Beatmap.Value.BeatmapSet?.OnlineID == item.OnlineID)
+                updateAvailability();
+        });
+
+        private void itemRemoved(BeatmapSetInfo item) => Schedule(() =>
+        {
+            if (matchingHash?.BeatmapSet.ID == item.ID)
+                updateAvailability();
+        });
 
         private void updateAvailability()
         {
             if (downloadTracker == null)
                 return;
+
+            // will be repopulated below if still valid.
+            matchingHash = null;
 
             switch (downloadTracker.State.Value)
             {
@@ -93,7 +119,9 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    bool hashMatches = checkHashValidity();
+                    matchingHash = findMatchingHash();
+
+                    bool hashMatches = matchingHash != null;
 
                     availability.Value = hashMatches ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
@@ -108,12 +136,23 @@ namespace osu.Game.Online.Rooms
             }
         }
 
-        private bool checkHashValidity()
+        private BeatmapInfo findMatchingHash()
         {
             int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            return beatmapManager.QueryBeatmap(b => b.OnlineID == onlineId && b.MD5Hash == checksum && !b.BeatmapSet.DeletePending) != null;
+            return beatmapManager.QueryBeatmap(b => b.OnlineID == onlineId && b.MD5Hash == checksum && !b.BeatmapSet.DeletePending);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmapManager != null)
+            {
+                beatmapManager.ItemUpdated -= itemUpdated;
+                beatmapManager.ItemRemoved -= itemRemoved;
+            }
         }
     }
 }

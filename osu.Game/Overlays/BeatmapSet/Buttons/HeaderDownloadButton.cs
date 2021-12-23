@@ -9,13 +9,13 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Overlays.BeatmapListing.Panels;
 using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, BeatmapManager beatmaps)
+        private void load(IAPIProvider api, BeatmapModelDownloader beatmaps)
         {
             FillFlowContainer textSprites;
 

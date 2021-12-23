@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -15,9 +14,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
@@ -25,15 +22,14 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>, IModelFileManager<ScoreInfo, ScoreFileInfo>, IModelDownloader<IScoreInfo>
+    public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
         private readonly OsuConfigManager configManager;
         private readonly ScoreModelManager scoreModelManager;
-        private readonly ScoreModelDownloader scoreModelDownloader;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IAPIProvider api, IDatabaseContextFactory contextFactory, Scheduler scheduler,
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, Scheduler scheduler,
                             IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
         {
             this.scheduler = scheduler;
@@ -41,7 +37,6 @@ namespace osu.Game.Scoring
             this.configManager = configManager;
 
             scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory, importHost);
-            scoreModelDownloader = new ScoreModelDownloader(scoreModelManager, api, importHost);
         }
 
         public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
@@ -76,7 +71,7 @@ namespace osu.Game.Scoring
 
             return scores.Select((score, index) => (score, totalScore: totalScores[index]))
                          .OrderByDescending(g => g.totalScore)
-                         .ThenBy(g => g.score.OnlineScoreID)
+                         .ThenBy(g => g.score.OnlineID)
                          .Select(g => g.score)
                          .ToArray();
         }
@@ -162,7 +157,12 @@ namespace osu.Game.Scoring
 
                     // We can compute the max combo locally after the async beatmap difficulty computation.
                     var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
-                    beatmapMaxCombo = difficulty.MaxCombo;
+
+                    // Something failed during difficulty calculation. Fall back to provided score.
+                    if (difficulty == null)
+                        return score.TotalScore;
+
+                    beatmapMaxCombo = difficulty.Value.MaxCombo;
                 }
             }
             else
@@ -235,11 +235,7 @@ namespace osu.Game.Scoring
 
         public Action<Notification> PostNotification
         {
-            set
-            {
-                scoreModelManager.PostNotification = value;
-                scoreModelDownloader.PostNotification = value;
-            }
+            set => scoreModelManager.PostNotification = value;
         }
 
         #endregion
@@ -256,21 +252,6 @@ namespace osu.Game.Scoring
         {
             add => scoreModelManager.ItemRemoved += value;
             remove => scoreModelManager.ItemRemoved -= value;
-        }
-
-        public Task ImportFromStableAsync(StableStorage stableStorage)
-        {
-            return scoreModelManager.ImportFromStableAsync(stableStorage);
-        }
-
-        public void Export(ScoreInfo item)
-        {
-            scoreModelManager.Export(item);
-        }
-
-        public void ExportModelTo(ScoreInfo model, Stream outputStream)
-        {
-            scoreModelManager.ExportModelTo(model, outputStream);
         }
 
         public void Update(ScoreInfo item)
@@ -333,49 +314,6 @@ namespace osu.Game.Scoring
         public bool IsAvailableLocally(ScoreInfo model)
         {
             return scoreModelManager.IsAvailableLocally(model);
-        }
-
-        #endregion
-
-        #region Implementation of IModelFileManager<in ScoreInfo,in ScoreFileInfo>
-
-        public void ReplaceFile(ScoreInfo model, ScoreFileInfo file, Stream contents, string filename = null)
-        {
-            scoreModelManager.ReplaceFile(model, file, contents, filename);
-        }
-
-        public void DeleteFile(ScoreInfo model, ScoreFileInfo file)
-        {
-            scoreModelManager.DeleteFile(model, file);
-        }
-
-        public void AddFile(ScoreInfo model, Stream contents, string filename)
-        {
-            scoreModelManager.AddFile(model, contents, filename);
-        }
-
-        #endregion
-
-        #region Implementation of IModelDownloader<IScoreInfo>
-
-        public event Action<ArchiveDownloadRequest<IScoreInfo>> DownloadBegan
-        {
-            add => scoreModelDownloader.DownloadBegan += value;
-            remove => scoreModelDownloader.DownloadBegan -= value;
-        }
-
-        public event Action<ArchiveDownloadRequest<IScoreInfo>> DownloadFailed
-        {
-            add => scoreModelDownloader.DownloadFailed += value;
-            remove => scoreModelDownloader.DownloadFailed -= value;
-        }
-
-        public bool Download(IScoreInfo model, bool minimiseDownloadSize) =>
-            scoreModelDownloader.Download(model, minimiseDownloadSize);
-
-        public ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
-        {
-            return scoreModelDownloader.GetExistingDownload(model);
         }
 
         #endregion

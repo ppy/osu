@@ -14,8 +14,9 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Ranking;
@@ -39,10 +40,7 @@ namespace osu.Game.Tests.Beatmaps
         private readonly BeatmapInfo beatmapInfo = new BeatmapInfo
         {
             BeatmapSet = new BeatmapSetInfo(),
-            Metadata = new BeatmapMetadata
-            {
-                Author = APIUser.SYSTEM_USER
-            }
+            Metadata = new BeatmapMetadata(),
         };
 
         private readonly TestResourceStore userSkinResourceStore = new TestResourceStore();
@@ -91,23 +89,15 @@ namespace osu.Game.Tests.Beatmaps
         {
             AddStep("setup skins", () =>
             {
-                userSkinInfo.Files = new List<SkinFileInfo>
-                {
-                    new SkinFileInfo
-                    {
-                        Filename = userFile,
-                        FileInfo = new IO.FileInfo { Hash = userFile }
-                    }
-                };
+                userSkinInfo.Files.Clear();
+                userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
-                beatmapInfo.BeatmapSet.Files = new List<BeatmapSetFileInfo>
+                beatmapInfo.BeatmapSet.Files.Clear();
+                beatmapInfo.BeatmapSet.Files.Add(new BeatmapSetFileInfo
                 {
-                    new BeatmapSetFileInfo
-                    {
-                        Filename = beatmapFile,
-                        FileInfo = new IO.FileInfo { Hash = beatmapFile }
-                    }
-                };
+                    Filename = beatmapFile,
+                    FileInfo = new IO.FileInfo { Hash = beatmapFile }
+                });
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
@@ -129,6 +119,7 @@ namespace osu.Game.Tests.Beatmaps
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
 
         #endregion
 

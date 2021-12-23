@@ -31,9 +31,9 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private SettingsButton undeleteButton;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] StableImportManager stableImportManager, DialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, ScoreManager scores, SkinManager skins, [CanBeNull] CollectionManager collectionManager, [CanBeNull] LegacyImportManager legacyImportManager, DialogOverlay dialogOverlay)
         {
-            if (stableImportManager?.SupportsImportFromStable == true)
+            if (legacyImportManager?.SupportsImportFromStable == true)
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
-                        stableImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                        legacyImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
                     }
                 });
             }
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllBeatmaps,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (stableImportManager?.SupportsImportFromStable == true)
+            if (legacyImportManager?.SupportsImportFromStable == true)
             {
                 Add(importScoresButton = new SettingsButton
                 {
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importScoresButton.Enabled.Value = false;
-                        stableImportManager.ImportFromStableAsync(StableContent.Scores).ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
+                        legacyImportManager.ImportFromStableAsync(StableContent.Scores).ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
                     }
                 });
             }
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllScores,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteScoresButton.Enabled.Value = false;
                         Task.Run(() => scores.Delete(scores.GetAllUsableScores())).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 }
             });
 
-            if (stableImportManager?.SupportsImportFromStable == true)
+            if (legacyImportManager?.SupportsImportFromStable == true)
             {
                 Add(importSkinsButton = new SettingsButton
                 {
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importSkinsButton.Enabled.Value = false;
-                        stableImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
+                        legacyImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
                     }
                 });
             }
@@ -103,17 +103,20 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 Text = MaintenanceSettingsStrings.DeleteAllSkins,
                 Action = () =>
                 {
-                    dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                    dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteSkinsButton.Enabled.Value = false;
-                        Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                        Task.Run(() =>
+                        {
+                            skins.Delete();
+                        }).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
                     }));
                 }
             });
 
             if (collectionManager != null)
             {
-                if (stableImportManager?.SupportsImportFromStable == true)
+                if (legacyImportManager?.SupportsImportFromStable == true)
                 {
                     Add(importCollectionsButton = new SettingsButton
                     {
@@ -121,7 +124,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Action = () =>
                         {
                             importCollectionsButton.Enabled.Value = false;
-                            stableImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
+                            legacyImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
                         }
                     });
                 }
@@ -131,7 +134,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Text = MaintenanceSettingsStrings.DeleteAllCollections,
                     Action = () =>
                     {
-                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(collectionManager.DeleteAll));
+                        dialogOverlay?.Push(new MassDeleteConfirmationDialog(collectionManager.DeleteAll));
                     }
                 });
             }

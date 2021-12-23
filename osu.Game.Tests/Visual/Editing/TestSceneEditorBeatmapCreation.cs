@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestCreateNewBeatmap()
         {
             AddStep("save beatmap", () => Editor.Save());
-            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
+            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.IsManaged);
             AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == false);
         }
 

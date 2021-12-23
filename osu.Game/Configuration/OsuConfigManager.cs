@@ -17,6 +17,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
@@ -26,8 +27,8 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
-            SetDefault(OsuSetting.Ruleset, 0, 0, int.MaxValue);
-            SetDefault(OsuSetting.Skin, 0, -1, int.MaxValue);
+            SetDefault(OsuSetting.Ruleset, string.Empty);
+            SetDefault(OsuSetting.Skin, SkinInfo.DEFAULT_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -210,9 +211,12 @@ namespace osu.Game.Configuration
                         value: scalingMode.GetLocalisableDescription()
                     )
                 ),
-                new TrackedSetting<int>(OsuSetting.Skin, skin =>
+                new TrackedSetting<string>(OsuSetting.Skin, skin =>
                 {
-                    string skinName = LookupSkinName(skin) ?? string.Empty;
+                    string skinName = string.Empty;
+
+                    if (Guid.TryParse(skin, out var id))
+                        skinName = LookupSkinName(id) ?? string.Empty;
 
                     return new SettingDescription(
                         rawValue: skinName,
@@ -233,7 +237,7 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<int, string> LookupSkinName { private get; set; }
+        public Func<Guid, string> LookupSkinName { private get; set; }
 
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; }
     }

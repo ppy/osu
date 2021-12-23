@@ -162,9 +162,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("I want the pp", filterCriteria.SearchText.Trim());
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(BeatmapSetOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Min);
             Assert.IsTrue(filterCriteria.OnlineStatus.IsLowerInclusive);
-            Assert.AreEqual(BeatmapSetOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
+            Assert.AreEqual(BeatmapOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
             Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
         }
 
