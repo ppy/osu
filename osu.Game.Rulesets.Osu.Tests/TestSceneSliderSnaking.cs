@@ -47,9 +47,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             => new ClockBackedTestWorkingBeatmap(this.beatmap = beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
 
         [BackgroundDependencyLoader]
-        private void load(IRulesetConfigCache configCache)
+        private void load()
         {
-            var config = (OsuRulesetConfigManager)configCache.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
+            var config = (OsuRulesetConfigManager)RulesetConfigs.GetConfigFor(Ruleset.Value.CreateInstance()).AsNonNull();
             config.BindWith(OsuRulesetSetting.SnakingInSliders, snakingIn);
             config.BindWith(OsuRulesetSetting.SnakingOutSliders, snakingOut);
         }
