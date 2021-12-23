@@ -68,7 +68,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
         public void TestPlayingUsersUpdatedOnJoin()
         {
             AddStep("leave room", () => Client.LeaveRoom());
-            AddUntilStep("wait for room part", () => Client.Room == null);
+            AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddStep("create room initially in gameplay", () =>
             {

@@ -6,14 +6,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -22,14 +20,11 @@ using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Tests.Resources;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-
         [Cached(typeof(UserLookupCache))]
         private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
@@ -52,14 +47,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                selectedItem.Value = null;
-
                 Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                    SelectedItem = { BindTarget = selectedItem },
                     Items = { BindTarget = Client.APIRoom!.Playlist }
                 };
             });
@@ -113,12 +105,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
-            AddStep("select item 0", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(0).Model);
             assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, true);
 
-            AddStep("select item 1", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(1).Model);
-            assertDeleteButtonVisibility(0, true);
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddUntilStep("wait for next item to be selected", () => Client.Room?.Settings.PlaylistItemId == 2);
+            AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
+
+            assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, false);
         }
 
@@ -142,23 +136,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("item arrived in playlist", () => playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().Any(i => i.Model.ID == itemId));
         }
 
-        private void deleteItem(int index)
-        {
-            OsuRearrangeableListItem<PlaylistItem> item = null;
-
-            AddStep($"move mouse to delete button {index}", () =>
-            {
-                item = playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index);
-                InputManager.MoveMouseTo(item.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(0));
-            });
-
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-
-            AddUntilStep("item removed from playlist", () => !playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().Contains(item));
-        }
-
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible",
-                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(index).Alpha > 0) == visible);
+            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible", () =>
+            {
+                var button = playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAtOrDefault(index);
+                return (button?.Alpha > 0) == visible;
+            });
     }
 }
