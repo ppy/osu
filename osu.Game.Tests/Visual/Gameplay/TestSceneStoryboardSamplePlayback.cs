@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void checkForFirstSamplePlayback()
         {
-            AddUntilStep("storyboard loaded", () => Player.Beatmap.Value.StoryboardLoaded);
+            AddAssert("storyboard loaded", () => Player.Beatmap.Value.Storyboard != null);
             AddUntilStep("any storyboard samples playing", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
         }
 
