@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 placementControlPoint.Position = e.MousePosition - HitObject.Position;
         }
 
-        protected override void OnDragEnd(DragEndEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (placementControlPoint != null)
             {
