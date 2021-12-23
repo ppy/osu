@@ -102,7 +102,6 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
-                                Current = collection.Name,
                                 PlaceholderText = IsCreated.Value ? string.Empty : "Create a new collection"
                             },
                         }
@@ -113,6 +112,9 @@ namespace osu.Game.Collections
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                // Bind late, as the collection name may change externally while still loading.
+                textBox.Current = collection.Name;
 
                 collectionName.BindValueChanged(_ => createNewCollection(), true);
                 IsCreated.BindValueChanged(created => textBoxPaddingContainer.Padding = new MarginPadding { Right = created.NewValue ? button_width : 0 }, true);
