@@ -12,8 +12,6 @@ namespace osu.Game.Tests
     /// </summary>
     public class CleanRunHeadlessGameHost : TestRunHeadlessGameHost
     {
-        public new string Name => base.Name;
-
         /// <summary>
         /// Create a new instance.
         /// </summary>
