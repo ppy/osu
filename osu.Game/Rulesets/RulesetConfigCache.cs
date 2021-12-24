@@ -6,15 +6,12 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets
 {
-    /// <summary>
-    /// A cache that provides a single <see cref="IRulesetConfigManager"/> per-ruleset.
-    /// This is done to support referring to and updating ruleset configs from multiple locations in the absence of inter-config bindings.
-    /// </summary>
-    public class RulesetConfigCache : Component
+    public class RulesetConfigCache : Component, IRulesetConfigCache
     {
         private readonly RealmContextFactory realmFactory;
         private readonly RulesetStore rulesets;
@@ -43,18 +40,13 @@ namespace osu.Game.Rulesets
             }
         }
 
-        /// <summary>
-        /// Retrieves the <see cref="IRulesetConfigManager"/> for a <see cref="Ruleset"/>.
-        /// </summary>
-        /// <param name="ruleset">The <see cref="Ruleset"/> to retrieve the <see cref="IRulesetConfigManager"/> for.</param>
-        /// <returns>The <see cref="IRulesetConfigManager"/> defined by <paramref name="ruleset"/>, null if <paramref name="ruleset"/> doesn't define one.</returns>
-        /// <exception cref="InvalidOperationException">If <paramref name="ruleset"/> doesn't have a valid <see cref="RulesetInfo.ID"/>.</exception>
         public IRulesetConfigManager GetConfigFor(Ruleset ruleset)
         {
+            if (!IsLoaded)
+                throw new InvalidOperationException($@"Cannot retrieve {nameof(IRulesetConfigManager)} before {nameof(RulesetConfigCache)} has loaded");
+
             if (!configCache.TryGetValue(ruleset.RulesetInfo.ShortName, out var config))
-                // any ruleset request which wasn't initialised on startup should not be stored to realm.
-                // this should only be used by tests.
-                return ruleset.CreateConfig(null);
+                throw new InvalidOperationException($@"Attempted to retrieve {nameof(IRulesetConfigManager)} for an unavailable ruleset {ruleset.GetDisplayString()}");
 
             return config;
         }
