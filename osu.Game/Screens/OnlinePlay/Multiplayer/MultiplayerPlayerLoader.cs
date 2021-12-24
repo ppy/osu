@@ -9,7 +9,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerPlayerLoader : PlayerLoader
     {
-        public bool GameplayCompleted => player?.GameplayCompleted == true;
+        public bool GameplayPassed => player?.GameplayPassed == true;
 
         private Player player;
 
