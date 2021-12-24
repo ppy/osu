@@ -31,6 +31,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
@@ -94,6 +95,16 @@ namespace osu.Game.Tests.Visual
         /// </remarks>
         protected Storage LocalStorage => localStorage.Value;
 
+        /// <summary>
+        /// A cache for ruleset configurations to be used in this test scene.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="IRulesetConfigCache"/> instance is provided to the children of this test scene via DI.
+        /// It is only exposed so that test scenes themselves can access the ruleset config cache in a safe manner
+        /// (<see cref="OsuTestScene"/>s cannot use DI themselves, as they will end up accessing the real cached instance from <see cref="OsuGameBase"/>).
+        /// </remarks>
+        protected IRulesetConfigCache RulesetConfigs { get; private set; }
+
         private Lazy<Storage> localStorage;
 
         private Storage headlessHostStorage;
@@ -118,6 +129,13 @@ namespace osu.Game.Tests.Visual
             RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
+
+            // to isolate ruleset configs in tests from the actual database and avoid state pollution problems,
+            // as well as problems due to the implementation details of the "real" implementation (the configs only being available at `LoadComplete()`),
+            // cache a test implementation of the ruleset config cache over the "real" one.
+            var isolatedBaseDependencies = new DependencyContainer(baseDependencies);
+            isolatedBaseDependencies.CacheAs(RulesetConfigs = new TestRulesetConfigCache());
+            baseDependencies = isolatedBaseDependencies;
 
             var providedRuleset = CreateRuleset();
             if (providedRuleset != null)
