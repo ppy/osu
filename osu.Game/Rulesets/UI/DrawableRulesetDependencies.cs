@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.UI
                 CacheAs(ShaderManager = new FallbackShaderManager(ShaderManager, parent.Get<ShaderManager>()));
             }
 
-            RulesetConfigManager = parent.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+            RulesetConfigManager = parent.Get<IRulesetConfigCache>().GetConfigFor(ruleset);
             if (RulesetConfigManager != null)
                 Cache(RulesetConfigManager);
         }
