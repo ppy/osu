@@ -315,7 +315,7 @@ namespace osu.Game.Tests.NonVisual
             public CustomTestHeadlessGameHost([CallerMemberName] string callingMethodName = @"")
                 : base(callingMethodName: callingMethodName)
             {
-                string defaultStorageLocation = getDefaultLocationFor(callingMethodName);
+                string defaultStorageLocation = getDefaultLocationFor(Name);
 
                 InitialStorage = new DesktopStorage(defaultStorageLocation, this);
                 InitialStorage.DeleteDirectory(string.Empty);
