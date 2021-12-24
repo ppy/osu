@@ -70,5 +70,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override RoomManager CreateRoomManager() => new MultiplayerRoomManager();
 
         protected override LoungeSubScreen CreateLounge() => new MultiplayerLoungeSubScreen();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (client != null)
+                client.RoomUpdated -= onRoomUpdated;
+        }
     }
 }
