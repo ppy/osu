@@ -342,11 +342,9 @@ namespace osu.Game.Overlays
 
         private void changeTrack()
         {
+            var queuedTrack = getQueuedTrack();
+
             var lastTrack = CurrentTrack;
-
-            var queuedTrack = new DrawableTrack(current.LoadTrack());
-            queuedTrack.Completed += () => onTrackCompleted(current);
-
             CurrentTrack = queuedTrack;
 
             // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.
@@ -368,6 +366,15 @@ namespace osu.Game.Overlays
                     queuedTrack.Dispose();
                 }
             });
+        }
+
+        private DrawableTrack getQueuedTrack()
+        {
+            // Important to keep this in its own method to avoid inadvertently capturing unnecessary variables in the callback.
+            // Can lead to leaks.
+            var queuedTrack = new DrawableTrack(current.LoadTrack());
+            queuedTrack.Completed += () => onTrackCompleted(current);
+            return queuedTrack;
         }
 
         private void onTrackCompleted(WorkingBeatmap workingBeatmap)
