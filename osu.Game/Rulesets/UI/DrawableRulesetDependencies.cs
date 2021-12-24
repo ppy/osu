@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.UI
 
             public Sample Get(string name) => primary.Get(name) ?? fallback.Get(name);
 
-            public Task<Sample> GetAsync(string name) => primary.GetAsync(name) ?? fallback.GetAsync(name);
+            public Task<Sample> GetAsync(string name, CancellationToken cancellationToken = default) => primary.GetAsync(name, cancellationToken) ?? fallback.GetAsync(name, cancellationToken);
 
             public Stream GetStream(string name) => primary.GetStream(name) ?? fallback.GetStream(name);
 
