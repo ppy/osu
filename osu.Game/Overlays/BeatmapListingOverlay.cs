@@ -131,7 +131,7 @@ namespace osu.Game.Overlays
                 Loading.Show();
         }
 
-        private Task panelLoadDelegate;
+        private Task panelLoadTask;
 
         private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
@@ -155,16 +155,16 @@ namespace osu.Game.Overlays
 
                 var content = createCardContainerFor(newCards);
 
-                panelLoadDelegate = LoadComponentAsync(foundContent = content, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                panelLoadTask = LoadComponentAsync(foundContent = content, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
             }
             else
             {
-                panelLoadDelegate = LoadComponentsAsync(newCards, loaded =>
+                panelLoadTask = LoadComponentsAsync(newCards, loaded =>
                 {
                     lastFetchDisplayedTime = Time.Current;
                     foundContent.AddRange(loaded);
                     loaded.ForEach(p => p.FadeIn(200, Easing.OutQuint));
-                });
+                }, (cancellationToken = new CancellationTokenSource()).Token);
             }
         }
 
@@ -239,7 +239,7 @@ namespace osu.Game.Overlays
 
             var newCards = createCardsFor(foundContent.Reverse().Select(card => card.BeatmapSet));
 
-            panelLoadDelegate = LoadComponentsAsync(newCards, cards =>
+            panelLoadTask = LoadComponentsAsync(newCards, cards =>
             {
                 foundContent.Clear();
                 foundContent.AddRange(cards);
@@ -374,7 +374,7 @@ namespace osu.Game.Overlays
 
             const int pagination_scroll_distance = 500;
 
-            bool shouldShowMore = panelLoadDelegate?.IsCompleted != false
+            bool shouldShowMore = panelLoadTask?.IsCompleted != false
                                   && Time.Current - lastFetchDisplayedTime > time_between_fetches
                                   && (ScrollFlow.ScrollableExtent > 0 && ScrollFlow.IsScrolledToEnd(pagination_scroll_distance));
 
