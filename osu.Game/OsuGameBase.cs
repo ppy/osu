@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+// using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -285,6 +286,24 @@ namespace osu.Game
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
             // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
+
+            // Audio.GlobalMixer.Effects.Add(new CompressorParameters
+            // {
+            //     fAttack = 100f,
+            //     fRelease = 500f,
+            //     fThreshold = -3f,
+            //     fGain = 0f,
+            //     fRatio = 1000f,
+            // });
+            //
+            // Audio.SampleMixer.Effects.Add(new CompressorParameters
+            // {
+            //     fAttack = 50f,
+            //     fRelease = 300f,
+            //     fThreshold = -7f,
+            //     fGain = 0f,
+            //     fRatio = 1000f,
+            // });
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 
