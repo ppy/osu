@@ -17,7 +17,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestDefaultDirectory)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
