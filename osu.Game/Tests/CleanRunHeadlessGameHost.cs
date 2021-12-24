@@ -26,7 +26,14 @@ namespace osu.Game.Tests
 
         protected override void SetupForRun()
         {
-            Storage.DeleteDirectory(string.Empty);
+            try
+            {
+                Storage.DeleteDirectory(string.Empty);
+            }
+            catch
+            {
+                // May fail if a logging target has already been set via OsuStorage.ChangeTargetStorage.
+            }
 
             // base call needs to be run *after* storage is emptied, as it updates the (static) logger's storage and may start writing
             // log entries from another source if a unit test host is shared over multiple tests, causing a file access denied exception.
