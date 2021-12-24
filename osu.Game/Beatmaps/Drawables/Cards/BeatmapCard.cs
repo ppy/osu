@@ -21,6 +21,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         public const float TRANSITION_DURATION = 400;
         public const float CORNER_RADIUS = 10;
 
+        protected const float WIDTH = 430;
+
         public IBindable<bool> Expanded { get; }
 
         public readonly APIBeatmapSet BeatmapSet;

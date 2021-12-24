@@ -25,7 +25,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         protected override Drawable IdleContent => idleBottomContent;
         protected override Drawable DownloadInProgressContent => downloadProgressBar;
 
-        private const float width = 475;
         private const float height = 140;
 
         [Cached]
@@ -51,7 +50,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay? beatmapSetOverlay)
         {
-            Width = width;
+            Width = WIDTH;
             Height = height;
 
             FillFlowContainer leftIconArea = null!;
@@ -81,7 +80,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
                             X = height - CORNER_RADIUS,
-                            Width = width - height + CORNER_RADIUS,
+                            Width = WIDTH - height + CORNER_RADIUS,
                             FavouriteState = { BindTarget = FavouriteState },
                             ButtonsCollapsedWidth = CORNER_RADIUS,
                             ButtonsExpandedWidth = 30,
