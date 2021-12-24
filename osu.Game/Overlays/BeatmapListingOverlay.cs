@@ -121,6 +121,8 @@ namespace osu.Game.Overlays
 
         private CancellationTokenSource cancellationToken;
 
+        private Task panelLoadTask;
+
         private void onSearchStarted()
         {
             cancellationToken?.Cancel();
@@ -131,10 +133,10 @@ namespace osu.Game.Overlays
                 Loading.Show();
         }
 
-        private Task panelLoadTask;
-
         private void onSearchFinished(BeatmapListingFilterControl.SearchResult searchResult)
         {
+            cancellationToken?.Cancel();
+
             if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
                 supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
@@ -238,6 +240,8 @@ namespace osu.Game.Overlays
             Loading.Show();
 
             var newCards = createCardsFor(foundContent.Reverse().Select(card => card.BeatmapSet));
+
+            cancellationToken?.Cancel();
 
             panelLoadTask = LoadComponentsAsync(newCards, cards =>
             {
