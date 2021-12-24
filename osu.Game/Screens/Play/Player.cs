@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether gameplay has completed without the user having failed.
         /// </summary>
-        public bool GameplayCompleted { get; private set; }
+        public bool GameplayPassed { get; private set; }
 
         public Action RestartRequested;
 
@@ -671,6 +671,7 @@ namespace osu.Game.Screens.Play
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
 
+                GameplayPassed = false;
                 ValidForResume = true;
                 skipOutroOverlay.Hide();
                 return;
@@ -680,7 +681,7 @@ namespace osu.Game.Screens.Play
             if (HealthProcessor.HasFailed)
                 return;
 
-            GameplayCompleted = true;
+            GameplayPassed = true;
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
