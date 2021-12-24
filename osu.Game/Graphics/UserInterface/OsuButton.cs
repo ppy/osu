@@ -91,6 +91,11 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (backgroundColour == null)
                 BackgroundColour = colours.BlueDark;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Colour = enablementColour;
             Enabled.BindValueChanged(_ => this.FadeColour(enablementColour, 200, Easing.OutQuint));
