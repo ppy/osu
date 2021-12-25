@@ -128,8 +128,12 @@ namespace osu.Game.Tests.Collections.IO
         [Test]
         public async Task TestSaveAndReload()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(bypassCleanup: true))
+            string firstRunName;
+
+            using (var host = new CleanRunHeadlessGameHost(bypassCleanup: true))
             {
+                firstRunName = host.Name;
+
                 try
                 {
                     var osu = LoadOsuIntoHost(host, true);
@@ -150,7 +154,7 @@ namespace osu.Game.Tests.Collections.IO
             }
 
             // Name matches the automatically chosen name from `CleanRunHeadlessGameHost` above, so we end up using the same storage location.
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestSaveAndReload)))
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName))
             {
                 try
                 {
