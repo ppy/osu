@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -9,47 +10,96 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOsuAnimatedButton : OsuGridTestScene
+    public class TestSceneOsuAnimatedButton : OsuTestScene
     {
-        public TestSceneOsuAnimatedButton()
-            : base(3, 2)
+        [Test]
+        public void TestRelativeSized()
         {
-            Cell(0).Add(new BaseContainer("relative sized")
+            AddStep("add button", () => Child = new BaseContainer("relative sized")
             {
                 RelativeSizeAxes = Axes.Both,
+                Action = () => { }
             });
+        }
 
-            Cell(1).Add(new BaseContainer("auto sized")
+        [Test]
+        public void TestAutoSized()
+        {
+            AddStep("add button", () => Child = new BaseContainer("auto sized")
             {
-                AutoSizeAxes = Axes.Both
+                AutoSizeAxes = Axes.Both,
+                Action = () => { }
             });
+        }
 
-            Cell(2).Add(new BaseContainer("relative Y auto X")
+        [Test]
+        public void TestRelativeYAutoX()
+        {
+            AddStep("add button", () => Child = new BaseContainer("relative Y auto X")
             {
                 RelativeSizeAxes = Axes.Y,
-                AutoSizeAxes = Axes.X
+                AutoSizeAxes = Axes.X,
+                Action = () => { }
             });
+        }
 
-            Cell(3).Add(new BaseContainer("relative X auto Y")
+        [Test]
+        public void TestRelativeXAutoY()
+        {
+            AddStep("add button", () => Child = new BaseContainer("relative X auto Y")
             {
                 RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y
+                AutoSizeAxes = Axes.Y,
+                Action = () => { }
             });
+        }
 
-            Cell(4).Add(new BaseContainer("fixed")
+        [Test]
+        public void TestFixed1()
+        {
+            AddStep("add button", () => Child = new BaseContainer("fixed")
             {
                 Size = new Vector2(100),
+                Action = () => { }
             });
+        }
 
-            Cell(5).Add(new BaseContainer("fixed")
+        [Test]
+        public void TestFixed2()
+        {
+            AddStep("add button", () => Child = new BaseContainer("fixed")
             {
                 Size = new Vector2(100, 50),
+                Action = () => { }
+            });
+        }
+
+        [Test]
+        public void TestToggleEnabled()
+        {
+            BaseContainer button = null;
+
+            AddStep("add button", () => Child = button = new BaseContainer("fixed")
+            {
+                Size = new Vector2(200),
             });
 
             AddToggleStep("toggle enabled", toggle =>
             {
                 for (int i = 0; i < 6; i++)
-                    ((BaseContainer)Cell(i).Child).Action = toggle ? () => { } : (Action)null;
+                    button.Action = toggle ? () => { } : (Action)null;
+            });
+        }
+
+        [Test]
+        public void TestInitiallyDisabled()
+        {
+            AddStep("add disabled button", () =>
+            {
+                Child = new BaseContainer("disabled")
+                {
+                    Size = new Vector2(100)
+                };
             });
         }
 
