@@ -25,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    string defaultStorageLocation = getDefaultLocationFor(nameof(TestDefaultDirectory));
+                    string defaultStorageLocation = getDefaultLocationFor(host);
 
                     var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    string defaultStorageLocation = getDefaultLocationFor(nameof(TestMigration));
+                    string defaultStorageLocation = getDefaultLocationFor(host);
 
                     var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
@@ -284,9 +284,9 @@ namespace osu.Game.Tests.NonVisual
             }
         }
 
-        private static string getDefaultLocationFor(string testTypeName)
+        private static string getDefaultLocationFor(CustomTestHeadlessGameHost host)
         {
-            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, testTypeName);
+            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, host.Name);
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -315,7 +315,7 @@ namespace osu.Game.Tests.NonVisual
             public CustomTestHeadlessGameHost([CallerMemberName] string callingMethodName = @"")
                 : base(callingMethodName: callingMethodName)
             {
-                string defaultStorageLocation = getDefaultLocationFor(callingMethodName);
+                string defaultStorageLocation = getDefaultLocationFor(this);
 
                 InitialStorage = new DesktopStorage(defaultStorageLocation, this);
                 InitialStorage.DeleteDirectory(string.Empty);
