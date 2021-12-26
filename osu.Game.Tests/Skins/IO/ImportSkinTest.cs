@@ -319,7 +319,7 @@ namespace osu.Game.Tests.Skins.IO
 
         private async Task runSkinTest(Func<OsuGameBase, Task> action, [CallerMemberName] string callingMethodName = @"")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: callingMethodName))
             {
                 try
                 {

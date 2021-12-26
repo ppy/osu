@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
 
             var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, scoreInfo);
 
-            Current.Value = (int)Math.Round(calculator?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
+            Current.Value = (int)Math.Round(calculator?.Calculate().Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
 

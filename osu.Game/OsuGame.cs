@@ -741,7 +741,7 @@ namespace osu.Game
             sessionIdleTracker.IsIdle.BindValueChanged(idle =>
             {
                 if (idle.NewValue)
-                    SessionStatics.ResetValues();
+                    SessionStatics.ResetAfterInactivity();
             });
 
             Add(sessionIdleTracker);

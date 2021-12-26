@@ -29,6 +29,7 @@
     <Compile Include="GameplayScreenRotationLocker.cs" />
     <Compile Include="OsuGameActivity.cs" />
     <Compile Include="OsuGameAndroid.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
