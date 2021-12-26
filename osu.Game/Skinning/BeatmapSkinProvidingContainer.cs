@@ -57,12 +57,12 @@ namespace osu.Game.Skinning
             return beatmapSkins.Value;
         }
 
-        protected override bool AllowSampleLookup(ISampleInfo componentName)
+        protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
-            return componentName is StoryboardSampleInfo || beatmapHitsounds.Value;
+            return sampleInfo is StoryboardSampleInfo || beatmapHitsounds.Value;
         }
 
         public BeatmapSkinProvidingContainer(ISkin skin)
