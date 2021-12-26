@@ -66,6 +66,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
+        /// <summary>
+        /// Whether gameplay has completed without the user having failed.
+        /// </summary>
+        public bool GameplayPassed { get; private set; }
+
         public Action RestartRequested;
 
         public bool HasFailed { get; private set; }
@@ -667,6 +672,7 @@ namespace osu.Game.Screens.Play
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
 
+                GameplayPassed = false;
                 ValidForResume = true;
                 skipOutroOverlay.Hide();
                 return;
@@ -675,6 +681,8 @@ namespace osu.Game.Screens.Play
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed)
                 return;
+
+            GameplayPassed = true;
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
             // is no chance that a user could return to the (already completed) Player instance from a child screen.

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -37,6 +36,6 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = track.Rate;
         }
 
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        public abstract PerformanceAttributes Calculate();
     }
 }

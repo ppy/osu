@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Database
 
         protected void RunTestWithRealm(Action<RealmContextFactory, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(() =>
                 {
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Database
 
         protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(async () =>
                 {

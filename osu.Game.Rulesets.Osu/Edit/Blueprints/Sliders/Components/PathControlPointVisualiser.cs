@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
@@ -16,6 +17,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -39,6 +41,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private InputManager inputManager;
 
         public Action<List<PathControlPoint>> RemoveControlPointsRequested;
+
+        [Resolved(CanBeNull = true)]
+        private IPositionSnapProvider snapProvider { get; set; }
 
         public PathControlPointVisualiser(Slider slider, bool allowSelection)
         {
@@ -64,6 +69,39 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             controlPoints.BindTo(slider.Path.ControlPoints);
         }
 
+        /// <summary>
+        /// Selects the <see cref="PathControlPointPiece"/> corresponding to the given <paramref name="pathControlPoint"/>,
+        /// and deselects all other <see cref="PathControlPointPiece"/>s.
+        /// </summary>
+        public void SetSelectionTo(PathControlPoint pathControlPoint)
+        {
+            foreach (var p in Pieces)
+                p.IsSelected.Value = p.ControlPoint == pathControlPoint;
+        }
+
+        /// <summary>
+        /// Delete all visually selected <see cref="PathControlPoint"/>s.
+        /// </summary>
+        /// <returns></returns>
+        public bool DeleteSelected()
+        {
+            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
+
+            // Ensure that there are any points to be deleted
+            if (toRemove.Count == 0)
+                return false;
+
+            changeHandler?.BeginChange();
+            RemoveControlPointsRequested?.Invoke(toRemove);
+            changeHandler?.EndChange();
+
+            // Since pieces are re-used, they will not point to the deleted control points while remaining selected
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = false;
+
+            return true;
+        }
+
         private void onControlPointsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -87,7 +125,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         Pieces.Add(new PathControlPointPiece(slider, point).With(d =>
                         {
                             if (allowSelection)
-                                d.RequestSelection = selectPiece;
+                                d.RequestSelection = selectionRequested;
+
+                            d.DragStarted = dragStarted;
+                            d.DragInProgress = dragInProgress;
+                            d.DragEnded = dragEnded;
                         }));
 
                         Connections.Add(new PathControlPointConnectionPiece(slider, e.NewStartingIndex + i));
@@ -119,6 +161,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnClick(ClickEvent e)
         {
+            if (Pieces.Any(piece => piece.IsHovered))
+                return false;
+
             foreach (var piece in Pieces)
             {
                 piece.IsSelected.Value = false;
@@ -142,15 +187,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
         }
 
-        private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
+        private void selectionRequested(PathControlPointPiece piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
                 piece.IsSelected.Toggle();
             else
-            {
-                foreach (var p in Pieces)
-                    p.IsSelected.Value = p == piece;
-            }
+                SetSelectionTo(piece.ControlPoint);
         }
 
         /// <summary>
@@ -184,24 +226,81 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IEditorChangeHandler changeHandler { get; set; }
 
-        public bool DeleteSelected()
-        {
-            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
+        #region Drag handling
 
-            // Ensure that there are any points to be deleted
-            if (toRemove.Count == 0)
-                return false;
+        private Vector2[] dragStartPositions;
+        private PathType?[] dragPathTypes;
+        private int draggedControlPointIndex;
+        private HashSet<PathControlPoint> selectedControlPoints;
+
+        private void dragStarted(PathControlPoint controlPoint)
+        {
+            dragStartPositions = slider.Path.ControlPoints.Select(point => point.Position).ToArray();
+            dragPathTypes = slider.Path.ControlPoints.Select(point => point.Type).ToArray();
+            draggedControlPointIndex = slider.Path.ControlPoints.IndexOf(controlPoint);
+            selectedControlPoints = new HashSet<PathControlPoint>(Pieces.Where(piece => piece.IsSelected.Value).Select(piece => piece.ControlPoint));
+
+            Debug.Assert(draggedControlPointIndex >= 0);
 
             changeHandler?.BeginChange();
-            RemoveControlPointsRequested?.Invoke(toRemove);
-            changeHandler?.EndChange();
-
-            // Since pieces are re-used, they will not point to the deleted control points while remaining selected
-            foreach (var piece in Pieces)
-                piece.IsSelected.Value = false;
-
-            return true;
         }
+
+        private void dragInProgress(DragEvent e)
+        {
+            Vector2[] oldControlPoints = slider.Path.ControlPoints.Select(cp => cp.Position).ToArray();
+            var oldPosition = slider.Position;
+            double oldStartTime = slider.StartTime;
+
+            if (selectedControlPoints.Contains(slider.Path.ControlPoints[0]))
+            {
+                // Special handling for selections containing head control point - the position of the slider changes which means the snapped position and time have to be taken into account
+                Vector2 newHeadPosition = Parent.ToScreenSpace(e.MousePosition + (dragStartPositions[0] - dragStartPositions[draggedControlPointIndex]));
+                var result = snapProvider?.SnapScreenSpacePositionToValidTime(newHeadPosition);
+
+                Vector2 movementDelta = Parent.ToLocalSpace(result?.ScreenSpacePosition ?? newHeadPosition) - slider.Position;
+
+                slider.Position += movementDelta;
+                slider.StartTime = result?.Time ?? slider.StartTime;
+
+                for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
+                {
+                    var controlPoint = slider.Path.ControlPoints[i];
+                    // Since control points are relative to the position of the slider, all points that are _not_ selected
+                    // need to be offset _back_ by the delta corresponding to the movement of the head point.
+                    // All other selected control points (if any) will move together with the head point
+                    // (and so they will not move at all, relative to each other).
+                    if (!selectedControlPoints.Contains(controlPoint))
+                        controlPoint.Position -= movementDelta;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < controlPoints.Count; ++i)
+                {
+                    var controlPoint = controlPoints[i];
+                    if (selectedControlPoints.Contains(controlPoint))
+                        controlPoint.Position = dragStartPositions[i] + (e.MousePosition - e.MouseDownPosition);
+                }
+            }
+
+            if (!slider.Path.HasValidLength)
+            {
+                for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position = oldControlPoints[i];
+
+                slider.Position = oldPosition;
+                slider.StartTime = oldStartTime;
+                return;
+            }
+
+            // Maintain the path types in case they got defaulted to bezier at some point during the drag.
+            for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
+                slider.Path.ControlPoints[i].Type = dragPathTypes[i];
+        }
+
+        private void dragEnded() => changeHandler?.EndChange();
+
+        #endregion
 
         public MenuItem[] ContextMenuItems
         {
