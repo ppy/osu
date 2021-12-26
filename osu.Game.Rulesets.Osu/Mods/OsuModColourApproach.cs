@@ -42,7 +42,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             //apply coloured effect
             Color4 flashColourValue = Color4.Azure;
-            drawable.FlashColour(flashColourValue, 300, Easing.InElastic);
+
+            switch (drawable)
+            {
+                case DrawableSliderHead _:
+                case DrawableHitCircle _:
+                {
+                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
+                        drawable.FadeColour(flashColourValue, 300, Easing.InOutSine);
+                    break;
+                }
+            }
 
             {
                 switch (drawable)
