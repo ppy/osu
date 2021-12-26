@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= calculateMissPenalty(effectiveMissCount);
+                aimValue *= calculateMissPenalty(effectiveMissCount, Attributes.AimDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                speedValue *= calculateMissPenalty(effectiveMissCount);
+                speedValue *= calculateMissPenalty(effectiveMissCount, Attributes.SpeedDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
@@ -267,17 +267,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
         }
 
-        private double calculateMissPenalty(double missCount)
+        private double calculateMissPenalty(double missCount, double strainCount)
         {
-            double leniency = 4.3;
-
-            if (missCount > totalHits - leniency)
-                return 0;
-
-            double missApprox = SpecialFunctions.ErfInv((totalHits - leniency - missCount) / totalHits);
-            double fcApprox = SpecialFunctions.ErfInv((totalHits - leniency) / totalHits);
-
-            return Math.Pow(missApprox / fcApprox, 3.5);
+            return 0.95 / ((missCount / (3 * Math.Sqrt(strainCount))) + 1);
         }
 
         private int totalHits => countGreat + countOk + countMeh + countMiss;

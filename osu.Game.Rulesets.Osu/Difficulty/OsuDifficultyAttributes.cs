@@ -24,6 +24,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("slider_factor")]
         public double SliderFactor { get; set; }
 
+        [JsonProperty("aim_difficult_strain_count")]
+        public int AimDifficultStrainCount { get; set; }
+
+        [JsonProperty("speed_difficult_strain_count")]
+        public int SpeedDifficultStrainCount { get; set; }
+
         [JsonProperty("approach_rate")]
         public double ApproachRate { get; set; }
 
