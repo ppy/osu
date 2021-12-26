@@ -69,21 +69,21 @@ namespace osu.Game.Screens.Play.HUD
 
             InternalChildren = new[]
             {
-                popOutCount = new LegacySpriteText(LegacyFont.Combo)
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(0.05f),
-                    Blending = BlendingParameters.Additive,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    BypassAutoSizeAxes = Axes.Both,
-                },
                 counterContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     AlwaysPresent = true,
                     Children = new[]
                     {
+                        popOutCount = new LegacySpriteText(LegacyFont.Combo)
+                        {
+                            Alpha = 0,
+                            Margin = new MarginPadding(0.05f),
+                            Blending = BlendingParameters.Additive,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            BypassAutoSizeAxes = Axes.Both,
+                        },
                         displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
                         {
                             // Initial text and AlwaysPresent allow the counter to have a size before it first displays a combo.
