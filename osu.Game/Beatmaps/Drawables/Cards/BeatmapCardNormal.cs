@@ -158,7 +158,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                         {
                                             d.AutoSizeAxes = Axes.Both;
                                             d.Margin = new MarginPadding { Top = 2 };
-                                            d.AddText("mapped by ", t => t.Colour = colourProvider.Content2);
+                                            d.AddText("谱师：", t => t.Colour = colourProvider.Content2);
                                             d.AddUserLink(BeatmapSet.Author);
                                         }),
                                     }
