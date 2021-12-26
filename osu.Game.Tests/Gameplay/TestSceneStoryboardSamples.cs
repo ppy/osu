@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Audio;
@@ -16,6 +17,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
@@ -35,6 +37,9 @@ namespace osu.Game.Tests.Gameplay
     [HeadlessTest]
     public class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [Test]
         public void TestRetrieveTopLevelSample()
         {
@@ -164,6 +169,39 @@ namespace osu.Game.Tests.Gameplay
                 testedMod != null && Precision.AlmostEquals(
                     sample.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value,
                     ((IApplicableToRate)testedMod).ApplyToRate(sampleInfo.StartTime)));
+        }
+
+        [Test]
+        public void TestSamplePlaybackWithBeatmapHitsoundsOff()
+        {
+            GameplayClockContainer gameplayContainer = null;
+            TestDrawableStoryboardSample sample = null;
+
+            AddStep("disable beatmap hitsounds", () => config.SetValue(OsuSetting.BeatmapHitsounds, false));
+
+            AddStep("setup storyboard sample", () =>
+            {
+                Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, this);
+
+                var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+
+                Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
+                {
+                    Child = beatmapSkinSourceContainer
+                });
+
+                beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                {
+                    Clock = gameplayContainer.GameplayClock
+                });
+            });
+
+            AddStep("start", () => gameplayContainer.Start());
+
+            AddUntilStep("sample played", () => sample.IsPlayed);
+            AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
+
+            AddStep("restore default", () => config.GetBindable<bool>(OsuSetting.BeatmapHitsounds).SetDefault());
         }
 
         private class TestSkin : LegacySkin
