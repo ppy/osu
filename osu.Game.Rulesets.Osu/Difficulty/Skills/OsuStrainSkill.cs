@@ -57,5 +57,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             return difficulty * DifficultyMultiplier;
         }
+
+        public int RelevantDifficultStrains()
+        {
+            List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
+
+            return strains.Count(s => s > strains[0] * 0.66);
+        }
     }
 }

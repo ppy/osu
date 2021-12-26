@@ -40,6 +40,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
+            int aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).RelevantDifficultStrains();
+            int speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).RelevantDifficultStrains();
+
+            // Total number of strains in a map can vary by clockrate, and this needs to be corrected for.
+            aimDifficultyStrainCount = (int)(aimDifficultyStrainCount * clockRate);
+            speedDifficultyStrainCount = (int)(aimDifficultyStrainCount * clockRate);
+
             if (mods.Any(h => h is OsuModRelax))
                 speedRating = 0.0;
 
@@ -78,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedStrain = speedRating,
                 FlashlightRating = flashlightRating,
                 SliderFactor = sliderFactor,
+                AimDifficultStrainCount = aimDifficultyStrainCount,
+                SpeedDifficultStrainCount = speedDifficultyStrainCount,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 DrainRate = drainRate,
