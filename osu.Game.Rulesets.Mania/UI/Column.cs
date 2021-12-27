@@ -136,6 +136,33 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
+        // https://github.com/ppy/osu-framework/blob/49c954321c3686628b2c223670363438f88a0341/osu.Framework/Graphics/Drawable.cs#L1513-L1524
+        private T findClosestParent<T>() where T : class, IDrawable
+        {
+            Drawable cursor = this;
+
+            while ((cursor = cursor.Parent) != null)
+            {
+                if (cursor is T match)
+                    return match;
+            }
+
+            return default;
+        }
+
+        private ManiaInputManager.RulesetKeyBindingContainer keyBindingManager => findClosestParent<ManiaInputManager.RulesetKeyBindingContainer>();
+
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            keyBindingManager.TriggerPressed(Action.Value);
+            return base.OnTouchDown(e);
+        }
+
+        protected override void OnTouchUp(TouchUpEvent e)
+        {
+            keyBindingManager.TriggerReleased(Action.Value);
+        }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
