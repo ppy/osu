@@ -35,8 +35,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double aimRatingNoSliders = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
-            double flashlightRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double rhythmRating = Math.Sqrt(skills[2].DifficultyValue()) * difficulty_multiplier;
+            double speedRating = Math.Sqrt(skills[3].DifficultyValue()) * difficulty_multiplier;
+            double flashlightRating = Math.Sqrt(skills[4].DifficultyValue()) * difficulty_multiplier;
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
@@ -77,6 +78,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimDifficulty = aimRating,
                 SpeedDifficulty = speedRating,
                 FlashlightDifficulty = flashlightRating,
+                RhythmDifficulty = rhythmRating,
                 SliderFactor = sliderFactor,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
@@ -113,6 +115,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 new Aim(mods, true),
                 new Aim(mods, false),
+
+                // It is important to run rhythm calculation before Speed because it depends on Rhythm setting a value in OsuDifficultyHitObject
+                new Rhythm(mods, hitWindowGreat),
                 new Speed(mods, hitWindowGreat),
                 new Flashlight(mods)
             };

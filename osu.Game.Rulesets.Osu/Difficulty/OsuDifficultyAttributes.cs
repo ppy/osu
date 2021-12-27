@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         [JsonProperty("flashlight_difficulty")]
         public double FlashlightDifficulty { get; set; }
 
+        [JsonProperty("rhythm_difficulty")]
+        public double RhythmDifficulty { get; set; }
+
         [JsonProperty("slider_factor")]
         public double SliderFactor { get; set; }
 

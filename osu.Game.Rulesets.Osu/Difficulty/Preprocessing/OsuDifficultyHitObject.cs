@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -69,6 +70,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// Calculated as the angle between the circles (current-2, current-1, current).
         /// </summary>
         public double? Angle { get; private set; }
+
+        /// <summary>
+        /// Rhythm difficulty bonus calculated by <see cref="Rhythm"/> and then used by <see cref="Speed"/>
+        /// </summary>
+        public double? RhythmDifficulty { get; set; }
 
         private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
