@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Total number of strains in a map can vary by clockrate, and this needs to be corrected for.
             aimDifficultyStrainCount = (int)(aimDifficultyStrainCount * clockRate);
-            speedDifficultyStrainCount = (int)(aimDifficultyStrainCount * clockRate);
+            speedDifficultyStrainCount = (int)(speedDifficultyStrainCount * clockRate);
 
             if (mods.Any(h => h is OsuModRelax))
                 speedRating = 0.0;
