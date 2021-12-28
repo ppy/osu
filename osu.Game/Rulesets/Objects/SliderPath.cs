@@ -250,13 +250,13 @@ namespace osu.Game.Rulesets.Objects
                     if (subControlPoints.Length != 3)
                         break;
 
-                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
+                    List<Vector2> subPath = PathApproximator.ApproximateCircularArc(subControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
-                    if (subpath.Count == 0)
+                    if (subPath.Count == 0)
                         break;
 
-                    return subpath;
+                    return subPath;
 
                 case PathType.Catmull:
                     return PathApproximator.ApproximateCatmull(subControlPoints);
