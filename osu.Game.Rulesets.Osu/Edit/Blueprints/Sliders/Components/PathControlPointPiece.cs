@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (pathType)
             {
                 case PathType.Catmull:
-                    return colours.Seafoam;
+                    return colours.SeaFoam;
 
                 case PathType.Bezier:
                     return colours.Pink;

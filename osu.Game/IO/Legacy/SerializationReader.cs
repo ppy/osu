@@ -235,9 +235,9 @@ namespace osu.Game.IO.Legacy
 
                     if (typeName.Contains("System.Collections.Generic") && typeName.Contains("[["))
                     {
-                        string[] splitTyps = typeName.Split('[');
+                        string[] splitTypes = typeName.Split('[');
 
-                        foreach (string typ in splitTyps)
+                        foreach (string typ in splitTypes)
                         {
                             if (typ.Contains("Version"))
                             {
