@@ -22,6 +22,8 @@ namespace osu.Game.Online.API.Requests
     public enum RecentActivityType
     {
         Achievement,
+
+        // ReSharper disable once IdentifierTypo
         BeatmapPlaycount,
         BeatmapsetApprove,
         BeatmapsetDelete,
