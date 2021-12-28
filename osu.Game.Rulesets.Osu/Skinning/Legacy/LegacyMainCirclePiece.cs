@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -72,9 +73,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                hitCircleSprite = new KiaiFlashingSprite
+                hitCircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = baseTexture })
                 {
-                    Texture = baseTexture,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -82,9 +82,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = hitCircleOverlay = new KiaiFlashingSprite
+                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => new Sprite { Texture = overlayTexture })
                     {
-                        Texture = overlayTexture,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
