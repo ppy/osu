@@ -136,22 +136,22 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
+        private ManiaInputManager.RulesetKeyBindingContainer rulesetKeyBindingContainer { get; set; }
 
-        private ManiaInputManager.RulesetKeyBindingContainer getKeyBindingManager()
+        private ManiaInputManager.RulesetKeyBindingContainer getRulesetKeyBindingContainer()
         {
-            return keyBindingContainer ??= ((ManiaInputManager)GetContainingInputManager()).GetKeyBindingContainer();
+            return rulesetKeyBindingContainer ??= ((ManiaInputManager)GetContainingInputManager()).GetKeyBindingContainer();
         }
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
-            getKeyBindingManager().TriggerPressed(Action.Value);
+            getRulesetKeyBindingContainer().TriggerPressed(Action.Value);
             return base.OnTouchDown(e);
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
         {
-            getKeyBindingManager().TriggerReleased(Action.Value);
+            getRulesetKeyBindingContainer().TriggerReleased(Action.Value);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
