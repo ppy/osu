@@ -13,11 +13,6 @@ namespace osu.Game.Rulesets.Mania
             : base(ruleset, variant, SimultaneousBindingMode.Unique)
         {
         }
-
-        public RulesetKeyBindingContainer GetKeyBindingContainer()
-        {
-            return (RulesetKeyBindingContainer)KeyBindingContainer;
-        }
     }
 
     public enum ManiaAction
