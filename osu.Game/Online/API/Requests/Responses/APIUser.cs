@@ -154,7 +154,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"beatmap_playcounts_count")]
         public int BeatmapPlayCountsCount;
 
-        [JsonProperty]
+        [JsonProperty(@"playstyle")]
         private string[] playStyle
         {
             set => PlayStyles = value?.Select(str => Enum.Parse(typeof(APIPlayStyle), str, true)).Cast<APIPlayStyle>().ToArray();

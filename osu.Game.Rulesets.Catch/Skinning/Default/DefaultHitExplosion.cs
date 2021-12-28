@@ -90,9 +90,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 .ResizeTo(largeFaint.Size * new Vector2(5, 1), duration, Easing.OutQuint)
                 .FadeOut(duration * 2);
 
-            const float angle_variable = 15; // should be less than 45
-            directionalGlow1.Rotation = StatelessRNG.NextSingle(-angle_variable, angle_variable, randomSeed, 4);
-            directionalGlow2.Rotation = StatelessRNG.NextSingle(-angle_variable, angle_variable, randomSeed, 5);
+            const float angle_variance = 15; // should be less than 45
+            directionalGlow1.Rotation = StatelessRNG.NextSingle(-angle_variance, angle_variance, randomSeed, 4);
+            directionalGlow2.Rotation = StatelessRNG.NextSingle(-angle_variance, angle_variance, randomSeed, 5);
 
             this.FadeInFromZero(50).Then().FadeOut(duration, Easing.Out);
         }
