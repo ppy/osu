@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
             private ManiaInputManager.RulesetKeyBindingContainer getKeyBindingContainer()
             {
-                return keyBindingContainer ??= ((ManiaInputManager)GetContainingInputManager()).GetKeyBindingContainer();
+                return keyBindingContainer ??= (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
             }
 
             protected override bool OnTouchDown(TouchDownEvent e)
