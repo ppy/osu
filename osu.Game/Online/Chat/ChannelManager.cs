@@ -335,7 +335,7 @@ namespace osu.Game.Online.Chat
         /// right now it caps out at 50 messages and therefore only returns one channel's worth of content.
         /// </summary>
         /// <param name="channel">The channel </param>
-        private void fetchInitalMessages(Channel channel)
+        private void fetchInitialMessages(Channel channel)
         {
             if (channel.Id <= 0 || channel.MessagesLoaded) return;
 
@@ -441,7 +441,7 @@ namespace osu.Game.Online.Chat
             else
             {
                 if (fetchInitialMessages)
-                    fetchInitalMessages(channel);
+                    this.fetchInitialMessages(channel);
             }
 
             CurrentChannel.Value ??= channel;
