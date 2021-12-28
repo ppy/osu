@@ -136,24 +136,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        private ManiaInputManager.RulesetKeyBindingContainer rulesetKeyBindingContainer { get; set; }
-
-        private ManiaInputManager.RulesetKeyBindingContainer getRulesetKeyBindingContainer()
-        {
-            return rulesetKeyBindingContainer ??= ((ManiaInputManager)GetContainingInputManager()).GetKeyBindingContainer();
-        }
-
-        protected override bool OnTouchDown(TouchDownEvent e)
-        {
-            getRulesetKeyBindingContainer().TriggerPressed(Action.Value);
-            return base.OnTouchDown(e);
-        }
-
-        protected override void OnTouchUp(TouchUpEvent e)
-        {
-            getRulesetKeyBindingContainer().TriggerReleased(Action.Value);
-        }
-
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));

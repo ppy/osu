@@ -36,10 +36,31 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             RelativeSizeAxes = Axes.Both;
         }
 
+        public class ChildContainer : Container
+        {
+            private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
+
+            private ManiaInputManager.RulesetKeyBindingContainer getKeyBindingContainer()
+            {
+                return keyBindingContainer ??= ((ManiaInputManager)GetContainingInputManager()).GetKeyBindingContainer();
+            }
+
+            protected override bool OnTouchDown(TouchDownEvent e)
+            {
+                getKeyBindingContainer().TriggerPressed(((DefaultKeyArea)Parent).column.Action.Value);
+                return base.OnTouchDown(e);
+            }
+
+            protected override void OnTouchUp(TouchUpEvent e)
+            {
+                getKeyBindingContainer().TriggerReleased(((DefaultKeyArea)Parent).column.Action.Value);
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
-            InternalChild = directionContainer = new Container
+            InternalChild = directionContainer = new ChildContainer
             {
                 RelativeSizeAxes = Axes.X,
                 Height = Stage.HIT_TARGET_POSITION,
@@ -69,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                                 AlwaysPresent = true
                             }
                         }
-                    }
+                    },
                 }
             };
 
