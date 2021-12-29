@@ -58,11 +58,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return difficulty * DifficultyMultiplier;
         }
 
-        public int RelevantDifficultStrains()
+        /// <summary>
+        /// Returns the number of difficult strains.
+        /// A strain is considered difficult if it's higher than 66% of the highest strain.
+        /// </summary>
+        public int CountDifficultStrains(double clockRate)
         {
             List<double> strains = GetCurrentStrainPeaks().OrderByDescending(d => d).ToList();
 
-            return strains.Count(s => s > strains[0] * 0.66);
+            // Total number of strains in a map can vary by clockrate, and this needs to be corrected for.
+            return (int)(strains.Count(s => s > strains[0] * 0.66) * clockRate);
         }
     }
 }
