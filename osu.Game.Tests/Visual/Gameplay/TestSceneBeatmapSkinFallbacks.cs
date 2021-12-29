@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 AddStep("setup skins", () =>
                 {
-                    skinManager.CurrentSkinInfo.Value = gameCurrentSkin.ToLive();
+                    skinManager.CurrentSkinInfo.Value = gameCurrentSkin.ToLiveUnmanaged();
                     currentBeatmapSkin = getBeatmapSkin();
                 });
             });

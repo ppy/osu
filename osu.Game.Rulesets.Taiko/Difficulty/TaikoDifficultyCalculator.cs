@@ -91,9 +91,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 StarRating = starRating,
                 Mods = mods,
-                StaminaStrain = staminaRating,
-                RhythmStrain = rhythmRating,
-                ColourStrain = colourRating,
+                StaminaDifficulty = staminaRating,
+                RhythmDifficulty = rhythmRating,
+                ColourDifficulty = colourRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
             };

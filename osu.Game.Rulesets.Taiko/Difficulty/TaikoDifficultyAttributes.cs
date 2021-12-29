@@ -9,14 +9,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyAttributes : DifficultyAttributes
     {
-        [JsonProperty("stamina_strain")]
-        public double StaminaStrain { get; set; }
+        [JsonProperty("stamina_difficulty")]
+        public double StaminaDifficulty { get; set; }
 
-        [JsonProperty("rhythm_strain")]
-        public double RhythmStrain { get; set; }
+        [JsonProperty("rhythm_difficulty")]
+        public double RhythmDifficulty { get; set; }
 
-        [JsonProperty("colour_strain")]
-        public double ColourStrain { get; set; }
+        [JsonProperty("colour_difficulty")]
+        public double ColourDifficulty { get; set; }
 
         [JsonProperty("approach_rate")]
         public double ApproachRate { get; set; }
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 yield return v;
 
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-            yield return (ATTRIB_ID_STRAIN, StarRating);
+            yield return (ATTRIB_ID_DIFFICULTY, StarRating);
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
         }
 
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             base.FromDatabaseAttributes(values);
 
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-            StarRating = values[ATTRIB_ID_STRAIN];
+            StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
         }
     }

@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
             {

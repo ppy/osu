@@ -92,6 +92,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected void TriggerOperationStarted() => OperationStarted?.Invoke();
 
-        protected void TriggerOperatoinEnded() => OperationEnded?.Invoke();
+        protected void TriggerOperationEnded() => OperationEnded?.Invoke();
     }
 }

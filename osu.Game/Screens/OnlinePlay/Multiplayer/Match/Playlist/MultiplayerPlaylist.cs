@@ -121,7 +121,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private void addItemToLists(MultiplayerPlaylistItem item)
         {
-            var apiItem = Playlist.Single(i => i.ID == item.ID);
+            var apiItem = Playlist.SingleOrDefault(i => i.ID == item.ID);
+
+            // Item could have been removed from the playlist while the local player was in gameplay.
+            if (apiItem == null)
+                return;
 
             if (item.Expired)
                 historyList.Items.Add(apiItem);

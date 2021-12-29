@@ -10,6 +10,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.Models;
 
 #nullable enable
@@ -27,15 +28,16 @@ namespace osu.Game.Tests.Database
             storage.DeleteDirectory(string.Empty);
         }
 
-        protected void RunTestWithRealm(Action<RealmContextFactory, Storage> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealm(Action<RealmContextFactory, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(() =>
                 {
-                    var testStorage = storage.GetStorageForDirectory(caller);
+                    // ReSharper disable once AccessToDisposedClosure
+                    var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
                         testAction(realmFactory, testStorage);
@@ -52,13 +54,13 @@ namespace osu.Game.Tests.Database
 
         protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(async () =>
                 {
                     var testStorage = storage.GetStorageForDirectory(caller);
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
                         await testAction(realmFactory, testStorage);
