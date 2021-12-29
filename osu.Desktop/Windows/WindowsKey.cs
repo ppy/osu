@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace osu.Desktop.Windows
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     internal class WindowsKey
     {
         private delegate int LowLevelKeyboardProcDelegate(int nCode, int wParam, ref KdDllHookStruct lParam);
@@ -15,7 +17,6 @@ namespace osu.Desktop.Windows
         private const int wh_keyboard_ll = 13;
         private const int wm_keydown = 256;
 
-        // ReSharper disable once IdentifierTypo
         private const int wm_syskeyup = 261;
 
         //Resharper disable once NotAccessedField.Local
@@ -71,7 +72,6 @@ namespace osu.Desktop.Windows
         }
 
         [DllImport(@"user32.dll", EntryPoint = @"SetWindowsHookExA")]
-        // ReSharper disable once IdentifierTypo
         private static extern IntPtr setWindowsHookEx(int idHook, LowLevelKeyboardProcDelegate lpfn, IntPtr hMod, int dwThreadId);
 
         [DllImport(@"user32.dll", EntryPoint = @"UnhookWindowsHookEx")]
