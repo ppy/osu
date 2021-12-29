@@ -193,7 +193,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 this.room = room;
             }
 
-            private OsuPasswordTextBox passwordTextbox;
+            private OsuPasswordTextBox passwordTextBox;
             private TriangleButton joinButton;
             private OsuSpriteText errorText;
             private Sample sampleJoinFail;
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                passwordTextbox = new OsuPasswordTextBox
+                                passwordTextBox = new OsuPasswordTextBox
                                 {
                                     Width = 200,
                                     PlaceholderText = "password",
@@ -246,21 +246,21 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 base.LoadComplete();
 
-                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextbox));
-                passwordTextbox.OnCommit += (_, __) => performJoin();
+                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
+                passwordTextBox.OnCommit += (_, __) => performJoin();
             }
 
             private void performJoin()
             {
-                lounge?.Join(room, passwordTextbox.Text, null, joinFailed);
-                GetContainingInputManager().TriggerFocusContention(passwordTextbox);
+                lounge?.Join(room, passwordTextBox.Text, null, joinFailed);
+                GetContainingInputManager().TriggerFocusContention(passwordTextBox);
             }
 
             private void joinFailed(string error) => Schedule(() =>
             {
-                passwordTextbox.Text = string.Empty;
+                passwordTextBox.Text = string.Empty;
 
-                GetContainingInputManager().ChangeFocus(passwordTextbox);
+                GetContainingInputManager().ChangeFocus(passwordTextBox);
 
                 errorText.Text = error;
                 errorText

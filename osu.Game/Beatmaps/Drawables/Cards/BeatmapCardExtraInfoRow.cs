@@ -1,21 +1,28 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
 namespace osu.Game.Beatmaps.Drawables.Cards
 {
-    public class BeatmapCardExtraInfoRow : HoverHandlingContainer
+    public class BeatmapCardExtraInfoRow : CompositeDrawable
     {
+        [Resolved(CanBeNull = true)]
+        private BeatmapCardContent? content { get; set; }
+
         public BeatmapCardExtraInfoRow(APIBeatmapSet beatmapSet)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Child = new FillFlowContainer
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -38,6 +45,20 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     }
                 }
             };
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            content?.ExpandAfterDelay();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            if (content?.Expanded.Value == false)
+                content.CancelExpand();
+
+            base.OnHoverLost(e);
         }
     }
 }

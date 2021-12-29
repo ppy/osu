@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -14,6 +15,7 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Models;
 using osu.Game.Rulesets;
@@ -118,6 +120,7 @@ namespace osu.Game.Tests.Beatmaps
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
 
         #endregion
 
@@ -164,7 +167,7 @@ namespace osu.Game.Tests.Beatmaps
                 return Array.Empty<byte>();
             }
 
-            public Task<byte[]> GetAsync(string name)
+            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
             {
                 markLookup(name);
                 return Task.FromResult(Array.Empty<byte>());

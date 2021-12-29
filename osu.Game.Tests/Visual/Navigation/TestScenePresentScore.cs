@@ -65,11 +65,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenu([Values] ScorePresentType type)
         {
             var firstImport = importScore(1);
-            var secondimport = importScore(3);
+            var secondImport = importScore(3);
 
             presentAndConfirm(firstImport, type);
             returnToMenu();
-            presentAndConfirm(secondimport, type);
+            presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
         }
@@ -78,11 +78,11 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenuDifferentRuleset([Values] ScorePresentType type)
         {
             var firstImport = importScore(1);
-            var secondimport = importScore(3, new ManiaRuleset().RulesetInfo);
+            var secondImport = importScore(3, new ManiaRuleset().RulesetInfo);
 
             presentAndConfirm(firstImport, type);
             returnToMenu();
-            presentAndConfirm(secondimport, type);
+            presentAndConfirm(secondImport, type);
             returnToMenu();
             returnToMenu();
         }
@@ -93,8 +93,8 @@ namespace osu.Game.Tests.Visual.Navigation
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
-            var secondimport = importScore(3);
-            presentAndConfirm(secondimport, type);
+            var secondImport = importScore(3);
+            presentAndConfirm(secondImport, type);
         }
 
         [Test]
@@ -103,8 +103,8 @@ namespace osu.Game.Tests.Visual.Navigation
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
-            var secondimport = importScore(3, new ManiaRuleset().RulesetInfo);
-            presentAndConfirm(secondimport, type);
+            var secondImport = importScore(3, new ManiaRuleset().RulesetInfo);
+            presentAndConfirm(secondImport, type);
         }
 
         private void returnToMenu()

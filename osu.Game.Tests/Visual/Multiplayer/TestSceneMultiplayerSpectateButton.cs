@@ -21,7 +21,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Tests.Resources;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -121,10 +120,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(MultiplayerUserState.Ready)]
         public void TestToggleWhenIdle(MultiplayerUserState initialState)
         {
-            addClickSpectateButtonStep();
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             AddUntilStep("user is spectating", () => Client.Room?.Users[0].State == MultiplayerUserState.Spectating);
 
-            addClickSpectateButtonStep();
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             AddUntilStep("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
         }
 
@@ -138,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestReadyButtonDisabledWhenHostAndNoReadyUsers()
         {
-            addClickSpectateButtonStep();
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             assertReadyButtonEnablement(false);
         }
 
@@ -148,7 +147,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("add user", () => Client.AddUser(new APIUser { Id = PLAYER_1_ID }));
             AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
-            addClickSpectateButtonStep();
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             assertReadyButtonEnablement(true);
         }
 
@@ -163,15 +162,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
-            addClickSpectateButtonStep();
+            ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             assertReadyButtonEnablement(false);
         }
-
-        private void addClickSpectateButtonStep() => AddStep("click spectate button", () =>
-        {
-            InputManager.MoveMouseTo(spectateButton);
-            InputManager.Click(MouseButton.Left);
-        });
 
         private void assertSpectateButtonEnablement(bool shouldBeEnabled)
             => AddUntilStep($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
