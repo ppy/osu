@@ -70,16 +70,18 @@ namespace osu.Game.Skinning.Editor
             // base call intentionally omitted.
             if (skinEditor == null)
             {
-                skinEditor = new SkinEditor(target);
-                skinEditor.State.BindValueChanged(editorVisibilityChanged);
+                var editor = new SkinEditor(target);
+                editor.State.BindValueChanged(editorVisibilityChanged);
 
                 // Schedule ensures that if `Show` is called before this overlay is loaded,
                 // it will not throw (LoadComponentAsync requires the load target to be in a loaded state).
                 Schedule(() =>
                 {
-                    Debug.Assert(skinEditor != null);
-                    LoadComponentAsync(skinEditor, AddInternal);
+                    Debug.Assert(editor != null);
+                    LoadComponentAsync(editor, AddInternal);
                 });
+
+                skinEditor = editor;
             }
             else
                 skinEditor.Show();
