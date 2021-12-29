@@ -70,16 +70,16 @@ namespace osu.Game.Tournament.Screens.Editors
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Add new",
-                            Action = () => Storage.Add(new TModel())
+                            Action = () => Storage.Add(new TModel()),
                         },
                         new DangerousSettingsButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Clear all",
-                            Action = Storage.Clear
+                            Action = Storage.Clear,
                         },
-                    }
-                }
+                    },
+                },
             });
 
             if (parentScreen != null)
@@ -89,7 +89,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     State = { Value = Visibility.Visible },
-                    Action = () => sceneManager?.SetScreen(parentScreen.GetType())
+                    Action = () => sceneManager?.SetScreen(parentScreen.GetType()),
                 });
 
                 flow.Padding = new MarginPadding { Bottom = backButton.Height * 2 };

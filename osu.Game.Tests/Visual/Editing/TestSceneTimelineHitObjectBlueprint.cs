@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     Position = new Vector2(256, 256),
                     StartTime = 2700,
-                    Duration = 500
+                    Duration = 500,
                 });
             });
 

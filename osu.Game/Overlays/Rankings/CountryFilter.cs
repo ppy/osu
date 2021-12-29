@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     background = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer
                     {
@@ -60,18 +60,18 @@ namespace osu.Game.Overlays.Rankings
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = @"filtered by country:",
-                                Font = OsuFont.GetFont(size: 14)
+                                Font = OsuFont.GetFont(size: 14),
                             },
                             countryPill = new CountryPill
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Alpha = 0,
-                                Current = Current
-                            }
-                        }
-                    }
-                }
+                                Current = Current,
+                            },
+                        },
+                    },
+                },
             };
         }
 

@@ -116,9 +116,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                         Origin = Anchor.TopRight,
                         Colour = Color4.Gray,
                     },
-                    panelLeft = new ModBlindsPanel { Origin = Anchor.TopRight, },
+                    panelLeft = new ModBlindsPanel { Origin = Anchor.TopRight },
                     bgPanelRight = new ModBlindsPanel { Colour = Color4.Gray },
-                    panelRight = new ModBlindsPanel()
+                    panelRight = new ModBlindsPanel(),
                 };
             }
 

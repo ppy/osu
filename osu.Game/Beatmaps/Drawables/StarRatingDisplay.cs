@@ -126,10 +126,10 @@ namespace osu.Game.Beatmaps.Drawables
                                     Font = OsuFont.Torus.With(size: 14.4f, weight: FontWeight.Bold),
                                     Shadow = false,
                                 },
-                            }
-                        }
+                            },
+                        },
                     },
-                }
+                },
             };
         }
 

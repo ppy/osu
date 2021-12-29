@@ -62,11 +62,11 @@ namespace osu.Game.Tournament.Screens.Setup
                         Button = new TriangleButton
                         {
                             Size = new Vector2(100, 40),
-                            Action = () => Action?.Invoke()
-                        }
-                    }
-                }
-            }
+                            Action = () => Action?.Invoke(),
+                        },
+                    },
+                },
+            },
         };
     }
 }

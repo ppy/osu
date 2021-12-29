@@ -32,9 +32,9 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    AutoSizeAxes = Axes.Both
+                    AutoSizeAxes = Axes.Both,
                 },
-                login = new LoginOverlay()
+                login = new LoginOverlay(),
             });
         }
 

@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes please!",
-                    Action = importFromStable
+                    Action = importFromStable,
                 },
                 new PopupDialogCancelButton
                 {

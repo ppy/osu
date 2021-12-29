@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Objects
                 AddNested(new HoldNoteTick
                 {
                     StartTime = t,
-                    Column = Column
+                    Column = Column,
                 });
             }
         }

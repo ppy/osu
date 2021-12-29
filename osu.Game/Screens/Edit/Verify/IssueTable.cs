@@ -101,14 +101,14 @@ namespace osu.Game.Screens.Edit.Verify
             {
                 Text = $"#{index + 1}",
                 Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Medium),
-                Margin = new MarginPadding { Right = 10 }
+                Margin = new MarginPadding { Right = 10 },
             },
             new OsuSpriteText
             {
                 Text = issue.Template.Type.ToString(),
                 Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
                 Margin = new MarginPadding { Right = 10 },
-                Colour = issue.Template.Colour
+                Colour = issue.Template.Colour,
             },
             new OsuSpriteText
             {
@@ -119,14 +119,14 @@ namespace osu.Game.Screens.Edit.Verify
             new OsuSpriteText
             {
                 Text = issue.ToString(),
-                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Medium)
+                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Medium),
             },
             new OsuSpriteText
             {
                 Text = issue.Check.Metadata.Category.ToString(),
                 Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold),
-                Margin = new MarginPadding(10)
-            }
+                Margin = new MarginPadding(10),
+            },
         };
     }
 }

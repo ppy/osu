@@ -60,7 +60,7 @@ namespace osu.Game.Models
             Name = Name,
             ShortName = ShortName,
             InstantiationInfo = InstantiationInfo,
-            Available = Available
+            Available = Available,
         };
 
         public Ruleset CreateInstance()

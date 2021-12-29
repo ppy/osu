@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         Width = 0.5f,
                         Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     },
                     new ColumnTestContainer(1, ManiaAction.Key2)
                     {
@@ -39,10 +39,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         Width = 0.5f,
                         Child = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                }
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    },
+                },
             });
         }
     }

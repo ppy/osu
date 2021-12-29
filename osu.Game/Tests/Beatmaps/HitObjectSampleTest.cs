@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Beatmaps
                 beatmapInfo.BeatmapSet.Files.Add(new BeatmapSetFileInfo
                 {
                     Filename = beatmapFile,
-                    FileInfo = new IO.FileInfo { Hash = beatmapFile }
+                    FileInfo = new IO.FileInfo { Hash = beatmapFile },
                 });
 
                 // Need to refresh the cached skin source to refresh the skin resource store.

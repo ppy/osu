@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Menu
 
                 LoadComponentAsync(new WelcomeIntroSequence
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 }, intro =>
                 {
                     PrepareMenuLoad();
@@ -126,22 +126,22 @@ namespace osu.Game.Screens.Menu
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Colour = Color4.DarkBlue,
-                                Size = new Vector2(0.96f)
+                                Size = new Vector2(0.96f),
                             },
                             new Circle
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(480),
-                                Colour = Color4.Black
+                                Colour = Color4.Black,
                             },
                             welcomeText = new Sprite
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Texture = textures.Get(@"Intro/Welcome/welcome_text")
+                                Texture = textures.Get(@"Intro/Welcome/welcome_text"),
                             },
-                        }
+                        },
                     },
                 };
             }

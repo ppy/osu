@@ -29,15 +29,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Id = 2,
                         Username = "peppy",
-                    }
-                }
+                    },
+                },
             };
 
             Child = list = new DrawableRoomParticipantsList
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                NumberOfCircles = 4
+                NumberOfCircles = 4,
             };
         });
 
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             SelectedRoom.Value.RecentParticipants.Add(new APIUser
             {
                 Id = id,
-                Username = $"User {id}"
+                Username = $"User {id}",
             });
             SelectedRoom.Value.ParticipantCount.Value++;
         }

@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 },
                 BeatmapInfo =
                 {
-                    Ruleset = new TaikoRuleset().RulesetInfo
-                }
+                    Ruleset = new TaikoRuleset().RulesetInfo,
+                },
             };
 
         [Test]

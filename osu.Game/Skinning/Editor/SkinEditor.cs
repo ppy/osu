@@ -63,7 +63,7 @@ namespace osu.Game.Skinning.Editor
                         Padding = new MarginPadding(20),
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.X
+                        RelativeSizeAxes = Axes.X,
                     },
                     new GridContainer
                     {
@@ -71,7 +71,7 @@ namespace osu.Game.Skinning.Editor
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension()
+                            new Dimension(),
                         },
                         Content = new[]
                         {
@@ -81,7 +81,7 @@ namespace osu.Game.Skinning.Editor
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    RequestPlacement = placeComponent
+                                    RequestPlacement = placeComponent,
                                 },
                                 new Container
                                 {
@@ -127,14 +127,14 @@ namespace osu.Game.Skinning.Editor
                                                     Width = 140,
                                                     Action = revert,
                                                 },
-                                            }
+                                            },
                                         },
-                                    }
+                                    },
                                 },
-                            }
-                        }
-                    }
-                }
+                            },
+                        },
+                    },
+                },
             };
         }
 

@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual
             : base((beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateReplayScore(beatmap, mods), new PlayerConfiguration
             {
                 AllowPause = allowPause,
-                ShowResults = showResults
+                ShowResults = showResults,
             })
         {
             PauseOnFocusLost = pauseOnFocusLost;
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual
             : base(score, new PlayerConfiguration
             {
                 AllowPause = allowPause,
-                ShowResults = showResults
+                ShowResults = showResults,
             })
         {
             PauseOnFocusLost = pauseOnFocusLost;

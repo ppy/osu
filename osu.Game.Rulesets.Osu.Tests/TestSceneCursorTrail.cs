@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             createTest(() => scalingContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new CursorTrail()
+                Child = new CursorTrail(),
             });
 
             AddStep("set large scale", () => scalingContainer.Scale = new Vector2(10));
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.8f),
-                Child = new MovingCursorInputManager { Child = createContent?.Invoke() }
+                Child = new MovingCursorInputManager { Child = createContent?.Invoke() },
             });
         });
 

@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.LayerGroup
+            Icon = FontAwesome.Solid.LayerGroup,
         };
 
         public UserInterfaceSection()
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new GeneralSettings(),
                 new MainMenuSettings(),
-                new SongSelectSettings()
+                new SongSelectSettings(),
             };
         }
     }

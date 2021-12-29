@@ -297,17 +297,17 @@ namespace osu.Game.Overlays.Mods
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                        }
-                    }
+                        },
+                    },
                 },
                 text = new OsuSpriteText
                 {
                     Y = 75,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    Font = OsuFont.GetFont(size: 18)
+                    Font = OsuFont.GetFont(size: 18),
                 },
-                new HoverSounds()
+                new HoverSounds(),
             };
             Mod = mod;
         }

@@ -97,7 +97,7 @@ namespace osu.Game.Input
                         KeyCombinationString = k.KeyCombination.ToString(),
                         ActionInt = (int)k.Action,
                         RulesetName = rulesetName,
-                        Variant = variant
+                        Variant = variant,
                     }));
                 }
                 else if (defaultsCount < existingCount)
@@ -123,7 +123,7 @@ namespace osu.Game.Input
             InputKey.MouseWheelDown,
             InputKey.MouseWheelLeft,
             InputKey.MouseWheelUp,
-            InputKey.MouseWheelRight
+            InputKey.MouseWheelRight,
         };
 
         public static bool CheckValidForGameplay(KeyCombination combination)

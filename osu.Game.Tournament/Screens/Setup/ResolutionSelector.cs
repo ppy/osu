@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Screens.Setup
             FlowContainer.Insert(-1, numberBox = new OsuNumberBox
             {
                 Text = "1080",
-                Width = 100
+                Width = 100,
             });
 
             base.Action = () =>

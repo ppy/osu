@@ -46,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             RelativeSizeAxes = Axes.Both,
             RelativePositionAxes = Axes.Y,
-            SettingsApplied = Hide
+            SettingsApplied = Hide,
         };
 
         protected class MatchSettings : OnlinePlayComposite
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
+                        Colour = colourProvider.Background4,
                     },
                     new GridContainer
                     {
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                        Vertical = 10
+                                        Vertical = 10,
                                     },
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                     Alpha = disabled_alpha,
                                                                     Child = AvailabilityPicker = new RoomAvailabilityPicker
                                                                     {
-                                                                        Enabled = { Value = false }
+                                                                        Enabled = { Value = false },
                                                                     },
                                                                 },
                                                                 new Section("Game type")
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                             typeLabel = new OsuSpriteText
                                                                             {
                                                                                 Font = OsuFont.GetFont(size: 14),
-                                                                                Colour = colours.Yellow
+                                                                                Colour = colours.Yellow,
                                                                             },
                                                                         },
                                                                     },
@@ -201,10 +201,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         Height = 40,
                                                                         Child = QueueModeDropdown = new OsuEnumDropdown<QueueMode>
                                                                         {
-                                                                            RelativeSizeAxes = Axes.X
-                                                                        }
-                                                                    }
-                                                                }
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                        },
+                                                                    },
+                                                                },
                                                             },
                                                         },
                                                         new SectionContainer
@@ -233,8 +233,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         LengthLimit = 255,
                                                                     },
                                                                 },
-                                                            }
-                                                        }
+                                                            },
+                                                        },
                                                     },
                                                 },
                                                 playlistContainer = new FillFlowContainer
@@ -251,19 +251,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                         drawablePlaylist = new DrawableRoomPlaylist
                                                         {
                                                             RelativeSizeAxes = Axes.X,
-                                                            Height = DrawableRoomPlaylistItem.HEIGHT
+                                                            Height = DrawableRoomPlaylistItem.HEIGHT,
                                                         },
                                                         new PurpleTriangleButton
                                                         {
                                                             RelativeSizeAxes = Axes.X,
                                                             Height = 40,
                                                             Text = "Select beatmap",
-                                                            Action = SelectBeatmap
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                                            Action = SelectBeatmap,
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
                                     },
                                 },
                             },
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = colourProvider.Background5
+                                            Colour = colourProvider.Background5,
                                         },
                                         new FillFlowContainer
                                         {
@@ -307,16 +307,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                     Origin = Anchor.BottomCentre,
                                                     Alpha = 0,
                                                     Depth = 1,
-                                                    Colour = colours.RedDark
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                                                    Colour = colours.RedDark,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
-                    loadingLayer = new LoadingLayer(true)
+                    loadingLayer = new LoadingLayer(true),
                 };
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);

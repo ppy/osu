@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Children = new[]
             {
                 new PaginatedScoreContainer(ScoreType.Best, User, UsersStrings.ShowExtraTopRanksBestTitle),
-                new PaginatedScoreContainer(ScoreType.Firsts, User, UsersStrings.ShowExtraTopRanksFirstTitle)
+                new PaginatedScoreContainer(ScoreType.Firsts, User, UsersStrings.ShowExtraTopRanksFirstTitle),
             };
         }
     }

@@ -61,7 +61,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             return new Room
             {
                 Name = { Value = $"{api.LocalUser}'s awesome playlist" },
-                Type = { Value = MatchType.Playlists }
+                Type = { Value = MatchType.Playlists },
             };
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             Any,
             Normal,
-            Spotlight
+            Spotlight,
         }
     }
 }

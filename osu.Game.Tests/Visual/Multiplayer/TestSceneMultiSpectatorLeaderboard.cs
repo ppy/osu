@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 clocks = new Dictionary<int, ManualClock>
                 {
                     { PLAYER_1_ID, new ManualClock() },
-                    { PLAYER_2_ID, new ManualClock() }
+                    { PLAYER_2_ID, new ManualClock() },
                 };
 
                 foreach ((int userId, var _) in clocks)

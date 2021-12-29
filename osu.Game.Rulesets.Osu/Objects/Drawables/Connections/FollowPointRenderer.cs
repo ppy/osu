@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             InternalChildren = new Drawable[]
             {
                 connectionPool = new DrawablePool<FollowPointConnection>(1, 200),
-                pointPool = new DrawablePool<FollowPoint>(50, 1000)
+                pointPool = new DrawablePool<FollowPoint>(50, 1000),
             };
         }
 

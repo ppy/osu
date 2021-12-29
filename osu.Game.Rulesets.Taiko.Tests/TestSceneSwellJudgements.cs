@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
                     {
                         StartTime = 1000,
                         Duration = 1000,
-                    }
-                }
+                    },
+                },
             };
 
             return beatmap;

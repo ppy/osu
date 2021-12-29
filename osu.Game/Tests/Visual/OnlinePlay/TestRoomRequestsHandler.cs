@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         MaxCombo = 1000,
                         TotalScore = 1000000,
                         User = localUser,
-                        Statistics = new Dictionary<HitResult, int>()
+                        Statistics = new Dictionary<HitResult, int>(),
                     });
                     return true;
             }

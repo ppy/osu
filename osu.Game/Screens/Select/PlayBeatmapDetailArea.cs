@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Select
             Local,
             Country,
             Global,
-            Friends
+            Friends,
         }
     }
 }

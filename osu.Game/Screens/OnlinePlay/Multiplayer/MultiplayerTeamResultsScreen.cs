@@ -99,7 +99,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Height = winner_background_half_height,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
-                            Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0), Colour4.Black.Opacity(0.4f))
+                            Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0), Colour4.Black.Opacity(0.4f)),
                         },
                         new Box
                         {
@@ -107,16 +107,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Height = winner_background_half_height,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
-                            Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.4f), Colour4.Black.Opacity(0))
-                        }
-                    }
+                            Colour = ColourInfo.GradientVertical(Colour4.Black.Opacity(0.4f), Colour4.Black.Opacity(0)),
+                        },
+                    },
                 },
                 (winnerText = new OsuSpriteText
                 {
                     Alpha = 0,
                     Font = OsuFont.Torus.With(size: 80, weight: FontWeight.Bold),
                     Text = winner,
-                    Blending = BlendingParameters.Additive
+                    Blending = BlendingParameters.Additive,
                 }).WithEffect(new GlowEffect
                 {
                     Colour = winnerColour,
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 {
                     e.Anchor = Anchor.Centre;
                     e.Origin = Anchor.Centre;
-                })
+                }),
             });
         }
 

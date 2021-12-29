@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Login
 
                 protected override Drawable CreateContent() => new Content
                 {
-                    Label = { Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 } }
+                    Label = { Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 } },
                 };
             }
         }

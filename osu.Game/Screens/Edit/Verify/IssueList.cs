@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Verify
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                         },
-                    }
+                    },
                 },
             };
         }

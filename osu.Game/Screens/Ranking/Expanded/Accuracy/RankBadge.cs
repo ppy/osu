@@ -70,9 +70,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                             AlwaysPresent = true,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

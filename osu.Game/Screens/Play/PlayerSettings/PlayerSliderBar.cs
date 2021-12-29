@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override Drawable CreateControl() => new SliderBar
         {
-            RelativeSizeAxes = Axes.X
+            RelativeSizeAxes = Axes.X,
         };
 
         private class SliderBar : OsuSliderBar<T>

@@ -22,24 +22,24 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 new SettingsCheckbox
                 {
                     LabelText = UserInterfaceStrings.CursorRotation,
-                    Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                    Current = config.GetBindable<bool>(OsuSetting.CursorRotation),
                 },
                 new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
                 },
                 new SettingsCheckbox
                 {
                     LabelText = UserInterfaceStrings.Parallax,
-                    Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuParallax),
                 },
                 new SettingsSlider<float, TimeSlider>
                 {
                     LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
-                    KeyboardStep = 50
+                    KeyboardStep = 50,
                 },
             };
         }

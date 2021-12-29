@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Visual.Background
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "THIS IS A STORYBOARD",
-                Font = new FontUsage(size: 50)
+                Font = new FontUsage(size: 50),
             });
         });
 

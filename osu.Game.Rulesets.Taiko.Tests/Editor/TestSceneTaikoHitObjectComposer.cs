@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Editor
                 {
                     EditorBeatmap = new EditorBeatmap(new TaikoBeatmap())
                     {
-                        BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo }
+                        BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo },
                     },
-                    new TaikoHitObjectComposer(new TaikoRuleset())
+                    new TaikoHitObjectComposer(new TaikoRuleset()),
                 };
 
                 for (int i = 0; i < 10; i++)

@@ -47,14 +47,14 @@ namespace osu.Game.Overlays.News.Sidebar
                 {
                     new DropdownHeader(month, year)
                     {
-                        Expanded = { BindTarget = Expanded }
+                        Expanded = { BindTarget = Expanded },
                     },
                     new PostsContainer
                     {
                         Expanded = { BindTarget = Expanded },
-                        Children = posts.Select(p => new PostButton(p)).ToArray()
-                    }
-                }
+                        Children = posts.Select(p => new PostButton(p)).ToArray(),
+                    },
+                },
             };
 
             Expanded.ValueChanged += expanded =>
@@ -93,15 +93,15 @@ namespace osu.Game.Overlays.News.Sidebar
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                        Text = date.ToString("MMM yyyy")
+                        Text = date.ToString("MMM yyyy"),
                     },
                     icon = new SpriteIcon
                     {
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Size = new Vector2(10),
-                        Icon = FontAwesome.Solid.ChevronDown
-                    }
+                        Icon = FontAwesome.Solid.ChevronDown,
+                    },
                 };
             }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Text = post.Title
+                    Text = post.Title,
                 };
             }
 
@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 5),
-                    Alpha = 0
+                    Alpha = 0,
                 };
             }
 

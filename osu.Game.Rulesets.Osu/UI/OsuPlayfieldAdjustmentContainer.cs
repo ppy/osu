@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 4f / 3,
-                Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both }
+                Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both },
             };
         }
 

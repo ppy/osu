@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Play
                     {
                         ModDisplay = CreateModsContainer(),
                         PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
-                    }
+                    },
                 },
                 bottomRightElements = new FillFlowContainer
                 {
@@ -115,8 +115,8 @@ namespace osu.Game.Screens.Play
                     {
                         KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
-                    }
-                }
+                    },
+                },
             };
         }
 
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}."
+                    Text = $"The score overlay is currently disabled. You can toggle this by pressing {config.LookupKeyBindings(GlobalAction.ToggleInGameInterface)}.",
                 });
             }
 
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Play
 
         protected FailingLayer CreateFailingLayer() => new FailingLayer
         {
-            ShowHealth = { BindTarget = ShowHealthBar }
+            ShowHealth = { BindTarget = ShowHealthBar },
         };
 
         protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay

@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         new OverlinedTotalPlayTime
                                         {
-                                            User = { BindTarget = User }
+                                            User = { BindTarget = User },
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             Title = "pp",
                                             LineColour = colours.Red,
                                         },
-                                    }
+                                    },
                                 },
                                 new FillFlowContainer
                                 {
@@ -127,9 +127,9 @@ namespace osu.Game.Overlays.Profile.Header
                                         scoreRankInfos[ScoreRank.SH] = new ScoreRankInfo(ScoreRank.SH),
                                         scoreRankInfos[ScoreRank.S] = new ScoreRankInfo(ScoreRank.S),
                                         scoreRankInfos[ScoreRank.A] = new ScoreRankInfo(ScoreRank.A),
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         },
                         new Container
                         {
@@ -162,11 +162,11 @@ namespace osu.Game.Overlays.Profile.Header
                                             Title = UsersStrings.ShowRankCountrySimple,
                                             LineColour = colourProvider.Highlight1,
                                         },
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         },
-                    }
+                    },
                 },
             };
         }
@@ -213,9 +213,9 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
-                        }
-                    }
+                            Origin = Anchor.TopCentre,
+                        },
+                    },
                 };
             }
         }

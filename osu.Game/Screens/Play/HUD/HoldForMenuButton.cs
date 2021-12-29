@@ -48,14 +48,14 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft
+                    Origin = Anchor.CentreLeft,
                 },
                 button = new Button
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
                     HoverLost = () => text.FadeOut(500, Easing.OutQuint),
-                    IsPaused = { BindTarget = IsPaused }
-                }
+                    IsPaused = { BindTarget = IsPaused },
+                },
             };
             AutoSizeAxes = Axes.Both;
         }
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play.HUD
                         circularProgress = new CircularProgress
                         {
                             RelativeSizeAxes = Axes.Both,
-                            InnerRadius = 1
+                            InnerRadius = 1,
                         },
                         overlayCircle = new Circle
                         {
@@ -151,9 +151,9 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(15),
-                            Icon = FontAwesome.Solid.Times
+                            Icon = FontAwesome.Solid.Times,
                         },
-                    }
+                    },
                 };
 
                 bind();

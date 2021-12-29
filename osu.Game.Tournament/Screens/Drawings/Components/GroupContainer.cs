@@ -37,7 +37,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                     AutoSizeAxes = Axes.Both,
 
-                    Spacing = new Vector2(7f, 0)
+                    Spacing = new Vector2(7f, 0),
                 },
                 bottomGroups = new FillFlowContainer<Group>
                 {
@@ -46,8 +46,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                     AutoSizeAxes = Axes.Both,
 
-                    Spacing = new Vector2(7f, 0)
-                }
+                    Spacing = new Vector2(7f, 0),
+                },
             };
 
             for (int i = 0; i < numGroups; i++)

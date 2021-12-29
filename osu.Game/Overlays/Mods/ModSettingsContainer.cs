@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Mods
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new Color4(0, 0, 0, 192)
+                        Colour = new Color4(0, 0, 0, 192),
                     },
                     new OsuScrollContainer
                     {
@@ -61,9 +61,9 @@ namespace osu.Game.Overlays.Mods
                             AutoSizeAxes = Axes.Y,
                             Spacing = new Vector2(0f, 10f),
                             Padding = new MarginPadding(20),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

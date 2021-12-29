@@ -23,8 +23,8 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Hitcircle / Slider Combos",
                     FixedLabelWidth = LABEL_WIDTH,
-                    ColourNamePrefix = "Combo"
-                }
+                    ColourNamePrefix = "Combo",
+                },
             };
 
             if (Beatmap.BeatmapSkin != null)

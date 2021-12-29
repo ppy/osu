@@ -16,6 +16,6 @@ namespace osu.Game.Online.Multiplayer
         AllPlayers,
 
         [Description("All players (round robin)")]
-        AllPlayersRoundRobin
+        AllPlayersRoundRobin,
     }
 }

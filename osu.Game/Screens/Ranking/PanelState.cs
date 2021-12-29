@@ -6,6 +6,6 @@ namespace osu.Game.Screens.Ranking
     public enum PanelState
     {
         Expanded,
-        Contracted
+        Contracted,
     }
 }

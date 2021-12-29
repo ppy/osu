@@ -209,8 +209,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             Colour = colours.Gray0,
                             Font = OsuFont.Default.With(size: 11),
                             Text = text,
-                        }
-                    }
+                        },
+                    },
                 },
                 new Container
                 {
@@ -225,15 +225,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             RelativeSizeAxes = Axes.Both,
 
                             AlwaysPresent = true,
-                            Alpha = 0
+                            Alpha = 0,
                         },
-                    }
+                    },
                 },
                 dragHandles = new SelectionBoxDragHandleContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     // ensures that the centres of all drag handles line up with the middle of the selection box border.
-                    Padding = new MarginPadding(BORDER_RADIUS / 2)
+                    Padding = new MarginPadding(BORDER_RADIUS / 2),
                 },
                 buttons = new FillFlowContainer
                 {
@@ -241,8 +241,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.Centre
-                }
+                    Origin = Anchor.Centre,
+                },
             };
 
             if (CanScaleX) addXScaleComponents();
@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             var button = new SelectionBoxButton(icon, tooltip)
             {
-                Action = action
+                Action = action,
             };
 
             button.OperationStarted += operationStarted;
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor)
+                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor),
             };
 
             handle.OperationStarted += operationStarted;
@@ -325,7 +325,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxRotationHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e))
+                HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e)),
             };
 
             handle.OperationStarted += operationStarted;

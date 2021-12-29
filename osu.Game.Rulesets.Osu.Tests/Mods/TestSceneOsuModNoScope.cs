@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         {
                             Position = new Vector2(300, 192),
                             StartTime = 5000,
-                        }
+                        },
                     },
                     Breaks = new List<BreakPeriod>
                     {
                         new BreakPeriod(2000, 4000),
-                    }
-                }
+                    },
+                },
             });
 
             AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(0));
@@ -88,9 +88,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         {
                             Position = new Vector2(300, 192),
                             StartTime = 5000,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
 
             AddUntilStep("wait for cursor to hide", () => cursorAlphaAlmostEquals(0));
@@ -130,8 +130,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                             Position = new Vector2(200, 192),
                             StartTime = 5000,
                         },
-                    }
-                }
+                    },
+                },
             });
 
             AddAssert("cursor must start visible", () => cursorAlphaAlmostEquals(1));

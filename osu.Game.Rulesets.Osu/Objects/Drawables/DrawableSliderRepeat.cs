@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         Origin = Anchor.Centre,
                     },
                     Arrow = new ReverseArrowPiece(),
-                }
+                },
             };
 
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));

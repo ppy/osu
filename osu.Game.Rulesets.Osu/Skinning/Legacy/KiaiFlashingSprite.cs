@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Origin = Anchor.Centre,
                     Alpha = 0,
                     Blending = BlendingParameters.Additive,
-                }
+                },
             };
         }
 

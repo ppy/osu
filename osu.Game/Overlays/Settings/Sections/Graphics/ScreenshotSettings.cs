@@ -21,13 +21,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = GraphicsSettingsStrings.ScreenshotFormat,
-                    Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
+                    Current = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GraphicsSettingsStrings.ShowCursorInScreenshots,
-                    Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
-                }
+                    Current = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor),
+                },
             };
         }
     }

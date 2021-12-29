@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mods
                     {
                         ShowsDefaultIndicator = false,
                         Current = currentNumber,
-                    }
+                    },
                 };
 
                 AutoSizeAxes = Axes.Y;

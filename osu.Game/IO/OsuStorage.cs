@@ -36,7 +36,7 @@ namespace osu.Game.IO
         public override string[] IgnoreDirectories => new[]
         {
             "cache",
-            "client.realm.management"
+            "client.realm.management",
         };
 
         public override string[] IgnoreFiles => new[]

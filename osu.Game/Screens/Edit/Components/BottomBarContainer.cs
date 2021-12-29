@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Horizontal = contents_padding },
-                }
+                },
             };
         }
 

@@ -40,7 +40,7 @@ namespace osu.Game.Tournament.Components
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                FillMode = FillMode.Fill
+                FillMode = FillMode.Fill,
             };
 
             (flag = team.FlagName.GetBoundCopy()).BindValueChanged(acronym => flagSprite.Texture = textures.Get($@"Flags/{team.FlagName}"), true);

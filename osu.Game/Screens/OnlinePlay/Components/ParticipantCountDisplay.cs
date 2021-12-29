@@ -35,18 +35,18 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 {
                     count = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: text_size)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: text_size),
                     },
                     slash = new OsuSpriteText
                     {
                         Text = @"/",
-                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: text_size)
+                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: text_size),
                     },
                     maxText = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: text_size)
+                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: text_size),
                     },
-                }
+                },
             };
 
             MaxParticipants.BindValueChanged(_ => updateMax(), true);

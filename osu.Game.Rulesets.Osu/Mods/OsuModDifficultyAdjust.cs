@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     circleSize,
                     base.SettingDescription,
-                    approachRate
+                    approachRate,
                 }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }

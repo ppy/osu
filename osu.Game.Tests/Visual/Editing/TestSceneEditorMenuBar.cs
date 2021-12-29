@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 new EditorMenuItem("Open .osb in Notepad"),
                                 new EditorMenuItemSpacer(),
                                 new EditorMenuItem("Exit"),
-                            }
+                            },
                         },
                         new MenuItem("Timing")
                         {
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 new EditorMenuItem("Delete All Timing Sections", MenuItemType.Destructive),
                                 new EditorMenuItemSpacer(),
                                 new EditorMenuItem("Set Current Position as Preview Point"),
-                            }
+                            },
                         },
                         new MenuItem("Testing")
                         {
@@ -84,10 +84,10 @@ namespace osu.Game.Tests.Visual.Editing
                                 new EditorMenuItem("Item 1"),
                                 new EditorMenuItem("Item 2"),
                                 new EditorMenuItem("Item 3"),
-                            }
+                            },
                         },
-                    }
-                }
+                    },
+                },
             });
         }
     }

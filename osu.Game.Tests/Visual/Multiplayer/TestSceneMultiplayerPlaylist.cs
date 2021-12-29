@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.4f, 0.8f)
+                Size = new Vector2(0.4f, 0.8f),
             };
         });
 
@@ -144,15 +144,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         new PlaylistItem
                         {
                             Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value }
+                            Ruleset = { Value = Ruleset.Value },
                         },
                         new PlaylistItem
                         {
                             Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
                             Ruleset = { Value = Ruleset.Value },
-                            Expired = true
-                        }
-                    }
+                            Expired = true,
+                        },
+                    },
                 });
             });
 
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Beatmap = { Value = importedBeatmap },
             BeatmapID = importedBeatmap.OnlineID ?? -1,
             Expired = expired,
-            PlayedAt = DateTimeOffset.Now
+            PlayedAt = DateTimeOffset.Now,
         })));
 
         /// <summary>

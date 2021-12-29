@@ -18,7 +18,7 @@ namespace osu.Game.Tournament.Tests
                 LoadComponentAsync(new Background("Menu/menu-background-0")
                 {
                     Colour = OsuColour.Gray(0.5f),
-                    Depth = 10
+                    Depth = 10,
                 }, AddInternal);
 
                 // Have to construct this here, rather than in the constructor, because

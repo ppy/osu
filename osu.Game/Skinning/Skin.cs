@@ -139,7 +139,7 @@ namespace osu.Game.Skinning
 
                     return new SkinnableTargetComponentsContainer
                     {
-                        ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance())
+                        ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance()),
                     };
             }
 

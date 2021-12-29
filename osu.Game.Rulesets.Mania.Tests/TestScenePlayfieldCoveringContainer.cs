@@ -27,11 +27,11 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Child = cover = new PlayfieldCoveringWrapper(new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Orange
+                    Colour = Color4.Orange,
                 })
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 

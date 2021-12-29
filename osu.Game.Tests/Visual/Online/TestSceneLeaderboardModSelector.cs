@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Ruleset = { BindTarget = ruleset }
+                Ruleset = { BindTarget = ruleset },
             });
 
             modSelector.SelectedMods.CollectionChanged += (_, args) =>

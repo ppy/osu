@@ -94,6 +94,6 @@ namespace osu.Game.Database
         Scores = 1 << 1,
         Skins = 1 << 2,
         Collections = 1 << 3,
-        All = Beatmaps | Scores | Skins | Collections
+        All = Beatmaps | Scores | Skins | Collections,
     }
 }

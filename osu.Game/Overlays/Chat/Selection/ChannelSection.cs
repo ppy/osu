@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
-                    Text = "All Channels".ToUpperInvariant()
+                    Text = "All Channels".ToUpperInvariant(),
                 },
                 ChannelFlow = new FillFlowContainer<ChannelListItem>
                 {

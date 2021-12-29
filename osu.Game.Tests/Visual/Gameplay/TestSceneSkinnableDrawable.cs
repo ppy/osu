@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             new ExposedSkinnableDrawable("default", _ => new DefaultBox()),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox()),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling)
-                        }
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling),
+                        },
                     },
                 };
             });
@@ -76,8 +76,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             new ExposedSkinnableDrawable("default", _ => new DefaultBox()),
                             new ExposedSkinnableDrawable("available", _ => new DefaultBox()),
-                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling)
-                        }
+                            new ExposedSkinnableDrawable("available", _ => new DefaultBox(), ConfineMode.NoScaling),
+                        },
                     },
                 };
             });
@@ -101,8 +101,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"))
-                    }
+                        Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation")),
+                    },
                 };
             });
 
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = target = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 };
             });
 
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Child = target = new SwitchableSkinProvidingContainer(new SecondarySource())
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 };
             });
 
@@ -212,7 +212,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    },
                 };
             }
 
@@ -239,8 +239,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Font = OsuFont.Default.With(size: 40),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = name
-                    }
+                        Text = name,
+                    },
                 };
             }
         }
@@ -292,7 +292,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     ? new DrawWidthBox
                     {
                         Colour = Color4.Yellow,
-                        Size = new Vector2(size)
+                        Size = new Vector2(size),
                     }
                     : null;
 

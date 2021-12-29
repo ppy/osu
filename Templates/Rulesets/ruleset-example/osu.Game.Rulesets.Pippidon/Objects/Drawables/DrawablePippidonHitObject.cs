@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Pippidon.Objects.Drawables
 
         public override IEnumerable<HitSampleInfo> GetSamples() => new[]
         {
-            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK)
+            new HitSampleInfo(HitSampleInfo.HIT_NORMAL, SampleControlPoint.DEFAULT_BANK),
         };
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

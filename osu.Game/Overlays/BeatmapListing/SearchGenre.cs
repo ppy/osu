@@ -51,6 +51,6 @@ namespace osu.Game.Overlays.BeatmapListing
         Folk = 13,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GenreJazz))]
-        Jazz = 14
+        Jazz = 14,
     }
 }

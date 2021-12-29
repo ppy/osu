@@ -307,7 +307,7 @@ namespace osu.Game
             {
                 MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
                 // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                globalBindings = new GlobalActionContainer(this)
+                globalBindings = new GlobalActionContainer(this),
             };
 
             MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };

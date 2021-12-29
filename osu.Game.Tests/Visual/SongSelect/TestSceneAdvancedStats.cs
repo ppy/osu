@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [SetUp]
         public void Setup() => Schedule(() => Child = advancedStats = new TestAdvancedStats
         {
-            Width = 500
+            Width = 500,
         });
 
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
@@ -44,9 +44,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                 CircleSize = 7.2f,
                 DrainRate = 3,
                 OverallDifficulty = 5.7f,
-                ApproachRate = 3.5f
+                ApproachRate = 3.5f,
             },
-            StarRating = 4.5f
+            StarRating = 4.5f,
         };
 
         [Test]
@@ -74,9 +74,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                     CircleSize = 5,
                     DrainRate = 4.3f,
                     OverallDifficulty = 4.5f,
-                    ApproachRate = 3.1f
+                    ApproachRate = 3.1f,
                 },
-                StarRating = 8
+                StarRating = 8,
             });
 
             AddAssert("first bar text is Key Count", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Key Count");

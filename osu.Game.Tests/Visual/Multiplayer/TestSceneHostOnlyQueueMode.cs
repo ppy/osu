@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("change queue mode", () => Client.ChangeSettings(new MultiplayerRoomSettings
             {
-                QueueMode = QueueMode.AllPlayers
+                QueueMode = QueueMode.AllPlayers,
             }));
 
             AddUntilStep("api room updated", () => Client.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);

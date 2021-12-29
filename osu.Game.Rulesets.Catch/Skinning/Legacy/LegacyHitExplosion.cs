@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     Origin = Anchor.CentreLeft,
                     Alpha = 0,
                     Blending = BlendingParameters.Additive,
-                    Rotation = -90
+                    Rotation = -90,
                 },
                 explosion2 = new Sprite
                 {
@@ -46,8 +46,8 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     Origin = Anchor.CentreLeft,
                     Alpha = 0,
                     Blending = BlendingParameters.Additive,
-                    Rotation = -90
-                }
+                    Rotation = -90,
+                },
             };
         }
 

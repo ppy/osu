@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Setup
                 {
                     Label = "Use special (N+1) style",
                     Description = "Changes one column to act as a classic \"scratch\" or \"special\" column, which can be moved around by the user's skin (to the left/right/centre). Generally used in 5k (4+1) or 8key (7+1) configurations.",
-                    Current = { Value = Beatmap.BeatmapInfo.SpecialStyle }
-                }
+                    Current = { Value = Beatmap.BeatmapInfo.SpecialStyle },
+                },
             };
         }
 

@@ -55,10 +55,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.SlateGray
+                    Colour = Color4.SlateGray,
                 },
                 grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
-                new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
+                new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position },
             };
         });
 
@@ -106,10 +106,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Color4.SlateGray,
                     },
                     grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }, new HitCircle { StartTime = 200 }),
-                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
+                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position },
                 };
             });
 
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     Origin = Anchor.Centre,
                     Size = new Vector2(50),
-                    Colour = Color4.Red
+                    Colour = Color4.Red,
                 };
             }
 

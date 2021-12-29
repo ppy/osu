@@ -203,7 +203,7 @@ namespace osu.Game.Tests.Visual.Editing
             var addedObject = new HitCircle
             {
                 StartTime = 0,
-                Position = OsuPlayfield.BASE_SIZE * 0.5f
+                Position = OsuPlayfield.BASE_SIZE * 0.5f,
             };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
@@ -225,7 +225,7 @@ namespace osu.Game.Tests.Visual.Editing
             var addedObject = new HitCircle
             {
                 StartTime = 0,
-                Position = OsuPlayfield.BASE_SIZE * 0.5f
+                Position = OsuPlayfield.BASE_SIZE * 0.5f,
             };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 new PathControlPoint(),
                 new PathControlPoint(new Vector2(50, 0)),
-                new PathControlPoint(new Vector2(100, 0))
+                new PathControlPoint(new Vector2(100, 0)),
             };
 
             AddStep("add slider", () =>
@@ -258,7 +258,7 @@ namespace osu.Game.Tests.Visual.Editing
                 slider = new Slider
                 {
                     StartTime = 1000,
-                    Path = new SliderPath(points)
+                    Path = new SliderPath(points),
                 };
 
                 EditorBeatmap.Add(slider);

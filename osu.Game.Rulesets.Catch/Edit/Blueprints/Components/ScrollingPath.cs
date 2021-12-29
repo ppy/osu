@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
                 drawablePath = new SmoothPath
                 {
                     PathRadius = 2,
-                    Alpha = 0.5f
+                    Alpha = 0.5f,
                 },
             };
         }

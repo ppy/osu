@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             InternalChild = path = new SmoothPath
             {
                 Anchor = Anchor.Centre,
-                PathRadius = 1
+                PathRadius = 1,
             };
         }
 

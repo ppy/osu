@@ -44,7 +44,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                 mainContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
 
             currentCompleted.BindValueChanged(_ => update());
@@ -94,7 +94,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Position = new Vector2(-300, 10),
-                    Scale = new Vector2(2f)
+                    Scale = new Vector2(2f),
                 },
                 new FillFlowContainer
                 {
@@ -115,8 +115,8 @@ namespace osu.Game.Tournament.Screens.TeamWin
                             Font = OsuFont.Torus.With(size: 100, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Bottom = 50 },
                         },
-                        new DrawableTeamWithPlayers(match.Winner, match.WinnerColour)
-                    }
+                        new DrawableTeamWithPlayers(match.Winner, match.WinnerColour),
+                    },
                 },
             };
             mainContainer.FadeOut();

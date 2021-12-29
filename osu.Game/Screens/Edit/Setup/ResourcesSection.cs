@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Setup
                     FixedLabelWidth = LABEL_WIDTH,
                     PlaceholderText = "Click to select a background image",
                     Current = { Value = working.Value.Metadata.BackgroundFile },
-                    TabbableContentContainer = this
+                    TabbableContentContainer = this,
                 },
                 audioTrackTextBox = new FileChooserLabelledTextBox(".mp3", ".ogg")
                 {
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                     FixedLabelWidth = LABEL_WIDTH,
                     PlaceholderText = "Click to select a track",
                     Current = { Value = working.Value.Metadata.AudioFile },
-                    TabbableContentContainer = this
+                    TabbableContentContainer = this,
                 },
             };
 

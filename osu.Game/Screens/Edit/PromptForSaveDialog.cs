@@ -20,17 +20,17 @@ namespace osu.Game.Screens.Edit
                 new PopupDialogCancelButton
                 {
                     Text = @"Save my masterpiece!",
-                    Action = saveAndExit
+                    Action = saveAndExit,
                 },
                 new PopupDialogOkButton
                 {
                     Text = @"Forget all changes",
-                    Action = exit
+                    Action = exit,
                 },
                 new PopupDialogCancelButton
                 {
                     Text = @"Oops, continue editing",
-                    Action = cancel
+                    Action = cancel,
                 },
             };
         }

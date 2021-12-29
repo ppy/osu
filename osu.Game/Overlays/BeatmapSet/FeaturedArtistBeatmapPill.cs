@@ -39,8 +39,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         Text = BeatmapsetsStrings.FeaturedArtistBadgeLabel.ToUpper(),
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Colour = OverlayColourProvider.Blue.Colour1,
-                    }
-                }
+                    },
+                },
             };
         }
     }

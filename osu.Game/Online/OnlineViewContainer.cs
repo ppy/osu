@@ -51,7 +51,7 @@ namespace osu.Game.Online
                 LoadingSpinner = new LoadingSpinner
                 {
                     Alpha = 0,
-                }
+                },
             };
 
             apiState.BindTo(api.State);

@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Import
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Width = 0.65f
+                        Width = 0.65f,
                     },
                     new Container
                     {
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Import
                             new Box
                             {
                                 Colour = colours.GreySeaFoamDarker,
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
                             },
                             new Container
                             {
@@ -90,13 +90,13 @@ namespace osu.Game.Screens.Import
                                         RelativeSizeAxes = Axes.X,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        TextAnchor = Anchor.Centre
+                                        TextAnchor = Anchor.Centre,
                                     },
                                     ScrollContent =
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                    }
+                                    },
                                 },
                             },
                             importButton = new TriangleButton
@@ -108,11 +108,11 @@ namespace osu.Game.Screens.Import
                                 Height = button_height,
                                 Width = 0.9f,
                                 Margin = new MarginPadding { Vertical = button_vertical_margin },
-                                Action = () => startImport(fileSelector.CurrentFile.Value?.FullName)
-                            }
-                        }
-                    }
-                }
+                                Action = () => startImport(fileSelector.CurrentFile.Value?.FullName),
+                            },
+                        },
+                    },
+                },
             };
 
             fileSelector.CurrentFile.BindValueChanged(fileChanged, true);

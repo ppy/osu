@@ -41,9 +41,9 @@ namespace osu.Game.Overlays.Dashboard.Home
                     {
                         Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                         Colour = colourProvider.Light1,
-                        Text = Title
-                    }
-                }
+                        Text = Title,
+                    },
+                },
             };
 
             flow.AddRange(beatmapSets.Select(CreateBeatmapPanel));

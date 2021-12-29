@@ -50,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(100, 1),
                     Text = "Edit",
-                    Action = () => OnEdit?.Invoke()
+                    Action = () => OnEdit?.Invoke(),
                 });
             }
         }

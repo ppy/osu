@@ -74,9 +74,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                     Icon = new SpriteIcon
                     {
                         Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre
-                    }
-                }
+                        Anchor = Anchor.Centre,
+                    },
+                },
             });
 
             Size = new Vector2(24);

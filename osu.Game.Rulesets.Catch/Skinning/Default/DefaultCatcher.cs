@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit
+                FillMode = FillMode.Fit,
             };
         }
 

@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add button", () => Child = new BaseContainer("relative sized")
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = () => { }
+                Action = () => { },
             });
         }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add button", () => Child = new BaseContainer("auto sized")
             {
                 AutoSizeAxes = Axes.Both,
-                Action = () => { }
+                Action = () => { },
             });
         }
 
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
-                Action = () => { }
+                Action = () => { },
             });
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Action = () => { }
+                Action = () => { },
             });
         }
 
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add button", () => Child = new BaseContainer("fixed")
             {
                 Size = new Vector2(100),
-                Action = () => { }
+                Action = () => { },
             });
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("add button", () => Child = new BaseContainer("fixed")
             {
                 Size = new Vector2(100, 50),
-                Action = () => { }
+                Action = () => { },
             });
         }
 
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Child = new BaseContainer("disabled")
                 {
-                    Size = new Vector2(100)
+                    Size = new Vector2(100),
                 };
             });
         }
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = text
+                    Text = text,
                 });
             }
         }

@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
-                })
+                }),
             };
 
             if (particleTexture != null)

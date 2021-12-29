@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             Type = EdgeEffectType.Shadow,
             Offset = new Vector2(0, 1),
             Radius = 3,
-            Colour = Colour4.Black.Opacity(0.3f)
+            Colour = Colour4.Black.Opacity(0.3f),
         };
 
         private class OsuHueSelector : HueSelector
@@ -71,8 +71,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         EdgeEffect = createShadowParameters(),
                         Child = fill = new Box
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     };
                 }
 
@@ -110,8 +110,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                         EdgeEffect = createShadowParameters(),
                         Child = previewBox = new Box
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     };
                 }
 

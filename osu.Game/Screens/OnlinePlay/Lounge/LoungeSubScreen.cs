@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         protected override BackgroundScreen CreateBackground() => new LoungeBackgroundScreen
         {
-            SelectedRoom = { BindTarget = SelectedRoom }
+            SelectedRoom = { BindTarget = SelectedRoom },
         };
 
         protected override UserActivity InitialActivity => new UserActivity.SearchingForLobby();
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
-            AutoSizeAxes = Axes.Both
+            AutoSizeAxes = Axes.Both,
         };
 
         protected ListingPollingComponent ListingPollingComponent { get; private set; }
@@ -107,8 +107,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         Child = roomsContainer = new RoomsContainer
                         {
                             Filter = { BindTarget = filter },
-                            SelectedRoom = { BindTarget = SelectedRoom }
-                        }
+                            SelectedRoom = { BindTarget = SelectedRoom },
+                        },
                     },
                 },
                 loadingLayer = new LoadingLayer(true),
@@ -157,10 +157,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                     {
                                         d.Anchor = Anchor.TopRight;
                                         d.Origin = Anchor.TopRight;
-                                    }))
-                                }
-                            }
-                        }
+                                    })),
+                                },
+                            },
+                        },
                     },
                 },
             };
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         {
             SearchString = searchTextBox.Current.Value,
             Ruleset = ruleset.Value,
-            Status = statusDropdown.Current.Value
+            Status = statusDropdown.Current.Value,
         };
 
         protected virtual IEnumerable<Drawable> CreateFilterControls()

@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                         },
-                    }
+                    },
                 },
             };
         }

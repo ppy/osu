@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             Direction = FillDirection.Full,
             RelativeSizeAxes = Axes.Both,
             Depth = -1,
-            Masking = true
+            Masking = true,
         };
 
         private class ChannelTabFillFlowContainer : TabFillFlowContainer

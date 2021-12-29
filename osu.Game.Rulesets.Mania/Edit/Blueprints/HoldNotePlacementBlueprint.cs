@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             {
                 bodyPiece = new EditBodyPiece { Origin = Anchor.TopCentre },
                 headPiece = new EditNotePiece { Origin = Anchor.Centre },
-                tailPiece = new EditNotePiece { Origin = Anchor.Centre }
+                tailPiece = new EditNotePiece { Origin = Anchor.Centre },
             };
         }
 

@@ -77,8 +77,8 @@ namespace osu.Game.Screens.Select.Carousel
                         Content = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                        }
-                    }
+                        },
+                    },
                 },
             };
         }

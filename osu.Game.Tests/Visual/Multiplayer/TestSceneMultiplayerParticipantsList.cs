@@ -214,8 +214,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             {
                                 Ruleset.Value.ShortName,
-                                new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
-                            }
+                                new UserStatistics { GlobalRank = RNG.Next(1, 100000) }
+                            },
                         },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     });
@@ -258,8 +258,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         {
                             Ruleset.Value.ShortName,
-                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
-                        }
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000) }
+                        },
                     },
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 });
@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.ChangeUserMods(0, new Mod[]
                 {
                     new OsuModHardRock(),
-                    new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } }
+                    new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } },
                 });
             });
 
@@ -290,7 +290,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.ChangeUserMods(new Mod[]
                 {
                     new OsuModNoFail(),
-                    new OsuModDoubleTime()
+                    new OsuModDoubleTime(),
                 });
             });
 
@@ -304,15 +304,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         {
                             Ruleset.Value.ShortName,
-                            new UserStatistics { GlobalRank = RNG.Next(1, 100000), }
-                        }
+                            new UserStatistics { GlobalRank = RNG.Next(1, 100000) }
+                        },
                     },
                     CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                 });
                 Client.ChangeUserMods(0, new Mod[]
                 {
                     new OsuModHardRock(),
-                    new OsuModDoubleTime()
+                    new OsuModDoubleTime(),
                 });
             });
 
@@ -349,7 +349,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
-                Size = new Vector2(380, 0.7f)
+                Size = new Vector2(380, 0.7f),
             });
 
             AddUntilStep("wait for list to load", () => participantsList.IsLoaded);

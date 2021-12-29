@@ -63,17 +63,17 @@ namespace osu.Game.Tests.Visual.Editing
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
-                                    Alpha = 0.75f
+                                    Alpha = 0.75f,
                                 },
                                 new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Text = $"Resolution: {resolution:0.00}"
-                                }
-                            }
-                        }
-                    }
+                                    Text = $"Resolution: {resolution:0.00}",
+                                },
+                            },
+                        },
+                    },
                 };
             });
 

@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Keyboard
+            Icon = FontAwesome.Solid.Keyboard,
         };
 
         public InputSection(KeyBindingPanel keyConfig)
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections
                     new SettingsCheckbox
                     {
                         LabelText = CommonStrings.Enabled,
-                        Current = handler.Enabled
+                        Current = handler.Enabled,
                     },
                 };
             }

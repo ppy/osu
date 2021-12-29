@@ -36,7 +36,7 @@ namespace osu.Desktop
 
         private readonly RichPresence presence = new RichPresence
         {
-            Assets = new Assets { LargeImageKey = "osu_logo_lazer", }
+            Assets = new Assets { LargeImageKey = "osu_logo_lazer" },
         };
 
         [BackgroundDependencyLoader]
@@ -44,7 +44,7 @@ namespace osu.Desktop
         {
             client = new DiscordRpcClient(client_id)
             {
-                SkipIdenticalPresence = false // handles better on discord IPC loss, see updateStatus call in onReady.
+                SkipIdenticalPresence = false, // handles better on discord IPC loss, see updateStatus call in onReady.
             };
 
             client.OnReady += onReady;

@@ -42,15 +42,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     switch (point)
                     {
                         case TimingControlPoint _:
-                            AddInternal(new ControlPointVisualisation(point) { Y = 0, });
+                            AddInternal(new ControlPointVisualisation(point) { Y = 0 });
                             break;
 
                         case DifficultyControlPoint _:
-                            AddInternal(new ControlPointVisualisation(point) { Y = 0.25f, });
+                            AddInternal(new ControlPointVisualisation(point) { Y = 0.25f });
                             break;
 
                         case SampleControlPoint _:
-                            AddInternal(new ControlPointVisualisation(point) { Y = 0.5f, });
+                            AddInternal(new ControlPointVisualisation(point) { Y = 0.5f });
                             break;
 
                         case EffectControlPoint effect:

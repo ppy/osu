@@ -28,7 +28,7 @@ namespace osu.Game.Online.Chat
         {
             @"#lazer",
             @"#osu",
-            @"#lobby"
+            @"#lobby",
         };
 
         private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
@@ -147,7 +147,7 @@ namespace osu.Game.Online.Chat
                     Timestamp = DateTimeOffset.Now,
                     ChannelId = target.Id,
                     IsAction = isAction,
-                    Content = text
+                    Content = text,
                 };
 
                 target.AddLocalEcho(message);

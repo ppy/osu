@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Children = posts.Select(p => new NewsGroupItem(p)).ToArray()
+                Children = posts.Select(p => new NewsGroupItem(p)).ToArray(),
             };
         }
     }

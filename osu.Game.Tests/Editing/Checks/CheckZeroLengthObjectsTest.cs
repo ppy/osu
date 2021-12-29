@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assertOk(new List<HitObject>
             {
-                new HitCircle { StartTime = 1000, Position = new Vector2(0, 0) }
+                new HitCircle { StartTime = 1000, Position = new Vector2(0, 0) },
             });
         }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assertOk(new List<HitObject>
             {
-                getSliderMock(1000).Object
+                getSliderMock(1000).Object,
             });
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assertZeroLength(new List<HitObject>
             {
-                getSliderMock(0).Object
+                getSliderMock(0).Object,
             });
         }
 
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assertZeroLength(new List<HitObject>
             {
-                getSliderMock(-1000).Object
+                getSliderMock(-1000).Object,
             });
         }
 

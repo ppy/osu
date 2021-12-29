@@ -56,8 +56,8 @@ namespace osu.Game.Overlays.Toolbar
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
-                }
+                    },
+                },
             });
 
             foreach (var ruleset in Rulesets.AvailableRulesets)

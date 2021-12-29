@@ -104,7 +104,7 @@ namespace osu.Game.Graphics.UserInterface
                                     RelativeSizeAxes = Axes.Both,
                                     EdgeSmoothness = new Vector2(2, 0),
                                 },
-                            }
+                            },
                         },
                         bouncingIcon = new BouncingIcon
                         {
@@ -112,7 +112,7 @@ namespace osu.Game.Graphics.UserInterface
                             Origin = Anchor.Centre,
                             Shear = -shear,
                         },
-                    }
+                    },
                 },
                 c1 = new Container
                 {
@@ -143,15 +143,15 @@ namespace osu.Game.Graphics.UserInterface
                                     RelativeSizeAxes = Axes.Both,
                                     EdgeSmoothness = new Vector2(2, 0),
                                 },
-                            }
+                            },
                         },
                         text = new OsuSpriteText
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                             Shear = -shear,
-                        }
-                    }
+                        },
+                    },
                 },
             };
         }
@@ -228,7 +228,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(25),
-                    }
+                    },
                 };
             }
 

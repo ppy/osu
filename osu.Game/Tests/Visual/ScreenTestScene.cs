@@ -32,10 +32,10 @@ namespace osu.Game.Tests.Visual
                 Stack = new OsuScreenStack
                 {
                     Name = nameof(ScreenTestScene),
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 content = new Container { RelativeSizeAxes = Axes.Both },
-                DialogOverlay = new DialogOverlay()
+                DialogOverlay = new DialogOverlay(),
             });
 
             Stack.ScreenPushed += (lastScreen, newScreen) => Logger.Log($"{nameof(ScreenTestScene)} screen changed → {newScreen}");

@@ -115,12 +115,12 @@ namespace osu.Game.Screens.Play
                                 {
                                     Name = "Handle box",
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White
-                                }
-                            }
-                        }
-                    }
-                }
+                                    Colour = Color4.White,
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
 

@@ -50,8 +50,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Children = new[]
                 {
                     createStage(ScrollingDirection.Up, ManiaAction.Key1),
-                    createStage(ScrollingDirection.Down, ManiaAction.Key3)
-                }
+                    createStage(ScrollingDirection.Down, ManiaAction.Key3),
+                },
             };
         }
 
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 TimeRange = 2000,
-                Child = stage
+                Child = stage,
             };
         }
     }

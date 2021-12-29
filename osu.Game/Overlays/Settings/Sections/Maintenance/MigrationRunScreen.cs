@@ -58,27 +58,27 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = "Migration in progress",
-                            Font = OsuFont.Default.With(size: 40)
+                            Font = OsuFont.Default.With(size: 40),
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = "This could take a few minutes depending on the speed of your disk(s).",
-                            Font = OsuFont.Default.With(size: 30)
+                            Font = OsuFont.Default.With(size: 30),
                         },
                         new LoadingSpinner(true)
                         {
-                            State = { Value = Visibility.Visible }
+                            State = { Value = Visibility.Visible },
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = "Please avoid interacting with the game!",
-                            Font = OsuFont.Default.With(size: 30)
+                            Font = OsuFont.Default.With(size: 30),
                         },
-                    }
+                    },
                 },
             };
 

@@ -70,14 +70,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
                                         Score = score,
-                                    }
+                                    },
                                 },
                             },
                             ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize), new Dimension(GridSizeMode.Absolute, 20) },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

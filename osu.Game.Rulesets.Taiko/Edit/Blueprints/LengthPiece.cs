@@ -32,8 +32,8 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                         Anchor = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 8,
-                    }
-                }
+                    },
+                },
             };
         }
     }

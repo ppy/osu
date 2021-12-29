@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Edit.Verify
         protected override IReadOnlyList<Drawable> CreateSections() => new Drawable[]
         {
             new InterpretationSection(),
-            new VisibilitySection()
+            new VisibilitySection(),
         };
     }
 }

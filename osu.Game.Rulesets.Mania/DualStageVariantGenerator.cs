@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania
                 RightKeys = stage1RightKeys,
                 SpecialKey = InputKey.V,
                 SpecialAction = ManiaAction.Special1,
-                NormalActionStart = ManiaAction.Key1
+                NormalActionStart = ManiaAction.Key1,
             }.GenerateKeyBindingsFor(singleStageVariant, out var nextNormal);
 
             var stage2Bindings = new VariantMappingGenerator
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania
                 RightKeys = stage2RightKeys,
                 SpecialKey = InputKey.B,
                 SpecialAction = ManiaAction.Special2,
-                NormalActionStart = nextNormal
+                NormalActionStart = nextNormal,
             }.GenerateKeyBindingsFor(singleStageVariant, out _);
 
             return stage1Bindings.Concat(stage2Bindings);

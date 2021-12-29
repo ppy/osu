@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Pippidon.UI
                         {
                             Left = 200,
                             Top = LANE_HEIGHT / 2,
-                            Bottom = LANE_HEIGHT / 2
+                            Bottom = LANE_HEIGHT / 2,
                         },
                         Children = new Drawable[]
                         {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Pippidon.UI
                             {
                                 Origin = Anchor.Centre,
                             },
-                        }
+                        },
                     },
                 },
             });

@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         Colour = Color4.Orange,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.2f,
-                    }
+                    },
                 };
             }
         }
@@ -265,8 +265,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
                         AlwaysPresent = true,
-                        Alpha = 0
-                    }
+                        Alpha = 0,
+                    },
                 };
 
                 slider.Tracking.BindValueChanged(trackingChanged, true);

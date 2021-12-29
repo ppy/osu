@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             BeatmapInfo = new BeatmapInfo
             {
                 BaseDifficulty = new BeatmapDifficulty { CircleSize = 5, SliderMultiplier = 2 },
-                Ruleset = ruleset
+                Ruleset = ruleset,
             },
             HitObjects = new List<HitObject>
             {
@@ -35,17 +35,17 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,
-                        new Vector2(0, 100)
+                        new Vector2(0, 100),
                     }),
-                    StartTime = 200
+                    StartTime = 200,
                 },
                 new Banana
                 {
                     X = CatchPlayfield.CENTER_X,
                     StartTime = 1000,
-                    NewCombo = true
-                }
-            }
+                    NewCombo = true,
+                },
+            },
         };
     }
 }

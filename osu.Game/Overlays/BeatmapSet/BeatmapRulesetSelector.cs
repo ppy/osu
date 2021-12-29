@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new BeatmapRulesetTabItem(value)
         {
-            BeatmapSet = { BindTarget = beatmapSet }
+            BeatmapSet = { BindTarget = beatmapSet },
         };
     }
 }

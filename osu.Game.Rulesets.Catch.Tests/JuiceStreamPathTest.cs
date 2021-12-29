@@ -81,21 +81,21 @@ namespace osu.Game.Rulesets.Catch.Tests
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
                 new JuiceStreamPathVertex(0, 0),
-                new JuiceStreamPathVertex(20, -5)
+                new JuiceStreamPathVertex(20, -5),
             }));
 
             removeCount = path.RemoveVertices((_, i) => i == 0);
             Assert.That(removeCount, Is.EqualTo(1));
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
-                new JuiceStreamPathVertex(20, -5)
+                new JuiceStreamPathVertex(20, -5),
             }));
 
             removeCount = path.RemoveVertices((_, i) => true);
             Assert.That(removeCount, Is.EqualTo(1));
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
-                new JuiceStreamPathVertex()
+                new JuiceStreamPathVertex(),
             }));
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 -50,
                 0,
                 70,
-                120
+                120,
             });
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             path.ResampleVertices(Array.Empty<double>());
             Assert.That(path.Vertices, Is.EqualTo(new[]
             {
-                new JuiceStreamPathVertex(0, 10)
+                new JuiceStreamPathVertex(0, 10),
             }));
         }
 

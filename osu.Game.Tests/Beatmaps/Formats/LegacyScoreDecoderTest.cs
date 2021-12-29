@@ -71,9 +71,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 {
                     Frames = new List<ReplayFrame>
                     {
-                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton)
-                    }
-                }
+                        new OsuReplayFrame(2000, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton),
+                    },
+                },
             };
 
             // the "se" culture is used here, as it encodes the negative number sign as U+2212 MINUS SIGN,
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new OsuRuleset(),
                 new TaikoRuleset(),
                 new CatchRuleset(),
-                new ManiaRuleset()
+                new ManiaRuleset(),
             }.ToDictionary(ruleset => ((ILegacyRuleset)ruleset).LegacyID);
 
             protected override Ruleset GetRuleset(int rulesetId) => rulesets[rulesetId];
@@ -129,8 +129,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 {
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
-                    BaseDifficulty = new BeatmapDifficulty()
-                }
+                    BaseDifficulty = new BeatmapDifficulty(),
+                },
             });
         }
     }

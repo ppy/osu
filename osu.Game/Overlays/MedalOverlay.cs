@@ -145,7 +145,7 @@ namespace osu.Game.Overlays
                             },
                         },
                     },
-                }
+                },
             };
 
             Show();
@@ -279,7 +279,7 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
-                    }
+                    },
                 };
             }
         }

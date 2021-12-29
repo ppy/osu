@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     Username = "peppy",
                     Statistics = new UserStatistics { GlobalRank = 1234 },
-                    Id = 2
+                    Id = 2,
                 });
             }
         });

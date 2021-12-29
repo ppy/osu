@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Background4,
-                    }
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Padding = new MarginPadding
                             {
                                 Left = 8,
-                                Right = 16
+                                Right = 16,
                             },
                             Children = new Drawable[]
                             {
@@ -80,9 +80,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Both
-                                }
-                            }
+                                    AutoSizeAxes = Axes.Both,
+                                },
+                            },
                         },
                         new Container
                         {
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = colours.Background3,
-                                    }
+                                    },
                                 },
                                 new FillFlowContainer
                                 {
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Padding = new MarginPadding
                                     {
                                         Left = 8,
-                                        Right = 16
+                                        Right = 16,
                                     },
                                     Children = new Drawable[]
                                     {
@@ -142,13 +142,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                        }
-                                    }
-                                }
-                            }
+                                        },
+                                    },
+                                },
+                            },
                         },
-                    }
-                }
+                    },
+                },
             };
         }
 
@@ -294,8 +294,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Colour = colours.Background5,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        avatar
-                    }
+                        avatar,
+                    },
                 };
             }
         }
@@ -343,8 +343,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             RelativeSizeAxes = Axes.Both,
                             Colour = colours.Background5,
                         },
-                        countText
-                    }
+                        countText,
+                    },
                 };
             }
         }

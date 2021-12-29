@@ -56,8 +56,8 @@ namespace osu.Game.Storyboards
         {
             layers.Add("Video", new StoryboardVideoLayer("Video", 4, false));
             layers.Add("Background", new StoryboardLayer("Background", 3));
-            layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false, });
-            layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false, });
+            layers.Add("Fail", new StoryboardLayer("Fail", 2) { VisibleWhenPassing = false });
+            layers.Add("Pass", new StoryboardLayer("Pass", 1) { VisibleWhenFailing = false });
             layers.Add("Foreground", new StoryboardLayer("Foreground", minimumLayerDepth = 0));
 
             layers.Add("Overlay", new StoryboardLayer("Overlay", int.MinValue));

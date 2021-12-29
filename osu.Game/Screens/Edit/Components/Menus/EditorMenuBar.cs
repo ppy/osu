@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    X = -15
-                }
+                    X = -15,
+                },
             });
 
             Mode.BindTo(tabControl.Current);
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         CornerRadius = 4,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                        Child = new Box { RelativeSizeAxes = Axes.Both },
                     };
                 }
 

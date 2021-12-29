@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     droppedObjectContainer,
                     catcher = new TestCatcher(droppedObjectContainer, difficulty),
-                }
+                },
             };
         });
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch hyper fruit", () => attemptCatch(new Fruit
             {
-                HyperDashTarget = new Fruit { X = 100 }
+                HyperDashTarget = new Fruit { X = 100 },
             }));
             checkHyperDash(true);
             AddStep("catch normal fruit", () => attemptCatch(new Fruit()));
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch hyper kiai fruit", () => attemptCatch(new TestKiaiFruit
             {
-                HyperDashTarget = new Fruit { X = 100 }
+                HyperDashTarget = new Fruit { X = 100 },
             }));
             AddStep("catch tiny droplet", () => attemptCatch(new TinyDroplet()));
             AddStep("miss tiny droplet", () => attemptCatch(new TinyDroplet { X = 100 }));
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch hyper kiai fruit", () => attemptCatch(new TestKiaiFruit
             {
-                HyperDashTarget = new Fruit { X = 100 }
+                HyperDashTarget = new Fruit { X = 100 },
             }));
             AddStep("miss banana", () => attemptCatch(new Banana { X = 100 }));
             // catcher state is preserved but hyper dash state is reset
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             AddStep("catch more fruits", () => attemptCatch(() => new Fruit
             {
-                X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(Vector2.One)
+                X = (RNG.NextSingle() - 0.5f) * Catcher.CalculateCatchWidth(Vector2.One),
             }, 50));
         }
 
@@ -286,7 +286,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             return new CatchJudgementResult(hitObject, hitObject.CreateJudgement())
             {
-                Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss
+                Type = catcher.CanCatch(hitObject) ? HitResult.Great : HitResult.Miss,
             };
         }
 

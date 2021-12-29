@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 SelectionHandler,
                 SelectionBlueprints = CreateSelectionBlueprintContainer(),
                 SelectionHandler.CreateProxy(),
-                DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
+                DragBox.CreateProxy().With(p => p.Depth = float.MinValue),
             });
         }
 

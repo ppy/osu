@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             Height = 1000;
             Padding = new MarginPadding
             {
-                Bottom = 100
+                Bottom = 100,
             };
 
             InternalChildren = new Drawable[]
@@ -40,18 +40,18 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                     RelativeSizeAxes = Axes.Both,
                     Child = Playfield = new TestCatchPlayfield
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new PlayfieldBorder
                 {
                     PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Full },
-                    Clock = new FramedClock(new StopwatchClock(true))
+                    Clock = new FramedClock(new StopwatchClock(true)),
                 },
                 Content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             };
         }
 

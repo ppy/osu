@@ -142,7 +142,7 @@ namespace osu.Game.Graphics
                     {
                         storage.PresentFileExternally(filename);
                         return true;
-                    }
+                    },
                 });
             }
         });

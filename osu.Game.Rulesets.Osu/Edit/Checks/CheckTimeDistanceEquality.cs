@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateIrregularSpacingProblem(this),
-            new IssueTemplateIrregularSpacingWarning(this)
+            new IssueTemplateIrregularSpacingWarning(this),
         };
 
         /// <summary>

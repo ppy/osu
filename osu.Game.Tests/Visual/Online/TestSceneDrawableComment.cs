@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
 ### Heading 3
 #### Heading 4
 ##### Heading 5
-###### Heading 6"
+###### Heading 6",
             },
 
             // Taken from https://github.com/ppy/osu/issues/13993#issuecomment-885994077
@@ -82,8 +82,8 @@ Checking the logs, it looks for other Huion tablets before sending the notificat
  ""2021-07-23 03:52:33 [verbose]: Detect: Searching for tablet 'Huion WH1409 V2'
  20 2021-07-23 03:52:33 [error]: DeviceInUseException: Device is currently in use by another kernel module. To fix this     issue, please follow the instructions from https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ#arg    umentoutofrangeexception-value-0-15"")
 I use an Arch based installation of Linux and the tablet runs perfectly with Digimend kernel driver, with area configuration, pen pressure, etc. On osu!lazer the cursor disappears until I set it to ""Borderless"" instead of ""Fullscreen"" and even after it shows up, it goes to the bottom left corner as soon as a map starts.
-I have honestly 0 idea of whats going on at this point."
-            }
+I have honestly 0 idea of whats going on at this point.",
+            },
         };
     }
 }

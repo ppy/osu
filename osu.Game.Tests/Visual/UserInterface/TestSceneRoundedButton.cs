@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.DarkGray
+                        Colour = Colour4.DarkGray,
                     },
                     button = new RoundedButton
                     {
@@ -33,9 +33,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Text = "Test button",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Action = () => { }
-                    }
-                }
+                        Action = () => { },
+                    },
+                },
             });
 
             AddToggleStep("toggle disabled", disabled => button.Action = disabled ? (Action)null : () => { });

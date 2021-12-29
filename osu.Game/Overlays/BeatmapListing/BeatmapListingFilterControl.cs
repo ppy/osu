@@ -94,8 +94,8 @@ namespace osu.Game.Overlays.BeatmapListing
                         },
                         Child = searchControl = new BeatmapListingSearchControl
                         {
-                            TypingStarted = () => TypingStarted?.Invoke()
-                        }
+                            TypingStarted = () => TypingStarted?.Invoke(),
+                        },
                     },
                     new Container
                     {
@@ -105,24 +105,24 @@ namespace osu.Game.Overlays.BeatmapListing
                         {
                             sortControlBackground = new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
                             },
                             sortControl = new BeatmapListingSortTabControl
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Margin = new MarginPadding { Left = 20 }
+                                Margin = new MarginPadding { Left = 20 },
                             },
                             new BeatmapListingCardSizeTabControl
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Margin = new MarginPadding { Right = 20 },
-                                Current = { BindTarget = CardSize }
-                            }
-                        }
-                    }
-                }
+                                Current = { BindTarget = CardSize },
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -287,7 +287,7 @@ namespace osu.Game.Overlays.BeatmapListing
             /// <summary>
             /// The user is not a supporter, but used supporter-only search filters.
             /// </summary>
-            SupporterOnlyFilters
+            SupporterOnlyFilters,
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace osu.Game.Overlays.BeatmapListing
             public static SearchResult SupporterOnlyFilters(List<LocalisableString> filters) => new SearchResult
             {
                 Type = SearchResultType.SupporterOnlyFilters,
-                SupporterOnlyFiltersUsed = filters
+                SupporterOnlyFiltersUsed = filters,
             };
         }
     }

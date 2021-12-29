@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new CatchModEasy(),
                         new CatchModNoFail(),
-                        new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
+                        new MultiMod(new CatchModHalfTime(), new CatchModDaycore()),
                     };
 
                 case ModType.DifficultyIncrease:

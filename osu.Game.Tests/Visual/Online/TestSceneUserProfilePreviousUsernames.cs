@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Online
             new APIUser { Id = 3, PreviousUsernames = new[] { "test", "angelsim", "verylongusername" } },
             new APIUser { Id = 4, PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" } },
             new APIUser { Id = 5, PreviousUsernames = Array.Empty<string>() },
-            null
+            null,
         };
     }
 }

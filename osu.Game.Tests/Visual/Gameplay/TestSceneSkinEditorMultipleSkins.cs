@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             drawableRuleset,
                             hudOverlay,
                             new SkinEditor(hudOverlay),
-                        }
+                        },
                     };
                 });
             });

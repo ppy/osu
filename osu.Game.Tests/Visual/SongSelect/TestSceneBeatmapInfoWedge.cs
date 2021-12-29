@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 Size = new Vector2(0.5f, 245),
                 RelativeSizeAxes = Axes.X,
-                Margin = new MarginPadding { Top = 20 }
+                Margin = new MarginPadding { Top = 20 },
             });
 
             AddStep("show", () =>
@@ -211,14 +211,14 @@ namespace osu.Game.Tests.Visual.SongSelect
                         AuthorString = $"{ruleset.ShortName}Author",
                         Artist = $"{ruleset.ShortName}Artist",
                         Source = $"{ruleset.ShortName}Source",
-                        Title = $"{ruleset.ShortName}Title"
+                        Title = $"{ruleset.ShortName}Title",
                     },
                     Ruleset = ruleset,
                     StarRating = 6,
                     DifficultyName = $"{ruleset.ShortName}Version",
-                    BaseDifficulty = new BeatmapDifficulty()
+                    BaseDifficulty = new BeatmapDifficulty(),
                 },
-                HitObjects = objects
+                HitObjects = objects,
             };
         }
 
@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         AuthorString = "WWWWWWWWWWWWWWW",
                         Artist = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
                         Source = "Verrrrry long Source",
-                        Title = "Verrrrry long Title"
+                        Title = "Verrrrry long Title",
                     },
                     DifficultyName = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
                     Status = BeatmapOnlineStatus.Graveyard,

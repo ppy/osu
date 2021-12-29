@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Tests.Screens
         {
             Add(new TeamEditorScreen
             {
-                Width = 0.85f // create room for control panel
+                Width = 0.85f, // create room for control panel
             });
         }
     }

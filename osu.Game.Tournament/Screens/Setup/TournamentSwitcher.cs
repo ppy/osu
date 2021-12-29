@@ -35,7 +35,7 @@ namespace osu.Game.Tournament.Screens.Setup
 
             FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
             {
-                Width = 510
+                Width = 510,
             });
 
             return drawable;

@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
-                    SelectedMods = { BindTarget = SelectedMods }
+                    SelectedMods = { BindTarget = SelectedMods },
                 };
             });
         }
@@ -181,7 +181,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     return new Mod[]
                     {
                         new TestModCustomisable1(),
-                        new TestModCustomisable2()
+                        new TestModCustomisable2(),
                     };
                 }
 
@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 MinValue = 0,
                 MaxValue = 10,
                 Default = 5,
-                Value = 7
+                Value = 7,
             };
 
             [SettingSource("Sample bool", "Clicking this changes a setting")]

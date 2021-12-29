@@ -22,43 +22,43 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 // requested component
                 "Gameplay/osu/followpoint",
                 // returned texture name & scale
-                "Gameplay/osu/followpoint@2x", 2
+                "Gameplay/osu/followpoint@2x", 2,
             },
             new object[]
             {
                 new[] { "Gameplay/osu/followpoint@2x" },
                 "Gameplay/osu/followpoint",
-                "Gameplay/osu/followpoint@2x", 2
+                "Gameplay/osu/followpoint@2x", 2,
             },
             new object[]
             {
                 new[] { "Gameplay/osu/followpoint" },
                 "Gameplay/osu/followpoint",
-                "Gameplay/osu/followpoint", 1
+                "Gameplay/osu/followpoint", 1,
             },
             new object[]
             {
                 new[] { "Gameplay/osu/followpoint", "followpoint@2x" },
                 "Gameplay/osu/followpoint",
-                "Gameplay/osu/followpoint", 1
+                "Gameplay/osu/followpoint", 1,
             },
             new object[]
             {
                 new[] { "followpoint@2x", "followpoint" },
                 "Gameplay/osu/followpoint",
-                "followpoint@2x", 2
+                "followpoint@2x", 2,
             },
             new object[]
             {
                 new[] { "followpoint@2x" },
                 "Gameplay/osu/followpoint",
-                "followpoint@2x", 2
+                "followpoint@2x", 2,
             },
             new object[]
             {
                 new[] { "followpoint" },
                 "Gameplay/osu/followpoint",
-                "followpoint", 1
+                "followpoint", 1,
             },
         };
 

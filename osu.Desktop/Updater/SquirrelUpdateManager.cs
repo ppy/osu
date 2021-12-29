@@ -174,7 +174,7 @@ namespace osu.Desktop.Updater
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow),
                     },
                     new SpriteIcon
                     {
@@ -183,7 +183,7 @@ namespace osu.Desktop.Updater
                         Icon = FontAwesome.Solid.Upload,
                         Colour = Color4.White,
                         Size = new Vector2(20),
-                    }
+                    },
                 });
             }
 

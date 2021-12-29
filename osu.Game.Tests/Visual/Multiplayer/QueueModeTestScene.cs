@@ -77,8 +77,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = InitialBeatmap },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             }));
 
             AddUntilStep("wait for room open", () => this.ChildrenOfType<MultiplayerMatchSubScreen>().FirstOrDefault()?.IsLoaded == true);

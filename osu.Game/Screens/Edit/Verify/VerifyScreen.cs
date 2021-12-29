@@ -51,8 +51,8 @@ namespace osu.Game.Screens.Edit.Verify
                             IssueList,
                             new IssueSettings(),
                         },
-                    }
-                }
+                    },
+                },
             };
         }
     }

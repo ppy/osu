@@ -38,11 +38,11 @@ namespace osu.Game.Overlays.BeatmapListing
                 ColumnDimensions = new[]
                 {
                     new Dimension(GridSizeMode.Absolute, size: 100),
-                    new Dimension()
+                    new Dimension(),
                 },
                 RowDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 Content = new[]
                 {
@@ -53,11 +53,11 @@ namespace osu.Game.Overlays.BeatmapListing
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(size: 13),
-                            Text = header
+                            Text = header,
                         },
-                        filter = CreateFilter()
-                    }
-                }
+                        filter = CreateFilter(),
+                    },
+                },
             });
 
             if (filter is IHasCurrentValue<T> filterWithValue)
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 protected override DropdownHeader CreateHeader() => new FilterHeader
                 {
                     Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
+                    Origin = Anchor.TopRight,
                 };
 
                 private class FilterHeader : OsuTabDropdownHeader

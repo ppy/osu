@@ -61,12 +61,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarRating = 2.5
-                                            }
+                                                StarRating = 2.5,
+                                            },
                                         }.BeatmapInfo,
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         }),
                         createLoungeRoom(new Room
                         {
@@ -91,12 +91,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                                     ArtistUnicode = "very very very very very very very very very long artist",
                                                     Title = "very very very very very very very very very very very long title",
                                                     TitleUnicode = "very very very very very very very very very very very long title",
-                                                }
-                                            }
+                                                },
+                                            },
                                         }.BeatmapInfo,
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         }),
                         createLoungeRoom(new Room
                         {
@@ -113,10 +113,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarRating = 2.5
-                                            }
+                                                StarRating = 2.5,
+                                            },
                                         }.BeatmapInfo,
-                                    }
+                                    },
                                 },
                                 new PlaylistItem
                                 {
@@ -126,12 +126,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         {
                                             BeatmapInfo =
                                             {
-                                                StarRating = 4.5
-                                            }
+                                                StarRating = 4.5,
+                                            },
                                         }.BeatmapInfo,
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         }),
                         createLoungeRoom(new Room
                         {
@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Status = { Value = new RoomStatusOpen() },
                             Category = { Value = RoomCategory.Spotlight },
                         }),
-                    }
+                    },
                 };
             });
         }
@@ -189,21 +189,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Name = { Value = "A host-only room" },
                         QueueMode = { Value = QueueMode.HostOnly },
-                        Type = { Value = MatchType.HeadToHead }
+                        Type = { Value = MatchType.HeadToHead },
                     }),
                     new DrawableMatchRoom(new Room
                     {
                         Name = { Value = "An all-players, team-versus room" },
                         QueueMode = { Value = QueueMode.AllPlayers },
-                        Type = { Value = MatchType.TeamVersus }
+                        Type = { Value = MatchType.TeamVersus },
                     }),
                     new DrawableMatchRoom(new Room
                     {
                         Name = { Value = "A round-robin room" },
                         QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
-                        Type = { Value = MatchType.HeadToHead }
+                        Type = { Value = MatchType.HeadToHead },
                     }),
-                }
+                },
             });
         }
 
@@ -216,14 +216,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 room.RecentParticipants.AddRange(Enumerable.Range(0, 20).Select(i => new APIUser
                 {
                     Id = i,
-                    Username = $"User {i}"
+                    Username = $"User {i}",
                 }));
             }
 
             return new DrawableLoungeRoom(room)
             {
                 MatchingFilter = true,
-                SelectedRoom = { BindTarget = selectedRoom }
+                SelectedRoom = { BindTarget = selectedRoom },
             };
         }
     }

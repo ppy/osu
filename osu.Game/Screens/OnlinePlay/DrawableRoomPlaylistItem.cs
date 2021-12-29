@@ -328,7 +328,7 @@ namespace osu.Game.Screens.OnlinePlay
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        AlwaysPresent = true
+                        AlwaysPresent = true,
                     },
                     onScreenLoader,
                     panelBackground = new PanelBackground
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.OnlinePlay
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.AutoSize)
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]
                         {
@@ -371,7 +371,7 @@ namespace osu.Game.Screens.OnlinePlay
                                             // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
                                             // TODO: remove when text/link flow can support truncation with ellipsis natively.
                                             Height = OsuFont.DEFAULT_FONT_SIZE,
-                                            Masking = true
+                                            Masking = true,
                                         },
                                         new FillFlowContainer
                                         {
@@ -394,7 +394,7 @@ namespace osu.Game.Screens.OnlinePlay
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                             Margin = new MarginPadding { Top = 3f },
-                                                        }
+                                                        },
                                                     },
                                                 },
                                                 new Container
@@ -405,12 +405,12 @@ namespace osu.Game.Screens.OnlinePlay
                                                     Child = modDisplay = new ModDisplay
                                                     {
                                                         Scale = new Vector2(0.4f),
-                                                        ExpansionMode = ExpansionMode.AlwaysExpanded
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                                        ExpansionMode = ExpansionMode.AlwaysExpanded,
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
                                 },
                                 buttonsFlow = new FillFlowContainer
                                 {
@@ -424,7 +424,7 @@ namespace osu.Game.Screens.OnlinePlay
                                     {
                                         b.Anchor = Anchor.Centre;
                                         b.Origin = Anchor.Centre;
-                                    }))
+                                    })),
                                 },
                                 ownerAvatar = new OwnerAvatar
                                 {
@@ -434,12 +434,12 @@ namespace osu.Game.Screens.OnlinePlay
                                     Margin = new MarginPadding { Right = 8 },
                                     Masking = true,
                                     CornerRadius = 4,
-                                    Alpha = ShowItemOwner ? 1 : 0
+                                    Alpha = ShowItemOwner ? 1 : 0,
                                 },
-                            }
-                        }
+                            },
+                        },
                     },
-                }
+                },
             };
         }
 
@@ -450,7 +450,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Action = () => RequestResults?.Invoke(Item),
                 Alpha = AllowShowingResults ? 1 : 0,
-                TooltipText = "View results"
+                TooltipText = "View results",
             },
             Item.Beatmap.Value == null ? Empty() : new PlaylistDownloadButton(Item),
             editButton = new PlaylistEditButton
@@ -458,14 +458,14 @@ namespace osu.Game.Screens.OnlinePlay
                 Size = new Vector2(30, 30),
                 Alpha = AllowEditing ? 1 : 0,
                 Action = () => RequestEdit?.Invoke(Item),
-                TooltipText = "Edit"
+                TooltipText = "Edit",
             },
             removeButton = new PlaylistRemoveButton
             {
                 Size = new Vector2(30, 30),
                 Alpha = AllowDeletion ? 1 : 0,
                 Action = () => RequestDeletion?.Invoke(Item),
-                TooltipText = "Remove from playlist"
+                TooltipText = "Remove from playlist",
             },
         };
 
@@ -591,8 +591,8 @@ namespace osu.Game.Screens.OnlinePlay
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.7f), new Color4(0, 0, 0, 0.4f)),
                                 Width = 0.4f,
                             },
-                        }
-                    }
+                        },
+                    },
                 };
 
                 // manual binding required as playlists don't expose IBeatmapInfo currently.
@@ -608,7 +608,7 @@ namespace osu.Game.Screens.OnlinePlay
                 AddInternal(new TooltipArea(this)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = -1
+                    Depth = -1,
                 });
             }
 

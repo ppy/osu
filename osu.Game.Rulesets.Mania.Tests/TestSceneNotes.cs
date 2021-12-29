@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                         createNoteDisplay(ScrollingDirection.Up, 2, out note2),
                         createHoldNoteDisplay(ScrollingDirection.Down, 1, out holdNote1),
                         createHoldNoteDisplay(ScrollingDirection.Up, 2, out holdNote2),
-                    }
+                    },
                 };
             });
 
@@ -73,8 +73,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AutoSizeAxes = Axes.Both,
                 Child = new NoteContainer(direction, $"note {identifier}, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
-                    Child = hitObject = new DrawableNote(note) { AccentColour = { Value = Color4.OrangeRed } }
-                }
+                    Child = hitObject = new DrawableNote(note) { AccentColour = { Value = Color4.OrangeRed } },
+                },
             };
         }
 
@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                     {
                         RelativeSizeAxes = Axes.Both,
                         AccentColour = { Value = Color4.OrangeRed },
-                    }
-                }
+                    },
+                },
             };
         }
 
@@ -136,19 +136,19 @@ namespace osu.Game.Rulesets.Mania.Tests
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 1.25f,
-                                    Colour = Color4.Green.Opacity(0.5f)
+                                    Colour = Color4.Green.Opacity(0.5f),
                                 },
-                                content = new Container { RelativeSizeAxes = Axes.Both }
-                            }
+                                content = new Container { RelativeSizeAxes = Axes.Both },
+                            },
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.GetFont(size: 14),
-                            Text = description
-                        }
-                    }
+                            Text = description,
+                        },
+                    },
                 };
             }
 

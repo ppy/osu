@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override SortTabControl CreateControl() => new BeatmapSortTabControl
         {
-            SortDirection = { BindTarget = SortDirection }
+            SortDirection = { BindTarget = SortDirection },
         };
 
         private class BeatmapSortTabControl : SortTabControl
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
             protected override TabItem<SortCriteria> CreateTabItem(SortCriteria value) => new BeatmapSortTabItem(value)
             {
-                SortDirection = { BindTarget = SortDirection }
+                SortDirection = { BindTarget = SortDirection },
             };
         }
 
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapListing
             protected override TabButton CreateTabButton(SortCriteria value) => new BeatmapTabButton(value)
             {
                 Active = { BindTarget = Active },
-                SortDirection = { BindTarget = SortDirection }
+                SortDirection = { BindTarget = SortDirection },
             };
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     Origin = Anchor.Centre,
                     AlwaysPresent = true,
                     Alpha = 0,
-                    Size = new Vector2(6)
+                    Size = new Vector2(6),
                 });
             }
 

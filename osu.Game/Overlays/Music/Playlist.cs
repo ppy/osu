@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Music
         protected override OsuRearrangeableListItem<BeatmapSetInfo> CreateOsuDrawable(BeatmapSetInfo item) => new PlaylistItem(item)
         {
             SelectedSet = { BindTarget = SelectedSet },
-            RequestSelection = set => RequestSelection?.Invoke(set)
+            RequestSelection = set => RequestSelection?.Invoke(set),
         };
 
         protected override FillFlowContainer<RearrangeableListItem<BeatmapSetInfo>> CreateListFillFlowContainer() => new SearchContainer<RearrangeableListItem<BeatmapSetInfo>>

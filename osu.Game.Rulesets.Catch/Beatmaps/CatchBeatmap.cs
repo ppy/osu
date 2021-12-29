@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     Name = @"Banana Shower Count",
                     Content = bananaShowers.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
-                }
+                },
             };
         }
     }

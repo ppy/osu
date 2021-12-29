@@ -59,7 +59,7 @@ namespace osu.Game.Skinning.Editor
                                     Alpha = 0f,
                                     AlwaysPresent = true,
                                 },
-                            }
+                            },
                         },
                         new OsuSpriteText
                         {
@@ -73,7 +73,7 @@ namespace osu.Game.Skinning.Editor
                 anchorOriginVisualiser = new AnchorOriginVisualiser(drawable)
                 {
                     Alpha = 0,
-                }
+                },
             };
         }
 

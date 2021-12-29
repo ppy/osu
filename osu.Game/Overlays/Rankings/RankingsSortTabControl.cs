@@ -21,6 +21,6 @@ namespace osu.Game.Overlays.Rankings
         All,
 
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Friends))]
-        Friends
+        Friends,
     }
 }

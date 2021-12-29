@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new Container
                 {
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Origin = Anchor.Centre,
                                     Alpha = 0,
                                     Text = "This beatmap is not ranked",
-                                    Font = OsuFont.GetFont(size: 12)
+                                    Font = OsuFont.GetFont(size: 12),
                                 },
                             },
                         },

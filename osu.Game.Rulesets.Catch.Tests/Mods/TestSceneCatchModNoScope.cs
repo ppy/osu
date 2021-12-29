@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                         {
                             X = CatchPlayfield.CENTER_X,
                             StartTime = 5000,
-                        }
+                        },
                     },
                     Breaks = new List<BreakPeriod>
                     {
                         new BreakPeriod(2000, 4000),
-                    }
-                }
+                    },
+                },
             });
 
             AddUntilStep("wait for catcher to hide", () => catcherAlphaAlmostEquals(0));
@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                             X = CatchPlayfield.WIDTH,
                             StartTime = 5000,
                         },
-                    }
-                }
+                    },
+                },
             });
 
             AddAssert("catcher must start visible", () => catcherAlphaAlmostEquals(1));

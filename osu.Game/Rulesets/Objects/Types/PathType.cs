@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Objects.Types
         Catmull,
         Bezier,
         Linear,
-        PerfectCurve
+        PerfectCurve,
     }
 }

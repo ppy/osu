@@ -71,7 +71,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 },
             };
 

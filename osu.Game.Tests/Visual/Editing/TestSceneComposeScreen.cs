@@ -22,8 +22,8 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 BeatmapInfo =
                 {
-                    Ruleset = new OsuRuleset().RulesetInfo
-                }
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
             });
 
         [Cached]

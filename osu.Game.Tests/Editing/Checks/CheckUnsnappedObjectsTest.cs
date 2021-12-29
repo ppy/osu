@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assertOk(new List<HitObject>
             {
-                new HitCircle { StartTime = 100 }
+                new HitCircle { StartTime = 100 },
             });
         }
 
@@ -45,12 +45,12 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assert1Ms(new List<HitObject>
             {
-                new HitCircle { StartTime = 101 }
+                new HitCircle { StartTime = 101 },
             });
 
             assert1Ms(new List<HitObject>
             {
-                new HitCircle { StartTime = 99 }
+                new HitCircle { StartTime = 99 },
             });
         }
 
@@ -59,12 +59,12 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assert2Ms(new List<HitObject>
             {
-                new HitCircle { StartTime = 102 }
+                new HitCircle { StartTime = 102 },
             });
 
             assert2Ms(new List<HitObject>
             {
-                new HitCircle { StartTime = 98 }
+                new HitCircle { StartTime = 98 },
             });
         }
 
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Editing.Checks
             // Slider ends are naturally < 1 ms unsnapped because of how SV works.
             assertOk(new List<HitObject>
             {
-                getSliderMock(startTime: 100, endTime: 400.75d).Object
+                getSliderMock(startTime: 100, endTime: 400.75d).Object,
             });
         }
 
@@ -83,13 +83,13 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assert1Ms(new List<HitObject>
             {
-                getSliderMock(startTime: 101, endTime: 401.75d).Object
+                getSliderMock(startTime: 101, endTime: 401.75d).Object,
             }, count: 2);
 
             // End is only off by 0.25 ms, hence count 1.
             assert1Ms(new List<HitObject>
             {
-                getSliderMock(startTime: 99, endTime: 399.75d).Object
+                getSliderMock(startTime: 99, endTime: 399.75d).Object,
             }, count: 1);
         }
 
@@ -98,13 +98,13 @@ namespace osu.Game.Tests.Editing.Checks
         {
             assert2Ms(new List<HitObject>
             {
-                getSliderMock(startTime: 102, endTime: 402.75d).Object
+                getSliderMock(startTime: 102, endTime: 402.75d).Object,
             }, count: 2);
 
             // Start and end are 2 ms and 1.25 ms off respectively, hence two different issues in one object.
             var hitObjects = new List<HitObject>
             {
-                getSliderMock(startTime: 98, endTime: 398.75d).Object
+                getSliderMock(startTime: 98, endTime: 398.75d).Object,
             };
 
             var issues = check.Run(getContext(hitObjects)).ToList();
@@ -150,7 +150,7 @@ namespace osu.Game.Tests.Editing.Checks
             var beatmap = new Beatmap<HitObject>
             {
                 ControlPointInfo = cpi,
-                HitObjects = hitObjects
+                HitObjects = hitObjects,
             };
 
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));

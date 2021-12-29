@@ -619,7 +619,7 @@ namespace osu.Game
             => new Dictionary<FrameworkSetting, object>
             {
                 // General expectation that osu! starts in fullscreen by default (also gives the most predictable performance)
-                { FrameworkSetting.WindowMode, WindowMode.Fullscreen }
+                { FrameworkSetting.WindowMode, WindowMode.Fullscreen },
             };
 
         protected override void LoadComplete()
@@ -718,12 +718,12 @@ namespace osu.Game
 
                                         if (!((Drawable)currentScreen).IsLoaded || (currentScreen.AllowBackButton && !currentScreen.OnBackButton()))
                                             ScreenStack.Exit();
-                                    }
+                                    },
                                 },
                                 logoContainer = new Container { RelativeSizeAxes = Axes.Both },
-                            }
+                            },
                         },
-                    }
+                    },
                 },
                 overlayOffsetContainer = new Container
                 {
@@ -733,11 +733,11 @@ namespace osu.Game
                         overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                         rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                         leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                    }
+                    },
                 },
                 topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 idleTracker,
-                new ConfineMouseTracker()
+                new ConfineMouseTracker(),
             });
 
             ScreenStack.ScreenPushed += screenPushed;
@@ -932,7 +932,7 @@ namespace osu.Game
                         {
                             Storage.GetStorageForDirectory(@"logs").PresentFileExternally(logFile);
                             return true;
-                        }
+                        },
                     }));
                 }
 

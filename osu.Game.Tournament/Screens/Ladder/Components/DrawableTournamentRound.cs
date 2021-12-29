@@ -34,16 +34,16 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     {
                         Colour = TournamentGame.TEXT_COLOUR,
                         Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre
+                        Anchor = Anchor.TopCentre,
                     },
                     textName = new TournamentSpriteText
                     {
                         Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                         Colour = TournamentGame.TEXT_COLOUR,
                         Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre
+                        Anchor = Anchor.TopCentre,
                     },
-                }
+                },
             };
 
             name = round.Name.GetBoundCopy();

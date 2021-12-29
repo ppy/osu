@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current,
                 IsStrong = true,
-                Samples = createSamples(strong: true)
+                Samples = createSamples(strong: true),
             };
             var h = new DrawableTestHit(hit, kiai: kiai) { X = RNG.NextSingle(hitResult == HitResult.Ok ? -0.1f : -0.05f, hitResult == HitResult.Ok ? 0.1f : 0.05f) };
 
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             DrawableTestHit h;
             DrawableRuleset.Playfield.Add(h = new DrawableTestHit(new Hit { StartTime = DrawableRuleset.Playfield.Time.Current }, HitResult.Miss)
             {
-                Alpha = 0
+                Alpha = 0,
             });
             ((TaikoPlayfield)DrawableRuleset.Playfield).OnNewResult(h, new JudgementResult(h.HitObject, new TaikoJudgement()) { Type = HitResult.Miss });
         }
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             BarLine bl = new BarLine
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current + delay,
-                Major = major
+                Major = major,
             };
 
             DrawableRuleset.Playfield.Add(bl);
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong,
-                Samples = createSamples(HitType.Centre, strong)
+                Samples = createSamples(HitType.Centre, strong),
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 StartTime = DrawableRuleset.Playfield.Time.Current + scroll_time,
                 IsStrong = strong,
-                Samples = createSamples(HitType.Rim, strong)
+                Samples = createSamples(HitType.Rim, strong),
             };
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

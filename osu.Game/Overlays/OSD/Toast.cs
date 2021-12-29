@@ -41,13 +41,13 @@ namespace osu.Game.Overlays.OSD
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Width = toast_minimum_width
+                    Width = toast_minimum_width,
                 },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
-                    Alpha = 0.7f
+                    Alpha = 0.7f,
                 },
                 content = new Container
                 {
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.OSD
                     Spacing = new Vector2(1, 0),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = description.ToUpper()
+                    Text = description.ToUpper(),
                 },
                 ValueText = new OsuSpriteText
                 {
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.OSD
                     Name = "Value",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = value
+                    Text = value,
                 },
                 ShortcutText = new OsuSpriteText
                 {
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.OSD
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15, Horizontal = 10 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(shortcut.ToString()) ? ToastStrings.NoKeyBound.ToUpper() : shortcut.ToUpper()
+                    Text = string.IsNullOrEmpty(shortcut.ToString()) ? ToastStrings.NoKeyBound.ToUpper() : shortcut.ToUpper(),
                 },
             };
         }

@@ -23,8 +23,8 @@ namespace osu.Game.Tests.Visual.Menus
                 {
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
-                    State = { Value = Visibility.Visible }
-                }
+                    State = { Value = Visibility.Visible },
+                },
             });
         }
     }

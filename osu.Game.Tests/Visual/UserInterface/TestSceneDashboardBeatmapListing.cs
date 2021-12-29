@@ -35,16 +35,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
+                        Colour = colourProvider.Background4,
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Horizontal = 10 },
-                        Child = new DashboardBeatmapListing(new_beatmaps, popular_beatmaps)
-                    }
-                }
+                        Child = new DashboardBeatmapListing(new_beatmaps, popular_beatmaps),
+                    },
+                },
             });
         }
 
@@ -65,13 +65,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Author = new APIUser
                 {
                     Username = "author",
-                    Id = 100
+                    Id = 100,
                 },
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
                 },
-                Ranked = DateTimeOffset.Now
+                Ranked = DateTimeOffset.Now,
             },
             new APIBeatmapSet
             {
@@ -80,14 +80,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Author = new APIUser
                 {
                     Username = "author",
-                    Id = 100
+                    Id = 100,
                 },
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
                 },
-                Ranked = DateTimeOffset.Now
-            }
+                Ranked = DateTimeOffset.Now,
+            },
         };
 
         private static readonly List<APIBeatmapSet> popular_beatmaps = new List<APIBeatmapSet>
@@ -99,13 +99,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Author = new APIUser
                 {
                     Username = "author",
-                    Id = 100
+                    Id = 100,
                 },
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
                 },
-                Ranked = DateTimeOffset.Now
+                Ranked = DateTimeOffset.Now,
             },
             new APIBeatmapSet
             {
@@ -114,14 +114,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Author = new APIUser
                 {
                     Username = "author",
-                    Id = 100
+                    Id = 100,
                 },
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
                 },
-                Ranked = DateTimeOffset.Now
-            }
+                Ranked = DateTimeOffset.Now,
+            },
         };
     }
 }

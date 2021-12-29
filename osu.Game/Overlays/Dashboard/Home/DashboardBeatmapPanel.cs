@@ -49,8 +49,8 @@ namespace osu.Game.Overlays.Dashboard.Home
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = ColourProvider.Background3,
-                        Alpha = 0
-                    }
+                        Alpha = 0,
+                    },
                 },
                 new Container
                 {
@@ -62,11 +62,11 @@ namespace osu.Game.Overlays.Dashboard.Home
                         {
                             new Dimension(GridSizeMode.Absolute, 70),
                             new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize)
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         RowDimensions = new[]
                         {
-                            new Dimension()
+                            new Dimension(),
                         },
                         Content = new[]
                         {
@@ -82,8 +82,8 @@ namespace osu.Game.Overlays.Dashboard.Home
                                         RelativeSizeAxes = Axes.Both,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        OnlineInfo = BeatmapSet
-                                    }
+                                        OnlineInfo = BeatmapSet,
+                                    },
                                 },
                                 new Container
                                 {
@@ -103,29 +103,29 @@ namespace osu.Game.Overlays.Dashboard.Home
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
                                                 Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                                                Text = BeatmapSet.Title
+                                                Text = BeatmapSet.Title,
                                             },
                                             new OsuSpriteText
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Truncate = true,
                                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
-                                                Text = BeatmapSet.Artist
+                                                Text = BeatmapSet.Artist,
                                             },
                                             new LinkFlowContainer(f => f.Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular))
                                             {
                                                 AutoSizeAxes = Axes.Y,
                                                 RelativeSizeAxes = Axes.X,
                                                 Spacing = new Vector2(3),
-                                                Margin = new MarginPadding { Top = 2 }
+                                                Margin = new MarginPadding { Top = 2 },
                                             }.With(c =>
                                             {
                                                 c.AddText("by");
                                                 c.AddUserLink(BeatmapSet.Author);
                                                 c.AddArbitraryDrawable(CreateInfo());
-                                            })
-                                        }
-                                    }
+                                            }),
+                                        },
+                                    },
                                 },
                                 chevron = new SpriteIcon
                                 {
@@ -133,12 +133,12 @@ namespace osu.Game.Overlays.Dashboard.Home
                                     Origin = Anchor.CentreRight,
                                     Size = new Vector2(16),
                                     Icon = FontAwesome.Solid.ChevronRight,
-                                    Colour = ColourProvider.Foreground1
-                                }
-                            }
-                        }
-                    }
-                }
+                                    Colour = ColourProvider.Foreground1,
+                                },
+                            },
+                        },
+                    },
+                },
             };
 
             Action = () =>

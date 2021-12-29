@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             selectedGroup.Value = group;
                             clock.SeekSmoothlyTo(group.Time);
-                        }
+                        },
                     });
                 }
 
@@ -99,10 +99,10 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                        }
-                    }
+                        },
+                    },
                 },
-                new ControlGroupAttributes(group, c => !(c is TimingControlPoint))
+                new ControlGroupAttributes(group, c => !(c is TimingControlPoint)),
             };
         }
 
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Edit.Timing
                     AutoSizeAxes = Axes.X,
                     RelativeSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(2)
+                    Spacing = new Vector2(2),
                 };
 
                 controlPoints.BindTo(group.ControlPoints);

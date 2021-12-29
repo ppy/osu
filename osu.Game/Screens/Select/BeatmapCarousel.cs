@@ -156,8 +156,8 @@ namespace osu.Game.Screens.Select
                     Scroll = new CarouselScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
-                }
+                    },
+                },
             };
         }
 
@@ -632,7 +632,7 @@ namespace osu.Game.Screens.Select
 
             var set = new CarouselBeatmapSet(beatmapSet)
             {
-                GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
+                GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps),
             };
 
             foreach (var c in set.Beatmaps)

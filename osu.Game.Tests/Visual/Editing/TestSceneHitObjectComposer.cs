@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Editing
                                 new Vector2(216, 0),
                             }),
                             Scale = 0.5f,
-                        }
+                        },
                     },
                 });
             });
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 Child = editorBeatmapContainer = new EditorBeatmapContainer(Beatmap.Value)
                 {
-                    Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset())
+                    Child = hitObjectComposer = new OsuHitObjectComposer(new OsuRuleset()),
                 };
             });
         }

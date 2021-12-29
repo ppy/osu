@@ -30,19 +30,19 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
                     LabelText = "Scrolling direction",
-                    Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
+                    Current = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection),
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = "Scroll speed",
                     Current = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime),
-                    KeyboardStep = 5
+                    KeyboardStep = 5,
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Timing-based note colouring",
                     Current = config.GetBindable<bool>(ManiaRulesetSetting.TimingBasedNoteColouring),
-                }
+                },
             };
         }
 

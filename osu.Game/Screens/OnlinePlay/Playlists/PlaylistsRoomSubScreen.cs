@@ -85,7 +85,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             RelativeSizeAxes = Axes.Both,
                             Content = new[]
                             {
-                                new Drawable[] { new OverlinedPlaylistHeader(), },
+                                new Drawable[] { new OverlinedPlaylistHeader() },
                                 new Drawable[]
                                 {
                                     new DrawableRoomPlaylist
@@ -99,16 +99,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         {
                                             Debug.Assert(RoomId.Value != null);
                                             ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));
-                                        }
-                                    }
+                                        },
+                                    },
                                 },
                             },
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
-                            }
-                        }
+                            },
+                        },
                     },
                     null,
                     new GridContainer
@@ -149,9 +149,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     Current = UserMods,
                                                     Scale = new Vector2(0.8f),
                                                 },
-                                            }
-                                        }
-                                    }
+                                            },
+                                        },
+                                    },
                                 },
                             },
                             new Drawable[]
@@ -167,16 +167,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     {
                                         new OverlinedHeader("Progress"),
                                         new RoomLocalUserInfo(),
-                                    }
+                                    },
                                 },
                             },
                             new Drawable[]
                             {
-                                new OverlinedHeader("Leaderboard")
+                                new OverlinedHeader("Leaderboard"),
                             },
-                            new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both }, },
-                            new Drawable[] { new OverlinedHeader("Chat"), },
-                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
+                            new Drawable[] { leaderboard = new MatchLeaderboard { RelativeSizeAxes = Axes.Both } },
+                            new Drawable[] { new OverlinedHeader("Chat") },
+                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } },
                         },
                         RowDimensions = new[]
                         {
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                             new Dimension(),
                             new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.Relative, size: 0.4f, minSize: 120),
-                        }
+                        },
                     },
                 },
             },
@@ -195,12 +195,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
                 new Dimension(),
                 new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
-            }
+            },
         };
 
         protected override Drawable CreateFooter() => new PlaylistsRoomFooter
         {
-            OnStart = StartPlay
+            OnStart = StartPlay,
         };
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new PlaylistsRoomSettingsOverlay(room)
@@ -220,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(Room, SelectedItem.Value)
         {
-            Exited = () => leaderboard.RefreshScores()
+            Exited = () => leaderboard.RefreshScores(),
         });
     }
 }

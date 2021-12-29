@@ -33,9 +33,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 {
                     attemptDisplay = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                     },
-                }
+                },
             };
         }
 

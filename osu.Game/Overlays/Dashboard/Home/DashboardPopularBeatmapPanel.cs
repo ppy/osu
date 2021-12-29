@@ -29,14 +29,14 @@ namespace osu.Game.Overlays.Dashboard.Home
                 new SpriteIcon
                 {
                     Size = new Vector2(10),
-                    Icon = FontAwesome.Solid.Heart
+                    Icon = FontAwesome.Solid.Heart,
                 },
                 new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 10, weight: FontWeight.Regular),
-                    Text = BeatmapSet.FavouriteCount.ToString()
-                }
-            }
+                    Text = BeatmapSet.FavouriteCount.ToString(),
+                },
+            },
         };
     }
 }

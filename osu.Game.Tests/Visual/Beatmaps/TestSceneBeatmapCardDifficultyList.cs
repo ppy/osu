@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new APIBeatmap { RulesetID = 3, StarRating = 4.82, DifficultyName = "[7K] Another" },
 
                     new APIBeatmap { RulesetID = 4, StarRating = 9.99, DifficultyName = "Unknown?!" },
-                }
+                },
             };
 
             Child = new Container
@@ -55,16 +55,16 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background2
+                        Colour = colourProvider.Background2,
                     },
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Padding = new MarginPadding(10),
-                        Child = new BeatmapCardDifficultyList(beatmapSet)
-                    }
-                }
+                        Child = new BeatmapCardDifficultyList(beatmapSet),
+                    },
+                },
             };
         }
     }

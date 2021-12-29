@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Settings
                         Width = SettingsPanel.PANEL_WIDTH,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                    }
+                    },
                 };
             });
 

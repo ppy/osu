@@ -35,8 +35,8 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Vertical = 20 },
-                    Text = "see more"
-                }
+                    Text = "see more",
+                },
             };
 
             IdleColour = colourProvider.Light1;

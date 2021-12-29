@@ -227,7 +227,7 @@ namespace osu.Game.Graphics.UserInterface
                 RelativeSizeAxes = Axes.Both,
                 Colour = ButtonColour,
                 Blending = BlendingParameters.Additive,
-                Alpha = 0.05f
+                Alpha = 0.05f,
             };
 
             colourContainer.Add(flash);

@@ -184,19 +184,19 @@ namespace osu.Game.Skinning.Editor
         {
             var closestItem = new TernaryStateRadioMenuItem("Closest", MenuItemType.Standard, _ => applyClosestAnchors())
             {
-                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) }
+                State = { Value = GetStateFromSelection(selection, c => !c.Item.UsesFixedAnchor) },
             };
 
             yield return new OsuMenuItem("Anchor")
             {
                 Items = createAnchorItems((d, a) => d.UsesFixedAnchor && ((Drawable)d).Anchor == a, applyFixedAnchors)
                         .Prepend(closestItem)
-                        .ToArray()
+                        .ToArray(),
             };
 
             yield return new OsuMenuItem("Origin")
             {
-                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
+                Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray(),
             };
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
@@ -220,7 +220,7 @@ namespace osu.Game.Skinning.Editor
                 {
                     return new TernaryStateRadioMenuItem(a.ToString(), MenuItemType.Standard, _ => applyFunction(a))
                     {
-                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) }
+                        State = { Value = GetStateFromSelection(selection, c => checkFunction(c.Item, a)) },
                     };
                 });
             }

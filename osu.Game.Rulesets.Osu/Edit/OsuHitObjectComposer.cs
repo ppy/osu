@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             new HitCircleCompositionTool(),
             new SliderCompositionTool(),
-            new SpinnerCompositionTool()
+            new SpinnerCompositionTool(),
         };
 
         private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
         {
             new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler }),
-            new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Th })
+            new TernaryButton(rectangularGridSnapToggle, "Grid Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Th }),
         });
 
         private BindableList<HitObject> selectedHitObjects;
@@ -62,16 +62,16 @@ namespace osu.Game.Rulesets.Osu.Edit
                 new PlayfieldBorder
                 {
                     RelativeSizeAxes = Axes.Both,
-                    PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
+                    PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners },
                 },
                 distanceSnapGridContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 rectangularPositionSnapGrid = new OsuRectangularPositionSnapGrid
                 {
-                    RelativeSizeAxes = Axes.Both
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();

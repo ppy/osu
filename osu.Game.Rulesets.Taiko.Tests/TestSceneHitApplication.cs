@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 Type = HitType.Rim,
                 IsStrong = false,
-                StartTime = 300
+                StartTime = 300,
             })));
 
             AddHitObject(hit);
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             {
                 Type = HitType.Centre,
                 IsStrong = true,
-                StartTime = 500
+                StartTime = 500,
             })));
 
             AddHitObject(hit);

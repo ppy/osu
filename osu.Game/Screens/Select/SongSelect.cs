@@ -170,12 +170,12 @@ namespace osu.Game.Screens.Select
                                         Padding = new MarginPadding
                                         {
                                             Top = FilterControl.HEIGHT,
-                                            Bottom = Footer.HEIGHT
+                                            Bottom = Footer.HEIGHT,
                                         },
-                                        Child = new LoadingSpinner(true) { State = { Value = Visibility.Visible } }
-                                    }
+                                        Child = new LoadingSpinner(true) { State = { Value = Visibility.Visible } },
+                                    },
                                 },
-                            }
+                            },
                         },
                         FilterControl = new FilterControl
                         {
@@ -226,14 +226,14 @@ namespace osu.Game.Screens.Select
                                                 {
                                                     d.RelativeSizeAxes = Axes.Both;
                                                     d.Padding = new MarginPadding { Top = 10, Right = 5 };
-                                                })
+                                                }),
                                             },
-                                        }
+                                        },
                                     },
                                 },
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
             });
 
@@ -263,13 +263,13 @@ namespace osu.Game.Screens.Select
                                     Children = new Drawable[]
                                     {
                                         BeatmapOptions = new BeatmapOptionsOverlay(),
-                                        ModSelect = CreateModSelectOverlay()
-                                    }
-                                }
-                            }
-                        }
+                                        ModSelect = CreateModSelectOverlay(),
+                                    },
+                                },
+                            },
+                        },
                     },
-                    Footer = new Footer()
+                    Footer = new Footer(),
                 });
             }
 
@@ -316,9 +316,9 @@ namespace osu.Game.Screens.Select
             (new FooterButtonRandom
             {
                 NextRandom = () => Carousel.SelectNextRandom(),
-                PreviousRandom = Carousel.SelectPreviousRandom
+                PreviousRandom = Carousel.SelectPreviousRandom,
             }, null),
-            (new FooterButtonOptions(), BeatmapOptions)
+            (new FooterButtonOptions(), BeatmapOptions),
         };
 
         protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();

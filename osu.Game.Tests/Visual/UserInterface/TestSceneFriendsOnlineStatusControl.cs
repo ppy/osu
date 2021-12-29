@@ -33,16 +33,16 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 new APIUser
                 {
-                    IsOnline = true
+                    IsOnline = true,
                 },
                 new APIUser
                 {
-                    IsOnline = false
+                    IsOnline = false,
                 },
                 new APIUser
                 {
-                    IsOnline = false
-                }
+                    IsOnline = false,
+                },
             }));
 
             AddAssert("3 users", () => control.Items.FirstOrDefault(item => item.Status == OnlineStatus.All)?.Count == 3);

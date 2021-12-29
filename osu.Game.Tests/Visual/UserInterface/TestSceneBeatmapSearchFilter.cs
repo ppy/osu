@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new BeatmapSearchRulesetFilterRow(),
                     new BeatmapSearchFilterRow<SearchCategory>("Categories"),
-                    new BeatmapSearchFilterRow<SearchCategory>("Header Name")
-                }
+                    new BeatmapSearchFilterRow<SearchCategory>("Header Name"),
+                },
             });
         }
 

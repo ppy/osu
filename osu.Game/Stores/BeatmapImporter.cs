@@ -184,7 +184,7 @@ namespace osu.Game.Stores
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
                 // Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
+                DateAdded = DateTimeOffset.UtcNow,
             };
         }
 
@@ -241,7 +241,7 @@ namespace osu.Game.Stores
                         Author =
                         {
                             OnlineID = decoded.Metadata.Author.Id,
-                            Username = decoded.Metadata.Author.Username
+                            Username = decoded.Metadata.Author.Username,
                         },
                         Source = decoded.Metadata.Source,
                         Tags = decoded.Metadata.Tags,

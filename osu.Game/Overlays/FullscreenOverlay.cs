@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
             {
                 Colour = Color4.Black.Opacity(0),
                 Type = EdgeEffectType.Shadow,
-                Radius = 10
+                Radius = 10,
             };
 
             base.Content.AddRange(new Drawable[]
@@ -62,12 +62,12 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = BackgroundColour
+                    Colour = BackgroundColour,
                 },
                 content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
         }
 

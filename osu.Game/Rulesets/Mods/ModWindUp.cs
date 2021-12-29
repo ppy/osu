@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mods
         public override BindableBool AdjustPitch { get; } = new BindableBool
         {
             Default = true,
-            Value = true
+            Value = true,
         };
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModWindDown)).ToArray();

@@ -64,20 +64,20 @@ namespace osu.Game.Screens.Ranking.Contracted
                                 Colour = Color4.Black.Opacity(0.25f),
                                 Type = EdgeEffectType.Shadow,
                                 Radius = 1,
-                                Offset = new Vector2(0, 4)
+                                Offset = new Vector2(0, 4),
                             },
                             Children = new Drawable[]
                             {
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4Extensions.FromHex("444")
+                                    Colour = Color4Extensions.FromHex("444"),
                                 },
                                 new UserCoverBackground
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     User = score.User,
-                                    Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
+                                    Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0)),
                                 },
                                 new FillFlowContainer
                                 {
@@ -101,14 +101,14 @@ namespace osu.Game.Screens.Ranking.Contracted
                                                 Type = EdgeEffectType.Shadow,
                                                 Radius = 8,
                                                 Offset = new Vector2(0, 4),
-                                            }
+                                            },
                                         },
                                         new OsuSpriteText
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
                                             Text = score.UserString,
-                                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold)
+                                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold),
                                         },
                                         new FillFlowContainer
                                         {
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             AutoSizeAxes = Axes.Y,
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 5),
-                                            ChildrenEnumerable = score.GetStatisticsForDisplay().Where(s => !s.Result.IsBonus()).Select(createStatistic)
+                                            ChildrenEnumerable = score.GetStatisticsForDisplay().Where(s => !s.Result.IsBonus()).Select(createStatistic),
                                         },
                                         new FillFlowContainer
                                         {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             {
                                                 createStatistic("Max Combo", $"x{score.MaxCombo}"),
                                                 createStatistic("Accuracy", $"{score.Accuracy.FormatAccuracy()}"),
-                                            }
+                                            },
                                         },
                                         new ModFlowDisplay
                                         {
@@ -139,10 +139,10 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             RelativeSizeAxes = Axes.X,
                                             Current = { Value = score.Mods },
                                             IconScale = 0.5f,
-                                        }
-                                    }
-                                }
-                            }
+                                        },
+                                    },
+                                },
+                            },
                         },
                     },
                     new Drawable[]
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             Origin = Anchor.Centre,
                                             Current = scoreManager.GetBindableTotalScoreString(score),
                                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, fixedWidth: true),
-                                            Spacing = new Vector2(-1, 0)
+                                            Spacing = new Vector2(-1, 0),
                                         },
                                     },
                                     new Drawable[]
@@ -177,23 +177,23 @@ namespace osu.Game.Screens.Ranking.Contracted
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                            }
-                                        }
+                                            },
+                                        },
                                     },
                                 },
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                 },
                 RowDimensions = new[]
                 {
                     new Dimension(),
                     new Dimension(GridSizeMode.Absolute, 45),
-                }
+                },
             };
         }
 
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Text = key,
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                 },
                 new OsuSpriteText
                 {
@@ -219,9 +219,9 @@ namespace osu.Game.Screens.Ranking.Contracted
                     Origin = Anchor.CentreRight,
                     Text = value,
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                    Colour = Color4Extensions.FromHex("#FFDD55")
-                }
-            }
+                    Colour = Color4Extensions.FromHex("#FFDD55"),
+                },
+            },
         };
     }
 }

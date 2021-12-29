@@ -21,12 +21,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.PositionalHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
+                    Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
-                    Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
+                    Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak),
                 },
             };
         }

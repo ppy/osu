@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
             {
-                BeatmapInfo = { AudioLeadIn = leadIn }
+                BeatmapInfo = { AudioLeadIn = leadIn },
             });
 
             AddAssert($"first frame is {expectedStartTime}", () =>
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Text = $"GameplayStartTime: {DrawableRuleset.GameplayStartTime} "
                                + $"FirstHitObjectTime: {FirstHitObjectTime} "
                                + $"LeadInTime: {Beatmap.Value.BeatmapInfo.AudioLeadIn} "
-                               + $"FirstFrameClockTime: {FirstFrameClockTime}"
+                               + $"FirstFrameClockTime: {FirstFrameClockTime}",
                     });
                 }
             }

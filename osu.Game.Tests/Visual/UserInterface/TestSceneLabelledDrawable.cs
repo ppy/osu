@@ -40,24 +40,24 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new NonPaddedLabelledDrawable
                     {
                         Label = "short",
-                        FixedLabelWidth = label_width
+                        FixedLabelWidth = label_width,
                     },
                     new NonPaddedLabelledDrawable
                     {
                         Label = "very very very very very very very very very very very long",
-                        FixedLabelWidth = label_width
+                        FixedLabelWidth = label_width,
                     },
                     new PaddedLabelledDrawable
                     {
                         Label = "short",
-                        FixedLabelWidth = label_width
+                        FixedLabelWidth = label_width,
                     },
                     new PaddedLabelledDrawable
                     {
                         Label = "very very very very very very very very very very very long",
-                        FixedLabelWidth = label_width
-                    }
-                }
+                        FixedLabelWidth = label_width,
+                    },
+                },
             });
 
             AddStep("unset label width", () => this.ChildrenOfType<LabelledDrawable<Drawable>>().ForEach(d => d.FixedLabelWidth = null));
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.Red,
-                Text = @"(( Component ))"
+                Text = @"(( Component ))",
             };
         }
 
@@ -118,16 +118,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Color4.SlateGray,
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Colour = Color4.Red,
-                        Text = @"(( Component ))"
-                    }
-                }
+                        Text = @"(( Component ))",
+                    },
+                },
             };
         }
     }

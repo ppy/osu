@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "JUSTadICE (TV Size)",
                         Artist = "Oomori Seiko",
                     },
-                    DifficultyName = "Extreme"
+                    DifficultyName = "Extreme",
                 },
                 Date = DateTimeOffset.Now,
                 Mods = new[]
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Online
                     new APIMod { Acronym = new OsuModHardRock().Acronym },
                     new APIMod { Acronym = new OsuModDoubleTime().Acronym },
                 },
-                Accuracy = 0.9813
+                Accuracy = 0.9813,
             };
 
             var secondScore = new APIScore
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "Triumph & Regret",
                         Artist = "typeMARS",
                     },
-                    DifficultyName = "[4K] Regret"
+                    DifficultyName = "[4K] Regret",
                 },
                 Date = DateTimeOffset.Now,
                 Mods = new[]
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
                     new APIMod { Acronym = new OsuModHardRock().Acronym },
                     new APIMod { Acronym = new OsuModDoubleTime().Acronym },
                 },
-                Accuracy = 0.998546
+                Accuracy = 0.998546,
             };
 
             var thirdScore = new APIScore
@@ -75,10 +75,10 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "Idolize",
                         Artist = "Creo",
                     },
-                    DifficultyName = "Insane"
+                    DifficultyName = "Insane",
                 },
                 Date = DateTimeOffset.Now,
-                Accuracy = 0.9726
+                Accuracy = 0.9726,
             };
 
             var noPPScore = new APIScore
@@ -91,10 +91,10 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "C18H27NO3(extend)",
                         Artist = "Team Grimoire",
                     },
-                    DifficultyName = "[4K] Cataclysmic Hypernova"
+                    DifficultyName = "[4K] Cataclysmic Hypernova",
                 },
                 Date = DateTimeOffset.Now,
-                Accuracy = 0.55879
+                Accuracy = 0.55879,
             };
 
             Add(new FillFlowContainer
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual.Online
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(firstScore, 0.97)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, 0.85)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(thirdScore, 0.66)),
-                }
+                },
             });
         }
 

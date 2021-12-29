@@ -90,15 +90,15 @@ namespace osu.Game.Tournament
                                 new SeedingScreen(),
                                 new DrawingsScreen(),
                                 new GameplayScreen(),
-                                new TeamWinScreen()
-                            }
+                                new TeamWinScreen(),
+                            },
                         },
                         chatContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = chat
+                            Child = chat,
                         },
-                    }
+                    },
                 },
                 new Container
                 {
@@ -138,7 +138,7 @@ namespace osu.Game.Tournament
                                 new Separator(),
                                 new ScreenButton(typeof(DrawingsScreen)) { Text = "Drawings", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(ShowcaseScreen)) { Text = "Showcase", RequestSelection = SetScreen },
-                            }
+                            },
                         },
                     },
                 },

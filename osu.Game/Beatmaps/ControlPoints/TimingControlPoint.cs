@@ -27,9 +27,9 @@ namespace osu.Game.Beatmaps.ControlPoints
             BeatLengthBindable =
             {
                 Value = default_beat_length,
-                Disabled = true
+                Disabled = true,
             },
-            TimeSignatureBindable = { Disabled = true }
+            TimeSignatureBindable = { Disabled = true },
         };
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             Default = DEFAULT_BEAT_LENGTH,
             MinValue = 6,
-            MaxValue = 60000
+            MaxValue = 60000,
         };
 
         /// <summary>

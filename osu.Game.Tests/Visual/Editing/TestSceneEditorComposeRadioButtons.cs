@@ -25,8 +25,8 @@ namespace osu.Game.Tests.Visual.Editing
                     new RadioButton("Item 2", () => { }),
                     new RadioButton("Item 3", () => { }, () => new SpriteIcon { Icon = FontAwesome.Regular.Angry }),
                     new RadioButton("Item 4", () => { }),
-                    new RadioButton("Item 5", () => { })
-                }
+                    new RadioButton("Item 5", () => { }),
+                },
             });
 
             for (int i = 0; i < collection.Items.Count; i++)

@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         importBeatmapsButton.Enabled.Value = false;
                         legacyImportManager.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
-                    }
+                    },
                 });
             }
 
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         deleteBeatmapsButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
                     }));
-                }
+                },
             });
 
             if (legacyImportManager?.SupportsImportFromStable == true)
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         importScoresButton.Enabled.Value = false;
                         legacyImportManager.ImportFromStableAsync(StableContent.Scores).ContinueWith(t => Schedule(() => importScoresButton.Enabled.Value = true));
-                    }
+                    },
                 });
             }
 
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         deleteScoresButton.Enabled.Value = false;
                         Task.Run(() => scores.Delete(scores.GetAllUsableScores())).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
                     }));
-                }
+                },
             });
 
             if (legacyImportManager?.SupportsImportFromStable == true)
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         importSkinsButton.Enabled.Value = false;
                         legacyImportManager.ImportFromStableAsync(StableContent.Skins).ContinueWith(t => Schedule(() => importSkinsButton.Enabled.Value = true));
-                    }
+                    },
                 });
             }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             skins.Delete();
                         }).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
                     }));
-                }
+                },
             });
 
             if (collectionManager != null)
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             importCollectionsButton.Enabled.Value = false;
                             legacyImportManager.ImportFromStableAsync(StableContent.Collections).ContinueWith(t => Schedule(() => importCollectionsButton.Enabled.Value = true));
-                        }
+                        },
                     });
                 }
 
@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         dialogOverlay?.Push(new MassDeleteConfirmationDialog(collectionManager.DeleteAll));
-                    }
+                    },
                 });
             }
 
@@ -152,7 +152,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                             foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
-                    }
+                    },
                 },
                 undeleteButton = new SettingsButton
                 {
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     {
                         undeleteButton.Enabled.Value = false;
                         Task.Run(() => beatmaps.Undelete(beatmaps.QueryBeatmapSets(b => b.DeletePending).ToList())).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
-                    }
+                    },
                 },
             });
         }

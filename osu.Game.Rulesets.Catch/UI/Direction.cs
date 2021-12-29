@@ -6,6 +6,6 @@ namespace osu.Game.Rulesets.Catch.UI
     public enum Direction
     {
         Right = 1,
-        Left = -1
+        Left = -1,
     }
 }

@@ -193,7 +193,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             RepeatIndex = e.SpanIndex,
                             StartTime = e.Time,
                             Position = EndPosition,
-                            StackHeight = StackHeight
+                            StackHeight = StackHeight,
                         });
                         break;
 

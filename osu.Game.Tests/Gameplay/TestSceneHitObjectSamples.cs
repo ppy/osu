@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Gameplay
             string[] expectedSamples =
             {
                 "normal-hitnormal2",
-                "normal-hitwhistle" // user skin lookups ignore custom sample set index
+                "normal-hitwhistle", // user skin lookups ignore custom sample set index
             };
 
             SetupSkins(expectedSamples[0], expectedSamples[1]);

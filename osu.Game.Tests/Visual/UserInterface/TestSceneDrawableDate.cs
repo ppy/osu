@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(60))),
                     new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(65))),
                     new PokeyDrawableDate(DateTimeOffset.Now.Add(TimeSpan.FromSeconds(70))),
-                }
+                },
             };
         }
 
@@ -52,12 +52,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Size = new Vector2(box_size),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Alpha = 0
+                        Alpha = 0,
                     },
                     drawableDate = new DrawableDate(date)
                     {
                         X = box_size + 2,
-                    }
+                    },
                 };
 
                 drawableDate.Current.ValueChanged += _ => flash.FadeOutFromOne(500);

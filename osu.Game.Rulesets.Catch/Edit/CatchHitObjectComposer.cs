@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             LayerBelowRuleset.Add(new PlayfieldBorder
             {
                 RelativeSizeAxes = Axes.Both,
-                PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
+                PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners },
             });
 
             LayerBelowRuleset.Add(distanceSnapGrid = new CatchDistanceSnapGrid(new[]
@@ -77,12 +77,12 @@ namespace osu.Game.Rulesets.Catch.Edit
         {
             new FruitCompositionTool(),
             new JuiceStreamCompositionTool(),
-            new BananaShowerCompositionTool()
+            new BananaShowerCompositionTool(),
         };
 
         protected override IEnumerable<TernaryButton> CreateTernaryButtons() => base.CreateTernaryButtons().Concat(new[]
         {
-            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler })
+            new TernaryButton(distanceSnapToggle, "Distance Snap", () => new SpriteIcon { Icon = FontAwesome.Solid.Ruler }),
         });
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)

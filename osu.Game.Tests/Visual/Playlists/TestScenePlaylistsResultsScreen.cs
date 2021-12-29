@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 LoadScreen(resultsScreen = new TestResultsScreen(getScore?.Invoke(), 1, new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 }));
             });
 
@@ -255,8 +255,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 ScoresAround = new MultiplayerScoresAround
                 {
                     Higher = new MultiplayerScores(),
-                    Lower = new MultiplayerScores()
-                }
+                    Lower = new MultiplayerScores(),
+                },
             };
 
             totalCount++;
@@ -278,7 +278,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         Username = $"peppy{i}",
                         CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     },
-                    Statistics = userScore.Statistics
+                    Statistics = userScore.Statistics,
                 });
 
                 multiplayerUserScore.ScoresAround.Higher.Scores.Add(new MultiplayerScore
@@ -296,7 +296,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         Username = $"peppy{i}",
                         CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     },
-                    Statistics = userScore.Statistics
+                    Statistics = userScore.Statistics,
                 });
 
                 totalCount += 2;
@@ -337,8 +337,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         { HitResult.Miss, 1 },
                         { HitResult.Meh, 50 },
                         { HitResult.Good, 100 },
-                        { HitResult.Great, 300 }
-                    }
+                        { HitResult.Great, 300 },
+                    },
                 });
 
                 totalCount++;
@@ -357,15 +357,15 @@ namespace osu.Game.Tests.Visual.Playlists
                 {
                     { "total_score", JToken.FromObject(scores.Scores[^1].TotalScore) },
                     { "score_id", JToken.FromObject(scores.Scores[^1].ID) },
-                }
+                },
             };
 
             scores.Params = new IndexScoresParams
             {
                 Properties = new Dictionary<string, JToken>
                 {
-                    { "sort", JToken.FromObject(scores.Scores[^1].TotalScore > scores.Scores[^2].TotalScore ? "score_asc" : "score_desc") }
-                }
+                    { "sort", JToken.FromObject(scores.Scores[^1].TotalScore > scores.Scores[^2].TotalScore ? "score_asc" : "score_desc") },
+                },
             };
         }
 

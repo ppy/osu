@@ -404,7 +404,7 @@ namespace osu.Game.Skinning
                                         new DefaultHealthDisplay(),
                                         new SongProgress(),
                                         new BarHitErrorMeter(),
-                                    }
+                                    },
                             };
 
                             return skinnableTargetWrapper;

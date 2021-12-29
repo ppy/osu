@@ -84,14 +84,14 @@ namespace osu.Game.Overlays.Mods
                     {
                         Margin = new MarginPadding { Top = 5 },
                         Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                        Text = "Incompatible with:"
+                        Text = "Incompatible with:",
                     },
                     new ModDisplay
                     {
                         Current = incompatibleMods,
                         ExpansionMode = ExpansionMode.AlwaysExpanded,
-                        Scale = new Vector2(0.7f)
-                    }
+                        Scale = new Vector2(0.7f),
+                    },
                 });
             }
 

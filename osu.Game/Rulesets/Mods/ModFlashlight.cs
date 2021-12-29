@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Mods
                     addAction = v => quadBatch.Add(new PositionAndColourVertex
                     {
                         Position = v.Position,
-                        Colour = v.Colour
+                        Colour = v.Colour,
                     });
                 }
 

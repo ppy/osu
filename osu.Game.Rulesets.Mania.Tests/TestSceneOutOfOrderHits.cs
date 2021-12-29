@@ -68,8 +68,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new HoldNote
                 {
                     StartTime = 1020,
-                    EndTime = 1030
-                }
+                    EndTime = 1030,
+                },
             };
 
             performTest(objects, new List<ReplayFrame>());
@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new HoldNote
                 {
                     StartTime = 1020,
-                    EndTime = 1030
-                }
+                    EndTime = 1030,
+                },
             };
 
             var frames = new List<ReplayFrame>
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 new ManiaReplayFrame(1000, ManiaAction.Key1),
                 new ManiaReplayFrame(1030),
                 new ManiaReplayFrame(1040, ManiaAction.Key1),
-                new ManiaReplayFrame(1050)
+                new ManiaReplayFrame(1050),
             };
 
             performTest(objects, frames);
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     HitObjects = hitObjects,
                     BeatmapInfo =
                     {
-                        Ruleset = new ManiaRuleset().RulesetInfo
+                        Ruleset = new ManiaRuleset().RulesetInfo,
                     },
                 });
 

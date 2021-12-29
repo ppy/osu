@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.Centre,
                         Label = "Testing text",
                         PlaceholderText = "This is definitely working as intended",
-                    }
+                    },
                 };
 
                 component.Label = "a sample component";
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Label = "Testing text",
                     PlaceholderText = "This is definitely working as intended",
-                }
+                },
             };
         }
     }

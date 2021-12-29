@@ -73,11 +73,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
+                            AlwaysPresent = true,
+                        },
+                    },
                 },
-                new HoverSounds()
+                new HoverSounds(),
             });
         }
 
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             new OsuMenuItem("Create copy", MenuItemType.Standard, () =>
             {
                 lounge?.Open(Room.DeepClone());
-            })
+            }),
         };
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -227,14 +227,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                                 {
                                     Width = 80,
                                     Text = "Join Room",
-                                }
-                            }
+                                },
+                            },
                         },
                         errorText = new OsuSpriteText
                         {
                             Colour = colours.Red,
                         },
-                    }
+                    },
                 };
 
                 sampleJoinFail = audio.Samples.Get(@"UI/password-fail");

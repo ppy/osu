@@ -22,7 +22,7 @@ namespace osu.Game.Collections
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Go for it.",
-                    Action = deleteAction
+                    Action = deleteAction,
                 },
                 new PopupDialogCancelButton
                 {

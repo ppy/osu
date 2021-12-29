@@ -23,19 +23,19 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = GameplaySettingsStrings.BackgroundDim,
                     Current = config.GetBindable<double>(OsuSetting.DimLevel),
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = GameplaySettingsStrings.BackgroundBlur,
                     Current = config.GetBindable<double>(OsuSetting.BlurLevel),
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.LightenDuringBreaks,
-                    Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
+                    Current = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks),
                 },
                 new SettingsCheckbox
                 {

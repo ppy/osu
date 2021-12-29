@@ -14,6 +14,6 @@ namespace osu.Game.Beatmaps.Legacy
         Custom,
         CentreRight,
         BottomLeft,
-        BottomRight
+        BottomRight,
     }
 }

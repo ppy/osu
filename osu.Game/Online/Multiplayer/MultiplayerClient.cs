@@ -416,7 +416,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.RecentParticipants.Add(user.User ?? new APIUser
             {
                 Id = user.UserID,
-                Username = "[Unresolved]"
+                Username = "[Unresolved]",
             });
             APIRoom.ParticipantCount.Value++;
         }
@@ -743,7 +743,7 @@ namespace osu.Game.Online.Multiplayer
                 Ruleset = { Value = ruleset },
                 Expired = item.Expired,
                 PlaylistOrder = item.PlaylistOrder,
-                PlayedAt = item.PlayedAt
+                PlayedAt = item.PlayedAt,
             };
 
             playlistItem.RequiredMods.AddRange(item.RequiredMods.Select(m => m.ToMod(rulesetInstance)));

@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 composer.EditorBeatmap.Add(new HoldNote
                 {
                     Column = 1,
-                    EndTime = 200
+                    EndTime = 200,
                 });
             });
 
@@ -205,9 +205,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 {
                     EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
                     {
-                        BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
+                        BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
                     },
-                    Composer = new ManiaHitObjectComposer(new ManiaRuleset())
+                    Composer = new ManiaHitObjectComposer(new ManiaRuleset()),
                 };
 
                 for (int i = 0; i < 10; i++)

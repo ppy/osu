@@ -12,6 +12,6 @@ namespace osu.Game.Beatmaps.Legacy
         Normal = 1,
         Whistle = 2,
         Finish = 4,
-        Clap = 8
+        Clap = 8,
     }
 }

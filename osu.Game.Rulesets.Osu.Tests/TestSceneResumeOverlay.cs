@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     cursor = new CursorContainer(),
                     resume = new OsuResumeOverlay
                     {
-                        GameplayCursor = cursor
+                        GameplayCursor = cursor,
                     },
-                }
+                },
             };
 
             resume.ResumeAction = () => resumeFired = true;

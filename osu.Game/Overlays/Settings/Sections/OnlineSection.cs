@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.GlobeAsia
+            Icon = FontAwesome.Solid.GlobeAsia,
         };
 
         public OnlineSection()
@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new WebSettings(),
                 new AlertsAndPrivacySettings(),
-                new IntegrationSettings()
+                new IntegrationSettings(),
             };
         }
     }

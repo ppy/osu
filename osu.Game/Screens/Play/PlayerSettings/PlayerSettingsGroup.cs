@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                     Scale = new Vector2(0.75f),
                                     Action = () => Expanded = !Expanded,
                                 },
-                            }
+                            },
                         },
                         content = new FillFlowContainer
                         {
@@ -121,8 +121,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding(15),
                             Spacing = new Vector2(0, 15),
-                        }
-                    }
+                        },
+                    },
                 },
             };
         }

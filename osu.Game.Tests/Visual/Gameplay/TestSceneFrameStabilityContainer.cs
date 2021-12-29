@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
-                        }
+                        },
                     },
                 };
             }

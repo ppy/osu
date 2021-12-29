@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Editing.Checks
             hitsounded = new List<HitSampleInfo>
             {
                 new HitSampleInfo(HitSampleInfo.HIT_NORMAL),
-                new HitSampleInfo(HitSampleInfo.HIT_FINISH)
+                new HitSampleInfo(HitSampleInfo.HIT_FINISH),
             };
         }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var nested = new MockNestableHitObject(ticks.ToList(), 0, 16000)
             {
-                Samples = hitsounded
+                Samples = hitsounded,
             };
             nested.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var nested = new MockNestableHitObject(ticks.ToList(), 0, 16000)
             {
-                Samples = hitsounded
+                Samples = hitsounded,
             };
             nested.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Editing.Checks
 
             var nested = new MockNestableHitObject(ticks.ToList(), 0, 50000)
             {
-                Samples = notHitsounded
+                Samples = notHitsounded,
             };
             nested.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
             hitObjects.Add(nested);

@@ -39,9 +39,9 @@ namespace osu.Game.Tests.Visual.Editing
                         CanFlipY = true,
 
                         OnRotation = handleRotation,
-                        OnScale = handleScale
-                    }
-                }
+                        OnScale = handleScale,
+                    },
+                },
             };
 
             InputManager.MoveMouseTo(selectionBox);

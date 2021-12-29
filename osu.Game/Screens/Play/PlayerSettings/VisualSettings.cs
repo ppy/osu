@@ -24,28 +24,28 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 new OsuSpriteText
                 {
-                    Text = "Background dim:"
+                    Text = "Background dim:",
                 },
                 dimSliderBar = new PlayerSliderBar<double>
                 {
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new OsuSpriteText
                 {
-                    Text = "Background blur:"
+                    Text = "Background blur:",
                 },
                 blurSliderBar = new PlayerSliderBar<double>
                 {
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new OsuSpriteText
                 {
-                    Text = "Toggles:"
+                    Text = "Toggles:",
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboard / Video" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
                 beatmapColorsToggle = new PlayerCheckbox { LabelText = "Beatmap colours" },
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" },
             };
         }
 

@@ -21,6 +21,6 @@ namespace osu.Game.Overlays.BeatmapSet
         Genre,
 
         [LocalisableDescription(typeof(BeatmapsetsStrings), nameof(BeatmapsetsStrings.ShowInfoLanguage))]
-        Language
+        Language,
     }
 }

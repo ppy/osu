@@ -41,8 +41,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Height = AccuracyCircle.RANK_CIRCLE_RADIUS,
                     Width = 1f,
                     Colour = OsuColour.Gray(0.3f),
-                    EdgeSmoothness = new Vector2(1f)
-                }
+                    EdgeSmoothness = new Vector2(1f),
+                },
             };
         }
     }

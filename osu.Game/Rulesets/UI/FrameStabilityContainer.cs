@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.UI
             /// <summary>
             /// In a valid state, progressing one child hierarchy loop per game loop.
             /// </summary>
-            Valid
+            Valid,
         }
 
         private class FrameStabilityClock : GameplayClock, IFrameStableClock

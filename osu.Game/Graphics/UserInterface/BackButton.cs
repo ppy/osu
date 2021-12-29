@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.TopLeft,
                 Text = @"back",
                 Icon = OsuIcon.LeftCircle,
-                Action = () => Action?.Invoke()
+                Action = () => Action?.Invoke(),
             };
 
             if (receptor == null)

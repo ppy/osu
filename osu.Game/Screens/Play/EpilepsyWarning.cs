@@ -80,8 +80,8 @@ namespace osu.Game.Screens.Play
                             tfc.NewParagraph();
                             tfc.AddText("Please take caution if you are affected by epilepsy.");
                         }),
-                    }
-                }
+                    },
+                },
             };
         }
 

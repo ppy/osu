@@ -21,23 +21,23 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsEnumDropdown<HUDVisibilityMode>
                 {
                     LabelText = GameplaySettingsStrings.HUDVisibilityMode,
-                    Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode)
+                    Current = config.GetBindable<HUDVisibilityMode>(OsuSetting.HUDVisibilityMode),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.ShowDifficultyGraph,
-                    Current = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
+                    Current = config.GetBindable<bool>(OsuSetting.ShowProgressGraph),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
-                    Keywords = new[] { "hp", "bar" }
+                    Keywords = new[] { "hp", "bar" },
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.AlwaysShowKeyOverlay,
-                    Current = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                    Current = config.GetBindable<bool>(OsuSetting.KeyOverlay),
                 },
             };
         }

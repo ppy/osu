@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Colour = Colour4.White,
                     Alpha = index == 0 ? 0.3f : 0.1f,
-                    EdgeSmoothness = new Vector2(0.2f)
+                    EdgeSmoothness = new Vector2(0.2f),
                 };
 
                 if (direction == Direction.Horizontal)

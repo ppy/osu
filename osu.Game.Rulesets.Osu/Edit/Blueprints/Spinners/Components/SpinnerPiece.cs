@@ -32,9 +32,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     Alpha = 0.5f,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
-                ring = new RingPiece()
+                ring = new RingPiece(),
             };
         }
 

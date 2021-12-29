@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Text = post.Title
+                Text = post.Title,
             };
 
             HoverColour = colourProvider.Light1;

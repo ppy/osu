@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             Y = 0.5f,
                             Icon = FontAwesome.Solid.ChevronRight,
                             Size = new Vector2(chevron_size),
-                        }
+                        },
                     },
                     colourBars = new Container
                     {
@@ -114,8 +114,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Icon = FontAwesome.Solid.Bicycle,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.Centre,
-                            }
-                        }
+                            },
+                        },
                     },
                     judgementsContainer = new Container
                     {
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         Width = judgement_line_width,
                         RelativeSizeAxes = Axes.Y,
                     },
-                }
+                },
             };
 
             createColourBars(colours);
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = colour,
-                                Height = height * gradient_start
+                                Height = height * gradient_start,
                             },
                             new Box
                             {
@@ -199,9 +199,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientVertical(colour, colour.Opacity(0)),
                                 Y = gradient_start,
-                                Height = height * (1 - gradient_start)
+                                Height = height * (1 - gradient_start),
                             },
-                        }
+                        },
                     };
                 }
 
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colour,
-                    Height = height
+                    Height = height,
                 };
             }
         }
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
-                    }
+                    },
                 };
             }
 

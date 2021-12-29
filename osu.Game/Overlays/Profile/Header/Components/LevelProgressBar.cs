@@ -45,15 +45,15 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         RelativeSizeAxes = Axes.Both,
                         BackgroundColour = Color4.Black,
                         Direction = BarDirection.LeftToRight,
-                        AccentColour = colourProvider.Highlight1
-                    }
+                        AccentColour = colourProvider.Highlight1,
+                    },
                 },
                 levelProgressText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.TopRight,
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
-                }
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                },
             };
 
             User.BindValueChanged(user => updateProgress(user.NewValue));

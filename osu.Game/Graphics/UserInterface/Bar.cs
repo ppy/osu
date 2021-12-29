@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0, 0, 0, 0)
+                    Colour = new Color4(0, 0, 0, 0),
                 },
                 bar = new Box
                 {

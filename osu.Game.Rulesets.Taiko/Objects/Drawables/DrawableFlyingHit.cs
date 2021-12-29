@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 StartTime = drumRollTick.HitObject.StartTime + drumRollTick.Result.TimeOffset,
                 IsStrong = drumRollTick.HitObject.IsStrong,
-                Type = drumRollTick.JudgementType
+                Type = drumRollTick.JudgementType,
             })
         {
             HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

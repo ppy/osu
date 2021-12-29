@@ -99,9 +99,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             ColourLight = Color4.White,
-                            ColourDark = Color4.White.Darken(0.1f)
-                        }
-                    }
+                            ColourDark = Color4.White.Darken(0.1f),
+                        },
+                    },
                 },
                 new CircularContainer
                 {
@@ -122,9 +122,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                             Colour = Color4.White,
                             Blending = BlendingParameters.Additive,
                             Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
+                            AlwaysPresent = true,
+                        },
+                    },
                 },
                 content = new Container
                 {
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             });
         }
 
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             {
                 Type = EdgeEffectType.Glow,
                 Colour = AccentColour.Opacity(KiaiMode ? edge_alpha_kiai : 1f),
-                Radius = KiaiMode ? 32 : 8
+                Radius = KiaiMode ? 32 : 8,
             };
         }
 

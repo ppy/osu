@@ -31,8 +31,8 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Status = status
-            })
+                Status = status,
+            }),
         };
 
         private IEnumerable<BeatmapSetOnlineStatusPill> statusPills => this.ChildrenOfType<BeatmapSetOnlineStatusPill>();

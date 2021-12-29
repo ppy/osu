@@ -60,14 +60,14 @@ namespace osu.Game.Tests.Visual.Ranking
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#333")
+                    Colour = Color4Extensions.FromHex("#333"),
                 },
                 new HitEventTimingDistributionGraph(events)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(600, 130)
-                }
+                    Size = new Vector2(600, 130),
+                },
             };
         });
 

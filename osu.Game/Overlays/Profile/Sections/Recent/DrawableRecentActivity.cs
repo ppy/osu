@@ -49,11 +49,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 {
                     new Dimension(GridSizeMode.Absolute, size: 28),
                     new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 RowDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 Content = new[]
                 {
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                             {
                                 icon.Anchor = Anchor.Centre;
                                 icon.Origin = Anchor.Centre;
-                            })
+                            }),
                         },
                         content = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: font_size))
                         {
@@ -82,9 +82,9 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                             Origin = Anchor.CentreRight,
                             Colour = colourProvider.Foreground1,
                             Font = OsuFont.GetFont(size: font_size),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
 
             createMessage();
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                         RelativeSizeAxes = Axes.X,
                         Height = 11,
                         FillMode = FillMode.Fit,
-                        Margin = new MarginPadding { Top = 2 }
+                        Margin = new MarginPadding { Top = 2 },
                     };
 
                 case RecentActivityType.Achievement:
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     {
                         RelativeSizeAxes = Axes.X,
                         Width = 0.5f,
-                        Height = 18
+                        Height = 18,
                     };
 
                 default:

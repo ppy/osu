@@ -281,9 +281,9 @@ namespace osu.Game.Rulesets.Osu
                             new HitEventTimingDistributionGraph(timedHitEvents)
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 250
+                                Height = 250,
                             }),
-                    }
+                    },
                 },
                 new StatisticRow
                 {
@@ -292,9 +292,9 @@ namespace osu.Game.Rulesets.Osu
                         new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250
+                            Height = 250,
                         }),
-                    }
+                    },
                 },
                 new StatisticRow
                 {
@@ -302,10 +302,10 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
-                            new UnstableRate(timedHitEvents)
-                        }))
-                    }
-                }
+                            new UnstableRate(timedHitEvents),
+                        })),
+                    },
+                },
             };
         }
 

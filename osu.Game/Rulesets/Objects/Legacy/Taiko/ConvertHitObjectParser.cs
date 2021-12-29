@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
             {
                 Path = new SliderPath(controlPoints, length),
                 NodeSamples = nodeSamples,
-                RepeatCount = repeatCount
+                RepeatCount = repeatCount,
             };
         }
 
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
         {
             return new ConvertSpinner
             {
-                Duration = duration
+                Duration = duration,
             };
         }
 

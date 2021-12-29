@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Beatmaps
                     new HitCircle { StartTime = 1000 },
                     new HitCircle { StartTime = 1000 },
                     new HitCircle { StartTime = 2000 },
-                }
+                },
             });
 
             var hitCircle = new HitCircle { StartTime = 1000 };
@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Beatmaps
                     new HitCircle { StartTime = 1000 },
                     hitCircle,
                     new HitCircle { StartTime = 2000 },
-                }
+                },
             });
 
             hitCircle.StartTime = 0;

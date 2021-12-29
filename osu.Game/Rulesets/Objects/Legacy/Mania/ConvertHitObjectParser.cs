@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
         {
             return new ConvertHit
             {
-                X = position.X
+                X = position.X,
             };
         }
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
                 X = position.X,
                 Path = new SliderPath(controlPoints, length),
                 NodeSamples = nodeSamples,
-                RepeatCount = repeatCount
+                RepeatCount = repeatCount,
             };
         }
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             return new ConvertSpinner
             {
                 X = position.X,
-                Duration = duration
+                Duration = duration,
             };
         }
 
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             return new ConvertHold
             {
                 X = position.X,
-                Duration = duration
+                Duration = duration,
             };
         }
     }

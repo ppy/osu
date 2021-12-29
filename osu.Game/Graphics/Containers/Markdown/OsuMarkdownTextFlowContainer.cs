@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         // TODO : Change font to monospace
         protected override void AddCodeInLine(CodeInline codeInline) => AddDrawable(new OsuMarkdownInlineCode
         {
-            Text = codeInline.Content
+            Text = codeInline.Content,
         });
 
         protected override SpriteText CreateEmphasisedSpriteText(bool bold, bool italic)

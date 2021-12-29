@@ -11,6 +11,6 @@ namespace osu.Game.Beatmaps.Timing
         SimpleQuadruple = 4,
 
         [Description("3/4")]
-        SimpleTriple = 3
+        SimpleTriple = 3,
     }
 }

@@ -101,8 +101,8 @@ namespace osu.Game.Tests.Scores.IO
                         Statistics = new Dictionary<HitResult, int>
                         {
                             { HitResult.Perfect, 100 },
-                            { HitResult.Miss, 50 }
-                        }
+                            { HitResult.Miss, 50 },
+                        },
                     };
 
                     var imported = await LoadScoreIntoOsu(osu, toImport);
@@ -132,8 +132,8 @@ namespace osu.Game.Tests.Scores.IO
                         Statistics = new Dictionary<HitResult, int>
                         {
                             { HitResult.Perfect, 100 },
-                            { HitResult.Miss, 50 }
-                        }
+                            { HitResult.Miss, 50 },
+                        },
                     };
 
                     var imported = await LoadScoreIntoOsu(osu, toImport);

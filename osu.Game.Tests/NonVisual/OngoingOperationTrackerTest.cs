@@ -74,7 +74,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 Child = stack = new OsuScreenStack
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 };
 
                 stack.Push(screen = new TestScreenWithTracker());

@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             Add(mute = new MuteButton
             {
-                Margin = new MarginPadding { Top = 200 }
+                Margin = new MarginPadding { Top = 200 },
             });
 
             AddToggleStep("mute", b => mute.Current.Value = b);

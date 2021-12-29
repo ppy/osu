@@ -442,7 +442,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 new LegacyHitSampleInfo(HitSampleInfo.HIT_NORMAL, bankInfo.Normal, bankInfo.Volume, bankInfo.CustomSampleBank,
                     // if the sound type doesn't have the Normal flag set, attach it anyway as a layered sample.
                     // None also counts as a normal non-layered sample: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)#hitsounds
-                    type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal))
+                    type != LegacyHitSoundType.None && !type.HasFlagFast(LegacyHitSoundType.Normal)),
             };
 
             if (type.HasFlagFast(LegacyHitSoundType.Finish))
@@ -523,7 +523,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public override IEnumerable<string> LookupNames => new[]
             {
                 Filename,
-                Path.ChangeExtension(Filename, null)
+                Path.ChangeExtension(Filename, null),
             };
 
             public sealed override LegacyHitSampleInfo With(Optional<string> newName = default, Optional<string?> newBank = default, Optional<int> newVolume = default, Optional<int> newCustomSampleBank = default,

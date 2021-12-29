@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
                 RankHistory = new APIRankHistory
                 {
                     Mode = @"osu",
-                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray(),
                 },
             },
             Badges = new[]
@@ -50,8 +50,8 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
                     Description = "Outstanding help by being a voluntary test subject.",
-                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
-                }
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg",
+                },
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 2,
                 IsSupporter = true,
                 Country = new Country { FullName = @"Australia", FlagName = @"AU" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
             }));
 
             AddStep("Show flyte", () => profile.ShowUser(new APIUser
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Online
                 Username = @"flyte",
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
             }));
 
             AddStep("Show bancho", () => profile.ShowUser(new APIUser
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3,
                 IsBot = true,
                 Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg",
             }));
 
             AddStep("Show ppy from username", () => profile.ShowUser(new APIUser { Username = @"peppy" }));

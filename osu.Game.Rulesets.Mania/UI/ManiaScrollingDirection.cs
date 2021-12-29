@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Mania.UI
     public enum ManiaScrollingDirection
     {
         Up = ScrollingDirection.Up,
-        Down = ScrollingDirection.Down
+        Down = ScrollingDirection.Down,
     }
 }

@@ -19,13 +19,13 @@ namespace osu.Game.Tournament.Tests.Components
                     {
                         Value = new TournamentRound
                         {
-                            Name = { Value = "Test Round" }
-                        }
-                    }
+                            Name = { Value = "Test Round" },
+                        },
+                    },
                 })
                 {
-                    Margin = new MarginPadding(20)
-                }
+                    Margin = new MarginPadding(20),
+                },
             };
         }
     }

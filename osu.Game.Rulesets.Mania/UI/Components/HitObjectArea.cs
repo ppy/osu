@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = HitObjectContainer = hitObjectContainer
+                Child = HitObjectContainer = hitObjectContainer,
             };
         }
 

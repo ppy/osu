@@ -67,9 +67,9 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new APIRankHistory
                     {
                         Mode = @"osu",
-                        Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                        Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray(),
                     },
-                }
+                },
             });
 
             AddStep("Show unranked user", () => header.User.Value = new APIUser
@@ -83,9 +83,9 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new APIRankHistory
                     {
                         Mode = @"osu",
-                        Data = Enumerable.Range(2345, 85).ToArray()
+                        Data = Enumerable.Range(2345, 85).ToArray(),
                     },
-                }
+                },
             });
         }
     }

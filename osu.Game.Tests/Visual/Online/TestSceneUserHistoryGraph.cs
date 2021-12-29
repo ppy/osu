@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Online
                 new APIUserHistoryCount { Date = new DateTime(2000, 2, 1), Count = 20 },
                 new APIUserHistoryCount { Date = new DateTime(2000, 3, 1), Count = 100 },
                 new APIUserHistoryCount { Date = new DateTime(2000, 4, 1), Count = 15 },
-                new APIUserHistoryCount { Date = new DateTime(2000, 5, 1), Count = 30 }
+                new APIUserHistoryCount { Date = new DateTime(2000, 5, 1), Count = 30 },
             };
 
             var moreValues = new[]
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
                 new APIUserHistoryCount { Date = new DateTime(2010, 8, 1), Count = 30 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 9, 1), Count = 50 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 10, 1), Count = 2000 },
-                new APIUserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 }
+                new APIUserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 },
             };
 
             AddStep("Set fake values", () => graph.Values = values);

@@ -5,6 +5,6 @@ namespace osu.Game.Skinning
 {
     public enum SkinnableTarget
     {
-        MainHUDComponents
+        MainHUDComponents,
     }
 }

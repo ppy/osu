@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#66FFCC"), Color4Extensions.FromHex("#FF9AD7")),
                     Alpha = 0,
                     UseFullGlyphHeight = false,
-                }
-            }
+                },
+            },
         };
     }
 }

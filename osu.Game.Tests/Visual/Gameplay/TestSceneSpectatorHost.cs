@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set dummy user", () => dummyAPIAccess.LocalUser.Value = new APIUser
             {
                 Id = dummy_user_id,
-                Username = "DummyUser"
+                Username = "DummyUser",
             });
             AddStep("add test spectator client", () => Add(spectatorClient));
             AddStep("add watching user", () => spectatorClient.WatchUser(dummy_user_id));

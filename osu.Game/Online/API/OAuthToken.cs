@@ -44,7 +44,7 @@ namespace osu.Game.Online.API
                 {
                     AccessToken = parts[0],
                     AccessTokenExpiry = long.Parse(parts[1], NumberFormatInfo.InvariantInfo),
-                    RefreshToken = parts[2]
+                    RefreshToken = parts[2],
                 };
             }
             catch

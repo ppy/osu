@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 {
                     Artist = "SomeArtist",
                     AuthorString = "SomeAuthor",
-                    Title = "import"
+                    Title = "import",
                 };
 
                 beatmap = Game.BeatmapManager.Import(new BeatmapSetInfo
@@ -47,16 +47,16 @@ namespace osu.Game.Tests.Visual.Navigation
                             OnlineID = 1 * 1024,
                             Metadata = metadata,
                             BaseDifficulty = difficulty,
-                            Ruleset = new OsuRuleset().RulesetInfo
+                            Ruleset = new OsuRuleset().RulesetInfo,
                         },
                         new BeatmapInfo
                         {
                             OnlineID = 1 * 2048,
                             Metadata = metadata,
                             BaseDifficulty = difficulty,
-                            Ruleset = new OsuRuleset().RulesetInfo
+                            Ruleset = new OsuRuleset().RulesetInfo,
                         },
-                    }
+                    },
                 }).Result.Value;
             });
         }
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
-                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
+                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
                 }).Result.Value;
             });
 

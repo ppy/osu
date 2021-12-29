@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         Origin = Anchor.BottomCentre,
                         Texture = skin.GetTexture(upImage),
                         RelativeSizeAxes = Axes.X,
-                        Width = 1
+                        Width = 1,
                     },
                     downSprite = new Sprite
                     {
@@ -59,9 +59,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         Texture = skin.GetTexture(downImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
-                        Alpha = 0
-                    }
-                }
+                        Alpha = 0,
+                    },
+                },
             };
 
             direction.BindTo(scrollingInfo.Direction);

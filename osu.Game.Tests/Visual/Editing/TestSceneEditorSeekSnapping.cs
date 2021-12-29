@@ -32,8 +32,8 @@ namespace osu.Game.Tests.Visual.Editing
                 HitObjects =
                 {
                     new HitCircle { StartTime = 0 },
-                    new HitCircle { StartTime = 5000 }
-                }
+                    new HitCircle { StartTime = 5000 },
+                },
             };
 
             testBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 200 });
@@ -329,7 +329,7 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         Name = "Background",
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(85f)
+                        Colour = Color4.Black.Opacity(85f),
                     },
                     new Container
                     {
@@ -352,10 +352,10 @@ namespace osu.Game.Tests.Visual.Editing
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Spacing = new Vector2(0, 5)
+                                Spacing = new Vector2(0, 5),
                             },
-                        }
-                    }
+                        },
+                    },
                 };
 
                 var timingPoints = beatmap.ControlPointInfo.TimingPoints;
@@ -388,7 +388,7 @@ namespace osu.Game.Tests.Visual.Editing
                         RelativePositionAxes = Axes.X,
                         X = (float)(time / fullDuration),
                         Height = 10,
-                        Width = 2
+                        Width = 2,
                     };
 
                     Box createBeatTick(double time) => new Box
@@ -399,7 +399,7 @@ namespace osu.Game.Tests.Visual.Editing
                         X = (float)(time / fullDuration),
                         Height = 5,
                         Width = 2,
-                        Colour = time > endTime ? Color4.Gray : Color4.Yellow
+                        Colour = time > endTime ? Color4.Gray : Color4.Yellow,
                     };
 
                     AddInternal(createMainTick(timingPoint.Time));

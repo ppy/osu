@@ -501,7 +501,7 @@ namespace osu.Game.Database
                 model.Files.Add(new TFileModel
                 {
                     Filename = filename,
-                    FileInfo = Files.Add(contents)
+                    FileInfo = Files.Add(contents),
                 });
             }
 
@@ -666,7 +666,7 @@ namespace osu.Game.Database
                     fileInfos.Add(new TFileModel
                     {
                         Filename = filenames.shortened,
-                        FileInfo = files.Add(s)
+                        FileInfo = files.Add(s),
                     });
                 }
             }

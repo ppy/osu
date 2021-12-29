@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = onlineView = new TestOnlineViewContainer()
+                Child = onlineView = new TestOnlineViewContainer(),
             };
         }
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Online
                         Font = OsuFont.Default.With(size: 40),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    },
                 };
             }
         }

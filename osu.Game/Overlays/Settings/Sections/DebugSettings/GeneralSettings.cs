@@ -23,18 +23,18 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 new SettingsCheckbox
                 {
                     LabelText = DebugSettingsStrings.ShowLogOverlay,
-                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
+                    Current = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = DebugSettingsStrings.BypassFrontToBackPass,
-                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
-                }
+                    Current = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass),
+                },
             };
             Add(new SettingsButton
             {
                 Text = DebugSettingsStrings.ImportFiles,
-                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen()))
+                Action = () => game?.PerformFromScreen(menu => menu.Push(new FileImportScreen())),
             });
         }
     }

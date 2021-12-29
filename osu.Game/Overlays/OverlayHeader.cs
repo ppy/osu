@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
                 contentSidePadding = value;
                 content.Padding = new MarginPadding
                 {
-                    Horizontal = value
+                    Horizontal = value,
                 };
             }
         }
@@ -84,15 +84,15 @@ namespace osu.Game.Overlays
                                             {
                                                 content.Anchor = Anchor.CentreRight;
                                                 content.Origin = Anchor.CentreRight;
-                                            })
-                                        }
-                                    }
-                                }
+                                            }),
+                                        },
+                                    },
+                                },
                             },
-                        }
+                        },
                     },
-                    CreateContent()
-                }
+                    CreateContent(),
+                },
             });
 
             ContentSidePadding = 50;

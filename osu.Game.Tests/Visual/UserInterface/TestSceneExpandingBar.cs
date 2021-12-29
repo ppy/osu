@@ -34,8 +34,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         ExpandedSize = 10,
                         CollapsedSize = 2,
                         Colour = Color4.DeepSkyBlue,
-                    }
-                }
+                    },
+                },
             });
 
             AddStep(@"Collapse", () => expandingBar.Collapse());

@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             },
                             rank = new UpdateableRank(ScoreRank.D)
                             {
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Size = new Vector2(28),
                                 FillMode = FillMode.Fit,
                             },
-                        }
+                        },
                     },
                     avatar = new UpdateableAvatar(showGuestOnNull: false)
                     {
@@ -104,13 +104,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     new OsuSpriteText
                                     {
                                         Text = "achieved ",
-                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
+                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
                                     },
                                     achievedOn = new DrawableDate(DateTimeOffset.MinValue)
                                     {
-                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
+                                        Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
                                     },
-                                }
+                                },
                             },
                             flag = new UpdateableFlag
                             {
@@ -120,9 +120,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Margin = new MarginPadding { Top = 3 }, // makes spacing look more even
                                 ShowPlaceholderOnNull = false,
                             },
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

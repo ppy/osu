@@ -53,28 +53,28 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = MouseSettingsStrings.HighPrecisionMouse,
                     TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
                     Current = relativeMode,
-                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
+                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" },
                 },
                 new SensitivitySetting
                 {
                     LabelText = MouseSettingsStrings.CursorSensitivity,
-                    Current = localSensitivity
+                    Current = localSensitivity,
                 },
                 confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
                     LabelText = MouseSettingsStrings.ConfineMouseMode,
-                    Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
+                    Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = MouseSettingsStrings.DisableMouseWheelVolumeAdjust,
                     TooltipText = MouseSettingsStrings.DisableMouseWheelVolumeAdjustTooltip,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = MouseSettingsStrings.DisableMouseButtons,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons),
                 },
             };
         }

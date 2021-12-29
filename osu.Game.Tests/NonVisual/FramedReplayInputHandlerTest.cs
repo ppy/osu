@@ -21,7 +21,7 @@ namespace osu.Game.Tests.NonVisual
         {
             handler = new TestInputHandler(replay = new Replay
             {
-                HasReceivedAllFrames = false
+                HasReceivedAllFrames = false,
             });
         }
 
@@ -310,7 +310,7 @@ namespace osu.Game.Tests.NonVisual
                 7000,
                 repeating_time,
                 repeating_time,
-                10000
+                10000,
             }.Select((time, index) => new TestReplayFrame(time, true, index)));
 
             replay.HasReceivedAllFrames = true;

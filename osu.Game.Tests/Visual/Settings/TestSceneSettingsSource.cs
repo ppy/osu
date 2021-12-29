@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Settings
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Padding = new MarginPadding(50),
-                    ChildrenEnumerable = new TestTargetClass().CreateSettingsControls()
+                    ChildrenEnumerable = new TestTargetClass().CreateSettingsControls(),
                 },
             };
         }
@@ -43,35 +43,35 @@ namespace osu.Game.Tests.Visual.Settings
                 MinValue = 0,
                 MaxValue = 10,
                 Default = 5,
-                Value = 7
+                Value = 7,
             };
 
             [SettingSource("Sample enum", "Change something for a mod")]
             public Bindable<TestEnum> EnumBindable { get; } = new Bindable<TestEnum>
             {
                 Default = TestEnum.Value1,
-                Value = TestEnum.Value2
+                Value = TestEnum.Value2,
             };
 
             [SettingSource("Sample string", "Change something for a mod")]
             public Bindable<string> StringBindable { get; } = new Bindable<string>
             {
                 Default = string.Empty,
-                Value = "Sample text"
+                Value = "Sample text",
             };
 
             [SettingSource("Sample number textbox", "Textbox number entry", SettingControlType = typeof(SettingsNumberBox))]
             public Bindable<int?> IntTextBoxBindable { get; } = new Bindable<int?>
             {
                 Default = null,
-                Value = null
+                Value = null,
             };
         }
 
         private enum TestEnum
         {
             Value1,
-            Value2
+            Value2,
         }
     }
 }

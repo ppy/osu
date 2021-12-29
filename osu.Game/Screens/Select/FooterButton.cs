@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Select
                                         AlwaysPresent = true,
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                    }
+                                    },
                                 },
                             },
                         },
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Select
             {
                 Left = horizontalMargin,
                 // right side margin offset to compensate for shear
-                Right = horizontalMargin - SHEAR_WIDTH / 2
+                Right = horizontalMargin - SHEAR_WIDTH / 2,
             };
         }
 

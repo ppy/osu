@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Globe
+            Icon = FontAwesome.Solid.Globe,
         };
 
         public override LocalisableString Header => InputSettingsStrings.GlobalKeyBindingHeader;

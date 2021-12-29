@@ -40,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = tab_control_height,
-                    Current = { BindTarget = DisplayMode }
+                    Current = { BindTarget = DisplayMode },
                 },
                 new Container
                 {
@@ -53,16 +53,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             SelectedItem = { BindTarget = SelectedItem },
-                            RequestEdit = item => RequestEdit?.Invoke(item)
+                            RequestEdit = item => RequestEdit?.Invoke(item),
                         },
                         historyList = new MultiplayerHistoryList
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            SelectedItem = { BindTarget = SelectedItem }
-                        }
-                    }
-                }
+                            SelectedItem = { BindTarget = SelectedItem },
+                        },
+                    },
+                },
             };
         }
 

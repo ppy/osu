@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Texture = source.GetTexture("spinner-metre"),
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        Scale = new Vector2(SPRITE_SCALE)
-                    }
+                        Scale = new Vector2(SPRITE_SCALE),
+                    },
                 },
                 ApproachCircle = new Sprite
                 {
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                     Texture = source.GetTexture("spinner-approachcircle"),
                     Scale = new Vector2(SPRITE_SCALE * 1.86f),
                     Y = SPINNER_Y_CENTRE,
-                }
+                },
             });
         }
 

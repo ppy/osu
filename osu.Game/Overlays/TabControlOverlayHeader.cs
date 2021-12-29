@@ -63,9 +63,9 @@ namespace osu.Game.Overlays
                         Child = TabControl = CreateTabControl().With(control =>
                         {
                             control.Current = Current;
-                        })
-                    }
-                }
+                        }),
+                    },
+                },
             });
         }
 

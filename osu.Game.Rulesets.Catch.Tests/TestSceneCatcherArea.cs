@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     area.OnNewResult(drawable, new CatchJudgementResult(fruit, new CatchJudgement())
                     {
-                        Type = area.Catcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss
+                        Type = area.Catcher.CanCatch(fruit) ? HitResult.Great : HitResult.Miss,
                     });
 
                     drawable.Expire();
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             beatmapDifficulty = new BeatmapDifficulty
             {
-                CircleSize = circleSize
+                CircleSize = circleSize,
             };
 
             SetContents(_ =>
@@ -106,8 +106,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.TopCentre,
-                        }
-                    }
+                        },
+                    },
                 };
             });
         }
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
                 Catcher = new Catcher(droppedObjectContainer, beatmapDifficulty)
                 {
-                    X = CatchPlayfield.CENTER_X
+                    X = CatchPlayfield.CENTER_X,
                 };
             }
 

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Height = 200,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Clock = new FramedClock(new StopwatchClock())
+                Clock = new FramedClock(new StopwatchClock()),
             };
         }
 

@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
             Font = OsuFont.TorusAlternate.With(weight: FontWeight.Light, size: 24),
-            Shadow = false
+            Shadow = false,
         };
 
         [BackgroundDependencyLoader]

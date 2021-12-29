@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 Difficulty = difficultyValue,
                 Accuracy = accValue,
                 ScaledScore = scaledScore,
-                Total = totalValue
+                Total = totalValue,
             };
         }
 

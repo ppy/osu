@@ -15,6 +15,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
         Online,
 
         [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.StatusOffline))]
-        Offline
+        Offline,
     }
 }

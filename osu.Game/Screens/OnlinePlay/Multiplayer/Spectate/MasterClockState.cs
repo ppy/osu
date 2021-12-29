@@ -13,6 +13,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// <summary>
         /// The master clock is too far ahead of any player clock and needs to slow down.
         /// </summary>
-        TooFarAhead
+        TooFarAhead,
     }
 }

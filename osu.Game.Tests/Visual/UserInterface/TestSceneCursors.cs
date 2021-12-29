@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     cursorBoxes[1] = new CustomCursorBox(Color4.Blue)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.4f)
+                        Size = new Vector2(0.4f),
                     },
                     // Bottom-right user
                     cursorBoxes[2] = new CustomCursorBox(Color4.Red)
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.4f)
+                        Size = new Vector2(0.4f),
                     },
                     // Bottom-left local
                     cursorBoxes[3] = new CustomCursorBox(Color4.Magenta, false)
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.4f)
+                        Size = new Vector2(0.4f),
                     },
                     // Top-right local
                     cursorBoxes[4] = new CustomCursorBox(Color4.Cyan, false)
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.4f)
+                        Size = new Vector2(0.4f),
                     },
                     // Left-local
                     cursorBoxes[5] = new CustomCursorBox(Color4.Yellow, false)
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.2f, 1),
                     },
-                }
+                },
             };
 
             AddToggleStep("Smooth transitions", b => cursorBoxes.ForEach(box => box.SmoothTransition = b));
@@ -208,18 +208,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                     background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.1f
+                        Alpha = 0.1f,
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Text = providesUserCursor ? "User cursor" : "Local cursor"
+                        Text = providesUserCursor ? "User cursor" : "Local cursor",
                     },
                     Cursor = new TestCursorContainer
                     {
                         State = { Value = providesUserCursor ? Visibility.Hidden : Visibility.Visible },
-                    }
+                    },
                 };
             }
 

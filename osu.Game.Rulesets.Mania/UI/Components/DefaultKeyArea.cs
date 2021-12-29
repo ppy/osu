@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     {
                         Name = "Key gradient",
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.5f
+                        Alpha = 0.5f,
                     },
                     keyIcon = new Container
                     {
@@ -66,11 +66,11 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
-                                AlwaysPresent = true
-                            }
-                        }
-                    }
-                }
+                                AlwaysPresent = true,
+                            },
+                        },
+                    },
+                },
             };
 
             keyIcon.EdgeEffect = new EdgeEffectParameters

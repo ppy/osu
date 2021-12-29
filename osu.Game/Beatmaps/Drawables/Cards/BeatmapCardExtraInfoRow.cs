@@ -35,15 +35,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         AutoSizeAxes = Axes.Both,
                         Status = beatmapSet.Status,
                         Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft
+                        Origin = Anchor.CentreLeft,
                     },
                     new DifficultySpectrumDisplay(beatmapSet)
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        DotSize = new Vector2(6, 12)
-                    }
-                }
+                        DotSize = new Vector2(6, 12),
+                    },
+                },
             };
         }
 

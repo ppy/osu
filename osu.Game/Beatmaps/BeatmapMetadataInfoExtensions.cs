@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps
             metadataInfo.Title,
             metadataInfo.TitleUnicode,
             metadataInfo.Source,
-            metadataInfo.Tags
+            metadataInfo.Tags,
         }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
         /// <summary>

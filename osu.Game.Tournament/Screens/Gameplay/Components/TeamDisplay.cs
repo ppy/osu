@@ -88,8 +88,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                             {
                                                 Origin = anchor,
                                                 Anchor = anchor,
-                                            }
-                                        }
+                                            },
+                                        },
                                     },
                                     new TournamentSpriteTextWithBackground(team?.FullName.Value ?? "???")
                                     {
@@ -97,11 +97,11 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                         Origin = anchor,
                                         Anchor = anchor,
                                     },
-                                }
+                                },
                             },
-                        }
+                        },
                     },
-                }
+                },
             };
         }
 

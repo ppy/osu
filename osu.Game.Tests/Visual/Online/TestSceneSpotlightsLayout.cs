@@ -34,8 +34,8 @@ namespace osu.Game.Tests.Visual.Online
                 Width = 0.8f,
                 Child = new SpotlightsLayout
                 {
-                    Ruleset = { BindTarget = ruleset }
-                }
+                    Ruleset = { BindTarget = ruleset },
+                },
             });
 
             AddStep("Osu ruleset", () => ruleset.Value = new OsuRuleset().RulesetInfo);

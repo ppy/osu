@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
             {
                 Type = EdgeEffectType.Glow,
                 Radius = DrawWidth / 2,
-                Colour = colour.NewValue.Darken(0.2f).Opacity(0.75f)
+                Colour = colour.NewValue.Darken(0.2f).Opacity(0.75f),
             };
         }
     }

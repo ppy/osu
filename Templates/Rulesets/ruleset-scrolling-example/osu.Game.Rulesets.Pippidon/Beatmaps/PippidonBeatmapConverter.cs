@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Pippidon.Beatmaps
             {
                 Samples = original.Samples,
                 StartTime = original.StartTime,
-                Lane = getLane(original)
+                Lane = getLane(original),
             };
         }
 

@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                         Title = @"You're breathtaking",
                         AuthorString = @"Everyone",
                     },
-                    Ruleset = new CatchRuleset().RulesetInfo
+                    Ruleset = new CatchRuleset().RulesetInfo,
                 },
-                ControlPointInfo = controlPointInfo
+                ControlPointInfo = controlPointInfo,
             });
 
             Child = new Container
@@ -54,8 +54,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap.GetPlayableBeatmap(new CatchRuleset().RulesetInfo))
-                }
+                    drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap.GetPlayableBeatmap(new CatchRuleset().RulesetInfo)),
+                },
             };
         });
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     X = getXCoords(hit),
                     LastInCombo = i % 4 == 0,
-                    StartTime = playfieldTime + 800 + (200 * i)
+                    StartTime = playfieldTime + 800 + (200 * i),
                 };
 
                 fruit.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -127,8 +127,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Path = new SliderPath(PathType.Linear, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(0, 200)
-                })
+                    new Vector2(0, 200),
+                }),
             };
 
             juice.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     X = getXCoords(hit),
                     LastInCombo = i % 4 == 0,
-                    StartTime = playfieldTime + 800 + (200 * i)
+                    StartTime = playfieldTime + 800 + (200 * i),
                 };
 
                 banana.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

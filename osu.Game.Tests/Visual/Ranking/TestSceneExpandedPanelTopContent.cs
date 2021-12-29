@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         Colour = Color4Extensions.FromHex("#444"),
                     },
                     new ExpandedPanelTopContent(TestResources.CreateTestScoreInfo().User),
-                }
+                },
             };
         }
     }

@@ -38,10 +38,10 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new UserTestContainer
                     {
-                        User = { BindTarget = user }
+                        User = { BindTarget = user },
                     },
-                    loading = new LoadingLayer()
-                }
+                    loading = new LoadingLayer(),
+                },
             });
         }
 
@@ -93,11 +93,11 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new OsuSpriteText
                     {
-                        Text = $@"Username: {user.NewValue?.Username}"
+                        Text = $@"Username: {user.NewValue?.Username}",
                     },
                     new OsuSpriteText
                     {
-                        Text = $@"RankedScore: {user.NewValue?.Statistics.RankedScore}"
+                        Text = $@"RankedScore: {user.NewValue?.Statistics.RankedScore}",
                     },
                 });
             }

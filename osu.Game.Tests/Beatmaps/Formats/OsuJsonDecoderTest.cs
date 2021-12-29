@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 11505, 22054, 32604, 43153, 53703, 64252, 74802, 85351,
                 95901, 106450, 116999, 119637, 130186, 140735, 151285,
-                161834, 164471, 175020, 185570, 196119, 206669, 209306
+                161834, 164471, 175020, 185570, 196119, 206669, 209306,
             };
             Assert.AreEqual(expectedBookmarks.Length, beatmapInfo.Bookmarks.Length);
             for (int i = 0; i < expectedBookmarks.Length; i++)

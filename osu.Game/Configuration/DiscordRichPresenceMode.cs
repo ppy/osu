@@ -12,6 +12,6 @@ namespace osu.Game.Configuration
         [Description("Hide identifiable information")]
         Limited,
 
-        Full
+        Full,
     }
 }

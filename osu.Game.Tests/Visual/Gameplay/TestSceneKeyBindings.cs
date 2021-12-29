@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             Add(new TestKeyBindingContainer
             {
-                Child = receiver = new ActionReceiver()
+                Child = receiver = new ActionReceiver(),
             });
         }
 

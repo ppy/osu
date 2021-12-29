@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.News
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new FillFlowContainer
                 {
@@ -76,10 +76,10 @@ namespace osu.Game.Overlays.News
                                     FillMode = FillMode.Fill,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Alpha = 0
+                                    Alpha = 0,
                                 })
                                 {
-                                    RelativeSizeAxes = Axes.Both
+                                    RelativeSizeAxes = Axes.Both,
                                 },
                                 new DateContainer(post.PublishedAt)
                                 {
@@ -88,10 +88,10 @@ namespace osu.Game.Overlays.News
                                     Margin = new MarginPadding
                                     {
                                         Top = 10,
-                                        Right = 15
-                                    }
-                                }
-                            }
+                                        Right = 15,
+                                    },
+                                },
+                            },
                         },
                         new Container
                         {
@@ -100,16 +100,16 @@ namespace osu.Game.Overlays.News
                             Padding = new MarginPadding
                             {
                                 Horizontal = 15,
-                                Vertical = 10
+                                Vertical = 10,
                             },
                             Child = main = new TextFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            }
-                        }
-                    }
-                }
+                                AutoSizeAxes = Axes.Y,
+                            },
+                        },
+                    },
+                },
             });
 
             IdleColour = colourProvider.Background4;
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.News
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background6.Opacity(0.5f)
+                        Colour = colourProvider.Background6.Opacity(0.5f),
                     },
                     new OsuSpriteText
                     {
@@ -151,9 +151,9 @@ namespace osu.Game.Overlays.News
                         Margin = new MarginPadding
                         {
                             Horizontal = 20,
-                            Vertical = 5
-                        }
-                    }
+                            Vertical = 5,
+                        },
+                    },
                 };
             }
 

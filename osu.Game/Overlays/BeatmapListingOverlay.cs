@@ -82,11 +82,11 @@ namespace osu.Game.Overlays
                                     foundContent = new FillFlowContainer<BeatmapCard>(),
                                     notFoundContent = new NotFoundDrawable(),
                                     supporterRequiredContent = new SupporterRequiredDrawable(),
-                                }
-                            }
+                                },
+                            },
                         },
                     },
-                }
+                },
             };
         }
 
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(10),
                 Alpha = 0,
                 Margin = new MarginPadding { Vertical = 15 },
-                ChildrenEnumerable = newCards
+                ChildrenEnumerable = newCards,
             };
             return content;
         }
@@ -290,15 +290,15 @@ namespace osu.Game.Overlays
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
-                            Texture = textures.Get(@"Online/not-found")
+                            Texture = textures.Get(@"Online/not-found"),
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = BeatmapsStrings.ListingSearchNotFoundQuote,
-                        }
-                    }
+                        },
+                    },
                 });
             }
         }
@@ -347,7 +347,7 @@ namespace osu.Game.Overlays
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Bottom = 10 },
                         },
-                    }
+                    },
                 });
             }
 

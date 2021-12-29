@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
             InternalChildren = new[]
             {
                 Background = new Box { RelativeSizeAxes = Axes.Both },
-                foregroundContainer = new Container { RelativeSizeAxes = Axes.Both }
+                foregroundContainer = new Container { RelativeSizeAxes = Axes.Both },
             };
 
             if (drawableObject != null)
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
         protected virtual Drawable CreateForeground() => new ForegroundPiece
         {
             AccentColour = { BindTarget = AccentColour },
-            IsHitting = { BindTarget = IsHitting }
+            IsHitting = { BindTarget = IsHitting },
         };
 
         private void onAccentChanged(ValueChangedEvent<Color4> accent) => Background.Colour = accent.NewValue.Opacity(0.7f);
@@ -111,11 +111,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0,
-                                    AlwaysPresent = true
-                                }
-                            }
-                        }
-                    }
+                                    AlwaysPresent = true,
+                                },
+                            },
+                        },
+                    },
                 };
 
                 AccentColour.BindValueChanged(onAccentChanged, true);
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
                     {
                         Colour = Color4.White,
                         Type = EdgeEffectType.Glow,
-                        Radius = DrawWidth
+                        Radius = DrawWidth,
                     };
 
                     foregroundBuffer.ForceRedraw();

@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                controlPointVisualiser = new PathControlPointVisualiser(HitObject, false)
+                controlPointVisualiser = new PathControlPointVisualiser(HitObject, false),
             };
 
             setState(SliderPlacementState.Initial);

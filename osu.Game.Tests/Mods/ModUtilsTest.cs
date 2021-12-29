@@ -138,32 +138,32 @@ namespace osu.Game.Tests.Mods
             new object[]
             {
                 new Mod[] { new OsuModDoubleTime(), new OsuModHalfTime() },
-                new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) }
+                new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) },
             },
             // incompatible pair with derived class.
             new object[]
             {
                 new Mod[] { new OsuModNightcore(), new OsuModHalfTime() },
-                new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) }
+                new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) },
             },
             // system mod.
             new object[]
             {
                 new Mod[] { new OsuModDoubleTime(), new OsuModTouchDevice() },
-                new[] { typeof(OsuModTouchDevice) }
+                new[] { typeof(OsuModTouchDevice) },
             },
             // multi mod.
             new object[]
             {
                 new Mod[] { new MultiMod(new OsuModHalfTime()), new OsuModDaycore() },
-                new[] { typeof(MultiMod) }
+                new[] { typeof(MultiMod) },
             },
             // valid pair.
             new object[]
             {
                 new Mod[] { new OsuModDoubleTime(), new OsuModHardRock() },
-                null
-            }
+                null,
+            },
         };
 
         [TestCaseSource(nameof(invalid_mod_test_scenarios))]

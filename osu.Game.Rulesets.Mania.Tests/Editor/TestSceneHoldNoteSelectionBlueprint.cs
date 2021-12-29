@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 {
                     Column = i,
                     StartTime = i * 100,
-                    Duration = 500
+                    Duration = 500,
                 };
                 holdNote.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 

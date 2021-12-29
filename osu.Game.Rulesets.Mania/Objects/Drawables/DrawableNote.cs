@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddInternal(headPiece = new SkinnableDrawable(new ManiaSkinComponent(Component), _ => new DefaultNotePiece())
             {
                 RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y
+                AutoSizeAxes = Axes.Y,
             });
         }
 

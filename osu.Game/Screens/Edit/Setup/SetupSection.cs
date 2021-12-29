@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Setup
             Padding = new MarginPadding
             {
                 Vertical = 10,
-                Horizontal = EditorRoundedScreen.HORIZONTAL_PADDING
+                Horizontal = EditorRoundedScreen.HORIZONTAL_PADDING,
             };
 
             InternalChild = new FillFlowContainer
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                     new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Text = Title
+                        Text = Title,
                     },
                     flow = new FillFlowContainer
                     {
@@ -62,8 +62,8 @@ namespace osu.Game.Screens.Edit.Setup
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(10),
                         Direction = FillDirection.Vertical,
-                    }
-                }
+                    },
+                },
             };
         }
     }

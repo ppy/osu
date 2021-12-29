@@ -165,9 +165,9 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                         Title = "Sample Beatmap",
                         AuthorString = "Craftplacer",
                     },
-                    Ruleset = new TaikoRuleset().RulesetInfo
+                    Ruleset = new TaikoRuleset().RulesetInfo,
                 },
-                ControlPointInfo = controlPointInfo
+                ControlPointInfo = controlPointInfo,
             });
 
             scoreProcessor.ApplyBeatmap(Beatmap.Value.Beatmap);

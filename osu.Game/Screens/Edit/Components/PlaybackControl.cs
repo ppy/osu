@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Components
                     Text = "Playback speed",
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
-                    Padding = new MarginPadding { Left = 45 }
+                    Padding = new MarginPadding { Left = 45 },
                 },
                 new Container
                 {
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Components
                     Height = 0.5f,
                     Padding = new MarginPadding { Left = 45 },
                     Child = new PlaybackTabControl { Current = freqAdjust },
-                }
+                },
             };
 
             Track.BindValueChanged(tr => tr.NewValue?.AddAdjustment(AdjustableProperty.Frequency, freqAdjust), true);
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Edit.Components
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Text = $"{value:0%}",
-                            Font = OsuFont.GetFont(size: 14)
+                            Font = OsuFont.GetFont(size: 14),
                         },
                         textBold = new OsuSpriteText
                         {

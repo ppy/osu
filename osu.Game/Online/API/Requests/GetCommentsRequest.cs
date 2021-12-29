@@ -47,6 +47,6 @@ namespace osu.Game.Online.API.Requests
     {
         Build,
         Beatmapset,
-        NewsPost
+        NewsPost,
     }
 }

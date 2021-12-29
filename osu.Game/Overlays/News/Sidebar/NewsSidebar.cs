@@ -32,9 +32,9 @@ namespace osu.Game.Overlays.News.Sidebar
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 10)
-                }
-            }
+                    Spacing = new Vector2(0, 10),
+                },
+            },
         };
 
         protected override void LoadComplete()
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.News.Sidebar
 
                 monthsFlow.Add(new MonthSection(month, year, posts)
                 {
-                    Expanded = { Value = i == 0 }
+                    Expanded = { Value = i == 0 },
                 });
             }
         }

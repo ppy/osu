@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Comments
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 20, italics: true),
                         Colour = colourProvider.Light1,
-                        Text = @"Comments"
+                        Text = @"Comments",
                     },
                     new CircularContainer
                     {
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Comments
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background6
+                                Colour = colourProvider.Background6,
                             },
                             counter = new OsuSpriteText
                             {
@@ -60,11 +60,11 @@ namespace osu.Game.Overlays.Comments
                                 Origin = Anchor.Centre,
                                 Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                Colour = colourProvider.Foreground1
-                            }
+                                Colour = colourProvider.Foreground1,
+                            },
                         },
-                    }
-                }
+                    },
+                },
             });
         }
 

@@ -575,7 +575,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var metadata = new BeatmapMetadata
                     {
                         Artist = "SomeArtist",
-                        AuthorString = "SomeAuthor"
+                        AuthorString = "SomeAuthor",
                     };
 
                     var difficulty = new BeatmapDifficulty();
@@ -590,16 +590,16 @@ namespace osu.Game.Tests.Beatmaps.IO
                             {
                                 OnlineID = 2,
                                 Metadata = metadata,
-                                BaseDifficulty = difficulty
+                                BaseDifficulty = difficulty,
                             },
                             new BeatmapInfo
                             {
                                 OnlineID = 2,
                                 Metadata = metadata,
                                 Status = BeatmapOnlineStatus.Loved,
-                                BaseDifficulty = difficulty
-                            }
-                        }
+                                BaseDifficulty = difficulty,
+                            },
+                        },
                     };
 
                     var manager = osu.Dependencies.Get<BeatmapManager>();
@@ -1024,7 +1024,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 OnlineID = 2,
                 BeatmapInfo = beatmapInfo,
-                BeatmapInfoID = beatmapInfo.ID
+                BeatmapInfoID = beatmapInfo.ID,
             }, new ImportScoreTest.TestArchiveReader());
         }
 

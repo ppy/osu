@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
                     Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
-                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
+                    List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg",
                 },
                 Title = beatmap.Metadata.Title,
                 TitleUnicode = beatmap.Metadata.TitleUnicode,
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual
                 Author = new APIUser
                 {
                     Username = beatmap.Metadata.Author.Username,
-                    Id = beatmap.Metadata.Author.OnlineID
+                    Id = beatmap.Metadata.Author.OnlineID,
                 },
                 Source = beatmap.Metadata.Source,
                 Tags = beatmap.Metadata.Tags,
@@ -275,8 +275,8 @@ namespace osu.Game.Tests.Visual
                         RulesetID = beatmap.RulesetID,
                         StarRating = beatmap.StarRating,
                         DifficultyName = beatmap.DifficultyName,
-                    }
-                }
+                    },
+                },
             };
         }
 

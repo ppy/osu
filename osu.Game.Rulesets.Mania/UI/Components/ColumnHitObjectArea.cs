@@ -30,13 +30,13 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 hitTarget = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HitTarget), _ => new DefaultHitTarget())
                 {
                     RelativeSizeAxes = Axes.X,
-                    Depth = 1
+                    Depth = 1,
                 },
                 Explosions = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = -1,
-                }
+                },
             });
         }
 

@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     UseFullGlyphHeight = false,
                 }, confineMode: ConfineMode.NoScaling)
                 {
-                    Text = @"1"
-                }
+                    Text = @"1",
+                },
             };
         }
     }

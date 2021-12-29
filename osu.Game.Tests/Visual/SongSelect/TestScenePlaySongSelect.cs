@@ -627,8 +627,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 BPM = new FilterCriteria.OptionalRange<double>
                 {
                     Min = maxBPM = songSelect.Carousel.SelectedBeatmapSet.MaxBPM,
-                    IsLowerInclusive = true
-                }
+                    IsLowerInclusive = true,
+                },
             }));
 
             BeatmapInfo filteredBeatmap = null;
@@ -814,7 +814,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     User = new APIUser { Username = "woo" },
                     BeatmapInfo = getPresentBeatmap(),
-                    Ruleset = getPresentBeatmap().Ruleset
+                    Ruleset = getPresentBeatmap().Ruleset,
                 });
             });
 

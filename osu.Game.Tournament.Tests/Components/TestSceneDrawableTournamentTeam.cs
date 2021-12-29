@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Tests.Components
                     new APIUser { Username = "Parkes" },
                     new APIUser { Username = "Shiroha" },
                     new APIUser { Username = "Jordan The Bear" },
-                }
+                },
             };
 
             var match = new TournamentMatch { Team1 = { Value = team } };
@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Cell(i++).AddRange(new Drawable[]
@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Cell(i++).AddRange(new Drawable[]
@@ -65,7 +65,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Cell(i++).AddRange(new Drawable[]
@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Cell(i++).AddRange(new Drawable[]
@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Cell(i++).AddRange(new Drawable[]
@@ -95,7 +95,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Cell(i).AddRange(new Drawable[]
@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Tests.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
         }
     }

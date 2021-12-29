@@ -103,7 +103,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     {
                         AcronymText,
                         Flag,
-                    }
+                    },
                 },
                 new Container
                 {
@@ -125,9 +125,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.Torus.With(size: 22),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             completed.BindValueChanged(_ => updateWinStyle());

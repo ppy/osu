@@ -138,9 +138,9 @@ namespace osu.Game.Overlays.Volume
                                             Child = volumeCircle = new CircularProgress
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                            }
+                                            },
                                         },
-                                    }
+                                    },
                                 },
                                 new Circle
                                 {
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Volume
                                         Colour = meterColour,
                                         BlurSigma = new Vector2(blur_amount),
                                         Strength = 5,
-                                        PadExtent = true
+                                        PadExtent = true,
                                     }),
                                 },
                             },
@@ -190,19 +190,19 @@ namespace osu.Game.Overlays.Volume
                                 Type = EdgeEffectType.Glow,
                                 Colour = meterColour.Opacity(0.1f),
                                 Radius = 10,
-                            }
+                            },
                         },
                         maxGlow = (text = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
+                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize),
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
                             PadExtent = true,
-                        })
-                    }
+                        }),
+                    },
                 },
                 new Container
                 {
@@ -224,10 +224,10 @@ namespace osu.Game.Overlays.Volume
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                            Text = name
-                        }
-                    }
-                }
+                            Text = name,
+                        },
+                    },
+                },
             };
 
             Bindable.BindValueChanged(volume => { this.TransformTo(nameof(DisplayVolume), volume.NewValue, 400, Easing.OutQuint); }, true);

@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Child = background = new TestUpdateableBeatmapBackgroundSprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Beatmap = { Value = testBeatmap.Beatmaps.First() }
+                    Beatmap = { Value = testBeatmap.Beatmaps.First() },
                 };
             });
 
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Child = background = new TestUpdateableBeatmapBackgroundSprite
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Beatmap = { Value = new APIBeatmap { BeatmapSet = req.Response } }
+                        Beatmap = { Value = new APIBeatmap { BeatmapSet = req.Response } },
                     };
                 });
 
@@ -106,8 +106,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(10),
-                        Padding = new MarginPadding { Bottom = 550 }
-                    }
+                        Padding = new MarginPadding { Bottom = 550 },
+                    },
                 };
 
                 for (int i = 0; i < 25; i++)
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         RelativeSizeAxes = Axes.X,
                         Height = 100,
                         Masking = true,
-                        Child = background
+                        Child = background,
                     });
 
                     backgrounds.Add(background);

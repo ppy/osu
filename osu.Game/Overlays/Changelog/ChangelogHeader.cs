@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 streamsBackground = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new Container
                 {
@@ -92,11 +92,11 @@ namespace osu.Game.Overlays.Changelog
                     Padding = new MarginPadding
                     {
                         Horizontal = 65,
-                        Vertical = 20
+                        Vertical = 20,
                     },
                     Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },
-                }
-            }
+                },
+            },
         };
 
         protected override OverlayTitle CreateTitle() => new ChangelogHeaderTitle();

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 new SettingsButton
                 {
                     Text = DebugSettingsStrings.ClearAllCaches,
-                    Action = host.Collect
+                    Action = host.Collect,
                 },
             };
         }

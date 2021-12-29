@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                         Size = new Vector2(size),
                         Icon = FontAwesome.Regular.Clock,
                         Colour = colours.Blue,
-                        Shadow = false
+                        Shadow = false,
                     };
 
                 case MatchType.HeadToHead:

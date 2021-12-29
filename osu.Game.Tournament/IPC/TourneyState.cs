@@ -9,6 +9,6 @@ namespace osu.Game.Tournament.IPC
         Idle,
         WaitingForClients,
         Playing,
-        Ranking
+        Ranking,
     }
 }

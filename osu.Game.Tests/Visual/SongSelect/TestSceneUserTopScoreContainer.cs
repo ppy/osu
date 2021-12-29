@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             Add(dialogOverlay = new DialogOverlay
             {
-                Depth = -1
+                Depth = -1,
             });
 
             Add(new Container
@@ -47,8 +47,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     {
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
-                    }
-                }
+                    },
+                },
             });
 
             var scores = new[]
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() },
                     User = new APIUser
                     {
                         Id = 6602580,
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                             FlagName = @"CA",
                         },
                     },
-                }
+                },
             };
 
             AddStep(@"Trigger visibility", topScoreContainer.ToggleVisibility);

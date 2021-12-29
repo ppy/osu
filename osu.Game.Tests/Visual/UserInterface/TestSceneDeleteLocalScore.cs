@@ -66,14 +66,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Artist = "TestArtist",
                                 Author = new APIUser
                                 {
-                                    Username = "TestAuthor"
+                                    Username = "TestAuthor",
                                 },
                             },
-                            DifficultyName = "Insane"
+                            DifficultyName = "Insane",
                         },
-                    }
+                    },
                 },
-                dialogOverlay = new DialogOverlay()
+                dialogOverlay = new DialogOverlay(),
             };
         }
 

@@ -46,13 +46,13 @@ namespace osu.Game.Beatmaps.Drawables
                     Child = button = new DownloadButton
                     {
                         RelativeSizeAxes = Axes.Both,
-                        State = { BindTarget = State }
+                        State = { BindTarget = State },
                     },
                 },
                 DownloadTracker = new BeatmapDownloadTracker(beatmapSet)
                 {
-                    State = { BindTarget = State }
-                }
+                    State = { BindTarget = State },
+                },
             };
 
             button.Add(new DownloadProgressBar(beatmapSet)

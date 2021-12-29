@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Containers
             InternalChildren = new Drawable[]
             {
                 content,
-                CreateHoverSounds(sampleSet)
+                CreateHoverSounds(sampleSet),
             };
         }
     }

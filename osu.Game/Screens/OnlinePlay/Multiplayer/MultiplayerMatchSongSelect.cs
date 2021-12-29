@@ -72,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     BeatmapChecksum = item.Beatmap.Value.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
-                    AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
+                    AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray(),
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);

@@ -49,7 +49,7 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
         {
-            Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
+            Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged(),
         };
 
         private readonly SkinModelManager skinModelManager;

@@ -417,8 +417,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Position = new Vector2(-5, 25),
-                    Current = { BindTarget = modSelect.SelectedMods }
-                }
+                    Current = { BindTarget = modSelect.SelectedMods },
+                },
             };
         }
 

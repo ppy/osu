@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
-                Direction = FillDirection.Full
+                Direction = FillDirection.Full,
             };
         }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 palette.Add(display = new ColourDisplay
                 {
-                    Current = { Value = Colours[colourIndex] }
+                    Current = { Value = Colours[colourIndex] },
                 });
 
                 display.Current.BindValueChanged(colour => Colours[colourIndex] = colour.NewValue);
@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
             palette.Add(new AddColourButton
             {
-                Action = () => Colours.Add(Colour4.White)
+                Action = () => Colours.Add(Colour4.White),
             });
 
             reindexItems();
@@ -151,24 +151,24 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Colour4.Transparent,
-                                    AlwaysPresent = true
+                                    AlwaysPresent = true,
                                 },
                                 new SpriteIcon
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(20),
-                                    Icon = FontAwesome.Solid.Plus
-                                }
-                            }
+                                    Icon = FontAwesome.Solid.Plus,
+                                },
+                            },
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "New"
-                        }
-                    }
+                            Text = "New",
+                        },
+                    },
                 };
             }
 

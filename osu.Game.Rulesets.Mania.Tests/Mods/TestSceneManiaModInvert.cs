@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         public void TestInversion() => CreateModTest(new ModTestData
         {
             Mod = new ManiaModInvert(),
-            PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2
+            PassCondition = () => Player.ScoreProcessor.JudgedHits >= 2,
         });
     }
 }

@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Id = 39828,
                     Username = @"WubWoofWolf",
-                }
+                },
             }.CreateScoreInfo(rulesets, CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo);
         }
 

@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Child = new ScreenStack(new BackgroundScreenDefault { Alpha = 0.8f })
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             });
 
             AddStep("default parallax", () => parallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT);

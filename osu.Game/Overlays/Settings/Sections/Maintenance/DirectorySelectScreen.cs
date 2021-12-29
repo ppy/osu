@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeaFoamDark
+                        Colour = colours.GreySeaFoamDark,
                     },
                     new GridContainer
                     {
@@ -88,14 +88,14 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Margin = new MarginPadding(10),
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                }
+                                },
                             },
                             new Drawable[]
                             {
                                 directorySelector = new OsuDirectorySelector
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                }
+                                },
                             },
                             new Drawable[]
                             {
@@ -106,12 +106,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                     Width = 300,
                                     Margin = new MarginPadding(10),
                                     Text = MaintenanceSettingsStrings.SelectDirectory,
-                                    Action = () => OnSelection(directorySelector.CurrentPath.Value)
+                                    Action = () => OnSelection(directorySelector.CurrentPath.Value),
                                 },
-                            }
-                        }
-                    }
-                }
+                            },
+                        },
+                    },
+                },
             };
         }
 

@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Current =
                 {
                     Value = new OsuRuleset().CreateAllMods().ToArray(),
-                }
+                },
             };
         });
 

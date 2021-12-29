@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             Y = -1,
                             Font = OsuFont.Default.With(size: circle_size * 0.5f, weight: FontWeight.Regular),
                         },
-                    }
+                    },
                 },
             });
 
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 colouredComponents.Add(new DragArea(item)
                 {
-                    OnDragHandled = e => OnDragHandled?.Invoke(e)
+                    OnDragHandled = e => OnDragHandled?.Invoke(e),
                 });
             }
         }
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     AddInternal(difficultyOverrideDisplay = new DifficultyPointPiece(Item)
                     {
                         Anchor = Anchor.TopLeft,
-                        Origin = Anchor.BottomCentre
+                        Origin = Anchor.BottomCentre,
                     });
                 }
             }
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     AddInternal(sampleOverrideDisplay = new SamplePointPiece(Item)
                     {
                         Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.TopCentre
+                        Origin = Anchor.TopCentre,
                     });
                 }
             }
@@ -247,7 +247,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 repeatsContainer.Add(new Tick
                 {
-                    X = (float)(i + 1) / (repeats.RepeatCount + 1)
+                    X = (float)(i + 1) / (repeats.RepeatCount + 1),
                 });
             }
         }
@@ -300,7 +300,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 };
             }
 
@@ -477,8 +477,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Type = EdgeEffectType.Shadow,
                         Radius = 5,
-                        Colour = Color4.Black.Opacity(0.4f)
-                    }
+                        Colour = Color4.Black.Opacity(0.4f),
+                    },
                 };
             }
         }

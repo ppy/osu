@@ -73,9 +73,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         AutoSizeAxes = Axes.X,
                         Height = 0.6f,
                         Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    }
-                }
+                        Origin = Anchor.Centre,
+                    },
+                },
             };
         }
 

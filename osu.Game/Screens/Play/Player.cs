@@ -246,8 +246,8 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(),
-                        createGameplayComponents(Beatmap.Value, playableBeatmap)
-                    }
+                        createGameplayComponents(Beatmap.Value, playableBeatmap),
+                    },
                 },
                 FailOverlay = new FailOverlay
                 {
@@ -371,10 +371,10 @@ namespace osu.Game.Screens.Play
                         new ComboEffects(ScoreProcessor),
                         breakTracker = new BreakTracker(DrawableRuleset.GameplayStartTime, ScoreProcessor)
                         {
-                            Breaks = working.Beatmap.Breaks
-                        }
+                            Breaks = working.Beatmap.Breaks,
+                        },
                     }),
-            }
+            },
         };
 
         private Drawable createOverlayComponents(IWorkingBeatmap working)
@@ -389,7 +389,7 @@ namespace osu.Game.Screens.Play
                     {
                         Clock = DrawableRuleset.FrameStableClock,
                         ProcessCustomClock = false,
-                        Breaks = working.Beatmap.Breaks
+                        Breaks = working.Beatmap.Breaks,
                     },
                     // display the cursor above some HUD elements.
                     DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
@@ -399,24 +399,24 @@ namespace osu.Game.Screens.Play
                         HoldToQuit =
                         {
                             Action = () => PerformExit(true),
-                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
+                            IsPaused = { BindTarget = GameplayClockContainer.IsPaused },
                         },
                         KeyCounter =
                         {
                             AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded },
-                            IsCounting = false
+                            IsCounting = false,
                         },
                         Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
+                        Origin = Anchor.Centre,
                     },
                     skipIntroOverlay = new SkipOverlay(DrawableRuleset.GameplayStartTime)
                     {
-                        RequestSkip = performUserRequestedSkip
+                        RequestSkip = performUserRequestedSkip,
                     },
                     skipOutroOverlay = new SkipOverlay(Beatmap.Value.Storyboard.LatestEventTime ?? 0)
                     {
                         RequestSkip = () => progressToResults(false),
-                        Alpha = 0
+                        Alpha = 0,
                     },
                     PauseOverlay = new PauseOverlay
                     {

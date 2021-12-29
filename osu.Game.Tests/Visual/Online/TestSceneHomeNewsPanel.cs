@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
                         Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                         FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
                         PublishedAt = DateTimeOffset.Now,
-                        Slug = "2020-07-16-summer-theme-park-2020-voting-open"
+                        Slug = "2020-07-16-summer-theme-park-2020-voting-open",
                     }),
                     new NewsItemGroupPanel(new List<APINewsPost>
                     {
@@ -51,10 +51,10 @@ namespace osu.Game.Tests.Visual.Online
                             Title = "Title of this post is Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                             Slug = "2020-07-16-summer-theme-park-2020-voting-open",
                             PublishedAt = DateTimeOffset.Now,
-                        }
+                        },
                     }),
-                    new ShowMoreNewsPanel()
-                }
+                    new ShowMoreNewsPanel(),
+                },
             });
         }
     }

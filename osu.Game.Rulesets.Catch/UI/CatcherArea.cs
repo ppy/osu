@@ -62,8 +62,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Bottom = 350f },
-                    X = CatchPlayfield.CENTER_X
-                }
+                    X = CatchPlayfield.CENTER_X,
+                },
             };
         }
 

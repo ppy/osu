@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Ranking
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue
+                    Depth = float.MaxValue,
                 },
                 new SpriteIcon
                 {

@@ -41,13 +41,13 @@ namespace osu.Game.Users
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension()
+                        new Dimension(),
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.Absolute, margin),
-                        new Dimension()
+                        new Dimension(),
                     },
                     Content = new[]
                     {
@@ -68,12 +68,12 @@ namespace osu.Game.Users
                                     RelativeSizeAxes = Axes.Both,
                                     ColumnDimensions = new[]
                                     {
-                                        new Dimension()
+                                        new Dimension(),
                                     },
                                     RowDimensions = new[]
                                     {
                                         new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension()
+                                        new Dimension(),
                                     },
                                     Content = new[]
                                     {
@@ -87,8 +87,8 @@ namespace osu.Game.Users
                                                 Children = new Drawable[]
                                                 {
                                                     CreateFlag(),
-                                                }
-                                            }
+                                                },
+                                            },
                                         },
                                         new Drawable[]
                                         {
@@ -96,16 +96,16 @@ namespace osu.Game.Users
                                             {
                                                 username.Anchor = Anchor.CentreLeft;
                                                 username.Origin = Anchor.CentreLeft;
-                                            })
-                                        }
-                                    }
-                                }
-                            }
+                                            }),
+                                        },
+                                    },
+                                },
+                            },
                         },
                         new[]
                         {
                             Empty(),
-                            Empty()
+                            Empty(),
                         },
                         new Drawable[]
                         {
@@ -119,10 +119,10 @@ namespace osu.Game.Users
                                 message.Anchor = Anchor.CentreLeft;
                                 message.Origin = Anchor.CentreLeft;
                                 message.Margin = new MarginPadding { Left = margin };
-                            })
-                        }
-                    }
-                }
+                            }),
+                        },
+                    },
+                },
             };
 
             if (User.IsSupporter)
@@ -130,7 +130,7 @@ namespace osu.Game.Users
                 details.Add(new SupporterIcon
                 {
                     Height = 26,
-                    SupportLevel = User.SupportLevel
+                    SupportLevel = User.SupportLevel,
                 });
             }
 

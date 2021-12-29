@@ -137,7 +137,7 @@ namespace osu.Game.Beatmaps.Drawables
                         Font = OsuFont.Default.With(size: 12),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Padding = new MarginPadding { Bottom = 1 }
+                        Padding = new MarginPadding { Bottom = 1 },
                     });
                 }
             }
@@ -161,7 +161,7 @@ namespace osu.Game.Beatmaps.Drawables
                 Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.ForStarDifficulty(starDifficulty)
+                    Colour = colours.ForStarDifficulty(starDifficulty),
                 };
             }
         }

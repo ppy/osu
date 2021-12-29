@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             hitCircle = new HitCircle
             {
                 Position = new Vector2(100, 100),
-                StartTime = Time.Current + 500
+                StartTime = Time.Current + 500,
             };
 
             hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both,
                 Child = drawableHitCircle = new DrawableHitCircle(hitCircle)
                 {
-                    Size = new Vector2(100)
-                }
+                    Size = new Vector2(100),
+                },
             };
         });
 

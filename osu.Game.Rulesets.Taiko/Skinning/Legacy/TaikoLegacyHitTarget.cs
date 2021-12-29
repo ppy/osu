@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                }
+                },
             };
         }
 

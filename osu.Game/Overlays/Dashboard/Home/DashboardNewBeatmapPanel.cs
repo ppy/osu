@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Dashboard.Home
 
         protected override Drawable CreateInfo() => new DrawableDate(BeatmapSet.Ranked ?? DateTimeOffset.Now, 10, false)
         {
-            Colour = ColourProvider.Foreground1
+            Colour = ColourProvider.Foreground1,
         };
     }
 }

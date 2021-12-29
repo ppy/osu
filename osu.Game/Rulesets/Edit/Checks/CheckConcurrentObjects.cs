@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateConcurrentSame(this),
-            new IssueTemplateConcurrentDifferent(this)
+            new IssueTemplateConcurrentDifferent(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Edit.Checks
                 var hitobjects = new List<HitObject> { hitobject, nextHitobject };
                 return new Issue(hitobjects, this, hitobject.GetType().Name, nextHitobject.GetType().Name)
                 {
-                    Time = nextHitobject.StartTime
+                    Time = nextHitobject.StartTime,
                 };
             }
         }

@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Editing
                     Content = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 },
             });
         }
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Editing
         {
             Children = new Drawable[]
             {
-                composer = new TestHitObjectComposer()
+                composer = new TestHitObjectComposer(),
             };
 
             BeatDivisor.Value = 1;
@@ -76,8 +76,8 @@ namespace osu.Game.Tests.Editing
             {
                 DifficultyControlPoint = new DifficultyControlPoint
                 {
-                    SliderVelocity = multiplier
-                }
+                    SliderVelocity = multiplier,
+                },
             });
         }
 

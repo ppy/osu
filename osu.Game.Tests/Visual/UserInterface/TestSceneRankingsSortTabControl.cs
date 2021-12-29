@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Child = new RankingsSortTabControl
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             };
         }
     }

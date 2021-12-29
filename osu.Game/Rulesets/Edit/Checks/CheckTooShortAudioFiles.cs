@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateTooShort(this),
-            new IssueTemplateBadFormat(this)
+            new IssueTemplateBadFormat(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

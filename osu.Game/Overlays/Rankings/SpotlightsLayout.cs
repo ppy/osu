@@ -64,12 +64,12 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Margin = new MarginPadding { Vertical = 10 }
+                                Margin = new MarginPadding { Vertical = 10 },
                             },
-                            loading = new LoadingLayer(true)
-                        }
-                    }
-                }
+                            loading = new LoadingLayer(true),
+                        },
+                    },
+                },
             };
 
             sort.BindTo(selector.Sort);
@@ -145,9 +145,9 @@ namespace osu.Game.Overlays.Rankings
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                    }).ToList()
-                }
-            }
+                    }).ToList(),
+                },
+            },
         };
 
         protected override void Dispose(bool isDisposing)

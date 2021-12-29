@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    AlwaysPresent = true
-                }
+                    AlwaysPresent = true,
+                },
             };
         }
 

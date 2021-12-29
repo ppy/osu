@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Origin = Anchor.TopRight,
                     Anchor = Anchor.TopRight,
                     State = { Value = Visibility.Visible },
-                }
+                },
             });
 
             Beatmap.BindValueChanged(beatmapChanged, true);

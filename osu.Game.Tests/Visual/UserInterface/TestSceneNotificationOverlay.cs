@@ -33,9 +33,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 notificationOverlay = new NotificationOverlay
                 {
                     Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
+                    Origin = Anchor.TopRight,
                 },
-                displayedCount = new OsuSpriteText()
+                displayedCount = new OsuSpriteText(),
             };
 
             notificationOverlay.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count.NewValue}"; };

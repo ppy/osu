@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Mods
             var result = applyDifficulty(new BeatmapDifficulty
             {
                 DrainRate = 10,
-                OverallDifficulty = 10
+                OverallDifficulty = 10,
             });
 
             Assert.That(result.DrainRate, Is.EqualTo(10));
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Mods
             result = applyDifficulty(new BeatmapDifficulty
             {
                 DrainRate = 1,
-                OverallDifficulty = 1
+                OverallDifficulty = 1,
             });
 
             Assert.That(result.DrainRate, Is.EqualTo(1));
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Mods
             var result = applyDifficulty(new BeatmapDifficulty
             {
                 DrainRate = 10,
-                OverallDifficulty = 10
+                OverallDifficulty = 10,
             });
 
             Assert.That(result.DrainRate, Is.EqualTo(10));
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Mods
             result = applyDifficulty(new BeatmapDifficulty
             {
                 DrainRate = 1,
-                OverallDifficulty = 1
+                OverallDifficulty = 1,
             });
 
             Assert.That(result.DrainRate, Is.EqualTo(1));
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Mods
             applyDifficulty(new BeatmapDifficulty
             {
                 DrainRate = 10,
-                OverallDifficulty = 10
+                OverallDifficulty = 10,
             });
 
             testMod.OverallDifficulty.Value = 4;
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Mods
             var applied = applyDifficulty(new BeatmapDifficulty
             {
                 DrainRate = 10,
-                OverallDifficulty = 10
+                OverallDifficulty = 10,
             });
 
             Assert.That(applied.OverallDifficulty, Is.EqualTo(10));

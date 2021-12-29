@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Changelog
             Children = new[]
             {
                 createTitle(),
-                createMessage()
+                createMessage(),
             };
         }
 
@@ -81,8 +81,8 @@ namespace osu.Game.Overlays.Changelog
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         TextAnchor = Anchor.BottomLeft,
-                    }
-                }
+                    },
+                },
             };
 
             title.AddText(entry.Title, t =>
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Changelog
                 title.AddUserLink(new APIUser
                 {
                     Username = entry.GithubUser.OsuUsername,
-                    Id = entry.GithubUser.UserId.Value
+                    Id = entry.GithubUser.UserId.Value,
                 }, t =>
                 {
                     t.Font = fontMedium;

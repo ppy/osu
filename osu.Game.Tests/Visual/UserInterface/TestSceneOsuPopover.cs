@@ -29,10 +29,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuSpriteText
                     {
                         Text = @"No OverlayColourProvider",
-                        Font = OsuFont.Default.With(size: 40)
+                        Font = OsuFont.Default.With(size: 40),
                     },
-                    new TriangleButtonWithPopover()
-                }
+                    new TriangleButtonWithPopover(),
+                },
             };
 
             Cell(0, 1).Child = new ColourProvidingContainer(OverlayColourScheme.Orange)
@@ -46,11 +46,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                         new OsuSpriteText
                         {
                             Text = @"With OverlayColourProvider (orange)",
-                            Font = OsuFont.Default.With(size: 40)
+                            Font = OsuFont.Default.With(size: 40),
                         },
-                        new TriangleButtonWithPopover()
-                    }
-                }
+                        new TriangleButtonWithPopover(),
+                    },
+                },
             };
         }
 
@@ -77,15 +77,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         new OsuSpriteText
                         {
-                            Text = @"sample text"
+                            Text = @"sample text",
                         },
                         new OsuTextBox
                         {
                             Width = 150,
-                            Height = 30
-                        }
-                    }
-                }
+                            Height = 30,
+                        },
+                    },
+                },
             };
         }
 

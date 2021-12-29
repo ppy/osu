@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Colour = inverted ? Color4.White : Color4.Black,
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = withBox ? 0.7f : 0
+                        Alpha = withBox ? 0.7f : 0,
                     },
                     spinner = new SpriteIcon
                     {
@@ -59,9 +59,9 @@ namespace osu.Game.Graphics.UserInterface
                         Colour = inverted ? Color4.Black : Color4.White,
                         Scale = new Vector2(withBox ? 0.6f : 1),
                         RelativeSizeAxes = Axes.Both,
-                        Icon = FontAwesome.Solid.CircleNotch
-                    }
-                }
+                        Icon = FontAwesome.Solid.CircleNotch,
+                    },
+                },
             };
         }
 

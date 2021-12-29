@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer = new CommentsContainer()
+                Child = commentsContainer = new CommentsContainer(),
             });
 
         [Test]
@@ -150,7 +150,7 @@ namespace osu.Game.Tests.Visual.Online
                         LegacyName = "FirstUser",
                         CreatedAt = DateTimeOffset.Now,
                         VotesCount = 19,
-                        RepliesCount = 1
+                        RepliesCount = 1,
                     },
                     new Comment
                     {
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Online
                         Message = "This is another comment",
                         LegacyName = "ThirdUser",
                         CreatedAt = DateTimeOffset.Now,
-                        VotesCount = 0
+                        VotesCount = 0,
                     },
                 },
                 IncludedComments = new List<Comment>(),

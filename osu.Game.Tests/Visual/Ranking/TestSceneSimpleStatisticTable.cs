@@ -35,9 +35,9 @@ namespace osu.Game.Tests.Visual.Ranking
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding(20)
-                    }
-                }
+                        Padding = new MarginPadding(20),
+                    },
+                },
             };
         });
 
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var items = Enumerable.Range(1, itemCount)
                                       .Select(i => new SimpleStatisticItem<int>($"Statistic #{i}")
                                       {
-                                          Value = RNG.Next(100)
+                                          Value = RNG.Next(100),
                                       });
 
                 container.Add(new SimpleStatisticTable(columnCount, items));

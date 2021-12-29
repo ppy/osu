@@ -101,7 +101,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
-            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions)
+            new KeyBinding(InputKey.F3, GlobalAction.ToggleBeatmapOptions),
         };
 
         public IEnumerable<KeyBinding> AudioControlKeyBindings => new[]
@@ -119,7 +119,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.TrackNext, GlobalAction.MusicNext),
             new KeyBinding(InputKey.F5, GlobalAction.MusicNext),
             new KeyBinding(InputKey.PlayPause, GlobalAction.MusicPlay),
-            new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
+            new KeyBinding(InputKey.F3, GlobalAction.MusicPlay),
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue
@@ -292,6 +292,6 @@ namespace osu.Game.Input.Bindings
         EditorCycleGridDisplayMode,
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorTestGameplay))]
-        EditorTestGameplay
+        EditorTestGameplay,
     }
 }

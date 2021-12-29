@@ -98,11 +98,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
-                                AlwaysPresent = true
-                            }
-                        }
-                    }
-                }
+                                AlwaysPresent = true,
+                            },
+                        },
+                    },
+                },
             };
         }
 

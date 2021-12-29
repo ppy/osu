@@ -42,18 +42,18 @@ namespace osu.Game.Tests.Visual.Editing
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.Gray(30)
+                                Colour = OsuColour.Gray(30),
                             },
-                            scrollContainer = new ZoomableScrollContainer { RelativeSizeAxes = Axes.Both }
-                        }
+                            scrollContainer = new ZoomableScrollContainer { RelativeSizeAxes = Axes.Both },
+                        },
                     },
-                    new MenuCursor()
+                    new MenuCursor(),
                 };
 
                 scrollContainer.Add(innerBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientHorizontal(new Color4(0.8f, 0.6f, 0.4f, 1f), new Color4(0.4f, 0.6f, 0.8f, 1f))
+                    Colour = ColourInfo.GradientHorizontal(new Color4(0.8f, 0.6f, 0.4f, 1f), new Color4(0.4f, 0.6f, 0.8f, 1f)),
                 });
             });
             AddUntilStep("Scroll container is loaded", () => scrollContainer.LoadState >= LoadState.Loaded);

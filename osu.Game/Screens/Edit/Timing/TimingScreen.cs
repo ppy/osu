@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Timing
                         new ControlPointList(),
                         new ControlPointSettings(),
                     },
-                }
+                },
             });
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Edit.Timing
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                             },
-                        }
+                        },
                     },
                 };
             }

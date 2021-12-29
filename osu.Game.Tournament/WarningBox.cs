@@ -32,8 +32,8 @@ namespace osu.Game.Tournament
                     Text = text,
                     Font = OsuFont.Torus.With(weight: FontWeight.Bold),
                     Colour = Color4.White,
-                    Padding = new MarginPadding(20)
-                }
+                    Padding = new MarginPadding(20),
+                },
             };
         }
     }

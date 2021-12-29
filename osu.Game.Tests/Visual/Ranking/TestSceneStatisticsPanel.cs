@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },
-                Score = { Value = score }
+                Score = { Value = score },
             };
         });
 

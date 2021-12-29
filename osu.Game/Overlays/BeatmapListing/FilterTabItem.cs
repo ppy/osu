@@ -38,9 +38,9 @@ namespace osu.Game.Overlays.BeatmapListing
                 text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
-                    Text = LabelFor(Value)
+                    Text = LabelFor(Value),
                 },
-                new HoverClickSounds()
+                new HoverClickSounds(),
             });
 
             Enabled.Value = true;

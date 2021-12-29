@@ -27,8 +27,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 RelativeSizeAxes = Axes.Both,
                 Child = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             };
         }
     }

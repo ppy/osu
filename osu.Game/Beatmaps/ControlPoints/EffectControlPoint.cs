@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             KiaiModeBindable = { Disabled = true },
             OmitFirstBarLineBindable = { Disabled = true },
-            ScrollSpeedBindable = { Disabled = true }
+            ScrollSpeedBindable = { Disabled = true },
         };
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             Precision = 0.01,
             Default = 1,
             MinValue = 0.01,
-            MaxValue = 10
+            MaxValue = 10,
         };
 
         /// <summary>

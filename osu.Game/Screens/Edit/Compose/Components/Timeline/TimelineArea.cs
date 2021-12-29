@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("111")
+                    Colour = Color4Extensions.FromHex("111"),
                 },
                 new GridContainer
                 {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex("222")
+                                        Colour = Color4Extensions.FromHex("222"),
                                     },
                                     new FillFlowContainer
                                     {
@@ -85,10 +85,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             {
                                                 LabelText = "Ticks",
                                                 Current = { Value = true },
-                                            }
-                                        }
-                                    }
-                                }
+                                            },
+                                        },
+                                    },
+                                },
                             },
                             new Container
                             {
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex("333")
+                                        Colour = Color4Extensions.FromHex("333"),
                                     },
                                     new Container<TimelineButton>
                                     {
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.Solid.SearchPlus,
-                                                Action = () => changeZoom(1)
+                                                Action = () => changeZoom(1),
                                             },
                                             new TimelineButton
                                             {
@@ -124,11 +124,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
                                                 Icon = FontAwesome.Solid.SearchMinus,
-                                                Action = () => changeZoom(-1)
+                                                Action = () => changeZoom(-1),
                                             },
-                                        }
-                                    }
-                                }
+                                        },
+                                    },
+                                },
                             },
                             Timeline = new Timeline(userContent),
                         },
@@ -142,8 +142,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
-                    }
-                }
+                    },
+                },
             };
 
             Timeline.WaveformVisible.BindTo(waveformCheckbox.Current);

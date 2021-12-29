@@ -35,8 +35,8 @@ namespace osu.Game.Overlays.Dashboard.Home
                 Children = new DrawableBeatmapList[]
                 {
                     new DrawableNewBeatmapList(newBeatmaps),
-                    new DrawablePopularBeatmapList(popularBeatmaps)
-                }
+                    new DrawablePopularBeatmapList(popularBeatmaps),
+                },
             };
         }
     }

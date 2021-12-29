@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Play.HUD
                                         },
                                     },
                                 },
-                            }
+                            },
                         },
                         gridContainer = new GridContainer
                         {
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Play.HUD
                                                         RelativeSizeAxes = Axes.Both,
                                                         Colour = Color4Extensions.FromHex("3399cc"),
                                                     },
-                                                }
+                                                },
                                             },
                                             new FillFlowContainer
                                             {
@@ -219,8 +219,8 @@ namespace osu.Game.Screens.Play.HUD
                                                                 Alpha = 0.3f,
                                                                 RelativeSizeAxes = Axes.Both,
                                                                 Colour = colours.Gray4,
-                                                            }
-                                                        }
+                                                            },
+                                                        },
                                                     },
                                                     usernameText = new OsuSpriteText
                                                     {
@@ -233,10 +233,10 @@ namespace osu.Game.Screens.Play.HUD
                                                         Text = User?.Username,
                                                         Truncate = true,
                                                         Shadow = false,
-                                                    }
-                                                }
+                                                    },
+                                                },
                                             },
-                                        }
+                                        },
                                     },
                                     scoreComponents = new Container
                                     {
@@ -272,11 +272,11 @@ namespace osu.Game.Screens.Play.HUD
                                                 Shadow = false,
                                             },
                                         },
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
             };
 

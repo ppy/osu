@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateNoneSet(this),
-            new IssueTemplateDoesNotExist(this)
+            new IssueTemplateDoesNotExist(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

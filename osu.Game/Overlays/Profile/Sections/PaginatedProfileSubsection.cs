@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
                     // ensure the container and its contents are in front of the "more" button.
-                    Depth = float.MinValue
+                    Depth = float.MinValue,
                 },
                 moreButton = new ShowMoreButton
                 {
@@ -72,8 +72,8 @@ namespace osu.Game.Overlays.Profile.Sections
                     Font = OsuFont.GetFont(size: 15),
                     Text = missingText ?? string.Empty,
                     Alpha = 0,
-                }
-            }
+                },
+            },
         };
 
         protected override void LoadComplete()

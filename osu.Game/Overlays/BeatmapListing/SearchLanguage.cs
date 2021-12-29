@@ -68,6 +68,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.LanguageOther))]
         [Order(13)]
-        Other
+        Other,
     }
 }

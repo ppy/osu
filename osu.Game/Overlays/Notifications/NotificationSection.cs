@@ -70,13 +70,13 @@ namespace osu.Game.Overlays.Notifications
                             Text = clearButtonText,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Action = clearAll
+                            Action = clearAll,
                         },
                         new FillFlowContainer
                         {
                             Margin = new MarginPadding
                             {
-                                Bottom = 5
+                                Bottom = 5,
                             },
                             Spacing = new Vector2(5, 0),
                             AutoSizeAxes = Axes.Both,
@@ -85,15 +85,15 @@ namespace osu.Game.Overlays.Notifications
                                 new OsuSpriteText
                                 {
                                     Text = titleText.ToUpperInvariant(),
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                 },
                                 countDrawable = new OsuSpriteText
                                 {
                                     Text = "3",
                                     Colour = colours.Yellow,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                                 },
-                            }
+                            },
                         },
                     },
                 },
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Notifications
                     LayoutDuration = 150,
                     LayoutEasing = Easing.OutQuart,
                     Spacing = new Vector2(3),
-                }
+                },
             });
         }
 
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Notifications
 
                 Children = new[]
                 {
-                    text = new OsuSpriteText()
+                    text = new OsuSpriteText(),
                 };
             }
 

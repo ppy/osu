@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Containers.Markdown
 
         protected override MarkdownList CreateList(ListBlock listBlock) => new MarkdownList
         {
-            Padding = new MarginPadding(0)
+            Padding = new MarginPadding(0),
         };
 
         protected virtual OsuMarkdownListItem CreateListItem(ListItemBlock listItemBlock, int level, bool isOrdered)

@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashColour = Color4.Goldenrod
+                HyperDashColour = Color4.Goldenrod,
             };
 
             checkHyperDashCatcherColour(skin, skin.HyperDashColour);
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashAfterImageColour = Color4.Lime
+                HyperDashAfterImageColour = Color4.Lime,
             };
 
             checkHyperDashCatcherColour(skin, Catcher.DEFAULT_HYPER_DASH_COLOUR, skin.HyperDashAfterImageColour);
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             var skin = new TestSkin
             {
                 HyperDashColour = Color4.Goldenrod,
-                HyperDashAfterImageColour = Color4.Lime
+                HyperDashAfterImageColour = Color4.Lime,
             };
 
             checkHyperDashCatcherColour(skin, skin.HyperDashColour, skin.HyperDashAfterImageColour);
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashFruitColour = Color4.Cyan
+                HyperDashFruitColour = Color4.Cyan,
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashFruitColour);
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             var skin = new TestSkin
             {
                 HyperDashColour = Color4.Goldenrod,
-                HyperDashFruitColour = Color4.Cyan
+                HyperDashFruitColour = Color4.Cyan,
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashFruitColour);
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
             var skin = new TestSkin
             {
-                HyperDashColour = Color4.Goldenrod
+                HyperDashColour = Color4.Goldenrod,
             };
 
             checkHyperDashFruitColour(skin, skin.HyperDashColour);
@@ -126,9 +126,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                     {
                         Catcher = catcher = new Catcher(new DroppedObjectContainer())
                         {
-                            Scale = new Vector2(4)
-                        }
-                    }
+                            Scale = new Vector2(4),
+                        },
+                    },
                 }, skin);
                 trails = catcherArea.ChildrenOfType<CatcherTrailDisplay>().Single();
             });

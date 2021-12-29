@@ -53,7 +53,7 @@ namespace osu.Game.Online.Chat
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
 

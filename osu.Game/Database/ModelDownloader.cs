@@ -114,7 +114,7 @@ namespace osu.Game.Database
             protected override Notification CreateCompletionNotification() => new SilencedProgressCompletionNotification
             {
                 Activated = CompletionClickAction,
-                Text = CompletionText
+                Text = CompletionText,
             };
 
             private class SilencedProgressCompletionNotification : ProgressCompletionNotification

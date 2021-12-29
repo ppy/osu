@@ -93,9 +93,9 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(-FooterButton.SHEAR_WIDTH, 0),
                             AutoSizeAxes = Axes.Both,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             updateModeLight();

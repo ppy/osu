@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 ColumnDimensions = new[]
                 {
                     new Dimension(),
-                    new Dimension()
+                    new Dimension(),
                 },
                 Content = new[]
                 {
@@ -40,15 +40,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new OsuSpriteText
                                 {
                                     Text = @"No OverlayColourProvider",
-                                    Font = OsuFont.Default.With(size: 40)
+                                    Font = OsuFont.Default.With(size: 40),
                                 },
                                 new OsuColourPicker
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Current = { BindTarget = colour },
-                                }
-                            }
+                                },
+                            },
                         },
                         new ColourProvidingContainer(OverlayColourScheme.Blue)
                         {
@@ -58,18 +58,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 new OsuSpriteText
                                 {
                                     Text = @"With blue OverlayColourProvider",
-                                    Font = OsuFont.Default.With(size: 40)
+                                    Font = OsuFont.Default.With(size: 40),
                                 },
                                 new OsuColourPicker
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Current = { BindTarget = colour },
-                                }
-                            }
-                        }
-                    }
-                }
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             AddStep("set green", () => colour.Value = Colour4.LimeGreen);

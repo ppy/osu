@@ -72,7 +72,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(5)
+                Spacing = new Vector2(5),
             });
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.

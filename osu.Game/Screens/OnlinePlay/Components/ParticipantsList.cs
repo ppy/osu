@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     Direction = Direction,
                     AutoSizeAxes = AutoSizeAxes,
                     RelativeSizeAxes = RelativeSizeAxes,
-                    Spacing = Vector2.One
+                    Spacing = Vector2.One,
                 };
 
                 for (int i = 0; i < RecentParticipants.Count; i++)

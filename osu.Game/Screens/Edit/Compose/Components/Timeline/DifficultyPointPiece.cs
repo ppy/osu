@@ -78,16 +78,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         {
                             sliderVelocitySlider = new IndeterminateSliderWithTextBoxInput<double>("Velocity", new DifficultyControlPoint().SliderVelocityBindable)
                             {
-                                KeyboardStep = 0.1f
+                                KeyboardStep = 0.1f,
                             },
                             new OsuTextFlowContainer
                             {
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
-                                Text = "Hold shift while dragging the end of an object to adjust velocity while snapping."
-                            }
-                        }
-                    }
+                                Text = "Hold shift while dragging the end of an object to adjust velocity while snapping.",
+                            },
+                        },
+                    },
                 };
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.

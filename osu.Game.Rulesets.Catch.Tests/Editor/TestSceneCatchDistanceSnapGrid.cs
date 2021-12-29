@@ -50,11 +50,11 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                         Child = playfield = new CatchPlayfield(new BeatmapDifficulty())
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Clock = new FramedClock(manualClock)
-                        }
+                            Clock = new FramedClock(manualClock),
+                        },
                     },
                     distanceGrid = new CatchDistanceSnapGrid(new double[] { 0, -1, 1 }),
-                    fruitOutline = new FruitOutline()
+                    fruitOutline = new FruitOutline(),
                 },
             };
         }

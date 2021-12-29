@@ -33,9 +33,9 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             {
                 Top = 10,
                 Left = 20,
-                Right = 40
+                Right = 40,
             },
-            Child = chart = new ProfileLineChart(GraphCounterName)
+            Child = chart = new ProfileLineChart(GraphCounterName),
         };
 
         protected override void LoadComplete()
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     filledHistoryEntries.Add(lastFilled = new APIUserHistoryCount
                     {
                         Count = 0,
-                        Date = lastFilled.Date.AddMonths(1)
+                        Date = lastFilled.Date.AddMonths(1),
                     });
                 }
 

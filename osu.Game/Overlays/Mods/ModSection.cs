@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         Top = 20,
                     },
-                    AlwaysPresent = true
+                    AlwaysPresent = true,
                 },
             };
         }
@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Mods
         protected virtual Drawable CreateHeader(string text) => new OsuSpriteText
         {
             Font = OsuFont.GetFont(weight: FontWeight.Bold),
-            Text = text
+            Text = text,
         };
 
         protected virtual ModButton CreateModButton(Mod mod) => new ModButton(mod);

@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 selector.BeatmapSet = new APIBeatmapSet
                 {
-                    Beatmaps = enabledRulesets.Select(r => new APIBeatmap { RulesetID = r.OnlineID }).ToArray()
+                    Beatmaps = enabledRulesets.Select(r => new APIBeatmap { RulesetID = r.OnlineID }).ToArray(),
                 };
             });
 
@@ -58,9 +58,9 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new APIBeatmap
                         {
-                            RulesetID = enabledRuleset.OnlineID
-                        }
-                    }
+                            RulesetID = enabledRuleset.OnlineID,
+                        },
+                    },
                 };
             });
 

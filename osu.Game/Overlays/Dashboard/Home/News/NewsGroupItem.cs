@@ -32,13 +32,13 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                 AutoSizeAxes = Axes.Y,
                 RowDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 ColumnDimensions = new[]
                 {
                     new Dimension(GridSizeMode.Absolute, size: 60),
                     new Dimension(GridSizeMode.Absolute, size: 20),
-                    new Dimension()
+                    new Dimension(),
                 },
                 Content = new[]
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Origin = Anchor.TopRight,
                             Width = 1,
                             RelativeSizeAxes = Axes.Y,
-                            Colour = colourProvider.Light1
+                            Colour = colourProvider.Light1,
                         },
                         new Container
                         {
@@ -60,10 +60,10 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Padding = new MarginPadding { Right = 10 },
-                            Child = new NewsTitleLink(post)
-                        }
-                    }
-                }
+                            Child = new NewsTitleLink(post),
+                        },
+                    },
+                },
             };
         }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Dashboard.Home.News
                     Origin = Anchor.TopRight,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Vertical = 5 }
+                    Margin = new MarginPadding { Vertical = 5 },
                 };
 
                 textFlow.AddText($"{date:dd}", t =>

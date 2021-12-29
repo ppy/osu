@@ -56,7 +56,7 @@ namespace osu.Game.Updater
                         {
                             host.OpenUrlExternally(getBestUrl(latest));
                             return true;
-                        }
+                        },
                     });
 
                     return true;

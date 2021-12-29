@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit
                 new LoadingSpinner(true)
                 {
                     State = { Value = Visibility.Visible },
-                }
+                },
             });
         }
 

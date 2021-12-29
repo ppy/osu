@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Height = 50
+                        Height = 50,
                     },
                     new Box
                     {
@@ -47,8 +47,8 @@ namespace osu.Game.Tests.Visual.Online
                         Depth = -1,
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                    }
-                }
+                    },
+                },
             });
 
             Add(new Container
@@ -59,9 +59,9 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     currentText = new OsuSpriteText
                     {
-                        Text = "Currently selected channel:"
-                    }
-                }
+                        Text = "Currently selected channel:",
+                    },
+                },
             });
 
             channelTabControl.OnRequestLeave += channel => channelTabControl.RemoveChannel(channel);
@@ -111,14 +111,14 @@ namespace osu.Game.Tests.Visual.Online
             channelTabControl.AddChannel(new Channel(new APIUser
             {
                 Id = RNG.Next(1000, 10000000),
-                Username = "Test User " + RNG.Next(1000)
+                Username = "Test User " + RNG.Next(1000),
             }));
 
         private void addChannel(string name) =>
             channelTabControl.AddChannel(new Channel
             {
                 Type = ChannelType.Public,
-                Name = name
+                Name = name,
             });
 
         private class TestTabControl : ChannelTabControl

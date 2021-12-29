@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
                             Vertical = 10,
                             Horizontal = 15,
                         };
-                    })
+                    }),
                 };
 
                 textFlow.AddText(Text);

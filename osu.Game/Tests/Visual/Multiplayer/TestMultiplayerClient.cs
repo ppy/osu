@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             var localUser = new MultiplayerRoomUser(api.LocalUser.Value.Id)
             {
-                User = api.LocalUser.Value
+                User = api.LocalUser.Value,
             };
 
             var room = new MultiplayerRoom(roomId)
@@ -194,11 +194,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Name = apiRoom.Name.Value,
                     MatchType = apiRoom.Type.Value,
                     Password = password,
-                    QueueMode = apiRoom.QueueMode.Value
+                    QueueMode = apiRoom.QueueMode.Value,
                 },
                 Playlist = serverSidePlaylist.ToList(),
                 Users = { localUser },
-                Host = localUser
+                Host = localUser,
             };
 
             await updatePlaylistOrder(room).ConfigureAwait(false);
@@ -419,7 +419,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 BeatmapSet = new APIBeatmapSet { OnlineID = set.OnlineID },
                 OnlineID = beatmapId,
-                Checksum = set.Beatmaps.First(b => b.OnlineID == beatmapId).MD5Hash
+                Checksum = set.Beatmaps.First(b => b.OnlineID == beatmapId).MD5Hash,
             });
         }
 
@@ -489,7 +489,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 BeatmapChecksum = currentItem.BeatmapChecksum,
                 RulesetID = currentItem.RulesetID,
                 RequiredMods = currentItem.RequiredMods,
-                AllowedMods = currentItem.AllowedMods
+                AllowedMods = currentItem.AllowedMods,
             }).ConfigureAwait(false);
         }
 

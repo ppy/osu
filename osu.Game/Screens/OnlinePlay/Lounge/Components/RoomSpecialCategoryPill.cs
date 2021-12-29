@@ -27,15 +27,15 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Background =
                 {
                     Colour = colours.Pink,
-                    Alpha = 1
+                    Alpha = 1,
                 },
                 Child = text = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 12),
-                    Colour = Color4.Black
-                }
+                    Colour = Color4.Black,
+                },
             };
         }
 

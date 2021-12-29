@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Comments
                                 },
                                 RowDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.AutoSize)
+                                    new Dimension(GridSizeMode.AutoSize),
                                 },
                                 Content = new[]
                                 {
@@ -116,10 +116,10 @@ namespace osu.Game.Overlays.Comments
                                                     Origin = Anchor.CentreRight,
                                                     Margin = new MarginPadding
                                                     {
-                                                        Right = 5
-                                                    }
-                                                }
-                                            }
+                                                        Right = 5,
+                                                    },
+                                                },
+                                            },
                                         },
                                         new FillFlowContainer
                                         {
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Comments
                                             Spacing = new Vector2(0, 4),
                                             Margin = new MarginPadding
                                             {
-                                                Vertical = 2
+                                                Vertical = 2,
                                             },
                                             Children = new Drawable[]
                                             {
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold))
                                                         {
-                                                            AutoSizeAxes = Axes.Both
+                                                            AutoSizeAxes = Axes.Both,
                                                         },
                                                         Comment.Pinned ? new PinnedCommentNotice() : Empty(),
                                                         new ParentUsername(Comment),
@@ -150,9 +150,9 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Alpha = Comment.IsDeleted ? 1 : 0,
                                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = "deleted"
-                                                        }
-                                                    }
+                                                            Text = "deleted",
+                                                        },
+                                                    },
                                                 },
                                                 message = new CommentMarkdownContainer
                                                 {
@@ -170,9 +170,9 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         new DrawableDate(Comment.CreatedAt, 12, false)
                                                         {
-                                                            Colour = colourProvider.Foreground1
-                                                        }
-                                                    }
+                                                            Colour = colourProvider.Foreground1,
+                                                        },
+                                                    },
                                                 },
                                                 new Container
                                                 {
@@ -181,18 +181,18 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         showRepliesButton = new ShowRepliesButton(Comment.RepliesCount)
                                                         {
-                                                            Expanded = { BindTarget = childrenExpanded }
+                                                            Expanded = { BindTarget = childrenExpanded },
                                                         },
                                                         loadRepliesButton = new LoadRepliesButton
                                                         {
-                                                            Action = () => RepliesRequested(this, ++currentPage)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                                            Action = () => RepliesRequested(this, ++currentPage),
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
                             },
                             childCommentsVisibilityContainer = new FillFlowContainer
                             {
@@ -206,24 +206,24 @@ namespace osu.Game.Overlays.Comments
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical
+                                        Direction = FillDirection.Vertical,
                                     },
                                     deletedCommentsCounter = new DeletedCommentsCounter
                                     {
                                         ShowDeleted = { BindTarget = ShowDeleted },
                                         Margin = new MarginPadding
                                         {
-                                            Top = 10
-                                        }
+                                            Top = 10,
+                                        },
                                     },
                                     showMoreButton = new ShowMoreRepliesButton
                                     {
-                                        Action = () => RepliesRequested(this, ++currentPage)
-                                    }
-                                }
+                                        Action = () => RepliesRequested(this, ++currentPage),
+                                    },
+                                },
                             },
-                        }
-                    }
+                        },
+                    },
                 },
                 new Container
                 {
@@ -236,9 +236,9 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Expanded = { BindTarget = childrenExpanded },
-                        Alpha = 0
-                    }
-                }
+                        Alpha = 0,
+                    },
+                },
             };
 
             if (Comment.UserId.HasValue)
@@ -260,20 +260,20 @@ namespace osu.Game.Overlays.Comments
                         {
                             Font = font,
                             Text = "edited ",
-                            Colour = colour
+                            Colour = colour,
                         },
                         new DrawableDate(Comment.EditedAt.Value)
                         {
                             Font = font,
-                            Colour = colour
+                            Colour = colour,
                         },
                         new OsuSpriteText
                         {
                             Font = font,
                             Text = $@" by {Comment.EditedUser.Username}",
-                            Colour = colour
+                            Colour = colour,
                         },
-                    }
+                    },
                 });
             }
 
@@ -294,7 +294,7 @@ namespace osu.Game.Overlays.Comments
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
                     Height = 1.5f,
-                    Colour = OsuColour.Gray(0.1f)
+                    Colour = OsuColour.Gray(0.1f),
                 });
             }
 
@@ -357,7 +357,7 @@ namespace osu.Game.Overlays.Comments
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
             Direction = FillDirection.Vertical,
-            Children = replies.ToList()
+            Children = replies.ToList(),
         };
 
         private void updateButtonsState()
@@ -382,13 +382,13 @@ namespace osu.Game.Overlays.Comments
                 return new MarginPadding
                 {
                     Horizontal = 70,
-                    Vertical = 15
+                    Vertical = 15,
                 };
             }
 
             return new MarginPadding
             {
-                Top = 10
+                Top = 10,
             };
         }
 
@@ -414,7 +414,7 @@ namespace osu.Game.Overlays.Comments
                         Text = CommentsStrings.Pinned,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                    }
+                    },
                 };
             }
         }
@@ -443,8 +443,8 @@ namespace osu.Game.Overlays.Comments
                     new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName
-                    }
+                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName,
+                    },
                 };
             }
 

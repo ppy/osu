@@ -65,8 +65,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             totalScoreColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersScoreTotal, largeFont, top_columns_min_width),
                             accuracyColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, largeFont, top_columns_min_width),
-                            maxComboColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, largeFont, top_columns_min_width)
-                        }
+                            maxComboColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, largeFont, top_columns_min_width),
+                        },
                     },
                     new FillFlowContainer
                     {
@@ -85,9 +85,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             },
                             ppColumn = new TextColumn(BeatmapsetsStrings.ShowScoreboardHeaderspp, smallFont, bottom_columns_min_width),
                             modsColumn = new ModsInfoColumn(),
-                        }
+                        },
                     },
-                }
+                },
             };
         }
 
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private TextColumn createStatisticsColumn(HitResultDisplayStatistic stat) => new TextColumn(stat.DisplayName, smallFont, bottom_columns_min_width)
         {
-            Text = stat.MaxCount == null ? stat.Count.ToLocalisableString(@"N0") : (LocalisableString)$"{stat.Count}/{stat.MaxCount}"
+            Text = stat.MaxCount == null ? stat.Count.ToLocalisableString(@"N0") : (LocalisableString)$"{stat.Count}/{stat.MaxCount}",
         };
 
         private class InfoColumn : CompositeDrawable
@@ -146,13 +146,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     AutoSizeAxes = Axes.Both,
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.AutoSize, minSize: minWidth ?? 0)
+                        new Dimension(GridSizeMode.AutoSize, minSize: minWidth ?? 0),
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.Absolute, 2),
-                        new Dimension(GridSizeMode.AutoSize)
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -163,8 +163,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
                                 Text = title.ToUpper(),
                                 // 2px padding bottom + 1px vertical to compensate for the additional spacing because of 1.25 line-height in osu-web
-                                Padding = new MarginPadding { Top = 1, Bottom = 3 }
-                            }
+                                Padding = new MarginPadding { Top = 1, Bottom = 3 },
+                            },
                         },
                         new Drawable[]
                         {
@@ -178,9 +178,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         new[]
                         {
                             // osu-web has 4px margin here but also uses 0.9 line-height, reducing margin to 2px seems like a good alternative to that
-                            content.With(c => c.Margin = new MarginPadding { Top = 2 })
-                        }
-                    }
+                            content.With(c => c.Margin = new MarginPadding { Top = 2 }),
+                        },
+                    },
                 };
             }
 
@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(1),
-                    Height = 18f
+                    Height = 18f,
                 })
             {
             }

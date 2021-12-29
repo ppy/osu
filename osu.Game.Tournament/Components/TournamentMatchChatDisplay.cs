@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Components
                     var channel = new Channel
                     {
                         Id = id,
-                        Type = ChannelType.Public
+                        Type = ChannelType.Public,
                     };
 
                     manager.JoinChannel(channel);

@@ -48,8 +48,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                 Child = counter = new StatisticCounter
                 {
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
+                    Origin = Anchor.TopCentre,
+                },
             };
 
             if (maxCount != null)
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                     Origin = Anchor.BottomCentre,
                     Font = OsuFont.Torus.With(size: 12, fixedWidth: true),
                     Spacing = new Vector2(-2, 0),
-                    Text = $"/{maxCount}"
+                    Text = $"/{maxCount}",
                 });
             }
 

@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
-                Action = () => exitAction = true
+                Action = () => exitAction = true,
             });
 
             var text = holdForMenuButton.Children.OfType<SpriteText>().First();

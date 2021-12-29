@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual
 
             cursorContainer.Child = content = new OsuTooltipContainer(cursorContainer.Cursor)
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             };
 
             if (CreateNestedActionContainer)
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
                 InputManager = new ManualInputManager
                 {
                     UseParentInput = true,
-                    Child = mainContent
+                    Child = mainContent,
                 },
                 new Container
                 {
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Text = "Input Priority"
+                                    Text = "Input Priority",
                                 },
                                 new FillFlowContainer
                                 {
@@ -102,19 +102,19 @@ namespace osu.Game.Tests.Visual
                                         {
                                             Text = "local",
                                             Size = new Vector2(50, 30),
-                                            Action = returnUserInput
+                                            Action = returnUserInput,
                                         },
                                         buttonTest = new TriangleButton
                                         {
                                             Text = "test",
                                             Size = new Vector2(50, 30),
-                                            Action = returnTestInput
+                                            Action = returnTestInput,
                                         },
-                                    }
+                                    },
                                 },
-                            }
+                            },
                         },
-                    }
+                    },
                 },
             });
         }

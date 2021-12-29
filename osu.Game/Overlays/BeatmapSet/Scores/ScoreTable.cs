@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1f,
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = row_height }
+                Margin = new MarginPadding { Top = row_height },
             });
         }
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
                 new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 25)), // flag
                 new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersPlayer, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
-                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
+                new TableColumn(BeatmapsetsStrings.ShowScoreboardHeadersCombo, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120)),
             };
 
             // All statistics across all scores, unordered.
@@ -143,24 +143,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Text = (index + 1).ToLocalisableString(@"\##"),
-                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                 },
                 new UpdateableRank(score.Rank)
                 {
-                    Size = new Vector2(28, 14)
+                    Size = new Vector2(28, 14),
                 },
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
                     Current = scoreManager.GetBindableTotalScoreString(score),
-                    Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium)
+                    Font = OsuFont.GetFont(size: text_size, weight: index == 0 ? FontWeight.Bold : FontWeight.Medium),
                 },
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
                     Text = score.DisplayAccuracy,
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
+                    Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White,
                 },
                 new UpdateableFlag(score.User.Country)
                 {
@@ -172,8 +172,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = score.MaxCombo.ToLocalisableString(@"0\x"),
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.MaxCombo == score.BeatmapInfo?.MaxCombo ? highAccuracyColour : Color4.White
-                }
+                    Colour = score.MaxCombo == score.BeatmapInfo?.MaxCombo ? highAccuracyColour : Color4.White,
+                },
             };
 
             var availableStatistics = score.GetStatisticsForDisplay().ToDictionary(tuple => tuple.Result);
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = stat.MaxCount == null ? stat.Count.ToLocalisableString(@"N0") : (LocalisableString)$"{stat.Count}/{stat.MaxCount}",
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = stat.Count == 0 ? Color4.Gray : Color4.White
+                    Colour = stat.Count == 0 ? Color4.Gray : Color4.White,
                 });
             }
 
@@ -198,7 +198,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 content.Add(new OsuSpriteText
                 {
                     Text = score.PP.ToLocalisableString(@"N0"),
-                    Font = OsuFont.GetFont(size: text_size)
+                    Font = OsuFont.GetFont(size: text_size),
                 });
             }
 
@@ -210,8 +210,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
                 {
                     AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.3f)
-                })
+                    Scale = new Vector2(0.3f),
+                }),
             });
 
             return content.ToArray();

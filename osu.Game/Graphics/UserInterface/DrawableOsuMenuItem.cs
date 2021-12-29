@@ -131,7 +131,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                         Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL, Vertical = MARGIN_VERTICAL },
-                    }
+                    },
                 };
             }
         }

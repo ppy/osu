@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override DropdownHeader CreateHeader() => new OsuTabDropdownHeader
         {
             Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight
+            Origin = Anchor.TopRight,
         };
 
         private void propagateAccentColour()
@@ -120,7 +120,7 @@ namespace osu.Game.Graphics.UserInterface
                         Size = new Vector2(14),
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                    }
+                    },
                 };
 
                 Padding = new MarginPadding { Left = 5, Right = 5 };

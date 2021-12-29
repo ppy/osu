@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.EmptyFreeform
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Text = c.ToString(),
-                        Font = OsuFont.Default.With(size: 18)
-                    }
+                        Font = OsuFont.Default.With(size: 18),
+                    },
                 };
             }
         }

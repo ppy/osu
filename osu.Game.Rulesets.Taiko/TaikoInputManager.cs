@@ -27,6 +27,6 @@ namespace osu.Game.Rulesets.Taiko
         RightCentre,
 
         [Description("Right (rim)")]
-        RightRim
+        RightRim,
     }
 }

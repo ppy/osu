@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                         },
-                    }
+                    },
                 };
             });
 
@@ -229,9 +229,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     adjustedBeatLength = new InfoString(@"Adjusted beat length"),
                                     timeUntilNextBeat = new InfoString(@"Time until next beat"),
                                     timeSinceLastBeat = new InfoString(@"Time since last beat"),
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     new Container
                     {
@@ -252,9 +252,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = Color4.White,
                                 Alpha = 0,
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 };
             }
 

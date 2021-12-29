@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
+                                    Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
                                 },
                                 starRatingContainer = new FillFlowContainer
                                 {
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold),
                                             Text = string.Empty,
                                         },
-                                    }
+                                    },
                                 },
                             },
                         },
@@ -262,8 +262,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         Child = backgroundBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.5f
-                        }
+                            Alpha = 0.5f,
+                        },
                     },
                     icon = new DifficultyIcon(beatmapInfo, shouldShowTooltip: false)
                     {

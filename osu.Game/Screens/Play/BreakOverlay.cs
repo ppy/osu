@@ -78,8 +78,8 @@ namespace osu.Game.Screens.Play
                             Height = 8,
                             CornerRadius = 4,
                             Masking = true,
-                            Child = new Box { RelativeSizeAxes = Axes.Both }
-                        }
+                            Child = new Box { RelativeSizeAxes = Axes.Both },
+                        },
                     },
                     remainingTimeCounter = new RemainingTimeCounter
                     {
@@ -97,8 +97,8 @@ namespace osu.Game.Screens.Play
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
-                }
+                    },
+                },
             };
 
             if (scoreProcessor != null)

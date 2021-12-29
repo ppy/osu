@@ -69,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                     RelativeSizeAxes = Axes.Both,
                     Child = gameplayContent = new DrawSizePreservingFillContainer { RelativeSizeAxes = Axes.Both },
                 },
-                loadingLayer = new LoadingLayer(true) { State = { Value = Visibility.Visible } }
+                loadingLayer = new LoadingLayer(true) { State = { Value = Visibility.Visible } },
             };
 
             audioContainer.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                 Child = stack = new OsuScreenStack
                 {
                     Name = nameof(PlayerArea),
-                }
+                },
             };
 
             stack.Push(new MultiSpectatorPlayerLoader(Score, () => new MultiSpectatorPlayer(Score, GameplayClock)));

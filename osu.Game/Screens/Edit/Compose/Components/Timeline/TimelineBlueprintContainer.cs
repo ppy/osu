@@ -217,7 +217,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         Colour = Color4.White,
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 });
             }
 

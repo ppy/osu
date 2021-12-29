@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
             {
                 LoadDisplay(new SpotlightsLayout
                 {
-                    Ruleset = { BindTarget = ruleset }
+                    Ruleset = { BindTarget = ruleset },
                 });
                 return;
             }

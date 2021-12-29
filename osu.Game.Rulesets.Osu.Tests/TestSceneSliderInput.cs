@@ -354,12 +354,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                                 Vector2.Zero,
                                 new Vector2(slider_path_length, 0),
                             }, slider_path_length),
-                        }
+                        },
                     },
                     BeatmapInfo =
                     {
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
-                        Ruleset = new OsuRuleset().RulesetInfo
+                        Ruleset = new OsuRuleset().RulesetInfo,
                     },
                 });
 

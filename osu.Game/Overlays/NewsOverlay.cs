@@ -43,12 +43,12 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.Y,
                 RowDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 ColumnDimensions = new[]
                 {
                     new Dimension(GridSizeMode.AutoSize),
-                    new Dimension()
+                    new Dimension(),
                 },
                 Content = new[]
                 {
@@ -57,15 +57,15 @@ namespace osu.Game.Overlays
                         sidebarContainer = new Container
                         {
                             AutoSizeAxes = Axes.X,
-                            Child = sidebar = new NewsSidebar()
+                            Child = sidebar = new NewsSidebar(),
                         },
                         content = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }
-                    }
-                }
+                            AutoSizeAxes = Axes.Y,
+                        },
+                    },
+                },
             };
         }
 

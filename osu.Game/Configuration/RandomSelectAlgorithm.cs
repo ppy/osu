@@ -11,6 +11,6 @@ namespace osu.Game.Configuration
         RandomPermutation,
 
         [Description("True Random")]
-        Random
+        Random,
     }
 }

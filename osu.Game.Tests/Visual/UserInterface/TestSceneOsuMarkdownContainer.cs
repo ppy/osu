@@ -35,9 +35,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Child = markdownContainer = new OsuMarkdownContainer
                     {
                         RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
-                    }
-                }
+                        AutoSizeAxes = Axes.Y,
+                    },
+                },
             };
         });
 

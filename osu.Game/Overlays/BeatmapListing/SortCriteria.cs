@@ -30,6 +30,6 @@ namespace osu.Game.Overlays.BeatmapListing
         Favourites,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ListingSearchSortingRelevance))]
-        Relevance
+        Relevance,
     }
 }

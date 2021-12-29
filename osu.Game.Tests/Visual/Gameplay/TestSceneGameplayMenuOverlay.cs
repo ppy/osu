@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     OnRetry = () => Logger.Log(@"Retry"),
                     OnQuit = () => Logger.Log(@"Quit"),
-                }
+                },
             };
 
             InputManager.MoveMouseTo(Vector2.Zero);

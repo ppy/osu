@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Setup
                 {
                     Label = "Enable countdown",
                     Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None },
-                    Description = "If enabled, an \"Are you ready? 3, 2, 1, GO!\" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so."
+                    Description = "If enabled, an \"Are you ready? 3, 2, 1, GO!\" countdown will be inserted at the beginning of the beatmap, assuming there is enough time to do so.",
                 },
                 CountdownSettings = new FillFlowContainer
                 {
@@ -52,41 +52,41 @@ namespace osu.Game.Screens.Edit.Setup
                         {
                             Label = "Countdown speed",
                             Current = { Value = Beatmap.BeatmapInfo.Countdown != CountdownType.None ? Beatmap.BeatmapInfo.Countdown : CountdownType.Normal },
-                            Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None)
+                            Items = Enum.GetValues(typeof(CountdownType)).Cast<CountdownType>().Where(type => type != CountdownType.None),
                         },
                         CountdownOffset = new LabelledNumberBox
                         {
                             Label = "Countdown offset",
                             Current = { Value = Beatmap.BeatmapInfo.CountdownOffset.ToString() },
                             Description = "If the countdown sounds off-time, use this to make it appear one or more beats early.",
-                        }
-                    }
+                        },
+                    },
                 },
                 Empty(),
                 widescreenSupport = new LabelledSwitchButton
                 {
                     Label = "Widescreen support",
                     Description = "Allows storyboards to use the full screen space, rather than be confined to a 4:3 area.",
-                    Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard }
+                    Current = { Value = Beatmap.BeatmapInfo.WidescreenStoryboard },
                 },
                 epilepsyWarning = new LabelledSwitchButton
                 {
                     Label = "Epilepsy warning",
                     Description = "Recommended if the storyboard or video contain scenes with rapidly flashing colours.",
-                    Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning }
+                    Current = { Value = Beatmap.BeatmapInfo.EpilepsyWarning },
                 },
                 letterboxDuringBreaks = new LabelledSwitchButton
                 {
                     Label = "Letterbox during breaks",
                     Description = "Adds horizontal letterboxing to give a cinematic look during breaks.",
-                    Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks }
+                    Current = { Value = Beatmap.BeatmapInfo.LetterboxInBreaks },
                 },
                 samplesMatchPlaybackRate = new LabelledSwitchButton
                 {
                     Label = "Samples match playback rate",
                     Description = "When enabled, all samples will speed up or slow down when rate-changing mods are enabled.",
-                    Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate }
-                }
+                    Current = { Value = Beatmap.BeatmapInfo.SamplesMatchPlaybackRate },
+                },
             };
         }
 

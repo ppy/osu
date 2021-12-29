@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Rulesets.Mods
             var beatmap = createSingleSpinnerBeatmap();
             var mod = new ModWindDown
             {
-                FinalRate = { Value = 0.5 }
+                FinalRate = { Value = 0.5 },
             };
             mod.ApplyToBeatmap(beatmap);
             mod.ApplyToTrack(track);
@@ -93,9 +93,9 @@ namespace osu.Game.Tests.Rulesets.Mods
                     new Spinner
                     {
                         StartTime = start_time,
-                        Duration = duration
-                    }
-                }
+                        Duration = duration,
+                    },
+                },
             };
         }
 
@@ -105,8 +105,8 @@ namespace osu.Game.Tests.Rulesets.Mods
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = start_time }
-                }
+                    new HitCircle { StartTime = start_time },
+                },
             };
         }
     }

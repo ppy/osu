@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Settings
                             Origin = Anchor.Centre,
                             Size = new Vector2(20),
                         },
-                    }
+                    },
                 },
                 selectionIndicator = new CircularContainer
                 {
@@ -97,8 +97,8 @@ namespace osu.Game.Overlays.Settings
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.White
-                    }
+                        Colour = Colour4.White,
+                    },
                 },
             });
         }

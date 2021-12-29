@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             AddInternal(ControlPointVisualiser = new PathControlPointVisualiser(HitObject, true)
             {
-                RemoveControlPointsRequested = removeControlPoints
+                RemoveControlPointsRequested = removeControlPoints,
             });
 
             base.OnSelected();
@@ -282,7 +282,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     Position = position,
                     NewCombo = i == 0 && HitObject.NewCombo,
                     SampleControlPoint = samplePoint,
-                    Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList()
+                    Samples = HitObject.HeadCircle.Samples.Select(s => s.With()).ToList(),
                 });
 
                 i += 1;

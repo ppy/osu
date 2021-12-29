@@ -72,10 +72,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                ColourNamePrefix = "My colour #"
-                            }
-                        }
-                    }
+                                ColourNamePrefix = "My colour #",
+                            },
+                        },
+                    },
                 };
 
                 component.Label = "a sample component";
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour4.DarkRed,
                     Colour4.Aquamarine,
                     Colour4.Goldenrod,
-                    Colour4.Gainsboro
+                    Colour4.Gainsboro,
                 });
             });
         }

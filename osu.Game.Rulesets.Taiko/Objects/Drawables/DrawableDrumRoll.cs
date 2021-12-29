@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.Add(tickContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Depth = float.MinValue
+                Depth = float.MinValue,
             });
         }
 

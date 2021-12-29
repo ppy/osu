@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical)
         {
-            Anchor = Direction == Direction.Horizontal ? Anchor.BottomLeft : Anchor.TopRight
+            Anchor = Direction == Direction.Horizontal ? Anchor.BottomLeft : Anchor.TopRight,
         };
     }
 }

@@ -39,14 +39,14 @@ namespace osu.Game.Rulesets.Mania.Skinning.Default
             {
                 new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 colouredBox = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = NOTE_HEIGHT / 2,
-                    Alpha = 0.1f
-                }
+                    Alpha = 0.1f,
+                },
             };
         }
 

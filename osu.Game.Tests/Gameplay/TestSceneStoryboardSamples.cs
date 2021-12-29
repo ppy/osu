@@ -80,8 +80,8 @@ namespace osu.Game.Tests.Gameplay
                     IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
-                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
-                    }
+                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1)),
+                    },
                 });
             });
 
@@ -107,8 +107,8 @@ namespace osu.Game.Tests.Gameplay
                     IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
-                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1))
-                    }
+                        Child = sample = new DrawableStoryboardSample(new StoryboardSampleInfo(string.Empty, 0, 1)),
+                    },
                 });
             });
 
@@ -154,12 +154,12 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
-                    Child = beatmapSkinSourceContainer
+                    Child = beatmapSkinSourceContainer,
                 });
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(sampleInfo = new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer.GameplayClock,
                 });
             });
 
@@ -187,12 +187,12 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
                 {
-                    Child = beatmapSkinSourceContainer
+                    Child = beatmapSkinSourceContainer,
                 });
 
                 beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
                 {
-                    Clock = gameplayContainer.GameplayClock
+                    Clock = gameplayContainer.GameplayClock,
                 });
             });
 

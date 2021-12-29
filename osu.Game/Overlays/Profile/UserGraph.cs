@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile
             Add(graph = new UserLineGraph
             {
                 RelativeSizeAxes = Axes.Both,
-                Alpha = 0
+                Alpha = 0,
             });
 
             graph.OnBallMove += i => hoveredIndex = i;
@@ -169,9 +169,9 @@ namespace osu.Game.Overlays.Profile
                             Masking = true,
                             BorderThickness = 4,
                             RelativePositionAxes = Axes.Y,
-                            Child = ballBg = new Box { RelativeSizeAxes = Axes.Both }
-                        }
-                    }
+                            Child = ballBg = new Box { RelativeSizeAxes = Axes.Both },
+                        },
+                    },
                 });
             }
 
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.Profile
                 {
                     background = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer
                     {
@@ -245,15 +245,15 @@ namespace osu.Game.Overlays.Profile
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
-                                    }
-                                }
+                                    },
+                                },
                             },
                             BottomText = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 };
             }
 

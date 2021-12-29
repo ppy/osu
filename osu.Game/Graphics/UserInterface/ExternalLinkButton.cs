@@ -34,9 +34,9 @@ namespace osu.Game.Graphics.UserInterface
                 linkIcon = new SpriteIcon
                 {
                     Icon = FontAwesome.Solid.ExternalLinkAlt,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
-                new HoverClickSounds(HoverSampleSet.Submit)
+                new HoverClickSounds(HoverSampleSet.Submit),
             };
         }
 

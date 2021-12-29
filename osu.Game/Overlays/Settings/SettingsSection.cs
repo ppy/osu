@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Settings
             {
                 Margin = new MarginPadding
                 {
-                    Top = 36
+                    Top = 36,
                 },
                 Spacing = new Vector2(0, ITEM_SPACING),
                 Direction = FillDirection.Vertical,
@@ -93,11 +93,11 @@ namespace osu.Game.Overlays.Settings
                             Text = Header,
                             Margin = new MarginPadding
                             {
-                                Horizontal = SettingsPanel.CONTENT_MARGINS
-                            }
+                                Horizontal = SettingsPanel.CONTENT_MARGINS,
+                            },
                         },
-                        FlowContent
-                    }
+                        FlowContent,
+                    },
                 },
             });
 

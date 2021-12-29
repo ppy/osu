@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new Container
             {
                 Clock = new FramedClock(new StopwatchClock()),
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             });
         }
 

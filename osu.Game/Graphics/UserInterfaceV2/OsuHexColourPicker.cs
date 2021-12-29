@@ -41,8 +41,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Masking = true,
                     Child = preview = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 };
             }
 

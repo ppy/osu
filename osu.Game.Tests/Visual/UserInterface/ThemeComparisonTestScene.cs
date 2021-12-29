@@ -27,9 +27,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeaFoam
+                    Colour = colours.GreySeaFoam,
                 },
-                CreateContent()
+                CreateContent(),
             });
         }
 
@@ -43,17 +43,17 @@ namespace osu.Game.Tests.Visual.UserInterface
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(OverlayColourProvider), colourProvider)
+                    (typeof(OverlayColourProvider), colourProvider),
                 },
                 Children = new[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
+                        Colour = colourProvider.Background4,
                     },
-                    CreateContent()
-                }
+                    CreateContent(),
+                },
             });
         }
 

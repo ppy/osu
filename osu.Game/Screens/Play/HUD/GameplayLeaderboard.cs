@@ -55,8 +55,8 @@ namespace osu.Game.Screens.Play.HUD
                         Spacing = new Vector2(2.5f),
                         LayoutDuration = 450,
                         LayoutEasing = Easing.OutQuint,
-                    }
-                }
+                    },
+                },
             };
         }
 

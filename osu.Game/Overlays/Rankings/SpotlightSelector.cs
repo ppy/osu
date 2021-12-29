@@ -78,8 +78,8 @@ namespace osu.Game.Overlays.Rankings
                                 Child = dropdown = new SpotlightsDropdown
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Current = Current
-                                }
+                                    Current = Current,
+                                },
                             },
                             new Container
                             {
@@ -98,20 +98,20 @@ namespace osu.Game.Overlays.Rankings
                                             startDateColumn = new InfoColumn(RankingsStrings.SpotlightStartDate),
                                             endDateColumn = new InfoColumn(RankingsStrings.SpotlightEndDate),
                                             mapCountColumn = new InfoColumn(RankingsStrings.SpotlightMapCount),
-                                            participantsColumn = new InfoColumn(RankingsStrings.SpotlightParticipants)
-                                        }
+                                            participantsColumn = new InfoColumn(RankingsStrings.SpotlightParticipants),
+                                        },
                                     },
                                     new RankingsSortTabControl
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Current = Sort
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                        Current = Sort,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -161,8 +161,8 @@ namespace osu.Game.Overlays.Rankings
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Light),
-                        }
-                    }
+                        },
+                    },
                 };
             }
 

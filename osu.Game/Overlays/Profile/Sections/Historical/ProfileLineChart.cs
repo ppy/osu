@@ -54,12 +54,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 ColumnDimensions = new[]
                 {
                     new Dimension(GridSizeMode.AutoSize),
-                    new Dimension()
+                    new Dimension(),
                 },
                 RowDimensions = new[]
                 {
                     new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 Content = new[]
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                         rowTicksContainer = new Container<TickText>
                         {
                             RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X
+                            AutoSizeAxes = Axes.X,
                         },
                         new Container
                         {
@@ -82,20 +82,20 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                     {
                                         rowLinesContainer = new Container<TickLine>
                                         {
-                                            RelativeSizeAxes = Axes.Both
+                                            RelativeSizeAxes = Axes.Both,
                                         },
                                         columnLinesContainer = new Container<TickLine>
                                         {
-                                            RelativeSizeAxes = Axes.Both
-                                        }
-                                    }
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    },
                                 },
                                 graph = new UserHistoryGraph(graphCounterName)
                                 {
-                                    RelativeSizeAxes = Axes.Both
-                                }
-                            }
-                        }
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            },
+                        },
                     },
                     new[]
                     {
@@ -104,10 +104,10 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Top = 10 }
-                        }
-                    }
-                }
+                            Padding = new MarginPadding { Top = 10 },
+                        },
+                    },
+                },
             };
         }
 
@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Margin = new MarginPadding { Right = 3 },
                 Text = value.ToLocalisableString("N0"),
                 Font = OsuFont.GetFont(size: 12),
-                Y = y
+                Y = y,
             });
 
             rowLinesContainer.Add(new TickLine
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 RelativePositionAxes = Axes.Y,
                 Height = 0.1f,
                 EdgeSmoothness = Vector2.One,
-                Y = y
+                Y = y,
             });
         }
 
@@ -197,7 +197,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Text = value.ToLocalisableString("MMM yyyy"),
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                 Rotation = 45,
-                X = x
+                X = x,
             });
 
             columnLinesContainer.Add(new TickLine
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 RelativePositionAxes = Axes.X,
                 Width = 0.1f,
                 EdgeSmoothness = Vector2.One,
-                X = x
+                X = x,
             });
         }
 

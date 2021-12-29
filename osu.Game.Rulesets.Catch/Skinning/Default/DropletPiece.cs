@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 new Pulp
                 {
                     RelativeSizeAxes = Axes.Both,
-                    AccentColour = { BindTarget = AccentColour }
+                    AccentColour = { BindTarget = AccentColour },
                 },
-                HyperBorderPiece = new HyperDropletBorderPiece()
+                HyperBorderPiece = new HyperDropletBorderPiece(),
             };
         }
     }

@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Comments.Buttons
                     {
                         background = new Box
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         new Container
                         {
@@ -67,17 +67,17 @@ namespace osu.Game.Overlays.Comments.Buttons
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         AlwaysPresent = true,
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                     },
                                     icon = new ChevronIcon
                                     {
                                         Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                        Origin = Anchor.CentreLeft,
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
                 new HoverClickSounds(),
             };

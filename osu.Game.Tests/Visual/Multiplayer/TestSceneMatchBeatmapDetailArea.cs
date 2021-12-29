@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(500),
-                CreateNewItem = createNewItem
+                CreateNewItem = createNewItem,
             };
         });
 
@@ -40,8 +40,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new OsuModHardRock(),
                     new OsuModDoubleTime(),
-                    new OsuModAutoplay()
-                }
+                    new OsuModAutoplay(),
+                },
             });
         }
     }

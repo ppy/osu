@@ -203,8 +203,8 @@ namespace osu.Game.Screens.Edit
                         Child = screenContainer = new Container<EditorScreen>
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Masking = true
-                        }
+                            Masking = true,
+                        },
                     },
                     new Container
                     {
@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 new MenuItem("File")
                                 {
-                                    Items = createFileMenuItems()
+                                    Items = createFileMenuItems(),
                                 },
                                 new MenuItem("Edit")
                                 {
@@ -233,18 +233,18 @@ namespace osu.Game.Screens.Edit
                                         cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
                                         copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
                                         pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
-                                    }
+                                    },
                                 },
                                 new MenuItem("View")
                                 {
                                     Items = new MenuItem[]
                                     {
                                         new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                        new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
-                                    }
-                                }
-                            }
-                        }
+                                        new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations)),
+                                    },
+                                },
+                            },
+                        },
                     },
                     new Container
                     {
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Edit
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = colours.Gray2
+                                Colour = colours.Gray2,
                             },
                             new Container
                             {
@@ -299,15 +299,15 @@ namespace osu.Game.Screens.Edit
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = 10 },
                                                 Size = new Vector2(1),
-                                                Action = testGameplay
-                                            }
+                                                Action = testGameplay,
+                                            },
                                         },
-                                    }
+                                    },
                                 },
-                            }
-                        }
+                            },
+                        },
                     },
-                }
+                },
             });
 
             changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
@@ -337,7 +337,7 @@ namespace osu.Game.Screens.Edit
         public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
+            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty,
         };
 
         /// <summary>
@@ -767,7 +767,7 @@ namespace osu.Game.Screens.Edit
         {
             var fileMenuItems = new List<MenuItem>
             {
-                new EditorMenuItem("Save", MenuItemType.Standard, Save)
+                new EditorMenuItem("Save", MenuItemType.Standard, Save),
             };
 
             if (RuntimeInfo.IsDesktop)

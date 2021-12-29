@@ -98,10 +98,10 @@ namespace osu.Game.Overlays.Changelog
                                 Font = OsuFont.GetFont(weight: FontWeight.Light, size: 19),
                                 Colour = Build.UpdateStream.Colour,
                             },
-                        }
-                    }
+                        },
+                    },
                 },
-            }
+            },
         };
     }
 }

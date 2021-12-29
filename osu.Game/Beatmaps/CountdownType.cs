@@ -19,6 +19,6 @@ namespace osu.Game.Beatmaps
         HalfSpeed = 2,
 
         [Description("Double speed")]
-        DoubleSpeed = 3
+        DoubleSpeed = 3,
     }
 }

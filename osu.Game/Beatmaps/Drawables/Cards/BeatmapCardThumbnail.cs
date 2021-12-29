@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 cover = new UpdateableOnlineBeatmapSetCover(BeatmapSetCoverType.List)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    OnlineInfo = beatmapSetInfo
+                    OnlineInfo = beatmapSetInfo,
                 },
                 foreground = new Container
                 {
@@ -49,21 +49,21 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     {
                         playButton = new PlayButton(beatmapSetInfo)
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         progress = new SmoothCircularProgress
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(50),
-                            InnerRadius = 0.2f
+                            InnerRadius = 0.2f,
                         },
                         content = new Container
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                }
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    },
+                },
             };
         }
 

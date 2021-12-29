@@ -40,8 +40,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         AutoSizeAxes = Axes.X,
                         RelativeSizeAxes = Axes.Y,
                         Padding = new MarginPadding { Horizontal = 10 },
-                    }
-                }
+                    },
+                },
             });
         }
 

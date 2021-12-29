@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new OsuMenuItem("standard", MenuItemType.Standard, performAction),
                     new OsuMenuItem("highlighted", MenuItemType.Highlighted, performAction),
                     new OsuMenuItem("destructive", MenuItemType.Destructive, performAction),
-                }
+                },
             };
         });
 

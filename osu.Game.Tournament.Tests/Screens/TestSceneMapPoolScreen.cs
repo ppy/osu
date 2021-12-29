@@ -133,7 +133,7 @@ namespace osu.Game.Tournament.Tests.Screens
             Ladder.CurrentMatch.Value.Round.Value.Beatmaps.Add(new RoundBeatmap
             {
                 Beatmap = CreateSampleBeatmap(),
-                Mods = mods
+                Mods = mods,
             });
         }
     }

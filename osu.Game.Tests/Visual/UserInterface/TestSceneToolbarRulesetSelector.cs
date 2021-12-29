@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.X,
                     Height = Toolbar.HEIGHT,
-                    Child = selector = new ToolbarRulesetSelector()
+                    Child = selector = new ToolbarRulesetSelector(),
                 };
             });
 
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.X,
                     Height = Toolbar.HEIGHT,
-                    Child = selector = new TestSelector()
+                    Child = selector = new TestSelector(),
                 };
 
                 selector.Current.Value = rulesets.GetRuleset(2);

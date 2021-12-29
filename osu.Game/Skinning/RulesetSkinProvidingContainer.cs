@@ -44,7 +44,7 @@ namespace osu.Game.Skinning
                 Child = Content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 

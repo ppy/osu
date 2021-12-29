@@ -82,7 +82,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                     room.Users.Add(new MultiplayerRoomUser(PLAYER_1_ID)
                     {
                         User = new APIUser { Id = PLAYER_1_ID },
-                        State = MultiplayerUserState.Playing
+                        State = MultiplayerUserState.Playing,
                     });
                 };
 

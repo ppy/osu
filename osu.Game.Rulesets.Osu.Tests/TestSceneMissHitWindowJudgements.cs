@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var beatmap = new Beatmap
             {
-                HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
+                HitObjects = { new HitCircle { Position = new Vector2(256, 192) } },
             };
 
             var hitWindows = new OsuHitWindows();
@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Mod = new TestAutoMod(),
                 Beatmap = new Beatmap
                 {
-                    HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
+                    HitObjects = { new HitCircle { Position = new Vector2(256, 192) } },
                 },
-                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset < -hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit
+                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset < -hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit,
             });
         }
 
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var beatmap = new Beatmap
             {
-                HitObjects = { new HitCircle { Position = new Vector2(256, 192) } }
+                HitObjects = { new HitCircle { Position = new Vector2(256, 192) } },
             };
 
             var hitWindows = new OsuHitWindows();
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Autoplay = false,
                 Beatmap = beatmap,
-                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit
+                PassCondition = () => Player.Results.Count > 0 && Player.Results[0].TimeOffset >= hitWindows.WindowFor(HitResult.Meh) && !Player.Results[0].IsHit,
             });
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
             {
                 ScoreInfo = new ScoreInfo { User = new APIUser { Username = "Autoplay" } },
-                Replay = new MissingAutoGenerator(beatmap, mods).Generate()
+                Replay = new MissingAutoGenerator(beatmap, mods).Generate(),
             };
         }
 

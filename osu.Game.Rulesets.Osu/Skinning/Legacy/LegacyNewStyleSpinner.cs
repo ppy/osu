@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Origin = Anchor.Centre,
                         Texture = source.GetTexture("spinner-middle2"),
                     },
-                }
+                },
             });
 
             if (!(source.FindProvider(s => s.GetTexture("spinner-top") != null) is DefaultLegacySkin))

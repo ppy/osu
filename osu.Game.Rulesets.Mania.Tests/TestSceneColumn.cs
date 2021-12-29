@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Children = new[]
                 {
                     createColumn(ScrollingDirection.Up, ManiaAction.Key1, 0),
-                    createColumn(ScrollingDirection.Down, ManiaAction.Key2, 1)
-                }
+                    createColumn(ScrollingDirection.Down, ManiaAction.Key2, 1),
+                },
             };
         }
 
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
                 TimeRange = 2000,
-                Child = column
+                Child = column,
             };
         }
     }

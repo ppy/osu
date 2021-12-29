@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(1),
-                }
+                },
             });
         }
 

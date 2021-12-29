@@ -22,10 +22,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("create circle", () => Child = dho = new DrawableHitCircle(prepareObject(new HitCircle
             {
                 Position = new Vector2(256, 192),
-                IndexInCurrentCombo = 0
+                IndexInCurrentCombo = 0,
             }))
             {
-                Clock = new FramedClock(new StopwatchClock())
+                Clock = new FramedClock(new StopwatchClock()),
             });
 
             AddStep("apply new circle", () => dho.Apply(prepareObject(new HitCircle

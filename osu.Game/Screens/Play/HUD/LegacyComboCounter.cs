@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Play.HUD
                             AlwaysPresent = true,
                             Alpha = 0,
                         },
-                    }
-                }
+                    },
+                },
             };
         }
 

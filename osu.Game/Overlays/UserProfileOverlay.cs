@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
                     //new MedalsSection(),
                     new HistoricalSection(),
                     new BeatmapsSection(),
-                    new KudosuSection()
+                    new KudosuSection(),
                 }
                 : Array.Empty<ProfileSection>();
 
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays
                 {
                     // this is only visible as the ProfileTabControl background
                     Colour = ColourProvider.Background5,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
             sectionsContainer.SelectedSection.ValueChanged += section =>

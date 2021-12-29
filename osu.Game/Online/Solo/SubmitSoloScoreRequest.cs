@@ -35,7 +35,7 @@ namespace osu.Game.Online.Solo
 
             req.AddRaw(JsonConvert.SerializeObject(score, new JsonSerializerSettings
             {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             }));
 
             return req;

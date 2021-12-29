@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     Padding = new MarginPadding(3),
                     Font = OsuFont.Default.With(size: 14, weight: FontWeight.SemiBold),
                     Colour = colours.B5,
-                }
+                },
             };
         }
     }

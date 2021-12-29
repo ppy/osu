@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 Origin = Anchor.Centre,
                 Texture = textures.Get("Gameplay/osu/ring-glow"),
                 Blending = BlendingParameters.Additive,
-                Alpha = 0.5f
+                Alpha = 0.5f,
             };
         }
     }

@@ -38,9 +38,9 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 header = new ProfileSubsectionHeader(headerText, counterVisibilityState)
                 {
-                    Alpha = string.IsNullOrEmpty(headerText.ToString()) ? 0 : 1
+                    Alpha = string.IsNullOrEmpty(headerText.ToString()) ? 0 : 1,
                 },
-                CreateContent()
+                CreateContent(),
             };
         }
 

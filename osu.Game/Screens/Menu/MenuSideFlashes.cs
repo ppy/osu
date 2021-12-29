@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
                     // align off-screen to make sure our edges don't become visible during parallax.
                     X = -box_width,
                     Alpha = 0,
-                    Blending = BlendingParameters.Additive
+                    Blending = BlendingParameters.Additive,
                 },
                 rightBox = new Box
                 {
@@ -81,8 +81,8 @@ namespace osu.Game.Screens.Menu
                     Height = 1.5f,
                     X = box_width,
                     Alpha = 0,
-                    Blending = BlendingParameters.Additive
-                }
+                    Blending = BlendingParameters.Additive,
+                },
             };
 
             user.ValueChanged += _ => updateColour();

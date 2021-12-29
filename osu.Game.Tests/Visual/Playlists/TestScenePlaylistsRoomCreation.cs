@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 });
             });
 
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 });
             });
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 });
             });
 
@@ -134,8 +134,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = realOnlineId,
                         BeatmapSet =
                         {
-                            OnlineID = realOnlineSetId
-                        }
+                            OnlineID = realOnlineSetId,
+                        },
                     },
                 };
 
@@ -161,10 +161,10 @@ namespace osu.Game.Tests.Visual.Playlists
                             BeatmapSet = new BeatmapSetInfo
                             {
                                 OnlineID = realOnlineSetId,
-                            }
-                        }
+                            },
+                        },
                     },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
                 });
             });
 
@@ -179,8 +179,8 @@ namespace osu.Game.Tests.Visual.Playlists
                         OnlineID = realOnlineId,
                         BeatmapSet =
                         {
-                            OnlineID = realOnlineSetId
-                        }
+                            OnlineID = realOnlineSetId,
+                        },
                     },
                 };
 

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateTooHighBitrate(this),
             new IssueTemplateTooLowBitrate(this),
-            new IssueTemplateNoBitrate(this)
+            new IssueTemplateNoBitrate(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

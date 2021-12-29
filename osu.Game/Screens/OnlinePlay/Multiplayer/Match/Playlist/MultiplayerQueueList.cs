@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new QueueFillFlowContainer
         {
-            Spacing = new Vector2(0, 2)
+            Spacing = new Vector2(0, 2),
         };
 
         protected override DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new QueuePlaylistItem(item);

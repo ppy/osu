@@ -37,9 +37,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 2)
-                    }
-                }
+                        Spacing = new Vector2(0, 2),
+                    },
+                },
             };
 
             userJoinSample = audio.Samples.Get(@"Multiplayer/player-joined");

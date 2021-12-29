@@ -57,13 +57,13 @@ namespace osu.Game.Tests.Visual.Online
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.2f)
+                        Colour = OsuColour.Gray(0.2f),
                     },
                     graph = new RankGraph
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("null user", () => graph.Statistics.Value = null);
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new APIRankHistory
                     {
                         Data = data,
-                    }
+                    },
                 };
             });
 
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new APIRankHistory
                     {
                         Data = dataWithZeros,
-                    }
+                    },
                 };
             });
 
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new APIRankHistory
                     {
                         Data = smallData,
-                    }
+                    },
                 };
             });
 
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.Online
                     RankHistory = new APIRankHistory
                     {
                         Data = edgyData,
-                    }
+                    },
                 };
             });
         }

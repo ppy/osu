@@ -42,12 +42,12 @@ namespace osu.Game.Tests.Visual.Online
                         CachedDependencies = new (Type, object)[]
                         {
                             (typeof(SpectatorClient), spectatorClient),
-                            (typeof(UserLookupCache), lookupCache)
+                            (typeof(UserLookupCache), lookupCache),
                         },
                         Child = currentlyPlaying = new CurrentlyPlayingDisplay
                         {
                             RelativeSizeAxes = Axes.Both,
-                        }
+                        },
                     },
                 };
             });
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Online
                 "Zallius",
                 "BanchoBot",
                 "rocketminer210",
-                "pishifat"
+                "pishifat",
             };
 
             protected override Task<APIUser> ComputeValueAsync(int lookup, CancellationToken token = default)

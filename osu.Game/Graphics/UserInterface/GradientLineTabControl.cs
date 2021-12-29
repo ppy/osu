@@ -58,14 +58,14 @@ namespace osu.Game.Graphics.UserInterface
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Colour)
+                            Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Colour),
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Colour, Color4.Transparent)
+                            Colour = ColourInfo.GradientHorizontal(Colour, Color4.Transparent),
                         },
-                    }
+                    },
                 };
             }
         }

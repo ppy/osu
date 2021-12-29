@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new OverlayRulesetSelector { Current = ruleset }),
                     new ColourProvidedContainer(OverlayColourScheme.Purple, new OverlayRulesetSelector { Current = ruleset }),
                     new ColourProvidedContainer(OverlayColourScheme.Red, new OverlayRulesetSelector { Current = ruleset }),
-                }
+                },
             });
         }
 

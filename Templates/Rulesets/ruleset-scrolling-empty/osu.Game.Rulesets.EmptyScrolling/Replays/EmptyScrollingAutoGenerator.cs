@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.EmptyScrolling.Replays
             {
                 Frames.Add(new EmptyScrollingReplayFrame
                 {
-                    Time = hitObject.StartTime
+                    Time = hitObject.StartTime,
                     // todo: add required inputs and extra frames.
                 });
             }

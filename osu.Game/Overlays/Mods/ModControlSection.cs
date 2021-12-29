@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Mods
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                ChildrenEnumerable = modControls
+                ChildrenEnumerable = modControls,
             };
         }
 
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Mods
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Colour = colours.Yellow,
                 },
-                FlowContent
+                FlowContent,
             });
         }
     }

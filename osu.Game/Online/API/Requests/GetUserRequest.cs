@@ -48,7 +48,7 @@ namespace osu.Game.Online.API.Requests
         private enum LookupType
         {
             Id,
-            Username
+            Username,
         }
     }
 }

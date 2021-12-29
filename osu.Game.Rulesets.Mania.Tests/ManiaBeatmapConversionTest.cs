@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             {
                 StartTime = hitObject.StartTime,
                 EndTime = hitObject.GetEndTime(),
-                Column = ((ManiaHitObject)hitObject).Column
+                Column = ((ManiaHitObject)hitObject).Column,
             };
         }
 

@@ -18,6 +18,6 @@ namespace osu.Game.Configuration
         /// <summary>
         /// Seasonal backgrounds are never shown.
         /// </summary>
-        Never
+        Never,
     }
 }

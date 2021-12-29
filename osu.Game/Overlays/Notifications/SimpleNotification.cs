@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Notifications
                 IconBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
+                    Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f)),
                 },
                 iconDrawable = new SpriteIcon
                 {
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Notifications
                     Origin = Anchor.Centre,
                     Icon = icon,
                     Size = new Vector2(20),
-                }
+                },
             });
 
             Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Notifications
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Text = text
+                Text = text,
             });
         }
 

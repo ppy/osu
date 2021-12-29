@@ -108,12 +108,12 @@ namespace osu.Game.Screens.OnlinePlay
             {
                 Beatmap =
                 {
-                    Value = Beatmap.Value.BeatmapInfo
+                    Value = Beatmap.Value.BeatmapInfo,
                 },
                 Ruleset =
                 {
-                    Value = Ruleset.Value
-                }
+                    Value = Ruleset.Value,
+                },
             };
 
             item.RequiredMods.AddRange(Mods.Value.Select(m => m.DeepClone()));
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
         {
-            IsValidMod = IsValidMod
+            IsValidMod = IsValidMod,
         };
 
         protected override IEnumerable<(FooterButton, OverlayContainer)> CreateFooterButtons()

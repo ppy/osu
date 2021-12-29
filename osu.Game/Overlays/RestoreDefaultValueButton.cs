@@ -107,7 +107,7 @@ namespace osu.Game.Overlays
                 {
                     Colour = (IsHovered ? colours.Lime1 : colours.Lime3).Opacity(0.4f),
                     Radius = IsHovered ? 8 : 4,
-                    Type = EdgeEffectType.Glow
+                    Type = EdgeEffectType.Glow,
                 }, fade_duration, Easing.OutQuint);
             }
             else
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays
                 {
                     Colour = colours.Lime3.Opacity(0.1f),
                     Radius = 2,
-                    Type = EdgeEffectType.Glow
+                    Type = EdgeEffectType.Glow,
                 }, fade_duration, Easing.OutQuint);
             }
         }

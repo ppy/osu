@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Tests.Components
         {
             Username = "HappyStick",
             Id = 2,
-            Colour = "f2ca34"
+            Colour = "f2ca34",
         };
 
         private readonly APIUser redUser = new APIUser
@@ -57,12 +57,12 @@ namespace osu.Game.Tournament.Tests.Components
             {
                 Team1 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<APIUser> { redUser } }
+                    Value = new TournamentTeam { Players = new BindableList<APIUser> { redUser } },
                 },
                 Team2 =
                 {
-                    Value = new TournamentTeam { Players = new BindableList<APIUser> { blueUser } }
-                }
+                    Value = new TournamentTeam { Players = new BindableList<APIUser> { blueUser } },
+                },
             };
 
             chatDisplay.Channel.Value = testChannel;
@@ -75,48 +75,48 @@ namespace osu.Game.Tournament.Tests.Components
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = admin,
-                Content = "I am a wang!"
+                Content = "I am a wang!",
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = redUser,
-                Content = "I am team red."
+                Content = "I am team red.",
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = redUser,
-                Content = "I plan to win!"
+                Content = "I plan to win!",
             }));
 
             AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = blueUser,
-                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
+                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand.",
             }));
 
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(nextMessageId())
             {
                 Sender = admin,
-                Content = "Okay okay, calm down guys. Let's do this!"
+                Content = "Okay okay, calm down guys. Let's do this!",
             }));
 
             AddStep("multiple messages", () => testChannel.AddNewMessages(
                 new Message(nextMessageId())
                 {
                     Sender = admin,
-                    Content = "I spam you!"
+                    Content = "I spam you!",
                 },
                 new Message(nextMessageId())
                 {
                     Sender = admin,
-                    Content = "I spam you!!!1"
+                    Content = "I spam you!!!1",
                 },
                 new Message(nextMessageId())
                 {
                     Sender = admin,
-                    Content = "I spam you!1!1"
+                    Content = "I spam you!1!1",
                 }));
 
             AddStep("change channel to 2", () => chatDisplay.Channel.Value = testChannel2);

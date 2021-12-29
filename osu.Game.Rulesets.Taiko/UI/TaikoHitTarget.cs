@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(border_thickness, (1 - TaikoStrongableHitObject.DEFAULT_STRONG_SIZE) / 2f),
-                    Alpha = 0.1f
+                    Alpha = 0.1f,
                 },
                 new CircularContainer
                 {
@@ -52,9 +52,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
+                            AlwaysPresent = true,
+                        },
+                    },
                 },
                 new CircularContainer
                 {
@@ -73,9 +73,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
+                            AlwaysPresent = true,
+                        },
+                    },
                 },
                 new Box
                 {
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(border_thickness, (1 - TaikoStrongableHitObject.DEFAULT_STRONG_SIZE) / 2f),
-                    Alpha = 0.1f
+                    Alpha = 0.1f,
                 },
             };
         }

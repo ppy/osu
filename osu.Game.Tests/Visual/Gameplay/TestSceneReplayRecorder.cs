@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 Recorder = recorder = new TestReplayRecorder(new Score
                                 {
                                     Replay = replay,
-                                    ScoreInfo = { BeatmapInfo = gameplayState.Beatmap.BeatmapInfo }
+                                    ScoreInfo = { BeatmapInfo = gameplayState.Beatmap.BeatmapInfo },
                                 })
                                 {
                                     ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
@@ -86,10 +86,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                         },
-                                        new TestInputConsumer()
-                                    }
+                                        new TestInputConsumer(),
+                                    },
                                 },
-                            }
+                            },
                         },
                         new Drawable[]
                         {
@@ -116,12 +116,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                         },
-                                        new TestInputConsumer()
-                                    }
+                                        new TestInputConsumer(),
+                                    },
                                 },
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 });
             });
         }

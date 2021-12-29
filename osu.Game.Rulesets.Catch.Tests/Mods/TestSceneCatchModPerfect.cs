@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 {
                     Vector2.Zero,
                     new Vector2(100, 0),
-                })
+                }),
             };
 
             CreateHitObjectTest(new HitObjectTestData(stream), shouldMiss);

@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Select.Carousel
                 Children = new Drawable[]
                 {
                     Content,
-                    hoverLayer = new HoverLayer()
-                }
+                    hoverLayer = new HoverLayer(),
+                },
             };
         }
 

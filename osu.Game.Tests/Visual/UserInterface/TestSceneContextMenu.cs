@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Green,
-                        }
+                        },
                     },
                     new AnotherContextMenuContainer
                     {
@@ -51,9 +51,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Red,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
         }
 
@@ -98,11 +98,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                                         new OsuMenuItem(@"Too Deep One"),
                                         new OsuMenuItem(@"Too Deep Two"),
                                         new OsuMenuItem(@"Too Deep Three"),
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
                 new OsuMenuItem(@"Choose me please"),
                 new OsuMenuItem(@"And me too"),

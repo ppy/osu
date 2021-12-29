@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             {
                 Difficulty = difficultyValue,
                 Accuracy = accuracyValue,
-                Total = totalValue
+                Total = totalValue,
             };
         }
 

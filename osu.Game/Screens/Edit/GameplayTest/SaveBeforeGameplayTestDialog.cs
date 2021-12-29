@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.GameplayTest
                 new PopupDialogOkButton
                 {
                     Text = "Sounds good, let's go!",
-                    Action = saveAndPreview
+                    Action = saveAndPreview,
                 },
                 new PopupDialogCancelButton
                 {

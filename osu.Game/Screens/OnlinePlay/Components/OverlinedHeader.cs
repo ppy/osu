@@ -52,7 +52,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
-                        Margin = new MarginPadding { Bottom = 2 }
+                        Margin = new MarginPadding { Bottom = 2 },
                     },
                     new FillFlowContainer
                     {
@@ -65,15 +65,15 @@ namespace osu.Game.Screens.OnlinePlay.Components
                             new OsuSpriteText
                             {
                                 Text = title,
-                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold)
+                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                             },
                             details = new OsuSpriteText
                             {
-                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold)
+                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                             },
-                        }
+                        },
                     },
-                }
+                },
             };
 
             Details.BindValueChanged(val => details.Text = val.NewValue);

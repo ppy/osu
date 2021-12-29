@@ -10,6 +10,6 @@ namespace osu.Game.Beatmaps
         Hard,
         Insane,
         Expert,
-        ExpertPlus
+        ExpertPlus,
     }
 }

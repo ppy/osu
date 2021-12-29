@@ -38,8 +38,8 @@ namespace osu.Game.Overlays.Comments.Buttons
             {
                 AlwaysPresent = true,
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                Text = "show more"
-            }
+                Text = "show more",
+            },
         };
 
         protected override void OnLoadStarted() => text.FadeOut(200, Easing.OutQuint);

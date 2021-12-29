@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Ranking
             {
                 Child = stack = new OsuScreenStack
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 };
 
                 stack.Push(screen = createResultsScreen());

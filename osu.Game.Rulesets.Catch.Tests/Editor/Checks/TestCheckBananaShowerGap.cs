@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor.Checks
                 {
                     new BananaShower { StartTime = 0, EndTime = 100, X = 0 },
                     new BananaShower { StartTime = 101, EndTime = 200, X = 0 },
-                    new BananaShower { StartTime = 201, EndTime = 300, X = 0 }
-                }
+                    new BananaShower { StartTime = 201, EndTime = 300, X = 0 },
+                },
             };
 
             assertOk(spinnerConsecutiveBeatmap, DifficultyRating.Easy);
@@ -86,8 +86,8 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor.Checks
                 {
                     new Fruit { StartTime = 0, X = 0 },
                     new BananaShower { StartTime = bananaShowerStart, EndTime = bananaShowerEnd, X = 0 },
-                    new Fruit { StartTime = nextFruitStart, X = 0 }
-                }
+                    new Fruit { StartTime = nextFruitStart, X = 0 },
+                },
             };
         }
 

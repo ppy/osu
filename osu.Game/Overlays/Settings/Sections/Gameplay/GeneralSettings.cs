@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = GameplaySettingsStrings.ScoreDisplayMode,
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
-                    Keywords = new[] { "scoring" }
+                    Keywords = new[] { "scoring" },
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GraphicsSettingsStrings.HitLighting,
-                    Current = config.GetBindable<bool>(OsuSetting.HitLighting)
+                    Current = config.GetBindable<bool>(OsuSetting.HitLighting),
                 },
             };
         }

@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = float.MaxValue,
-                    Colour = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
+                    Colour = new Colour4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1),
                 });
             });
 

@@ -51,9 +51,9 @@ namespace osu.Game.Overlays.Profile
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("222").Opacity(0.8f), Color4Extensions.FromHex("222").Opacity(0.2f))
+                        Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("222").Opacity(0.8f), Color4Extensions.FromHex("222").Opacity(0.2f)),
                     },
-                }
+                },
             };
 
         protected override Drawable CreateContent() => new FillFlowContainer
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Profile
                     RelativeSizeAxes = Axes.X,
                     User = { BindTarget = User },
                 },
-            }
+            },
         };
 
         protected override OverlayTitle CreateTitle() => new ProfileHeaderTitle();

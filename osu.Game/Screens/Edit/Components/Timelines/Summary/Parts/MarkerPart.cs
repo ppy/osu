@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
-                        Size = new Vector2(10, 5)
+                        Size = new Vector2(10, 5),
                     },
                     new Box
                     {
@@ -99,8 +99,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         Width = 2,
-                        EdgeSmoothness = new Vector2(1, 0)
-                    }
+                        EdgeSmoothness = new Vector2(1, 0),
+                    },
                 };
             }
 

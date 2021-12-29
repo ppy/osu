@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Ranking
                 Child = button = new DownloadButton
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
 
             button.Action = () =>
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     AddInternal(downloadTracker = new ScoreDownloadTracker(score.NewValue)
                     {
-                        State = { BindTarget = State }
+                        State = { BindTarget = State },
                     });
                 }
 

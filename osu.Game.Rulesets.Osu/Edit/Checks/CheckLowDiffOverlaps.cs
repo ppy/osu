@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         {
             new IssueTemplateShouldOverlap(this),
             new IssueTemplateShouldProbablyOverlap(this),
-            new IssueTemplateShouldNotOverlap(this)
+            new IssueTemplateShouldNotOverlap(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

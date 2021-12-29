@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
                 {
                     { 0, new BindableInt(team1Score) },
-                    { 1, new BindableInt(team2Score) }
+                    { 1, new BindableInt(team2Score) },
                 };
 
                 Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, playlistItem, teamScores));

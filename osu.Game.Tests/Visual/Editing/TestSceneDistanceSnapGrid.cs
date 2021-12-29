@@ -41,9 +41,9 @@ namespace osu.Game.Tests.Visual.Editing
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.SlateGray
+                    Colour = Color4.SlateGray,
                 },
-                new TestDistanceSnapGrid()
+                new TestDistanceSnapGrid(),
             };
         });
 
@@ -70,9 +70,9 @@ namespace osu.Game.Tests.Visual.Editing
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Color4.SlateGray,
                     },
-                    new TestDistanceSnapGrid(100)
+                    new TestDistanceSnapGrid(100),
                 };
             });
         }
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     Origin = Anchor.Centre,
                     Size = new Vector2(5),
-                    Position = StartPosition
+                    Position = StartPosition,
                 });
 
                 int indexFromPlacement = 0;
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Editing
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
                         Position = new Vector2(s, StartPosition.Y),
-                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement),
                     });
                 }
 
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Editing
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
                         Position = new Vector2(s, StartPosition.Y),
-                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement),
                     });
                 }
 
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Editing
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
                         Position = new Vector2(StartPosition.X, s),
-                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement),
                     });
                 }
 
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Editing
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
                         Position = new Vector2(StartPosition.X, s),
-                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement),
                     });
                 }
             }

@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Mods
                     Icon = FontAwesome.Solid.Slash,
                     Colour = Color4.White,
                     Shadow = true,
-                }
+                },
             };
         }
 

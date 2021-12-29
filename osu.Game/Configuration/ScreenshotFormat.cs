@@ -11,6 +11,6 @@ namespace osu.Game.Configuration
         Jpg = 1,
 
         [Description("PNG (lossless)")]
-        Png = 2
+        Png = 2,
     }
 }

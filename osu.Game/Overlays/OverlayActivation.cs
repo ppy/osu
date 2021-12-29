@@ -7,6 +7,6 @@ namespace osu.Game.Overlays
     {
         Disabled,
         UserTriggered,
-        All
+        All,
     }
 }

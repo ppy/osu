@@ -16,7 +16,7 @@ namespace osu.Game.Tournament.Tests.Components
             Container<DrawableTournamentMatch> level2;
 
             var match1 = new TournamentMatch(
-                new TournamentTeam { FlagName = { Value = "AU" }, FullName = { Value = "Australia" }, },
+                new TournamentTeam { FlagName = { Value = "AU" }, FullName = { Value = "Australia" } },
                 new TournamentTeam { FlagName = { Value = "JP" }, FullName = { Value = "Japan" }, Acronym = { Value = "JPN" } })
             {
                 Team1Score = { Value = 4 },
@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.Tests.Components
                             new DrawableTournamentMatch(match1),
                             new DrawableTournamentMatch(match2),
                             new DrawableTournamentMatch(new TournamentMatch()),
-                        }
+                        },
                     },
                     level2 = new FillFlowContainer<DrawableTournamentMatch>
                     {
@@ -56,10 +56,10 @@ namespace osu.Game.Tournament.Tests.Components
                         Children = new[]
                         {
                             new DrawableTournamentMatch(new TournamentMatch()),
-                            new DrawableTournamentMatch(new TournamentMatch())
-                        }
-                    }
-                }
+                            new DrawableTournamentMatch(new TournamentMatch()),
+                        },
+                    },
+                },
             };
 
             level1.Children[0].Match.Progression.Value = level2.Children[0].Match;

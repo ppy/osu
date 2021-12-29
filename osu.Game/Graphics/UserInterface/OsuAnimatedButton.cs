@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
                         Blending = BlendingParameters.Additive,
                         Alpha = 0,
                     },
-                }
+                },
             });
         }
 

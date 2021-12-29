@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap())
-                }
+                    drawableRuleset = (DrawableManiaRuleset)Ruleset.Value.CreateInstance().CreateDrawableRulesetWith(createTestBeatmap()),
+                },
             });
             AddStep("retrieve config bindable", () =>
             {
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     new Note { StartTime = beat_length / 4 },
                     new Note { StartTime = beat_length / 3 },
                     new Note { StartTime = beat_length / 2 },
-                    new Note { StartTime = beat_length }
+                    new Note { StartTime = beat_length },
                 },
                 ControlPointInfo = new ControlPointInfo(),
                 BeatmapInfo = { Ruleset = Ruleset.Value },
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint
             {
-                BeatLength = beat_length
+                BeatLength = beat_length,
             });
             return beatmap;
         }

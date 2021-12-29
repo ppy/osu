@@ -356,6 +356,6 @@ namespace osu.Game.Rulesets.Scoring
     public enum ScoringMode
     {
         Standardised,
-        Classic
+        Classic,
     }
 }

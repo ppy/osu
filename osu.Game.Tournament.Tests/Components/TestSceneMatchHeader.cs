@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Tests.Components
                     new MatchHeader { ShowLogo = false },
                     new TournamentSpriteText { Text = "without scores", Font = OsuFont.Torus.With(size: 30) },
                     new MatchHeader { ShowScores = false },
-                }
+                },
             };
         }
     }

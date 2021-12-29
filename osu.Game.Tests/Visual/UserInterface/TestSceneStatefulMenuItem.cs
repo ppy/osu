@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         new TernaryStateRadioMenuItem("First"),
                         new TernaryStateRadioMenuItem("Second") { State = { BindTarget = state } },
                         new TernaryStateRadioMenuItem("Third") { State = { Value = TernaryState.True } },
-                    }
+                    },
                 };
             });
 
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         new TernaryStateToggleMenuItem("First"),
                         new TernaryStateToggleMenuItem("Second") { State = { BindTarget = state } },
                         new TernaryStateToggleMenuItem("Third") { State = { Value = TernaryState.True } },
-                    }
+                    },
                 };
             });
 
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         new TestMenuItem("First", MenuItemType.Standard, getNextState),
                         new TestMenuItem("Second", MenuItemType.Standard, getNextState) { State = { Value = TestStates.State2 } },
                         new TestMenuItem("Third", MenuItemType.Standard, getNextState) { State = { Value = TestStates.State3 } },
-                    }
+                    },
                 };
             });
         }
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             State1,
             State2,
-            State3
+            State3,
         }
     }
 }

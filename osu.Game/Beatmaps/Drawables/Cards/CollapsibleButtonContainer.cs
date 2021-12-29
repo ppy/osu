@@ -94,7 +94,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Colour4.White
+                        Colour = Colour4.White,
                     },
                 },
                 buttonArea = new Container
@@ -112,22 +112,22 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             {
                                 Current = FavouriteState,
                                 Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
+                                Origin = Anchor.TopCentre,
                             },
                             new DownloadButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
+                                State = { BindTarget = downloadTracker.State },
                             },
                             new GoToBeatmapButton(beatmapSet)
                             {
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                State = { BindTarget = downloadTracker.State }
-                            }
-                        }
-                    }
+                                State = { BindTarget = downloadTracker.State },
+                            },
+                        },
+                    },
                 },
                 mainArea = new Container
                 {
@@ -140,7 +140,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         new BeatmapCardContentBackground(beatmapSet)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Dimmed = { BindTarget = ShowDetails }
+                            Dimmed = { BindTarget = ShowDetails },
                         },
                         mainContent = new Container
                         {
@@ -148,11 +148,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             Padding = new MarginPadding
                             {
                                 Horizontal = 10,
-                                Vertical = 4
+                                Vertical = 4,
                             },
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

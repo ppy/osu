@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     Child = catcher = new Catcher(new DroppedObjectContainer())
                     {
-                        Anchor = Anchor.Centre
-                    }
+                        Anchor = Anchor.Centre,
+                    },
                 };
             });
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             var judgement = fruit.CreateJudgement();
             catcher.OnNewResult(drawableFruit, new CatchJudgementResult(fruit, judgement)
             {
-                Type = judgement.MaxResult
+                Type = judgement.MaxResult,
             });
         }
 

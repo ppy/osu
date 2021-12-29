@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             Child = drawablePath = new SmoothPath
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             };
         }
 

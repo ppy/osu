@@ -52,8 +52,8 @@ namespace osu.Game.Tests.Visual
                 screenStack = new OsuScreenStack
                 {
                     Name = nameof(TestMultiplayerComponents),
-                    RelativeSizeAxes = Axes.Both
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             };
 
             screenStack.Push(multiplayerScreen);

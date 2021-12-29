@@ -31,9 +31,9 @@ namespace osu.Game.Tests.Visual.Editing
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(EditorBeatmap), editorBeatmap)
+                    (typeof(EditorBeatmap), editorBeatmap),
                 },
-                Child = designSection = new TestDesignSection()
+                Child = designSection = new TestDesignSection(),
             });
         }
 

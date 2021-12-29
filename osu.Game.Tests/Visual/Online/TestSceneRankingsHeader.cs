@@ -25,19 +25,19 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Current = { BindTarget = scope },
                 Country = { BindTarget = countryBindable },
-                Ruleset = { BindTarget = ruleset }
+                Ruleset = { BindTarget = ruleset },
             });
 
             var country = new Country
             {
                 FlagName = "BY",
-                FullName = "Belarus"
+                FullName = "Belarus",
             };
 
             var unknownCountry = new Country
             {
                 FlagName = "CK",
-                FullName = "Cook Islands"
+                FullName = "Cook Islands",
             };
 
             AddStep("Set country", () => countryBindable.Value = country);

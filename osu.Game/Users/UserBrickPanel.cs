@@ -51,16 +51,16 @@ namespace osu.Game.Users
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = string.IsNullOrEmpty(User.Colour) ? Color4Extensions.FromHex("0087ca") : Color4Extensions.FromHex(User.Colour)
-                    }
+                        Colour = string.IsNullOrEmpty(User.Colour) ? Color4Extensions.FromHex("0087ca") : Color4Extensions.FromHex(User.Colour),
+                    },
                 },
                 CreateUsername().With(u =>
                 {
                     u.Anchor = Anchor.CentreLeft;
                     u.Origin = Anchor.CentreLeft;
                     u.Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold);
-                })
-            }
+                }),
+            },
         };
     }
 }

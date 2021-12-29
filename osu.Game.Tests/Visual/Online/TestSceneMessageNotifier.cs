@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
                     var apiChatChannel = new APIChatChannel
                     {
                         RecentMessages = new List<Message>(0),
-                        ChannelID = (int)createChannelRequest.Channel.Id
+                        ChannelID = (int)createChannelRequest.Channel.Id,
                     };
                     createChannelRequest.TriggerSuccess(apiChatChannel);
                     return true;
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
                     updatesRequest.TriggerSuccess(new GetUpdatesResponse
                     {
                         Messages = new List<Message>(0),
-                        Presence = new List<Channel>(0)
+                        Presence = new List<Channel>(0),
                     });
                     return true;
 
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Content = content,
             Sender = sender,
-            ChannelId = channel.Id
+            ChannelId = channel.Id,
         };
 
         private void clickNotification<T>() where T : Notification

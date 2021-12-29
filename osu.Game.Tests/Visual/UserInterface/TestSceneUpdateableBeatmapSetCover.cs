@@ -54,8 +54,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(10),
-                        Padding = new MarginPadding { Bottom = 550 }
-                    }
+                        Padding = new MarginPadding { Bottom = 550 },
+                    },
                 };
 
                 var coverTypes = Enum.GetValues(typeof(BeatmapSetCoverType))
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 OnlineInfo = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg"),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                Alpha = 0.4f
+                Alpha = 0.4f,
             });
 
             AddUntilStep("cover loaded", () => updateableCover.ChildrenOfType<OnlineBeatmapSetCover>().Any());
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private static APIBeatmapSet createBeatmapWithCover(string coverUrl) => new APIBeatmapSet
         {
-            Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
+            Covers = new BeatmapSetOnlineCovers { Cover = coverUrl },
         };
 
         private class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover

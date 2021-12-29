@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         Alpha = 0,
                         Margin = new MarginPadding { Top = details_padding },
-                    }
+                    },
                 },
                 tabControl = new BeatmapDetailAreaTabControl
                 {

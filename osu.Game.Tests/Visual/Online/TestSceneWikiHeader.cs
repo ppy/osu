@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Change wiki page data", () => wikiPageData.Value = new APIWikiPage
             {
                 Title = "Welcome",
-                Path = "Welcome"
+                Path = "Welcome",
             });
             AddAssert("Current is welcome", () => checkCurrent("Welcome"));
             AddAssert("Check breadcrumb", checkBreadcrumb);
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Path = "People/The_Team",
                 Title = "The Team",
-                Subtitle = "People"
+                Subtitle = "People",
             };
         }
 

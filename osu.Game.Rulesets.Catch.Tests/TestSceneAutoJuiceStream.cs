@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 6, SliderMultiplier = 3 },
-                    Ruleset = ruleset
-                }
+                    Ruleset = ruleset,
+                },
             };
 
             for (int i = 0; i < 100; i++)
@@ -37,14 +37,14 @@ namespace osu.Game.Rulesets.Catch.Tests
                     Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,
-                        new Vector2(width, 0)
+                        new Vector2(width, 0),
                     }),
                     StartTime = i * 2000,
                     NewCombo = i % 8 == 0,
                     Samples = new List<HitSampleInfo>(new[]
                     {
-                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 100)
-                    })
+                        new HitSampleInfo(HitSampleInfo.HIT_NORMAL, "normal", volume: 100),
+                    }),
                 });
             }
 

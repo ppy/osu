@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             Mod = new OsuModSpunOut(),
             Autoplay = false,
             Beatmap = singleSpinnerBeatmap,
-            PassCondition = () => Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault()?.Progress >= 1
+            PassCondition = () => Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault()?.Progress >= 1,
         });
 
         [TestCase(null)]
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     var counter = Player.ChildrenOfType<SpinnerSpmCalculator>().SingleOrDefault();
                     return counter != null && Precision.AlmostEquals(counter.Result.Value, 286, 1);
-                }
+                },
             });
         }
 
@@ -61,9 +61,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     Position = new Vector2(256, 192),
                     StartTime = 500,
-                    Duration = 2000
-                }
-            }
+                    Duration = 2000,
+                },
+            },
         };
     }
 }

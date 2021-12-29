@@ -28,6 +28,6 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The room has been disbanded and closed.
         /// </summary>
-        Closed
+        Closed,
     }
 }

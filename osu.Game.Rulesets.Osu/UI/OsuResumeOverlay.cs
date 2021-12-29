@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             Add(cursorScaleContainer = new Container
             {
-                Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
+                Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume },
             });
         }
 

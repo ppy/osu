@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Origin = Anchor.CentreLeft,
                 Icon = FontAwesome.Solid.Envelope,
                 FillMode = FillMode.Fit,
-                Size = new Vector2(50, 14)
+                Size = new Vector2(50, 14),
             };
 
             Action = () =>

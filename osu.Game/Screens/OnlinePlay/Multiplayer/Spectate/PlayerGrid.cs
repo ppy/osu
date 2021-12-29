@@ -51,12 +51,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Spacing = new Vector2(player_spacing),
-                            }
+                            },
                         },
-                        maximisedFacade = new Facade { RelativeSizeAxes = Axes.Both }
-                    }
+                        maximisedFacade = new Facade { RelativeSizeAxes = Axes.Both },
+                    },
                 },
-                cellContainer = new Container<Cell> { RelativeSizeAxes = Axes.Both }
+                cellContainer = new Container<Cell> { RelativeSizeAxes = Axes.Both },
             };
         }
 

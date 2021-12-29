@@ -17,8 +17,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Items = new[]
                 {
                     new ToggleMenuItem("First"),
-                    new ToggleMenuItem("Second") { State = { Value = true } }
-                }
+                    new ToggleMenuItem("Second") { State = { Value = true } },
+                },
             });
         }
     }

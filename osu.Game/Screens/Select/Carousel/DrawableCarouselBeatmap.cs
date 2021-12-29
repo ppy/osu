@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Select.Carousel
                     TriangleScale = 2,
                     RelativeSizeAxes = Axes.Both,
                     ColourLight = Color4Extensions.FromHex(@"3a7285"),
-                    ColourDark = Color4Extensions.FromHex(@"123744")
+                    ColourDark = Color4Extensions.FromHex(@"123744"),
                 },
                 new FillFlowContainer
                 {
@@ -132,22 +132,22 @@ namespace osu.Game.Screens.Select.Carousel
                                             Text = beatmapInfo.DifficultyName,
                                             Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
+                                            Origin = Anchor.BottomLeft,
                                         },
                                         new OsuSpriteText
                                         {
                                             Text = "mapped by",
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
+                                            Origin = Anchor.BottomLeft,
                                         },
                                         new OsuSpriteText
                                         {
                                             Text = $"{(beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet.Metadata).Author.Username}",
                                             Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft
+                                            Origin = Anchor.BottomLeft,
                                         },
-                                    }
+                                    },
                                 },
                                 new FillFlowContainer
                                 {
@@ -159,18 +159,18 @@ namespace osu.Game.Screens.Select.Carousel
                                         new TopLocalRank(beatmapInfo)
                                         {
                                             Scale = new Vector2(0.8f),
-                                            Size = new Vector2(40, 20)
+                                            Size = new Vector2(40, 20),
                                         },
                                         starCounter = new StarCounter
                                         {
                                             Scale = new Vector2(0.8f),
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Select.Carousel
                     collection.Beatmaps.Remove(beatmapInfo);
             })
             {
-                State = { Value = collection.Beatmaps.Contains(beatmapInfo) }
+                State = { Value = collection.Beatmaps.Contains(beatmapInfo) },
             };
         }
 

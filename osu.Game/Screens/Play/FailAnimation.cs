@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
                     Depth = float.MinValue,
-                    Alpha = 0
+                    Alpha = 0,
                 },
             });
         }
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
             {
                 Colour = Color4.Black,
                 RelativeSizeAxes = Axes.Both,
-                Depth = float.MaxValue
+                Depth = float.MaxValue,
             });
 
             Content.ScaleTo(0.85f, duration, Easing.OutQuart);

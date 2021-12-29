@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                     Alpha = 0,
                     Colour = Color4.Black,
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
 
             Progress.ValueChanged += p =>

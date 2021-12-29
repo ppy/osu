@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             Add(new CommentsHeader
             {
                 Sort = { BindTarget = sort },
-                ShowDeleted = { BindTarget = showDeleted }
+                ShowDeleted = { BindTarget = showDeleted },
             });
 
             AddStep("Trigger ShowDeleted", () => showDeleted.Value = !showDeleted.Value);

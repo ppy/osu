@@ -44,8 +44,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             requestCount++;
                             gameplayClockContainer.Seek(gameplayClock.CurrentTime + increment);
-                        }
-                    }
+                        },
+                    },
                 },
             };
 

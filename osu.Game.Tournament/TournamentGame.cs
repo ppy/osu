@@ -112,7 +112,7 @@ namespace osu.Game.Tournament
                                 },
                                 Action = SaveChanges,
                             },
-                        }
+                        },
                     },
                     heightWarning = new WarningBox("Please make the window wider")
                     {
@@ -123,8 +123,8 @@ namespace osu.Game.Tournament
                     new OsuContextMenuContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new TournamentSceneManager()
-                    }
+                        Child = new TournamentSceneManager(),
+                    },
                 }, drawables =>
                 {
                     loadingSpinner.Hide();

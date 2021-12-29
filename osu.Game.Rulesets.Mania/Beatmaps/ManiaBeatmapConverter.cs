@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         Duration = endTimeData.Duration,
                         Column = column,
                         Samples = HitObject.Samples,
-                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? defaultNodeSamples
+                        NodeSamples = (HitObject as IHasRepeats)?.NodeSamples ?? defaultNodeSamples,
                     });
                 }
                 else if (HitObject is IHasXPosition)
@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     {
                         StartTime = HitObject.StartTime,
                         Samples = HitObject.Samples,
-                        Column = column
+                        Column = column,
                     });
                 }
 
@@ -276,7 +276,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 => new List<IList<HitSampleInfo>>
                 {
                     HitObject.Samples,
-                    new List<HitSampleInfo>()
+                    new List<HitSampleInfo>(),
                 };
         }
     }

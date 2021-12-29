@@ -58,9 +58,9 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            LabelText = typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty)
-                        }
-                    }
+                            LabelText = typeof(T).Name.Replace(nameof(Beatmaps.ControlPoints.ControlPoint), string.Empty),
+                        },
+                    },
                 },
                 content = new Container
                 {
@@ -82,8 +82,8 @@ namespace osu.Game.Screens.Edit.Timing
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                         },
-                    }
-                }
+                    },
+                },
             };
         }
 

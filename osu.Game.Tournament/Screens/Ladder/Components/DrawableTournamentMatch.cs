@@ -51,7 +51,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Origin = Anchor.Centre,
                     Alpha = 0,
                     Colour = Color4.YellowGreen,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
                 CurrentMatchSelectionBox = new Container
                 {
@@ -61,14 +61,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Origin = Anchor.Centre,
                     Alpha = 0,
                     Colour = Color4.White,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
                 },
                 Flow = new FillFlowContainer<DrawableMatchTeam>
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2)
-                }
+                    Spacing = new Vector2(2),
+                },
             };
 
             boundReference(match.Team1).BindValueChanged(_ => updateTeams());
@@ -254,7 +254,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Flow.Children = new[]
             {
                 new DrawableMatchTeam(Match.Team1.Value, Match, Match.Losers.Value),
-                new DrawableMatchTeam(Match.Team2.Value, Match, Match.Losers.Value)
+                new DrawableMatchTeam(Match.Team2.Value, Match, Match.Losers.Value),
             };
 
             SchedulerAfterChildren.Add(() => Scheduler.Add(updateProgression));

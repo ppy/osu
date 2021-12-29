@@ -21,6 +21,6 @@ namespace osu.Game.Overlays.Dashboard.Friends
         Rank,
 
         [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Username))]
-        Username
+        Username,
     }
 }

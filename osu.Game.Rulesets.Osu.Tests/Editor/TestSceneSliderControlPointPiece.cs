@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     new PathControlPoint(new Vector2(150, 150)),
                     new PathControlPoint(new Vector2(300, 0), PathType.PerfectCurve),
                     new PathControlPoint(new Vector2(400, 0)),
-                    new PathControlPoint(new Vector2(400, 150))
-                })
+                    new PathControlPoint(new Vector2(400, 150)),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });

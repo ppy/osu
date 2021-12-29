@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             {
                 new PathControlPoint(new Vector2(0), PathType.PerfectCurve),
                 new PathControlPoint(new Vector2(-100, 0)),
-                new PathControlPoint(new Vector2(100, 20))
+                new PathControlPoint(new Vector2(100, 20)),
             };
 
             int preSelectVersion = -1;

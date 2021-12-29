@@ -48,17 +48,17 @@ namespace osu.Desktop.Overlays
                                 new OsuSpriteText
                                 {
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                                    Text = game.Name
+                                    Text = game.Name,
                                 },
                                 new OsuSpriteText
                                 {
                                     Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
-                                    Text = game.Version
+                                    Text = game.Version,
                                 },
-                            }
+                            },
                         },
-                    }
-                }
+                    },
+                },
             };
 
             if (!game.IsDeployedBuild)
@@ -71,7 +71,7 @@ namespace osu.Desktop.Overlays
                         Origin = Anchor.TopCentre,
                         Font = OsuFont.Numeric.With(size: 12),
                         Colour = colours.Yellow,
-                        Text = @"Development Build"
+                        Text = @"Development Build",
                     },
                     new Sprite
                     {

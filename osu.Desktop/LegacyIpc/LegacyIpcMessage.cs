@@ -40,7 +40,7 @@ namespace osu.Desktop.LegacyIpc
             set => base.Value = new Data
             {
                 MessageType = value.GetType().Name,
-                MessageData = value
+                MessageData = value,
             };
         }
 

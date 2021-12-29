@@ -8,6 +8,6 @@ namespace osu.Game.Beatmaps.Legacy
         None = 0,
         Normal = 1,
         Soft = 2,
-        Drum = 3
+        Drum = 3,
     }
 }

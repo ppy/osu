@@ -53,8 +53,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 CachedDependencies = new (Type, object)[]
                 {
                     (typeof(GameplayState), gameplayState),
-                    (typeof(ScoreProcessor), scoreProcessor)
-                }
+                    (typeof(ScoreProcessor), scoreProcessor),
+                },
             };
 
             iteration = 0;

@@ -70,23 +70,23 @@ namespace osu.Game.Overlays.AccountCreation
                         {
                             PlaceholderText = "username",
                             RelativeSizeAxes = Axes.X,
-                            TabbableContentContainer = this
+                            TabbableContentContainer = this,
                         },
                         usernameDescription = new ErrorTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            AutoSizeAxes = Axes.Y,
                         },
                         emailTextBox = new OsuTextBox
                         {
                             PlaceholderText = "email address",
                             RelativeSizeAxes = Axes.X,
-                            TabbableContentContainer = this
+                            TabbableContentContainer = this,
                         },
                         emailAddressDescription = new ErrorTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            AutoSizeAxes = Axes.Y,
                         },
                         passwordTextBox = new OsuPasswordTextBox
                         {
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.AccountCreation
                         passwordDescription = new ErrorTextFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            AutoSizeAxes = Axes.Y,
                         },
                         new Container
                         {
@@ -113,14 +113,14 @@ namespace osu.Game.Overlays.AccountCreation
                                     {
                                         Text = "Register",
                                         Margin = new MarginPadding { Vertical = 20 },
-                                        Action = performRegistration
-                                    }
-                                }
-                            }
+                                        Action = performRegistration,
+                                    },
+                                },
+                            },
                         },
                     },
                 },
-                loadingLayer = new LoadingLayer(true)
+                loadingLayer = new LoadingLayer(true),
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };

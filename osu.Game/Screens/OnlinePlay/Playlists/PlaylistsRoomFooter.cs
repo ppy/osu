@@ -24,8 +24,8 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(600, 1),
-                    Action = () => OnStart?.Invoke()
-                }
+                    Action = () => OnStart?.Invoke(),
+                },
             };
         }
     }

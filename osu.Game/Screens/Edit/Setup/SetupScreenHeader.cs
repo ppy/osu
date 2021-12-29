@@ -38,15 +38,15 @@ namespace osu.Game.Screens.Edit.Setup
                     tabControl = new SetupScreenTabControl
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 30
+                        Height = 30,
                     },
                     Background = new SetupScreenHeaderBackground
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 120
-                    }
-                }
-            }
+                        Height = 120,
+                    },
+                },
+            },
         };
 
         [BackgroundDependencyLoader]
@@ -98,13 +98,13 @@ namespace osu.Game.Screens.Edit.Setup
                 AddInternal(background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = 1
+                    Depth = 1,
                 });
             }
 
             protected override TabItem<SetupSection> CreateTabItem(SetupSection value) => new SetupScreenTabItem(value)
             {
-                AccentColour = AccentColour
+                AccentColour = AccentColour,
             };
 
             private class SetupScreenTabItem : OverlayTabItem

@@ -44,8 +44,8 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                    }
-                }
+                    },
+                },
             };
         });
 

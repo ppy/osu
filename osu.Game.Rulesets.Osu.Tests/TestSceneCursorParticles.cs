@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         StartTime = 11000,
                         Position = OsuPlayfield.BASE_SIZE / 2,
                     },
-                }
+                },
             });
 
             AddUntilStep("fetch cursor particles", () =>
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                                 {
                                     new PathControlPoint(Vector2.Zero),
                                     new PathControlPoint(new Vector2(100, 0)),
-                                })
+                                }),
                             },
                             new HitCircle
                             {

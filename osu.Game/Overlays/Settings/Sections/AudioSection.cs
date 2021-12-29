@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.VolumeUp
+            Icon = FontAwesome.Solid.VolumeUp,
         };
 
         public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "sound" });

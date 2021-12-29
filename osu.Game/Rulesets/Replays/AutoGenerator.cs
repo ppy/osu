@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Replays
 
             return new Replay
             {
-                Frames = Frames.OrderBy(frame => frame.Time).Cast<ReplayFrame>().ToList()
+                Frames = Frames.OrderBy(frame => frame.Time).Cast<ReplayFrame>().ToList(),
             };
         }
 

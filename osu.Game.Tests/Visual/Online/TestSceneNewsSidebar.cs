@@ -63,56 +63,56 @@ namespace osu.Game.Tests.Visual.Online
                 2016,
                 2015,
                 2014,
-                2013
+                2013,
             },
             NewsPosts = new List<APINewsPost>
             {
                 new APINewsPost
                 {
                     Title = "(Mar) Short title",
-                    PublishedAt = new DateTime(year, 3, 1)
+                    PublishedAt = new DateTime(year, 3, 1),
                 },
                 new APINewsPost
                 {
                     Title = "(Mar) Oh boy that's a long post title I wonder if it will break anything",
-                    PublishedAt = new DateTime(year, 3, 1)
+                    PublishedAt = new DateTime(year, 3, 1),
                 },
                 new APINewsPost
                 {
                     Title = "(Mar) Medium title, nothing to see here",
-                    PublishedAt = new DateTime(year, 3, 1)
+                    PublishedAt = new DateTime(year, 3, 1),
                 },
                 new APINewsPost
                 {
                     Title = "(Feb) Short title",
-                    PublishedAt = new DateTime(year, 2, 1)
+                    PublishedAt = new DateTime(year, 2, 1),
                 },
                 new APINewsPost
                 {
                     Title = "(Feb) Oh boy that's a long post title I wonder if it will break anything",
-                    PublishedAt = new DateTime(year, 2, 1)
+                    PublishedAt = new DateTime(year, 2, 1),
                 },
                 new APINewsPost
                 {
                     Title = "(Feb) Medium title, nothing to see here",
-                    PublishedAt = new DateTime(year, 2, 1)
+                    PublishedAt = new DateTime(year, 2, 1),
                 },
                 new APINewsPost
                 {
                     Title = "Short title",
-                    PublishedAt = new DateTime(year, 1, 1)
+                    PublishedAt = new DateTime(year, 1, 1),
                 },
                 new APINewsPost
                 {
                     Title = "Oh boy that's a long post title I wonder if it will break anything",
-                    PublishedAt = new DateTime(year, 1, 1)
+                    PublishedAt = new DateTime(year, 1, 1),
                 },
                 new APINewsPost
                 {
                     Title = "Medium title, nothing to see here",
-                    PublishedAt = new DateTime(year, 1, 1)
-                }
-            }
+                    PublishedAt = new DateTime(year, 1, 1),
+                },
+            },
         };
 
         private static readonly APINewsSidebar metadata_with_no_posts = new APINewsSidebar
@@ -128,9 +128,9 @@ namespace osu.Game.Tests.Visual.Online
                 2016,
                 2015,
                 2014,
-                2013
+                2013,
             },
-            NewsPosts = Array.Empty<APINewsPost>()
+            NewsPosts = Array.Empty<APINewsPost>(),
         };
 
         private class TestNewsSidebar : NewsSidebar

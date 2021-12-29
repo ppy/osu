@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(200, 0) }
-                }
+                    new HitCircle { StartTime = 500, Position = new Vector2(200, 0) },
+                },
             });
         }
 
@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 167, Position = new Vector2(200, 0) }
-                }
+                    new HitCircle { StartTime = 167, Position = new Vector2(200, 0) },
+                },
             });
         }
 
@@ -61,8 +61,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 100, Position = new Vector2(200, 0) }
-                }
+                    new HitCircle { StartTime = 100, Position = new Vector2(200, 0) },
+                },
             });
         }
 
@@ -74,8 +74,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 100, Position = new Vector2(200, 0) }
-                }
+                    new HitCircle { StartTime = 100, Position = new Vector2(200, 0) },
+                },
             }, DifficultyRating.Expert);
         }
 
@@ -87,8 +87,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 167, Position = new Vector2(20, 0) }
-                }
+                    new HitCircle { StartTime = 167, Position = new Vector2(20, 0) },
+                },
             });
         }
 
@@ -100,8 +100,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(20, 0) }
-                }
+                    new HitCircle { StartTime = 500, Position = new Vector2(20, 0) },
+                },
             });
         }
 
@@ -115,8 +115,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     // Default circle diameter is 128 px, but part of that is the fade/border of the circle.
                     // We want this to only be a problem when it actually looks like an overlap.
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(125, 0) }
-                }
+                    new HitCircle { StartTime = 500, Position = new Vector2(125, 0) },
+                },
             });
         }
 
@@ -128,8 +128,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(110, 0) }
-                }
+                    new HitCircle { StartTime = 500, Position = new Vector2(110, 0) },
+                },
             });
         }
 
@@ -141,8 +141,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 500, Position = new Vector2(20, 0) }
-                }
+                    new HitCircle { StartTime = 500, Position = new Vector2(20, 0) },
+                },
             }, DifficultyRating.Expert);
         }
 
@@ -155,8 +155,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
-                    new HitCircle { StartTime = 2000, Position = new Vector2(20, 0) }
-                }
+                    new HitCircle { StartTime = 2000, Position = new Vector2(20, 0) },
+                },
             });
         }
 
@@ -168,8 +168,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     getSliderMock(startTime: 0, endTime: 500, startPosition: new Vector2(0, 0), endPosition: new Vector2(100, 0)).Object,
-                    new HitCircle { StartTime = 1000, Position = new Vector2(120, 0) }
-                }
+                    new HitCircle { StartTime = 1000, Position = new Vector2(120, 0) },
+                },
             });
         }
 
@@ -181,8 +181,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     getSliderMock(startTime: 0, endTime: 900, startPosition: new Vector2(0, 0), endPosition: new Vector2(100, 0)).Object,
-                    new HitCircle { StartTime = 1000, Position = new Vector2(120, 0) }
-                }
+                    new HitCircle { StartTime = 1000, Position = new Vector2(120, 0) },
+                },
             });
         }
 
@@ -194,8 +194,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     getSliderMock(startTime: 0, endTime: 500, startPosition: new Vector2(0, 0), endPosition: new Vector2(100, 0)).Object,
-                    new HitCircle { StartTime = 1000, Position = new Vector2(300, 0) }
-                }
+                    new HitCircle { StartTime = 1000, Position = new Vector2(300, 0) },
+                },
             });
         }
 
@@ -208,8 +208,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 HitObjects = new List<HitObject>
                 {
                     getSliderMock(startTime: 0, endTime: 900, startPosition: new Vector2(0, 0), endPosition: new Vector2(100, 0)).Object,
-                    new HitCircle { StartTime = 1000, Position = new Vector2(300, 0) }
-                }
+                    new HitCircle { StartTime = 1000, Position = new Vector2(300, 0) },
+                },
             });
         }
 

@@ -59,7 +59,7 @@ namespace osu.Game.Users
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourProvider?.Background5 ?? Colours.Gray1
+                    Colour = ColourProvider?.Background5 ?? Colours.Gray1,
                 },
                 Background = new UserCoverBackground
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Users
                     Origin = Anchor.Centre,
                     User = User,
                 },
-                CreateLayout()
+                CreateLayout(),
             });
 
             base.Action = ViewProfile = () =>

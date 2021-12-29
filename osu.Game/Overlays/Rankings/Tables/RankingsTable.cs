@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         private OsuSpriteText createIndexDrawable(int index) => new RowText
         {
             Text = (index + 1).ToLocalisableString(@"\##"),
-            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.SemiBold)
+            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.SemiBold),
         };
 
         private FillFlowContainer createMainContent(TModel item) => new FillFlowContainer
@@ -98,8 +98,8 @@ namespace osu.Game.Overlays.Rankings.Tables
                     Size = new Vector2(30, 20),
                     ShowPlaceholderOnNull = false,
                 },
-                CreateFlagContent(item)
-            }
+                CreateFlagContent(item),
+            },
         };
 
         protected class RankingsTableColumn : TableColumn

@@ -39,14 +39,14 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                 {
                     new Sprite
                     {
-                        Texture = skin.GetTexture("taiko-bar-left")
+                        Texture = skin.GetTexture("taiko-bar-left"),
                     },
                     left = new LegacyHalfDrum(false)
                     {
                         Name = "Left Half",
                         RelativeSizeAxes = Axes.Both,
                         RimAction = TaikoAction.LeftRim,
-                        CentreAction = TaikoAction.LeftCentre
+                        CentreAction = TaikoAction.LeftCentre,
                     },
                     right = new LegacyHalfDrum(true)
                     {
@@ -55,9 +55,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                         Origin = Anchor.TopRight,
                         Scale = new Vector2(-1, 1),
                         RimAction = TaikoAction.RightRim,
-                        CentreAction = TaikoAction.RightCentre
-                    }
-                }
+                        CentreAction = TaikoAction.RightCentre,
+                    },
+                },
             };
 
             // this will be used in the future for stable skin alignment. keeping here for reference.
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     {
                         Alpha = 0,
                         Origin = flipped ? Anchor.TopRight : Anchor.TopLeft,
-                    }
+                    },
                 };
             }
 

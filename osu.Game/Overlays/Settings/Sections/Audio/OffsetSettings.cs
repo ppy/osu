@@ -27,12 +27,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     LabelText = AudioSettingsStrings.AudioOffset,
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
-                    KeyboardStep = 1f
+                    KeyboardStep = 1f,
                 },
                 new SettingsButton
                 {
-                    Text = AudioSettingsStrings.OffsetWizard
-                }
+                    Text = AudioSettingsStrings.OffsetWizard,
+                },
             };
         }
 

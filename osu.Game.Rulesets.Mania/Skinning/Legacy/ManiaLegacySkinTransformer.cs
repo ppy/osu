@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 { HitResult.Good, LegacyManiaSkinConfigurationLookups.Hit200 },
                 { HitResult.Ok, LegacyManiaSkinConfigurationLookups.Hit100 },
                 { HitResult.Meh, LegacyManiaSkinConfigurationLookups.Hit50 },
-                { HitResult.Miss, LegacyManiaSkinConfigurationLookups.Hit0 }
+                { HitResult.Miss, LegacyManiaSkinConfigurationLookups.Hit0 },
             };
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 { HitResult.Good, "mania-hit200" },
                 { HitResult.Ok, "mania-hit100" },
                 { HitResult.Meh, "mania-hit50" },
-                { HitResult.Miss, "mania-hit0" }
+                { HitResult.Miss, "mania-hit0" },
             };
 
         private readonly Lazy<bool> isLegacySkin;

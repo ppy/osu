@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             { ColumnType.Even, new Color4(6, 84, 0, 255) },
             { ColumnType.Odd, new Color4(94, 0, 57, 255) },
-            { ColumnType.Special, new Color4(0, 48, 63, 255) }
+            { ColumnType.Special, new Color4(0, 48, 63, 255) },
         };
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     {
                         new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageBackground, stageDefinition: definition), _ => new DefaultStageBackground())
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         columnFlow = new ColumnFlow<Column>(definition)
                         {
@@ -96,22 +96,22 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
-                            }
+                            },
                         },
                         new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.StageForeground, stageDefinition: definition), _ => null)
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Y = HIT_TARGET_POSITION + 150
+                            Y = HIT_TARGET_POSITION + 150,
                         },
-                        topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
-                    }
-                }
+                        topLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    },
+                },
             };
 
             for (int i = 0; i < definition.Columns; i++)
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     Width = 1,
                     ColumnType = columnType,
                     AccentColour = columnColours[columnType],
-                    Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ }
+                    Action = { Value = columnType == ColumnType.Special ? specialColumnStartAction++ : normalColumnStartAction++ },
                 };
 
                 topLevelContainer.Add(column.TopLevelContainer.CreateProxy());

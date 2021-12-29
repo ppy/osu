@@ -31,9 +31,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical
-                    }
-                }
+                        Direction = FillDirection.Vertical,
+                    },
+                },
             });
 
             addHeader("Orange OverlayHeader (no background, 100 padding)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
@@ -63,8 +63,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                    }
-                }
+                    },
+                },
             });
         }
 
@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Some,
             Cool,
-            Tabs
+            Tabs,
         }
 
         private class TestBreadcrumbControlHeader : BreadcrumbControlOverlayHeader

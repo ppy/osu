@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         Width = 0.5f,
                         Child = new ColumnHitObjectArea(0, new HitObjectContainer())
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     },
                     new ColumnTestContainer(1, ManiaAction.Key2)
                     {
@@ -39,10 +39,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                         Width = 0.5f,
                         Child = new ColumnHitObjectArea(1, new HitObjectContainer())
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                }
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    },
+                },
             });
         }
     }

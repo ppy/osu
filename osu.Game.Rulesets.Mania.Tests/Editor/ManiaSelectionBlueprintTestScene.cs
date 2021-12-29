@@ -43,9 +43,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                     },
                     blueprints = new Container
                     {
-                        RelativeSizeAxes = Axes.Both
-                    }
-                }
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                },
             };
 
             AddToggleStep("Downward scroll", b => Direction = b ? ScrollingDirection.Down : ScrollingDirection.Up);

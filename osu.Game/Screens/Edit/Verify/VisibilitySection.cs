@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit.Verify
         {
             IssueType.Warning,
             IssueType.Error,
-            IssueType.Negligible
+            IssueType.Negligible,
         };
 
         private BindableList<IssueType> hiddenIssueTypes;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Verify
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     LabelText = issueType.ToString(),
-                    Current = { Default = !hiddenIssueTypes.Contains(issueType) }
+                    Current = { Default = !hiddenIssueTypes.Contains(issueType) },
                 };
 
                 checkbox.Current.SetDefault();

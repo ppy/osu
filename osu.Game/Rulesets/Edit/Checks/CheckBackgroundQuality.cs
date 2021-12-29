@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateTooHighResolution(this),
             new IssueTemplateTooLowResolution(this),
-            new IssueTemplateTooUncompressed(this)
+            new IssueTemplateTooUncompressed(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

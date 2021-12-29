@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }.With(explosion => explosion.Apply(hit))
-                }
+                    }.With(explosion => explosion.Apply(hit)),
+                },
             };
         }
 

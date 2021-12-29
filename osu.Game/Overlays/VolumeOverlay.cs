@@ -47,14 +47,14 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 300,
-                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0)),
                 },
                 muteButton = new MuteButton
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Margin = new MarginPadding(10),
-                    Current = { BindTarget = IsMuted }
+                    Current = { BindTarget = IsMuted },
                 },
                 volumeMeters = new SelectionCycleFillFlowContainer<VolumeMeter>
                 {
@@ -69,8 +69,8 @@ namespace osu.Game.Overlays
                         volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
                         volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
-                    }
-                }
+                    },
+                },
             });
 
             volumeMeterMaster.Bindable.BindTo(audio.Volume);

@@ -115,12 +115,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = $"{first} ",
-                        Font = OsuFont.GetFont(size: 11)
+                        Font = OsuFont.GetFont(size: 11),
                     },
                     new OsuSpriteText
                     {
                         Text = second,
-                        Font = secondFont.With(size: 11)
+                        Font = secondFont.With(size: 11),
                     },
                 };
             }
@@ -135,12 +135,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = $"{first} ",
-                        Font = OsuFont.GetFont(size: 13)
+                        Font = OsuFont.GetFont(size: 13),
                     },
                     new DrawableDate(second)
                     {
-                        Font = secondFont.With(size: 13)
-                    }
+                        Font = secondFont.With(size: 13),
+                    },
                 };
             }
 

@@ -38,8 +38,8 @@ namespace osu.Game.Screens.Edit
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Text = HeaderText,
-                        Font = new FontUsage(size: 25, weight: "bold")
-                    }
+                        Font = new FontUsage(size: 25, weight: "bold"),
+                    },
                 },
                 new Container
                 {
@@ -53,8 +53,8 @@ namespace osu.Game.Screens.Edit
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                    }
-                }
+                    },
+                },
             };
         }
     }

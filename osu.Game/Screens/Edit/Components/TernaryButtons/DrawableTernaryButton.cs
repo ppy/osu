@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
                 Type = EdgeEffectType.Shadow,
                 Radius = 2,
                 Offset = new Vector2(0, 1),
-                Colour = Color4.Black.Opacity(0.5f)
+                Colour = Color4.Black.Opacity(0.5f),
             };
 
             Add(icon = (Button.CreateIcon?.Invoke() ?? new Circle()).With(b =>
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit.Components.TernaryButtons
             Depth = -1,
             Origin = Anchor.CentreLeft,
             Anchor = Anchor.CentreLeft,
-            X = 40f
+            X = 40f,
         };
     }
 }

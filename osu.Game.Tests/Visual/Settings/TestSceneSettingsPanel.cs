@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Settings
 
                 Add(settings = new SettingsOverlay
                 {
-                    State = { Value = Visibility.Visible }
+                    State = { Value = Visibility.Visible },
                 });
             });
         }
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Settings
         {
             Add(dialogOverlay = new DialogOverlay
             {
-                Depth = -1
+                Depth = -1,
             });
 
             Dependencies.Cache(dialogOverlay);

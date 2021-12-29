@@ -66,8 +66,8 @@ namespace osu.Game.Screens.OnlinePlay
                     screenStack = new OnlinePlaySubScreenStack { RelativeSizeAxes = Axes.Both },
                     new Header(ScreenTitle, screenStack),
                     RoomManager,
-                    ongoingOperationTracker
-                }
+                    ongoingOperationTracker,
+                },
             };
         }
 

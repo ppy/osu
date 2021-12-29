@@ -42,7 +42,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 PP = PP,
                 TotalScore = TotalScore,
                 User = User,
-                Position = Position
+                Position = Position,
             };
     }
 }

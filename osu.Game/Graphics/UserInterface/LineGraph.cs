@@ -80,8 +80,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     AutoSizeAxes = Axes.None,
                     RelativeSizeAxes = Axes.Both,
-                    PathRadius = 1
-                }
+                    PathRadius = 1,
+                },
             });
 
             AddLayout(pathCached);

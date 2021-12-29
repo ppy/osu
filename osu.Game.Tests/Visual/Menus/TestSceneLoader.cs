@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Menus
             Child = logo = new OsuLogo
             {
                 Alpha = 0,
-                Depth = float.MinValue
+                Depth = float.MinValue,
             };
         }
 

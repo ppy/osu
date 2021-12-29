@@ -289,8 +289,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Min = 2,
                     Max = 5.5,
-                    IsLowerInclusive = true
-                }
+                    IsLowerInclusive = true,
+                },
             }, false));
 
             // should reselect the buffered selection.
@@ -651,7 +651,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     manySets.Add(TestResources.CreateTestBeatmapSetInfo(3, new[]
                     {
                         // all taiko except for first
-                        rulesets.GetRuleset(i > 0 ? 1 : 0)
+                        rulesets.GetRuleset(i > 0 ? 1 : 0),
                     }));
                 }
             });

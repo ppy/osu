@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Shadow = false,
-                }
+                },
             };
         }
 

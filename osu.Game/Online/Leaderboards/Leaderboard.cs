@@ -154,7 +154,7 @@ namespace osu.Game.Online.Leaderboards
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            Action = RefreshScores
+                            Action = RefreshScores,
                         });
                         break;
 
@@ -209,7 +209,7 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarVisible = false,
-                                }
+                                },
                             },
                             new Drawable[]
                             {
@@ -217,7 +217,7 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
+                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore),
                                 },
                             },
                         },
@@ -226,7 +226,7 @@ namespace osu.Game.Online.Leaderboards
                 loading = new LoadingSpinner(),
                 placeholderContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
         }

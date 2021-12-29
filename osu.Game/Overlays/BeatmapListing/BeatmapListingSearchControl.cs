@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new Container
                 {
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                    }
+                    },
                 },
                 new Container
                 {
@@ -137,11 +137,11 @@ namespace osu.Game.Overlays.BeatmapListing
                                     ranksFilter = new BeatmapSearchScoreFilterRow(),
                                     playedFilter = new BeatmapSearchFilterRow<SearchPlayed>(BeatmapsStrings.ListingSearchFiltersPlayed),
                                     explicitContentFilter = new BeatmapSearchFilterRow<SearchExplicit>(BeatmapsStrings.ListingSearchFiltersNsfw),
-                                }
-                            }
-                        }
-                    }
-                }
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             categoryFilter.Current.Value = SearchCategory.Leaderboard;

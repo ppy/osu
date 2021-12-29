@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativePositionAxes = Axes.X,
                             X = -middle_split / 2,
                             RimAction = TaikoAction.LeftRim,
-                            CentreAction = TaikoAction.LeftCentre
+                            CentreAction = TaikoAction.LeftCentre,
                         },
                         new TaikoHalfDrum(true)
                         {
@@ -66,11 +66,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativePositionAxes = Axes.X,
                             X = middle_split / 2,
                             RimAction = TaikoAction.RightRim,
-                            CentreAction = TaikoAction.RightCentre
-                        }
-                    }
+                            CentreAction = TaikoAction.RightCentre,
+                        },
+                    },
                 }),
-                sampleTriggerSource
+                sampleTriggerSource,
             };
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     rimHit = new Sprite
                     {
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.7f)
+                        Size = new Vector2(0.7f),
                     },
                     centreHit = new Sprite
                     {
@@ -131,8 +131,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f),
                         Alpha = 0,
-                        Blending = BlendingParameters.Additive
-                    }
+                        Blending = BlendingParameters.Additive,
+                    },
                 };
             }
 

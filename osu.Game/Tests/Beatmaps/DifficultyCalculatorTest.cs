@@ -41,8 +41,8 @@ namespace osu.Game.Tests.Beatmaps
                 {
                     BeatmapInfo =
                     {
-                        Ruleset = CreateRuleset().RulesetInfo
-                    }
+                        Ruleset = CreateRuleset().RulesetInfo,
+                    },
                 };
             }
         }

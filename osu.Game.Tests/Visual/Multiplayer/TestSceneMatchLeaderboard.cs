@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                     RoomID = 3,
                                     CompletedBeatmaps = 1,
                                     TotalAttempts = 6,
-                                    Accuracy = 0.9851
+                                    Accuracy = 0.9851,
                                 },
                                 new APIUserScoreAggregate
                                 {
@@ -47,9 +47,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                     RoomID = 3,
                                     CompletedBeatmaps = 1,
                                     TotalAttempts = 9,
-                                    Accuracy = 0.937
-                                }
-                            }
+                                    Accuracy = 0.937,
+                                },
+                            },
                         });
                         return true;
                 }

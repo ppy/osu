@@ -176,6 +176,6 @@ namespace osu.Game.Rulesets.Objects
         LegacyLastTick,
         Head,
         Tail,
-        Repeat
+        Repeat,
     }
 }

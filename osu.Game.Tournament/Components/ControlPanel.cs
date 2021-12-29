@@ -32,14 +32,14 @@ namespace osu.Game.Tournament.Components
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(54, 54, 54, 255)
+                    Colour = new Color4(54, 54, 54, 255),
                 },
                 new TournamentSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = "Control Panel",
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22)
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22),
                 },
                 buttons = new FillFlowContainer
                 {

@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 3)
+                Spacing = new Vector2(0, 3),
             };
 
             bool firstGroup = true;
@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         new StarRatingDisplay(new StarDifficulty(beatmapInfo.StarRating, 0), StarRatingDisplaySize.Small)
                         {
                             Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft
+                            Origin = Anchor.CentreLeft,
                         },
                         new LinkFlowContainer(s =>
                         {
@@ -94,8 +94,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                             d.Origin = Anchor.CentreLeft;
                             d.Padding = new MarginPadding { Bottom = 2 };
                             d.AddLink(beatmapInfo.DifficultyName, LinkAction.OpenBeatmap, beatmapInfo.OnlineID.ToString());
-                        })
-                    }
+                        }),
+                    },
                 };
             }
         }

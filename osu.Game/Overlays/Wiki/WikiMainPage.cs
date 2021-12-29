@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Wiki
                     AutoSizeAxes = Axes.Y,
                     Text = blurbNode.InnerText,
                     TextAnchor = Anchor.TopCentre,
-                }
+                },
             };
         }
 

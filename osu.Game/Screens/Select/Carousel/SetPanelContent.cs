@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 Margin = new MarginPadding { Right = 5 },
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
-                                Status = beatmapSet.Status
+                                Status = beatmapSet.Status,
                             },
                             new FillFlowContainer<DifficultyIcon>
                             {
@@ -74,9 +74,9 @@ namespace osu.Game.Screens.Select.Carousel
                                 Spacing = new Vector2(3),
                                 ChildrenEnumerable = getDifficultyIcons(),
                             },
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

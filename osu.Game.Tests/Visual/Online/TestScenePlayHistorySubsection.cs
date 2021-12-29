@@ -30,13 +30,13 @@ namespace osu.Game.Tests.Visual.Online
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
+                    Colour = colourProvider.Background4,
                 },
                 section = new PlayHistorySubsection(user)
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                }
+                    Origin = Anchor.Centre,
+                },
             });
         }
 
@@ -102,13 +102,13 @@ namespace osu.Game.Tests.Visual.Online
 
         private static readonly APIUser user_with_null_values = new APIUser
         {
-            Id = 1
+            Id = 1,
         };
 
         private static readonly APIUser user_with_empty_values = new APIUser
         {
             Id = 2,
-            MonthlyPlayCounts = Array.Empty<APIUserHistoryCount>()
+            MonthlyPlayCounts = Array.Empty<APIUserHistoryCount>(),
         };
 
         private static readonly APIUser user_with_one_value = new APIUser
@@ -116,8 +116,8 @@ namespace osu.Game.Tests.Visual.Online
             Id = 3,
             MonthlyPlayCounts = new[]
             {
-                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 100 }
-            }
+                new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 100 },
+            },
         };
 
         private static readonly APIUser user_with_two_values = new APIUser
@@ -126,8 +126,8 @@ namespace osu.Game.Tests.Visual.Online
             MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1 },
-                new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 2 }
-            }
+                new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 2 },
+            },
         };
 
         private static readonly APIUser user_with_constant_values = new APIUser
@@ -137,8 +137,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 5 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 5 },
-                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 5 }
-            }
+                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 5 },
+            },
         };
 
         private static readonly APIUser user_with_zero_values = new APIUser
@@ -148,8 +148,8 @@ namespace osu.Game.Tests.Visual.Online
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 0 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 0 },
-                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 0 }
-            }
+                new APIUserHistoryCount { Date = new DateTime(2010, 7, 1), Count = 0 },
+            },
         };
 
         private static readonly APIUser user_with_filled_values = new APIUser
@@ -163,8 +163,8 @@ namespace osu.Game.Tests.Visual.Online
                 new APIUserHistoryCount { Date = new DateTime(2010, 8, 1), Count = 30 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 9, 1), Count = 50 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 10, 1), Count = 2000 },
-                new APIUserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 }
-            }
+                new APIUserHistoryCount { Date = new DateTime(2010, 11, 1), Count = 2100 },
+            },
         };
 
         private static readonly APIUser user_with_missing_values = new APIUser
@@ -173,8 +173,8 @@ namespace osu.Game.Tests.Visual.Online
             MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2020, 1, 1), Count = 100 },
-                new APIUserHistoryCount { Date = new DateTime(2020, 7, 1), Count = 200 }
-            }
+                new APIUserHistoryCount { Date = new DateTime(2020, 7, 1), Count = 200 },
+            },
         };
     }
 }

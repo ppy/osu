@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Top = 5, Bottom = 5, },
+                    Margin = new MarginPadding { Top = 5, Bottom = 5 },
                     Spacing = new Vector2(5f, 0f),
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.White,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                }
+                },
             };
 
             Current.ValueChanged += selected =>

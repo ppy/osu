@@ -65,8 +65,8 @@ namespace osu.Game.Screens
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(TwoLayerButton.SIZE_RETRACTED.X, 1)
-                }
+                    Size = new Vector2(TwoLayerButton.SIZE_RETRACTED.X, 1),
+                },
             };
 
             if (PossibleChildren != null)
@@ -78,7 +78,7 @@ namespace osu.Game.Screens
                         Text = $@"{t.Name}",
                         BackgroundColour = getColourFor(t.Name),
                         HoverColour = getColourFor(t.Name).Lighten(0.2f),
-                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); }
+                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); },
                     });
                 }
             }
@@ -174,9 +174,9 @@ namespace osu.Game.Screens
                                         Text = "please check back a bit later.",
                                         Font = OsuFont.GetFont(size: 14),
                                     },
-                                }
+                                },
                             },
-                        }
+                        },
                     },
                 };
             }

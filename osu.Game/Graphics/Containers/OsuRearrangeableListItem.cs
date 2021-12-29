@@ -81,16 +81,16 @@ namespace osu.Game.Graphics.Containers
                                     Size = new Vector2(12),
                                     Colour = HandleColour,
                                     AlwaysPresent = true,
-                                    Alpha = 0
-                                }
+                                    Alpha = 0,
+                                },
                             },
-                            CreateContent()
-                        }
+                            CreateContent(),
+                        },
                     },
                     ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                 },
-                new HoverClickSounds()
+                new HoverClickSounds(),
             };
         }
 

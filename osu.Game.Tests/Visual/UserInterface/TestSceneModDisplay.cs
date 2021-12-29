@@ -29,8 +29,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                             new OsuModDoubleTime(),
                             new OsuModDifficultyAdjust(),
                             new OsuModEasy(),
-                        }
-                    }
+                        },
+                    },
                 };
             });
         }

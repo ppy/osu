@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Gameplay
             public readonly List<Color4> ComboColours = new List<Color4>
             {
                 Color4.Red,
-                Color4.Green
+                Color4.Green,
             };
 
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();

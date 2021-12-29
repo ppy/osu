@@ -22,7 +22,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new HistoryFillFlowContainer
         {
-            Spacing = new Vector2(0, 2)
+            Spacing = new Vector2(0, 2),
         };
 
         private class HistoryFillFlowContainer : FillFlowContainer<RearrangeableListItem<PlaylistItem>>

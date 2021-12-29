@@ -31,7 +31,7 @@ namespace osu.Game.Skinning.Editor
         private ScoreProcessor scoreProcessor = new ScoreProcessor
         {
             Combo = { Value = RNG.Next(1, 1000) },
-            TotalScore = { Value = RNG.Next(1000, 10000000) }
+            TotalScore = { Value = RNG.Next(1000, 10000000) },
         };
 
         [Cached(typeof(HealthProcessor))]
@@ -54,7 +54,7 @@ namespace osu.Game.Skinning.Editor
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(20)
+                Spacing = new Vector2(20),
             };
 
             var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
@@ -124,7 +124,7 @@ namespace osu.Game.Skinning.Editor
                     Type = EdgeEffectType.Shadow,
                     Radius = 2,
                     Offset = new Vector2(0, 1),
-                    Colour = Color4.Black.Opacity(0.5f)
+                    Colour = Color4.Black.Opacity(0.5f),
                 };
 
                 AddRange(new Drawable[]
@@ -143,8 +143,8 @@ namespace osu.Game.Skinning.Editor
                         RelativeSizeAxes = Axes.Both,
                         Scale = new Vector2(component_display_scale),
                         Masking = true,
-                        Child = component
-                    }
+                        Child = component,
+                    },
                 });
 
                 // adjust provided component to fit / display in a known state.

@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Children = new Drawable[]
                 {
                     sort = new OsuSpriteText(),
-                    displayStyle = new OsuSpriteText()
-                }
+                    displayStyle = new OsuSpriteText(),
+                },
             });
 
             toolbar.SortCriteria.BindValueChanged(criteria => sort.Text = $"Criteria: {criteria.NewValue}", true);

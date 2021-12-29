@@ -89,8 +89,8 @@ namespace osu.Game.Tournament.Tests
                                     Beatmap = CreateSampleBeatmap(),
                                     Score = 1234567,
                                     Seed = { Value = 16 },
-                                }
-                            }
+                                },
+                            },
                         },
                         new SeedingResult
                         {
@@ -115,9 +115,9 @@ namespace osu.Game.Tournament.Tests
                                     Beatmap = CreateSampleBeatmap(),
                                     Score = 234567,
                                     Seed = { Value = 12 },
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     Players =
                     {
@@ -126,8 +126,8 @@ namespace osu.Game.Tournament.Tests
                         new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 20 } },
                         new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 24 } },
                         new APIUser { Username = "Hello", Statistics = new UserStatistics { GlobalRank = 30 } },
-                    }
-                }
+                    },
+                },
             },
             Team2 =
             {
@@ -143,13 +143,13 @@ namespace osu.Game.Tournament.Tests
                         new APIUser { Username = "Hello" },
                         new APIUser { Username = "Hello" },
                         new APIUser { Username = "Hello" },
-                    }
-                }
+                    },
+                },
             },
             Round =
             {
-                Value = new TournamentRound { Name = { Value = "Quarterfinals" } }
-            }
+                Value = new TournamentRound { Name = { Value = "Quarterfinals" } },
+            },
         };
 
         public static APIBeatmap CreateSampleBeatmap() =>

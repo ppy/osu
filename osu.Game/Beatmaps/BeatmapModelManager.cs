@@ -367,7 +367,7 @@ namespace osu.Game.Beatmaps
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID,
                 Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
+                DateAdded = DateTimeOffset.UtcNow,
             };
         }
 
@@ -472,6 +472,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Include everything.
         /// </summary>
-        All
+        All,
     }
 }

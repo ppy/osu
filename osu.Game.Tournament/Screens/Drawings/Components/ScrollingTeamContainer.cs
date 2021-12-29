@@ -68,7 +68,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                             Origin = Anchor.BottomCentre,
                             Size = new Vector2(2, 55),
 
-                            Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White)
+                            Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White),
                         },
                         new Box
                         {
@@ -76,10 +76,10 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                             Origin = Anchor.TopCentre,
                             Size = new Vector2(2, 55),
 
-                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.Transparent)
-                        }
-                    }
-                }
+                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.Transparent),
+                        },
+                    },
+                },
             };
         }
 
@@ -275,7 +275,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             {
                 Add(new ScrollingTeam(t)
                 {
-                    X = leftPos + DrawWidth
+                    X = leftPos + DrawWidth,
                 });
             }
         }
@@ -304,7 +304,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             Idle,
             Stopping,
             Stopped,
-            Scrolling
+            Scrolling,
         }
 
         public class ScrollingTeam : DrawableTournamentTeam
@@ -353,9 +353,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.33f),
-                        Alpha = 0
+                        Alpha = 0,
                     },
-                    Flag
+                    Flag,
                 };
             }
         }

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Catcher = new Catcher(droppedObjectContainer, difficulty)
             {
-                X = CENTER_X
+                X = CENTER_X,
             };
 
             AddRangeInternal(new[]

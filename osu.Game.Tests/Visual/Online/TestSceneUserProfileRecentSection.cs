@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
+                    Colour = OsuColour.Gray(0.2f),
                 },
                 new OsuScrollContainer
                 {
@@ -40,9 +40,9 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = createDummyActivities().Select(a => new DrawableRecentActivity(a))
+                        ChildrenEnumerable = createDummyActivities().Select(a => new DrawableRecentActivity(a)),
                     },
-                }
+                },
             };
         }
 

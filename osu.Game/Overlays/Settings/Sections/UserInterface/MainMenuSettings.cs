@@ -30,12 +30,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 new SettingsCheckbox
                 {
                     LabelText = UserInterfaceStrings.InterfaceVoices,
-                    Current = config.GetBindable<bool>(OsuSetting.MenuVoice)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuVoice),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = UserInterfaceStrings.OsuMusicTheme,
-                    Current = config.GetBindable<bool>(OsuSetting.MenuMusic)
+                    Current = config.GetBindable<bool>(OsuSetting.MenuMusic),
                 },
                 new SettingsEnumDropdown<IntroSequence>
                 {
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 {
                     LabelText = UserInterfaceStrings.SeasonalBackgrounds,
                     Current = config.GetBindable<SeasonalBackgroundMode>(OsuSetting.SeasonalBackgroundMode),
-                }
+                },
             };
         }
 

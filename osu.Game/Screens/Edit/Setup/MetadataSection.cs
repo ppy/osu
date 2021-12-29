@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Setup
                 creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
                 difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.DifficultyName),
                 sourceTextBox = createTextBox<LabelledTextBox>("Source", metadata.Source),
-                tagsTextBox = createTextBox<LabelledTextBox>("Tags", metadata.Tags)
+                tagsTextBox = createTextBox<LabelledTextBox>("Tags", metadata.Tags),
             };
 
             foreach (var item in Children.OfType<LabelledTextBox>())
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Setup
                 Label = label,
                 FixedLabelWidth = LABEL_WIDTH,
                 Current = { Value = initialValue },
-                TabbableContentContainer = this
+                TabbableContentContainer = this,
             };
 
         protected override void LoadComplete()

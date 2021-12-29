@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         public void TestSpmUnaffectedByRateAdjust()
             => runSpmTest(new OsuModDaycore
             {
-                SpeedChange = { Value = 0.88 }
+                SpeedChange = { Value = 0.88 },
             });
 
         [Test]
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             => runSpmTest(new ModWindUp
             {
                 InitialRate = { Value = 0.7 },
-                FinalRate = { Value = 1.3 }
+                FinalRate = { Value = 1.3 },
             });
 
         private void runSpmTest(Mod mod)
@@ -47,10 +47,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         {
                             Duration = 6000,
                             Position = OsuPlayfield.BASE_SIZE / 2,
-                        }
-                    }
+                        },
+                    },
                 },
-                PassCondition = () => Player.ScoreProcessor.JudgedHits >= 1
+                PassCondition = () => Player.ScoreProcessor.JudgedHits >= 1,
             });
 
             AddUntilStep("fetch SPM calculator", () =>

@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.BeatmapListing
                     background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background3
+                        Colour = colourProvider.Background3,
                     },
                     new Container
                     {
@@ -70,9 +70,9 @@ namespace osu.Game.Overlays.BeatmapListing
                         Child = icon = new SpriteIcon
                         {
                             Size = new Vector2(12),
-                            Icon = getIconForCardSize(Value)
-                        }
-                    }
+                            Icon = getIconForCardSize(Value),
+                        },
+                    },
                 };
             }
 

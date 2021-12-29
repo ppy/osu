@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Changelog
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background6,
-                        }
+                        },
                     });
                 }
 

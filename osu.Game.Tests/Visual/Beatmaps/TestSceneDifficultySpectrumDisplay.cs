@@ -20,8 +20,8 @@ namespace osu.Game.Tests.Visual.Beatmaps
             Beatmaps = difficulties.Select(difficulty => new APIBeatmap
             {
                 RulesetID = difficulty.rulesetId,
-                StarRating = difficulty.stars
-            }).ToArray()
+                StarRating = difficulty.stars,
+            }).ToArray(),
         };
 
         [Test]
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            Scale = new Vector2(3)
+            Scale = new Vector2(3),
         });
     }
 }

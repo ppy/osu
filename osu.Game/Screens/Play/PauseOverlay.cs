@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play
             AddInternal(pauseLoop = new SkinnableSound(new SampleInfo("Gameplay/pause-loop"))
             {
                 Looping = true,
-                Volume = { Value = 0 }
+                Volume = { Value = 0 },
             });
         }
 

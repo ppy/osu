@@ -101,10 +101,10 @@ namespace osu.Game.Overlays.Notifications
                                     Padding = new MarginPadding
                                     {
                                         Left = 45,
-                                        Right = 30
+                                        Right = 30,
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                         closeButton = new CloseButton
                         {
@@ -114,11 +114,11 @@ namespace osu.Game.Overlays.Notifications
                             Origin = Anchor.CentreRight,
                             Margin = new MarginPadding
                             {
-                                Right = 5
+                                Right = 5,
                             },
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
         }
 
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Notifications
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.Solid.TimesCircle,
                         Size = new Vector2(20),
-                    }
+                    },
                 };
             }
 
@@ -265,8 +265,8 @@ namespace osu.Game.Overlays.Notifications
                             {
                                 RelativeSizeAxes = Axes.Both,
                             },
-                        }
-                    }
+                        },
+                    },
                 };
             }
         }

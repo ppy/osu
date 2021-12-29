@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("create screen", () => Add(new TeamWinScreen
             {
                 FillMode = FillMode.Fit,
-                FillAspectRatio = 16 / 9f
+                FillAspectRatio = 16 / 9f,
             }));
         }
     }

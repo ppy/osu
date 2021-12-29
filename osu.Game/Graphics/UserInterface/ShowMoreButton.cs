@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
                     Margin = new MarginPadding
                     {
                         Horizontal = 20,
-                        Vertical = 5
+                        Vertical = 5,
                     },
                     Children = new Drawable[]
                     {
@@ -86,10 +86,10 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                        }
-                    }
-                }
-            }
+                        },
+                    },
+                },
+            },
         };
 
         protected override void OnLoadStarted() => textContainer.FadeOut(duration, Easing.OutQuint);

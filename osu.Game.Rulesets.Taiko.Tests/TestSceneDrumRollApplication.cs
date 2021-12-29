@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 StartTime = 300,
                 Duration = 500,
                 IsStrong = false,
-                TickRate = 2
+                TickRate = 2,
             })));
 
             AddHitObject(drumRoll);
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 StartTime = 150,
                 Duration = 400,
                 IsStrong = true,
-                TickRate = 16
+                TickRate = 16,
             })));
 
             AddHitObject(drumRoll);

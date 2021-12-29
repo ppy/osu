@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 lightContainer = new HitTargetInsetContainer
                 {
                     Alpha = 0,
-                    Child = light
+                    Child = light,
                 };
             }
 

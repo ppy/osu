@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateHasAudioTrack(this),
             new IssueTemplateMissingFile(this),
-            new IssueTemplateFileError(this)
+            new IssueTemplateFileError(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play
                     {
                         Right = margin,
                     },
-                }
+                },
             };
         }
 

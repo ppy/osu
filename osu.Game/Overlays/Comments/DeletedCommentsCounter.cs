@@ -38,8 +38,8 @@ namespace osu.Game.Overlays.Comments
                     countText = new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                    }
-                }
+                    },
+                },
             };
         }
 

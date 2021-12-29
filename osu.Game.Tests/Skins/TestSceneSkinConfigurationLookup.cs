@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Skins
             {
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
-                new Color4(75, 125, 175, 255)
+                new Color4(75, 125, 175, 255),
             });
 
             AddStep("Disallow default colours fallback in beatmap skin", () => beatmapSource.Configuration.AllowDefaultComboColoursFallback = false);
@@ -181,14 +181,14 @@ namespace osu.Game.Tests.Skins
 
         public enum LookupType
         {
-            Test
+            Test,
         }
 
         public enum ValueType
         {
             Test1,
             Test2,
-            Test3
+            Test3,
         }
 
         public class UserSkinSource : LegacySkin

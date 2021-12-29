@@ -279,7 +279,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Width = 400,
                 Masking = true,
                 Clock = new FramedClock(testClock),
-                Child = drawableRuleset
+                Child = drawableRuleset,
             };
         });
 
@@ -363,12 +363,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.X,
                                     Height = 2,
-                                    Colour = Color4.Green
+                                    Colour = Color4.Green,
                                 },
-                                HitObjectContainer
-                            }
-                        }
-                    }
+                                HitObjectContainer,
+                            },
+                        },
+                    },
                 });
 
                 RegisterPool<TestPooledHitObject, DrawableTestPooledHitObject>(1);
@@ -437,15 +437,15 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.LightPink
+                        Colour = Color4.LightPink,
                     },
                     new Box
                     {
                         Origin = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
-                        Colour = Color4.Red
-                    }
+                        Colour = Color4.Red,
+                    },
                 });
             }
 

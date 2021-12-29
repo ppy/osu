@@ -28,17 +28,17 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 {
                     BaseDifficulty = new BeatmapDifficulty
                     {
-                        CircleSize = 8
-                    }
+                        CircleSize = 8,
+                    },
                 },
                 HitObjects = new List<HitObject>
                 {
                     new HitCircle { StartTime = 1000 },
-                    new HitCircle { StartTime = 2000 }
-                }
+                    new HitCircle { StartTime = 2000 },
+                },
             },
             Autoplay = true,
-            PassCondition = () => checkSomeHit() && checkObjectsScale(0.29f)
+            PassCondition = () => checkSomeHit() && checkObjectsScale(0.29f),
         });
 
         [Test]
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 1 } },
             Autoplay = true,
-            PassCondition = () => checkSomeHit() && checkObjectsScale(0.78f)
+            PassCondition = () => checkSomeHit() && checkObjectsScale(0.78f),
         });
 
         [Test]
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModDifficultyAdjust { CircleSize = { Value = 10 } },
             Autoplay = true,
-            PassCondition = () => checkSomeHit() && checkObjectsScale(0.15f)
+            PassCondition = () => checkSomeHit() && checkObjectsScale(0.15f),
         });
 
         [Test]
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 1 } },
             Autoplay = true,
-            PassCondition = () => checkSomeHit() && checkObjectsPreempt(1680)
+            PassCondition = () => checkSomeHit() && checkObjectsPreempt(1680),
         });
 
         [Test]
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new OsuModDifficultyAdjust { ApproachRate = { Value = 10 } },
             Autoplay = true,
-            PassCondition = () => checkSomeHit() && checkObjectsPreempt(450)
+            PassCondition = () => checkSomeHit() && checkObjectsPreempt(450),
         });
 
         private bool checkObjectsPreempt(double target)

@@ -142,10 +142,10 @@ namespace osu.Game.Screens.Ranking
                                 CornerRadius = 20,
                                 CornerExponent = 2.5f,
                                 Masking = true,
-                                Child = topLayerBackground = new Box { RelativeSizeAxes = Axes.Both }
+                                Child = topLayerBackground = new Box { RelativeSizeAxes = Axes.Both },
                             },
-                            topLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
-                        }
+                            topLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both },
+                        },
                     },
                     middleLayerContainer = new Container
                     {
@@ -166,14 +166,14 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         User = Score.User,
-                                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0))
-                                    }
-                                }
+                                        Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.5f), Color4Extensions.FromHex("#444").Opacity(0)),
+                                    },
+                                },
                             },
-                            middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both }
-                        }
-                    }
-                }
+                            middleLayerContentContainer = new Container { RelativeSizeAxes = Axes.Both },
+                        },
+                    },
+                },
             };
         }
 
@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Ranking
                     topLayerContentContainer.Add(topLayerContent = new ContractedPanelTopContent
                     {
                         ScorePosition = { BindTarget = ScorePosition },
-                        Alpha = 0
+                        Alpha = 0,
                     });
 
                     middleLayerContentContainer.Add(middleLayerContent = new ContractedPanelMiddleContent(Score) { Alpha = 0 });

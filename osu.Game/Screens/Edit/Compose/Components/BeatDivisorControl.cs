@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     Name = "Gray Background",
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Gray4
+                    Colour = colours.Gray4,
                 },
                 new GridContainer
                 {
@@ -60,14 +60,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                     {
                                         Name = "Black Background",
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black
+                                        Colour = Color4.Black,
                                     },
                                     new TickSliderBar(beatDivisor, BindableBeatDivisor.VALID_DIVISORS)
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         },
                         new Drawable[]
                         {
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = colours.Gray4
+                                        Colour = colours.Gray4,
                                     },
                                     new Container
                                     {
@@ -95,26 +95,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
-                                                        Action = beatDivisor.Previous
+                                                        Action = beatDivisor.Previous,
                                                     },
                                                     new DivisorText(beatDivisor),
                                                     new DivisorButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
-                                                        Action = beatDivisor.Next
-                                                    }
+                                                        Action = beatDivisor.Next,
+                                                    },
                                                 },
                                             },
                                             ColumnDimensions = new[]
                                             {
                                                 new Dimension(GridSizeMode.Absolute, 20),
                                                 new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 20)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                                                new Dimension(GridSizeMode.Absolute, 20),
+                                            },
+                                        },
+                                    },
+                                },
+                            },
                         },
                         new Drawable[]
                         {
@@ -123,16 +123,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                 Padding = new MarginPadding { Horizontal = 15 },
                                 Text = "beat snap divisor",
                                 RelativeSizeAxes = Axes.X,
-                                TextAnchor = Anchor.TopCentre
+                                TextAnchor = Anchor.TopCentre,
                             },
-                        }
+                        },
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 30),
                         new Dimension(GridSizeMode.Absolute, 25),
-                    }
-                }
+                    },
+                },
             };
         }
 
@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
                         Colour = BindableBeatDivisor.GetColourFor(t, colours),
-                        X = getMappedPosition(t)
+                        X = getMappedPosition(t),
                     });
                 }
 
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             Height = size,
                             EdgeSmoothness = new Vector2(1),
                             Colour = Color4.White,
-                        }
+                        },
                     };
                 }
 

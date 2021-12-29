@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                                 h.HitObject.StartTime = Time.Current + 5000;
                                 h.AccentColour.Value = Color4.Orange;
                             }));
-                        })
+                        }),
                     },
                     new ColumnTestContainer(1, ManiaAction.Key2, true)
                     {
@@ -61,9 +61,9 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                                 h.HitObject.StartTime = Time.Current + 5000;
                                 h.AccentColour.Value = Color4.Orange;
                             }));
-                        })
+                        }),
                     },
-                }
+                },
             });
         });
 

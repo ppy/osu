@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                State = { Value = Visibility.Visible }
+                State = { Value = Visibility.Visible },
             });
 
             Add(container = new ExampleContainer());

@@ -172,10 +172,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Vector2.Zero,
                     new Vector2(154, 28),
-                    new Vector2(52, -34)
+                    new Vector2(52, -34),
                 }, 700),
                 RepeatCount = repeats,
-                StackHeight = 10
+                StackHeight = 10,
             };
 
             return createDrawable(slider, 2, 2);
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(0, distance),
                 }, distance),
                 RepeatCount = repeats,
-                StackHeight = stackHeight
+                StackHeight = stackHeight,
             };
 
             return createDrawable(slider, circleSize, speedMultiplier);
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Vector2.Zero,
                     new Vector2(max_length / 2, max_length / 2),
-                    new Vector2(max_length, 0)
+                    new Vector2(max_length, 0),
                 }, max_length * 1.5f),
                 RepeatCount = repeats,
             };
@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(max_length / 2, 0),
                     new Vector2(max_length * 0.75f, -max_length / 2),
                     new Vector2(max_length * 0.95f, 0),
-                    new Vector2(max_length, 0)
+                    new Vector2(max_length, 0),
                 }),
                 RepeatCount = repeats,
             };
@@ -270,7 +270,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(max_length * 0.375f, max_length * 0.18f),
                     new Vector2(max_length / 2, max_length / 4),
                     new Vector2(max_length * 0.75f, -max_length / 2),
-                    new Vector2(max_length, 0)
+                    new Vector2(max_length, 0),
                 }),
                 RepeatCount = repeats,
             };
@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(0, 0),
                     new Vector2(0, -max_length / 2),
                     new Vector2(-max_length / 2, -max_length / 2),
-                    new Vector2(0, -max_length / 2)
+                    new Vector2(0, -max_length / 2),
                 }),
                 RepeatCount = repeats,
             };
@@ -318,10 +318,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Vector2.Zero,
                     new Vector2(max_length * 0.125f, max_length * 0.125f),
                     new Vector2(max_length * 0.375f, max_length * 0.125f),
-                    new Vector2(max_length / 2, 0)
+                    new Vector2(max_length / 2, 0),
                 }),
                 RepeatCount = repeats,
-                NodeSamples = repeatSamples
+                NodeSamples = repeatSamples,
             };
 
             return createDrawable(slider, 3, 1);
@@ -335,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider.ApplyDefaults(cpi, new BeatmapDifficulty
             {
                 CircleSize = circleSize,
-                SliderTickRate = 3
+                SliderTickRate = 3,
             });
 
             var drawable = CreateDrawableSlider(slider);
@@ -351,7 +351,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         protected virtual DrawableSlider CreateDrawableSlider(Slider slider) => new DrawableSlider(slider)
         {
             Anchor = Anchor.Centre,
-            Depth = depthIndex++
+            Depth = depthIndex++,
         };
 
         private float judgementOffsetDirection = 1;
@@ -369,7 +369,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Text = result.IsHit ? "Hit!" : "Miss!",
                 Colour = result.IsHit ? Color4.Green : Color4.Red,
                 Font = OsuFont.GetFont(size: 30),
-                Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
+                Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45),
             });
 
             text.Delay(150)

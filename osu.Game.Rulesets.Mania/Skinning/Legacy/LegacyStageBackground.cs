@@ -51,16 +51,16 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopLeft,
                     X = -0.05f,
-                    Texture = skin.GetTexture(rightImage)
+                    Texture = skin.GetTexture(rightImage),
                 },
                 columnBackgrounds = new ColumnFlow<Drawable>(stageDefinition)
                 {
-                    RelativeSizeAxes = Axes.Y
+                    RelativeSizeAxes = Axes.Y,
                 },
                 new HitTargetInsetContainer
                 {
-                    Child = new LegacyHitTarget { RelativeSizeAxes = Axes.Both }
-                }
+                    Child = new LegacyHitTarget { RelativeSizeAxes = Axes.Both },
+                },
             };
 
             for (int i = 0; i < stageDefinition.Columns; i++)
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 {
                     LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     }, backgroundColour),
                     new HitTargetInsetContainer
                     {
@@ -123,8 +123,8 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                                 Alpha = hasLeftLine ? 1 : 0,
                                 Child = LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
                                 {
-                                    RelativeSizeAxes = Axes.Both
-                                }, lineColour)
+                                    RelativeSizeAxes = Axes.Both,
+                                }, lineColour),
                             },
                             new Container
                             {
@@ -136,11 +136,11 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                                 Alpha = hasRightLine ? 1 : 0,
                                 Child = LegacyColourCompatibility.ApplyWithDoubledAlpha(new Box
                                 {
-                                    RelativeSizeAxes = Axes.Both
-                                }, lineColour)
+                                    RelativeSizeAxes = Axes.Both,
+                                }, lineColour),
                             },
-                        }
-                    }
+                        },
+                    },
                 };
             }
         }

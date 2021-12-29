@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             Children = new Drawable[]
             {
                 hitObjectContainer = new TestHitObjectContainer { RelativeSizeAxes = Axes.Both },
-                followPointRenderer = new FollowPointRenderer { RelativeSizeAxes = Axes.Both }
+                followPointRenderer = new FollowPointRenderer { RelativeSizeAxes = Axes.Both },
             };
         });
 
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new HitCircle
                 {
                     Position = new Vector2(300, 300),
-                    StackHeight = 20
+                    StackHeight = 20,
                 },
             });
 

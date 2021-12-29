@@ -53,10 +53,10 @@ namespace osu.Game.Overlays.OSD
                             Direction = FillDirection.Horizontal,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both
+                            AutoSizeAxes = Axes.Both,
                         },
-                    }
-                }
+                    },
+                },
             };
 
             switch (description.RawValue)

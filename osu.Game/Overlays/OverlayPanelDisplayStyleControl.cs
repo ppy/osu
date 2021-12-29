@@ -31,22 +31,22 @@ namespace osu.Game.Overlays
 
             AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Card)
             {
-                Icon = FontAwesome.Solid.Square
+                Icon = FontAwesome.Solid.Square,
             });
             AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.List)
             {
-                Icon = FontAwesome.Solid.Bars
+                Icon = FontAwesome.Solid.Bars,
             });
             AddTabItem(new PanelDisplayTabItem(OverlayPanelDisplayStyle.Brick)
             {
-                Icon = FontAwesome.Solid.Th
+                Icon = FontAwesome.Solid.Th,
             });
         }
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
             AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Horizontal
+            Direction = FillDirection.Horizontal,
         };
 
         private class PanelDisplayTabItem : TabItem<OverlayPanelDisplayStyle>, IHasTooltip
@@ -74,9 +74,9 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fit
+                        FillMode = FillMode.Fit,
                     },
-                    new HoverClickSounds()
+                    new HoverClickSounds(),
                 });
             }
 
@@ -109,6 +109,6 @@ namespace osu.Game.Overlays
         List,
 
         [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.ViewModeBrick))]
-        Brick
+        Brick,
     }
 }

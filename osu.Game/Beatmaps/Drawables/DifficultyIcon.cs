@@ -109,7 +109,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Child = background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.ForStarDifficulty(beatmapInfo.StarRating) // Default value that will be re-populated once difficulty calculation completes
+                        Colour = colours.ForStarDifficulty(beatmapInfo.StarRating), // Default value that will be re-populated once difficulty calculation completes
                     },
                 },
                 new ConstrainedIconContainer
@@ -118,7 +118,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
-                    Icon = getRulesetIcon()
+                    Icon = getRulesetIcon(),
                 },
             };
 

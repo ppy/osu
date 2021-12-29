@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     {
         Even,
         Odd,
-        Special
+        Special,
     }
 }

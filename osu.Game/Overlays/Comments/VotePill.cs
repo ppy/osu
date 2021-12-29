@@ -119,14 +119,14 @@ namespace osu.Game.Overlays.Comments
                     {
                         Background = new Box
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         hoverLayer = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0
-                        }
-                    }
+                            Alpha = 0,
+                        },
+                    },
                 },
                 sideNumber = new OsuSpriteText
                 {
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Comments
                     Margin = new MarginPadding { Horizontal = 10 },
                     Font = OsuFont.GetFont(size: 14),
                     AlwaysPresent = true,
-                }
+                },
             },
         };
 

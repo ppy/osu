@@ -84,8 +84,8 @@ namespace osu.Game.Overlays.Login
                         },
                         form = new LoginForm
                         {
-                            RequestHide = RequestHide
-                        }
+                            RequestHide = RequestHide,
+                        },
                     };
                     break;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Login
                                 panel = new UserGridPanel(api.LocalUser.Value)
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Action = RequestHide
+                                    Action = RequestHide,
                                 },
                                 dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                             },

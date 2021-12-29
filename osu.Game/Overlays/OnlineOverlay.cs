@@ -46,12 +46,12 @@ namespace osu.Game.Overlays
                             content = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
-                            }
-                        }
-                    }
+                                AutoSizeAxes = Axes.Y,
+                            },
+                        },
+                    },
                 },
-                Loading = new LoadingLayer(true)
+                Loading = new LoadingLayer(true),
             });
 
             base.Content.Add(mainContent);

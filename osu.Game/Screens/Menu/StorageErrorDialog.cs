@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Menu
                             {
                                 if (!storage.TryChangeToCustomStorage(out var nextError))
                                     dialogOverlay.Push(new StorageErrorDialog(storage, nextError));
-                            }
+                            },
                         },
                         new PopupDialogCancelButton
                         {
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Menu
                         new PopupDialogOkButton
                         {
                             Text = "Reset to default location",
-                            Action = storage.ResetCustomStoragePath
+                            Action = storage.ResetCustomStoragePath,
                         },
                     });
                     break;
@@ -58,12 +58,12 @@ namespace osu.Game.Screens.Menu
                     {
                         new PopupDialogCancelButton
                         {
-                            Text = "Start fresh at specified location"
+                            Text = "Start fresh at specified location",
                         },
                         new PopupDialogOkButton
                         {
                             Text = "Reset to default location",
-                            Action = storage.ResetCustomStoragePath
+                            Action = storage.ResetCustomStoragePath,
                         },
                     });
 

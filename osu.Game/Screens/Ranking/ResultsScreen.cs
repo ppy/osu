@@ -91,20 +91,20 @@ namespace osu.Game.Screens.Ranking
                                     statisticsPanel = new StatisticsPanel
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Score = { BindTarget = SelectedScore }
+                                        Score = { BindTarget = SelectedScore },
                                     },
                                     ScorePanelList = new ScorePanelList
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         SelectedScore = { BindTarget = SelectedScore },
-                                        PostExpandAction = () => statisticsPanel.ToggleVisibility()
+                                        PostExpandAction = () => statisticsPanel.ToggleVisibility(),
                                     },
                                     detachedPanelContainer = new Container<ScorePanel>
                                     {
-                                        RelativeSizeAxes = Axes.Both
+                                        RelativeSizeAxes = Axes.Both,
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                     },
                     new[]
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Ranking
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4Extensions.FromHex("#333")
+                                    Colour = Color4Extensions.FromHex("#333"),
                                 },
                                 buttons = new FillFlowContainer
                                 {
@@ -129,17 +129,17 @@ namespace osu.Game.Screens.Ranking
                                     Origin = Anchor.Centre,
                                     AutoSizeAxes = Axes.Both,
                                     Spacing = new Vector2(5),
-                                    Direction = FillDirection.Horizontal
-                                }
-                            }
-                        }
-                    }
+                                    Direction = FillDirection.Horizontal,
+                                },
+                            },
+                        },
+                    },
                 },
                 RowDimensions = new[]
                 {
                     new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize)
-                }
+                    new Dimension(GridSizeMode.AutoSize),
+                },
             };
 
             if (Score != null)
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Ranking
                 buttons.Add(new ReplayDownloadButton(null)
                 {
                     Score = { BindTarget = SelectedScore },
-                    Width = 300
+                    Width = 300,
                 });
             }
 

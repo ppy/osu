@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
                         Title = @"Sample Beatmap",
                         AuthorString = @"peppy",
                     },
-                    Ruleset = new TaikoRuleset().RulesetInfo
+                    Ruleset = new TaikoRuleset().RulesetInfo,
                 },
-                ControlPointInfo = controlPointInfo
+                ControlPointInfo = controlPointInfo,
             });
 
             Add(PlayfieldContainer = new Container
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.X,
                 Height = DEFAULT_PLAYFIELD_CONTAINER_HEIGHT,
-                Children = new[] { DrawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap.GetPlayableBeatmap(new TaikoRuleset().RulesetInfo)) }
+                Children = new[] { DrawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap.GetPlayableBeatmap(new TaikoRuleset().RulesetInfo)) },
             });
         }
     }

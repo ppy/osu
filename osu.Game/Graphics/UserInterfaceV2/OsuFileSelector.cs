@@ -55,9 +55,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     new OsuDirectorySelectorDirectory.Background
                     {
-                        Depth = 1
+                        Depth = 1,
                     },
-                    new HoverClickSounds()
+                    new HoverClickSounds(),
                 });
             }
 

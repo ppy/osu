@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                     Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                     Author = "someone, someone1, someone2, someone3, someone4",
                     FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
-                    PublishedAt = DateTimeOffset.Now
+                    PublishedAt = DateTimeOffset.Now,
                 },
                 new APINewsPost
                 {
@@ -74,9 +74,9 @@ namespace osu.Game.Tests.Visual.Online
                     Preview = "boom (HTML entity: &amp;)",
                     Author = "user (HTML entity: &amp;)",
                     FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
-                    PublishedAt = DateTimeOffset.Now
-                }
-            }
+                    PublishedAt = DateTimeOffset.Now,
+                },
+            },
         };
 
         private static GetNewsResponse responseWithCursor => new GetNewsResponse
@@ -89,10 +89,10 @@ namespace osu.Game.Tests.Visual.Online
                     Preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
                     Author = "someone, someone1, someone2, someone3, someone4",
                     FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
-                    PublishedAt = DateTimeOffset.Now
-                }
+                    PublishedAt = DateTimeOffset.Now,
+                },
             },
-            Cursor = new Cursor()
+            Cursor = new Cursor(),
         };
 
         private static GetNewsResponse responseWithNoCursor => new GetNewsResponse
@@ -105,10 +105,10 @@ namespace osu.Game.Tests.Visual.Online
                     Preview = "boom (HTML entity: &amp;)",
                     Author = "user (HTML entity: &amp;)",
                     FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
-                    PublishedAt = DateTimeOffset.Now
-                }
+                    PublishedAt = DateTimeOffset.Now,
+                },
             },
-            Cursor = null
+            Cursor = null,
         };
     }
 }

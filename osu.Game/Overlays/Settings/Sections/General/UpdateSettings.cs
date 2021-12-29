@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                             checkForUpdatesButton.Enabled.Value = true;
                         }));
-                    }
+                    },
                 });
             }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 Add(new SettingsButton
                 {
                     Text = GeneralSettingsStrings.ChangeFolderLocation,
-                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen()))
+                    Action = () => game?.PerformFromScreen(menu => menu.Push(new MigrationSelectScreen())),
                 });
             }
         }

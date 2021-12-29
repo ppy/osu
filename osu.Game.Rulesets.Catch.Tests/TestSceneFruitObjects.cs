@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             new TestDrawableCatchHitObjectSpecimen(new DrawableFruit(new Fruit
             {
                 IndexInBeatmap = indexInBeatmap,
-                HyperDashBindable = { Value = hyperDash }
+                HyperDashBindable = { Value = hyperDash },
             }));
 
         private Drawable createDrawableBanana() =>
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private Drawable createDrawableDroplet(bool hyperDash = false) =>
             new TestDrawableCatchHitObjectSpecimen(new DrawableDroplet(new Droplet
             {
-                HyperDashBindable = { Value = hyperDash }
+                HyperDashBindable = { Value = hyperDash },
             }));
 
         private Drawable createDrawableTinyDroplet() => new TestDrawableCatchHitObjectSpecimen(new DrawableTinyDroplet(new TinyDroplet()));

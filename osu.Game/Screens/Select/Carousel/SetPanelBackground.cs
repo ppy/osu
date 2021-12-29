@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
                             Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                             Width = 0.05f,
                         },
-                    }
+                    },
                 },
             };
         }

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 EndTime = hitObject.GetEndTime(),
                 Column = ((ManiaHitObject)hitObject).Column,
                 Samples = getSampleNames(hitObject.Samples),
-                NodeSamples = getNodeSampleNames((hitObject as HoldNote)?.NodeSamples)
+                NodeSamples = getNodeSampleNames((hitObject as HoldNote)?.NodeSamples),
             };
         }
 

@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.2f)
+                Colour = OsuColour.Gray(0.2f),
             });
 
             Add(new OsuScrollContainer

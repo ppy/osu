@@ -94,16 +94,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 Origin = Anchor.Centre,
                                 Colour = Color4.White,
                                 Font = OsuFont.Default.With(size: 12),
-                                Y = 10
-                            }
-                        }
+                                Y = 10,
+                            },
+                        },
                     },
                     tabletName = new OsuSpriteText
                     {
                         Padding = new MarginPadding(3),
-                        Font = OsuFont.Default.With(size: 8)
+                        Font = OsuFont.Default.With(size: 8),
                     },
-                }
+                },
             };
         }
 

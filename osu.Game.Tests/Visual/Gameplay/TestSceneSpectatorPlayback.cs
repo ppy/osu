@@ -139,10 +139,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                             },
-                                            new TestInputConsumer()
-                                        }
+                                            new TestInputConsumer(),
+                                        },
                                     },
-                                }
+                                },
                             },
                             new Drawable[]
                             {
@@ -170,14 +170,14 @@ namespace osu.Game.Tests.Visual.Gameplay
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                             },
-                                            new TestInputConsumer()
-                                        }
+                                            new TestInputConsumer(),
+                                        },
                                     },
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
-                    latencyDisplay = new OsuSpriteText()
+                    latencyDisplay = new OsuSpriteText(),
                 };
             });
         }

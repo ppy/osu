@@ -54,9 +54,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         Texture = skin.GetTexture(lightImage),
                         RelativeSizeAxes = Axes.X,
                         Width = 1,
-                        Alpha = 0
-                    }
-                }
+                        Alpha = 0,
+                    },
+                },
             };
 
             direction.BindTo(scrollingInfo.Direction);

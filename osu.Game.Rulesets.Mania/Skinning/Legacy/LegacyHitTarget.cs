@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         Texture = skin.GetTexture(targetImage),
                         Scale = new Vector2(1, 0.9f * 1.6025f),
                         RelativeSizeAxes = Axes.X,
-                        Width = 1
+                        Width = 1,
                     },
                     new Box
                     {
@@ -52,9 +52,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
                         Colour = LegacyColourCompatibility.DisallowZeroAlpha(lineColour),
-                        Alpha = showJudgementLine ? 0.9f : 0
-                    }
-                }
+                        Alpha = showJudgementLine ? 0.9f : 0,
+                    },
+                },
             };
 
             direction.BindTo(scrollingInfo.Direction);

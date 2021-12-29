@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         [TestCase(new[]
         {
-            ColumnType.Special
+            ColumnType.Special,
         }, 1)]
         [TestCase(new[]
         {
             ColumnType.Odd,
             ColumnType.Even,
             ColumnType.Even,
-            ColumnType.Odd
+            ColumnType.Odd,
         }, 4)]
         [TestCase(new[]
         {
@@ -29,13 +29,13 @@ namespace osu.Game.Rulesets.Mania.Tests
             ColumnType.Special,
             ColumnType.Odd,
             ColumnType.Even,
-            ColumnType.Odd
+            ColumnType.Odd,
         }, 7)]
         public void Test(IEnumerable<ColumnType> expected, int columns)
         {
             var definition = new StageDefinition
             {
-                Columns = columns
+                Columns = columns,
             };
             var results = getResults(definition);
             Assert.AreEqual(expected, results);

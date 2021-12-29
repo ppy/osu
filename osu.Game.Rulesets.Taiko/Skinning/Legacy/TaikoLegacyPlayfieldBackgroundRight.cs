@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     RelativeSizeAxes = Axes.Both,
                     Size = Vector2.One,
                     Alpha = 0,
-                }
+                },
             };
         }
 

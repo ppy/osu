@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Catch.Skinning
         /// <summary>
         /// Whether the contents of the catcher plate should be visually flipped when the catcher direction is changed.
         /// </summary>
-        FlipCatcherPlate
+        FlipCatcherPlate,
     }
 }

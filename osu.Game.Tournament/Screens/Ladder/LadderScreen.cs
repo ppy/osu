@@ -61,15 +61,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
                             headings = new Container { RelativeSizeAxes = Axes.Both },
                             MatchesContainer = new Container<DrawableTournamentMatch> { RelativeSizeAxes = Axes.Both },
-                        }
+                        },
                     },
-                }
+                },
             };
 
             void addMatch(TournamentMatch match) =>
                 MatchesContainer.Add(new DrawableTournamentMatch(match, this is LadderEditorScreen)
                 {
-                    Changed = () => layout.Invalidate()
+                    Changed = () => layout.Invalidate(),
                 });
 
             foreach (var match in LadderInfo.Matches)

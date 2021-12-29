@@ -18,7 +18,7 @@ namespace osu.Game.Tournament.Tests.Components
         {
             Child = textBox = new DateTextBox
             {
-                Width = 0.3f
+                Width = 0.3f,
             };
         });
 

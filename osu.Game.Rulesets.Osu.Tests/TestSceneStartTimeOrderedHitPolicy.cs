@@ -46,18 +46,18 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_first_circle,
-                    Position = positionFirstCircle
+                    Position = positionFirstCircle,
                 },
                 new TestHitCircle
                 {
                     StartTime = time_second_circle,
-                    Position = positionSecondCircle
-                }
+                    Position = positionSecondCircle,
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle - 100, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } }
+                new OsuReplayFrame { Time = time_first_circle - 100, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } },
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Miss);
@@ -81,18 +81,18 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_first_circle,
-                    Position = positionFirstCircle
+                    Position = positionFirstCircle,
                 },
                 new TestHitCircle
                 {
                     StartTime = time_second_circle,
-                    Position = positionSecondCircle
-                }
+                    Position = positionSecondCircle,
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } }
+                new OsuReplayFrame { Time = time_first_circle, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } },
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Miss);
@@ -116,18 +116,18 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_first_circle,
-                    Position = positionFirstCircle
+                    Position = positionFirstCircle,
                 },
                 new TestHitCircle
                 {
                     StartTime = time_second_circle,
-                    Position = positionSecondCircle
-                }
+                    Position = positionSecondCircle,
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
             {
-                new OsuReplayFrame { Time = time_first_circle + 100, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } }
+                new OsuReplayFrame { Time = time_first_circle + 100, Position = positionSecondCircle, Actions = { OsuAction.LeftButton } },
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Miss);
@@ -151,19 +151,19 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_first_circle,
-                    Position = positionFirstCircle
+                    Position = positionFirstCircle,
                 },
                 new TestHitCircle
                 {
                     StartTime = time_second_circle,
-                    Position = positionSecondCircle
-                }
+                    Position = positionSecondCircle,
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_first_circle - 200, Position = positionFirstCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_first_circle - 100, Position = positionSecondCircle, Actions = { OsuAction.RightButton } }
+                new OsuReplayFrame { Time = time_first_circle - 100, Position = positionSecondCircle, Actions = { OsuAction.RightButton } },
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_circle,
-                    Position = positionCircle
+                    Position = positionCircle,
                 },
                 new TestSlider
                 {
@@ -198,14 +198,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
-                    })
-                }
+                    }),
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
             {
                 new OsuReplayFrame { Time = time_slider, Position = positionCircle, Actions = { OsuAction.LeftButton } },
-                new OsuReplayFrame { Time = time_slider + 10, Position = positionSlider, Actions = { OsuAction.RightButton } }
+                new OsuReplayFrame { Time = time_slider + 10, Position = positionSlider, Actions = { OsuAction.RightButton } },
             });
 
             addJudgementAssert(hitObjects[0], HitResult.Great);
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_circle,
-                    Position = positionCircle
+                    Position = positionCircle,
                 },
                 new TestSlider
                 {
@@ -240,8 +240,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
-                    })
-                }
+                    }),
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_circle,
-                    Position = positionCircle
+                    Position = positionCircle,
                 },
             };
 
@@ -309,7 +309,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new TestHitCircle
                 {
                     StartTime = time_circle,
-                    Position = positionCircle
+                    Position = positionCircle,
                 },
                 new TestSlider
                 {
@@ -319,8 +319,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         Vector2.Zero,
                         new Vector2(25, 0),
-                    })
-                }
+                    }),
+                },
             };
 
             performTest(hitObjects, new List<ReplayFrame>
@@ -365,7 +365,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     BeatmapInfo =
                     {
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
-                        Ruleset = new OsuRuleset().RulesetInfo
+                        Ruleset = new OsuRuleset().RulesetInfo,
                     },
                 });
 

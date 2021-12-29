@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     {
                         RelativeSizeAxes = Axes.Both,
                         AlwaysPresent = true,
-                        Alpha = 0
+                        Alpha = 0,
                     },
                     new Container
                     {
@@ -61,11 +61,11 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                 RelativeSizeAxes = Axes.Both,
                                 FillMode = FillMode.Fit,
                                 Masking = true,
-                                Child = new Box { RelativeSizeAxes = Axes.Both }
-                            }
-                        }
-                    }
-                }
+                                Child = new Box { RelativeSizeAxes = Axes.Both },
+                            },
+                        },
+                    },
+                },
             };
         }
 

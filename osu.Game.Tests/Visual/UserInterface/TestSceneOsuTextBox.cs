@@ -40,9 +40,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new OsuNumberBox
                 {
                     RelativeSizeAxes = Axes.X,
-                    PlaceholderText = "Number textbox"
-                }
-            }
+                    PlaceholderText = "Number textbox",
+                },
+            },
         };
 
         [Test]

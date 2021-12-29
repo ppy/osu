@@ -269,7 +269,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                         SliderTickRate = 4,
                         OverallDifficulty = 10,
                     },
-                    Ruleset = new ManiaRuleset().RulesetInfo
+                    Ruleset = new ManiaRuleset().RulesetInfo,
                 },
             };
 
@@ -302,19 +302,19 @@ namespace osu.Game.Rulesets.Mania.Tests
                         StartTime = time_head,
                         Duration = time_tail - time_head,
                         Column = 0,
-                    }
+                    },
                 },
                 BeatmapInfo =
                 {
                     BaseDifficulty = new BeatmapDifficulty { SliderTickRate = tick_rate },
-                    Ruleset = new ManiaRuleset().RulesetInfo
+                    Ruleset = new ManiaRuleset().RulesetInfo,
                 },
             };
 
             performTest(new List<ReplayFrame>
             {
                 new ManiaReplayFrame(time_head, ManiaAction.Key1),
-                new ManiaReplayFrame(time_last_tick - 5)
+                new ManiaReplayFrame(time_last_tick - 5),
             }, beatmap);
 
             assertHeadJudgement(HitResult.Perfect);
@@ -379,12 +379,12 @@ namespace osu.Game.Rulesets.Mania.Tests
                             StartTime = time_head,
                             Duration = time_tail - time_head,
                             Column = 0,
-                        }
+                        },
                     },
                     BeatmapInfo =
                     {
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 4 },
-                        Ruleset = new ManiaRuleset().RulesetInfo
+                        Ruleset = new ManiaRuleset().RulesetInfo,
                     },
                 };
 

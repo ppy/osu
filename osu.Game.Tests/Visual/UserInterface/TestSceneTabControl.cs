@@ -21,13 +21,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Margin = new MarginPadding(4),
                 Size = new Vector2(229, 24),
-                AutoSort = true
+                AutoSort = true,
             });
             Add(text = new OsuSpriteText
             {
                 Text = "None",
                 Margin = new MarginPadding(4),
-                Position = new Vector2(275, 5)
+                Position = new Vector2(275, 5),
             });
 
             filter.PinItem(GroupMode.All);

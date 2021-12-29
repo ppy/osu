@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    },
                 };
 
                 component.Label = "a sample component";

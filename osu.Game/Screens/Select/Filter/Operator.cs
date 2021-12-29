@@ -12,6 +12,6 @@ namespace osu.Game.Screens.Select.Filter
         LessOrEqual,
         Equal,
         GreaterOrEqual,
-        Greater
+        Greater,
     }
 }

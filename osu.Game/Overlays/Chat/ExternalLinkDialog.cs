@@ -21,11 +21,11 @@ namespace osu.Game.Overlays.Chat
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Go for it.",
-                    Action = openExternalLinkAction
+                    Action = openExternalLinkAction,
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"No! Abort mission!"
+                    Text = @"No! Abort mission!",
                 },
             };
         }

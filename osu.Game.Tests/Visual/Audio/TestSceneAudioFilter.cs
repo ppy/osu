@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Audio
                     {
                         Padding = new MarginPadding(20),
                         Text = $"Low Pass: {lowPassFilter.Cutoff}hz",
-                        Font = new FontUsage(size: 40)
+                        Font = new FontUsage(size: 40),
                     },
                     lowPassSlider = new OsuSliderBar<int>
                     {
@@ -59,13 +59,13 @@ namespace osu.Game.Tests.Visual.Audio
                         {
                             MinValue = 0,
                             MaxValue = AudioFilter.MAX_LOWPASS_CUTOFF,
-                        }
+                        },
                     },
                     highPassText = new OsuSpriteText
                     {
                         Padding = new MarginPadding(20),
                         Text = $"High Pass: {highPassFilter.Cutoff}hz",
-                        Font = new FontUsage(size: 40)
+                        Font = new FontUsage(size: 40),
                     },
                     highPassSlider = new OsuSliderBar<int>
                     {
@@ -76,9 +76,9 @@ namespace osu.Game.Tests.Visual.Audio
                         {
                             MinValue = 0,
                             MaxValue = AudioFilter.MAX_LOWPASS_CUTOFF,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
 
             lowPassSlider.Current.ValueChanged += e =>

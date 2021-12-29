@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(0, 2),
                 Radius = 5,
-                Colour = Colour4.Black.Opacity(0.3f)
+                Colour = Colour4.Black.Opacity(0.3f),
             };
         }
 

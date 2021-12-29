@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Playlists
             Child = settings = new TestRoomSettings(SelectedRoom.Value)
             {
                 RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible }
+                State = { Value = Visibility.Visible },
             };
         });
 

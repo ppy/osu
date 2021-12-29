@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                             pool,
                             pool.Get(j => j.Apply(new JudgementResult(new HitObject
                             {
-                                StartTime = Time.Current
+                                StartTime = Time.Current,
                             }, new Judgement())
                             {
                                 Type = result,
@@ -94,8 +94,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                             {
                                 j.Anchor = Anchor.Centre;
                                 j.Origin = Anchor.Centre;
-                            })
-                        }
+                            }),
+                        },
                     };
 
                     poolIndex++;

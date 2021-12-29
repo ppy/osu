@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new CatchPerformanceAttributes
             {
-                Total = value
+                Total = value,
             };
         }
 

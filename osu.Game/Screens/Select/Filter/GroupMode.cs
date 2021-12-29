@@ -50,6 +50,6 @@ namespace osu.Game.Screens.Select.Filter
         RecentlyPlayed,
 
         [Description("Title")]
-        Title
+        Title,
     }
 }

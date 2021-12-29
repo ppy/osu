@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Select
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
-                                new Dimension()
+                                new Dimension(),
                             },
                             Content = new[]
                             {
@@ -165,12 +165,12 @@ namespace osu.Game.Screens.Select
                                             },
                                         },
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                     },
                 },
-                loading = new LoadingLayer(true)
+                loading = new LoadingLayer(true),
             };
         }
 

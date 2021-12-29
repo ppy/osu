@@ -32,16 +32,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
                         Origin = Anchor.CentreLeft,
                         Icon = Icon,
                         FillMode = FillMode.Fit,
-                        Size = new Vector2(50, 14)
+                        Size = new Vector2(50, 14),
                     },
                     drawableText = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Margin = new MarginPadding { Right = 10 },
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
-                    }
-                }
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                    },
+                },
             };
         }
 

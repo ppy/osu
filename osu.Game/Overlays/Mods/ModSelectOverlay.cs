@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Mods
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(36, 50, 68, 255)
+                            Colour = new Color4(36, 50, 68, 255),
                         },
                         new Triangles
                         {
@@ -201,7 +201,7 @@ namespace osu.Game.Overlays.Mods
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 10,
-                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
+                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
                                         },
                                         Children = new Drawable[]
                                         {
@@ -240,9 +240,9 @@ namespace osu.Game.Overlays.Mods
                                                     {
                                                         s.Action = modButtonPressed;
                                                     }),
-                                                }
+                                                },
                                             },
-                                        }
+                                        },
                                     },
                                     new Container
                                     {
@@ -258,9 +258,9 @@ namespace osu.Game.Overlays.Mods
                                                 Alpha = 0,
                                                 SelectedMods = { BindTarget = SelectedMods },
                                             },
-                                        }
+                                        },
                                     },
-                                }
+                                },
                             },
                         },
                         new Drawable[]
@@ -292,7 +292,7 @@ namespace osu.Game.Overlays.Mods
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
-                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
+                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
                                         },
                                         Children = new[]
                                         {
@@ -322,10 +322,10 @@ namespace osu.Game.Overlays.Mods
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
                                             },
-                                        }
-                                    }
+                                        },
+                                    },
                                 },
-                            }
+                            },
                         },
                     },
                 },

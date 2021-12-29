@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.TopCentre,
                     Size = new Vector2(triangle_height),
                     X = -triangle_offset,
-                    Rotation = 90
+                    Rotation = 90,
                 });
 
                 AddInternal(new EquilateralTriangle
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.TopCentre,
                     Size = new Vector2(triangle_height),
                     X = triangle_offset,
-                    Rotation = -90
+                    Rotation = -90,
                 });
             }
 

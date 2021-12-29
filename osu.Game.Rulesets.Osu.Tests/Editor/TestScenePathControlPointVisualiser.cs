@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
         private void createVisualiser(bool allowSelection) => AddStep("create visualiser", () => Child = visualiser = new PathControlPointVisualiser(slider, allowSelection)
         {
             Anchor = Anchor.Centre,
-            Origin = Anchor.Centre
+            Origin = Anchor.Centre,
         });
 
         private void addControlPointStep(Vector2 position) => addControlPointStep(position, null);

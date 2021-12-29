@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         readyClickOperation.Dispose();
                     });
-                }
+                },
             });
         });
 

@@ -29,7 +29,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MinValue,
-                Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.9f), Color4.Black.Opacity(0.6f))
+                Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.9f), Color4.Black.Opacity(0.6f)),
             });
         }
 

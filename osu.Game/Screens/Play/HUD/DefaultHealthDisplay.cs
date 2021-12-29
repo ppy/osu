@@ -97,8 +97,8 @@ namespace osu.Game.Screens.Play.HUD
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                        }
-                    }
+                        },
+                    },
                 },
             };
         }

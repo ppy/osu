@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
-            new IssueTemplateZeroLength(this)
+            new IssueTemplateZeroLength(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

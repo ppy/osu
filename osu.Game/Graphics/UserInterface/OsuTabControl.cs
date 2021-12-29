@@ -183,7 +183,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = text,
-                        Font = OsuFont.GetFont(size: 14)
+                        Font = OsuFont.GetFont(size: 14),
                     },
                     Bar = new Box
                     {
@@ -194,7 +194,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverClickSounds(HoverSampleSet.TabSelect),
                 };
             }
 

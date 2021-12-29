@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(MusicController),
             typeof(AccountCreationOverlay),
             typeof(DialogOverlay),
-            typeof(ScreenshotManager)
+            typeof(ScreenshotManager),
         };
 
         private IReadOnlyList<Type> requiredGameBaseDependencies => new[]

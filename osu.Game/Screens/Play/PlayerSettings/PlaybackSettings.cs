@@ -48,10 +48,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        }
+                        },
                     },
                 },
-                rateSlider = new PlayerSliderBar<double> { Current = UserPlaybackRate }
+                rateSlider = new PlayerSliderBar<double> { Current = UserPlaybackRate },
             };
         }
 

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             InternalChild = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Transparent
+                Colour = Color4.Transparent,
             };
         }
 

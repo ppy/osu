@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Menu
                             Colour = Color4.White,
                             Alpha = 0,
                         },
-                    }
+                    },
                 },
                 iconText = new Container
                 {
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Menu
                             Origin = Anchor.Centre,
                             Size = new Vector2(30),
                             Position = new Vector2(0, 0),
-                            Icon = symbol
+                            Icon = symbol,
                         },
                         new OsuSpriteText
                         {
@@ -124,10 +124,10 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Position = new Vector2(0, 35),
-                            Text = text
-                        }
-                    }
-                }
+                            Text = text,
+                        },
+                    },
+                },
             };
         }
 
@@ -325,6 +325,6 @@ namespace osu.Game.Screens.Menu
     {
         Contracted,
         Expanded,
-        Exploded
+        Exploded,
     }
 }

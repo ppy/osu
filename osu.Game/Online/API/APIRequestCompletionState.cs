@@ -18,6 +18,6 @@ namespace osu.Game.Online.API
         /// <summary>
         /// Cancelled or failed due to error.
         /// </summary>
-        Failed
+        Failed,
     }
 }

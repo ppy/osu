@@ -112,10 +112,10 @@ namespace osu.Game.Tests.Visual
                                 {
                                     Child = created,
                                 }
-                            )
-                        }
+                            ),
+                        },
                     },
-                }
+                },
             };
 
             // run this once initially to bring things into a sane state as early as possible.
@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                     Colour = Color4.Brown,
-                    AlwaysPresent = true
+                    AlwaysPresent = true,
                 };
             }
         }

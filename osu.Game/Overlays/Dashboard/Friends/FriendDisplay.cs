@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         {
                             controlBackground = new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
                             },
                             new Container
                             {
@@ -77,11 +77,11 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                 Padding = new MarginPadding
                                 {
                                     Top = 20,
-                                    Horizontal = 45
+                                    Horizontal = 45,
                                 },
                                 Child = onlineStreamControl = new FriendOnlineStreamControl(),
-                            }
-                        }
+                            },
+                        },
                     },
                     new Container
                     {
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                         {
                             background = new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
                             },
                             new FillFlowContainer
                             {
@@ -109,13 +109,13 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                         Padding = new MarginPadding
                                         {
                                             Horizontal = 40,
-                                            Vertical = 20
+                                            Vertical = 20,
                                         },
                                         Child = userListToolbar = new UserListToolbar
                                         {
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
-                                        }
+                                        },
                                     },
                                     new Container
                                     {
@@ -127,16 +127,16 @@ namespace osu.Game.Overlays.Dashboard.Friends
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Horizontal = 50 }
+                                                Padding = new MarginPadding { Horizontal = 50 },
                                             },
-                                            loading = new LoadingLayer(true)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                            loading = new LoadingLayer(true),
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             };
 
             background.Colour = colourProvider.Background4;
@@ -211,7 +211,7 @@ namespace osu.Game.Overlays.Dashboard.Friends
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(style == OverlayPanelDisplayStyle.Card ? 10 : 2),
-                Children = users.Select(u => createUserPanel(u, style)).ToList()
+                Children = users.Select(u => createUserPanel(u, style)).ToList(),
             };
         }
 

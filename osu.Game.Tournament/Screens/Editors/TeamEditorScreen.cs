@@ -36,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Editors
             {
                 RelativeSizeAxes = Axes.X,
                 Text = "Add all countries",
-                Action = addAllCountries
+                Action = addAllCountries,
             });
         }
 
@@ -77,7 +77,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 PlayerEditor playerEditor = new PlayerEditor(Model)
                 {
-                    Width = 0.95f
+                    Width = 0.95f,
                 };
 
                 InternalChildren = new Drawable[]
@@ -107,38 +107,38 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Name",
                                 Width = 0.2f,
-                                Current = Model.FullName
+                                Current = Model.FullName,
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Acronym",
                                 Width = 0.2f,
-                                Current = Model.Acronym
+                                Current = Model.Acronym,
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Flag",
                                 Width = 0.2f,
-                                Current = Model.FlagName
+                                Current = Model.FlagName,
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Seed",
                                 Width = 0.2f,
-                                Current = Model.Seed
+                                Current = Model.Seed,
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Last Year Placement",
                                 Width = 0.33f,
-                                Current = Model.LastYearPlacing
+                                Current = Model.LastYearPlacing,
                             },
                             new SettingsButton
                             {
                                 Width = 0.11f,
                                 Margin = new MarginPadding(10),
                                 Text = "Add player",
-                                Action = () => playerEditor.CreateNew()
+                                Action = () => playerEditor.CreateNew(),
                             },
                             new DangerousSettingsButton
                             {
@@ -160,9 +160,9 @@ namespace osu.Game.Tournament.Screens.Editors
                                 Action = () =>
                                 {
                                     sceneManager?.SetScreen(new SeedingEditorScreen(team, parent));
-                                }
+                                },
                             },
-                        }
+                        },
                     },
                 };
 
@@ -194,7 +194,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p))
+                        ChildrenEnumerable = team.Players.Select(p => new PlayerRow(team, p)),
                     };
                 }
 
@@ -258,7 +258,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     {
                                         Size = new Vector2(100, 70),
                                     },
-                                }
+                                },
                             },
                             new DangerousSettingsButton
                             {
@@ -272,7 +272,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     Expire();
                                     team.Players.Remove(user);
                                 },
-                            }
+                            },
                         };
                     }
 

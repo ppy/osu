@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play.HUD
                     Width = 0.5f,
                     Colour = colours.TeamColourRed,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopRight
+                    Origin = Anchor.TopRight,
                 },
                 new Box
                 {
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play.HUD
                     Width = 0.5f,
                     Colour = colours.TeamColourBlue,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopLeft
+                    Origin = Anchor.TopLeft,
                 },
                 score1Bar = new Box
                 {
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play.HUD
                     Width = 0,
                     Colour = colours.TeamColourRed,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopRight
+                    Origin = Anchor.TopRight,
                 },
                 score2Bar = new Box
                 {
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD
                     Width = 0,
                     Colour = colours.TeamColourBlue,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopLeft
+                    Origin = Anchor.TopLeft,
                 },
                 new Container
                 {
@@ -87,14 +87,14 @@ namespace osu.Game.Screens.Play.HUD
                         Score1Text = new MatchScoreCounter
                         {
                             Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
+                            Origin = Anchor.TopCentre,
                         },
                         Score2Text = new MatchScoreCounter
                         {
                             Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre
+                            Origin = Anchor.TopCentre,
                         },
-                    }
+                    },
                 },
             };
         }

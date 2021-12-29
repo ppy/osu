@@ -70,8 +70,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         ranks = new OsuSpriteText(),
                         played = new OsuSpriteText(),
                         explicitMap = new OsuSpriteText(),
-                    }
-                }
+                    },
+                },
             };
 
             control.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
@@ -114,16 +114,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             Covers = new BeatmapSetOnlineCovers
             {
-                Cover = "https://assets.ppy.sh/beatmaps/1094296/covers/cover@2x.jpg?1581416305"
-            }
+                Cover = "https://assets.ppy.sh/beatmaps/1094296/covers/cover@2x.jpg?1581416305",
+            },
         };
 
         private static readonly APIBeatmapSet no_cover_beatmap_set = new APIBeatmapSet
         {
             Covers = new BeatmapSetOnlineCovers
             {
-                Cover = string.Empty
-            }
+                Cover = string.Empty,
+            },
         };
     }
 }

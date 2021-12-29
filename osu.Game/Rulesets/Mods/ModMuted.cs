@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
         public BindableBool EnableMetronome { get; } = new BindableBool
         {
             Default = true,
-            Value = true
+            Value = true,
         };
 
         [SettingSource("Final volume at combo", "The combo count at which point the track reaches its final volume.", SettingControlType = typeof(SettingsSlider<int, MuteComboSlider>))]
@@ -56,14 +56,14 @@ namespace osu.Game.Rulesets.Mods
         public BindableBool InverseMuting { get; } = new BindableBool
         {
             Default = false,
-            Value = false
+            Value = false,
         };
 
         [SettingSource("Mute hit sounds", "Hit sounds are also muted alongside the track.")]
         public BindableBool AffectsHitSounds { get; } = new BindableBool
         {
             Default = true,
-            Value = true
+            Value = true,
         };
 
         protected ModMuted()

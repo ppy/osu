@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 overlay.Push(testDialog = new TestPopupDialog
                 {
-                    State = { Value = Visibility.Hidden }
+                    State = { Value = Visibility.Hidden },
                 });
             });
 

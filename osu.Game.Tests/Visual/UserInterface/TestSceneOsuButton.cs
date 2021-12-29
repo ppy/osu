@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(200),
-                Text = "Button"
+                Text = "Button",
             });
 
             AddToggleStep("toggle enabled", toggle =>
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(200),
-                Text = "Button"
+                Text = "Button",
             });
         }
     }

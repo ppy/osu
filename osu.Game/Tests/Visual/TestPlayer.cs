@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual
             : base(new PlayerConfiguration
             {
                 AllowPause = allowPause,
-                ShowResults = showResults
+                ShowResults = showResults,
             })
         {
             PauseOnFocusLost = pauseOnFocusLost;

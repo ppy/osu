@@ -90,9 +90,9 @@ namespace osu.Game.Graphics.UserInterface
                             {
                                 Colour = Color4.White,
                                 RelativeSizeAxes = Axes.Both,
-                            }
+                            },
                         },
-                    }
+                    },
                 };
             }
 

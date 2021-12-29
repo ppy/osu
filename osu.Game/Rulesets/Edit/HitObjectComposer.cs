@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Edit
                 drawableRulesetWrapper = new DrawableEditorRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap, new[] { Ruleset.GetAutoplayMod() }))
                 {
                     Clock = EditorClock,
-                    ProcessCustomClock = false
+                    ProcessCustomClock = false,
                 };
             }
             catch (Exception e)
@@ -114,8 +114,8 @@ namespace osu.Game.Rulesets.Edit
                         drawableRulesetWrapper,
                         // layers above playfield
                         drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer()
-                                              .WithChild(BlueprintContainer = CreateBlueprintContainer())
-                    }
+                                              .WithChild(BlueprintContainer = CreateBlueprintContainer()),
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Edit
                     {
                         new ToolboxGroup("toolbox (1-9)")
                         {
-                            Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
+                            Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X },
                         },
                         new ToolboxGroup("toggles (Q~P)")
                         {
@@ -139,8 +139,8 @@ namespace osu.Game.Rulesets.Edit
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(0, 5),
                             },
-                        }
-                    }
+                        },
+                    },
                 },
             };
 

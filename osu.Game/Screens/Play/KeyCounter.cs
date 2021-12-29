@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play
                     Texture = textures.Get(@"KeyCounter/key-glow"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Alpha = 0
+                    Alpha = 0,
                 },
                 textLayer = new Container
                 {
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,
                             Position = new Vector2(0, -0.25f),
-                            Colour = KeyUpTextColor
+                            Colour = KeyUpTextColor,
                         },
                         countSpriteText = new OsuSpriteText
                         {
@@ -119,10 +119,10 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,
                             Position = new Vector2(0, 0.25f),
-                            Colour = KeyUpTextColor
-                        }
-                    }
-                }
+                            Colour = KeyUpTextColor,
+                        },
+                    },
+                },
             };
             // Set this manually because an element with Alpha=0 won't take it size to AutoSizeContainer,
             // so the size can be changing between buttonSprite and glowSprite.

@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = header = new TestHeader
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             };
         });
 

@@ -20,9 +20,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new Box
                 {
                     Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
-                loading = new LoadingSpinner()
+                loading = new LoadingSpinner(),
             });
 
             loading.Show();
@@ -32,9 +32,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new Box
                 {
                     Colour = Color4.White,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
-                loading = new LoadingSpinner(true)
+                loading = new LoadingSpinner(true),
             });
 
             loading.Show();
@@ -44,16 +44,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new Box
                 {
                     Colour = Color4.Gray,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
-                loading = new LoadingSpinner()
+                loading = new LoadingSpinner(),
             });
 
             loading.Show();
 
             Cell(3).AddRange(new Drawable[]
             {
-                loading = new LoadingSpinner()
+                loading = new LoadingSpinner(),
             });
 
             Scheduler.AddDelayed(() => loading.ToggleVisibility(), 200, true);

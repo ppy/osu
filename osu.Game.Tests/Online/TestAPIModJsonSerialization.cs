@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Online
             {
                 AdjustPitch = { Value = false },
                 InitialRate = { Value = 1.25 },
-                FinalRate = { Value = 0.25 }
+                FinalRate = { Value = 0.25 },
             });
 
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Online
             var apiMod = new APIMod(new TestModDifficultyAdjust
             {
                 OverallDifficulty = { Value = 11 },
-                ExtendedLimits = { Value = true }
+                ExtendedLimits = { Value = true },
             });
 
             var deserialised = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Online
         {
             var score = new SubmittableScore(new ScoreInfo
             {
-                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
+                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } },
             });
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Online
             {
                 new TestMod(),
                 new TestModTimeRamp(),
-                new TestModDifficultyAdjust()
+                new TestModDifficultyAdjust(),
             };
 
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Online
             public override BindableBool AdjustPitch { get; } = new BindableBool
             {
                 Default = true,
-                Value = true
+                Value = true,
             };
         }
 

@@ -40,9 +40,9 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     new PathControlPoint(new Vector2()),
                     new PathControlPoint(new Vector2(150, -50)),
-                    new PathControlPoint(new Vector2(300, 0))
+                    new PathControlPoint(new Vector2(300, 0)),
                 }),
-                Position = new Vector2(0, 100)
+                Position = new Vector2(0, 100),
             };
             var secondSlider = new Slider
             {
@@ -50,9 +50,9 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     new PathControlPoint(new Vector2()),
                     new PathControlPoint(new Vector2(-50, 50)),
-                    new PathControlPoint(new Vector2(-100, 100))
+                    new PathControlPoint(new Vector2(-100, 100)),
                 }),
-                Position = new Vector2(200, 0)
+                Position = new Vector2(200, 0),
             };
 
             AddStep("add overlapping sliders", () =>

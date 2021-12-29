@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new HealthProcessorContainer(healthProcessor)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = layer = new FailingLayer()
+                    Child = layer = new FailingLayer(),
                 };
 
                 layer.ShowHealth.BindTo(showHealth);

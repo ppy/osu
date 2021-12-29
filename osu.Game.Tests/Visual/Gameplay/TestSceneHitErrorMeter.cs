@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     new OsuSpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
                     new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Ok)}" },
                     new OsuSpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
-                }
+                },
             });
 
             Add(new BarHitErrorMeter
@@ -200,14 +200,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
-                Margin = new MarginPadding { Right = 50 }
+                Margin = new MarginPadding { Right = 50 },
             });
 
             Add(new ColourHitErrorMeter
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                Margin = new MarginPadding { Left = 50 }
+                Margin = new MarginPadding { Left = 50 },
             });
 
             Add(new ColourHitErrorMeter
@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.CentreLeft,
                 Rotation = 270,
-                Margin = new MarginPadding { Left = 50 }
+                Margin = new MarginPadding { Left = 50 },
             });
         }
 

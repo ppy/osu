@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                         },
                     },
                 },
-                new HoverSounds()
+                new HoverSounds(),
             };
         }
 

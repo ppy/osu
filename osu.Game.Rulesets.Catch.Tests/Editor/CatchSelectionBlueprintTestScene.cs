@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
             EditorBeatmap = new EditorBeatmap(new CatchBeatmap()) { Difficulty = { CircleSize = 0 } };
             EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint
             {
-                BeatLength = 100
+                BeatLength = 100,
             });
 
             base.Content.Add(new EditorBeatmapDependencyContainer(EditorBeatmap, new BindableBeatDivisor())
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Tests.Editor
                 Children = new Drawable[]
                 {
                     EditorBeatmap,
-                    contentContainer = new CatchEditorTestSceneContainer()
+                    contentContainer = new CatchEditorTestSceneContainer(),
                 },
             });
         }

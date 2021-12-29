@@ -62,7 +62,7 @@ namespace osu.Game.Graphics.Backgrounds
                 {
                     RelativeSizeAxes = Axes.Both,
                     RedrawOnScale = false,
-                    Child = Sprite
+                    Child = Sprite,
                 });
             }
 

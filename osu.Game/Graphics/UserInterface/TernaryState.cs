@@ -22,6 +22,6 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// The current state is true.
         /// </summary>
-        True
+        True,
     }
 }

@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Child = new FreeModSelectOverlay
             {
-                State = { Value = Visibility.Visible }
+                State = { Value = Visibility.Visible },
             };
         });
     }

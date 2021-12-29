@@ -77,8 +77,8 @@ namespace osu.Game.Overlays.Profile
                                     Margin = new MarginPadding { Top = 4 },
                                     RelativeSizeAxes = Axes.X,
                                     Height = 2,
-                                }
-                            }
+                                },
+                            },
                         },
                         // reverse ID flow is required for correct Z-ordering of the content (last item should be front-most).
                         // particularly important in BeatmapsSection, as it uses beatmap cards, which have expandable overhanging content.
@@ -90,11 +90,11 @@ namespace osu.Game.Overlays.Profile
                             Padding = new MarginPadding
                             {
                                 Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                                Bottom = 20
-                            }
+                                Bottom = 20,
+                            },
                         },
                     },
-                }
+                },
             };
         }
 
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Profile
                     foreground = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 };
             }
 

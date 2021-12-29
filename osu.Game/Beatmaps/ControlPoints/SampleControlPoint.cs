@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         public static readonly SampleControlPoint DEFAULT = new SampleControlPoint
         {
             SampleBankBindable = { Disabled = true },
-            SampleVolumeBindable = { Disabled = true }
+            SampleVolumeBindable = { Disabled = true },
         };
 
         public override Color4 GetRepresentingColour(OsuColour colours) => colours.Pink;
@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             MinValue = 0,
             MaxValue = 100,
-            Default = 100
+            Default = 100,
         };
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected override BackgroundScreen CreateBackground() => new RoomBackgroundScreen(Room.Playlist.FirstOrDefault())
         {
-            SelectedItem = { BindTarget = SelectedItem }
+            SelectedItem = { BindTarget = SelectedItem },
         };
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     RowDimensions = new[]
                     {
                         new Dimension(),
-                        new Dimension(GridSizeMode.Absolute, 50)
+                        new Dimension(GridSizeMode.Absolute, 50),
                     },
                     Content = new[]
                     {
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                 Padding = new MarginPadding
                                 {
                                     Horizontal = WaveOverlayContainer.WIDTH_PADDING,
-                                    Bottom = 30
+                                    Bottom = 30,
                                 },
                                 Children = new[]
                                 {
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                         RowDimensions = new[]
                                         {
                                             new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension(GridSizeMode.Absolute, 10)
+                                            new Dimension(GridSizeMode.Absolute, 10),
                                         },
                                         Content = new[]
                                         {
@@ -139,8 +139,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                 new DrawableMatchRoom(Room, allowEdit)
                                                 {
                                                     OnEdit = () => settingsOverlay.Show(),
-                                                    SelectedItem = { BindTarget = SelectedItem }
-                                                }
+                                                    SelectedItem = { BindTarget = SelectedItem },
+                                                },
                                             },
                                             null,
                                             new Drawable[]
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                             Child = new Box
                                                             {
                                                                 RelativeSizeAxes = Axes.Both,
-                                                                Colour = Color4Extensions.FromHex(@"3e3a44") // Temporary.
+                                                                Colour = Color4Extensions.FromHex(@"3e3a44"), // Temporary.
                                                             },
                                                         },
                                                         new Container
@@ -176,21 +176,21 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                             Child = userModsSelectOverlay = new UserModSelectOverlay
                                                             {
                                                                 SelectedMods = { BindTarget = UserMods },
-                                                                IsValidMod = _ => false
-                                                            }
+                                                                IsValidMod = _ => false,
+                                                            },
                                                         },
-                                                    }
-                                                }
-                                            }
-                                        }
+                                                    },
+                                                },
+                                            },
+                                        },
                                     },
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         // Resolves 1px masking errors between the settings overlay and the room panel.
                                         Padding = new MarginPadding(-1),
-                                        Child = settingsOverlay = CreateRoomSettingsOverlay(Room)
-                                    }
+                                        Child = settingsOverlay = CreateRoomSettingsOverlay(Room),
+                                    },
                                 },
                             },
                         },
@@ -205,19 +205,19 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                     new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4Extensions.FromHex(@"28242d") // Temporary.
+                                        Colour = Color4Extensions.FromHex(@"28242d"), // Temporary.
                                     },
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding(5),
-                                        Child = CreateFooter()
+                                        Child = CreateFooter(),
                                     },
-                                }
-                            }
-                        }
-                    }
-                }
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -252,7 +252,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
         {
             return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
             {
-                Model = { Value = Room }
+                Model = { Value = Room },
             };
         }
 

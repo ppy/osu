@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RelativeSizeAxes = Axes.Both,
                 Volume = { Value = 0 },
-                Child = new DrawableStoryboard(Beatmap.Storyboard) { Clock = new InterpolatingFramedClock(Beatmap.Track) }
+                Child = new DrawableStoryboard(Beatmap.Storyboard) { Clock = new InterpolatingFramedClock(Beatmap.Track) },
             }, AddInternal);
         }
     }

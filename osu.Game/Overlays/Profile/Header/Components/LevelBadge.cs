@@ -44,8 +44,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(size: 20)
-                }
+                    Font = OsuFont.GetFont(size: 20),
+                },
             };
 
             User.BindValueChanged(user => updateLevel(user.NewValue));

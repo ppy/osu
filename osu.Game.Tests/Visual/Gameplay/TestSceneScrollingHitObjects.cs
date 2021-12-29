@@ -51,13 +51,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[0] = new TestPlayfield(),
-                            TimeRange = time_range
+                            TimeRange = time_range,
                         },
                         scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Down)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[1] = new TestPlayfield(),
-                            TimeRange = time_range
+                            TimeRange = time_range,
                         },
                     },
                     new Drawable[]
@@ -66,16 +66,16 @@ namespace osu.Game.Tests.Visual.Gameplay
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[2] = new TestPlayfield(),
-                            TimeRange = time_range
+                            TimeRange = time_range,
                         },
                         scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Right)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[3] = new TestPlayfield(),
-                            TimeRange = time_range
-                        }
-                    }
-                }
+                            TimeRange = time_range,
+                        },
+                    },
+                },
             };
 
             hitObjectSpawnDelegate?.Cancel();
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             new MultiplierControlPoint(time_range) { EffectPoint = { ScrollSpeed = 1.25 } },
             new MultiplierControlPoint(1.5 * time_range) { EffectPoint = { ScrollSpeed = 1 } },
-            new MultiplierControlPoint(2 * time_range) { EffectPoint = { ScrollSpeed = 1.5 } }
+            new MultiplierControlPoint(2 * time_range) { EffectPoint = { ScrollSpeed = 1.5 } },
         };
 
         [Test]
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("add control points", () => addControlPoints(
                 new List<MultiplierControlPoint>
                 {
-                    new MultiplierControlPoint { Velocity = 0.1 }
+                    new MultiplierControlPoint { Velocity = 0.1 },
                 },
                 Time.Current + time_range));
 
@@ -242,8 +242,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Child = HitObjectContainer
-                    }
+                        Child = HitObjectContainer,
+                    },
                 };
             }
         }
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 });
 
                 switch (direction)
@@ -292,7 +292,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddInternal(new Box
                 {
                     Size = new Vector2(75),
-                    Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
+                    Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1),
                 });
             }
         }

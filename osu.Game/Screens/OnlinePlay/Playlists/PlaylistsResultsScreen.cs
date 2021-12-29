@@ -71,7 +71,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.Centre,
                     },
-                }
+                },
             });
         }
 

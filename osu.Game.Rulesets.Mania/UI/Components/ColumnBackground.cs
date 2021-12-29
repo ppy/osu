@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Blending = BlendingParameters.Additive,
-                    Alpha = 0
-                }
+                    Alpha = 0,
+                },
             };
 
             direction.BindTo(scrollingInfo.Direction);

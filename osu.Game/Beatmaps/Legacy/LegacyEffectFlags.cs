@@ -10,6 +10,6 @@ namespace osu.Game.Beatmaps.Legacy
     {
         None = 0,
         Kiai = 1,
-        OmitFirstBarLine = 8
+        OmitFirstBarLine = 8,
     }
 }

@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         Idle,
         Clear,
         Kiai,
-        Fail
+        Fail,
     }
 }

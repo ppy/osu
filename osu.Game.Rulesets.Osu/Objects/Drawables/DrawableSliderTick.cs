@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Colour = AccentColour.Value,
                     Alpha = 0.3f,
-                }
+                },
             })
             {
                 Anchor = Anchor.Centre,

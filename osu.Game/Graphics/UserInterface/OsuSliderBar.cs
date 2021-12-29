@@ -121,10 +121,10 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
-                        Current = { Value = true }
+                        Current = { Value = true },
                     },
                 },
-                new HoverClickSounds()
+                new HoverClickSounds(),
             };
 
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };

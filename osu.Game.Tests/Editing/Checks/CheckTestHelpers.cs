@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Editing.Checks
             new BeatmapSetFileInfo
             {
                 Filename = $"abc123.{extension}",
-                FileInfo = new FileInfo { Hash = "abcdef" }
+                FileInfo = new FileInfo { Hash = "abcdef" },
             };
     }
 }

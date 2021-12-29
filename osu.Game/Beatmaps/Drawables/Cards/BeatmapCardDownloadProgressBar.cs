@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = backgroundFill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 },
                 foreground = new CircularContainer
                 {
@@ -53,8 +53,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                     Child = foregroundFill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                    }
-                }
+                    },
+                },
             };
         }
 

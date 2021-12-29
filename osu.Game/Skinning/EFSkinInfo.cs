@@ -47,7 +47,7 @@ namespace osu.Game.Skinning
             ID = DEFAULT_SKIN,
             Name = "osu! (triangles)",
             Creator = "team osu!",
-            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
+            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo(),
         };
 
         public bool Equals(EFSkinInfo other) => other != null && ID == other.ID;

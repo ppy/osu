@@ -561,8 +561,8 @@ namespace osu.Game.Tests.Database
                     Artist = "SomeArtist",
                     Author =
                     {
-                        Username = "SomeAuthor"
-                    }
+                        Username = "SomeAuthor",
+                    },
                 };
 
                 var ruleset = realmFactory.Context.All<RealmRuleset>().First();
@@ -580,8 +580,8 @@ namespace osu.Game.Tests.Database
                         {
                             OnlineID = 2,
                             Status = BeatmapOnlineStatus.Loved,
-                        }
-                    }
+                        },
+                    },
                 };
 
                 var imported = await importer.Import(toImport);

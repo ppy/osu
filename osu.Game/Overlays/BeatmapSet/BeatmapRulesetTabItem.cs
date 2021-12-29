@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background6
+                        Colour = colourProvider.Background6,
                     },
                     count = new OsuSpriteText
                     {
@@ -54,8 +54,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Horizontal = 5f },
                         Font = OsuFont.Default.With(weight: FontWeight.SemiBold),
                         Colour = colourProvider.Foreground1,
-                    }
-                }
+                    },
+                },
             });
         }
 

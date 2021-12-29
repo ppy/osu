@@ -55,8 +55,8 @@ namespace osu.Game.Overlays.Profile.Sections
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Highlight1
-                    }
+                        Colour = colourProvider.Highlight1,
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -76,10 +76,10 @@ namespace osu.Game.Overlays.Profile.Sections
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Current = { BindTarget = current }
-                        }
-                    }
-                }
+                            Current = { BindTarget = current },
+                        },
+                    },
+                },
             };
         }
 
@@ -119,6 +119,6 @@ namespace osu.Game.Overlays.Profile.Sections
     {
         AlwaysHidden,
         AlwaysVisible,
-        VisibleWhenZero
+        VisibleWhenZero,
     }
 }

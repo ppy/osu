@@ -39,9 +39,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle
                     {
                         StartTime = 3000,
-                        Position = playfield_centre
-                    }
-                }
+                        Position = playfield_centre,
+                    },
+                },
             });
         }
 
@@ -55,9 +55,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle
                     {
                         StartTime = 3000,
-                        Position = new Vector2(5, 5)
-                    }
-                }
+                        Position = new Vector2(5, 5),
+                    },
+                },
             });
         }
 
@@ -72,9 +72,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     {
                         StartTime = 3000,
                         Position = new Vector2(5, 5),
-                        StackHeight = 5
-                    }
-                }
+                        StackHeight = 5,
+                    },
+                },
             });
         }
 
@@ -88,9 +88,9 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle
                     {
                         StartTime = 3000,
-                        Position = new Vector2(0, 0)
-                    }
-                }
+                        Position = new Vector2(0, 0),
+                    },
+                },
             });
         }
 
@@ -108,10 +108,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(-100, 0))
+                            new PathControlPoint(new Vector2(-100, 0)),
                         }),
-                    }
-                }
+                    },
+                },
             });
         }
 
@@ -129,10 +129,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(0, -playfield_centre.Y + 5))
+                            new PathControlPoint(new Vector2(0, -playfield_centre.Y + 5)),
                         }),
-                    }
-                }
+                    },
+                },
             });
         }
 
@@ -150,11 +150,11 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(new Vector2(0, -playfield_centre.Y + 5))
+                            new PathControlPoint(new Vector2(0, -playfield_centre.Y + 5)),
                         }),
-                        StackHeight = 5
-                    }
-                }
+                        StackHeight = 5,
+                    },
+                },
             });
         }
 
@@ -172,10 +172,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(playfield_centre)
+                            new PathControlPoint(playfield_centre),
                         }),
-                    }
-                }
+                    },
+                },
             });
         }
 
@@ -193,10 +193,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                         Path = new SliderPath(new[]
                         {
                             new PathControlPoint(new Vector2(0, 0), PathType.Linear),
-                            new PathControlPoint(-playfield_centre)
+                            new PathControlPoint(-playfield_centre),
                         }),
-                    }
-                }
+                    },
+                },
             });
         }
 
@@ -216,10 +216,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                             // Circular arc shoots over the top of the screen.
                             new PathControlPoint(new Vector2(0, 0), PathType.PerfectCurve),
                             new PathControlPoint(new Vector2(-100, -200)),
-                            new PathControlPoint(new Vector2(100, -200))
+                            new PathControlPoint(new Vector2(100, -200)),
                         }),
-                    }
-                }
+                    },
+                },
             });
         }
 

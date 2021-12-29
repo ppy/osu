@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             new object[] { LegacyMods.Perfect, new[] { typeof(TaikoModPerfect) } },
             new object[] { LegacyMods.Random, new[] { typeof(TaikoModRandom) } },
             new object[] { LegacyMods.Cinema, new[] { typeof(TaikoModCinema) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) } }
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(TaikoModHardRock), typeof(TaikoModDoubleTime) } },
         };
 
         [TestCaseSource(nameof(taiko_mod_mapping))]

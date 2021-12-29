@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 CentreComponent = false,
                 Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre
+                Origin = Anchor.BottomCentre,
             };
         }
 

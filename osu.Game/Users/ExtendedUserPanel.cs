@@ -53,13 +53,13 @@ namespace osu.Game.Users
 
         protected UpdateableFlag CreateFlag() => new UpdateableFlag(User.Country)
         {
-            Size = new Vector2(39, 26)
+            Size = new Vector2(39, 26),
         };
 
         protected SpriteIcon CreateStatusIcon() => statusIcon = new SpriteIcon
         {
             Icon = FontAwesome.Regular.Circle,
-            Size = new Vector2(25)
+            Size = new Vector2(25),
         };
 
         protected FillFlowContainer CreateStatusMessage(bool rightAlignedChildren)
@@ -67,7 +67,7 @@ namespace osu.Game.Users
             var statusContainer = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical
+                Direction = FillDirection.Vertical,
             };
 
             var alignment = rightAlignedChildren ? Anchor.CentreRight : Anchor.CentreLeft;
@@ -84,7 +84,7 @@ namespace osu.Game.Users
                     text.AddText(@"Last seen ");
                     text.AddText(new DrawableDate(User.LastVisit.Value, italic: false)
                     {
-                        Shadow = false
+                        Shadow = false,
                     });
                 }
             }));
@@ -93,7 +93,7 @@ namespace osu.Game.Users
             {
                 Anchor = alignment,
                 Origin = alignment,
-                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold)
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
             });
 
             return statusContainer;

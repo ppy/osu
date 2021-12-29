@@ -28,8 +28,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
             {
                 HitObjects = new List<HitObject>
                 {
-                    new HitCircle()
-                }
+                    new HitCircle(),
+                },
             };
         }
 
@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             var judgementResult = new JudgementResult(beatmap.HitObjects.Single(), new OsuJudgement())
             {
-                Type = hitResult
+                Type = hitResult,
             };
             scoreProcessor.ApplyResult(judgementResult);
 
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             IBeatmap fourObjectBeatmap = new TestBeatmap(new RulesetInfo())
             {
-                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(maxResult), 4))
+                HitObjects = new List<HitObject>(Enumerable.Repeat(new TestHitObject(maxResult), 4)),
             };
             scoreProcessor.Mode.Value = scoringMode;
             scoreProcessor.ApplyBeatmap(fourObjectBeatmap);
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
             {
                 var judgementResult = new JudgementResult(fourObjectBeatmap.HitObjects[i], new Judgement())
                 {
-                    Type = i == 2 ? minResult : hitResult
+                    Type = i == 2 ? minResult : hitResult,
                 };
                 scoreProcessor.ApplyResult(judgementResult);
             }
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                                                 .Append(new TestHitObject(HitResult.Ok));
             IBeatmap fiveObjectBeatmap = new TestBeatmap(new RulesetInfo())
             {
-                HitObjects = hitObjects.ToList()
+                HitObjects = hitObjects.ToList(),
             };
             scoreProcessor.Mode.Value = scoringMode;
             scoreProcessor.ApplyBeatmap(fiveObjectBeatmap);
@@ -146,14 +146,14 @@ namespace osu.Game.Tests.Rulesets.Scoring
             {
                 var judgementResult = new JudgementResult(fiveObjectBeatmap.HitObjects[i], new Judgement())
                 {
-                    Type = i == 2 ? HitResult.SmallTickMiss : hitResult
+                    Type = i == 2 ? HitResult.SmallTickMiss : hitResult,
                 };
                 scoreProcessor.ApplyResult(judgementResult);
             }
 
             var lastJudgementResult = new JudgementResult(fiveObjectBeatmap.HitObjects.Last(), new Judgement())
             {
-                Type = HitResult.Ok
+                Type = HitResult.Ok,
             };
             scoreProcessor.ApplyResult(lastJudgementResult);
 
@@ -297,7 +297,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             scoreProcessor.ApplyBeatmap(new Beatmap
             {
-                HitObjects = { new TestHitObject(result) }
+                HitObjects = { new TestHitObject(result) },
             });
 
             Assert.That(scoreProcessor.GetImmediateScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));

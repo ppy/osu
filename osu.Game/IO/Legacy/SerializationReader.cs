@@ -204,7 +204,7 @@ namespace osu.Game.IO.Legacy
                 formatter = new BinaryFormatter
                 {
                     // AssemblyFormat = FormatterAssemblyStyle.Simple,
-                    Binder = versionBinder
+                    Binder = versionBinder,
                 };
             }
 
@@ -301,6 +301,6 @@ namespace osu.Game.IO.Legacy
         byteArrayType,
         charArrayType,
         otherType,
-        ILegacySerializableType
+        ILegacySerializableType,
     }
 }

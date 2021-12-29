@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Child = noteAnimation = GetAnimation(skin) ?? Empty()
+                Child = noteAnimation = GetAnimation(skin) ?? Empty(),
             };
 
             direction.BindTo(scrollingInfo.Direction);

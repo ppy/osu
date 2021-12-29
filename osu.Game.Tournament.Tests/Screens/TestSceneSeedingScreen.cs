@@ -28,16 +28,16 @@ namespace osu.Game.Tournament.Tests.Screens
                         new SeedingResult
                         {
                             // Mod intentionally left blank.
-                            Seed = { Value = 4 }
+                            Seed = { Value = 4 },
                         },
                         new SeedingResult
                         {
                             Mod = { Value = "DT" },
-                            Seed = { Value = 8 }
-                        }
-                    }
-                }
-            }
+                            Seed = { Value = 8 },
+                        },
+                    },
+                },
+            },
         };
 
         [Test]
@@ -46,7 +46,7 @@ namespace osu.Game.Tournament.Tests.Screens
             AddStep("create seeding screen", () => Add(new SeedingScreen
             {
                 FillMode = FillMode.Fit,
-                FillAspectRatio = 16 / 9f
+                FillAspectRatio = 16 / 9f,
             }));
 
             AddStep("set team to Japan", () => this.ChildrenOfType<SettingsTeamDropdown>().Single().Current.Value = ladder.Teams.Single());

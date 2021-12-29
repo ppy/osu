@@ -93,17 +93,17 @@ namespace osu.Game.Overlays.BeatmapSet
                     bpm = new Statistic(BeatmapStatisticsIconType.Bpm)
                     {
                         Width = 0.25f,
-                        TooltipText = BeatmapsetsStrings.ShowStatsBpm
+                        TooltipText = BeatmapsetsStrings.ShowStatsBpm,
                     },
                     circleCount = new Statistic(BeatmapStatisticsIconType.Circles)
                     {
                         Width = 0.25f,
-                        TooltipText = BeatmapsetsStrings.ShowStatsCountCircles
+                        TooltipText = BeatmapsetsStrings.ShowStatsCountCircles,
                     },
                     sliderCount = new Statistic(BeatmapStatisticsIconType.Sliders)
                     {
                         Width = 0.25f,
-                        TooltipText = BeatmapsetsStrings.ShowStatsCountSliders
+                        TooltipText = BeatmapsetsStrings.ShowStatsCountSliders,
                     },
                 },
             };

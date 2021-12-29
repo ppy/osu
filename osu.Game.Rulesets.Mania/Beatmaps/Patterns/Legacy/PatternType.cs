@@ -72,6 +72,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// Next note will be at column - 1.
         /// </summary>
-        ReverseStair = 1 << 12
+        ReverseStair = 1 << 12,
     }
 }

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override Drawable CreateBox() => new Box
         {
             RelativeSizeAxes = Axes.Y,
-            Alpha = 0.3f
+            Alpha = 0.3f,
         };
 
         public override bool HandleDrag(MouseButtonEvent e)

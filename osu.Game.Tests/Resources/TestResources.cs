@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Resources
                 OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 DateAdded = DateTimeOffset.UtcNow,
-                Metadata = metadata
+                Metadata = metadata,
             };
 
             foreach (var b in getBeatmaps(difficultyCount ?? RNG.Next(1, 20)))
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Resources
                         BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
-                        }
+                        },
                     };
                 }
             }
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Resources
                 [HitResult.LargeTickHit] = 100,
                 [HitResult.LargeTickMiss] = 50,
                 [HitResult.SmallBonus] = 10,
-                [HitResult.SmallBonus] = 50
+                [HitResult.SmallBonus] = 50,
             },
         };
 

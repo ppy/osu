@@ -66,19 +66,19 @@ namespace osu.Game.Tests.Database
                 realm.Add(new RealmKeyBinding
                 {
                     Action = GlobalAction.Back,
-                    KeyCombination = new KeyCombination(InputKey.A)
+                    KeyCombination = new KeyCombination(InputKey.A),
                 });
 
                 realm.Add(new RealmKeyBinding
                 {
                     Action = GlobalAction.Back,
-                    KeyCombination = new KeyCombination(InputKey.S)
+                    KeyCombination = new KeyCombination(InputKey.S),
                 });
 
                 realm.Add(new RealmKeyBinding
                 {
                     Action = GlobalAction.Back,
-                    KeyCombination = new KeyCombination(InputKey.D)
+                    KeyCombination = new KeyCombination(InputKey.D),
                 });
 
                 transaction.Commit();

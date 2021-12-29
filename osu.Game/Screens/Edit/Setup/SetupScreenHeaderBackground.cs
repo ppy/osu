@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
             InternalChild = content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = true
+                Masking = true,
             };
         }
 
@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Edit.Setup
                             Text = "Drag image here to set beatmap background!",
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both
-                        }
+                            AutoSizeAxes = Axes.Both,
+                        },
                     };
                 }
 

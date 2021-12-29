@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             placementBlueprintContainer = new Container<PlacementBlueprint>
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             };
         }
 

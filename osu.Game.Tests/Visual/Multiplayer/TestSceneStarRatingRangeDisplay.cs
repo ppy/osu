@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Child = new StarRatingRangeDisplay
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             };
         });
 

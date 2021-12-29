@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     AutoSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 

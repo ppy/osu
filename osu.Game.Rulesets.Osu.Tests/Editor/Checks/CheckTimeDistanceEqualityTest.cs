@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(100, 0) },
-                    new HitCircle { StartTime = 1500, Position = new Vector2(150, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(150, 0) },
+                },
             });
         }
 
@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(80, 0) }, // Distance a quite low compared to previous.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(130, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(130, 0) },
+                },
             });
         }
 
@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(150, 0) }, // Twice the regular spacing.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) },
+                },
             });
         }
 
@@ -82,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(150, 0) }, // Twice the regular spacing.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(250, 0) } // Also twice the regular spacing.
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(250, 0) }, // Also twice the regular spacing.
+                },
             }, count: 2);
         }
 
@@ -97,8 +97,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(50, 0) }, // Stacked, is fine.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) },
+                },
             });
         }
 
@@ -115,8 +115,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 1500, Position = new Vector2(50, 0), StackHeight = 2 },
                     new HitCircle { StartTime = 2000, Position = new Vector2(50, 0), StackHeight = 3 },
                     new HitCircle { StartTime = 2500, Position = new Vector2(50, 0), StackHeight = 4 }, // Ends up far from (50; 0), causing irregular spacing.
-                    new HitCircle { StartTime = 3000, Position = new Vector2(100, 0) }
-                }
+                    new HitCircle { StartTime = 3000, Position = new Vector2(100, 0) },
+                },
             });
         }
 
@@ -130,8 +130,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(55, 0) }, // Basically stacked, so is fine.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(105, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(105, 0) },
+                },
             });
         }
 
@@ -145,8 +145,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(65, 0) }, // Really low distance compared to previous.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(115, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(115, 0) },
+                },
             });
         }
 
@@ -161,8 +161,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(52, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(97, 0) },
-                    new HitCircle { StartTime = 1500, Position = new Vector2(165, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(165, 0) },
+                },
             });
         }
 
@@ -179,8 +179,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(50 + 50 * multiplier, 0) },
                     // This gap would be a warning if it weren't for the previous pushing the average spacing up.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(50 + 50 * multiplier + 50 * multiplier * multiplier, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(50 + 50 * multiplier + 50 * multiplier * multiplier, 0) },
+                },
             });
         }
 
@@ -196,8 +196,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(50 + 50 * multiplier, 0) }, // Warning
-                    new HitCircle { StartTime = 1500, Position = new Vector2(50 + 50 * multiplier + 50 * multiplier * multiplier, 0) } // Problem
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(50 + 50 * multiplier + 50 * multiplier * multiplier, 0) }, // Problem
+                },
             };
 
             var context = new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap), DifficultyRating.Easy);
@@ -218,8 +218,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 4000, Position = new Vector2(200, 0) }, // 2 seconds apart from previous, so can start from wherever.
-                    new HitCircle { StartTime = 4500, Position = new Vector2(250, 0) }
-                }
+                    new HitCircle { StartTime = 4500, Position = new Vector2(250, 0) },
+                },
             });
         }
 
@@ -233,8 +233,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 0, Position = new Vector2(0) },
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new HitCircle { StartTime = 1000, Position = new Vector2(150, 0) }, // Jumps are allowed in higher difficulties.
-                    new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) }
-                }
+                    new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) },
+                },
             }, DifficultyRating.Expert);
         }
 
@@ -249,8 +249,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     new Spinner { StartTime = 500, EndTime = 1000 }, // Distance to and from the spinner should be ignored. If it isn't this should give a problem.
                     new HitCircle { StartTime = 1500, Position = new Vector2(100, 0) },
-                    new HitCircle { StartTime = 2000, Position = new Vector2(150, 0) }
-                }
+                    new HitCircle { StartTime = 2000, Position = new Vector2(150, 0) },
+                },
             });
         }
 
@@ -265,8 +265,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     getSliderMock(startTime: 1000, endTime: 1500, startPosition: new Vector2(100, 0), endPosition: new Vector2(150, 0)).Object,
                     getSliderMock(startTime: 2000, endTime: 2500, startPosition: new Vector2(200, 0), endPosition: new Vector2(250, 0)).Object,
-                    new HitCircle { StartTime = 2500, Position = new Vector2(300, 0) }
-                }
+                    new HitCircle { StartTime = 2500, Position = new Vector2(300, 0) },
+                },
             });
         }
 
@@ -281,8 +281,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                     new HitCircle { StartTime = 500, Position = new Vector2(50, 0) },
                     getSliderMock(startTime: 1000, endTime: 1500, startPosition: new Vector2(100, 0), endPosition: new Vector2(150, 0)).Object,
                     getSliderMock(startTime: 2000, endTime: 2500, startPosition: new Vector2(250, 0), endPosition: new Vector2(300, 0)).Object, // Twice the spacing.
-                    new HitCircle { StartTime = 2500, Position = new Vector2(300, 0) }
-                }
+                    new HitCircle { StartTime = 2500, Position = new Vector2(300, 0) },
+                },
             });
         }
 

@@ -33,9 +33,9 @@ namespace osu.Game.Screens.Edit
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Children = CreateSections()
+                        Children = CreateSections(),
                     },
-                }
+                },
             };
         }
 

@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Comments
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background5
+                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Comments
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
-                            ShowDeleted = { BindTarget = ShowDeleted }
+                            ShowDeleted = { BindTarget = ShowDeleted },
                         },
                         content = new FillFlowContainer
                         {
@@ -115,8 +115,8 @@ namespace osu.Game.Overlays.Comments
                                             Margin = new MarginPadding
                                             {
                                                 Horizontal = 70,
-                                                Vertical = 10
-                                            }
+                                                Vertical = 10,
+                                            },
                                         },
                                         new Container
                                         {
@@ -128,18 +128,18 @@ namespace osu.Game.Overlays.Comments
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding
                                                 {
-                                                    Vertical = 10
+                                                    Vertical = 10,
                                                 },
                                                 Action = getComments,
                                                 IsLoading = true,
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             User.BindTo(api.LocalUser);
@@ -294,7 +294,7 @@ namespace osu.Game.Overlays.Comments
             {
                 ShowDeleted = { BindTarget = ShowDeleted },
                 Sort = { BindTarget = Sort },
-                RepliesRequested = onCommentRepliesRequested
+                RepliesRequested = onCommentRepliesRequested,
             };
         }
 
@@ -328,8 +328,8 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Margin = new MarginPadding { Left = 50 },
-                        Text = @"No comments yet."
-                    }
+                        Text = @"No comments yet.",
+                    },
                 });
             }
         }

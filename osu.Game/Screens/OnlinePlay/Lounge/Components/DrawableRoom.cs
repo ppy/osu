@@ -69,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
                 RelativeSizeAxes = Axes.Y,
-                AutoSizeAxes = Axes.X
+                AutoSizeAxes = Axes.X,
             };
 
             InternalChildren = new[]
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     RelativeSizeAxes = Axes.Both,
                                     ColumnDimensions = new[]
                                     {
-                                        new Dimension(GridSizeMode.Relative, 0.2f)
+                                        new Dimension(GridSizeMode.Relative, 0.2f),
                                     },
                                     Content = new[]
                                     {
@@ -117,10 +117,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             new Box
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f))
+                                                Colour = ColourInfo.GradientHorizontal(colours.Background5, colours.Background5.Opacity(0.3f)),
                                             },
-                                        }
-                                    }
+                                        },
+                                    },
                                 },
                                 new Container
                                 {
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                     Padding = new MarginPadding
                                     {
                                         Left = 20,
-                                        Vertical = 5
+                                        Vertical = 5,
                                     },
                                     Children = new Drawable[]
                                     {
@@ -150,19 +150,19 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                         new RoomStatusPill
                                                         {
                                                             Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft
+                                                            Origin = Anchor.CentreLeft,
                                                         },
                                                         specialCategoryPill = new RoomSpecialCategoryPill
                                                         {
                                                             Anchor = Anchor.CentreLeft,
-                                                            Origin = Anchor.CentreLeft
+                                                            Origin = Anchor.CentreLeft,
                                                         },
                                                         endDateInfo = new EndDateInfo
                                                         {
                                                             Anchor = Anchor.CentreLeft,
                                                             Origin = Anchor.CentreLeft,
                                                         },
-                                                    }
+                                                    },
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -173,9 +173,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                                     Children = new Drawable[]
                                                     {
                                                         new RoomNameText(),
-                                                        new RoomStatusText()
-                                                    }
-                                                }
+                                                        new RoomStatusText(),
+                                                    },
+                                                },
                                             },
                                         },
                                         new FillFlowContainer
@@ -185,9 +185,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(5),
-                                            ChildrenEnumerable = CreateBottomDetails()
-                                        }
-                                    }
+                                            ChildrenEnumerable = CreateBottomDetails(),
+                                        },
+                                    },
                                 },
                                 new FillFlowContainer
                                 {
@@ -209,17 +209,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                         {
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
-                                            NumberOfCircles = NumberOfAvatars
-                                        }
-                                    }
+                                            NumberOfCircles = NumberOfAvatars,
+                                        },
+                                    },
                                 },
-                                passwordIcon = new PasswordProtectedIcon { Alpha = 0 }
+                                passwordIcon = new PasswordProtectedIcon { Alpha = 0 },
                             },
                         },
                     }, 0)
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 
@@ -255,7 +255,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             return new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent))
             {
-                Model = { Value = Room }
+                Model = { Value = Room },
             };
         }
 
@@ -299,8 +299,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Scale = new Vector2(0.8f)
-                }
+                    Scale = new Vector2(0.8f),
+                },
             });
 
             return pills;
@@ -351,7 +351,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     },
                     RowDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.AutoSize)
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -360,7 +360,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             statusText = new OsuSpriteText
                             {
                                 Font = OsuFont.Default.With(size: 16),
-                                Colour = colours.Lime1
+                                Colour = colours.Lime1,
                             },
                             beatmapText = new LinkFlowContainer(s =>
                             {
@@ -372,10 +372,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                 // workaround to ensure only the first line of text shows, emulating truncation (but without ellipsis at the end).
                                 // TODO: remove when text/link flow can support truncation with ellipsis natively.
                                 Height = 16,
-                                Masking = true
-                            }
-                        }
-                    }
+                                Masking = true,
+                            },
+                        },
+                    },
                 };
             }
 
@@ -437,7 +437,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                         Origin = Anchor.TopRight,
                         Margin = new MarginPadding(6),
                         Size = new Vector2(14),
-                    }
+                    },
                 };
             }
         }

@@ -30,9 +30,9 @@ namespace osu.Game.Tests.Visual.Online
                     Padding = new MarginPadding(20),
                     Child = new WikiMainPage
                     {
-                        Markdown = main_page_markdown
-                    }
-                }
+                        Markdown = main_page_markdown,
+                    },
+                },
             };
         }
 

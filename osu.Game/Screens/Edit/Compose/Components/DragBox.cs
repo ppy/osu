@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Alpha = 0.1f
-            }
+                Alpha = 0.1f,
+            },
         };
 
         private RectangleF? dragRectangle;

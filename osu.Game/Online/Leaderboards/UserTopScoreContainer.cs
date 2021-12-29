@@ -55,9 +55,9 @@ namespace osu.Game.Online.Leaderboards
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             Score.BindValueChanged(onScoreChanged);

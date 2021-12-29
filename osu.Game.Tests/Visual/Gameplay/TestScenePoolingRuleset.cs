@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 HitObjects =
                 {
                     new HitObject(),
-                    new HitObject { StartTime = time_between_objects }
-                }
+                    new HitObject { StartTime = time_between_objects },
+                },
             }, 1, () => new FramedClock(clock = new ManualClock()));
 
             DrawableTestHitObject firstObject = null;
@@ -69,8 +69,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 HitObjects =
                 {
                     new HitObject(),
-                    new HitObject { StartTime = 2000 }
-                }
+                    new HitObject { StartTime = 2000 },
+                },
             }, 1, () => new FramedClock(clock = new ManualClock()));
 
             DrawableTestHitObject firstObject = null;
@@ -106,8 +106,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 HitObjects =
                 {
                     new HitObject(),
-                    new HitObject { StartTime = 250 }
-                }
+                    new HitObject { StartTime = 250 },
+                },
             }, 2, () => new FramedClock(clock = new ManualClock()));
 
             AddStep("fast forward to second object", () => clock.CurrentTime = drawableRuleset.Beatmap.HitObjects[1].StartTime);
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 RelativeSizeAxes = Axes.Both,
                 Clock = createClock?.Invoke() ?? new FramedOffsetClock(Clock, false) { Offset = -Clock.CurrentTime },
-                Child = drawableRuleset
+                Child = drawableRuleset,
             };
         });
 
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                         yield return new TestHitObject
                         {
                             StartTime = original.StartTime,
-                            Duration = 250
+                            Duration = 250,
                         };
 
                         break;

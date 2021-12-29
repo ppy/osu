@@ -23,6 +23,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.GeneralFeaturedArtists))]
         [Description("Featured artists")]
-        FeaturedArtists
+        FeaturedArtists,
     }
 }

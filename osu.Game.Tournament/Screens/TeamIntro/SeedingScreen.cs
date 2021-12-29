@@ -60,9 +60,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         {
                             LabelText = "Show specific team",
                             Current = currentTeam,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             currentTeam.BindValueChanged(teamChanged, true);
@@ -93,8 +93,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
         {
             mainContainer.Children = new Drawable[]
             {
-                new LeftInfo(team) { Position = new Vector2(55, 150), },
-                new RightInfo(team) { Position = new Vector2(500, 150), },
+                new LeftInfo(team) { Position = new Vector2(55, 150) },
+                new RightInfo(team) { Position = new Vector2(500, 150) },
             };
         }
 
@@ -141,10 +141,10 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Spacing = new Vector2(5),
                             Children = new Drawable[]
                             {
-                                new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR, },
+                                new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Title, Colour = TournamentGame.TEXT_COLOUR },
                                 new TournamentSpriteText { Text = "by", Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
                                 new TournamentSpriteText { Text = beatmap.Beatmap.Metadata.Artist, Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
-                            }
+                            },
                         },
                         new FillFlowContainer
                         {
@@ -157,7 +157,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             {
                                 new TournamentSpriteText { Text = beatmap.Score.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Width = 80 },
                                 new TournamentSpriteText { Text = "#" + beatmap.Seed.Value.ToString("#,0"), Colour = TournamentGame.TEXT_COLOUR, Font = OsuFont.Torus.With(weight: FontWeight.Regular) },
-                            }
+                            },
                         },
                     };
                 }
@@ -198,7 +198,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         row.Add(new Sprite
                         {
                             Texture = textures.Get($"Mods/{mods.ToLower()}"),
-                            Scale = new Vector2(0.5f)
+                            Scale = new Vector2(0.5f),
                         });
                     }
 
@@ -219,9 +219,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Text = seeding.ToString("#,0"),
-                                Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR
+                                Colour = TournamentGame.ELEMENT_FOREGROUND_COLOUR,
                             },
-                        }
+                        },
                     });
                 }
             }
@@ -251,7 +251,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             new RowDisplay("Seed:", team.Seed.Value),
                             new RowDisplay("Last year's placing:", team.LastYearPlacing.Value > 0 ? $"#{team.LastYearPlacing:#,0}" : "0"),
                             new Container { Margin = new MarginPadding { Bottom = 30 } },
-                        }
+                        },
                     },
                 };
 
@@ -310,7 +310,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Font = OsuFont.Torus.With(size: 32, weight: FontWeight.SemiBold),
                                 Colour = TournamentGame.TEXT_COLOUR,
                             },
-                        }
+                        },
                     };
                 }
             }

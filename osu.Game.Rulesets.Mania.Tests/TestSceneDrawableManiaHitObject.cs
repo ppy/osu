@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 {
                     Action = { Value = ManiaAction.Key1 },
                     Height = 0.85f,
-                    AccentColour = Color4.Gray
+                    AccentColour = Color4.Gray,
                 },
             };
         });
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 var h = new HoldNote
                 {
                     StartTime = 0,
-                    Duration = 1000
+                    Duration = 1000,
                 };
                 h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
                 column.Add(note = new DrawableHoldNote(h));

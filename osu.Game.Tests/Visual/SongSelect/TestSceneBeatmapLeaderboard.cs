@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 dialogOverlay = new DialogOverlay
                 {
-                    Depth = -1
+                    Depth = -1,
                 },
                 leaderboard = new FailableLeaderboard
                 {
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Anchor = Anchor.Centre,
                     Size = new Vector2(550f, 450f),
                     Scope = BeatmapLeaderboardScope.Global,
-                }
+                },
             });
         }
 
@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Accuracy = 1,
                 MaxCombo = 244,
                 TotalScore = 1707827,
-                Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock() },
                 User = new APIUser
                 {
                     Id = 6602580,

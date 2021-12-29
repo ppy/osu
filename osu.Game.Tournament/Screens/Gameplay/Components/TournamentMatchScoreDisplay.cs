@@ -45,7 +45,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Width = 0.5f,
                     Colour = TournamentGame.COLOUR_RED,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopRight
+                    Origin = Anchor.TopRight,
                 },
                 new Box
                 {
@@ -55,7 +55,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Width = 0.5f,
                     Colour = TournamentGame.COLOUR_BLUE,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopLeft
+                    Origin = Anchor.TopLeft,
                 },
                 score1Bar = new Box
                 {
@@ -65,12 +65,12 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Width = 0,
                     Colour = TournamentGame.COLOUR_RED,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopRight
+                    Origin = Anchor.TopRight,
                 },
                 score1Text = new MatchScoreCounter
                 {
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
+                    Origin = Anchor.TopCentre,
                 },
                 score2Bar = new Box
                 {
@@ -80,12 +80,12 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                     Width = 0,
                     Colour = TournamentGame.COLOUR_BLUE,
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopLeft
+                    Origin = Anchor.TopLeft,
                 },
                 score2Text = new MatchScoreCounter
                 {
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
+                    Origin = Anchor.TopCentre,
                 },
             };
         }

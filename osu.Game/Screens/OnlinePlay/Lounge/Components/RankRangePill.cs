@@ -40,16 +40,16 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(8),
-                            Icon = FontAwesome.Solid.User
+                            Icon = FontAwesome.Solid.User,
                         },
                         rankFlow = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 var bindable = new Bindable<TernaryState>
                 {
-                    Description = sampleName.Replace("hit", string.Empty).Titleize()
+                    Description = sampleName.Replace("hit", string.Empty).Titleize(),
                 };
 
                 bindable.ValueChanged += state =>
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             yield return new OsuMenuItem("Sound")
             {
                 Items = SelectionSampleStates.Select(kvp =>
-                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray()
+                    new TernaryStateToggleMenuItem(kvp.Value.Description) { State = { BindTarget = kvp.Value } }).ToArray(),
             };
         }
 

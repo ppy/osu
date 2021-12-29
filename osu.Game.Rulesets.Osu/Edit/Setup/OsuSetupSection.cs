@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Setup
                         Default = 0.7f,
                         MinValue = 0,
                         MaxValue = 1,
-                        Precision = 0.1f
-                    }
-                }
+                        Precision = 0.1f,
+                    },
+                },
             };
         }
 

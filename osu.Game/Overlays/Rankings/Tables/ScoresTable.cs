@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         protected override RankingsTableColumn[] CreateUniqueHeaders() => new[]
         {
             new RankingsTableColumn(RankingsStrings.StatTotalScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-            new RankingsTableColumn(RankingsStrings.StatRankedScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true)
+            new RankingsTableColumn(RankingsStrings.StatRankedScore, Anchor.Centre, new Dimension(GridSizeMode.AutoSize), true),
         };
 
         protected override Drawable[] CreateUniqueContent(UserStatistics item) => new Drawable[]
@@ -31,8 +31,8 @@ namespace osu.Game.Overlays.Rankings.Tables
             },
             new RowText
             {
-                Text = item.RankedScore.ToLocalisableString(@"N0")
-            }
+                Text = item.RankedScore.ToLocalisableString(@"N0"),
+            },
         };
     }
 }

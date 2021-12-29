@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             InternalChild = grid = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                ColumnDimensions = createColumns(preset_count).ToArray()
+                ColumnDimensions = createColumns(preset_count).ToArray(),
             };
 
             grid.Content = new[] { new Drawable[preset_count * 2 - 1] };

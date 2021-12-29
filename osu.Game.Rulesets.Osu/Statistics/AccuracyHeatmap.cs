@@ -76,8 +76,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4Extensions.FromHex("#202624")
-                        }
+                            Colour = Color4Extensions.FromHex("#202624"),
+                        },
                     },
                     new Container
                     {
@@ -113,9 +113,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                             RelativeSizeAxes = Axes.Y,
                                             Height = 2, // We're rotating along a diagonal - we don't really care how big this is.
                                             Width = line_thickness / 2, // adjust for edgesmoothness
-                                            Rotation = rotation
+                                            Rotation = rotation,
                                         },
-                                    }
+                                    },
                                 },
                             },
                             new Box
@@ -133,8 +133,8 @@ namespace osu.Game.Rulesets.Osu.Statistics
                                 EdgeSmoothness = new Vector2(1),
                                 Width = line_thickness / 2, // adjust for edgesmoothness
                                 Height = 10,
-                            }
-                        }
+                            },
+                        },
                     },
                     bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
                     {
@@ -142,10 +142,10 @@ namespace osu.Game.Rulesets.Osu.Statistics
                         BackgroundColour = Color4Extensions.FromHex("#202624").Opacity(0),
                         Child = pointGrid = new GridContainer
                         {
-                            RelativeSizeAxes = Axes.Both
-                        }
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     },
-                }
+                },
             };
 
             Vector2 centre = new Vector2(points_per_dimension) / 2;
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
                     var point = new HitPoint(pointType, this)
                     {
-                        BaseColour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255)
+                        BaseColour = pointType == HitPointType.Hit ? new Color4(102, 255, 204, 255) : new Color4(255, 102, 102, 255),
                     };
 
                     points[r][c] = point;
@@ -295,7 +295,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
         private enum HitPointType
         {
             Hit,
-            Miss
+            Miss,
         }
     }
 }

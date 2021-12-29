@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.TopCentre,
                                     Colour = colours.Yellow,
                                     Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f),
                                 },
                                 new OsuSpriteText
                                 {
@@ -111,9 +111,9 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Shadow = true,
-                                    ShadowColour = new Color4(0, 0, 0, 0.25f)
-                                }
-                            }
+                                    ShadowColour = new Color4(0, 0, 0, 0.25f),
+                                },
+                            },
                         },
                         InternalButtons = new SelectionCycleFillFlowContainer<DialogButton>
                         {
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.6f),
-                                Radius = 50
+                                Radius = 50,
                             },
                         },
                         retryCounterContainer = new FillFlowContainer
@@ -135,8 +135,8 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                        }
-                    }
+                        },
+                    },
                 },
             };
 
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Play
                 {
                     action?.Invoke();
                     Hide();
-                }
+                },
             };
 
             InternalButtons.Add(button);
@@ -242,7 +242,7 @@ namespace osu.Game.Screens.Play
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),
-                }
+                },
             };
         }
 

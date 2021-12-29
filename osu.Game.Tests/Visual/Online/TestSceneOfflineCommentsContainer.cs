@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Online
             Add(new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = comments = new TestCommentsContainer()
+                Child = comments = new TestCommentsContainer(),
             });
         });
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Online
                     Message = "Simple test comment",
                     LegacyName = "TestUser1",
                     CreatedAt = DateTimeOffset.Now,
-                    VotesCount = 5
+                    VotesCount = 5,
                 },
                 new Comment
                 {
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Online
                     LegacyName = "TestUser2",
                     CreatedAt = DateTimeOffset.Now,
                     DeletedAt = DateTimeOffset.Now,
-                    VotesCount = 5
+                    VotesCount = 5,
                 },
                 new Comment
                 {
@@ -146,23 +146,23 @@ namespace osu.Game.Tests.Visual.Online
                     EditedAt = DateTimeOffset.Now,
                     VotesCount = 1000,
                     EditedById = 1,
-                }
+                },
             },
             IncludedComments = new List<Comment>(),
             PinnedComments = new List<Comment>(),
             UserVotes = new List<long>
             {
-                5
+                5,
             },
             Users = new List<APIUser>
             {
                 new APIUser
                 {
                     Id = 1,
-                    Username = "Good_Admin"
-                }
+                    Username = "Good_Admin",
+                },
             },
-            Total = 10
+            Total = 10,
         };
 
         private CommentBundle getCommentSubBundle() => new CommentBundle
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Visual.Online
                     Message = "Simple test comment",
                     LegacyName = "TestUser1",
                     CreatedAt = DateTimeOffset.Now,
-                    VotesCount = 5
+                    VotesCount = 5,
                 },
             },
             IncludedComments = new List<Comment>(),

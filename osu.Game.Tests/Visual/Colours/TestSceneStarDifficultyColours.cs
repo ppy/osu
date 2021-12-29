@@ -71,18 +71,18 @@ namespace osu.Game.Tests.Visual.Colours
                                                 Colour = OsuColour.ForegroundTextColourFor(colour),
                                                 Text = colour.ToHex(),
                                             },
-                                        }
+                                        },
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Text = $"*{(1f * i + 0.1f * j):0.00}",
-                                    }
-                                }
+                                    },
+                                },
                             };
-                        })
-                    })
+                        }),
+                    }),
                 };
             });
         }

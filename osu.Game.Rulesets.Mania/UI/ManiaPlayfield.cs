@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.UI
             AddInternal(playfieldGrid = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Content = new[] { new Drawable[stageDefinitions.Count] }
+                Content = new[] { new Drawable[stageDefinitions.Count] },
             });
 
             var normalColumnAction = ManiaAction.Key1;

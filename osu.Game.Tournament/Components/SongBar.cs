@@ -87,7 +87,7 @@ namespace osu.Game.Tournament.Components
                     Direction = FillDirection.Full,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                }
+                },
             };
 
             Expanded = true;
@@ -143,7 +143,7 @@ namespace osu.Game.Tournament.Components
                     stats = new (string heading, string content)[]
                     {
                         ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                        ("HP", $"{beatmap.Difficulty.DrainRate:0.#}{hardRockExtra}")
+                        ("HP", $"{beatmap.Difficulty.DrainRate:0.#}{hardRockExtra}"),
                     };
                     break;
 
@@ -186,8 +186,8 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.#}{srExtra}"))
-                                        }
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.#}{srExtra}")),
+                                        },
                                     },
                                     new FillFlowContainer
                                     {
@@ -200,7 +200,7 @@ namespace osu.Game.Tournament.Components
                                         {
                                             new DiffPiece(("Length", length.ToFormattedDuration().ToString())),
                                             new DiffPiece(("BPM", $"{bpm:0.#}")),
-                                        }
+                                        },
                                     },
                                     new Container
                                     {
@@ -222,12 +222,12 @@ namespace osu.Game.Tournament.Components
                                                 Anchor = Anchor.CentreRight,
                                                 Origin = Anchor.CentreRight,
                                             },
-                                        }
+                                        },
                                     },
                                 },
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 new TournamentBeatmapPanel(beatmap)
                 {
@@ -236,7 +236,7 @@ namespace osu.Game.Tournament.Components
                     Height = HEIGHT,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                }
+                },
             };
         }
 

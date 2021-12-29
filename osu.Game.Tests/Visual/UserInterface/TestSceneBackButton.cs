@@ -29,14 +29,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.SlateGray
+                        Colour = Color4.SlateGray,
                     },
                     button = new BackButton(receptor)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                    }
-                }
+                    },
+                },
             };
 
             button.Action = () => button.Hide();

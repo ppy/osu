@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 var beatmapInfo = new BeatmapInfo
                 {
                     MaxCombo = apiBeatmap.MaxCombo,
-                    Status = apiBeatmap.Status
+                    Status = apiBeatmap.Status,
                 };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
@@ -131,15 +131,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Current = { BindTarget = scope }
+                                    Current = { BindTarget = scope },
                                 },
                                 modSelector = new LeaderboardModSelector
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    Ruleset = { BindTarget = ruleset }
-                                }
-                            }
+                                    Ruleset = { BindTarget = ruleset },
+                                },
+                            },
                         },
                         new Container
                         {
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     Origin = Anchor.TopCentre,
                                     Alpha = 0,
                                     AlwaysPresent = true,
-                                    Margin = new MarginPadding { Vertical = 10 }
+                                    Margin = new MarginPadding { Vertical = 10 },
                                 },
                                 notSupporterPlaceholder = new NotSupporterPlaceholder
                                 {
@@ -181,14 +181,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                        }
-                                    }
+                                        },
+                                    },
                                 },
-                            }
-                        }
+                            },
+                        },
                     },
                 },
-                loading = new LoadingLayer()
+                loading = new LoadingLayer(),
             });
         }
 

@@ -80,8 +80,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 HitTarget = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.HitTarget), _ => new TaikoHitTarget())
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                }
-                            }
+                                },
+                            },
                         },
                         hitTargetOffsetContent = new Container
                         {
@@ -96,8 +96,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Children = new Drawable[]
                                     {
                                         HitObjectContainer,
-                                        drumRollHitContainer = new DrumRollHitContainer()
-                                    }
+                                        drumRollHitContainer = new DrumRollHitContainer(),
+                                    },
                                 },
                                 kiaiExplosionContainer = new Container<KiaiHitExplosion>
                                 {
@@ -110,9 +110,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Name = "Judgements",
                                     RelativeSizeAxes = Axes.Y,
                                 },
-                            }
+                            },
                         },
-                    }
+                    },
                 },
                 leftArea = new Container
                 {
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                    }
+                    },
                 },
                 mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
                 {
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.TopLeft,
                     RelativePositionAxes = Axes.Y,
                     RelativeSizeAxes = Axes.None,
-                    Y = 0.2f
+                    Y = 0.2f,
                 },
                 topLevelHitContainer = new ProxyContainer
                 {

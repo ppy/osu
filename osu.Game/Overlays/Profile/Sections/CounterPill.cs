@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background6
+                    Colour = colourProvider.Background6,
                 },
                 counter = new OsuSpriteText
                 {
@@ -36,8 +36,8 @@ namespace osu.Game.Overlays.Profile.Sections
                     Origin = Anchor.Centre,
                     Margin = new MarginPadding { Horizontal = 10, Bottom = 1 },
                     Font = OsuFont.GetFont(size: 11.2f, weight: FontWeight.Bold),
-                    Colour = colourProvider.Foreground1
-                }
+                    Colour = colourProvider.Foreground1,
+                },
             };
         }
 

@@ -29,9 +29,9 @@ namespace osu.Game.Tests.Gameplay
                 Children = new Drawable[]
                 {
                     hitObjectContainer = new HitObjectContainer(),
-                    proxyContainer = new ProxyContainer()
+                    proxyContainer = new ProxyContainer(),
                 },
-                Clock = new FramedClock(clock)
+                Clock = new FramedClock(clock),
             };
             clock.CurrentTime = 0;
         });

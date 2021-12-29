@@ -51,8 +51,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Id = 1001,
                     Statistics = new UserStatistics
                     {
-                        PP = getNecessaryPP(rulesetID)
-                    }
+                        PP = getNecessaryPP(rulesetID),
+                    },
                 };
             }
 

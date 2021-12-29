@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Origin = Anchor.TopCentre,
                         Direction = FillDirection.Horizontal,
                         AutoSizeAxes = Axes.Both,
-                    }
-                }
+                    },
+                },
             };
 
             text.AddText("Click ");

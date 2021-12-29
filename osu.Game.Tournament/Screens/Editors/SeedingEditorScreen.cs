@@ -44,7 +44,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 SeedingBeatmapEditor beatmapEditor = new SeedingBeatmapEditor(round)
                 {
-                    Width = 0.95f
+                    Width = 0.95f,
                 };
 
                 InternalChildren = new Drawable[]
@@ -68,23 +68,23 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Mod",
                                 Width = 0.33f,
-                                Current = Model.Mod
+                                Current = Model.Mod,
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Seed",
                                 Width = 0.33f,
-                                Current = Model.Seed
+                                Current = Model.Seed,
                             },
                             new SettingsButton
                             {
                                 Width = 0.2f,
                                 Margin = new MarginPadding(10),
                                 Text = "Add beatmap",
-                                Action = () => beatmapEditor.CreateNew()
+                                Action = () => beatmapEditor.CreateNew(),
                             },
-                            beatmapEditor
-                        }
+                            beatmapEditor,
+                        },
                     },
                     new DangerousSettingsButton
                     {
@@ -98,7 +98,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             Expire();
                             team.SeedingResults.Remove(Model);
                         },
-                    }
+                    },
                 };
 
                 RelativeSizeAxes = Axes.X;
@@ -122,7 +122,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = round.Beatmaps.Select(p => new SeedingBeatmapRow(round, p))
+                        ChildrenEnumerable = round.Beatmaps.Select(p => new SeedingBeatmapRow(round, p)),
                     };
                 }
 
@@ -188,7 +188,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "Seed",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Current = beatmap.Seed
+                                        Current = beatmap.Seed,
                                     },
                                     new SettingsTextBox
                                     {
@@ -201,7 +201,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     {
                                         Size = new Vector2(100, 70),
                                     },
-                                }
+                                },
                             },
                             new DangerousSettingsButton
                             {
@@ -215,7 +215,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     Expire();
                                     result.Beatmaps.Remove(beatmap);
                                 },
-                            }
+                            },
                         };
                     }
 
@@ -267,7 +267,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Width = 300
+                                Width = 300,
                             };
                         }
                     }

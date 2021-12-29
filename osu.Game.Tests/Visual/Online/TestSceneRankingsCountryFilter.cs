@@ -41,28 +41,28 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Current = { BindTarget = countryBindable }
+                            Current = { BindTarget = countryBindable },
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Some content",
-                            Margin = new MarginPadding { Vertical = 20 }
-                        }
-                    }
-                }
+                            Margin = new MarginPadding { Vertical = 20 },
+                        },
+                    },
+                },
             });
 
             var country = new Country
             {
                 FlagName = "BY",
-                FullName = "Belarus"
+                FullName = "Belarus",
             };
             var unknownCountry = new Country
             {
                 FlagName = "CK",
-                FullName = "Cook Islands"
+                FullName = "Cook Islands",
             };
 
             AddStep("Set country", () => countryBindable.Value = country);

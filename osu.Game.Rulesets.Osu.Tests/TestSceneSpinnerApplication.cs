@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Duration = 500,
             }))
             {
-                Clock = new FramedClock(new StopwatchClock())
+                Clock = new FramedClock(new StopwatchClock()),
             });
 
             AddStep("rotate some", () => dho.RotationTracker.AddRotation(180));

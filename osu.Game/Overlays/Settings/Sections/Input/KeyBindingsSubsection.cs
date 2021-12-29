@@ -47,13 +47,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.ActionInt.Equals(intKey)).ToList())
                 {
                     AllowMainMouseButtons = Ruleset != null,
-                    Defaults = defaultGroup.Select(d => d.KeyCombination)
+                    Defaults = defaultGroup.Select(d => d.KeyCombination),
                 });
             }
 
             Add(new ResetButton
             {
-                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
+                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults()),
             });
         }
     }

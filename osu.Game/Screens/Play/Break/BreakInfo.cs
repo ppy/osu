@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play.Break
                             // RankDisplay = new BreakInfoLine<int>("Rank"),
                             GradeDisplay = new BreakInfoLine<ScoreRank>("Grade"),
                         },
-                    }
+                    },
                 },
             };
         }

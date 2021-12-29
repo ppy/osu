@@ -41,8 +41,8 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             TransferValueOnCommit = true,
                             RelativeSizeAxes = Axes.X,
-                        }
-                    }
+                        },
+                    },
                 },
             };
 

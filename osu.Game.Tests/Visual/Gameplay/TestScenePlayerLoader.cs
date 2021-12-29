@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                 },
-                changelogOverlay = new ChangelogOverlay()
+                changelogOverlay = new ChangelogOverlay(),
             });
         }
 

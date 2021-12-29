@@ -445,7 +445,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 StartTime = HitObject.StartTime,
                 Samples = HitObject.Samples,
-                Column = column
+                Column = column,
             });
         }
     }

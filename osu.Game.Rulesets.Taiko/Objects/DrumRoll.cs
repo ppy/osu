@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
-                    IsStrong = IsStrong
+                    IsStrong = IsStrong,
                 });
 
                 first = false;

@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.Dashboard.Friends
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
-                }
+                    },
+                },
             });
         }
     }

@@ -15,6 +15,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.ExtraStoryboard))]
         [Description("Has Storyboard")]
-        Storyboard
+        Storyboard,
     }
 }

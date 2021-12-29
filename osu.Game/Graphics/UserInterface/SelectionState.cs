@@ -6,6 +6,6 @@ namespace osu.Game.Graphics.UserInterface
     public enum SelectionState
     {
         NotSelected,
-        Selected
+        Selected,
     }
 }

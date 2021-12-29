@@ -226,7 +226,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(300, 200)
+                    new Vector2(300, 200),
                 }),
             },
             new Slider
@@ -236,7 +236,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(300, 200)
+                    new Vector2(300, 200),
                 }),
                 RepeatCount = 1,
             },
@@ -247,14 +247,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(300, 200)
+                    new Vector2(300, 200),
                 }),
                 RepeatCount = 2,
             },
             new HitCircle
             {
                 StartTime = 199999,
-            }
+            },
         };
     }
 }

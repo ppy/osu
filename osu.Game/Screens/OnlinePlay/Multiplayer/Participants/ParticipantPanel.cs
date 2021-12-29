@@ -81,7 +81,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Icon = FontAwesome.Solid.Crown,
                             Size = new Vector2(14),
                             Colour = Color4Extensions.FromHex("#F7E65D"),
-                            Alpha = 0
+                            Alpha = 0,
                         },
                         new TeamDisplay(User),
                         new Container
@@ -94,7 +94,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = backgroundColour
+                                    Colour = backgroundColour,
                                 },
                                 new UserCoverBackground
                                 {
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.75f,
                                     User = user,
-                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f))
+                                    Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White.Opacity(0.25f)),
                                 },
                                 new FillFlowContainer
                                 {
@@ -118,29 +118,29 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                             Origin = Anchor.CentreLeft,
                                             RelativeSizeAxes = Axes.Both,
                                             FillMode = FillMode.Fit,
-                                            User = user
+                                            User = user,
                                         },
                                         new UpdateableFlag
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Size = new Vector2(30, 20),
-                                            Country = user?.Country
+                                            Country = user?.Country,
                                         },
                                         new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
-                                            Text = user?.Username
+                                            Text = user?.Username,
                                         },
                                         userRankText = new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             Font = OsuFont.GetFont(size: 14),
-                                        }
-                                    }
+                                        },
+                                    },
                                 },
                                 new Container
                                 {
@@ -152,15 +152,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                     {
                                         Scale = new Vector2(0.5f),
                                         ExpansionMode = ExpansionMode.AlwaysContracted,
-                                    }
+                                    },
                                 },
                                 userStateDisplay = new StateDisplay
                                 {
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Margin = new MarginPadding { Right = 10 },
-                                }
-                            }
+                                },
+                            },
                         },
                         kickButton = new KickButton
                         {
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Action = () => Client.KickUser(User.UserID),
                         },
                     },
-                }
+                },
             };
         }
 
@@ -246,7 +246,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             return;
 
                         Client.KickUser(targetUser);
-                    })
+                    }),
                 };
             }
         }

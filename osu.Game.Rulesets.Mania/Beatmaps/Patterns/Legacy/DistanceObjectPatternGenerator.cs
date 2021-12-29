@@ -516,7 +516,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     StartTime = startTime,
                     Samples = sampleInfoListAt(startTime),
-                    Column = column
+                    Column = column,
                 };
             }
             else
@@ -527,7 +527,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - startTime,
                     Column = column,
                     Samples = HitObject.Samples,
-                    NodeSamples = nodeSamplesAt(startTime)
+                    NodeSamples = nodeSamplesAt(startTime),
                 };
             }
 

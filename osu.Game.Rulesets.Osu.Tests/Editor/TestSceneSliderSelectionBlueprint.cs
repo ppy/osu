@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     Vector2.Zero,
                     new Vector2(150, 150),
-                    new Vector2(300, 0)
-                })
+                    new Vector2(300, 0),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });

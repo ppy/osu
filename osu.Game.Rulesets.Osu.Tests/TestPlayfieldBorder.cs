@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         new PlayfieldBorder
                         {
-                            PlayfieldBorderStyle = { BindTarget = playfieldBorderStyle }
-                        }
-                    }
+                            PlayfieldBorderStyle = { BindTarget = playfieldBorderStyle },
+                        },
+                    },
                 };
             });
 

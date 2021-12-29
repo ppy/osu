@@ -29,12 +29,12 @@ namespace osu.Game.Overlays.Dialog
                 new PopupDialogOkButton
                 {
                     Text = @"Yes",
-                    Action = onConfirm
+                    Action = onConfirm,
                 },
                 new PopupDialogCancelButton
                 {
                     Text = Localisation.CommonStrings.Cancel,
-                    Action = onCancel
+                    Action = onCancel,
                 },
             };
         }

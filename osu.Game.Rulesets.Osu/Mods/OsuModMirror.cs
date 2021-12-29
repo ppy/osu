@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             Horizontal,
             Vertical,
-            Both
+            Both,
         }
     }
 }

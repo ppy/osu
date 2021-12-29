@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             new object[] { LegacyMods.Key3, new[] { typeof(ManiaModKey3) } },
             new object[] { LegacyMods.Key2, new[] { typeof(ManiaModKey2) } },
             new object[] { LegacyMods.Mirror, new[] { typeof(ManiaModMirror) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(ManiaModHardRock), typeof(ManiaModDoubleTime) } }
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(ManiaModHardRock), typeof(ManiaModDoubleTime) } },
         };
 
         [TestCaseSource(nameof(mania_mod_mapping))]

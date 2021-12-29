@@ -90,9 +90,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             {
                                 Label = "Bank Name",
                             },
-                            volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new SampleControlPoint().SampleVolumeBindable)
-                        }
-                    }
+                            volume = new IndeterminateSliderWithTextBoxInput<int>("Volume", new SampleControlPoint().SampleVolumeBindable),
+                        },
+                    },
                 };
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.

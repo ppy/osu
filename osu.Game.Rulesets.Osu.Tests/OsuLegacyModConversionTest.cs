@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             new object[] { LegacyMods.Perfect, new[] { typeof(OsuModPerfect) } },
             new object[] { LegacyMods.Cinema, new[] { typeof(OsuModCinema) } },
             new object[] { LegacyMods.Target, new[] { typeof(OsuModTarget) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } }
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(OsuModHardRock), typeof(OsuModDoubleTime) } },
         };
 
         [TestCaseSource(nameof(osu_mod_mapping))]

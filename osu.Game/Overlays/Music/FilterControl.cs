@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
                         },
-                        collectionDropdown = new CollectionDropdown { RelativeSizeAxes = Axes.X }
+                        collectionDropdown = new CollectionDropdown { RelativeSizeAxes = Axes.X },
                     },
                 },
             };
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Music
         private FilterCriteria createCriteria() => new FilterCriteria
         {
             SearchText = Search.Current.Value,
-            Collection = collectionDropdown.Current.Value?.Collection
+            Collection = collectionDropdown.Current.Value?.Collection,
         };
 
         public class FilterTextBox : SearchTextBox

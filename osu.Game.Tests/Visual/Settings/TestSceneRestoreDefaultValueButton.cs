@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Settings
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeaFoam
+                        Colour = colours.GreySeaFoam,
                     },
                     restoreDefaultValueButton = new RestoreDefaultValueButton<float>
                     {
@@ -47,8 +47,8 @@ namespace osu.Game.Tests.Visual.Settings
                         Origin = Anchor.Centre,
                         Scale = new Vector2(scale),
                         Current = current,
-                    }
-                }
+                    },
+                },
             });
             AddSliderStep("set scale", 1, 4, 1, scale =>
             {

@@ -41,7 +41,7 @@ namespace osu.Game.Storyboards
                 Alpha,
                 BlendingParameters,
                 FlipH,
-                FlipV
+                FlipV,
             };
         }
 

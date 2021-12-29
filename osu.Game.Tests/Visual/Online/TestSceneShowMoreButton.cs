@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Online
                     // ReSharper disable once AccessToModifiedClosure
                     // ReSharper disable once PossibleNullReferenceException
                     Scheduler.AddDelayed(() => button.IsLoading = false, 2000);
-                }
+                },
             });
 
             AddStep("click button", () => button.TriggerClick());

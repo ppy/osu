@@ -36,8 +36,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 Path = new SliderPath(new[]
                 {
                     new PathControlPoint(new Vector2(0, 0)),
-                    new PathControlPoint(new Vector2(100, 0))
-                })
+                    new PathControlPoint(new Vector2(100, 0)),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 Path = new SliderPath(new[]
                 {
                     new PathControlPoint(new Vector2(0, 0)),
-                    new PathControlPoint(new Vector2(25, 0))
-                })
+                    new PathControlPoint(new Vector2(25, 0)),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -74,8 +74,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 Path = new SliderPath(new[]
                 {
                     new PathControlPoint(new Vector2(0, 0)),
-                    new PathControlPoint(new Vector2(10, 0))
-                })
+                    new PathControlPoint(new Vector2(10, 0)),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -93,8 +93,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 Path = new SliderPath(new[]
                 {
                     new PathControlPoint(new Vector2(0, 0)),
-                    new PathControlPoint(new Vector2(10, 0))
-                })
+                    new PathControlPoint(new Vector2(10, 0)),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -113,8 +113,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor.Checks
                 Path = new SliderPath(new[]
                 {
                     new PathControlPoint(new Vector2(0, 0)),
-                    new PathControlPoint(new Vector2(10, 0))
-                })
+                    new PathControlPoint(new Vector2(10, 0)),
+                }),
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

@@ -47,15 +47,15 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                                 Text = $"{Score.PP * weight:0}pp",
                             },
-                        }
-                    }
+                        },
+                    },
                 },
                 new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 12),
-                    Text = UsersStrings.ShowExtraTopRanksPpWeight(weight.ToLocalisableString("0%"))
-                }
-            }
+                    Text = UsersStrings.ShowExtraTopRanksPpWeight(weight.ToLocalisableString("0%")),
+                },
+            },
         };
     }
 }

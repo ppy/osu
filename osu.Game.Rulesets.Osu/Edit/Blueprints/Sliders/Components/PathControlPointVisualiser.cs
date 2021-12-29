@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             InternalChildren = new Drawable[]
             {
                 Connections = new Container<PathControlPointConnectionPiece> { RelativeSizeAxes = Axes.Both },
-                Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both }
+                Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both },
             };
         }
 
@@ -331,8 +331,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => DeleteSelected()),
                     new OsuMenuItem("Curve type")
                     {
-                        Items = items
-                    }
+                        Items = items,
+                    },
                 };
             }
         }

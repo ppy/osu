@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
                     Width = OsuScrollContainer.SCROLL_BAR_HEIGHT,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Alpha = 0.5f
+                    Alpha = 0.5f,
                 },
                 new Container
                 {
@@ -53,13 +53,13 @@ namespace osu.Game.Overlays
                                 {
                                     Vertical = 20,
                                     Left = 50,
-                                    Right = 30
+                                    Right = 30,
                                 },
-                                Child = CreateContent()
-                            }
-                        }
-                    }
-                }
+                                Child = CreateContent(),
+                            },
+                        },
+                    },
+                },
             };
         }
 

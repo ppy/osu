@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,
-                }
+                },
             });
         }
 

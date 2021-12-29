@@ -49,7 +49,7 @@ namespace osu.Game.Collections
 
         protected override Drawable CreateContent() => new ItemContent(Model)
         {
-            IsCreated = { BindTarget = isCreated }
+            IsCreated = { BindTarget = isCreated },
         };
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace osu.Game.Collections
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         IsCreated = { BindTarget = IsCreated },
-                        IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v)
+                        IsTextBoxHovered = v => textBox.ReceivePositionalInputAt(v),
                     },
                     textBoxPaddingContainer = new Container
                     {
@@ -102,9 +102,9 @@ namespace osu.Game.Collections
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 CornerRadius = item_height / 2,
-                                PlaceholderText = IsCreated.Value ? string.Empty : "Create a new collection"
+                                PlaceholderText = IsCreated.Value ? string.Empty : "Create a new collection",
                             },
-                        }
+                        },
                     },
                 };
             }
@@ -188,7 +188,7 @@ namespace osu.Game.Collections
                         background = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Red
+                            Colour = colours.Red,
                         },
                         new SpriteIcon
                         {
@@ -196,9 +196,9 @@ namespace osu.Game.Collections
                             Origin = Anchor.Centre,
                             X = -button_width * 0.6f,
                             Size = new Vector2(10),
-                            Icon = FontAwesome.Solid.Trash
-                        }
-                    }
+                            Icon = FontAwesome.Solid.Trash,
+                        },
+                    },
                 };
             }
 

@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private OsuLogo logo = new OsuLogo
         {
-            Alpha = 0
+            Alpha = 0,
         };
 
         [BackgroundDependencyLoader]

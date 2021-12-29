@@ -141,7 +141,7 @@ namespace osu.Game.Database
 
         protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(database_name, storage))
         {
-            Database = { AutoTransactionsEnabled = false }
+            Database = { AutoTransactionsEnabled = false },
         };
 
         public void ResetDatabase()

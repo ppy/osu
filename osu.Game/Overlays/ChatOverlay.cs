@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding
                                             {
-                                                Bottom = text_box_height
+                                                Bottom = text_box_height,
                                             },
                                         },
                                         new Container
@@ -158,13 +158,13 @@ namespace osu.Game.Overlays
                                                     PlaceholderText = "type your message",
                                                     ReleaseFocusOnCommit = false,
                                                     HoldFocus = true,
-                                                }
-                                            }
+                                                },
+                                            },
                                         },
                                         loading = new LoadingSpinner(),
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                         tabsArea = new TabsArea
                         {
@@ -191,7 +191,7 @@ namespace osu.Game.Overlays
                                     d.OnRequestLeave = channelManager.LeaveChannel;
                                     d.IsSwitchable = true;
                                 }),
-                            }
+                            },
                         },
                     },
                 },

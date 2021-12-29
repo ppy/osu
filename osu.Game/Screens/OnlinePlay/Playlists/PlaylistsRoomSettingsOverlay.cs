@@ -46,7 +46,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             RelativeSizeAxes = Axes.Both,
             RelativePositionAxes = Axes.Y,
-            EditPlaylist = () => EditPlaylist?.Invoke()
+            EditPlaylist = () => EditPlaylist?.Invoke(),
         };
 
         protected class MatchSettings : OnlinePlayComposite
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
+                        Colour = colourProvider.Background4,
                     },
                     new GridContainer
                     {
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                     Padding = new MarginPadding
                                     {
                                         Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                                        Vertical = 10
+                                        Vertical = 10,
                                     },
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
                                                                 TabbableContentContainer = this,
-                                                                LengthLimit = 100
+                                                                LengthLimit = 100,
                                                             },
                                                         },
                                                         new Section("Duration")
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = DurationField = new DurationDropdown
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                            }
+                                                            },
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
                                                         {
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Alpha = disabled_alpha,
                                                             Child = AvailabilityPicker = new RoomAvailabilityPicker
                                                             {
-                                                                Enabled = { Value = false }
+                                                                Enabled = { Value = false },
                                                             },
                                                         },
                                                         new Section("Max participants")
@@ -202,7 +202,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                         playlist = new PlaylistsRoomSettingsPlaylist
                                                                         {
                                                                             RelativeSizeAxes = Axes.Both,
-                                                                        }
+                                                                        },
                                                                     },
                                                                     new Drawable[]
                                                                     {
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             Margin = new MarginPadding { Vertical = 5 },
                                                                             Colour = colours.Yellow,
                                                                             Font = OsuFont.GetFont(size: 12),
-                                                                        }
+                                                                        },
                                                                     },
                                                                     new Drawable[]
                                                                     {
@@ -220,22 +220,22 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                             RelativeSizeAxes = Axes.X,
                                                                             Height = 40,
                                                                             Text = "Edit playlist",
-                                                                            Action = () => EditPlaylist?.Invoke()
-                                                                        }
-                                                                    }
+                                                                            Action = () => EditPlaylist?.Invoke(),
+                                                                        },
+                                                                    },
                                                                 },
                                                                 RowDimensions = new[]
                                                                 {
                                                                     new Dimension(),
                                                                     new Dimension(GridSizeMode.AutoSize),
                                                                     new Dimension(GridSizeMode.AutoSize),
-                                                                }
-                                                            }
+                                                                },
+                                                            },
                                                         },
                                                     },
                                                 },
                                             },
-                                        }
+                                        },
                                     },
                                 },
                             },
@@ -253,7 +253,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = colourProvider.Background5
+                                            Colour = colourProvider.Background5,
                                         },
                                         new FillFlowContainer
                                         {
@@ -279,16 +279,16 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                     Origin = Anchor.BottomCentre,
                                                     Alpha = 0,
                                                     Depth = 1,
-                                                    Colour = colours.RedDark
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                                                    Colour = colours.RedDark,
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
-                    loadingLayer = new LoadingLayer(true)
+                    loadingLayer = new LoadingLayer(true),
                 };
 
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);

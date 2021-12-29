@@ -66,8 +66,8 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
-                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => CreateStar())
-                }
+                    ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => CreateStar()),
+                },
             };
         }
 

@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             });
         }
 

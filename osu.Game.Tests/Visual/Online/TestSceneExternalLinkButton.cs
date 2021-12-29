@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Child = new ExternalLinkButton("https://osu.ppy.sh/home")
             {
-                Size = new Vector2(50)
+                Size = new Vector2(50),
             };
         }
     }

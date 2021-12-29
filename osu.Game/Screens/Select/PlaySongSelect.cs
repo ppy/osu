@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
                 {
                     notifications?.Post(new SimpleNotification
                     {
-                        Text = "The current ruleset doesn't have an autoplay mod avalaible!"
+                        Text = "The current ruleset doesn't have an autoplay mod avalaible!",
                     });
                     return false;
                 }

@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
         {
             Waiting,
             Active,
-            Finished
+            Finished,
         }
     }
 }

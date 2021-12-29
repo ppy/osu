@@ -82,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                             Scale = new Vector2(4),
-                        }
-                    }
+                        },
+                    },
                 },
             };
 

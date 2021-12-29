@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             },
                             Label = "a sample component",
                             Description = hasDescription ? "this text describes the component" : string.Empty,
-                        }
+                        },
                     });
                 }
             });

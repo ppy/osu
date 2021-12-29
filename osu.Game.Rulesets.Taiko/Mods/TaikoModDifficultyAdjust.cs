@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 return string.Join(", ", new[]
                 {
                     base.SettingDescription,
-                    scrollSpeed
+                    scrollSpeed,
                 }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }

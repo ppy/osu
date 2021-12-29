@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 6 },
-                    Ruleset = ruleset
-                }
+                    Ruleset = ruleset,
+                },
             };
 
             for (int i = 0; i < 512; i++)
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 {
                     X = (0.5f + i / 2048f * (i % 10 - 5)) * CatchPlayfield.WIDTH,
                     StartTime = i * 100,
-                    NewCombo = i % 8 == 0
+                    NewCombo = i % 8 == 0,
                 });
             }
 

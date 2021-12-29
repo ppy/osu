@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                }
+                },
             });
         }
 

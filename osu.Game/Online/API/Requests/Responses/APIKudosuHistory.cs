@@ -71,7 +71,7 @@ namespace osu.Game.Online.API.Requests.Responses
         Forum,
         Recalculate,
         Restore,
-        Vote
+        Vote,
     }
 
     public enum KudosuAction

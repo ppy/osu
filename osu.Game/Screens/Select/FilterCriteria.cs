@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
         {
             IsLowerInclusive = true,
-            IsUpperInclusive = true
+            IsUpperInclusive = true,
         };
 
         public string[] SearchTerms = Array.Empty<string>();

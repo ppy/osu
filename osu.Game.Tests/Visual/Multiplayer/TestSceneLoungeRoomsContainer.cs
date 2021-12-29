@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 Child = container = new RoomsContainer
                 {
-                    SelectedRoom = { BindTarget = SelectedRoom }
-                }
+                    SelectedRoom = { BindTarget = SelectedRoom },
+                },
             };
         });
 

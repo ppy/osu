@@ -15,6 +15,6 @@ namespace osu.Game.Overlays.BeatmapListing
         Played,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.PlayedUnplayed))]
-        Unplayed
+        Unplayed,
     }
 }

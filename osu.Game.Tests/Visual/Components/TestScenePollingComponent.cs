@@ -51,9 +51,9 @@ namespace osu.Game.Tests.Visual.Components
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = "Poll!",
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         });
 

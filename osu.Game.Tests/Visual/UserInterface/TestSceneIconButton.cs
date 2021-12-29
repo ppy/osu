@@ -30,9 +30,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new NamedIconButton("Icon colours", new IconButton
                     {
                         IconColour = Color4.Green,
-                        IconHoverColour = Color4.Red
-                    })
-                }
+                        IconHoverColour = Color4.Red,
+                    }),
+                },
             };
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Text = name
+                                Text = name,
                             },
                             new Container
                             {
@@ -92,12 +92,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Child = button
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                        Child = button,
+                                    },
+                                },
+                            },
+                        },
+                    },
                 };
 
                 iconContainer.AutoSizeAxes = Axes.Both;

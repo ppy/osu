@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 state = new ReplayState<OsuAction>
                 {
-                    PressedActions = new List<OsuAction>()
+                    PressedActions = new List<OsuAction>(),
                 };
 
                 if (down)

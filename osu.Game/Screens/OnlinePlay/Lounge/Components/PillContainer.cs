@@ -38,7 +38,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
-                        Alpha = 0.5f
+                        Alpha = 0.5f,
                     },
                     new Container
                     {
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                             AutoSizeAxes = Axes.Both,
                             ColumnDimensions = new[]
                             {
-                                new Dimension(GridSizeMode.AutoSize, minSize: 80 - 2 * padding)
+                                new Dimension(GridSizeMode.AutoSize, minSize: 80 - 2 * padding),
                             },
                             Content = new[]
                             {
@@ -68,13 +68,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                             AutoSizeAxes = Axes.Both,
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
     }

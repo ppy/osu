@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(130)
-                }
+                    Size = new Vector2(130),
+                },
             };
         });
 
@@ -117,14 +117,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        AlwaysPresent = true
+                        AlwaysPresent = true,
                     },
                     new Circle
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(4),
-                    }
+                    },
                 };
             }
         }

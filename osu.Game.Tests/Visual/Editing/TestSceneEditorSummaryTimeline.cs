@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500, 50)
+                    Size = new Vector2(500, 50),
                 });
             });
         }

@@ -95,8 +95,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddRepeatStep("random stuff happens", performRandomAction, 30);
@@ -231,8 +231,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddAssert("Check participant count correct", () => client.APIRoom?.ParticipantCount.Value == 1);
@@ -253,8 +253,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        }
-                    }
+                        },
+                    },
                 }, API.LocalUser.Value);
             });
 
@@ -283,8 +283,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        }
-                    }
+                        },
+                    },
                 }, API.LocalUser.Value);
             });
 
@@ -314,8 +314,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddAssert("room has password", () => client.APIRoom?.Password.Value == "password");
@@ -336,8 +336,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        }
-                    }
+                        },
+                    },
                 }, API.LocalUser.Value);
             });
 
@@ -369,8 +369,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("change password", () => client.ChangeSettings(password: "password2"));
@@ -389,8 +389,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             pressReadyButton();
@@ -411,8 +411,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             pressReadyButton();
@@ -450,8 +450,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("join other user (ready, host)", () =>
@@ -484,8 +484,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
@@ -524,8 +524,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("disconnect", () => client.Disconnect());
@@ -544,9 +544,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        AllowedMods = { new OsuModHidden() }
-                    }
-                }
+                        AllowedMods = { new OsuModHidden() },
+                    },
+                },
             });
 
             AddStep("open mod overlay", () => this.ChildrenOfType<RoomSubScreen.UserModSelectButton>().Single().TriggerClick());
@@ -584,8 +584,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             enterGameplay();
@@ -615,8 +615,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                             Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        }
-                    }
+                        },
+                    },
                 }, API.LocalUser.Value);
             });
 
@@ -661,8 +661,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("set spectating state", () => client.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
@@ -697,8 +697,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddStep("set spectating state", () => client.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
@@ -736,8 +736,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             enterGameplay();
@@ -745,7 +745,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
             AddStep("add item as other user", () => client.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(new PlaylistItem
             {
-                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
+                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1,
             })));
 
             AddUntilStep("item arrived in playlist", () => client.Room?.Playlist.Count == 2);
@@ -767,8 +767,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             enterGameplay();
@@ -776,7 +776,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("join other user", () => client.AddUser(new APIUser { Id = 1234 }));
             AddStep("add item as other user", () => client.AddUserPlaylistItem(1234, new MultiplayerPlaylistItem(new PlaylistItem
             {
-                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1
+                BeatmapID = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo.OnlineID ?? -1,
             })));
 
             AddUntilStep("item arrived in playlist", () => client.Room?.Playlist.Count == 2);

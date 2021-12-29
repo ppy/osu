@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.UI
                     Alpha = 0,
                     Font = OsuFont.Numeric.With(null, 22f),
                     UseFullGlyphHeight = false,
-                    Text = mod.Acronym
+                    Text = mod.Acronym,
                 },
                 modIcon = new SpriteIcon
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.UI
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
                     Size = new Vector2(45),
-                    Icon = FontAwesome.Solid.Question
+                    Icon = FontAwesome.Solid.Question,
                 },
             };
         }

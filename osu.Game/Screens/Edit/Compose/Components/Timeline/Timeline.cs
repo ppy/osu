@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             Colour = colours.YellowDarker,
                         },
                         userContent,
-                    }
+                    },
                 },
             });
 

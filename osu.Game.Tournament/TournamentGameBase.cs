@@ -313,7 +313,7 @@ namespace osu.Game.Tournament
                     Formatting = Formatting.Indented,
                     NullValueHandling = NullValueHandling.Ignore,
                     DefaultValueHandling = DefaultValueHandling.Ignore,
-                    Converters = new JsonConverter[] { new JsonPointConverter() }
+                    Converters = new JsonConverter[] { new JsonPointConverter() },
                 });
 
             using (var stream = storage.GetStream(BRACKET_FILENAME, FileAccess.Write, FileMode.Create))

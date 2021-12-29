@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 Name = "Background",
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black
+                Colour = Color4.Black,
             };
         }
     }

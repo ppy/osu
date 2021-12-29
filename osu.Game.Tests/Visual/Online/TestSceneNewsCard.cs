@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
                         Author = "someone, someone1, someone2, someone3, someone4",
                         FirstImage = "/help/wiki/shared/news/banners/monthly-beatmapping-contest.png",
                         PublishedAt = DateTimeOffset.Now,
-                        Slug = "2020-07-16-summer-theme-park-2020-voting-open"
+                        Slug = "2020-07-16-summer-theme-park-2020-voting-open",
                     }),
                     new NewsCard(new APINewsPost
                     {
@@ -44,9 +44,9 @@ namespace osu.Game.Tests.Visual.Online
                         Preview = "boom (HTML entity: &amp;)",
                         Author = "user (HTML entity: &amp;)",
                         FirstImage = "https://assets.ppy.sh/artists/88/header.jpg",
-                        PublishedAt = DateTimeOffset.Now
-                    })
-                }
+                        PublishedAt = DateTimeOffset.Now,
+                    }),
+                },
             });
         }
     }

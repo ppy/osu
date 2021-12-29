@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Mods
         {
             Mod = new TaikoModHidden(),
             Autoplay = true,
-            PassCondition = checkSomeAutoplayHits
+            PassCondition = checkSomeAutoplayHits,
         });
 
         private bool checkSomeAutoplayHits()

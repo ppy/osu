@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                     Depth = 1,
                     Alpha = 0,
                     Scale = new Vector2(1.2f),
-                }
+                },
             };
         }
 

@@ -84,7 +84,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                             scoreDisplayContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y
+                                AutoSizeAxes = Axes.Y,
                             },
                         },
                         new Drawable[]
@@ -100,15 +100,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
                                         leaderboardContainer = new Container
                                         {
                                             RelativeSizeAxes = Axes.Y,
-                                            AutoSizeAxes = Axes.X
+                                            AutoSizeAxes = Axes.X,
                                         },
-                                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
+                                        grid = new PlayerGrid { RelativeSizeAxes = Axes.Both },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                }),
             };
 
             for (int i = 0; i < Users.Count; i++)

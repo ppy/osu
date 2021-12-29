@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Artist = "Some Artist",
                 Title = "Some Beatmap",
-                AuthorString = "Some Author"
+                AuthorString = "Some Author",
             };
 
             var beatmapSetInfo = new BeatmapSetInfo
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 OnlineID = 10,
                 Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                 Metadata = metadata,
-                DateAdded = DateTimeOffset.UtcNow
+                DateAdded = DateTimeOffset.UtcNow,
             };
 
             for (int i = 0; i < 8; ++i)
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Length = length,
                     BPM = bpm,
                     Metadata = metadata,
-                    BaseDifficulty = new BeatmapDifficulty()
+                    BaseDifficulty = new BeatmapDifficulty(),
                 };
 
                 beatmaps.Add(beatmap);

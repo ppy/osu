@@ -100,8 +100,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                             Right = 20,
                                             // ensure that the label is always vertically padded even if the component itself isn't.
                                             // this may become an issue if the label is taller than the component.
-                                            Vertical = padded ? 0 : CONTENT_PADDING_VERTICAL
-                                        }
+                                            Vertical = padded ? 0 : CONTENT_PADDING_VERTICAL,
+                                        },
                                     },
                                     new Container
                                     {
@@ -114,8 +114,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
                                         {
                                             d.Anchor = Anchor.CentreRight;
                                             d.Origin = Anchor.CentreRight;
-                                        })
-                                    }
+                                        }),
+                                    },
                                 },
                             },
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
@@ -126,9 +126,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding { Bottom = padded ? 0 : CONTENT_PADDING_VERTICAL },
                             Alpha = 0,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             updateLabelWidth();

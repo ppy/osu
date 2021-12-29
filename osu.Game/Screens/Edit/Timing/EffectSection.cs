@@ -26,8 +26,8 @@ namespace osu.Game.Screens.Edit.Timing
                 scrollSpeedSlider = new SliderWithTextBoxInput<double>("Scroll Speed")
                 {
                     Current = new EffectControlPoint().ScrollSpeedBindable,
-                    KeyboardStep = 0.1f
-                }
+                    KeyboardStep = 0.1f,
+                },
             });
         }
 

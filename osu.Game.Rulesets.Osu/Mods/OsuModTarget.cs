@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
             Default = null,
-            Value = null
+            Value = null,
         };
 
         #region Constants

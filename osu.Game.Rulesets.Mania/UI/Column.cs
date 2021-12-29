@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Drawable background = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.ColumnBackground), _ => new DefaultColumnBackground())
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             };
 
             InternalChildren = new[]
@@ -65,10 +65,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 HitObjectArea = new ColumnHitObjectArea(Index, HitObjectContainer) { RelativeSizeAxes = Axes.Both },
                 new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.KeyArea), _ => new DefaultKeyArea())
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 background,
-                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
+                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);

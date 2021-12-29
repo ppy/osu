@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Components
                     // going negative.
                     X = -35,
                     Font = OsuFont.GetFont(size: 25, fixedWidth: true),
-                }
+                },
             };
         }
 

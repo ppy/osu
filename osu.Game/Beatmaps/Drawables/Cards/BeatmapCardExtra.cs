@@ -74,8 +74,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                 Margin = new MarginPadding(5),
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(1)
-                            }
+                                Spacing = new Vector2(1),
+                            },
                         },
                         buttonContainer = new CollapsibleButtonContainer(BeatmapSet)
                         {
@@ -100,11 +100,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             ColumnDimensions = new[]
                                             {
                                                 new Dimension(),
-                                                new Dimension(GridSizeMode.AutoSize)
+                                                new Dimension(GridSizeMode.AutoSize),
                                             },
                                             RowDimensions = new[]
                                             {
-                                                new Dimension(GridSizeMode.AutoSize)
+                                                new Dimension(GridSizeMode.AutoSize),
                                             },
                                             Content = new[]
                                             {
@@ -115,11 +115,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                         Text = new RomanisableString(BeatmapSet.TitleUnicode, BeatmapSet.Title),
                                                         Font = OsuFont.Default.With(size: 22.5f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
-                                                        Truncate = true
+                                                        Truncate = true,
                                                     },
-                                                    Empty()
-                                                }
-                                            }
+                                                    Empty(),
+                                                },
+                                            },
                                         },
                                         artistContainer = new GridContainer
                                         {
@@ -128,11 +128,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             ColumnDimensions = new[]
                                             {
                                                 new Dimension(),
-                                                new Dimension(GridSizeMode.AutoSize)
+                                                new Dimension(GridSizeMode.AutoSize),
                                             },
                                             RowDimensions = new[]
                                             {
-                                                new Dimension(GridSizeMode.AutoSize)
+                                                new Dimension(GridSizeMode.AutoSize),
                                             },
                                             Content = new[]
                                             {
@@ -143,11 +143,11 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                         Text = createArtistText(),
                                                         Font = OsuFont.Default.With(size: 17.5f, weight: FontWeight.SemiBold),
                                                         RelativeSizeAxes = Axes.X,
-                                                        Truncate = true
+                                                        Truncate = true,
                                                     },
-                                                    Empty()
+                                                    Empty(),
                                                 },
-                                            }
+                                            },
                                         },
                                         new OsuSpriteText
                                         {
@@ -156,9 +156,9 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             Text = BeatmapSet.Source,
                                             Shadow = false,
                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
-                                            Colour = colourProvider.Content2
+                                            Colour = colourProvider.Content2,
                                         },
-                                    }
+                                    },
                                 },
                                 new Container
                                 {
@@ -196,22 +196,22 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                                     RowDimensions = new[]
                                                     {
                                                         new Dimension(GridSizeMode.AutoSize),
-                                                        new Dimension(GridSizeMode.AutoSize)
+                                                        new Dimension(GridSizeMode.AutoSize),
                                                     },
                                                     ColumnDimensions = new[]
                                                     {
                                                         new Dimension(GridSizeMode.AutoSize),
                                                         new Dimension(GridSizeMode.AutoSize),
-                                                        new Dimension()
+                                                        new Dimension(),
                                                     },
                                                     Content = new[]
                                                     {
                                                         new Drawable[3],
-                                                        new Drawable[3]
-                                                    }
+                                                        new Drawable[3],
+                                                    },
                                                 },
-                                                new BeatmapCardExtraInfoRow(BeatmapSet)
-                                            }
+                                                new BeatmapCardExtraInfoRow(BeatmapSet),
+                                            },
                                         },
                                         downloadProgressBar = new BeatmapCardDownloadProgressBar
                                         {
@@ -220,20 +220,20 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             State = { BindTarget = DownloadTracker.State },
-                                            Progress = { BindTarget = DownloadTracker.Progress }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                            Progress = { BindTarget = DownloadTracker.Progress },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
                 };
                 c.ExpandedContent = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = 10, Vertical = 13 },
-                    Child = new BeatmapCardDifficultyList(BeatmapSet)
+                    Child = new BeatmapCardDifficultyList(BeatmapSet),
                 };
                 c.Expanded.BindTarget = Expanded;
             });
@@ -250,7 +250,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Left = 5 }
+                    Margin = new MarginPadding { Left = 5 },
                 };
             }
 
@@ -260,7 +260,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Left = 5 }
+                    Margin = new MarginPadding { Left = 5 },
                 };
             }
 

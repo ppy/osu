@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (Gamu) [Normal].osu",
                     "Soleily - Renatus (MMzz) [Futsuu].osu",
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
-                    "Soleily - Renatus (MMzz) [Oni].osu"
+                    "Soleily - Renatus (MMzz) [Oni].osu",
                 };
                 string[] maps = reader.Filenames.ToArray();
                 foreach (string map in expected)

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Comments
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background3
+                    Colour = colourProvider.Background3,
                 },
                 new FillFlowContainer
                 {
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Comments
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = TextBoxPlaceholder,
-                            Current = Current
+                            Current = Current,
                         },
                         new Container
                         {
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Comments
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                                    Text = FooterText
+                                    Text = FooterText,
                                 },
                                 ButtonsContainer = new FillFlowContainer
                                 {
@@ -106,13 +106,13 @@ namespace osu.Game.Overlays.Comments
                                         {
                                             OnCommit?.Invoke(Current.Value);
                                             Current.Value = string.Empty;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             textBox.OnCommit += (u, v) =>
@@ -221,12 +221,12 @@ namespace osu.Game.Overlays.Comments
                 {
                     blockedBackground = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Alpha = 0
+                        Alpha = 0,
                     },
                     drawableText = new OsuSpriteText
                     {
@@ -236,8 +236,8 @@ namespace osu.Game.Overlays.Comments
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                         Margin = new MarginPadding { Horizontal = 20 },
                         Text = text,
-                    }
-                }
+                    },
+                },
             };
 
             protected override void OnLoadStarted() => drawableText.FadeOut(duration, Easing.OutQuint);

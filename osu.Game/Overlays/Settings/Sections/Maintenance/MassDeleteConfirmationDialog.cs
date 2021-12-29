@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Go for it.",
-                    Action = deleteAction
+                    Action = deleteAction,
                 },
                 new PopupDialogCancelButton
                 {

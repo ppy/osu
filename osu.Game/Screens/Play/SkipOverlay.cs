@@ -83,9 +83,9 @@ namespace osu.Game.Screens.Play
                             Colour = colours.Yellow,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 
@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Play
                                     new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
                                     new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
                                     new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.Solid.ChevronRight },
-                                }
+                                },
                             },
                             new OsuSpriteText
                             {
@@ -322,8 +322,8 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.Centre,
                                 Text = @"SKIP",
                             },
-                        }
-                    }
+                        },
+                    },
                 };
             }
 

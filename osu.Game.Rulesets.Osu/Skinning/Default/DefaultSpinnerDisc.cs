@@ -66,15 +66,15 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                         fill = new SpinnerFill
                         {
                             Alpha = idle_alpha,
-                            AccentColour = normalColour
+                            AccentColour = normalColour,
                         },
                         ticks = new SpinnerTicks
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            AccentColour = normalColour
+                            AccentColour = normalColour,
                         },
-                    }
+                    },
                 },
                 centre = new SpinnerCentreLayer
                 {

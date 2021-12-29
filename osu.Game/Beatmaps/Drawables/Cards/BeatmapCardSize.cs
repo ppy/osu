@@ -9,6 +9,6 @@ namespace osu.Game.Beatmaps.Drawables.Cards
     public enum BeatmapCardSize
     {
         Normal,
-        Extra
+        Extra,
     }
 }

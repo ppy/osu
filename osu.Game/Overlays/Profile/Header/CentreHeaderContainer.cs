@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
+                    Colour = colourProvider.Background4,
                 },
                 new FillFlowContainer
                 {
@@ -54,17 +54,17 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         new FollowersButton
                         {
-                            User = { BindTarget = User }
+                            User = { BindTarget = User },
                         },
                         new MappingSubscribersButton
                         {
-                            User = { BindTarget = User }
+                            User = { BindTarget = User },
                         },
                         new MessageUserButton
                         {
-                            User = { BindTarget = User }
+                            User = { BindTarget = User },
                         },
-                    }
+                    },
                 },
                 new Container
                 {
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        DetailsVisible = { BindTarget = DetailsVisible }
+                        DetailsVisible = { BindTarget = DetailsVisible },
                     },
                 },
                 new Container
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Size = new Vector2(40),
-                            User = { BindTarget = User }
+                            User = { BindTarget = User },
                         },
                         expandedDetailContainer = new Container
                         {
@@ -105,8 +105,8 @@ namespace osu.Game.Overlays.Profile.Header
                             Child = new LevelProgressBar
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                User = { BindTarget = User }
-                            }
+                                User = { BindTarget = User },
+                            },
                         },
                         hiddenDetailContainer = new FillFlowContainer
                         {
@@ -123,17 +123,17 @@ namespace osu.Game.Overlays.Profile.Header
                                 hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
                                     Title = UsersStrings.ShowRankGlobalSimple,
-                                    LineColour = colourProvider.Highlight1
+                                    LineColour = colourProvider.Highlight1,
                                 },
                                 hiddenDetailCountry = new OverlinedInfoContainer
                                 {
                                     Title = UsersStrings.ShowRankCountrySimple,
-                                    LineColour = colourProvider.Highlight1
+                                    LineColour = colourProvider.Highlight1,
                                 },
-                            }
-                        }
-                    }
-                }
+                            },
+                        },
+                    },
+                },
             };
 
             DetailsVisible.BindValueChanged(visible =>

@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Volume
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
 
             Current.BindValueChanged(muted =>

@@ -18,9 +18,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     @"Half",
                     @"Normal",
-                    @"Double"
+                    @"Double",
                 },
-                Description = @"This is a description"
+                Description = @"This is a description",
             });
 
         [Test]
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             => AddStep(@"create dropdown", () => Child = new LabelledEnumDropdown<BeatmapOnlineStatus>
             {
                 Label = @"Beatmap status",
-                Description = @"This is a description"
+                Description = @"This is a description",
             });
     }
 }

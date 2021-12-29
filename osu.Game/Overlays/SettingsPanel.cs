@@ -95,9 +95,9 @@ namespace osu.Game.Overlays
                     },
                     loading = new LoadingLayer
                     {
-                        State = { Value = Visibility.Visible }
-                    }
-                }
+                        State = { Value = Visibility.Visible },
+                    },
+                },
             };
 
             Add(SectionsContainer = new SettingsSectionsContainer
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
                     Padding = new MarginPadding
                     {
                         Vertical = 20,
-                        Horizontal = CONTENT_MARGINS
+                        Horizontal = CONTENT_MARGINS,
                     },
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -122,9 +122,9 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                    }
+                    },
                 },
-                Footer = CreateFooter().With(f => f.Alpha = 0)
+                Footer = CreateFooter().With(f => f.Alpha = 0),
             });
 
             if (showSidebar)
@@ -305,7 +305,7 @@ namespace osu.Game.Overlays
                 HeaderBackground = new Box
                 {
                     Colour = colourProvider.Background4,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 };
             }
 

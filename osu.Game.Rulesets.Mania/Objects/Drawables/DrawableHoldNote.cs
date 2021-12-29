@@ -92,17 +92,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Masking = true,
-                            }
+                            },
                         },
-                        headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both }
-                    }
+                        headContainer = new Container<DrawableHoldNoteHead> { RelativeSizeAxes = Axes.Both },
+                    },
                 },
                 bodyPiece = new SkinnableDrawable(new ManiaSkinComponent(ManiaSkinComponents.HoldNoteBody), _ => new DefaultBodyPiece
                 {
                     RelativeSizeAxes = Axes.Both,
                 })
                 {
-                    RelativeSizeAxes = Axes.X
+                    RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
                 tailContainer = new Container<DrawableHoldNoteTail> { RelativeSizeAxes = Axes.Both },

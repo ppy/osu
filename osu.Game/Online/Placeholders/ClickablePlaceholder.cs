@@ -23,9 +23,9 @@ namespace osu.Game.Online.Placeholders
                 Child = textFlow = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
                 {
                     AutoSizeAxes = Framework.Graphics.Axes.Both,
-                    Margin = new Framework.Graphics.MarginPadding(5)
+                    Margin = new Framework.Graphics.MarginPadding(5),
                 },
-                Action = () => Action?.Invoke()
+                Action = () => Action?.Invoke(),
             });
 
             textFlow.AddIcon(icon, i =>

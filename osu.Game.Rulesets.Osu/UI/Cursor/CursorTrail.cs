@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         TexturePosition = textureRect.BottomLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomLeft.Linear,
-                        Time = part.Time
+                        Time = part.Time,
                     });
 
                     vertexBatch.Add(new TexturedTrailVertex
@@ -287,7 +287,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         TexturePosition = textureRect.BottomRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.BottomRight.Linear,
-                        Time = part.Time
+                        Time = part.Time,
                     });
 
                     vertexBatch.Add(new TexturedTrailVertex
@@ -296,7 +296,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         TexturePosition = textureRect.TopRight,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopRight.Linear,
-                        Time = part.Time
+                        Time = part.Time,
                     });
 
                     vertexBatch.Add(new TexturedTrailVertex
@@ -305,7 +305,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         TexturePosition = textureRect.TopLeft,
                         TextureRect = new Vector4(0, 0, 1, 1),
                         Colour = DrawColourInfo.Colour.TopLeft.Linear,
-                        Time = part.Time
+                        Time = part.Time,
                     });
                 }
 

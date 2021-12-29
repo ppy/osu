@@ -71,9 +71,9 @@ namespace osu.Game.Overlays
                         {
                             Text = InfoText,
                             Font = OsuFont.GetFont(size: 10),
-                            Colour = colourProvider.Foreground1
+                            Colour = colourProvider.Foreground1,
                         },
-                    }
+                    },
                 },
                 expandingBar = new ExpandingBar
                 {
@@ -81,9 +81,9 @@ namespace osu.Game.Overlays
                     Colour = GetBarColour(colours),
                     ExpandedSize = 4,
                     CollapsedSize = 2,
-                    Expanded = true
+                    Expanded = true,
                 },
-                new HoverClickSounds()
+                new HoverClickSounds(),
             });
 
             SelectedItem.BindValueChanged(_ => updateState(), true);

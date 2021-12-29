@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Child = new RankRangePill
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             };
         });
 
@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.AddUser(new APIUser
                 {
                     Id = 2,
-                    Statistics = { GlobalRank = 1234 }
+                    Statistics = { GlobalRank = 1234 },
                 });
 
                 // Remove the local user so only the one above is displayed.
@@ -44,19 +44,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.AddUser(new APIUser
                 {
                     Id = 2,
-                    Statistics = { GlobalRank = 1234 }
+                    Statistics = { GlobalRank = 1234 },
                 });
 
                 Client.AddUser(new APIUser
                 {
                     Id = 3,
-                    Statistics = { GlobalRank = 3333 }
+                    Statistics = { GlobalRank = 3333 },
                 });
 
                 Client.AddUser(new APIUser
                 {
                     Id = 4,
-                    Statistics = { GlobalRank = 4321 }
+                    Statistics = { GlobalRank = 4321 },
                 });
 
                 // Remove the local user so only the ones above are displayed.
@@ -78,13 +78,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Client.AddUser(new APIUser
                 {
                     Id = 2,
-                    Statistics = { GlobalRank = min }
+                    Statistics = { GlobalRank = min },
                 });
 
                 Client.AddUser(new APIUser
                 {
                     Id = 3,
-                    Statistics = { GlobalRank = max }
+                    Statistics = { GlobalRank = max },
                 });
 
                 // Remove the local user so only the ones above are displayed.

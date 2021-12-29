@@ -23,6 +23,6 @@ namespace osu.Game.Graphics.UserInterface
         TabSelect,
 
         [Description("scrolltotop")]
-        ScrollToTop
+        ScrollToTop,
     }
 }

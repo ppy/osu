@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override TestPlayer CreatePlayer(Ruleset ruleset)
         {
-            SelectedMods.Value = new Mod[] { new OsuModAutoplay(), new OsuModFlashlight(), };
+            SelectedMods.Value = new Mod[] { new OsuModAutoplay(), new OsuModFlashlight() };
 
             return base.CreatePlayer(ruleset);
         }

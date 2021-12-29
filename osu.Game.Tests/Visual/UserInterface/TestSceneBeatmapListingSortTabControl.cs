@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Children = new Drawable[]
                 {
                     current = new OsuSpriteText(),
-                    direction = new OsuSpriteText()
-                }
+                    direction = new OsuSpriteText(),
+                },
             });
 
             control.SortDirection.BindValueChanged(sortDirection => direction.Text = $"Sort direction: {sortDirection.NewValue}", true);

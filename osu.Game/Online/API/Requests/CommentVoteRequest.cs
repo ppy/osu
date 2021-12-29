@@ -31,6 +31,6 @@ namespace osu.Game.Online.API.Requests
     public enum CommentVoteAction
     {
         Vote,
-        UnVote
+        UnVote,
     }
 }

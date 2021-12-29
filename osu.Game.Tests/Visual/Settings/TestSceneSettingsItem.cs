@@ -29,8 +29,8 @@ namespace osu.Game.Tests.Visual.Settings
                     Current = new Bindable<string>
                     {
                         Default = "test",
-                        Value = "test"
-                    }
+                        Value = "test",
+                    },
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
@@ -59,8 +59,8 @@ namespace osu.Game.Tests.Visual.Settings
                     Current = new Bindable<string>
                     {
                         Default = "test",
-                        Value = "test"
-                    }
+                        Value = "test",
+                    },
                 };
             });
             AddUntilStep("wait for loaded", () => textBox.IsLoaded);
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Settings
                         MinValue = 0f,
                         MaxValue = 10f,
                         Precision = 0.1f,
-                    }
+                    },
                 };
             });
             AddUntilStep("wait for loaded", () => sliderBar.IsLoaded);

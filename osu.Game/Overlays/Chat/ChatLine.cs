@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Chat
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                MaxWidth = MessagePadding - TimestampPadding
+                MaxWidth = MessagePadding - TimestampPadding,
             };
 
             if (hasBackground)
@@ -132,10 +132,10 @@ namespace osu.Game.Overlays.Chat
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Left = 4, Right = 4, Bottom = 1, Top = -2 },
-                                Child = username
-                            }
-                        }
-                    }
+                                Child = username,
+                            },
+                        },
+                    },
                 };
             }
 
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays.Chat
                             Shadow = false,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true)
+                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true),
                         },
                         new MessageSender(message.Sender)
                         {
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Chat
                             Anchor = Anchor.TopRight,
                             Child = effectedUsername,
                         },
-                    }
+                    },
                 },
                 new Container
                 {
@@ -186,9 +186,9 @@ namespace osu.Game.Overlays.Chat
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 
@@ -245,7 +245,7 @@ namespace osu.Game.Overlays.Chat
 
                     List<MenuItem> items = new List<MenuItem>
                     {
-                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
+                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
                     };
 
                     if (!sender.Equals(api.LocalUser.Value))

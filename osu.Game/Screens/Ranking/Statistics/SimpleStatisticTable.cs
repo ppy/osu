@@ -52,10 +52,10 @@ namespace osu.Game.Screens.Ranking.Statistics
                 AutoSizeAxes = Axes.Y,
                 RowDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.AutoSize)
+                    new Dimension(GridSizeMode.AutoSize),
                 },
                 ColumnDimensions = createColumnDimensions().ToArray(),
-                Content = new[] { createColumns().ToArray() }
+                Content = new[] { createColumns().ToArray() },
             };
 
             for (int i = 0; i < items.Length; ++i)
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     yield return new Spacer
                     {
-                        Alpha = items.Length > column ? 1 : 0
+                        Alpha = items.Length > column ? 1 : 0,
                     };
                 }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-            Direction = FillDirection.Vertical
+            Direction = FillDirection.Vertical,
         };
 
         private class Spacer : CompositeDrawable
@@ -114,8 +114,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex("#222")
-                    }
+                        Colour = Color4Extensions.FromHex("#222"),
+                    },
                 };
             }
         }

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StartTime = obj.StartTime,
                 EndTime = obj.GetEndTime(),
                 X = obj.StackedPosition.X,
-                Y = obj.StackedPosition.Y
+                Y = obj.StackedPosition.Y,
             };
         }
 

@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 await Client.ToggleSpectate();
                                 readyClickOperation.Dispose();
                             });
-                        }
+                        },
                     },
                     readyButton = new MultiplayerReadyButton
                     {
@@ -101,9 +101,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                                 readyClickOperation.Dispose();
                             });
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         });
 

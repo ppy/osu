@@ -50,15 +50,15 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
                 Playfield = new ManiaPlayfield(new List<StageDefinition>
                 {
                     new StageDefinition { Columns = 4 },
-                    new StageDefinition { Columns = 3 }
+                    new StageDefinition { Columns = 3 },
                 })
                 {
-                    Clock = new FramedClock(new StopwatchClock())
+                    Clock = new FramedClock(new StopwatchClock()),
                 },
                 new TestHitObjectComposer(Playfield)
                 {
-                    Child = beatSnapGrid = new ManiaBeatSnapGrid()
-                }
+                    Child = beatSnapGrid = new ManiaBeatSnapGrid(),
+                },
             };
         }
 

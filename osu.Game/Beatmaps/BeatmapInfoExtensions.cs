@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps
 
         public static string[] GetSearchableTerms(this IBeatmapInfo beatmapInfo) => new[]
         {
-            beatmapInfo.DifficultyName
+            beatmapInfo.DifficultyName,
         }.Concat(beatmapInfo.Metadata.GetSearchableTerms()).Where(s => !string.IsNullOrEmpty(s)).ToArray();
 
         private static string getVersionString(IBeatmapInfo beatmapInfo) => string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? string.Empty : $"[{beatmapInfo.DifficultyName}]";

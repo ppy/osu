@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Judgements
                     Colour = colours.ForHitResult(Result),
                     Font = OsuFont.Numeric.With(size: 20),
                     Scale = new Vector2(0.85f, 1),
-                }
+                },
             };
         }
 

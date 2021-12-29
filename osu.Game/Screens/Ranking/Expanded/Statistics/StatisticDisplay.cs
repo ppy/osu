@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4Extensions.FromHex("#222")
+                                Colour = Color4Extensions.FromHex("#222"),
                             },
                             HeaderText = new OsuSpriteText
                             {
@@ -61,8 +61,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                                 Origin = Anchor.Centre,
                                 Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
                                 Text = header.ToUpperInvariant(),
-                            }
-                        }
+                            },
+                        },
                     },
                     new Container
                     {
@@ -78,9 +78,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                                 d.Alpha = 0;
                                 d.AlwaysPresent = true;
                             }),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

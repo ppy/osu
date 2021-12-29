@@ -27,7 +27,7 @@ namespace osu.Game.Scoring.Legacy
         {
             var score = new Score
             {
-                Replay = new Replay()
+                Replay = new Replay(),
             };
 
             WorkingBeatmap workingBeatmap;

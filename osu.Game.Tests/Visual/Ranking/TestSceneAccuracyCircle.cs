@@ -51,16 +51,16 @@ namespace osu.Game.Tests.Visual.Ranking
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333"))
-                        }
-                    }
+                            Colour = ColourInfo.GradientVertical(Color4Extensions.FromHex("#555"), Color4Extensions.FromHex("#333")),
+                        },
+                    },
                 },
                 new AccuracyCircle(score, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(230)
-                }
+                    Size = new Vector2(230),
+                },
             };
         });
 
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 { HitResult.Meh, 50 },
                 { HitResult.Good, 100 },
                 { HitResult.Great, 300 },
-            }
+            },
         };
     }
 }

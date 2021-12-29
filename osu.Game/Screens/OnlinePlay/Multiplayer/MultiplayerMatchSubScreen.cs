@@ -107,7 +107,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             RelativeSizeAxes = Axes.Both,
                             RowDimensions = new[]
                             {
-                                new Dimension(GridSizeMode.AutoSize)
+                                new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
                             {
@@ -116,10 +116,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 {
                                     new ParticipantsList
                                     {
-                                        RelativeSizeAxes = Axes.Both
+                                        RelativeSizeAxes = Axes.Both,
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                         // Spacer
                         null,
@@ -137,7 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                         RelativeSizeAxes = Axes.X,
                                         Height = 40,
                                         Text = "Add item",
-                                        Action = () => OpenSongSelection()
+                                        Action = () => OpenSongSelection(),
                                     },
                                 },
                                 null,
@@ -146,8 +146,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     new MultiplayerPlaylist
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        RequestEdit = item => OpenSongSelection(item.ID)
-                                    }
+                                        RequestEdit = item => OpenSongSelection(item.ID),
+                                    },
                                 },
                                 new[]
                                 {
@@ -182,9 +182,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                                         Current = UserMods,
                                                         Scale = new Vector2(0.8f),
                                                     },
-                                                }
+                                                },
                                             },
-                                        }
+                                        },
                                     },
                                 },
                             },
@@ -195,7 +195,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                 new Dimension(GridSizeMode.Absolute, 5),
                                 new Dimension(),
                                 new Dimension(GridSizeMode.AutoSize),
-                            }
+                            },
                         },
                         // Spacer
                         null,
@@ -206,17 +206,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                             Content = new[]
                             {
                                 new Drawable[] { new OverlinedHeader("Chat") },
-                                new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
+                                new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } },
                             },
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
-                            }
+                            },
                         },
-                    }
-                }
-            }
+                    },
+                },
+            },
         };
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter
         {
             OnReadyClick = onReadyClick,
-            OnSpectateClick = onSpectateClick
+            OnSpectateClick = onSpectateClick,
         };
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);

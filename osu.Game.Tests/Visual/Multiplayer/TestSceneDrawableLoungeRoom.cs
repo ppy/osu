@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private readonly Room room = new Room
         {
-            HasPassword = { Value = true }
+            HasPassword = { Value = true },
         };
 
         [Cached]
@@ -70,14 +70,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Origin = Anchor.TopCentre,
                             Margin = new MarginPadding(50),
                             Width = 500,
-                            Depth = float.MaxValue
+                            Depth = float.MaxValue,
                         },
                         drawableRoom = new DrawableLoungeRoom(room)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                        }
-                    }
+                        },
+                    },
                 };
             });
         }

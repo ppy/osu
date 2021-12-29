@@ -136,9 +136,9 @@ namespace osu.Game.Overlays.Dashboard
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Action = () => game?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
-                                Enabled = { Value = User.Id != api.LocalUser.Value.Id }
-                            }
-                        }
+                                Enabled = { Value = User.Id != api.LocalUser.Value.Id },
+                            },
+                        },
                     },
                 };
             }

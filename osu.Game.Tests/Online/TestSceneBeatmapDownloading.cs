@@ -26,9 +26,9 @@ namespace osu.Game.Tests.Online
                 Title = "test title",
                 Author = new APIUser
                 {
-                    Username = "mapper"
-                }
-            }
+                    Username = "mapper",
+                },
+            },
         };
 
         private static readonly APIBeatmapSet test_online_model = new APIBeatmapSet
@@ -38,8 +38,8 @@ namespace osu.Game.Tests.Online
             Title = "test title",
             Author = new APIUser
             {
-                Username = "mapper"
-            }
+                Username = "mapper",
+            },
         };
 
         [BackgroundDependencyLoader]
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Online
         private static readonly object[][] notification_test_cases =
         {
             new object[] { test_db_model },
-            new object[] { test_online_model }
+            new object[] { test_online_model },
         };
 
         [TestCaseSource(nameof(notification_test_cases))]

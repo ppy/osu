@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints
             {
                 scrollingPath = new ScrollingPath(),
                 nestedOutlineContainer = new NestedOutlineContainer(),
-                editablePath = new SelectionEditablePath(positionToDistance)
+                editablePath = new SelectionEditablePath(positionToDistance),
             };
         }
 

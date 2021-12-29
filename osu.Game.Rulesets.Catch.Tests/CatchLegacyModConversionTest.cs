@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             new object[] { LegacyMods.Autoplay, new[] { typeof(CatchModAutoplay) } },
             new object[] { LegacyMods.Perfect, new[] { typeof(CatchModPerfect) } },
             new object[] { LegacyMods.Cinema, new[] { typeof(CatchModCinema) } },
-            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(CatchModHardRock), typeof(CatchModDoubleTime) } }
+            new object[] { LegacyMods.HardRock | LegacyMods.DoubleTime, new[] { typeof(CatchModHardRock), typeof(CatchModDoubleTime) } },
         };
 
         [TestCaseSource(nameof(catch_mod_mapping))]

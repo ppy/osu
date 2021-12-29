@@ -18,8 +18,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 mouseButtonsCheckbox = new PlayerCheckbox
                 {
-                    LabelText = "Disable mouse buttons"
-                }
+                    LabelText = "Disable mouse buttons",
+                },
             };
         }
 

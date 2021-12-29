@@ -217,8 +217,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             {
                                 new OsuModHardRock(),
                                 new OsuModDoubleTime(),
-                                new OsuModAutoplay()
-                            }
+                                new OsuModAutoplay(),
+                            },
                         },
                         new PlaylistItem
                         {
@@ -229,10 +229,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             {
                                 new OsuModHardRock(),
                                 new OsuModDoubleTime(),
-                                new OsuModAutoplay()
-                            }
-                        }
-                    }
+                                new OsuModAutoplay(),
+                            },
+                        },
+                    },
                 };
             });
 
@@ -284,7 +284,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300)
+                    Size = new Vector2(500, 300),
                 };
 
                 setupPlaylist?.Invoke(playlist);
@@ -307,16 +307,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         Author = new APIUser { Username = "Creator name here" },
                                         Title = "Long title used to check background colour",
                                     },
-                                    BeatmapSet = new BeatmapSetInfo()
-                                }
+                                    BeatmapSet = new BeatmapSetInfo(),
+                                },
                         },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
                         {
                             new OsuModHardRock(),
                             new OsuModDoubleTime(),
-                            new OsuModAutoplay()
-                        }
+                            new OsuModAutoplay(),
+                        },
                     });
                 }
             });
@@ -332,7 +332,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300)
+                    Size = new Vector2(500, 300),
                 };
 
                 int index = 0;
@@ -349,8 +349,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             new OsuModHardRock(),
                             new OsuModDoubleTime(),
-                            new OsuModAutoplay()
-                        }
+                            new OsuModAutoplay(),
+                        },
                     });
                 }
             });

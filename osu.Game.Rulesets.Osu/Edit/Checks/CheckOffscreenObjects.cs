@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateOffscreenCircle(this),
-            new IssueTemplateOffscreenSlider(this)
+            new IssueTemplateOffscreenSlider(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

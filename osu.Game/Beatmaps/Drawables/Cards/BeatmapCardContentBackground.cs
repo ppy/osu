@@ -34,8 +34,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 cover = new DelayedLoadUnloadWrapper(() => createCover(onlineInfo), 500, 500)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Transparent
-                }
+                    Colour = Colour4.Transparent,
+                },
             };
         }
 
@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
             RelativeSizeAxes = Axes.Both,
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            FillMode = FillMode.Fill
+            FillMode = FillMode.Fill,
         };
 
         [BackgroundDependencyLoader]

@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Login
                     PlaceholderText = "username",
                     RelativeSizeAxes = Axes.X,
                     Text = api?.ProvidedUsername ?? string.Empty,
-                    TabbableContentContainer = this
+                    TabbableContentContainer = this,
                 },
                 password = new OsuPasswordTextBox
                 {
@@ -89,10 +89,10 @@ namespace osu.Game.Overlays.Login
                             Child = new SettingsButton
                             {
                                 Text = "Sign in",
-                                Action = performLogin
+                                Action = performLogin,
                             },
-                        }
-                    }
+                        },
+                    },
                 },
                 new SettingsButton
                 {
@@ -101,8 +101,8 @@ namespace osu.Game.Overlays.Login
                     {
                         RequestHide();
                         accountCreation.Show();
-                    }
-                }
+                    },
+                },
             };
 
             password.OnCommit += (sender, newText) => performLogin();

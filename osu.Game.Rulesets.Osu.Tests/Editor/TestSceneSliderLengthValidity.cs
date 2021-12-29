@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     new PathControlPoint(new Vector2(0), PathType.PerfectCurve),
                     new PathControlPoint(new Vector2(100, 0)),
-                    new PathControlPoint(new Vector2(0, 10))
+                    new PathControlPoint(new Vector2(0, 10)),
                 };
 
                 slider.Path = new SliderPath(points);
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 {
                     new PathControlPoint(new Vector2(0), PathType.Linear),
                     new PathControlPoint(new Vector2(0, 50)),
-                    new PathControlPoint(new Vector2(0, 100))
+                    new PathControlPoint(new Vector2(0, 100)),
                 };
 
                 slider.Path = new SliderPath(points);

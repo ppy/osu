@@ -70,9 +70,9 @@ namespace osu.Game.Tests.Visual.Editing
                     ControlPoints =
                     {
                         new PathControlPoint(),
-                        new PathControlPoint(new Vector2(100, 0), PathType.Bezier)
-                    }
-                }
+                        new PathControlPoint(new Vector2(100, 0), PathType.Bezier),
+                    },
+                },
             };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Editing
             var addedObject = new Spinner
             {
                 StartTime = 1000,
-                Duration = 5000
+                Duration = 5000,
             };
 
             AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));

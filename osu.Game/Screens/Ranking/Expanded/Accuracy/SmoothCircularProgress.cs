@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             RelativeSizeAxes = Axes.Y,
                             Width = 1f,
                             EdgeSmoothness = new Vector2(2, 0),
-                        }
+                        },
                     },
                     new Container
                     {
@@ -81,9 +81,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
-                                AlwaysPresent = true
-                            }
-                        }
+                                AlwaysPresent = true,
+                            },
+                        },
                     },
                     innerSmoothingContainer = new Container
                     {
@@ -106,11 +106,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
-                                AlwaysPresent = true
-                            }
-                        }
+                                AlwaysPresent = true,
+                            },
+                        },
                     },
-                }
+                },
             };
 
             Current.BindValueChanged(c =>

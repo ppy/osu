@@ -33,7 +33,7 @@ namespace osu.Game.Tournament.Tests.Components
             Add(new TournamentBeatmapPanel(beatmap)
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             });
         }
     }

@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Children = new[] { new Box { RelativeSizeAxes = Axes.Both } }
-                    }
+                        Children = new[] { new Box { RelativeSizeAxes = Axes.Both } },
+                    },
                 };
             }
         }

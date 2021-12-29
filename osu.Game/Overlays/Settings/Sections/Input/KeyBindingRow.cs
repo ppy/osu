@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Action = RestoreDefaults,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
+                    },
                 },
                 new Container
                 {
@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight
+                                    Origin = Anchor.TopRight,
                                 },
                                 cancelAndClearButtons = new FillFlowContainer
                                 {
@@ -154,11 +154,11 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                         new ClearButton { Action = clear },
                                     },
                                 },
-                                new HoverClickSounds()
-                            }
-                        }
-                    }
-                }
+                                new HoverClickSounds(),
+                            },
+                        },
+                    },
+                },
             };
 
             foreach (var b in bindings)
@@ -478,7 +478,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    new HoverSounds()
+                    new HoverSounds(),
                 };
             }
 

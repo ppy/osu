@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Vector2.Zero,
                     new Vector2(150, 100),
                     new Vector2(300, 0),
-                })
+                }),
             })));
 
             AddWaitStep("wait for progression", 1);
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(150, 100),
                     new Vector2(300, 0),
                 }),
-                RepeatCount = 1
+                RepeatCount = 1,
             })));
         }
 
@@ -83,8 +83,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Vector2.Zero,
                             new Vector2(150, 100),
                             new Vector2(300, 0),
-                        })
-                    }))
+                        }),
+                    })),
                 };
             });
 

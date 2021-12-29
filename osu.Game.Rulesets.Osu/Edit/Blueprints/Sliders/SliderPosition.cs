@@ -6,6 +6,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     public enum SliderPosition
     {
         Start,
-        End
+        End,
     }
 }

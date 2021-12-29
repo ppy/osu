@@ -55,7 +55,7 @@ namespace osu.Game.Audio.Effects
                 lFilter = type,
                 fBandwidth = 0,
                 // This allows fCenter to go up to 22049hz (nyquist - 1hz) without overflowing and causing weird filter behaviour (see: https://www.un4seen.com/forum/?topic=19542.0)
-                fQ = 0.7f
+                fQ = 0.7f,
             };
 
             Cutoff = getInitialCutoff(type);

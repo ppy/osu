@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                          return new OsuReplayFrame(replayFrame.Time, flippedPosition, replayFrame.Actions.ToArray());
                      })
                      .Cast<ReplayFrame>()
-                     .ToList()
+                     .ToList(),
         };
 
         [Test]
@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var transformedScore = new Score
             {
                 ScoreInfo = score.ScoreInfo,
-                Replay = replayTransformation.Invoke(score.Replay)
+                Replay = replayTransformation.Invoke(score.Replay),
             };
             drawableRuleset.SetReplayScore(transformedScore);
         });
@@ -230,9 +230,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     Position = new Vector2(256, 192),
                     StartTime = spinner_start_time,
-                    Duration = spinner_duration
+                    Duration = spinner_duration,
                 },
-            }
+            },
         };
 
         private class ScoreExposedPlayer : TestPlayer

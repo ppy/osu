@@ -45,8 +45,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
                         AlwaysPresent = true,
-                    }
-                }
+                    },
+                },
             };
         }
 

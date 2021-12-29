@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings
     {
         protected override Drawable CreateControl() => new TSlider
         {
-            RelativeSizeAxes = Axes.X
+            RelativeSizeAxes = Axes.X,
         };
 
         /// <summary>

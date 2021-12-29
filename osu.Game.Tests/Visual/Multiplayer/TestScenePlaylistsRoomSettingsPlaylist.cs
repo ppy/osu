@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(500, 300)
+                    Size = new Vector2(500, 300),
                 };
 
                 for (int i = 0; i < 20; i++)
@@ -158,16 +158,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                         Author = new APIUser { Username = "Creator name here" },
                                         Title = "Long title used to check background colour",
                                     },
-                                    BeatmapSet = new BeatmapSetInfo()
-                                }
+                                    BeatmapSet = new BeatmapSetInfo(),
+                                },
                         },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                         RequiredMods =
                         {
                             new OsuModHardRock(),
                             new OsuModDoubleTime(),
-                            new OsuModAutoplay()
-                        }
+                            new OsuModAutoplay(),
+                        },
                     });
                 }
             });

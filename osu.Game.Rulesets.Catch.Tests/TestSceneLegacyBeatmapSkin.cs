@@ -142,9 +142,9 @@ namespace osu.Game.Rulesets.Catch.Tests
                     BeatmapInfo =
                     {
                         BeatmapSet = new BeatmapSetInfo(),
-                        Ruleset = new CatchRuleset().RulesetInfo
+                        Ruleset = new CatchRuleset().RulesetInfo,
                     },
-                    HitObjects = { new Fruit { StartTime = 1816, X = 56, NewCombo = true } }
+                    HitObjects = { new Fruit { StartTime = 1816, X = 56, NewCombo = true } },
                 };
         }
     }

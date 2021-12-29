@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 IsCentre = (hitObject as Hit)?.Type == HitType.Centre,
                 IsDrumRoll = hitObject is DrumRoll,
                 IsSwell = hitObject is Swell,
-                IsStrong = (hitObject as TaikoStrongableHitObject)?.IsStrong == true
+                IsStrong = (hitObject as TaikoStrongableHitObject)?.IsStrong == true,
             };
         }
 

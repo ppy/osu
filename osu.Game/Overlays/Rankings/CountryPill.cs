@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     background = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     new FillFlowContainer
                     {
@@ -77,25 +77,25 @@ namespace osu.Game.Overlays.Rankings
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Size = new Vector2(30, 20)
+                                        Size = new Vector2(30, 20),
                                     },
                                     countryName = new OsuSpriteText
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
-                                        Font = OsuFont.GetFont(size: 14)
-                                    }
-                                }
+                                        Font = OsuFont.GetFont(size: 14),
+                                    },
+                                },
                             },
                             new CloseButton
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Action = () => Current.Value = null
-                            }
-                        }
-                    }
-                }
+                                Action = () => Current.Value = null,
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Rankings
                 Add(icon = new SpriteIcon
                 {
                     Size = new Vector2(10),
-                    Icon = FontAwesome.Solid.Times
+                    Icon = FontAwesome.Solid.Times,
                 });
             }
 

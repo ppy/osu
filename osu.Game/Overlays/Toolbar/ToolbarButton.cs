@@ -155,11 +155,11 @@ namespace osu.Game.Overlays.Toolbar
                             Children = new[]
                             {
                                 tooltip2 = new OsuSpriteText { Shadow = true },
-                                keyBindingTooltip = new OsuSpriteText { Shadow = true }
-                            }
-                        }
-                    }
-                }
+                                keyBindingTooltip = new OsuSpriteText { Shadow = true },
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Toolbar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(30)
+                    Colour = OsuColour.Gray(30),
                 },
                 new Triangles
                 {

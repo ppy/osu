@@ -17,8 +17,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 new ModButton(new MultiMod(new TestMod1(), new TestMod2(), new TestMod3(), new TestMod4()))
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                }
+                    Origin = Anchor.Centre,
+                },
             };
         }
 

@@ -110,11 +110,11 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                 }, 300)
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 mainFlow = new DelayedLoadWrapper(() => new SetPanelContent((CarouselBeatmapSet)Item), 100)
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
             };
 
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Select.Carousel
                 {
                     X = 100,
                     RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation())
+                    ChildrenEnumerable = visibleBeatmaps.Select(c => c.CreateDrawableRepresentation()),
                 };
 
                 beatmapsLoadTask = LoadComponentAsync(beatmapContainer, loaded =>
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             })
             {
-                State = { Value = state }
+                State = { Value = state },
             };
         }
     }

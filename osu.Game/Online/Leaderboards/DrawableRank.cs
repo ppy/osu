@@ -64,8 +64,8 @@ namespace osu.Game.Online.Leaderboards
                             ShadowOffset = new Vector2(0, 0.08f),
                             Shadow = true,
                         },
-                    }
-                }
+                    },
+                },
             };
         }
 

@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Text = "button",
                 Icon = FontAwesome.Solid.Check,
                 BackgroundColour = Color4.SlateGray,
-                HoverColour = Color4.SlateGray.Darken(0.2f)
+                HoverColour = Color4.SlateGray.Darken(0.2f),
             });
         }
     }

@@ -13,6 +13,6 @@ namespace osu.Game.Replays.Legacy
         Right1 = 2,
         Left2 = 4,
         Right2 = 8,
-        Smoke = 16
+        Smoke = 16,
     }
 }

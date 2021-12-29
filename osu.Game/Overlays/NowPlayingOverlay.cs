@@ -157,7 +157,7 @@ namespace osu.Game.Overlays
                                                     Action = () => musicController.NextTrack(),
                                                     Icon = FontAwesome.Solid.StepForward,
                                                 },
-                                            }
+                                            },
                                         },
                                         playlistButton = new MusicIconButton
                                         {
@@ -165,9 +165,9 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
                                             Icon = FontAwesome.Solid.Bars,
-                                            Action = togglePlaylist
+                                            Action = togglePlaylist,
                                         },
-                                    }
+                                    },
                                 },
                                 progressBar = new HoverableProgressBar
                                 {
@@ -176,12 +176,12 @@ namespace osu.Game.Overlays
                                     Height = progress_height / 2,
                                     FillColour = colours.Yellow,
                                     BackgroundColour = colours.YellowDarker.Opacity(0.5f),
-                                    OnSeek = musicController.SeekTo
-                                }
+                                    OnSeek = musicController.SeekTo,
+                                },
                             },
                         },
-                    }
-                }
+                    },
+                },
             };
         }
 
@@ -390,8 +390,8 @@ namespace osu.Game.Overlays
                         Height = bottom_black_area_height,
                         Origin = Anchor.BottomCentre,
                         Anchor = Anchor.BottomCentre,
-                        Colour = Color4.Black.Opacity(0.5f)
-                    }
+                        Colour = Color4.Black.Opacity(0.5f),
+                    },
                 };
             }
 

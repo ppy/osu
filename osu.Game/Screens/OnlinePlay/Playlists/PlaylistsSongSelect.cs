@@ -18,7 +18,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea
         {
-            CreateNewItem = createNewItem
+            CreateNewItem = createNewItem,
         };
 
         protected override void SelectItem(PlaylistItem item)
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             PlaylistItem item = new PlaylistItem
             {
-                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1
+                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1,
             };
 
             populateItemFromCurrent(item);

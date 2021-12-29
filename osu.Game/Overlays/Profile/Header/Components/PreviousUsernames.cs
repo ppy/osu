@@ -53,12 +53,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize)
+                        new Dimension(GridSizeMode.AutoSize),
                     },
                     ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.AutoSize),
-                        new Dimension()
+                        new Dimension(),
                     },
                     Content = new[]
                     {
@@ -70,8 +70,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
                                 Text = UsersStrings.ShowPreviousUsernames,
-                                Font = OsuFont.GetFont(size: 10, italics: true)
-                            }
+                                Font = OsuFont.GetFont(size: 10, italics: true),
+                            },
                         },
                         new Drawable[]
                         {
@@ -84,11 +84,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Full,
-                                Margin = new MarginPadding { Bottom = margin, Top = margin / 2f }
-                            }
-                        }
-                    }
-                }
+                                Margin = new MarginPadding { Bottom = margin, Top = margin / 2f },
+                            },
+                        },
+                    },
+                },
             });
 
             hoverIcon.ActivateHover += showContent;

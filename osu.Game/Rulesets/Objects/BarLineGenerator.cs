@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Objects
                     BarLines.Add(new TBarLine
                     {
                         StartTime = t,
-                        Major = currentBeat % (int)currentTimingPoint.TimeSignature == 0
+                        Major = currentBeat % (int)currentTimingPoint.TimeSignature == 0,
                     });
                 }
             }

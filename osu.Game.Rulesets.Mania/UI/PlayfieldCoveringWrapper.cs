@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             // Subtract the cover's alpha from the destination (points with alpha 1 should make the destination completely transparent).
                             AlphaEquation = BlendingEquation.Add,
                             SourceAlpha = BlendingType.Zero,
-                            DestinationAlpha = BlendingType.OneMinusSrcAlpha
+                            DestinationAlpha = BlendingType.OneMinusSrcAlpha,
                         },
                         Children = new Drawable[]
                         {
@@ -72,18 +72,18 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Colour = ColourInfo.GradientVertical(
                                     Color4.White.Opacity(0f),
                                     Color4.White.Opacity(1f)
-                                )
+                                ),
                             },
                             filled = new Box
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 0
-                            }
-                        }
-                    }
-                }
+                                Height = 0,
+                            },
+                        },
+                    },
+                },
             };
         }
 
@@ -128,6 +128,6 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// The cover expands against the scrolling direction.
         /// </summary>
-        AgainstScroll
+        AgainstScroll,
     }
 }

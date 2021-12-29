@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Wiki
                                 Right = 50,
                             },
                             OnAddHeading = sidebar.AddEntry,
-                        }
+                        },
                     },
                 },
             };

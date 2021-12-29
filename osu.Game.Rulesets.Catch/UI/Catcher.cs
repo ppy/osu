@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.BottomCentre,
                     // offset fruit vertically to better place "above" the plate.
-                    Y = -5
+                    Y = -5,
                 },
                 body = new SkinnableCatcher(),
                 hitExplosionContainer = new HitExplosionContainer
@@ -458,7 +458,7 @@ namespace osu.Game.Rulesets.Catch.UI
         private enum DroppedObjectAnimation
         {
             Drop,
-            Explode
+            Explode,
         }
     }
 }

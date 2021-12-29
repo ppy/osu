@@ -53,7 +53,7 @@ namespace osu.Game.Users.Drawables
             Add(clickableArea = new ClickableArea
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = openProfile
+                Action = openProfile,
             });
         }
 

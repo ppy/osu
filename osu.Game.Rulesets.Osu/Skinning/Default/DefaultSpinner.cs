@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = @"0",
-                            Font = OsuFont.Numeric.With(size: 24)
+                            Font = OsuFont.Numeric.With(size: 24),
                         },
                         new OsuSpriteText
                         {
@@ -72,10 +72,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                             Origin = Anchor.TopCentre,
                             Text = @"SPINS PER MINUTE",
                             Font = OsuFont.Numeric.With(size: 12),
-                            Y = 30
-                        }
-                    }
-                }
+                            Y = 30,
+                        },
+                    },
+                },
             });
         }
 

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Beatmap.Value = CreateWorkingBeatmap(new Beatmap
             {
-                ControlPointInfo = controlPointInfo
+                ControlPointInfo = controlPointInfo,
             });
 
             // track needs to be playing for BeatSyncedContainer to work.

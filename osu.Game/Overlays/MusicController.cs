@@ -441,13 +441,13 @@ namespace osu.Game.Overlays
     {
         None,
         Next,
-        Prev
+        Prev,
     }
 
     public enum PreviousTrackResult
     {
         None,
         Restart,
-        Previous
+        Previous,
     }
 }

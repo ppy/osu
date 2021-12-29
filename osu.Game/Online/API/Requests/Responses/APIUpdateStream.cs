@@ -35,7 +35,7 @@ namespace osu.Game.Online.API.Requests.Responses
             ["beta40"] = new Color4(255, 221, 85, 255),
             ["cuttingedge"] = new Color4(238, 170, 0, 255),
             [OsuGameBase.CLIENT_STREAM_NAME] = new Color4(237, 18, 33, 255),
-            ["web"] = new Color4(136, 102, 238, 255)
+            ["web"] = new Color4(136, 102, 238, 255),
         };
 
         public ColourInfo Colour => KNOWN_STREAMS.TryGetValue(Name, out var colour) ? colour : new Color4(0, 0, 0, 255);

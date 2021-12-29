@@ -130,7 +130,7 @@ namespace osu.Game.Collections
             var notification = new ProgressNotification
             {
                 State = ProgressNotificationState.Active,
-                Text = "Collections import is initialising..."
+                Text = "Collections import is initialising...",
             };
 
             PostNotification?.Invoke(notification);

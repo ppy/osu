@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
             AddInternal(new HitPiece
             {
                 RelativeSizeAxes = Axes.Both,
-                Origin = Anchor.TopLeft
+                Origin = Anchor.TopLeft,
             });
         }
 

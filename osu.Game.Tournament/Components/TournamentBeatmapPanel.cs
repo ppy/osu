@@ -89,27 +89,27 @@ namespace osu.Game.Tournament.Components
                                 {
                                     Text = "mapper",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
                                 },
                                 new TournamentSpriteText
                                 {
                                     Text = Beatmap.Metadata.Author.Username,
                                     Padding = new MarginPadding { Right = 20 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
                                 },
                                 new TournamentSpriteText
                                 {
                                     Text = "difficulty",
                                     Padding = new MarginPadding { Right = 5 },
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Regular, size: 14),
                                 },
                                 new TournamentSpriteText
                                 {
                                     Text = Beatmap.DifficultyName,
-                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14)
+                                    Font = OsuFont.Torus.With(weight: FontWeight.Bold, size: 14),
                                 },
-                            }
-                        }
+                            },
+                        },
                     },
                 },
                 flash = new Box

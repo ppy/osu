@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             Head,
             Repeat,
             Tail,
-            None
+            None,
         }
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Audio, "Low volume hitobjects");
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             new IssueTemplateMutedActive(this),
             new IssueTemplateLowVolumeActive(this),
-            new IssueTemplateMutedPassive(this)
+            new IssueTemplateMutedPassive(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

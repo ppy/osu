@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     Name = @"Spinner Count",
                     Content = spinners.ToString(),
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
-                }
+                },
             };
         }
     }

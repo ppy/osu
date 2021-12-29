@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
-                    State = { Value = Visibility.Visible }
-                }
+                    State = { Value = Visibility.Visible },
+                },
             };
 
             beatmapSets.Clear();

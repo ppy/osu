@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Editing
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Margin = new MarginPadding(30),
-                Size = new Vector2(90)
+                Size = new Vector2(90),
             });
         }
     }

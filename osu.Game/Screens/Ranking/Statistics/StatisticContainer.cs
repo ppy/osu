@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     new[]
                     {
-                        createHeader(item)
+                        createHeader(item),
                     },
                     new Drawable[]
                     {
@@ -43,15 +43,15 @@ namespace osu.Game.Screens.Ranking.Statistics
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Top = 15 },
-                            Child = item.Content
-                        }
+                            Child = item.Content,
+                        },
                     },
                 },
                 RowDimensions = new[]
                 {
                     new Dimension(GridSizeMode.AutoSize),
                     new Dimension(GridSizeMode.AutoSize),
-                }
+                },
             };
         }
 
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Origin = Anchor.CentreLeft,
                         Height = 9,
                         Width = 4,
-                        Colour = Color4Extensions.FromHex("#00FFAA")
+                        Colour = Color4Extensions.FromHex("#00FFAA"),
                     },
                     new OsuSpriteText
                     {
@@ -82,8 +82,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Origin = Anchor.CentreLeft,
                         Text = item.Name,
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
-                    }
-                }
+                    },
+                },
             };
         }
     }

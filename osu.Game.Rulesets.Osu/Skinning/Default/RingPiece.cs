@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             {
                 AlwaysPresent = true,
                 Alpha = 0,
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             };
         }
     }

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play.Break
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = ColourInfo.GradientVertical(Color4.Black, transparent_black),
-                    }
+                    },
                 },
                 new Container
                 {
@@ -42,8 +42,8 @@ namespace osu.Game.Screens.Play.Break
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = ColourInfo.GradientVertical(transparent_black, Color4.Black),
-                    }
-                }
+                    },
+                },
             };
         }
     }

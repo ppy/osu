@@ -156,7 +156,7 @@ namespace osu.Game.Graphics.Containers
             {
                 Vector2 size = new Vector2(SCROLL_BAR_HEIGHT)
                 {
-                    [(int)ScrollDirection] = val
+                    [(int)ScrollDirection] = val,
                 };
                 this.ResizeTo(size, duration, easing);
             }

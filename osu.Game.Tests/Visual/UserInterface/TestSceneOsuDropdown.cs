@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Width = 150
+                Width = 150,
             };
     }
 }

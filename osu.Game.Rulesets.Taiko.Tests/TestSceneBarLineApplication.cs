@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("apply new bar line", () => barLine.Apply(PrepareObject(new BarLine
             {
                 StartTime = 400,
-                Major = true
+                Major = true,
             })));
             AddHitObject(barLine);
             RemoveHitObject(barLine);
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("apply new bar line", () => barLine.Apply(PrepareObject(new BarLine
             {
                 StartTime = 200,
-                Major = false
+                Major = false,
             })));
             AddHitObject(barLine);
         }

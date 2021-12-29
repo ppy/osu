@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Beatmaps
                 {
                     converterResult[o] = r;
                     OnConversionGenerated(o, r, c);
-                }
+                },
             };
 
             working.GetPlayableBeatmap(CreateRuleset().RulesetInfo, mods);
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Beatmaps
                     mapping.StartTime = r.Key.StartTime;
                     mapping.Objects.AddRange(r.Value.SelectMany(CreateConvertValue));
                     return mapping;
-                }).ToList()
+                }).ToList(),
             };
         }
 

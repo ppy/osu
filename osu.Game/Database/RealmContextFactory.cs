@@ -272,7 +272,7 @@ namespace osu.Game.Database
                         string username = oldItem.Author;
                         newItem.Author = new RealmUser
                         {
-                            Username = username
+                            Username = username,
                         };
                     }
 

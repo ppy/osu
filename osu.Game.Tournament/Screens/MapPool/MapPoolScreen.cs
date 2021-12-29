@@ -60,42 +60,42 @@ namespace osu.Game.Tournament.Screens.MapPool
                     {
                         new TournamentSpriteText
                         {
-                            Text = "Current Mode"
+                            Text = "Current Mode",
                         },
                         buttonRedBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Ban",
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
+                            Action = () => setMode(TeamColour.Red, ChoiceType.Ban),
                         },
                         buttonBlueBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Ban",
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
+                            Action = () => setMode(TeamColour.Blue, ChoiceType.Ban),
                         },
                         buttonRedPick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Pick",
-                            Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
+                            Action = () => setMode(TeamColour.Red, ChoiceType.Pick),
                         },
                         buttonBluePick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Pick",
-                            Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
+                            Action = () => setMode(TeamColour.Blue, ChoiceType.Pick),
                         },
                         new ControlPanel.Spacer(),
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Reset",
-                            Action = reset
+                            Action = reset,
                         },
                         new ControlPanel.Spacer(),
                     },
-                }
+                },
             };
         }
 
@@ -191,7 +191,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             {
                 Team = pickColour,
                 Type = pickType,
-                BeatmapID = beatmapId
+                BeatmapID = beatmapId,
             });
 
             setNextMode();
@@ -230,7 +230,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                             Spacing = new Vector2(10, 5),
                             Direction = FillDirection.Full,
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            AutoSizeAxes = Axes.Y,
                         });
 
                         currentMod = b.Mods;
@@ -257,7 +257,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             mapFlows.Padding = new MarginPadding(5)
             {
                 // remove horizontal padding to increase flow width to 3 panels
-                Horizontal = totalRows > 9 ? 0 : 100
+                Horizontal = totalRows > 9 ? 0 : 100,
             };
         }
     }

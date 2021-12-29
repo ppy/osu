@@ -51,13 +51,13 @@ namespace osu.Game.Tests.Visual.Editing
                     {
                         new StartStopButton(),
                         new AudioVisualiser(),
-                    }
+                    },
                 },
                 TimelineArea = new TimelineArea(CreateTestComponent())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                }
+                },
             });
         }
 
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Editing
                         RelativePositionAxes = Axes.X,
                         RelativeSizeAxes = Axes.Y,
                         Width = 2,
-                    }
+                    },
                 };
             }
 

@@ -222,7 +222,7 @@ namespace osu.Game.IO.Legacy
                         BinaryFormatter b = new BinaryFormatter
                         {
                             // AssemblyFormat = FormatterAssemblyStyle.Simple,
-                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded
+                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
                         };
                         b.Serialize(BaseStream, obj);
                         break;

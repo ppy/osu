@@ -46,8 +46,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                         {
                             new RoundBeatmap { Beatmap = TournamentTestScene.CreateSampleBeatmap() },
                             new RoundBeatmap { Beatmap = TournamentTestScene.CreateSampleBeatmap() },
-                        }
-                    }
+                        },
+                    },
                 },
 
                 Matches =
@@ -58,7 +58,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 {
                     new TournamentProgression(1, 2),
                     new TournamentProgression(1, 3, true),
-                }
+                },
             };
         }
     }

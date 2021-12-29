@@ -85,10 +85,10 @@ namespace osu.Game.Collections
                                             Colour = colours.GreySeaFoamDarker,
                                             Scale = new Vector2(0.8f),
                                             X = -10,
-                                            Action = () => State.Value = Visibility.Hidden
-                                        }
-                                    }
-                                }
+                                            Action = () => State.Value = Visibility.Hidden,
+                                        },
+                                    },
+                                },
                             },
                             new Drawable[]
                             {
@@ -100,20 +100,20 @@ namespace osu.Game.Collections
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = colours.GreySeaFoamDarker
+                                            Colour = colours.GreySeaFoamDarker,
                                         },
                                         new DrawableCollectionList
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Items = { BindTarget = collectionManager?.Collections ?? new BindableList<BeatmapCollection>() }
-                                        }
-                                    }
-                                }
+                                            Items = { BindTarget = collectionManager?.Collections ?? new BindableList<BeatmapCollection>() },
+                                        },
+                                    },
+                                },
                             },
-                        }
-                    }
+                        },
+                    },
                 },
-                lowPassFilter = new AudioFilter(audio.TrackMixer)
+                lowPassFilter = new AudioFilter(audio.TrackMixer),
             };
         }
 

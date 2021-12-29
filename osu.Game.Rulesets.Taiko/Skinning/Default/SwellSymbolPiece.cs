@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
                     {
                         RelativeSizeAxes = Axes.Both,
                         Icon = FontAwesome.Solid.Asterisk,
-                        Shadow = false
-                    }
+                        Shadow = false,
+                    },
                 };
             }
         }

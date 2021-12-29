@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Ranking
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(panel_spacing, 0),
                     AutoSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Ranking
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                PostExpandAction = () => PostExpandAction?.Invoke()
+                PostExpandAction = () => PostExpandAction?.Invoke(),
             }.With(p =>
             {
                 p.StateChanged += s =>

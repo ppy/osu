@@ -100,8 +100,8 @@ namespace osu.Game.Screens.OnlinePlay
                 Child = checkbox = new HeaderCheckbox
                 {
                     LabelText = text,
-                    Changed = onCheckboxChanged
-                }
+                    Changed = onCheckboxChanged,
+                },
             };
 
             private void onCheckboxChanged(bool value)

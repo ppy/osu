@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
                             Alpha = 0,
                             AlwaysPresent = true,
                         },
-                    }
+                    },
                 },
             };
         }

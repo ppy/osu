@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             },
                             coverGradient = new Box
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
                             },
                         },
                     },
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         {
                                             title = new OsuSpriteText
                                             {
-                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true),
                                             },
                                             externalLink = new ExternalLinkButton
                                             {
@@ -132,8 +132,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 Anchor = Anchor.BottomLeft,
                                                 Origin = Anchor.BottomLeft,
                                                 Margin = new MarginPadding { Left = 10, Bottom = 4 },
-                                            }
-                                        }
+                                            },
+                                        },
                                     },
                                     new FillFlowContainer
                                     {
@@ -151,9 +151,9 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 Alpha = 0f,
                                                 Anchor = Anchor.BottomLeft,
                                                 Origin = Anchor.BottomLeft,
-                                                Margin = new MarginPadding { Left = 10 }
-                                            }
-                                        }
+                                                Margin = new MarginPadding { Left = 10 },
+                                            },
+                                        },
                                     },
                                     new Container
                                     {
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         {
                                             favouriteButton = new FavouriteButton
                                             {
-                                                BeatmapSet = { BindTarget = BeatmapSet }
+                                                BeatmapSet = { BindTarget = BeatmapSet },
                                             },
                                             downloadButtonsContainer = new FillFlowContainer
                                             {
@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     },
                                 },
                             },
-                        }
+                        },
                     },
                     loading = new LoadingSpinner
                     {
@@ -207,12 +207,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 TextSize = 14,
-                                TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
+                                TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 },
                             },
                             Details = new Details(),
                         },
                     },
-                }
+                },
             };
 
             Picker.Beatmap.ValueChanged += b =>
@@ -289,7 +289,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y,
-                        SelectedBeatmap = { BindTarget = Picker.Beatmap }
+                        SelectedBeatmap = { BindTarget = Picker.Beatmap },
                     };
                     break;
 

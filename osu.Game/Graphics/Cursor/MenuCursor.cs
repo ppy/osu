@@ -155,8 +155,8 @@ namespace osu.Game.Graphics.Cursor
                                 Alpha = 0,
                                 Texture = textures.Get(@"Cursor/menu-cursor-additive"),
                             },
-                        }
-                    }
+                        },
+                    },
                 };
 
                 cursorScale = config.GetBindable<float>(OsuSetting.MenuCursorSize);

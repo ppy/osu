@@ -32,9 +32,9 @@ namespace osu.Game.Tests.Editing.Checks
                 {
                     BeatmapSet = new BeatmapSetInfo
                     {
-                        Files = { CheckTestHelpers.CreateMockFile("wav") }
-                    }
-                }
+                        Files = { CheckTestHelpers.CreateMockFile("wav") },
+                    },
+                },
             };
 
             // 0 = No output device. This still allows decoding.

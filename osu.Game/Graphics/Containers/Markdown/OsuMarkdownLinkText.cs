@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.Containers.Markdown
                     RelativeSizeAxes = Axes.Both,
                     Action = OnLinkPressed,
                     TooltipText = title ?? Url,
-                }
+                },
             };
         }
 

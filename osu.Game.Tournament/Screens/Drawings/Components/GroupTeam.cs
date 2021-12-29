@@ -45,9 +45,9 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     Children = new Drawable[]
                     {
                         Flag,
-                        AcronymText
-                    }
-                }
+                        AcronymText,
+                    },
+                },
             };
         }
 

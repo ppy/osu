@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 beatmap.HitObjects.Add(new HitCircle
                 {
                     Position = new Vector2(256, 192),
-                    StartTime = 1000 + 30 * i
+                    StartTime = 1000 + 30 * i,
                 });
             }
 

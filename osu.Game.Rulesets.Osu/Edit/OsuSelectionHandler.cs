@@ -286,7 +286,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     {
                         h.Position,
                         // can't use EndPosition for reverse slider cases.
-                        h.Position + path.Path.PositionAt(1)
+                        h.Position + path.Path.PositionAt(1),
                     };
                 }
 

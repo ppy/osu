@@ -24,7 +24,7 @@ namespace osu.Game.Tests.NonVisual
 
             assertCombinations(new[]
             {
-                new[] { typeof(ModNoMod) }
+                new[] { typeof(ModNoMod) },
             }, combinations);
         }
 
@@ -36,7 +36,7 @@ namespace osu.Game.Tests.NonVisual
             assertCombinations(new[]
             {
                 new[] { typeof(ModNoMod) },
-                new[] { typeof(ModA) }
+                new[] { typeof(ModA) },
             }, combinations);
         }
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.NonVisual
                 new[] { typeof(ModNoMod) },
                 new[] { typeof(ModA) },
                 new[] { typeof(ModA), typeof(ModB) },
-                new[] { typeof(ModB) }
+                new[] { typeof(ModB) },
             }, combinations);
         }
 
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 new[] { typeof(ModNoMod) },
                 new[] { typeof(ModA) },
-                new[] { typeof(ModIncompatibleWithA) }
+                new[] { typeof(ModIncompatibleWithA) },
             }, combinations);
         }
 
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 new[] { typeof(ModNoMod) },
                 new[] { typeof(ModAofA) },
-                new[] { typeof(ModIncompatibleWithAofA) }
+                new[] { typeof(ModIncompatibleWithAofA) },
             }, combinations);
         }
 
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.NonVisual
                 new[] { typeof(ModNoMod) },
                 new[] { typeof(ModA) },
                 new[] { typeof(ModA), typeof(ModB), typeof(ModC) },
-                new[] { typeof(ModB), typeof(ModC) }
+                new[] { typeof(ModB), typeof(ModC) },
             }, combinations);
         }
 
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 new[] { typeof(ModNoMod) },
                 new[] { typeof(ModA) },
-                new[] { typeof(ModB), typeof(ModIncompatibleWithA) }
+                new[] { typeof(ModB), typeof(ModIncompatibleWithA) },
             }, combinations);
         }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 new[] { typeof(ModNoMod) },
                 new[] { typeof(ModA) },
-                new[] { typeof(ModA), typeof(ModB) }
+                new[] { typeof(ModA), typeof(ModB) },
             }, combinations);
         }
 

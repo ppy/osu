@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Menu
             Child = logoTrackingContainer = new LogoTrackingContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = buttonArea = new ButtonArea()
+                Child = buttonArea = new ButtonArea(),
             };
 
             buttonArea.AddRange(new Drawable[]
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Menu
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f))
+                logoTrackingContainer.LogoFacade.With(d => d.Scale = new Vector2(0.74f)),
             });
 
             buttonArea.Flow.CentreTarget = logoTrackingContainer.LogoFacade;
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Menu
                     {
                         loginOverlay?.Show();
                         return true;
-                    }
+                    },
                 });
 
                 return;
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Menu
                     {
                         loginOverlay?.Show();
                         return true;
-                    }
+                    },
                 });
 
                 return;

@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 BeatmapInfo =
                 {
                     Ruleset = ruleset,
-                    BaseDifficulty = new BeatmapDifficulty { CircleSize = 3.6f }
-                }
+                    BaseDifficulty = new BeatmapDifficulty { CircleSize = 3.6f },
+                },
             };
 
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
             beatmap.ControlPointInfo.Add(startTime, new TimingControlPoint
             {
-                BeatLength = 50
+                BeatLength = 50,
             });
 
             createObjects(() => new TestJuiceStream(left_x)
@@ -96,8 +96,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Path = new SliderPath(new[]
                 {
                     new PathControlPoint(Vector2.Zero),
-                    new PathControlPoint(new Vector2(512, 0))
-                })
+                    new PathControlPoint(new Vector2(512, 0)),
+                }),
             }, 1);
 
             return beatmap;

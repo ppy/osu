@@ -167,13 +167,13 @@ namespace osu.Game.Screens.Play
                         Children = new PlayerSettingsGroup[]
                         {
                             VisualSettings = new VisualSettings(),
-                            new InputSettings()
-                        }
+                            new InputSettings(),
+                        },
                     },
                     idleTracker = new IdleTracker(750),
                 }),
                 lowPassFilter = new AudioFilter(audio.TrackMixer),
-                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass)
+                highPassFilter = new AudioFilter(audio.TrackMixer, BQFType.HighPass),
             };
 
             if (Beatmap.Value.BeatmapInfo.EpilepsyWarning)

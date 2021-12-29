@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             inputs.Add(new CatchReplayState
             {
                 PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
-                CatcherX = position
+                CatcherX = position,
             });
         }
 

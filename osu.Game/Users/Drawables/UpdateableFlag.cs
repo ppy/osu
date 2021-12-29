@@ -40,10 +40,10 @@ namespace osu.Game.Users.Drawables
                 {
                     new DrawableFlag(country)
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
-                    new HoverClickSounds(HoverSampleSet.Submit)
-                }
+                    new HoverClickSounds(HoverSampleSet.Submit),
+                },
             };
         }
 

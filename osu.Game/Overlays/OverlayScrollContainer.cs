@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
                 Margin = new MarginPadding(20),
-                Action = scrollToTop
+                Action = scrollToTop,
             });
         }
 
@@ -109,16 +109,16 @@ namespace osu.Game.Overlays
                     {
                         background = new Box
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(15),
-                            Icon = FontAwesome.Solid.ChevronUp
-                        }
-                    }
+                            Icon = FontAwesome.Solid.ChevronUp,
+                        },
+                    },
                 });
 
                 TooltipText = CommonStrings.ButtonsBackToTop;

@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Mods
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 Content = new FillFlowContainer
                 {
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Mods
                         {
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
                         },
-                    }
+                    },
                 },
             };
         }

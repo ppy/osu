@@ -50,12 +50,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.Solid.Play,
-                    Size = new Vector2(14)
+                    Size = new Vector2(14),
                 },
                 loadingSpinner = new LoadingSpinner
                 {
-                    Size = new Vector2(14)
-                }
+                    Size = new Vector2(14),
+                },
             };
 
             Action = () => Playing.Toggle();

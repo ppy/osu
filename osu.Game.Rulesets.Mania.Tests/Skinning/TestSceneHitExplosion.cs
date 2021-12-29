@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     RelativePositionAxes = Axes.Y,
                     Y = -0.25f,
                     Size = new Vector2(Column.COLUMN_WIDTH, DefaultNotePiece.NOTE_HEIGHT),
-                    Child = pool
+                    Child = pool,
                 };
             });
         }

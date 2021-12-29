@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         Idle,
         Fail,
-        Kiai
+        Kiai,
     }
 }

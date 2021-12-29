@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             FrameStableComponents.Add(scroller = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Scroller), _ => Empty())
             {
                 RelativeSizeAxes = Axes.X,
-                Depth = float.MaxValue
+                Depth = float.MaxValue,
             });
         }
 

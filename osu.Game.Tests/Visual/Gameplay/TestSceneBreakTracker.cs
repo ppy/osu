@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 breakOverlay = new BreakOverlay(true, null)
                 {
                     ProcessCustomClock = false,
-                }
+                },
             });
         }
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 breakOverlay.Breaks = breakTracker.Breaks = new List<BreakPeriod>
                 {
-                    new BreakPeriod(Clock.CurrentTime, Clock.CurrentTime + seconds * 1000)
+                    new BreakPeriod(Clock.CurrentTime, Clock.CurrentTime + seconds * 1000),
                 };
             });
         }

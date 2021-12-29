@@ -90,23 +90,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                         new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Content = new[] { bars }
-                        }
+                            Content = new[] { bars },
+                        },
                     },
                     new Drawable[]
                     {
                         axisFlow = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }
+                            AutoSizeAxes = Axes.Y,
+                        },
                     },
                 },
                 RowDimensions = new[]
                 {
                     new Dimension(),
                     new Dimension(GridSizeMode.AutoSize),
-                }
+                },
             };
 
             // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "0",
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
             });
 
             for (int i = 1; i <= axis_points; i++)
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     X = -position / 2,
                     Alpha = alpha,
                     Text = axisValue.ToString("-0"),
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                 });
 
                 axisFlow.Add(new OsuSpriteText
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     X = position / 2,
                     Alpha = alpha,
                     Text = axisValue.ToString("+0"),
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                 });
             }
         }
@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 InternalChild = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#66FFCC")
+                    Colour = Color4Extensions.FromHex("#66FFCC"),
                 };
             }
         }

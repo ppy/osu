@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background4
+                    Colour = colourProvider.Background4,
                 },
                 new FillFlowContainer
                 {
@@ -67,9 +67,9 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             User.BindValueChanged(user => updateDisplay(user.NewValue));

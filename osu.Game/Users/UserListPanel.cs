@@ -65,8 +65,8 @@ namespace osu.Game.Users
                             {
                                 username.Anchor = Anchor.CentreLeft;
                                 username.Origin = Anchor.CentreLeft;
-                            })
-                        }
+                            }),
+                        },
                     },
                     new FillFlowContainer
                     {
@@ -87,10 +87,10 @@ namespace osu.Game.Users
                             {
                                 message.Anchor = Anchor.CentreRight;
                                 message.Origin = Anchor.CentreRight;
-                            })
-                        }
-                    }
-                }
+                            }),
+                        },
+                    },
+                },
             };
 
             if (User.IsSupporter)
@@ -100,7 +100,7 @@ namespace osu.Game.Users
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Height = 20,
-                    SupportLevel = User.SupportLevel
+                    SupportLevel = User.SupportLevel,
                 });
             }
 

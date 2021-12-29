@@ -80,12 +80,12 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             Child = lineBackground = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                            }
+                            },
                         },
                         new OsuSpriteText
                         {
                             Text = header,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                         },
                         valueText = new OsuSpriteText
                         {
@@ -97,8 +97,8 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                        }
-                    }
+                        },
+                    },
                 };
             }
 

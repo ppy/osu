@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Stack.Push(player = new MultiplayerPlayer(Client.APIRoom, new PlaylistItem
                 {
                     Beatmap = { Value = Beatmap.Value.BeatmapInfo },
-                    Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset }
+                    Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset },
                 }, Client.Room?.Users.ToArray()));
             });
 

@@ -29,7 +29,7 @@ namespace osu.Game.Skinning
             Name = "osu! (triangles)",
             Creator = "team osu!",
             Protected = true,
-            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo()
+            InstantiationInfo = typeof(DefaultSkin).GetInvariantInstantiationInfo(),
         };
 
         private readonly IStorageResourceProvider resources;
@@ -139,8 +139,8 @@ namespace osu.Game.Skinning
                                     new SongProgress(),
                                     new BarHitErrorMeter(),
                                     new BarHitErrorMeter(),
-                                    new PerformancePointsCounter()
-                                }
+                                    new PerformancePointsCounter(),
+                                },
                             };
 
                             return skinnableTargetWrapper;

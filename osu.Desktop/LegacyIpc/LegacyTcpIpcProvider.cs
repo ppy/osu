@@ -42,7 +42,7 @@ namespace osu.Desktop.LegacyIpc
 
                     return new LegacyIpcMessage
                     {
-                        Value = onLegacyIpcMessageReceived(value)
+                        Value = onLegacyIpcMessageReceived(value),
                     };
                 }
                 catch (Exception ex)
@@ -84,7 +84,7 @@ namespace osu.Desktop.LegacyIpc
 
                         return new LegacyIpcDifficultyCalculationResponse
                         {
-                            StarRating = ruleset.CreateDifficultyCalculator(beatmap).Calculate(mods).StarRating
+                            StarRating = ruleset.CreateDifficultyCalculator(beatmap).Calculate(mods).StarRating,
                         };
                     }
                     catch

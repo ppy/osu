@@ -76,11 +76,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
                                 Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 12),
-                                Colour = Color4Extensions.FromHex("#DDFFFF")
+                                Colour = Color4Extensions.FromHex("#DDFFFF"),
                             },
-                        }
+                        },
                     },
-                }
+                },
             };
         }
 

@@ -34,9 +34,9 @@ namespace osu.Game.Tests.Editing.Checks
                         Files =
                         {
                             CheckTestHelpers.CreateMockFile("mp4"),
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
         }
 

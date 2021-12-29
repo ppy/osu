@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     roomUser.MatchState = new TeamVersusUserState
                     {
-                        TeamID = RNG.Next(0, 2)
+                        TeamID = RNG.Next(0, 2),
                     };
 
                     multiplayerUsers.Add(roomUser);
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     LoadComponentAsync(new MatchScoreDisplay
                     {
                         Team1Score = { BindTarget = leaderboard.TeamScores[0] },
-                        Team2Score = { BindTarget = leaderboard.TeamScores[1] }
+                        Team2Score = { BindTarget = leaderboard.TeamScores[1] },
                     }, Add);
 
                     LoadComponentAsync(gameplayScoreDisplay = new GameplayMatchScoreDisplay
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Team1Score = { BindTarget = leaderboard.TeamScores[0] },
-                        Team2Score = { BindTarget = leaderboard.TeamScores[1] }
+                        Team2Score = { BindTarget = leaderboard.TeamScores[1] },
                     }, Add);
 
                     Add(gameplayLeaderboard);

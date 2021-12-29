@@ -93,17 +93,17 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                     {
                                                         Text = $"{Score.Beatmap?.DifficultyName}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
-                                                        Colour = colours.Yellow
+                                                        Colour = colours.Yellow,
                                                     },
                                                     new DrawableDate(Score.Date, 12)
                                                     {
-                                                        Colour = colourProvider.Foreground1
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                                        Colour = colourProvider.Foreground1,
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
                             },
                             new FillFlowContainer
                             {
@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Child = CreateRightContent()
+                                        Child = CreateRightContent(),
                                     },
                                     new FillFlowContainer
                                     {
@@ -133,12 +133,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(2),
                                         Children = Score.Mods.Select(mod => new ModIcon(rulesets.GetRuleset(Score.RulesetID).CreateInstance().CreateModFromAcronym(mod.Acronym))
                                         {
-                                            Scale = new Vector2(0.35f)
+                                            Scale = new Vector2(0.35f),
                                         }).ToList(),
-                                    }
-                                }
-                            }
-                        }
+                                    },
+                                },
+                            },
+                        },
                     },
                     new Container
                     {
@@ -177,17 +177,17 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 {
                                     Vertical = 5,
                                     Left = 30,
-                                    Right = 20
+                                    Right = 20,
                                 },
                                 Child = createDrawablePerformance().With(d =>
                                 {
                                     d.Anchor = Anchor.Centre;
                                     d.Origin = Anchor.Centre;
-                                })
-                            }
-                        }
-                    }
-                }
+                                }),
+                            },
+                        },
+                    },
+                },
             });
         }
 
@@ -204,8 +204,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                 Colour = colours.Yellow,
                 Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft
-            }
+                Origin = Anchor.CentreLeft,
+            },
         };
 
         private Drawable createDrawablePerformance()
@@ -224,7 +224,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = $"{Score.PP:0}",
-                            Colour = colourProvider.Highlight1
+                            Colour = colourProvider.Highlight1,
                         },
                         new OsuSpriteText
                         {
@@ -232,9 +232,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Text = "pp",
-                            Colour = colourProvider.Light3
-                        }
-                    }
+                            Colour = colourProvider.Light3,
+                        },
+                    },
                 };
             }
 
@@ -242,7 +242,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 Text = "-",
-                Colour = colourProvider.Highlight1
+                Colour = colourProvider.Highlight1,
             };
         }
 
@@ -266,21 +266,21 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true),
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Text = " by ",
-                        Font = OsuFont.GetFont(size: 12, italics: true)
+                        Font = OsuFont.GetFont(size: 12, italics: true),
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                        Font = OsuFont.GetFont(size: 12, italics: true)
+                        Font = OsuFont.GetFont(size: 12, italics: true),
                     },
                 };
             }

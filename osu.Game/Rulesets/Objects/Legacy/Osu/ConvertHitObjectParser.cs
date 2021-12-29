@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             {
                 Position = position,
                 NewCombo = FirstObject || newCombo,
-                ComboOffset = comboOffset
+                ComboOffset = comboOffset,
             };
         }
 
@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
                 ComboOffset = comboOffset,
                 Path = new SliderPath(controlPoints, length),
                 NodeSamples = nodeSamples,
-                RepeatCount = repeatCount
+                RepeatCount = repeatCount,
             };
         }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             return new ConvertSpinner
             {
                 Position = position,
-                Duration = duration
+                Duration = duration,
             };
         }
 

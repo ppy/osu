@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
                         Colour = colourProvider.Background4,
                     },
                     new ChangelogSupporterPromo(),
-                }
+                },
             };
         }
     }

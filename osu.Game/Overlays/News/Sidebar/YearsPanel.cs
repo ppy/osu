@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.News.Sidebar
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = overlayColours.Background3
+                    Colour = overlayColours.Background3,
                 },
                 new Container
                 {
@@ -46,9 +46,9 @@ namespace osu.Game.Overlays.News.Sidebar
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(0, 5)
-                    }
-                }
+                        Spacing = new Vector2(0, 5),
+                    },
+                },
             };
         }
 
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.News.Sidebar
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 12, weight: isCurrent ? FontWeight.SemiBold : FontWeight.Medium),
-                    Text = year.ToString()
+                    Text = year.ToString(),
                 };
             }
 

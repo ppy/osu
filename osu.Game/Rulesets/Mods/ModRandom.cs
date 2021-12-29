@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public Bindable<int?> Seed { get; } = new Bindable<int?>
         {
             Default = null,
-            Value = null
+            Value = null,
         };
     }
 }

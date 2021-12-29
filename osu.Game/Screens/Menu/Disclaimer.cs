@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Menu
                             Origin = Anchor.TopCentre,
                             Spacing = new Vector2(0, 2),
                         },
-                    }
+                    },
                 },
                 supportFlow = new LinkFlowContainer
                 {

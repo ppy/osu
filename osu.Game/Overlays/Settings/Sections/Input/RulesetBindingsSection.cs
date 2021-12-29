@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         public override Drawable CreateIcon() => ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon
         {
-            Icon = OsuIcon.Hot
+            Icon = OsuIcon.Hot,
         };
 
         public override LocalisableString Header => ruleset.Name;

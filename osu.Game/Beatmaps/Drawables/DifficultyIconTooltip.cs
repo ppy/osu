@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new FillFlowContainer
                 {
@@ -69,10 +69,10 @@ namespace osu.Game.Beatmaps.Drawables
                                     Icon = FontAwesome.Solid.Star,
                                     Size = new Vector2(12),
                                 },
-                            }
-                        }
-                    }
-                }
+                            },
+                        },
+                    },
+                },
             };
         }
 

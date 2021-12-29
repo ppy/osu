@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
             return Task.FromResult(new APIUser
             {
                 Id = lookup,
-                Username = $"User {lookup}"
+                Username = $"User {lookup}",
             });
         }
     }

@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = GraphicsSettingsStrings.Resolution,
                     ShowsDefaultIndicator = false,
                     ItemSource = resolutions,
-                    Current = sizeFullscreen
+                    Current = sizeFullscreen,
                 },
                 new SettingsSlider<float, UIScaleSlider>
                 {
@@ -106,30 +106,30 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                             LabelText = GraphicsSettingsStrings.HorizontalPosition,
                             Current = scalingPositionX,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
+                            DisplayAsPercentage = true,
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.VerticalPosition,
                             Current = scalingPositionY,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
+                            DisplayAsPercentage = true,
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.HorizontalScale,
                             Current = scalingSizeX,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
+                            DisplayAsPercentage = true,
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = GraphicsSettingsStrings.VerticalScale,
                             Current = scalingSizeY,
                             KeyboardStep = 0.01f,
-                            DisplayAsPercentage = true
+                            DisplayAsPercentage = true,
                         },
-                    }
+                    },
                 },
             };
         }

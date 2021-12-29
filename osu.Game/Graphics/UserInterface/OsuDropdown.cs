@@ -127,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item)
             {
                 BackgroundColourHover = HoverColour,
-                BackgroundColourSelected = SelectionColour
+                BackgroundColourSelected = SelectionColour,
             };
 
             protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
@@ -333,8 +333,8 @@ namespace osu.Game.Graphics.UserInterface
                                 Origin = Anchor.CentreRight,
                                 Size = new Vector2(16),
                             },
-                        }
-                    }
+                        },
+                    },
                 };
 
                 AddInternal(new HoverClickSounds());

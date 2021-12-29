@@ -27,8 +27,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         new OverlayHeaderBackground(@"Headers/news"),
                         new OverlayHeaderBackground(@"Headers/rankings"),
                         new OverlayHeaderBackground(@"Headers/search"),
-                    }
-                }
+                    },
+                },
             });
         }
     }

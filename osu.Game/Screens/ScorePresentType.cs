@@ -6,6 +6,6 @@ namespace osu.Game.Screens
     public enum ScorePresentType
     {
         Results,
-        Gameplay
+        Gameplay,
     }
 }

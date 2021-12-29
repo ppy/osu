@@ -216,9 +216,9 @@ namespace osu.Game.Rulesets.Taiko
                         new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250
+                            Height = 250,
                         }),
-                    }
+                    },
                 },
                 new StatisticRow
                 {
@@ -226,10 +226,10 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
-                            new UnstableRate(timedHitEvents)
-                        }))
-                    }
-                }
+                            new UnstableRate(timedHitEvents),
+                        })),
+                    },
+                },
             };
         }
     }

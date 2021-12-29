@@ -15,14 +15,14 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Wrench
+            Icon = FontAwesome.Solid.Wrench,
         };
 
         public MaintenanceSection()
         {
             Children = new Drawable[]
             {
-                new GeneralSettings()
+                new GeneralSettings(),
             };
         }
     }

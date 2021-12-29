@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Comments
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
-                Action = () => OnCancel?.Invoke()
+                Action = () => OnCancel?.Invoke(),
             });
         }
 
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         background = new Box
                         {
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         },
                         new OsuSpriteText
                         {
@@ -54,9 +54,9 @@ namespace osu.Game.Overlays.Comments
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Horizontal = 20 },
-                            Text = @"Cancel"
-                        }
-                    }
+                            Text = @"Cancel",
+                        },
+                    },
                 };
             }
 

@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Changelog
                                             Margin = new MarginPadding { Top = 10 },
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                        }
+                                        },
                                     },
                                 },
                                 new Container
@@ -145,11 +145,11 @@ namespace osu.Game.Overlays.Changelog
                                                 Texture = textures.Get(@"Online/supporter-heart"),
                                             },
                                         },
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         },
-                    }
+                    },
                 },
             };
 

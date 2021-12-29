@@ -57,7 +57,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                             RelativeSizeAxes = Axes.Both,
                             Size = new Vector2(0.5f),
                         },
-                    }
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -65,9 +65,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
                     Children = new Drawable[]
                     {
                         minDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
-                        maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range)
-                    }
-                }
+                        maxDisplay = new StarRatingDisplay(default, StarRatingDisplaySize.Range),
+                    },
+                },
             };
         }
 

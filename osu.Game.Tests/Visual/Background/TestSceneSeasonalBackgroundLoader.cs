@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             "Backgrounds/bg2",
             "Backgrounds/bg4",
-            "Backgrounds/bg3"
+            "Backgrounds/bg3",
         };
 
         [BackgroundDependencyLoader]
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Background
 
             Add(backgroundContainer = new Container
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             });
         }
 
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Visual.Background
                     backgroundsRequest.TriggerSuccess(new APISeasonalBackgrounds
                     {
                         Backgrounds = seasonal_background_urls.Select(url => new APISeasonalBackground { Url = url }).ToList(),
-                        EndDate = endDate
+                        EndDate = endDate,
                     });
 
                     return true;

@@ -45,21 +45,21 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
-                        Margin = new MarginPadding { Bottom = 2 }
+                        Margin = new MarginPadding { Bottom = 2 },
                     },
                     title = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold),
                     },
                     content = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light)
+                        Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light),
                     },
                     new Container // Add a minimum size to the FillFlowContainer
                     {
                         Width = minimumWidth,
-                    }
-                }
+                    },
+                },
             };
         }
     }

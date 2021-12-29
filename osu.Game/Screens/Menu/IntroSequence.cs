@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Menu
                             Rotation = 45,
                             Colour = Color4.White.Opacity(130),
                         },
-                    }
+                    },
                 },
                 bigRing = new Ring(Color4Extensions.FromHex(@"B6C5E9"), 0.85f),
                 mediumRing = new Ring(Color4.White.Opacity(130), 0.7f),
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Menu
                             Width = 0,
                             Colour = Color4.White,
                         },
-                    }
+                    },
                 },
                 purpleCircle = new Circle
                 {
@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Menu
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
-                    }
+                    },
                 };
             }
         }

@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Full,
                     },
-                }
+                },
             });
 
             foreach (var p in typeof(OsuIcon).GetProperties(BindingFlags.Public | BindingFlags.Static))

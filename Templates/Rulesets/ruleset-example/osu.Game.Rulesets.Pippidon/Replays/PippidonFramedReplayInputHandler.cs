@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Pippidon.Replays
 
             inputs.Add(new MousePositionAbsoluteInput
             {
-                Position = GamefieldToScreenSpace(position)
+                Position = GamefieldToScreenSpace(position),
             });
         }
     }

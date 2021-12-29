@@ -38,7 +38,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Length = 2500,
             BPM = 160,
             BeatDivisor = 12,
-            Status = BeatmapOnlineStatus.Loved
+            Status = BeatmapOnlineStatus.Loved,
         };
 
         [Test]
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { OnlineID = 6 }
+                Ruleset = new RulesetInfo { OnlineID = 6 },
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { OnlineID = 6 },
-                AllowConvertedBeatmaps = true
+                AllowConvertedBeatmaps = true,
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -91,8 +91,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ApproachRate = new FilterCriteria.OptionalRange<float>
                 {
                     IsLowerInclusive = inclusive,
-                    Min = 5.0f
-                }
+                    Min = 5.0f,
+                },
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -112,8 +112,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 BPM = new FilterCriteria.OptionalRange<double>
                 {
                     IsUpperInclusive = inclusive,
-                    Max = 160d
-                }
+                    Max = 160d,
+                },
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             {
                 Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
-                SearchText = terms
+                SearchText = terms,
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Creator = new FilterCriteria.OptionalTextFilter { SearchTerm = creatorName }
+                Creator = new FilterCriteria.OptionalTextFilter { SearchTerm = creatorName },
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -175,7 +175,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = artistName }
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = artistName },
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
 
             var criteria = new FilterCriteria
             {
-                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = artistName }
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = artistName },
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);

@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Menu
                             confirmAndExit();
                         else
                             this.Exit();
-                    }
+                    },
                 });
             }
 
@@ -108,17 +108,17 @@ namespace osu.Game.Screens.Menu
                             OnMultiplayer = () => this.Push(new Multiplayer()),
                             OnPlaylists = () => this.Push(new Playlists()),
                             OnExit = confirmAndExit,
-                        }
-                    }
+                        },
+                    },
                 },
                 sideFlashes = new MenuSideFlashes(),
                 songTicker = new SongTicker
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Margin = new MarginPadding { Right = 15, Top = 5 }
+                    Margin = new MarginPadding { Right = 15, Top = 5 },
                 },
-                exitConfirmOverlay?.CreateProxy() ?? Empty()
+                exitConfirmOverlay?.CreateProxy() ?? Empty(),
             });
 
             buttons.StateChanged += state =>

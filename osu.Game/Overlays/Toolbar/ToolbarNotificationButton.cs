@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Toolbar
                     circle = new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Red
+                        Colour = Color4.Red,
                     },
                     countText = new OsuSpriteText
                     {
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Toolbar
                         Padding = new MarginPadding(5),
                         Colour = Color4.White,
                         UseFullGlyphHeight = true,
-                    }
+                    },
                 };
             }
         }

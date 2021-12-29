@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Notifications
         protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
-            Text = CompletionText
+            Text = CompletionText,
         };
 
         protected virtual void Completed()
@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Notifications
                 loadingSpinner = new LoadingSpinner
                 {
                     Size = new Vector2(loading_spinner_size),
-                }
+                },
             });
         }
 
@@ -273,7 +273,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0,
-                    }
+                    },
                 };
             }
 
@@ -292,6 +292,6 @@ namespace osu.Game.Overlays.Notifications
         Queued,
         Active,
         Completed,
-        Cancelled
+        Cancelled,
     }
 }

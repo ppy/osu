@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Icon = FontAwesome.Solid.ChevronRight,
-                    Size = new Vector2(FONT_SIZE / 2)
+                    Size = new Vector2(FONT_SIZE / 2),
                 });
             }
 

@@ -52,15 +52,15 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Statistics
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Size = new Vector2(10),
-                        Margin = new MarginPadding { Top = 1 }
+                        Margin = new MarginPadding { Top = 1 },
                     },
                     spriteText = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Font = OsuFont.Default.With(size: 14)
-                    }
-                }
+                        Font = OsuFont.Default.With(size: 14),
+                    },
+                },
             };
         }
 

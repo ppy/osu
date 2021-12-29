@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Select
                     {
                         new BeatmapInfoWedgeBackground(beatmap),
                         Info = new WedgeInfoText(beatmap, ruleset.Value),
-                    }
+                    },
                 }, loaded =>
                 {
                     // ensure we are the most recent loaded wedge.
@@ -213,8 +213,8 @@ namespace osu.Game.Screens.Select
                                 Alpha = 0.5f,
                                 X = top_height,
                                 Width = 1 - top_height,
-                            }
-                        }
+                            },
+                        },
                     },
                     new FillFlowContainer
                     {
@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Select
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
                             },
-                        }
+                        },
                     },
                     new FillFlowContainer
                     {
@@ -264,8 +264,8 @@ namespace osu.Game.Screens.Select
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
-                            }
-                        }
+                            },
+                        },
                     },
                     new FillFlowContainer
                     {
@@ -303,9 +303,9 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 20 },
                                 Spacing = new Vector2(20, 0),
                                 AutoSizeAxes = Axes.Both,
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 };
 
                 titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
@@ -372,8 +372,8 @@ namespace osu.Game.Screens.Select
                     {
                         AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(20, 0),
-                        Children = getRulesetInfoLabels()
-                    }
+                        Children = getRulesetInfoLabels(),
+                    },
                 };
             }
 
@@ -428,7 +428,7 @@ namespace osu.Game.Screens.Select
                 {
                     Name = "BPM",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Bpm),
-                    Content = labelText
+                    Content = labelText,
                 });
             }
 
@@ -492,7 +492,7 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4Extensions.FromHex(@"f7dd55"),
                                     Icon = FontAwesome.Regular.Circle,
-                                    Size = new Vector2(0.8f)
+                                    Size = new Vector2(0.8f),
                                 },
                                 statistic.CreateIcon().With(i =>
                                 {
@@ -502,7 +502,7 @@ namespace osu.Game.Screens.Select
                                     i.Colour = Color4Extensions.FromHex(@"f7dd55");
                                     i.Size = new Vector2(0.64f);
                                 }),
-                            }
+                            },
                         },
                         new OsuSpriteText
                         {
@@ -512,7 +512,7 @@ namespace osu.Game.Screens.Select
                             Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                             Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,
-                        }
+                        },
                     };
                 }
             }

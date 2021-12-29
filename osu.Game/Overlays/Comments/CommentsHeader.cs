@@ -44,16 +44,16 @@ namespace osu.Game.Overlays.Comments
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Current = Sort
+                            Current = Sort,
                         },
                         new ShowDeletedButton
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            Checked = { BindTarget = ShowDeleted }
-                        }
-                    }
-                }
+                            Checked = { BindTarget = ShowDeleted },
+                        },
+                    },
+                },
             });
         }
 
@@ -91,8 +91,8 @@ namespace osu.Game.Overlays.Comments
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = @"Show deleted"
-                        }
+                            Text = @"Show deleted",
+                        },
                     },
                 });
             }
@@ -129,6 +129,6 @@ namespace osu.Game.Overlays.Comments
         [System.ComponentModel.Description(@"Recent")]
         New,
         Old,
-        Top
+        Top,
     }
 }

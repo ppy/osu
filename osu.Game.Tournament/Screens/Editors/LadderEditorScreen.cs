@@ -37,7 +37,7 @@ namespace osu.Game.Tournament.Screens.Editors
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Margin = new MarginPadding(5)
+                Margin = new MarginPadding(5),
             });
 
             AddInternal(rightClickMessage = new WarningBox("Right click to place and link matches"));
@@ -74,7 +74,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     {
                         foreach (var p in MatchesContainer)
                             p.Match.Reset();
-                    })
+                    }),
                 };
             }
         }

@@ -72,15 +72,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
+                OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
                     BypassAutoSizeAxes = Axes.Both,
                     AlwaysPresent = true,
-                    Alpha = 0
+                    Alpha = 0,
                 },
-                slidingSample = new PausableSkinnableSound { Looping = true }
+                slidingSample = new PausableSkinnableSound { Looping = true },
             };
 
             PositionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);

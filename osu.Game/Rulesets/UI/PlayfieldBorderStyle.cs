@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.UI
     {
         None,
         Corners,
-        Full
+        Full,
     }
 }

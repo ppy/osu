@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1f,
                 Padding = new MarginPadding { Horizontal = -horizontal_inset },
-                Margin = new MarginPadding { Top = ROW_HEIGHT }
+                Margin = new MarginPadding { Top = ROW_HEIGHT },
             });
         }
 

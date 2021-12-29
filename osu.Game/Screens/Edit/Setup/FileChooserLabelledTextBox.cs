@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Setup
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 CornerRadius = CORNER_RADIUS,
-                OnFocused = this.ShowPopover
+                OnFocused = this.ShowPopover,
             };
 
         protected override void LoadComplete()
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Edit.Setup
                     Child = new OsuFileSelector(currentFile.Value?.DirectoryName, handledExtensions)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CurrentFile = { BindTarget = currentFile }
+                        CurrentFile = { BindTarget = currentFile },
                     },
                 };
             }

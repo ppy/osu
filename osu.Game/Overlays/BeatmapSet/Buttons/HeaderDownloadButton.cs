@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             Icon = FontAwesome.Solid.Download,
                             Size = new Vector2(18),
                         },
-                    }
+                    },
                 },
                 new DownloadProgressBar(beatmapSet)
                 {
@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = CommonStrings.Downloading,
-                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                             },
                         };
                         break;
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = CommonStrings.Importing,
-                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                             },
                         };
                         break;
@@ -151,12 +151,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = BeatmapsetsStrings.ShowDetailsDownloadDefault,
-                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                             },
                             new OsuSpriteText
                             {
                                 Text = getVideoSuffixText(),
-                                Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: text_size - 2, weight: FontWeight.Bold),
                             },
                         };
                         this.FadeIn(200);

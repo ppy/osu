@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
-                            RequestSelection = itemSelected
+                            RequestSelection = itemSelected,
                         },
                         filter = new FilterControl
                         {

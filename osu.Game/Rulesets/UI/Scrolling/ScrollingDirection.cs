@@ -23,6 +23,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// Hit objects will scroll horizontally from the left of the hitobject container.
         /// </summary>
-        Right
+        Right,
     }
 }

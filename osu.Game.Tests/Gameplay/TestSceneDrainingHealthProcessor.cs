@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap
             {
-                Difficulty = { DrainRate = 10 }
+                Difficulty = { DrainRate = 10 },
             };
 
             beatmap.HitObjects.Add(new JudgeableHitObject { StartTime = 0 });
@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap
             {
-                HitObjects = { new JudgeableLongHitObject() }
+                HitObjects = { new JudgeableLongHitObject() },
             };
 
             beatmap.HitObjects[0].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Gameplay
         {
             var beatmap = new Beatmap
             {
-                Difficulty = { DrainRate = 10 }
+                Difficulty = { DrainRate = 10 },
             };
 
             for (double time = startTime; time <= endTime; time += 100)

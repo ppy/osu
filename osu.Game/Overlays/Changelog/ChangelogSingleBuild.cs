@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Changelog
                         Colour = colourProvider.Background6,
                         Alpha = api.LocalUser.Value.IsSupporter ? 0 : 1,
                     },
-                    comments = new CommentsContainer()
+                    comments = new CommentsContainer(),
                 };
 
                 comments.ShowComments(CommentableType.Build, build.Id);
@@ -120,12 +120,12 @@ namespace osu.Game.Overlays.Changelog
                 fill.Insert(-1, new NavigationIconButton(Build.Versions?.Previous)
                 {
                     Icon = FontAwesome.Solid.ChevronLeft,
-                    SelectBuild = b => SelectBuild(b)
+                    SelectBuild = b => SelectBuild(b),
                 });
                 fill.Insert(1, new NavigationIconButton(Build.Versions?.Next)
                 {
                     Icon = FontAwesome.Solid.ChevronRight,
-                    SelectBuild = b => SelectBuild(b)
+                    SelectBuild = b => SelectBuild(b),
                 });
 
                 return fill;

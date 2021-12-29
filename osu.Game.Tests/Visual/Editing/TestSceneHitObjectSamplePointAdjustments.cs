@@ -40,8 +40,8 @@ namespace osu.Game.Tests.Visual.Editing
                     SampleControlPoint = new SampleControlPoint
                     {
                         SampleBank = "normal",
-                        SampleVolume = 80
-                    }
+                        SampleVolume = 80,
+                    },
                 });
 
                 EditorBeatmap.Add(new HitCircle
@@ -51,8 +51,8 @@ namespace osu.Game.Tests.Visual.Editing
                     SampleControlPoint = new SampleControlPoint
                     {
                         SampleBank = "soft",
-                        SampleVolume = 60
-                    }
+                        SampleVolume = 60,
+                    },
                 });
             });
         }

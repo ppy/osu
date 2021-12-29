@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.UI
                             ),
                     },
                     Overlays,
-                }
+                },
             };
 
             Audio = audioContainer;

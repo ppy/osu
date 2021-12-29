@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft
+                Origin = Anchor.BottomLeft,
             });
         }
 
@@ -97,9 +97,9 @@ namespace osu.Game.Overlays
                     {
                         Anchor = Anchor.BottomCentre,
                         ExpandedSize = 5f,
-                        CollapsedSize = 0
+                        CollapsedSize = 0,
                     },
-                    new HoverClickSounds(HoverSampleSet.TabSelect)
+                    new HoverClickSounds(HoverSampleSet.TabSelect),
                 };
             }
 

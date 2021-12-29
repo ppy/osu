@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Online
             {
                 AdjustPitch = { Value = false },
                 InitialRate = { Value = 1.25 },
-                FinalRate = { Value = 0.25 }
+                FinalRate = { Value = 0.25 },
             });
 
             var deserialised = MessagePackSerializer.Deserialize<APIMod>(MessagePackSerializer.Serialize(apiMod));
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Online
             public override BindableBool AdjustPitch { get; } = new BindableBool
             {
                 Default = true,
-                Value = true
+                Value = true,
             };
         }
 
@@ -163,7 +163,7 @@ namespace osu.Game.Tests.Online
         {
             Value1 = 0,
             Value2 = 1,
-            Value3 = 2
+            Value3 = 2,
         }
     }
 }

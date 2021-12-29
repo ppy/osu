@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Chat
                 Content = request.Message.Content,
                 Links = request.Message.Links,
                 Timestamp = request.Message.Timestamp,
-                Sender = request.Message.Sender
+                Sender = request.Message.Sender,
             };
 
             sentMessages.Add(message);

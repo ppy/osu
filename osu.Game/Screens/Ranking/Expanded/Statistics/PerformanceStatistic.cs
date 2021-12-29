@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         protected override Drawable CreateContent() => counter = new StatisticCounter
         {
             Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre
+            Origin = Anchor.TopCentre,
         };
     }
 }

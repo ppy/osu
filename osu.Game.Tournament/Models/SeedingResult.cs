@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Models
         public Bindable<int> Seed = new BindableInt
         {
             MinValue = 1,
-            MaxValue = 64
+            MaxValue = 64,
         };
     }
 }

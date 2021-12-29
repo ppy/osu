@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = display = new FriendDisplay()
+                Child = display = new FriendDisplay(),
             };
         });
 
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                 IsOnline = true,
                 Statistics = new UserStatistics { GlobalRank = 1111 },
                 Country = new Country { FlagName = "JP" },
-                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
             },
             new APIUser
             {
@@ -74,8 +74,8 @@ namespace osu.Game.Tests.Visual.Online
                 Country = new Country { FlagName = "BY" },
                 CoverUrl = "https://assets.ppy.sh/user-profile-covers/8195163/4a8e2ad5a02a2642b631438cfa6c6bd7e2f9db289be881cb27df18331f64144c.jpeg",
                 IsOnline = false,
-                LastVisit = DateTimeOffset.Now
-            }
+                LastVisit = DateTimeOffset.Now,
+            },
         };
     }
 }

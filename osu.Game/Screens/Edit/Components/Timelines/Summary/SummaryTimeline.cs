@@ -28,14 +28,14 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Y = -10,
-                    Height = 0.35f
+                    Height = 0.35f,
                 },
                 new BookmarkPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.35f
+                    Height = 0.35f,
                 },
                 new Container
                 {
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(5)
+                            Size = new Vector2(5),
                         },
                         new Box
                         {
@@ -62,17 +62,17 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.Centre,
-                            Size = new Vector2(5)
+                            Size = new Vector2(5),
                         },
-                    }
+                    },
                 },
                 new BreakPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.10f
-                }
+                    Height = 0.10f,
+                },
             };
         }
     }

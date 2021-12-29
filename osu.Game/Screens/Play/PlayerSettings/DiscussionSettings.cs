@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 new PlayerCheckbox
                 {
                     LabelText = "Show floating comments",
-                    Current = config.GetBindable<bool>(OsuSetting.FloatingComments)
+                    Current = config.GetBindable<bool>(OsuSetting.FloatingComments),
                 },
                 new FocusedTextBox
                 {

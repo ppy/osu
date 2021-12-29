@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings
         protected override Drawable CreateControl() => new OutlinedTextBox
         {
             RelativeSizeAxes = Axes.X,
-            CommitOnFocusLost = true
+            CommitOnFocusLost = true,
         };
 
         public override Bindable<string> Current

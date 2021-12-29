@@ -71,7 +71,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
                                         Text = "Please select a new location",
-                                        Font = OsuFont.Default.With(size: 40)
+                                        Font = OsuFont.Default.With(size: 40),
                                     },
                                 },
                                 new Drawable[]
@@ -79,7 +79,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                     directorySelector = new OsuDirectorySelector(initialPath)
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                    }
+                                    },
                                 },
                                 new Drawable[]
                                 {
@@ -97,7 +97,7 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
                                                 Text = "Select stable path",
-                                                Action = ChangePath
+                                                Action = ChangePath,
                                             },
                                             new TriangleButton
                                             {
@@ -105,13 +105,13 @@ namespace osu.Game.Tournament.Screens.Setup
                                                 Origin = Anchor.Centre,
                                                 Width = 300,
                                                 Text = "Auto detect",
-                                                Action = AutoDetect
+                                                Action = AutoDetect,
                                             },
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                                        },
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
                 new BackButton
@@ -119,8 +119,8 @@ namespace osu.Game.Tournament.Screens.Setup
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     State = { Value = Visibility.Visible },
-                    Action = () => sceneManager?.SetScreen(typeof(SetupScreen))
-                }
+                    Action = () => sceneManager?.SetScreen(typeof(SetupScreen)),
+                },
             });
         }
 

@@ -28,8 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 Scale = new Vector2
                 {
                     X = Anchor.HasFlagFast(Anchor.x0) ? 1f : -1f,
-                    Y = Anchor.HasFlagFast(Anchor.y0) ? 1f : -1f
-                }
+                    Y = Anchor.HasFlagFast(Anchor.y0) ? 1f : -1f,
+                },
             });
         }
 

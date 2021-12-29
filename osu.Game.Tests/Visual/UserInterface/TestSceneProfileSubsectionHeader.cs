@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Current = { Value = initialValue }
+                Current = { Value = initialValue },
             });
         }
     }

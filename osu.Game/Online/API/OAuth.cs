@@ -44,7 +44,7 @@ namespace osu.Game.Online.API
                 Url = $@"{endpoint}/oauth/token",
                 Method = HttpMethod.Post,
                 ClientId = clientId,
-                ClientSecret = clientSecret
+                ClientSecret = clientSecret,
             };
 
             using (accessTokenRequest)
@@ -86,7 +86,7 @@ namespace osu.Game.Online.API
                     Url = $@"{endpoint}/oauth/token",
                     Method = HttpMethod.Post,
                     ClientId = clientId,
-                    ClientSecret = clientSecret
+                    ClientSecret = clientSecret,
                 };
 
                 using (refreshRequest)

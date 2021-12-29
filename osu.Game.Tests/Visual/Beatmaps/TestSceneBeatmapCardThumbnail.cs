@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(200)
+                    Size = new Vector2(200),
                 };
             });
             AddStep("enable dim", () => thumbnail.Dimmed.Value = true);

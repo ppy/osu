@@ -32,6 +32,6 @@ namespace osu.Game.Online.API.Requests
     public enum BeatmapFavouriteAction
     {
         Favourite,
-        UnFavourite
+        UnFavourite,
     }
 }

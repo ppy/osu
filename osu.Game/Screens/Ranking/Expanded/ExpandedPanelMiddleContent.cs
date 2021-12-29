@@ -128,14 +128,14 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                }
+                                },
                             },
                             scoreCounter = new TotalScoreCounter
                             {
                                 Margin = new MarginPadding { Top = 0, Bottom = 5 },
                                 Current = { Value = 0 },
                                 Alpha = 0,
-                                AlwaysPresent = true
+                                AlwaysPresent = true,
                             },
                             starAndModDisplay = new FillFlowContainer
                             {
@@ -172,10 +172,10 @@ namespace osu.Game.Screens.Ranking.Expanded
                                             t.AddText("mapped by ");
                                             t.AddText(creator, s => s.Font = s.Font.With(weight: FontWeight.SemiBold));
                                         }
-                                    })
-                                }
+                                    }),
+                                },
                             },
-                        }
+                        },
                     },
                     new FillFlowContainer
                     {
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
-                                }
+                                },
                             },
                             new GridContainer
                             {
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
-                                }
+                                },
                             },
                             new GridContainer
                             {
@@ -213,11 +213,11 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 RowDimensions = new[]
                                 {
                                     new Dimension(GridSizeMode.AutoSize),
-                                }
-                            }
-                        }
-                    }
-                }
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             if (score.Date != default)
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                 starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
                 {
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft
+                    Origin = Anchor.CentreLeft,
                 });
             }
 
@@ -240,7 +240,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                     Origin = Anchor.CentreLeft,
                     ExpansionMode = ExpansionMode.AlwaysExpanded,
                     Scale = new Vector2(0.5f),
-                    Current = { Value = score.Mods }
+                    Current = { Value = score.Mods },
                 });
             }
         }

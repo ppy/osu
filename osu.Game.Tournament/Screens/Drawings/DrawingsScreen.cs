@@ -71,8 +71,8 @@ namespace osu.Game.Tournament.Screens.Drawings
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Y = 60,
-                        AutoSizeAxes = Axes.Both
-                    }
+                        AutoSizeAxes = Axes.Both,
+                    },
                 };
 
                 links.AddLink("Click for details on the file format", "https://osu.ppy.sh/wiki/en/Tournament_Drawings", t => t.Colour = Color4.White);
@@ -93,7 +93,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                         {
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fill,
-                            Texture = textures.Get(@"Backgrounds/Drawings/background.png")
+                            Texture = textures.Get(@"Backgrounds/Drawings/background.png"),
                         },
                         // Visualiser
                         new VisualiserContainer
@@ -106,7 +106,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
                             Colour = new Color4(255, 204, 34, 255),
 
-                            Lines = 6
+                            Lines = 6,
                         },
                         // Groups
                         groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
@@ -120,8 +120,8 @@ namespace osu.Game.Tournament.Screens.Drawings
                             Padding = new MarginPadding
                             {
                                 Top = 35f,
-                                Bottom = 35f
-                            }
+                                Bottom = 35f,
+                            },
                         },
                         // Scrolling teams
                         teamsContainer = new ScrollingTeamContainer
@@ -144,8 +144,8 @@ namespace osu.Game.Tournament.Screens.Drawings
                             Alpha = 0,
 
                             Font = OsuFont.Torus.With(weight: FontWeight.Light, size: 42),
-                        }
-                    }
+                        },
+                    },
                 },
                 // Control panel container
                 new ControlPanel
@@ -169,7 +169,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                         RelativeSizeAxes = Axes.X,
 
                         Text = "Reload",
-                        Action = reloadTeams
+                        Action = reloadTeams,
                     },
                     new ControlPanel.Spacer(),
                     new TourneyButton
@@ -177,9 +177,9 @@ namespace osu.Game.Tournament.Screens.Drawings
                         RelativeSizeAxes = Axes.X,
 
                         Text = "Reset",
-                        Action = () => reset()
-                    }
-                }
+                        Action = () => reset(),
+                    },
+                },
             };
 
             teamsContainer.OnSelected += onTeamSelected;

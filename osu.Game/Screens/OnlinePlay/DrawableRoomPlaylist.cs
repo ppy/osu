@@ -151,7 +151,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
-            Spacing = new Vector2(0, 2)
+            Spacing = new Vector2(0, 2),
         };
 
         protected sealed override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => CreateDrawablePlaylistItem(item).With(d =>

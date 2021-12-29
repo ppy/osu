@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
                     name: "Scroll Speed",
                     value: $"{(int)Math.Round(DrawableManiaRuleset.MAX_TIME_RANGE / scrollTime)} ({scrollTime}ms)"
                 )
-            )
+            ),
         };
     }
 
@@ -41,6 +41,6 @@ namespace osu.Game.Rulesets.Mania.Configuration
     {
         ScrollTime,
         ScrollDirection,
-        TimingBasedNoteColouring
+        TimingBasedNoteColouring,
     }
 }

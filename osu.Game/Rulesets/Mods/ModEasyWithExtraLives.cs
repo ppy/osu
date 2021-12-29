@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public Bindable<int> Retries { get; } = new BindableInt(2)
         {
             MinValue = 0,
-            MaxValue = 10
+            MaxValue = 10,
         };
 
         public override string SettingDescription => Retries.IsDefault ? string.Empty : $"{"lives".ToQuantity(Retries.Value)}";

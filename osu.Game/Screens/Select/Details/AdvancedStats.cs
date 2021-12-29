@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Select.Details
                         Padding = new MarginPadding { Vertical = 1 },
                         Child = name = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 12)
+                            Font = OsuFont.GetFont(size: 12),
                         },
                     },
                     bar = new Bar
@@ -267,7 +267,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 12)
+                            Font = OsuFont.GetFont(size: 12),
                         },
                     },
                 };

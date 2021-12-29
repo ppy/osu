@@ -72,7 +72,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     Action = () => sceneManager?.SetScreen(new StablePathSelectScreen()),
                     Value = fileBasedIpc?.IPCStorage?.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.IPCStorage == null,
-                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation."
+                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation.",
                 },
                 new ActionableInfo
                 {
@@ -95,7 +95,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     },
                     Value = api?.LocalUser.Value.Username,
                     Failing = api?.IsLoggedIn != true,
-                    Description = "In order to access the API and display metadata, signing in is required."
+                    Description = "In order to access the API and display metadata, signing in is required.",
                 },
                 new LabelledDropdown<RulesetInfo>
                 {
@@ -116,7 +116,7 @@ namespace osu.Game.Tournament.Screens.Setup
                     Action = height =>
                     {
                         windowSize.Value = new Size((int)(height * aspect_ratio / TournamentSceneManager.STREAM_AREA_WIDTH * TournamentSceneManager.REQUIRED_WIDTH), height);
-                    }
+                    },
                 },
             };
         }

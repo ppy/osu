@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitCircle = new HitCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitCircle = new HitCircle
             {
                 StartTime = 1000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitCircle = new HitCircle
             {
                 StartTime = 2000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitCircle = new HitCircle
             {
                 StartTime = 2000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) },
             };
             hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitCircle = new HitCircle
             {
                 StartTime = 2000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_low) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_low) },
             };
             hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Editing.Checks
             var hitCircle = new HitCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) },
             };
             hitCircle.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -122,20 +122,20 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var sliderTick = new SliderTick
             {
                 StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick", volume: volume_muted) } // Should be fine.
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick", volume: volume_muted) }, // Should be fine.
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 500)
+            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick }, startTime: 0, endTime: 500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -148,20 +148,20 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) },
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var sliderTick = new SliderTick
             {
                 StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") },
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 500)
+            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick }, startTime: 0, endTime: 500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) } // Applies to the tail.
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }, // Applies to the tail.
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -174,20 +174,20 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var sliderTick = new SliderTick
             {
                 StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") },
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 2500)
+            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick }, startTime: 0, endTime: 2500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) } // Applies to the tail.
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_muted) }, // Applies to the tail.
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -200,20 +200,20 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 2000,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var sliderTick = new SliderTick
             {
                 StartTime = 2250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") },
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 2000, endTime: 2500)
+            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick }, startTime: 2000, endTime: 2500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL, volume: volume_regular) },
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -226,21 +226,21 @@ namespace osu.Game.Tests.Editing.Checks
             var sliderHead = new SliderHeadCircle
             {
                 StartTime = 0,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             sliderHead.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var sliderTick = new SliderTick
             {
                 StartTime = 250,
-                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo("slidertick") },
             };
             sliderTick.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             // Ends after the 5% control point.
-            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick, }, startTime: 0, endTime: 2500)
+            var slider = new MockNestableHitObject(new List<HitObject> { sliderHead, sliderTick }, startTime: 0, endTime: 2500)
             {
-                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                Samples = new List<HitSampleInfo> { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
             };
             slider.ApplyDefaults(cpi, new BeatmapDifficulty());
 
@@ -281,7 +281,7 @@ namespace osu.Game.Tests.Editing.Checks
             var beatmap = new Beatmap<HitObject>
             {
                 ControlPointInfo = cpi,
-                HitObjects = hitObjects
+                HitObjects = hitObjects,
             };
 
             return new BeatmapVerifierContext(beatmap, new TestWorkingBeatmap(beatmap));

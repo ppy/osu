@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     EdgeSmoothness = new Vector2(1),
                     Width = Math.Min(crosshair_max_size, DistanceSpacing * 2),
                     Height = crosshair_thickness,
-                }
+                },
             });
 
             float dx = Math.Max(StartPosition.X, DrawWidth - StartPosition.X);
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     Current = { Value = 1 },
                     Size = new Vector2(radius),
                     InnerRadius = 4 * 1f / radius,
-                    Colour = GetColourForIndexFromPlacement(i)
+                    Colour = GetColourForIndexFromPlacement(i),
                 });
             }
         }

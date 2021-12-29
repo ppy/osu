@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Online
 
             Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
-                SelectedItem = { BindTarget = selectedItem, }
+                SelectedItem = { BindTarget = selectedItem },
             };
         });
 
@@ -125,7 +125,7 @@ namespace osu.Game.Tests.Online
 
             AddStep("recreate tracker", () => Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
-                SelectedItem = { BindTarget = selectedItem }
+                SelectedItem = { BindTarget = selectedItem },
             });
             addAvailabilityCheckStep("state not downloaded as well", BeatmapAvailability.NotDownloaded);
 

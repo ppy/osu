@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Colour = colour
+                    Colour = colour,
                 };
             }
 

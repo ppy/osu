@@ -61,7 +61,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 {
                     background = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     bodyContent = new Container
                     {
@@ -85,8 +85,8 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         Child = dropdownScroll = new ExpandedContentScrollContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            ScrollbarVisible = false
-                        }
+                            ScrollbarVisible = false,
+                        },
                     },
                     borderContainer = new Container
                     {
@@ -98,10 +98,10 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
-                }
+                            AlwaysPresent = true,
+                        },
+                    },
+                },
             };
         }
 

@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Visual.Ranking
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4Extensions.FromHex("#444"),
                     },
-                    new ExpandedPanelMiddleContent(score)
+                    new ExpandedPanelMiddleContent(score),
                 };
             }
         }

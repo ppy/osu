@@ -50,7 +50,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 },
                 header = new MatchHeader
                 {
-                    ShowLogo = false
+                    ShowLogo = false,
                 },
                 new Container
                 {
@@ -81,10 +81,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Width = 0.5f,
-                                }
-                            }
+                                },
+                            },
                         },
-                    }
+                    },
                 },
                 scoreDisplay = new TournamentMatchScoreDisplay
                 {
@@ -100,13 +100,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle warmup",
-                            Action = () => warmup.Toggle()
+                            Action = () => warmup.Toggle(),
                         },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
-                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
+                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; },
                         },
                         new SettingsSlider<int>
                         {
@@ -119,9 +119,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             LabelText = "Players per team",
                             Current = LadderInfo.PlayersPerTeam,
                             KeyboardStep = 1,
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
 
             ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);

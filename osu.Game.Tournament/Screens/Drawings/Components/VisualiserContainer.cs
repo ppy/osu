@@ -116,7 +116,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                     Texture = texture,
 
-                    X = leftPos + 1
+                    X = leftPos + 1,
                 });
             }
         }

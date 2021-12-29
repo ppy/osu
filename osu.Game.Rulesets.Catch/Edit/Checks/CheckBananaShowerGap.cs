@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
             [DifficultyRating.Hard] = (125, 250),
             [DifficultyRating.Insane] = (125, 125),
             [DifficultyRating.Expert] = (62, 125),
-            [DifficultyRating.ExpertPlus] = (62, 125)
+            [DifficultyRating.ExpertPlus] = (62, 125),
         };
 
         public CheckMetadata Metadata { get; } = new CheckMetadata(CheckCategory.Compose, "Too short spinner gap");
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateBananaShowerStartGap(this),
-            new IssueTemplateBananaShowerEndGap(this)
+            new IssueTemplateBananaShowerEndGap(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Online
                 Version = version,
                 DisplayVersion = version,
                 UpdateStream = streams[stream],
-                ChangelogEntries = new List<APIChangelogEntry>()
+                ChangelogEntries = new List<APIChangelogEntry>(),
             }).ToDictionary(build => build.UpdateStream.Name);
 
             foreach (var stream in streams.Values)
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
                         var changelogResponse = new APIChangelogIndex
                         {
                             Streams = streams.Values.ToList(),
-                            Builds = builds.Values.ToList()
+                            Builds = builds.Values.ToList(),
                         };
                         changelogRequest.TriggerSuccess(changelogResponse);
                         return true;
@@ -119,8 +119,8 @@ namespace osu.Game.Tests.Visual.Online
                         GithubUser = new APIChangelogUser
                         {
                             OsuUsername = "smoogipoo",
-                            UserId = 1040328
-                        }
+                            UserId = 1040328,
+                        },
                     },
                     new APIChangelogEntry
                     {
@@ -133,8 +133,8 @@ namespace osu.Game.Tests.Visual.Online
                         GithubUser = new APIChangelogUser
                         {
                             DisplayName = "frenzibyte",
-                            GithubUrl = "https://github.com/frenzibyte"
-                        }
+                            GithubUrl = "https://github.com/frenzibyte",
+                        },
                     },
                     new APIChangelogEntry
                     {
@@ -143,16 +143,16 @@ namespace osu.Game.Tests.Visual.Online
                         Title = "Clean up thing",
                         GithubUser = new APIChangelogUser
                         {
-                            DisplayName = "some dude"
-                        }
+                            DisplayName = "some dude",
+                        },
                     },
                     new APIChangelogEntry
                     {
                         Type = ChangelogEntryType.Misc,
                         Category = "Code quality",
-                        Title = "Clean up another thing"
-                    }
-                }
+                        Title = "Clean up another thing",
+                    },
+                },
             });
 
             AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Online
                 UpdateStream = new APIUpdateStream
                 {
                     Name = "Test",
-                    DisplayName = "Test"
+                    DisplayName = "Test",
                 },
                 ChangelogEntries = new List<APIChangelogEntry>
                 {
@@ -185,9 +185,9 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             DisplayName = "Dummy",
                             OsuUsername = "Dummy",
-                        }
+                        },
                     },
-                }
+                },
             });
         }
 

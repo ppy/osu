@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Direction = FillDirection.Vertical,
-                    }
+                    },
                 });
                 flowContainer.Children = new Drawable[]
                 {
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Colour = Color4.Azure,
-                        Size = new Vector2(visual_box_size)
+                        Size = new Vector2(visual_box_size),
                     },
                     new Container
                     {
@@ -134,14 +134,14 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 RelativeSizeAxes = Axes.Both,
                             },
                             trackingContainer.LogoFacade,
-                        }
+                        },
                     },
                     new Box
                     {
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Colour = Color4.Azure,
-                        Size = new Vector2(visual_box_size)
+                        Size = new Vector2(visual_box_size),
                     },
                 };
             });
@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Colour = Color4.Tomato,
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 },
                 transferContainer = new Container
                 {
@@ -245,7 +245,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Colour = Color4.White,
                         RelativeSizeAxes = Axes.Both,
-                    }
+                    },
                 },
             });
 

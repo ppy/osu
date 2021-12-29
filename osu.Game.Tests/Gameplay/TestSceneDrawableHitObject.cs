@@ -22,11 +22,11 @@ namespace osu.Game.Tests.Gameplay
             TestDrawableHitObject dho = null;
             var initialHitObject = new HitObject
             {
-                StartTime = 1000
+                StartTime = 1000,
             };
             var entry = new TestLifetimeEntry(new HitObject
             {
-                StartTime = 2000
+                StartTime = 2000,
             });
 
             AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject(initialHitObject));
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Gameplay
             TestLifetimeEntry entry = null;
             AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                Entry = entry = new TestLifetimeEntry(new HitObject())
+                Entry = entry = new TestLifetimeEntry(new HitObject()),
             });
 
             AddStep("KeepAlive = true", () =>
@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Gameplay
             AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
                 Entry = entry,
-                SetLifetimeStartOnApply = true
+                SetLifetimeStartOnApply = true,
             });
             AddStep("ApplyDefaults", () => entry.HitObject.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty()));
             AddAssert("Lifetime is correct", () => dho.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY && entry.LifetimeStart == TestDrawableHitObject.LIFETIME_ON_APPLY);
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Gameplay
             TestLifetimeEntry entry = null;
             AddStep("Create DHO", () => Child = dho = new TestDrawableHitObject
             {
-                Entry = entry = new TestLifetimeEntry(new HitObject())
+                Entry = entry = new TestLifetimeEntry(new HitObject()),
             });
 
             AddStep("Set entry lifetime", () =>

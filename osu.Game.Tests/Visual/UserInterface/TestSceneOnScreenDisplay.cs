@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             ToggleSettingNoKeyBind,
             EnumSettingNoKeyBind,
             ToggleSettingWithKeyBind,
-            EnumSettingWithKeyBind
+            EnumSettingWithKeyBind,
         }
 
         private enum EnumSetting
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             Setting1,
             Setting2,
             Setting3,
-            Setting4
+            Setting4,
         }
 
         private class EmptyToast : Toast

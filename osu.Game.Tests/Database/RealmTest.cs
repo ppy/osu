@@ -81,17 +81,17 @@ namespace osu.Game.Tests.Database
             var metadata = new RealmBeatmapMetadata
             {
                 Title = "My Love",
-                Artist = "Kuba Oms"
+                Artist = "Kuba Oms",
             };
 
             var beatmapSet = new RealmBeatmapSet
             {
                 Beatmaps =
                 {
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Easy", },
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Normal", },
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Hard", },
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Insane", }
+                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Easy" },
+                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Normal" },
+                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Hard" },
+                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Insane" },
                 },
                 Files =
                 {
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Database
                     new RealmNamedFileUsage(createRealmFile(), "test [normal].osu"),
                     new RealmNamedFileUsage(createRealmFile(), "test [hard].osu"),
                     new RealmNamedFileUsage(createRealmFile(), "test [insane].osu"),
-                }
+                },
             };
 
             for (int i = 0; i < 8; i++)

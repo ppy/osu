@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mods
                 return string.Join(", ", new[]
                 {
                     drainRate,
-                    overallDifficulty
+                    overallDifficulty,
                 }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }

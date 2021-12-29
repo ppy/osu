@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new NoteCompositionTool(),
-            new HoldNoteCompositionTool()
+            new HoldNoteCompositionTool(),
         };
 
         protected override void UpdateAfterChildren()

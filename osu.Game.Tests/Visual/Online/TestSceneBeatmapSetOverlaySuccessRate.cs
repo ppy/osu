@@ -47,9 +47,9 @@ namespace osu.Game.Tests.Visual.Online
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(275, 220),
-                        Padding = new MarginPadding(20)
-                    }
-                }
+                        Padding = new MarginPadding(20),
+                    },
+                },
             };
         });
 
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                     Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
-                }
+                },
             };
         }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Online
                 FailTimes = new APIFailTimes
                 {
                     Fails = Enumerable.Range(1, 100).ToArray(),
-                }
+                },
             });
 
             AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 100));
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set beatmap", () => successRate.Beatmap = new APIBeatmap
             {
-                FailTimes = new APIFailTimes()
+                FailTimes = new APIFailTimes(),
             });
 
             AddAssert("graph max values correct", () => successRate.ChildrenOfType<BarGraph>().All(graph => graph.MaxValue == 0));

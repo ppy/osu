@@ -89,15 +89,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Children = new Drawable[]
                     {
                         Body = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SpinnerBody), _ => new DefaultSpinner()),
-                        RotationTracker = new SpinnerRotationTracker(this)
-                    }
+                        RotationTracker = new SpinnerRotationTracker(this),
+                    },
                 },
                 spinningSample = new PausableSkinnableSound
                 {
                     Volume = { Value = 0 },
                     Looping = true,
-                    Frequency = { Value = spinning_sample_initial_frequency }
-                }
+                    Frequency = { Value = spinning_sample_initial_frequency },
+                },
             });
 
             PositionBindable.BindValueChanged(pos => Position = pos.NewValue);

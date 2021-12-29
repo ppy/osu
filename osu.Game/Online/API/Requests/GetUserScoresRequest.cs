@@ -39,6 +39,6 @@ namespace osu.Game.Online.API.Requests
     {
         Best,
         Firsts,
-        Recent
+        Recent,
     }
 }

@@ -45,20 +45,20 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.StarsMinimum,
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
-                    Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
+                    Keywords = new[] { "minimum", "maximum", "star", "difficulty" },
                 },
                 new SettingsSlider<double, MaximumStarsSlider>
                 {
                     LabelText = UserInterfaceStrings.StarsMaximum,
                     Current = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
-                    Keywords = new[] { "minimum", "maximum", "star", "difficulty" }
+                    Keywords = new[] { "minimum", "maximum", "star", "difficulty" },
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
                     LabelText = UserInterfaceStrings.RandomSelectionAlgorithm,
                     Current = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
-                }
+                },
             };
         }
 

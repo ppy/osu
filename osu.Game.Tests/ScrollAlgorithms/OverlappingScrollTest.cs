@@ -20,7 +20,7 @@ namespace osu.Game.Tests.ScrollAlgorithms
             {
                 new MultiplierControlPoint(0) { Velocity = 1 },
                 new MultiplierControlPoint(10000) { Velocity = 2f },
-                new MultiplierControlPoint(20000) { Velocity = 0.5f }
+                new MultiplierControlPoint(20000) { Velocity = 0.5f },
             };
 
             algorithm = new OverlappingScrollAlgorithm(controlPoints);

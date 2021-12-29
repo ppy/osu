@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 nonProxiedContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Content = new Container { RelativeSizeAxes = Axes.Both }
+                    Child = Content = new Container { RelativeSizeAxes = Axes.Both },
                 },
-                proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
+                proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both },
             });
         }
 

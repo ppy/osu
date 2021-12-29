@@ -51,6 +51,6 @@ namespace osu.Game.Configuration
         /// The last playback time in milliseconds of a hover sample (from <see cref="HoverSounds"/>).
         /// Used to debounce hover sounds game-wide to avoid volume saturation, especially in scrolling views with many UI controls like <see cref="SettingsOverlay"/>.
         /// </summary>
-        LastHoverSoundPlaybackTime
+        LastHoverSoundPlaybackTime,
     }
 }

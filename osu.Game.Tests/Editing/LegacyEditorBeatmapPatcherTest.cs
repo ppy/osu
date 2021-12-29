@@ -32,8 +32,8 @@ namespace osu.Game.Tests.Editing
             {
                 BeatmapInfo =
                 {
-                    Ruleset = new OsuRuleset().RulesetInfo
-                }
+                    Ruleset = new OsuRuleset().RulesetInfo,
+                },
             }));
         }
 
@@ -50,8 +50,8 @@ namespace osu.Game.Tests.Editing
             {
                 HitObjects =
                 {
-                    new HitCircle { StartTime = 1000, NewCombo = true }
-                }
+                    new HitCircle { StartTime = 1000, NewCombo = true },
+                },
             };
 
             runTest(patch);
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Editing
                     (OsuHitObject)current.HitObjects[0],
                     new HitCircle { StartTime = 2000 },
                     (OsuHitObject)current.HitObjects[1],
-                }
+                },
             };
 
             runTest(patch);
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Editing
                 {
                     (OsuHitObject)current.HitObjects[0],
                     (OsuHitObject)current.HitObjects[2],
-                }
+                },
             };
 
             runTest(patch);
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Editing
                     new HitCircle { StartTime = 500, NewCombo = true },
                     (OsuHitObject)current.HitObjects[1],
                     (OsuHitObject)current.HitObjects[2],
-                }
+                },
             };
 
             runTest(patch);
@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Editing
                     (OsuHitObject)current.HitObjects[0],
                     new HitCircle { StartTime = 2000, Samples = { new HitSampleInfo(HitSampleInfo.HIT_FINISH) } },
                     (OsuHitObject)current.HitObjects[2],
-                }
+                },
             };
 
             runTest(patch);
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Editing
                         new PathControlPoint(Vector2.One),
                         new PathControlPoint(new Vector2(2), PathType.Bezier),
                         new PathControlPoint(new Vector2(3)),
-                    }, 50)
+                    }, 50),
                 },
                 new HitCircle { StartTime = 3000 },
             });
@@ -180,10 +180,10 @@ namespace osu.Game.Tests.Editing
                             new PathControlPoint(Vector2.Zero, PathType.Bezier),
                             new PathControlPoint(new Vector2(4)),
                             new PathControlPoint(new Vector2(5)),
-                        }, 100)
+                        }, 100),
                     },
                     (OsuHitObject)current.HitObjects[2],
-                }
+                },
             };
 
             runTest(patch);
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Editing
                     new HitCircle { StartTime = 2500 },
                     (OsuHitObject)current.HitObjects[2],
                     new HitCircle { StartTime = 3500 },
-                }
+                },
             };
 
             runTest(patch);
@@ -242,7 +242,7 @@ namespace osu.Game.Tests.Editing
                     (OsuHitObject)current.HitObjects[1],
                     (OsuHitObject)current.HitObjects[3],
                     (OsuHitObject)current.HitObjects[6],
-                }
+                },
             };
 
             runTest(patch);
@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Editing
                     (OsuHitObject)current.HitObjects[5],
                     new HitCircle { StartTime = 3000, Samples = { new HitSampleInfo(HitSampleInfo.HIT_CLAP) } },
                     (OsuHitObject)current.HitObjects[7],
-                }
+                },
             };
 
             runTest(patch);
@@ -307,7 +307,7 @@ namespace osu.Game.Tests.Editing
                     new HitCircle { StartTime = 2650 },
                     new HitCircle { StartTime = 2750 },
                     new HitCircle { StartTime = 4000 },
-                }
+                },
             };
 
             runTest(patch);
@@ -332,7 +332,7 @@ namespace osu.Game.Tests.Editing
                     new HitCircle { StartTime = 500, Position = new Vector2(100), NewCombo = true },
                     new HitCircle { StartTime = 500, Position = new Vector2(50), NewCombo = true },
                     new HitCircle { StartTime = 500, Position = new Vector2(200), NewCombo = true },
-                }
+                },
             };
 
             runTest(patch);

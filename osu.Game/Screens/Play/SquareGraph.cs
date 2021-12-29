@@ -263,7 +263,7 @@ namespace osu.Game.Screens.Play
         public enum ColumnState
         {
             Lit,
-            Dimmed
+            Dimmed,
         }
     }
 }

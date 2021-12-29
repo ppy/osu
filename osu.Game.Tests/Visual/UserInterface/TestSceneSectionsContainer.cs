@@ -31,8 +31,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Alpha = 0.5f,
                     Width = 300,
                     Height = header_height,
-                    Colour = Color4.Red
-                }
+                    Colour = Color4.Red,
+                },
             };
             container.SelectedSection.ValueChanged += section =>
             {
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Width = 300,
                 Height = (container.ChildSize.Y - header_height) * multiplier,
-                Colour = default_colour
+                Colour = default_colour,
             });
         }
 

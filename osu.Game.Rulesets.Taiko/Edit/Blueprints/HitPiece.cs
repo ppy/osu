@@ -26,9 +26,9 @@ namespace osu.Game.Rulesets.Taiko.Edit.Blueprints
                     {
                         AlwaysPresent = true,
                         Alpha = 0,
-                        RelativeSizeAxes = Axes.Both
-                    }
-                }
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                },
             };
         }
     }

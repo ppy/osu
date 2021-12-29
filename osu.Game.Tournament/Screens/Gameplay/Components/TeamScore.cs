@@ -72,7 +72,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
                                     RelativeSizeAxes = Axes.Both,
                                     AlwaysPresent = true,
                                 },
-                            }
+                            },
                         },
                         box = new Box
                         {

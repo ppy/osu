@@ -47,12 +47,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText { Text = "Sample content" },
-                                new TriangleButton { Text = "can't puush me", Width = 200, },
+                                new TriangleButton { Text = "can't puush me", Width = 200 },
                                 new TriangleButton { Text = "puush me", Width = 200, Action = () => { } },
-                            }
+                            },
                         },
                         overlay = new TestLoadingLayer(true),
-                    }
+                    },
                 },
             };
         });

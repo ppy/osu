@@ -87,8 +87,8 @@ namespace osu.Game.Beatmaps
                         Metadata = metadata,
                         WidescreenStoryboard = true,
                         SamplesMatchPlaybackRate = true,
-                    }
-                }
+                    },
+                },
             };
 
             var imported = beatmapModelManager.Import(set).Result.Value;

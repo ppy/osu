@@ -55,15 +55,15 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                        Text = SortStrings.Default
+                        Text = SortStrings.Default,
                     },
                     CreateControl().With(c =>
                     {
                         c.Anchor = Anchor.CentreLeft;
                         c.Origin = Anchor.CentreLeft;
                         c.Current = current;
-                    })
-                }
+                    }),
+                },
             });
         }
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
             [NotNull]
             protected virtual TabButton CreateTabButton(T value) => new TabButton(value)
             {
-                Active = { BindTarget = Active }
+                Active = { BindTarget = Active },
             };
 
             protected override void OnActivated()
@@ -144,9 +144,9 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = (value as Enum)?.GetLocalisableDescription() ?? value.ToString()
-                        }
-                    }
+                            Text = (value as Enum)?.GetLocalisableDescription() ?? value.ToString(),
+                        },
+                    },
                 });
 
                 AddInternal(new HoverClickSounds());

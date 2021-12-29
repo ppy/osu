@@ -68,7 +68,7 @@ namespace osu.Game.Graphics.Containers
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
                 CornerRadius = 10,
-                Child = content = new ScalingDrawSizePreservingFillContainer(targetMode != ScalingMode.Gameplay)
+                Child = content = new ScalingDrawSizePreservingFillContainer(targetMode != ScalingMode.Gameplay),
             };
         }
 
@@ -145,7 +145,7 @@ namespace osu.Game.Graphics.Containers
                         {
                             Colour = OsuColour.Gray(0.1f),
                             Alpha = 0,
-                            Depth = float.MaxValue
+                            Depth = float.MaxValue,
                         });
 
                         backgroundStack.Push(new ScalingBackgroundScreen());

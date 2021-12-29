@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     Name = @"Swell Count",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Spinners),
                     Content = swells.ToString(),
-                }
+                },
             };
         }
     }

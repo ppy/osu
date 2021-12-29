@@ -29,6 +29,6 @@ namespace osu.Game.Online.API.Requests
         Ranked,
         Loved,
         Pending,
-        Graveyard
+        Graveyard,
     }
 }

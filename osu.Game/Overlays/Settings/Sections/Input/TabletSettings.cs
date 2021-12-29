@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 t.AddText(" for troubleshooting steps.");
                             }
                         }),
-                    }
+                    },
                 },
                 mainSettings = new FillFlowContainer
                 {
@@ -145,57 +145,57 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                             Action = () =>
                             {
                                 forceAspectRatio((float)host.Window.ClientSize.Width / host.Window.ClientSize.Height);
-                            }
+                            },
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.XOffset,
-                            Current = offsetX
+                            Current = offsetX,
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.YOffset,
-                            Current = offsetY
+                            Current = offsetY,
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.Rotation,
-                            Current = rotation
+                            Current = rotation,
                         },
                         new RotationPresetButtons(tabletHandler)
                         {
                             Padding = new MarginPadding
                             {
-                                Horizontal = SettingsPanel.CONTENT_MARGINS
-                            }
+                                Horizontal = SettingsPanel.CONTENT_MARGINS,
+                            },
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = TabletSettingsStrings.AspectRatio,
-                            Current = aspectRatio
+                            Current = aspectRatio,
                         },
                         new SettingsCheckbox
                         {
                             LabelText = TabletSettingsStrings.LockAspectRatio,
-                            Current = aspectLock
+                            Current = aspectLock,
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = CommonStrings.Width,
-                            Current = sizeX
+                            Current = sizeX,
                         },
                         new SettingsSlider<float>
                         {
                             TransferValueOnCommit = true,
                             LabelText = CommonStrings.Height,
-                            Current = sizeY
+                            Current = sizeY,
                         },
-                    }
+                    },
                 },
             };
         }

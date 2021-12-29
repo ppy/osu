@@ -21,7 +21,7 @@ namespace osu.Game.Collections
 
         protected override FillFlowContainer<RearrangeableListItem<BeatmapCollection>> CreateListFillFlowContainer() => new Flow
         {
-            DragActive = { BindTarget = DragActive }
+            DragActive = { BindTarget = DragActive },
         };
 
         protected override OsuRearrangeableListItem<BeatmapCollection> CreateOsuDrawable(BeatmapCollection item)
@@ -68,9 +68,9 @@ namespace osu.Game.Collections
                         placeholderContainer = new Container<DrawableCollectionListItem>
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }
-                    }
+                            AutoSizeAxes = Axes.Y,
+                        },
+                    },
                 });
 
                 ReplacePlaceholder();

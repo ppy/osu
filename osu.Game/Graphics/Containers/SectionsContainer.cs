@@ -127,8 +127,8 @@ namespace osu.Game.Graphics.Containers
                 }),
                 headerBackgroundContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.X
-                }
+                    RelativeSizeAxes = Axes.X,
+                },
             });
 
             originalSectionsMargin = scrollContentContainer.Margin;

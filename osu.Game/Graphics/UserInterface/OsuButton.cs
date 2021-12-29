@@ -76,10 +76,10 @@ namespace osu.Game.Graphics.UserInterface
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White.Opacity(.1f),
                         Blending = BlendingParameters.Additive,
-                        Depth = float.MinValue
+                        Depth = float.MinValue,
                     },
                     SpriteText = CreateText(),
-                }
+                },
             });
 
             if (hoverSounds.HasValue)
@@ -146,7 +146,7 @@ namespace osu.Game.Graphics.UserInterface
             Depth = -1,
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
-            Font = OsuFont.GetFont(weight: FontWeight.Bold)
+            Font = OsuFont.GetFont(weight: FontWeight.Bold),
         };
     }
 }

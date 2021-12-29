@@ -30,8 +30,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 6, SliderMultiplier = 3 },
-                    Ruleset = ruleset
-                }
+                    Ruleset = ruleset,
+                },
             };
 
             const double start_offset = 8000;
@@ -44,12 +44,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     // intentionally start objects a bit late so we can test the case of no alive objects.
                     StartTime = t += spacing,
-                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) }
+                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_NORMAL) },
                 },
                 new HitCircle
                 {
                     StartTime = t += spacing,
-                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) }
+                    Samples = new[] { new HitSampleInfo(HitSampleInfo.HIT_WHISTLE) },
                 },
                 new HitCircle
                 {

@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.AddInternal(shakeContainer = new ShakeContainer
             {
                 ShakeDuration = 30,
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             });
         }
 

@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Width = 200,
                 Height = 100,
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             });
         }
 

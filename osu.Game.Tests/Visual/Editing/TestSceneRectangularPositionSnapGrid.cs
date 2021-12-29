@@ -27,12 +27,12 @@ namespace osu.Game.Tests.Visual.Editing
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Colour4.Gray
+                    Colour = Colour4.Gray,
                 },
                 content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both
-                }
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
         }
 
@@ -52,13 +52,13 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("create grid", () => Child = grid = new RectangularPositionSnapGrid(position)
             {
                 RelativeSizeAxes = Axes.Both,
-                Spacing = spacing
+                Spacing = spacing,
             });
 
             AddStep("add snapping cursor", () => Add(new SnappingCursorContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                GetSnapPosition = pos => grid.GetSnappedPosition(grid.ToLocalSpace(pos))
+                GetSnapPosition = pos => grid.GetSnappedPosition(grid.ToLocalSpace(pos)),
             }));
         }
 
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Editing
                 {
                     Origin = Anchor.Centre,
                     Size = new Vector2(50),
-                    Colour = Color4.Red
+                    Colour = Color4.Red,
                 };
             }
 

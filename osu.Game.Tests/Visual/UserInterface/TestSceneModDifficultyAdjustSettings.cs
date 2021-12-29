@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             AutoSizeAxes = Axes.Y,
                             ChildrenEnumerable = modDifficultyAdjust.CreateSettingsControls(),
                         },
-                    }
+                    },
                 };
             });
         }
@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 tracker = new ModSettingChangeTracker(modDifficultyAdjust.Yield())
                 {
-                    SettingChanged = settingsChangedQueue.Enqueue
+                    SettingChanged = settingsChangedQueue.Enqueue,
                 };
             });
 
@@ -273,8 +273,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                         CircleSize = value,
                         DrainRate = value,
                         ApproachRate = value,
-                    }
-                }
+                    },
+                },
             }));
         }
     }

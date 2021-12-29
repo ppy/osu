@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.PaintBrush
+            Icon = FontAwesome.Solid.PaintBrush,
         };
 
         private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLiveUnmanaged() };
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 skinDropdown = new SkinSettingsDropdown
                 {
-                    LabelText = SkinSettingsStrings.CurrentSkin
+                    LabelText = SkinSettingsStrings.CurrentSkin,
                 },
                 new SettingsButton
                 {

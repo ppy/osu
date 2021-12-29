@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
                 Sort = sortMode.Value,
                 AllowConvertedBeatmaps = showConverted.Value,
                 Ruleset = ruleset.Value,
-                Collection = collectionDropdown?.Current.Value?.Collection
+                Collection = collectionDropdown?.Current.Value?.Collection,
             };
 
             if (!minimumStars.IsDefault)
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Select
                                                 Anchor = Anchor.BottomRight,
                                                 Origin = Anchor.BottomRight,
                                                 AccentColour = colours.GreenLight,
-                                                Current = { BindTarget = sortMode }
+                                                Current = { BindTarget = sortMode },
                                             },
                                             new OsuSpriteText
                                             {
@@ -148,9 +148,9 @@ namespace osu.Game.Screens.Select
                                                 Anchor = Anchor.BottomRight,
                                                 Origin = Anchor.BottomRight,
                                             },
-                                        }
+                                        },
                                     },
-                                }
+                                },
                             },
                             new Container
                             {
@@ -164,12 +164,12 @@ namespace osu.Game.Screens.Select
                                         Origin = Anchor.TopRight,
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.4f,
-                                    }
-                                }
+                                    },
+                                },
                             },
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);

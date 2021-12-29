@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                     AutoSizeAxes = Axes.X,
                     Margin = new MarginPadding
                     {
-                        Horizontal = 3
+                        Horizontal = 3,
                     },
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
@@ -50,13 +50,13 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Masking = true,
                             Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
                             {
-                                RelativeSizeAxes = Axes.Both
+                                RelativeSizeAxes = Axes.Both,
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,
-                            }
+                            },
                         },
-                    }
+                    },
                 },
             });
 

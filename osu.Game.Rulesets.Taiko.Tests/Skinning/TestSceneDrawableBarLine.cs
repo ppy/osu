@@ -41,8 +41,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Children = new Drawable[]
                     {
                         new TaikoPlayfield(),
-                        hoc = new ScrollingHitObjectContainer()
-                    }
+                        hoc = new ScrollingHitObjectContainer(),
+                    },
                 };
 
                 hoc.Add(new DrawableBarLine(createBarLineAtCurrentTime())
@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     Children = new Drawable[]
                     {
                         new TaikoPlayfield(),
-                        hoc = new ScrollingHitObjectContainer()
-                    }
+                        hoc = new ScrollingHitObjectContainer(),
+                    },
                 };
 
                 hoc.Add(new DrawableBarLine(createBarLineAtCurrentTime(true))

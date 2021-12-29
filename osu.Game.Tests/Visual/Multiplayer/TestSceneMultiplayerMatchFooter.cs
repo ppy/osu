@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 50,
-                Child = new MultiplayerMatchFooter()
+                Child = new MultiplayerMatchFooter(),
             };
         });
     }

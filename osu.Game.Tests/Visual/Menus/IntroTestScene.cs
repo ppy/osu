@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Menus
                     RelativePositionAxes = Axes.Both,
                     Depth = float.MinValue,
                     Position = new Vector2(0.5f),
-                }
+                },
             };
         }
 

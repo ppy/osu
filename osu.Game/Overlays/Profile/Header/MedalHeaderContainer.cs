@@ -47,8 +47,8 @@ namespace osu.Game.Overlays.Profile.Header
                             TopLeft = Color4.Black.Opacity(0.2f),
                             TopRight = Color4.Black.Opacity(0.2f),
                             BottomLeft = Color4.Black.Opacity(0),
-                            BottomRight = Color4.Black.Opacity(0)
-                        }
+                            BottomRight = Color4.Black.Opacity(0),
+                        },
                     },
                 },
                 badgeFlowContainer = new FillFlowContainer
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Margin = new MarginPadding { Top = 5 },
                     Spacing = new Vector2(10, 10),
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
-                }
+                },
             };
         }
 

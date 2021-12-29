@@ -183,7 +183,7 @@ namespace osu.Game.Collections
             protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new CollectionDropdownMenuItem(item)
             {
                 BackgroundColourHover = HoverColour,
-                BackgroundColourSelected = SelectionColour
+                BackgroundColourSelected = SelectionColour,
             };
         }
 

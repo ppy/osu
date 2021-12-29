@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
                                      Name = $"Channel no. {index}",
                                      Topic = index == 3 ? null : $"We talk about the number {index} here",
                                      Type = index % 2 == 0 ? ChannelType.PM : ChannelType.Temporary,
-                                     Id = index
+                                     Id = index,
                                  })
                                  .ToList();
         }
@@ -148,9 +148,9 @@ namespace osu.Game.Tests.Visual.Online
                             Sender = new APIUser
                             {
                                 Id = 2,
-                                Username = "test_user"
-                            }
-                        }
+                                Username = "test_user",
+                            },
+                        },
                     };
                 }
 
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.Online
                 channelManager.JoinChannel(new Channel
                 {
                     Name = $"Channel no. {joinedChannels.Count() + 11}",
-                    Type = ChannelType.Temporary
+                    Type = ChannelType.Temporary,
                 });
 
                 return false;
@@ -454,7 +454,7 @@ namespace osu.Game.Tests.Visual.Online
                 InternalChildren = new Drawable[]
                 {
                     ChannelManager,
-                    ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
+                    ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both },
                 };
 
                 ChatOverlay.Show();

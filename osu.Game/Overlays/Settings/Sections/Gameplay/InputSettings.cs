@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
                 },
                 new SettingsCheckbox
                 {
                     LabelText = SkinSettingsStrings.AutoCursorSize,
-                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                    Current = config.GetBindable<bool>(OsuSetting.AutoCursorSize),
                 },
             };
 
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 Add(new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.DisableWinKey,
-                    Current = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey)
+                    Current = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey),
                 });
             }
         }

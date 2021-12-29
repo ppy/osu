@@ -34,8 +34,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Children = new Drawable[]
                 {
                     commentEditor = new TestCommentEditor(),
-                    cancellableCommentEditor = new TestCancellableCommentEditor()
-                }
+                    cancellableCommentEditor = new TestCancellableCommentEditor(),
+                },
             }));
 
         [Test]

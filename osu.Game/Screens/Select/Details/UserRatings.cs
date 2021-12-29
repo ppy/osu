@@ -90,14 +90,14 @@ namespace osu.Game.Screens.Select.Details
                                 negativeRatings = new OsuSpriteText
                                 {
                                     Text = 0.ToLocalisableString(@"N0"),
-                                    Font = OsuFont.GetFont(size: 12)
+                                    Font = OsuFont.GetFont(size: 12),
                                 },
                                 positiveRatings = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Text = 0.ToLocalisableString(@"N0"),
-                                    Font = OsuFont.GetFont(size: 12)
+                                    Font = OsuFont.GetFont(size: 12),
                                 },
                             },
                         },

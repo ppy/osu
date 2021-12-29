@@ -21,22 +21,22 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = SkinSettingsStrings.BeatmapSkins,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = SkinSettingsStrings.BeatmapColours,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours)
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapColours),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = SkinSettingsStrings.BeatmapHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
+                    Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GraphicsSettingsStrings.StoryboardVideo,
-                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                    Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard),
                 },
             };
         }

@@ -44,10 +44,10 @@ namespace osu.Game.Overlays
                     info = new Info(),
                     new ScoresContainer
                     {
-                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
+                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap },
                     },
-                    comments = new CommentsSection()
-                }
+                    comments = new CommentsSection(),
+                },
             };
 
             Header.BeatmapSet.BindTo(beatmapSet);

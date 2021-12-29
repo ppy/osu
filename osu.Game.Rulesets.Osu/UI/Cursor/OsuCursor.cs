@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                }
+                },
             };
         }
 

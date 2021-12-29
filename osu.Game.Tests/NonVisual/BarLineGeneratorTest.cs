@@ -33,15 +33,15 @@ namespace osu.Game.Tests.NonVisual
                 HitObjects = new List<HitObject>
                 {
                     new HitObject { StartTime = 0 },
-                    new HitObject { StartTime = 120_000 }
+                    new HitObject { StartTime = 120_000 },
                 },
-                ControlPointInfo = new ControlPointInfo()
+                ControlPointInfo = new ControlPointInfo(),
             };
 
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint
             {
                 BeatLength = (double)beat_length_numerator / beat_length_denominator,
-                TimeSignature = signature
+                TimeSignature = signature,
             });
 
             var barLines = new BarLineGenerator<BarLine>(beatmap).BarLines;

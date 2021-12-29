@@ -98,7 +98,7 @@ namespace osu.Game.Online.Leaderboards
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = rank_width, },
+                    Padding = new MarginPadding { Left = rank_width },
                     Children = new Drawable[]
                     {
                         new Container
@@ -149,7 +149,7 @@ namespace osu.Game.Online.Leaderboards
                                         nameLabel = new OsuSpriteText
                                         {
                                             Text = user.Username,
-                                            Font = OsuFont.GetFont(size: 23, weight: FontWeight.Bold, italics: true)
+                                            Font = OsuFont.GetFont(size: 23, weight: FontWeight.Bold, italics: true),
                                         },
                                         new FillFlowContainer
                                         {
@@ -183,7 +183,7 @@ namespace osu.Game.Online.Leaderboards
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0f),
                                                     Margin = new MarginPadding { Left = edge_margin },
-                                                    Children = statisticsLabels
+                                                    Children = statisticsLabels,
                                                 },
                                             },
                                         },
@@ -214,7 +214,7 @@ namespace osu.Game.Online.Leaderboards
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Size = new Vector2(40f)
+                                                    Size = new Vector2(40f),
                                                 },
                                             },
                                         },
@@ -227,7 +227,7 @@ namespace osu.Game.Online.Leaderboards
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(1),
-                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) }),
                                 },
                             },
                         },
@@ -278,7 +278,7 @@ namespace osu.Game.Online.Leaderboards
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
             new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy)
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy),
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -366,7 +366,7 @@ namespace osu.Game.Online.Leaderboards
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.GetFont(size: 20, italics: true),
-                    Text = rank == null ? "-" : rank.Value.FormatRank()
+                    Text = rank == null ? "-" : rank.Value.FormatRank(),
                 };
             }
 

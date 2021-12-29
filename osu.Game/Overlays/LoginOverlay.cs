@@ -64,10 +64,10 @@ namespace osu.Game.Overlays
                                     Colour = colours.Yellow,
                                     Alpha = 1,
                                 },
-                            }
-                        }
-                    }
-                }
+                            },
+                        },
+                    },
+                },
             };
         }
 

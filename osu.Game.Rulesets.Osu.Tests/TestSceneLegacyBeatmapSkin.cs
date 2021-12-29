@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         {
                             new PathControlPoint(new Vector2(0, 0)),
                             new PathControlPoint(new Vector2(100, 0)),
-                        })
+                        }),
                     };
 
                 hitObject.StartTime = i;
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 beatmap.HitObjects.AddRange(hitObjects ?? new[]
                 {
-                    new HitCircle { Position = new Vector2(256, 192) }
+                    new HitCircle { Position = new Vector2(256, 192) },
                 });
 
                 return beatmap;

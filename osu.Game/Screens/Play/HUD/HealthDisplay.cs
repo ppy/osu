@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play.HUD
         public Bindable<double> Current { get; } = new BindableDouble(1)
         {
             MinValue = 0,
-            MaxValue = 1
+            MaxValue = 1,
         };
 
         protected virtual void Flash(JudgementResult result)

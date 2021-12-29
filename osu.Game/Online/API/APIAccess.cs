@@ -83,7 +83,7 @@ namespace osu.Game.Online.API
             var thread = new Thread(run)
             {
                 Name = "APIAccess",
-                IsBackground = true
+                IsBackground = true,
             };
 
             thread.Start();
@@ -279,7 +279,7 @@ namespace osu.Game.Online.API
                 Method = HttpMethod.Post,
                 Username = username,
                 Email = email,
-                Password = password
+                Password = password,
             };
 
             try
@@ -477,6 +477,6 @@ namespace osu.Game.Online.API
         /// <summary>
         /// We are online.
         /// </summary>
-        Online
+        Online,
     }
 }

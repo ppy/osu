@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Origin = Anchor.Centre,
                 Blending = BlendingParameters.Additive,
                 Depth = float.MaxValue,
-                Alpha = 0
+                Alpha = 0,
             });
         }
 

@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
         // Invariant: `path.Vertices.Count == vertexStates.Count`
         private readonly List<VertexState> vertexStates = new List<VertexState>
         {
-            new VertexState { IsFixed = true }
+            new VertexState { IsFixed = true },
         };
 
         private readonly List<VertexState> previousVertexStates = new List<VertexState>();
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
             vertexStates.Clear();
             vertexStates.AddRange(path.Vertices.Select((_, i) => new VertexState
             {
-                IsFixed = i == 0
+                IsFixed = i == 0,
             }));
         }
 

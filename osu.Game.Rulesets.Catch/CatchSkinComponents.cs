@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Catch
         Droplet,
         Catcher,
         CatchComboCounter,
-        HitExplosion
+        HitExplosion,
     }
 }

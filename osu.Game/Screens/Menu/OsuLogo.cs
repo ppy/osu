@@ -126,9 +126,9 @@ namespace osu.Game.Screens.Menu
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Blending = BlendingParameters.Additive,
-                                            Alpha = 0
-                                        }
-                                    }
+                                            Alpha = 0,
+                                        },
+                                    },
                                 },
                                 logoAmplitudeContainer = new Container
                                 {
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Menu
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Alpha = visualizer_default_alpha,
-                                                    Size = new Vector2(0.96f)
+                                                    Size = new Vector2(0.96f),
                                                 },
                                                 new Container
                                                 {
@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Menu
                                                                             ColourDark = Color4Extensions.FromHex(@"de5b95"),
                                                                             RelativeSizeAxes = Axes.Both,
                                                                         },
-                                                                    }
+                                                                    },
                                                                 },
                                                                 flashLayer = new Box
                                                                 {
@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Menu
                                                             Anchor = Anchor.Centre,
                                                             Origin = Anchor.Centre,
                                                         },
-                                                    }
+                                                    },
                                                 },
                                                 impactContainer = new CircularContainer
                                                 {
@@ -215,17 +215,17 @@ namespace osu.Game.Screens.Menu
                                                             RelativeSizeAxes = Axes.Both,
                                                             AlwaysPresent = true,
                                                             Alpha = 0,
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
 

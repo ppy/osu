@@ -62,16 +62,16 @@ namespace osu.Game.Overlays
                             {
                                 new NotificationSection(@"Notifications", @"Clear All")
                                 {
-                                    AcceptTypes = new[] { typeof(SimpleNotification) }
+                                    AcceptTypes = new[] { typeof(SimpleNotification) },
                                 },
                                 new NotificationSection(@"Running Tasks", @"Cancel All")
                                 {
-                                    AcceptTypes = new[] { typeof(ProgressNotification) }
-                                }
-                            }
-                        }
-                    }
-                }
+                                    AcceptTypes = new[] { typeof(ProgressNotification) },
+                                },
+                            },
+                        },
+                    },
+                },
             };
         }
 

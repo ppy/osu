@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Mods
         {
             Autoplay = false,
             Mod = new OsuModSuddenDeath(),
-            PassCondition = () => !restartRequested && Player.ChildrenOfType<FailOverlay>().Single().State.Value == Visibility.Visible
+            PassCondition = () => !restartRequested && Player.ChildrenOfType<FailOverlay>().Single().State.Value == Visibility.Visible,
         });
 
         [Test]
@@ -47,9 +47,9 @@ namespace osu.Game.Tests.Visual.Mods
             Autoplay = false,
             Mod = new OsuModSuddenDeath
             {
-                Restart = { Value = true }
+                Restart = { Value = true },
             },
-            PassCondition = () => restartRequested && Player.ChildrenOfType<FailOverlay>().Single().State.Value == Visibility.Hidden
+            PassCondition = () => restartRequested && Player.ChildrenOfType<FailOverlay>().Single().State.Value == Visibility.Hidden,
         });
     }
 }

@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Child = new SettingsCheckbox
                         {
                             LabelText = "a sample component",
-                        }
+                        },
                     });
                 }
             });

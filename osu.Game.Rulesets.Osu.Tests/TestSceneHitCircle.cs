@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected virtual TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto, double hitOffset = 0) => new TestDrawableHitCircle(circle, auto, hitOffset)
         {
-            Depth = depthIndex++
+            Depth = depthIndex++,
         };
 
         protected class TestDrawableHitCircle : DrawableHitCircle

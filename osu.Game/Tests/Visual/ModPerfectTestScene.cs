@@ -23,10 +23,10 @@ namespace osu.Game.Tests.Visual
             Beatmap = new Beatmap
             {
                 BeatmapInfo = { Ruleset = CreatePlayerRuleset().RulesetInfo },
-                HitObjects = { testData.HitObject }
+                HitObjects = { testData.HitObject },
             },
             Autoplay = !shouldMiss,
-            PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testData.FailOnMiss)
+            PassCondition = () => ((PerfectModTestPlayer)Player).CheckFailed(shouldMiss && testData.FailOnMiss),
         });
 
         protected override TestPlayer CreateModPlayer(Ruleset ruleset) => new PerfectModTestPlayer();

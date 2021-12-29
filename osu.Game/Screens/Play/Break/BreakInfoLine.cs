@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play.Break
                     Origin = Anchor.CentreRight,
                     Text = name,
                     Font = OsuFont.GetFont(size: 17),
-                    Margin = new MarginPadding { Right = margin }
+                    Margin = new MarginPadding { Right = margin },
                 },
                 valueText = new OsuSpriteText
                 {
@@ -47,8 +47,8 @@ namespace osu.Game.Screens.Play.Break
                     Origin = Anchor.CentreLeft,
                     Text = prefix + @"-",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
-                    Margin = new MarginPadding { Left = margin }
-                }
+                    Margin = new MarginPadding { Left = margin },
+                },
             };
 
             Current.ValueChanged += currentValueChanged;

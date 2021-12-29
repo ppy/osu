@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                 RelativeSizeAxes = Axes.Both,
                 Blending = BlendingParameters.Additive,
                 Icon = FontAwesome.Solid.ChevronRight,
-                Size = new Vector2(0.35f)
+                Size = new Vector2(0.35f),
             })
             {
                 Anchor = Anchor.Centre,

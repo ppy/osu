@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
                         Colour = Color4.Black,
                     },
                     scoresContainer = new TestScoresContainer(),
-                }
+                },
             };
 
             var allScores = new APIScoresCollection
@@ -161,7 +161,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 123456,
                         Accuracy = 0.6543,
                     },
-                }
+                },
             };
 
             var myBestScore = new APIScoreWithPosition
@@ -238,8 +238,8 @@ namespace osu.Game.Tests.Visual.Online
                         MaxCombo = 1234,
                         TotalScore = 1234567890,
                         Accuracy = 1,
-                    }
-                }
+                    },
+                },
             };
 
             foreach (var s in allScores.Scores)
@@ -249,7 +249,7 @@ namespace osu.Game.Tests.Visual.Online
                     { "count_300", RNG.Next(2000) },
                     { "count_100", RNG.Next(2000) },
                     { "count_50", RNG.Next(2000) },
-                    { "count_miss", RNG.Next(2000) }
+                    { "count_miss", RNG.Next(2000) },
                 };
             }
 

@@ -35,6 +35,6 @@ namespace osu.Game.Online.API.Requests
     public enum UserRankingsType
     {
         Performance,
-        Score
+        Score,
     }
 }

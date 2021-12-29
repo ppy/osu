@@ -12,6 +12,6 @@ namespace osu.Game.Configuration
         [Description("Hide during gameplay")]
         HideDuringGameplay,
 
-        Always
+        Always,
     }
 }

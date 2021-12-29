@@ -35,11 +35,11 @@ namespace osu.Game.Tests.Visual.UserInterface
                     button = new TestButton(),
                     new LoadRepliesButton
                     {
-                        Action = () => { }
+                        Action = () => { },
                     },
                     new ShowRepliesButton(1),
-                    new ShowRepliesButton(2)
-                }
+                    new ShowRepliesButton(2),
+                },
             };
         }
 

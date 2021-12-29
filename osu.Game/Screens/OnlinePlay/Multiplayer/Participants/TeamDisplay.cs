@@ -65,8 +65,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    }
-                }
+                    },
+                },
             };
 
             if (Client.LocalUser?.Equals(user) == true)

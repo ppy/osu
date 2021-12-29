@@ -56,6 +56,6 @@ namespace osu.Game.Rulesets.Edit.Checks.Components
         /// <summary>
         /// Anything to do with storyboarding, breaks, video offset, etc.
         /// </summary>
-        Events
+        Events,
     }
 }

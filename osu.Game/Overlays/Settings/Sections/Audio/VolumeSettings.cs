@@ -24,28 +24,28 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     LabelText = AudioSettingsStrings.MasterVolume,
                     Current = audio.Volume,
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = AudioSettingsStrings.MasterVolumeInactive,
                     Current = config.GetBindable<double>(OsuSetting.VolumeInactive),
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = AudioSettingsStrings.EffectVolume,
                     Current = audio.VolumeSample,
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = AudioSettingsStrings.MusicVolume,
                     Current = audio.VolumeTrack,
                     KeyboardStep = 0.01f,
-                    DisplayAsPercentage = true
+                    DisplayAsPercentage = true,
                 },
             };
         }

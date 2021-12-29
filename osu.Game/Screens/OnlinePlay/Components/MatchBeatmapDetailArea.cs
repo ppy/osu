@@ -46,9 +46,9 @@ namespace osu.Game.Screens.OnlinePlay.Components
                                 Padding = new MarginPadding { Bottom = 10 },
                                 Child = playlist = new PlaylistsRoomSettingsPlaylist
                                 {
-                                    RelativeSizeAxes = Axes.Both
-                                }
-                            }
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            },
                         },
                         new Drawable[]
                         {
@@ -57,16 +57,16 @@ namespace osu.Game.Screens.OnlinePlay.Components
                                 Text = "Add new playlist entry",
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
-                                Action = () => CreateNewItem?.Invoke()
-                            }
+                                Action = () => CreateNewItem?.Invoke(),
+                            },
                         },
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(),
                         new Dimension(GridSizeMode.Absolute, 50),
-                    }
-                }
+                    },
+                },
             });
         }
 

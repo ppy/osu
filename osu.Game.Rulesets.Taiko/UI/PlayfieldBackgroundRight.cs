@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colours.Gray0,
-                    Alpha = 0.6f
+                    Alpha = 0.6f,
                 },
                 new Container
                 {
@@ -51,10 +51,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            AlwaysPresent = true
-                        }
-                    }
-                }
+                            AlwaysPresent = true,
+                        },
+                    },
+                },
             };
         }
     }

@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                     Masking = true,
                     Size = new Vector2(0.01f, initial_height),
                     Blending = BlendingParameters.Additive,
-                }
+                },
             };
         }
 

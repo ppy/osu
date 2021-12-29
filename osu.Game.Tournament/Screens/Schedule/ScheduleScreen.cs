@@ -77,11 +77,11 @@ namespace osu.Game.Tournament.Screens.Schedule
                                                     new TournamentSpriteTextWithBackground("Schedule")
                                                     {
                                                         X = 60,
-                                                        Scale = new Vector2(0.8f)
-                                                    }
-                                                }
+                                                        Scale = new Vector2(0.8f),
+                                                    },
+                                                },
                                             },
-                                        }
+                                        },
                                     },
                                 },
                                 new Drawable[]
@@ -89,11 +89,11 @@ namespace osu.Game.Tournament.Screens.Schedule
                                     mainContainer = new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
             };
         }
@@ -143,23 +143,23 @@ namespace osu.Game.Tournament.Screens.Schedule
                                                                            && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
                                                                .OrderByDescending(p => p.Date.Value)
                                                                .Take(8)
-                                                               .Select(p => new ScheduleMatch(p))
+                                                               .Select(p => new ScheduleMatch(p)),
                                 },
                                 new ScheduleContainer("upcoming matches")
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.6f,
-                                    ChildrenEnumerable = upcoming.Select(p => new ScheduleMatch(p))
+                                    ChildrenEnumerable = upcoming.Select(p => new ScheduleMatch(p)),
                                 },
-                            }
-                        }
+                            },
+                        },
                     },
                     comingUpNext = new ScheduleContainer("coming up next")
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0.25f,
-                    }
-                }
+                    },
+                },
             };
 
             if (match.NewValue != null)
@@ -180,14 +180,14 @@ namespace osu.Game.Tournament.Screens.Schedule
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Scale = new Vector2(0.5f)
+                            Scale = new Vector2(0.5f),
                         },
                         new TournamentSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Text = match.NewValue.Team1.Value?.FullName + " vs " + match.NewValue.Team2.Value?.FullName,
-                            Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold)
+                            Font = OsuFont.Torus.With(size: 24, weight: FontWeight.SemiBold),
                         },
                         new FillFlowContainer
                         {
@@ -199,11 +199,11 @@ namespace osu.Game.Tournament.Screens.Schedule
                             {
                                 new ScheduleMatchDate(match.NewValue.Date.Value)
                                 {
-                                    Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular)
-                                }
-                            }
+                                    Font = OsuFont.Torus.With(size: 24, weight: FontWeight.Regular),
+                                },
+                            },
                         },
-                    }
+                    },
                 };
             }
         }
@@ -242,7 +242,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                         Colour = OsuColour.Gray(0.7f),
                         Alpha = conditional ? 0.6f : 1,
                         Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                        Text = match.Date.Value.ToUniversalTime().ToString("HH:mm UTC") + (conditional ? " (conditional)" : "")
+                        Text = match.Date.Value.ToUniversalTime().ToString("HH:mm UTC") + (conditional ? " (conditional)" : ""),
                     });
                 }
             }
@@ -279,15 +279,15 @@ namespace osu.Game.Tournament.Screens.Schedule
                         {
                             new TournamentSpriteTextWithBackground(title.ToUpperInvariant())
                             {
-                                Scale = new Vector2(0.5f)
+                                Scale = new Vector2(0.5f),
                             },
                             content = new FillFlowContainer
                             {
                                 Direction = FillDirection.Vertical,
                                 RelativeSizeAxes = Axes.Both,
-                                Margin = new MarginPadding(10)
+                                Margin = new MarginPadding(10),
                             },
-                        }
+                        },
                     },
                 };
             }

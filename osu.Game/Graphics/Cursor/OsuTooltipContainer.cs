@@ -68,8 +68,8 @@ namespace osu.Game.Graphics.Cursor
                     text = new OsuSpriteText
                     {
                         Padding = new MarginPadding(5),
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
-                    }
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                    },
                 };
             }
 

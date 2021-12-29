@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = details = new RatingsExposingDetails
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
             };
         });
 
@@ -54,10 +54,10 @@ namespace osu.Game.Tests.Visual.Online
                             Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
                         },
-                    }
+                    },
                 },
                 Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray(),
-                Status = BeatmapOnlineStatus.Ranked
+                Status = BeatmapOnlineStatus.Ranked,
             };
         }
 

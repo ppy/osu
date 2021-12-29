@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Colour = colours.Gray4,
                     RelativeSizeAxes = Axes.Both,
-                    Depth = float.MaxValue
+                    Depth = float.MaxValue,
                 },
                 Icon = new SpriteIcon
                 {

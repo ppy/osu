@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 BeatmapInfo =
                 {
                     Ruleset = ruleset,
-                }
+                },
             };
 
             beatmap.ControlPointInfo.Add(0, new TimingControlPoint());
@@ -38,12 +38,12 @@ namespace osu.Game.Rulesets.Catch.Tests
                 beatmap.HitObjects.Add(new Fruit
                 {
                     StartTime = (i + 1) * 1000,
-                    X = 0
+                    X = 0,
                 });
                 beatmap.HitObjects.Add(new Fruit
                 {
                     StartTime = (i + 1) * 1000 + 1,
-                    X = CatchPlayfield.WIDTH
+                    X = CatchPlayfield.WIDTH,
                 });
             }
 

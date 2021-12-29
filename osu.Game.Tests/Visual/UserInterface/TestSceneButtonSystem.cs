@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 logo = new OsuLogo
                 {
                     RelativePositionAxes = Axes.Both,
-                    Position = new Vector2(0.5f)
-                }
+                    Position = new Vector2(0.5f),
+                },
             };
 
             buttons.SetOsuLogo(logo);

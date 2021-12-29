@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             Default = time_span_default,
             MinValue = time_span_min,
-            MaxValue = time_span_max
+            MaxValue = time_span_max,
         };
 
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     Velocity = Beatmap.Difficulty.SliderMultiplier,
                     BaseBeatLength = baseBeatLength,
                     TimingPoint = lastTimingPoint,
-                    EffectPoint = lastEffectPoint
+                    EffectPoint = lastEffectPoint,
                 };
             });
 

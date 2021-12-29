@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             {
                                                 usernameText = new OsuSpriteText
                                                 {
-                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular),
                                                 },
                                                 openUserExternally = new ExternalLinkButton
                                                 {
@@ -96,13 +96,13 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
                                                 },
-                                            }
+                                            },
                                         },
                                         titleText = new OsuSpriteText
                                         {
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular),
                                         },
-                                    }
+                                    },
                                 },
                                 new FillFlowContainer
                                 {
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         supporterTag = new SupporterIcon
                                         {
                                             Height = 20,
-                                            Margin = new MarginPadding { Top = 5 }
+                                            Margin = new MarginPadding { Top = 5 },
                                         },
                                         new Box
                                         {
@@ -143,14 +143,14 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
                                                     Colour = colourProvider.Light1,
-                                                }
-                                            }
+                                                },
+                                            },
                                         },
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    },
+                                },
+                            },
+                        },
+                    },
                 },
                 userStats = new FillFlowContainer
                 {
@@ -160,8 +160,8 @@ namespace osu.Game.Overlays.Profile.Header
                     Width = 300,
                     Margin = new MarginPadding { Right = UserProfileOverlay.CONTENT_X_MARGIN },
                     Padding = new MarginPadding { Vertical = 15 },
-                    Spacing = new Vector2(0, 2)
-                }
+                    Spacing = new Vector2(0, 2),
+                },
             };
 
             User.BindValueChanged(user => updateUser(user.NewValue));

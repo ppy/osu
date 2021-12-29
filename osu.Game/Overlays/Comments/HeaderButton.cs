@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Comments
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Horizontal = 10 }
+                    Margin = new MarginPadding { Horizontal = 10 },
                 },
             });
         }

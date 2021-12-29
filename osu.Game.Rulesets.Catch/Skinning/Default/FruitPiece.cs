@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Catch.Skinning.Default
                 new FruitPulpFormation
                 {
                     AccentColour = { BindTarget = AccentColour },
-                    VisualRepresentation = { BindTarget = VisualRepresentation }
+                    VisualRepresentation = { BindTarget = VisualRepresentation },
                 },
                 BorderPiece = new BorderPiece(),
-                HyperBorderPiece = new HyperBorderPiece()
+                HyperBorderPiece = new HyperBorderPiece(),
             };
         }
 

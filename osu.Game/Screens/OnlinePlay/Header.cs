@@ -73,23 +73,23 @@ namespace osu.Game.Screens.OnlinePlay
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.TorusAlternate.With(size: 24),
-                                Text = mainTitle
+                                Text = mainTitle,
                             },
                             dot = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.TorusAlternate.With(size: 24),
-                                Text = "·"
+                                Text = "·",
                             },
                             pageTitle = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Font = OsuFont.TorusAlternate.With(size: 24),
-                                Text = "Lounge"
-                            }
-                        }
+                                Text = "Lounge",
+                            },
+                        },
                     },
                 };
             }

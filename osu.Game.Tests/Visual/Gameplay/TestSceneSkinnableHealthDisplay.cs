@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 healthProcessor.Health.Value += 0.1f;
                 healthProcessor.ApplyResult(new JudgementResult(new HitCircle(), new OsuJudgement())
                 {
-                    Type = HitResult.Perfect
+                    Type = HitResult.Perfect,
                 });
             }, 3);
         }

@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Judgements
             AddInternal(aboveHitObjectsContent = new Container
             {
                 Depth = float.MinValue,
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
             });
 
             proxiedAboveHitObjectsContent = new Lazy<Drawable>(() => aboveHitObjectsContent.CreateProxy());

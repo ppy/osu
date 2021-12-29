@@ -27,17 +27,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 frameLimiterDropdown = new SettingsEnumDropdown<FrameSync>
                 {
                     LabelText = GraphicsSettingsStrings.FrameLimiter,
-                    Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
+                    Current = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync),
                 },
                 new SettingsEnumDropdown<ExecutionMode>
                 {
                     LabelText = GraphicsSettingsStrings.ThreadingMode,
-                    Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode)
+                    Current = config.GetBindable<ExecutionMode>(FrameworkSetting.ExecutionMode),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GraphicsSettingsStrings.ShowFPS,
-                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay),
                 },
             };
         }

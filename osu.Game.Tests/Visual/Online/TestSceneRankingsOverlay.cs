@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly Country us_country = new Country
         {
             FlagName = "US",
-            FullName = "United States"
+            FullName = "United States",
         };
 
         private class TestRankingsOverlay : RankingsOverlay

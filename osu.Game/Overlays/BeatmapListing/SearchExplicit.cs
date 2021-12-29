@@ -12,6 +12,6 @@ namespace osu.Game.Overlays.BeatmapListing
         Hide,
 
         [LocalisableDescription(typeof(BeatmapsStrings), nameof(BeatmapsStrings.NsfwInclude))]
-        Show
+        Show,
     }
 }

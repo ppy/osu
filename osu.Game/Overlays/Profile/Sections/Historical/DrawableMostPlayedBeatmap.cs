@@ -91,20 +91,20 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                         d.AddText("mapped by ");
                                                         d.AddUserLink(mostPlayed.BeatmapSet.Author);
                                                     }),
-                                                }
+                                                },
                                             },
                                             new PlayCountText(mostPlayed.PlayCount)
                                             {
                                                 Anchor = Anchor.CentreRight,
-                                                Origin = Anchor.CentreRight
+                                                Origin = Anchor.CentreRight,
                                             },
-                                        }
+                                        },
                                     },
-                                }
-                            }
-                        }
-                    }
-                }
+                                },
+                            },
+                        },
+                    },
+                },
             });
         }
 
@@ -136,22 +136,22 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     new OsuSpriteText
                     {
                         Text = new RomanisableString(metadata.TitleUnicode, metadata.Title),
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     },
                     new OsuSpriteText
                     {
                         Text = $" [{beatmapInfo.DifficultyName}]",
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     },
                     new OsuSpriteText
                     {
                         Text = " by ",
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular),
                     },
                     new OsuSpriteText
                     {
                         Text = new RomanisableString(metadata.ArtistUnicode, metadata.Artist),
-                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular),
                     },
                 };
             }
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             Text = playCount.ToString(),
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular),
                         },
-                    }
+                    },
                 };
             }
 

@@ -50,9 +50,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         {
                             Value = new BeatmapInfo
                             {
-                                Metadata = new BeatmapMetadata()
-                            }
-                        }
+                                Metadata = new BeatmapMetadata(),
+                            },
+                        },
                     });
                 }
 

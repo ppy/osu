@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                                       .Concat(column.OfType<HoldNote>().SelectMany(h => new[]
                                       {
                                           (startTime: h.StartTime, samples: h.GetNodeSamples(0)),
-                                          (startTime: h.EndTime, samples: h.GetNodeSamples(1))
+                                          (startTime: h.EndTime, samples: h.GetNodeSamples(1)),
                                       }))
                                       .OrderBy(h => h.startTime).ToList();
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                         Column = column.Key,
                         StartTime = locations[i].startTime,
                         Duration = duration,
-                        NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() }
+                        NodeSamples = new List<IList<HitSampleInfo>> { locations[i].samples, Array.Empty<HitSampleInfo>() },
                     });
                 }
 

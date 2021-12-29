@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Edit
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                    }
-                }
+                    },
+                },
             });
         }
     }

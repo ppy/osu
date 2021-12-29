@@ -34,14 +34,14 @@ namespace osu.Game.Tests.Visual.Online
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.2f)
+                        Colour = OsuColour.Gray(0.2f),
                     },
                     new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = ranks = new RanksSection(),
                     },
-                }
+                },
             });
 
             AddStep("Show cookiezi", () => ranks.User.Value = new APIUser { Id = 124493 });

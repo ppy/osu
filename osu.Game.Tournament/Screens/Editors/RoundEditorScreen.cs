@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 RoundBeatmapEditor beatmapEditor = new RoundBeatmapEditor(round)
                 {
-                    Width = 0.95f
+                    Width = 0.95f,
                 };
 
                 InternalChildren = new Drawable[]
@@ -63,35 +63,35 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Name",
                                 Width = 0.33f,
-                                Current = Model.Name
+                                Current = Model.Name,
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Description",
                                 Width = 0.33f,
-                                Current = Model.Description
+                                Current = Model.Description,
                             },
                             new DateTextBox
                             {
                                 LabelText = "Start Time",
                                 Width = 0.33f,
-                                Current = Model.StartDate
+                                Current = Model.StartDate,
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Best of",
                                 Width = 0.33f,
-                                Current = Model.BestOf
+                                Current = Model.BestOf,
                             },
                             new SettingsButton
                             {
                                 Width = 0.2f,
                                 Margin = new MarginPadding(10),
                                 Text = "Add beatmap",
-                                Action = () => beatmapEditor.CreateNew()
+                                Action = () => beatmapEditor.CreateNew(),
                             },
-                            beatmapEditor
-                        }
+                            beatmapEditor,
+                        },
                     },
                     new DangerousSettingsButton
                     {
@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             Expire();
                             ladderInfo.Rounds.Remove(Model);
                         },
-                    }
+                    },
                 };
 
                 RelativeSizeAxes = Axes.X;
@@ -129,7 +129,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        ChildrenEnumerable = round.Beatmaps.Select(p => new RoundBeatmapRow(round, p))
+                        ChildrenEnumerable = round.Beatmaps.Select(p => new RoundBeatmapRow(round, p)),
                     };
                 }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     {
                                         Size = new Vector2(100, 70),
                                     },
-                                }
+                                },
                             },
                             new DangerousSettingsButton
                             {
@@ -213,7 +213,7 @@ namespace osu.Game.Tournament.Screens.Editors
                                     Expire();
                                     team.Beatmaps.Remove(beatmap);
                                 },
-                            }
+                            },
                         };
                     }
 
@@ -265,7 +265,7 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Width = 300
+                                Width = 300,
                             };
                         }
                     }

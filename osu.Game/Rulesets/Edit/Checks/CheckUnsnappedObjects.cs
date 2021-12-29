@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit.Checks
         public IEnumerable<IssueTemplate> PossibleTemplates => new IssueTemplate[]
         {
             new IssueTemplateLargeUnsnap(this),
-            new IssueTemplateSmallUnsnap(this)
+            new IssueTemplateSmallUnsnap(this),
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)

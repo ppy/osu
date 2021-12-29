@@ -53,9 +53,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        AlwaysPresent = true
-                    }
-                }
+                        AlwaysPresent = true,
+                    },
+                },
             });
         }
 
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Type = EdgeEffectType.Glow,
                     Radius = 2f,
                     Roundness = 15f,
-                    Colour = colour.NewValue.Opacity(0.3f)
+                    Colour = colour.NewValue.Opacity(0.3f),
                 };
             }, true);
         }

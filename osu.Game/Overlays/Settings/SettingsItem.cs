@@ -126,8 +126,8 @@ namespace osu.Game.Overlays.Settings
                         AutoSizeAxes = Axes.Y,
                         Spacing = new Vector2(0, 10),
                         Child = Control = CreateControl(),
-                    }
-                }
+                    },
+                },
             };
 
             // IMPORTANT: all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Current = controlWithCurrent.Current,
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Origin = Anchor.Centre,
                 });
                 updateLayout();
             }

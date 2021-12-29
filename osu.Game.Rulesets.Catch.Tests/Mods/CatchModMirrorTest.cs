@@ -53,12 +53,12 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                 new Fruit
                 {
                     OriginalX = 150,
-                    StartTime = 0
+                    StartTime = 0,
                 },
                 new Fruit
                 {
                     OriginalX = 450,
-                    StartTime = 500
+                    StartTime = 500,
                 },
                 new JuiceStream
                 {
@@ -70,17 +70,17 @@ namespace osu.Game.Rulesets.Catch.Tests.Mods
                             new PathControlPoint(new Vector2(-100, 1)),
                             new PathControlPoint(new Vector2(0, 2)),
                             new PathControlPoint(new Vector2(100, 3)),
-                            new PathControlPoint(new Vector2(0, 4))
-                        }
+                            new PathControlPoint(new Vector2(0, 4)),
+                        },
                     },
                     StartTime = 1000,
                 },
                 new BananaShower
                 {
                     StartTime = 5000,
-                    Duration = 5000
-                }
-            }
+                    Duration = 5000,
+                },
+            },
         };
 
         private static void assertEffectivePositionsMirrored(IBeatmap original, IBeatmap mirrored)

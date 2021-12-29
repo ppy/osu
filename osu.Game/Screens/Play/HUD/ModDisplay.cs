@@ -120,6 +120,6 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// The <see cref="ModDisplay"/> will always be contracted.
         /// </summary>
-        AlwaysContracted
+        AlwaysContracted,
     }
 }

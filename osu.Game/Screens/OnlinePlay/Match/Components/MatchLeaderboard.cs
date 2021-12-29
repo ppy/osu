@@ -55,6 +55,6 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
     public enum MatchLeaderboardScope
     {
-        Overall
+        Overall,
     }
 }

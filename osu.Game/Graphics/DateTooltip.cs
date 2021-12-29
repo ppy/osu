@@ -27,7 +27,7 @@ namespace osu.Game.Graphics
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
                 },
                 new FillFlowContainer
                 {
@@ -47,8 +47,8 @@ namespace osu.Game.Graphics
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                        }
-                    }
+                        },
+                    },
                 },
             };
         }

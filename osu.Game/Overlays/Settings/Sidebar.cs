@@ -48,8 +48,8 @@ namespace osu.Game.Overlays.Settings
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Direction = FillDirection.Vertical,
-                        }
-                    }
+                        },
+                    },
                 },
             };
         }

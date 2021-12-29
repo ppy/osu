@@ -43,13 +43,13 @@ namespace osu.Game.Screens.Ranking.Statistics
                     Left = ScorePanel.EXPANDED_WIDTH + SIDE_PADDING * 3,
                     Right = SIDE_PADDING,
                     Top = SIDE_PADDING,
-                    Bottom = 50 // Approximate padding to the bottom of the score panel.
+                    Bottom = 50, // Approximate padding to the bottom of the score panel.
                 },
                 Children = new Drawable[]
                 {
                     content = new Container { RelativeSizeAxes = Axes.Both },
-                    spinner = new LoadingSpinner()
-                }
+                    spinner = new LoadingSpinner(),
+                },
             };
         }
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                    }
+                    },
                 });
             }
             else
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Origin = Anchor.Centre,
                         Direction = FillDirection.Vertical,
                         Spacing = new Vector2(30, 15),
-                        Alpha = 0
+                        Alpha = 0,
                     };
 
                     foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
@@ -132,11 +132,11 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                }).Cast<Drawable>().ToArray()
+                                }).Cast<Drawable>().ToArray(),
                             },
                             ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
                                                          .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                         });
                     }
 

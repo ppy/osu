@@ -25,6 +25,6 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
     public enum DrawingsConfig
     {
         Groups,
-        TeamsPerGroup
+        TeamsPerGroup,
     }
 }

@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             InternalChild = body = new ManualSliderBody
             {
-                AccentColour = Color4.Transparent
+                AccentColour = Color4.Transparent,
             };
 
             // SliderSelectionBlueprint relies on calling ReceivePositionalInputAt on this drawable to determine whether selection should occur.

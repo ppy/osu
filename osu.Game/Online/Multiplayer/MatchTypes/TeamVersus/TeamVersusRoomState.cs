@@ -21,7 +21,7 @@ namespace osu.Game.Online.Multiplayer.MatchTypes.TeamVersus
                 {
                     new MultiplayerTeam { ID = 0, Name = "Team Red" },
                     new MultiplayerTeam { ID = 1, Name = "Team Blue" },
-                }
+                },
             };
     }
 }

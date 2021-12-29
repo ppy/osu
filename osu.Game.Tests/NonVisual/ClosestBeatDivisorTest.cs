@@ -81,7 +81,7 @@ namespace osu.Game.Tests.NonVisual
             var beatmap = new Beatmap
             {
                 HitObjects = hitobjects,
-                ControlPointInfo = cpi
+                ControlPointInfo = cpi,
             };
 
             for (int i = 0; i < divisors.Count; ++i)

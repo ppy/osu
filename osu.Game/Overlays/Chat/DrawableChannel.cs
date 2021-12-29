@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Chat
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                    }
+                    },
                 },
             };
 
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.Chat
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
                     },
-                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                     Content = new[]
                     {
                         new Drawable[]
@@ -231,8 +231,8 @@ namespace osu.Game.Overlays.Chat
                                 RelativeSizeAxes = Axes.X,
                                 Height = lineHeight,
                             },
-                        }
-                    }
+                        },
+                    },
                 };
             }
         }

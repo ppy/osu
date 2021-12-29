@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 body = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
 
             updateColour();

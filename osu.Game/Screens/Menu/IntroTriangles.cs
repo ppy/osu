@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Menu
 
                 decoupledClock = new DecoupleableInterpolatingFramedClock
                 {
-                    IsCoupled = false
+                    IsCoupled = false,
                 };
 
                 if (UsingThemedIntro)
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Menu
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = decoupledClock,
-                    LoadMenu = LoadMenu
+                    LoadMenu = LoadMenu,
                 }, t =>
                 {
                     AddInternal(t);
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Menu
                         Alpha = 0,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(0.4f, 0.16f)
+                        Size = new Vector2(0.4f, 0.16f),
                     },
                     welcomeText = new OsuSpriteText
                     {
@@ -160,8 +160,8 @@ namespace osu.Game.Screens.Menu
                         Origin = Anchor.Centre,
                         Children = new Drawable[]
                         {
-                            rulesets = new RulesetFlow()
-                        }
+                            rulesets = new RulesetFlow(),
+                        },
                     },
                     logoContainerSecondary = new Container
                     {
@@ -171,8 +171,8 @@ namespace osu.Game.Screens.Menu
                         Child = lazerLogo = new LazerLogo
                         {
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre
-                        }
+                            Origin = Anchor.Centre,
+                        },
                     },
                 };
             }

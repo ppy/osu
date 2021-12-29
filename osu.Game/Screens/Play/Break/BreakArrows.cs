@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play.Break
                             BlurSigma = new Vector2(glow_icon_blur_sigma),
                             Size = new Vector2(glow_icon_size),
                         },
-                    }
+                    },
                 },
                 new ParallaxContainer
                 {
@@ -82,8 +82,8 @@ namespace osu.Game.Screens.Play.Break
                             BlurSigma = new Vector2(blurred_icon_blur_sigma),
                             Size = new Vector2(blurred_icon_size),
                         },
-                    }
-                }
+                    },
+                },
             };
         }
 

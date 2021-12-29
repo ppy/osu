@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                }
+                },
             };
 
             if (hasNumber)

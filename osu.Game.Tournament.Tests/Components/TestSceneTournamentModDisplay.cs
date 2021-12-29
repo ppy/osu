@@ -36,7 +36,7 @@ namespace osu.Game.Tournament.Tests.Components
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Direction = FillDirection.Full,
-                Spacing = new Vector2(10)
+                Spacing = new Vector2(10),
             });
         }
 
@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.Tests.Components
                 fillFlow.Add(new TournamentBeatmapPanel(beatmap, mod.Acronym)
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Origin = Anchor.Centre,
                 });
             }
         }

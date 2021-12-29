@@ -31,7 +31,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 mainContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                }
+                },
             };
         }
 
@@ -52,7 +52,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
             {
                 new RoundDisplay(match.NewValue)
                 {
-                    Position = new Vector2(100, 100)
+                    Position = new Vector2(100, 100),
                 },
                 new DrawableTeamFlag(match.NewValue.Team1.Value)
                 {

@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             nowPlayingOverlay = new NowPlayingOverlay
             {
                 Origin = Anchor.Centre,
-                Anchor = Anchor.Centre
+                Anchor = Anchor.Centre,
             };
 
             Add(musicController);

@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                User = { BindTarget = user }
+                User = { BindTarget = user },
             };
 
             AddStep("set osu! as default", () => selector.SetDefaultRuleset(new OsuRuleset().RulesetInfo));

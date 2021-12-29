@@ -68,8 +68,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = inner_ring_alpha,
-                            }
-                        }
+                            },
+                        },
                     },
                     targetRing = new CircularContainer
                     {
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Alpha = 0,
-                                AlwaysPresent = true
+                                AlwaysPresent = true,
                             },
                             new CircularContainer
                             {
@@ -103,13 +103,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Alpha = 0,
-                                        AlwaysPresent = true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                                        AlwaysPresent = true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });

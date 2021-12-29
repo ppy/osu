@@ -72,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 EndTime = Time.Current + delay + length,
                 Samples = new List<HitSampleInfo>
                 {
-                    new HitSampleInfo("hitnormal")
-                }
+                    new HitSampleInfo("hitnormal"),
+                },
             };
 
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = circleSize });
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Anchor = Anchor.Centre,
                 Depth = depthIndex++,
-                Scale = new Vector2(0.75f)
+                Scale = new Vector2(0.75f),
             };
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObject>())

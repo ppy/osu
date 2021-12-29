@@ -111,8 +111,8 @@ namespace osu.Game.Screens.Play
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
                                 },
-                                loading = new LoadingLayer(true)
-                            }
+                                loading = new LoadingLayer(true),
+                            },
                         },
                         versionFlow = new FillFlowContainer
                         {
@@ -136,8 +136,8 @@ namespace osu.Game.Screens.Play
                                     Alpha = 0f,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                }
-                            }
+                                },
+                            },
                         },
                         new GridContainer
                         {
@@ -159,24 +159,24 @@ namespace osu.Game.Screens.Play
                                 new Drawable[]
                                 {
                                     new MetadataLineLabel("Source"),
-                                    new MetadataLineInfo(metadata.Source)
+                                    new MetadataLineInfo(metadata.Source),
                                 },
                                 new Drawable[]
                                 {
                                     new MetadataLineLabel("Mapper"),
-                                    new MetadataLineInfo(metadata.Author.Username)
-                                }
-                            }
+                                    new MetadataLineInfo(metadata.Author.Username),
+                                },
+                            },
                         },
                         new ModDisplay
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Margin = new MarginPadding { Top = 20 },
-                            Current = mods
+                            Current = mods,
                         },
                     },
-                }
+                },
             };
 
             starDifficulty = difficultyCache.GetBindableDifficulty(beatmap.BeatmapInfo);

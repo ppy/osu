@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Judgements
         Good,
 
         [Description(@"Amazing")]
-        Perfect
+        Perfect,
     }
 }

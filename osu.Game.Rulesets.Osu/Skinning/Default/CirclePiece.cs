@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
                     Alpha = 0.5f,
-                }
+                },
             };
 
             drawableObject.HitObjectApplied += onHitObjectApplied;

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             var slider = new Slider
             {
                 StartTime = 1000,
-                Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0) }),
             };
 
             CreateHitObjectTest(new HitObjectTestData(slider), shouldMiss);
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 StartTime = 1000,
                 EndTime = 3000,
-                Position = new Vector2(256, 192)
+                Position = new Vector2(256, 192),
             };
 
             CreateHitObjectTest(new HitObjectTestData(spinner), shouldMiss);

@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertOk(new List<HitObject>
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 150 }
+                new HitCircle { StartTime = 150 },
             });
         }
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertConcurrentSame(new List<HitObject>
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 100 }
+                new HitCircle { StartTime = 100 },
             });
         }
 
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertConcurrentSame(new List<HitObject>
             {
                 new HitCircle { StartTime = 100 },
-                new HitCircle { StartTime = 101 }
+                new HitCircle { StartTime = 101 },
             });
         }
 
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertOk(new List<HitObject>
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
-                getSliderMock(startTime: 500, endTime: 900.75d).Object
+                getSliderMock(startTime: 500, endTime: 900.75d).Object,
             });
         }
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertConcurrentSame(new List<HitObject>
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
-                getSliderMock(startTime: 300, endTime: 700.75d).Object
+                getSliderMock(startTime: 300, endTime: 700.75d).Object,
             });
         }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertConcurrentSame(new List<HitObject>
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
-                getSliderMock(startTime: 402, endTime: 902.75d).Object
+                getSliderMock(startTime: 402, endTime: 902.75d).Object,
             });
         }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertConcurrentDifferent(new List<HitObject>
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
-                new HitCircle { StartTime = 300 }
+                new HitCircle { StartTime = 300 },
             });
         }
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Editing.Checks
             {
                 getSliderMock(startTime: 100, endTime: 400.75d).Object,
                 getSliderMock(startTime: 200, endTime: 500.75d).Object,
-                new HitCircle { StartTime = 300 }
+                new HitCircle { StartTime = 300 },
             };
 
             var issues = check.Run(getContext(hitobjects)).ToList();
@@ -120,7 +120,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertOk(new List<HitObject>
             {
                 getHoldNoteMock(startTime: 100, endTime: 400.75d, column: 1).Object,
-                getHoldNoteMock(startTime: 500, endTime: 900.75d, column: 1).Object
+                getHoldNoteMock(startTime: 500, endTime: 900.75d, column: 1).Object,
             });
         }
 
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertOk(new List<HitObject>
             {
                 getHoldNoteMock(startTime: 100, endTime: 400.75d, column: 1).Object,
-                getHoldNoteMock(startTime: 300, endTime: 700.75d, column: 2).Object
+                getHoldNoteMock(startTime: 300, endTime: 700.75d, column: 2).Object,
             });
         }
 
@@ -140,7 +140,7 @@ namespace osu.Game.Tests.Editing.Checks
             assertConcurrentSame(new List<HitObject>
             {
                 getHoldNoteMock(startTime: 100, endTime: 400.75d, column: 1).Object,
-                getHoldNoteMock(startTime: 300, endTime: 700.75d, column: 1).Object
+                getHoldNoteMock(startTime: 300, endTime: 700.75d, column: 1).Object,
             });
         }
 

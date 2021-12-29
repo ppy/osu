@@ -27,6 +27,6 @@ namespace osu.Game.Input
         /// <summary>
         /// The mouse cursor will always be locked to the window bounds while the game has focus.
         /// </summary>
-        Always
+        Always,
     }
 }

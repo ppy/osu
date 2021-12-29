@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Online
         {
             var room = new MultiplayerRoom(1)
             {
-                MatchState = new TeamVersusRoomState()
+                MatchState = new TeamVersusRoomState(),
             };
 
             byte[] serialized = MessagePackSerializer.Serialize(room);

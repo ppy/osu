@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Username = "HappyStick",
             Id = 2,
-            Colour = "f2ca34"
+            Colour = "f2ca34",
         };
 
         private readonly APIUser redUser = new APIUser
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Online
                     Margin = new MarginPadding(20),
                     Size = new Vector2(400, 150),
                     Channel = { Value = testChannel },
-                }
+                },
             };
         });
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Online
             var standardMessage = new Message(messageIdSequence++)
             {
                 Sender = admin,
-                Content = "I am a wang!"
+                Content = "I am a wang!",
             };
 
             var infoMessage1 = new InfoMessage($"the system is calling {messageIdSequence++}");
@@ -111,44 +111,44 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = admin,
-                Content = "I am a wang!"
+                Content = "I am a wang!",
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = redUser,
-                Content = "I am team red."
+                Content = "I am team red.",
             }));
 
             AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = redUser,
-                Content = "I plan to win!"
+                Content = "I plan to win!",
             }));
 
             AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = blueUser,
-                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
+                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand.",
             }));
 
             AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = admin,
-                Content = "Okay okay, calm down guys. Let's do this!"
+                Content = "Okay okay, calm down guys. Let's do this!",
             }));
 
             AddStep("message from long username", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = longUsernameUser,
-                Content = "Hi guys, my new username is lit!"
+                Content = "Hi guys, my new username is lit!",
             }));
 
             AddStep("message with new date", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
             {
                 Sender = longUsernameUser,
                 Content = "Message from the future!",
-                Timestamp = DateTimeOffset.Now
+                Timestamp = DateTimeOffset.Now,
             }));
 
             checkScrolledToBottom();
@@ -162,7 +162,7 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         Sender = longUsernameUser,
                         Content = "Many messages! " + Guid.NewGuid(),
-                        Timestamp = DateTimeOffset.Now
+                        Timestamp = DateTimeOffset.Now,
                     });
                 }
             }, Channel.MAX_HISTORY / messages_per_call + 5);

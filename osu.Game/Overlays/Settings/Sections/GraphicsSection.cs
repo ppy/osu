@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override Drawable CreateIcon() => new SpriteIcon
         {
-            Icon = FontAwesome.Solid.Laptop
+            Icon = FontAwesome.Solid.Laptop,
         };
 
         public GraphicsSection()

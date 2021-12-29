@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         {
             Mod = new TestOsuModHidden(),
             Autoplay = true,
-            PassCondition = () => checkSomeHit() && objectWithIncreasedVisibilityHasIndex(0)
+            PassCondition = () => checkSomeHit() && objectWithIncreasedVisibilityHasIndex(0),
         });
 
         [Test]
@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     {
                         Position = new Vector2(384, 192),
                         StartTime = 4200,
-                    }
-                }
+                    },
+                },
             },
-            PassCondition = () => checkSomeHit() && objectWithIncreasedVisibilityHasIndex(2)
+            PassCondition = () => checkSomeHit() && objectWithIncreasedVisibilityHasIndex(2),
         });
 
         [Test]
@@ -81,16 +81,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new Slider
                     {
                         StartTime = 3200,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0) }),
                     },
                     new Slider
                     {
                         StartTime = 5200,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
-                    }
-                }
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0) }),
+                    },
+                },
             },
-            PassCondition = () => checkSomeHit() && objectWithIncreasedVisibilityHasIndex(2)
+            PassCondition = () => checkSomeHit() && objectWithIncreasedVisibilityHasIndex(2),
         });
 
         [Test]
@@ -105,16 +105,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new Slider
                     {
                         StartTime = 1000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0) }),
                     },
                     new Slider
                     {
                         StartTime = 4000,
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0), })
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(100, 0) }),
                     },
-                }
+                },
             },
-            PassCondition = checkSomeHit
+            PassCondition = checkSomeHit,
         });
 
         [Test]
@@ -129,28 +129,28 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     new HitCircle
                     {
                         StartTime = 1000,
-                        Position = new Vector2(206, 142)
+                        Position = new Vector2(206, 142),
                     },
                     new HitCircle
                     {
                         StartTime = 2000,
-                        Position = new Vector2(306, 142)
+                        Position = new Vector2(306, 142),
                     },
                     new Slider
                     {
                         StartTime = 3000,
                         Position = new Vector2(156, 242),
-                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(200, 0), })
+                        Path = new SliderPath(PathType.Linear, new[] { Vector2.Zero, new Vector2(200, 0) }),
                     },
                     new Spinner
                     {
                         Position = new Vector2(256, 192),
                         StartTime = 7000,
-                        EndTime = 9000
-                    }
-                }
+                        EndTime = 9000,
+                    },
+                },
             },
-            PassCondition = checkSomeHit
+            PassCondition = checkSomeHit,
         });
 
         private bool checkSomeHit() => Player.ScoreProcessor.JudgedHits >= 4;

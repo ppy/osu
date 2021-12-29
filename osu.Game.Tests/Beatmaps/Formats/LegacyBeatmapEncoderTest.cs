@@ -129,10 +129,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
                             new PathControlPoint(new Vector2(0.5f)),
                             new PathControlPoint(new Vector2(0.51f)), // This is actually on the same position as the previous one in legacy beatmaps (truncated to int).
                             new PathControlPoint(new Vector2(1f), PathType.Bezier),
-                            new PathControlPoint(new Vector2(2f))
-                        })
+                            new PathControlPoint(new Vector2(2f)),
+                        }),
                     },
-                }
+                },
             };
 
             var decodedAfterEncode = decodeFromLegacy(encodeToLegacy((beatmap, new TestLegacySkin(beatmaps_resource_store, string.Empty))), string.Empty);

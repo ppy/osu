@@ -26,12 +26,12 @@ namespace osu.Game.Screens.Menu
                 new PopupDialogOkButton
                 {
                     Text = @"Let me out!",
-                    Action = onConfirm
+                    Action = onConfirm,
                 },
                 new PopupDialogCancelButton
                 {
                     Text = @"Just a little more...",
-                    Action = onCancel
+                    Action = onCancel,
                 },
             };
         }

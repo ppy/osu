@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </remarks>
         private readonly List<JuiceStreamPathVertex> vertices = new List<JuiceStreamPathVertex>
         {
-            new JuiceStreamPathVertex()
+            new JuiceStreamPathVertex(),
         };
 
         /// <summary>

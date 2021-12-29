@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Edit
         {
             new HitCompositionTool(),
             new DrumRollCompositionTool(),
-            new SwellCompositionTool()
+            new SwellCompositionTool(),
         };
 
         protected override ComposeBlueprintContainer CreateBlueprintContainer()

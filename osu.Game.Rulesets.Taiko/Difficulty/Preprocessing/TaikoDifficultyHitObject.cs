@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Preprocessing
             new TaikoDifficultyHitObjectRhythm(3, 2, 0.6), // purposefully higher (requires hand switch in full alternating gameplay style)
             new TaikoDifficultyHitObjectRhythm(2, 3, 0.4),
             new TaikoDifficultyHitObjectRhythm(5, 4, 0.5),
-            new TaikoDifficultyHitObjectRhythm(4, 5, 0.7)
+            new TaikoDifficultyHitObjectRhythm(4, 5, 0.7),
         };
 
         /// <summary>

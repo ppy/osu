@@ -54,12 +54,12 @@ namespace osu.Game.Tests.Visual.Beatmaps
             withStatistics.HypeStatus = new BeatmapSetHypeStatus
             {
                 Current = 34,
-                Required = 5
+                Required = 5,
             };
             withStatistics.NominationStatus = new BeatmapSetNominationStatus
             {
                 Current = 1,
-                Required = 2
+                Required = 2,
             };
 
             var undownloadable = getUndownloadableBeatmapSet();
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             someDifficulties.NominationStatus = new BeatmapSetNominationStatus
             {
                 Current = 2,
-                Required = 2
+                Required = 2,
             };
 
             var manyDifficulties = getManyDifficultiesBeatmapSet(100);
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 explicitMap,
                 featuredMap,
                 explicitFeaturedMap,
-                longName
+                longName,
             };
 
             foreach (var testCase in testCases)
@@ -146,8 +146,8 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     RulesetID = Ruleset.Value.OnlineID,
                     DifficultyName = "Test",
                     StarRating = 6.42,
-                }
-            }
+                },
+            },
         };
 
         private static APIBeatmapSet getManyDifficultiesBeatmapSet(int count)
@@ -217,14 +217,14 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 RelativeSizeAxes = Axes.Both,
                 CachedDependencies = new (Type, object)[]
                 {
-                    (typeof(OverlayColourProvider), colourProvider)
+                    (typeof(OverlayColourProvider), colourProvider),
                 },
                 Children = new Drawable[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background5
+                        Colour = colourProvider.Background5,
                     },
                     new BasicScrollContainer
                     {
@@ -236,10 +236,10 @@ namespace osu.Game.Tests.Visual.Beatmaps
                             Direction = FillDirection.Full,
                             Padding = new MarginPadding(10),
                             Spacing = new Vector2(10),
-                            ChildrenEnumerable = testCases.Select(creationFunc)
-                        }
-                    }
-                }
+                            ChildrenEnumerable = testCases.Select(creationFunc),
+                        },
+                    },
+                },
             };
         }
 

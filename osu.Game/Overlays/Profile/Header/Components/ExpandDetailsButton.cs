@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Size = new Vector2(20, 12)
+                Size = new Vector2(20, 12),
             };
 
             DetailsVisible.BindValueChanged(visible => updateState(visible.NewValue), true);

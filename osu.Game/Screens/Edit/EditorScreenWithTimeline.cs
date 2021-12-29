@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black.Opacity(0.5f)
+                                    Colour = Color4.Black.Opacity(0.5f),
                                 },
                                 new Container
                                 {
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Edit
                                                     AutoSizeAxes = Axes.Y,
                                                     Padding = new MarginPadding { Right = 5 },
                                                 },
-                                                new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
+                                                new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both },
                                             },
                                         },
                                         RowDimensions = new[]
@@ -93,10 +93,10 @@ namespace osu.Game.Screens.Edit
                                         {
                                             new Dimension(),
                                             new Dimension(GridSizeMode.Absolute, 90),
-                                        }
+                                        },
                                     },
-                                }
-                            }
+                                },
+                            },
                         },
                     },
                     new Drawable[]
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit
                             {
                                 Horizontal = horizontal_margins,
                                 Top = vertical_margins,
-                                Bottom = vertical_margins
+                                Bottom = vertical_margins,
                             },
                             Child = spinner = new LoadingSpinner(true)
                             {
@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit
                             },
                         },
                     },
-                }
+                },
             };
         }
 

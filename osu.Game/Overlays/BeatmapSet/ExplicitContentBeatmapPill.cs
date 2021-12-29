@@ -39,8 +39,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         Text = BeatmapsetsStrings.NsfwBadgeLabel.ToUpper(),
                         Font = OsuFont.GetFont(size: 10, weight: FontWeight.SemiBold),
                         Colour = OverlayColourProvider.Orange.Colour2,
-                    }
-                }
+                    },
+                },
             };
         }
     }

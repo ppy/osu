@@ -125,7 +125,7 @@ namespace osu.Game.Configuration
                         {
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
-                            Current = bNumber
+                            Current = bNumber,
                         };
 
                         break;
@@ -135,7 +135,7 @@ namespace osu.Game.Configuration
                         {
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
-                            Current = bBool
+                            Current = bBool,
                         };
 
                         break;
@@ -145,7 +145,7 @@ namespace osu.Game.Configuration
                         {
                             LabelText = attr.Label,
                             TooltipText = attr.Description,
-                            Current = bString
+                            Current = bString,
                         };
 
                         break;

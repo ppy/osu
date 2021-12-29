@@ -56,7 +56,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Scale = new Vector2(2)
+                    Scale = new Vector2(2),
                 };
             });
         }

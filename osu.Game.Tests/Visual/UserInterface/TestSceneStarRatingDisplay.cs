@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         }),
-                    })
+                    }),
                 };
             });
         }

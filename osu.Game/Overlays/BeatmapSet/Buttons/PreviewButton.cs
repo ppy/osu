@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.5f
+                    Alpha = 0.5f,
                 },
                 new Container
                 {

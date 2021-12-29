@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Action = Hide
+                Action = Hide,
             });
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(15),
                                 Shadow = true,
-                                Icon = FontAwesome.Solid.ChevronLeft
+                                Icon = FontAwesome.Solid.ChevronLeft,
                             },
                             new OsuSpriteText
                             {
@@ -65,8 +65,8 @@ namespace osu.Game.Overlays
                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                 Text = @"back",
                             },
-                        }
-                    }
+                        },
+                    },
                 });
             }
 

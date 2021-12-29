@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Wiki
                     Text = text,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                }
+                },
             };
         }
 

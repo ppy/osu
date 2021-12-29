@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                     },
-                                }
+                                },
                             },
                             automaticDownload = new SettingsCheckbox
                             {
@@ -152,11 +152,11 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Action = () => scheduleStart(immediateSpectatorGameplayState),
-                                Enabled = { Value = false }
-                            }
-                        }
-                    }
-                }
+                                Enabled = { Value = false },
+                            },
+                        },
+                    },
+                },
             };
         }
 

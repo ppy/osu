@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             createListStep(() => new ScorePanelList
             {
-                SelectedScore = { Value = TestResources.CreateTestScoreInfo() }
+                SelectedScore = { Value = TestResources.CreateTestScoreInfo() },
             });
         }
 
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             createListStep(() => new ScorePanelList
             {
-                SelectedScore = { Value = score }
+                SelectedScore = { Value = score },
             });
 
             AddStep("add panel", () => list.AddScore(score));

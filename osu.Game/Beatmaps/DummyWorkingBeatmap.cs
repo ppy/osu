@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
                 Metadata = new BeatmapMetadata
                 {
                     Artist = "please load a beatmap!",
-                    Title = "no beatmaps available!"
+                    Title = "no beatmaps available!",
                 },
                 BeatmapSet = new BeatmapSetInfo(),
                 BaseDifficulty = new BeatmapDifficulty
@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps
                     CircleSize = 0,
                     OverallDifficulty = 0,
                 },
-                Ruleset = new DummyRuleset().RulesetInfo
+                Ruleset = new DummyRuleset().RulesetInfo,
             }, audio)
         {
             this.textures = textures;

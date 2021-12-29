@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.News.Displays
             {
                 Vertical = 20,
                 Left = 30,
-                Right = 50
+                Right = 50,
             };
 
             InternalChild = new FillFlowContainer
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.News.Displays
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 10)
+                        Spacing = new Vector2(0, 10),
                     },
                     showMore = new ShowMoreButton
                     {
@@ -67,9 +67,9 @@ namespace osu.Game.Overlays.News.Displays
                         Origin = Anchor.TopCentre,
                         Margin = new MarginPadding { Top = 15 },
                         Action = fetchMorePosts,
-                        Alpha = 0
-                    }
-                }
+                        Alpha = 0,
+                    },
+                },
             };
         }
 

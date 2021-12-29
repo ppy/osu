@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     DifficultyName = version,
                     StarRating = RNG.NextDouble(0, 10),
-                }
+                },
             }));
         }
 
@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     },
                     DifficultyName = "10k objects",
                     StarRating = 99.99f,
-                }
+                },
             }));
 
             AddStep("allow calculation", () => testDifficultyCache.BlockCalculation = false);
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Alpha = 0f,
-                    }
+                    },
                 };
 
                 display.FadeIn(400, Easing.OutQuint);

@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select
                             },
                         },
                     },
-                }
+                },
             };
         }
     }

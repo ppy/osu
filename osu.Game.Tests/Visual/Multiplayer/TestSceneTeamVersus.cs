@@ -73,8 +73,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddUntilStep("room type is team vs", () => client.Room?.Settings.MatchType == MatchType.TeamVersus);
@@ -94,8 +94,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddAssert("user on team 0", () => (client.Room?.Users.FirstOrDefault()?.MatchState as TeamVersusUserState)?.TeamID == 0);
@@ -132,15 +132,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddUntilStep("match type head to head", () => client.APIRoom?.Type.Value == MatchType.HeadToHead);
 
             AddStep("change match type", () => client.ChangeSettings(new MultiplayerRoomSettings
             {
-                MatchType = MatchType.TeamVersus
+                MatchType = MatchType.TeamVersus,
             }));
 
             AddUntilStep("api room updated to team versus", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
@@ -158,8 +158,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                    }
-                }
+                    },
+                },
             });
 
             AddUntilStep("room type is head to head", () => client.Room?.Settings.MatchType == MatchType.HeadToHead);

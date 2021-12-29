@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         Roundness = roundness,
                         Radius = 40,
                     },
-                }
+                },
             };
 
             direction.BindTo(scrollingInfo.Direction);

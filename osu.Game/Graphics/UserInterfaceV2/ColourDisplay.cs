@@ -72,14 +72,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                     new ColourCircle
                     {
                         Current = { BindTarget = Current },
-                        DeleteRequested = () => DeleteRequested?.Invoke(this)
+                        DeleteRequested = () => DeleteRequested?.Invoke(this),
                     },
                     colourName = new OsuSpriteText
                     {
                         Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre
-                    }
-                }
+                        Origin = Anchor.TopCentre,
+                    },
+                },
             };
         }
 
@@ -104,14 +104,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 {
                     fill = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
                     },
                     colourHexCode = new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = OsuFont.Default.With(size: 12)
-                    }
+                        Font = OsuFont.Default.With(size: 12),
+                    },
                 };
             }
 
@@ -133,13 +133,13 @@ namespace osu.Game.Graphics.UserInterfaceV2
             {
                 Child = new OsuColourPicker
                 {
-                    Current = { BindTarget = Current }
-                }
+                    Current = { BindTarget = Current },
+                },
             };
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke())
+                new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke()),
             };
         }
     }

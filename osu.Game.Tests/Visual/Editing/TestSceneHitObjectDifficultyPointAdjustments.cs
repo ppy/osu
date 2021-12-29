@@ -41,9 +41,9 @@ namespace osu.Game.Tests.Visual.Editing
                         ControlPoints =
                         {
                             new PathControlPoint(new Vector2(0, 0)),
-                            new PathControlPoint(new Vector2(0, 100))
-                        }
-                    }
+                            new PathControlPoint(new Vector2(0, 100)),
+                        },
+                    },
                 });
 
                 EditorBeatmap.Add(new Slider
@@ -55,13 +55,13 @@ namespace osu.Game.Tests.Visual.Editing
                         ControlPoints =
                         {
                             new PathControlPoint(new Vector2(0, 0)),
-                            new PathControlPoint(new Vector2(100, 0))
-                        }
+                            new PathControlPoint(new Vector2(100, 0)),
+                        },
                     },
                     DifficultyControlPoint = new DifficultyControlPoint
                     {
-                        SliderVelocity = 2
-                    }
+                        SliderVelocity = 2,
+                    },
                 });
             });
         }

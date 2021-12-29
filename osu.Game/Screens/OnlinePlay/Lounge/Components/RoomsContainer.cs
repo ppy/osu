@@ -54,7 +54,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(10),
-                }
+                },
             };
         }
 

@@ -74,10 +74,10 @@ namespace osu.Game.Overlays.Toolbar
                         new ToolbarSettingsButton(),
                         new ToolbarHomeButton
                         {
-                            Action = () => OnHome?.Invoke()
+                            Action = () => OnHome?.Invoke(),
                         },
-                        rulesetSelector = new ToolbarRulesetSelector()
-                    }
+                        rulesetSelector = new ToolbarRulesetSelector(),
+                    },
                 },
                 new FillFlowContainer
                 {
@@ -102,8 +102,8 @@ namespace osu.Game.Overlays.Toolbar
                         //},
                         userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),
-                    }
-                }
+                    },
+                },
             };
 
             // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
