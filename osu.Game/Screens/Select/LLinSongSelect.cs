@@ -17,9 +17,17 @@ namespace osu.Game.Screens.Select
             musicController.CurrentTrack.Looping = true;
         }
 
+        protected override void ApplyFilterToCarousel(FilterCriteria criteria)
+        {
+            criteria.RulesetCriteria = null;
+            criteria.Ruleset = null;
+
+            base.ApplyFilterToCarousel(criteria);
+        }
+
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MvisBeatmapDetailArea
         {
-            SelectCurrentAction = () => this.OnStart(),
+            SelectCurrentAction = () => OnStart()
         };
 
         public override bool AllowEditing => false;
@@ -28,7 +36,7 @@ namespace osu.Game.Screens.Select
         {
             SampleConfirm?.Play();
 
-            if ( BeatmapSetChanged )
+            if (BeatmapSetChanged)
                 musicController.SeekTo(0);
 
             this.Exit();
