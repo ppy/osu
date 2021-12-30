@@ -44,6 +44,63 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly GameplaySampleTriggerSource sampleTriggerSource;
 
+        public class ColumnTouchInputArea : Container
+        {
+            private Column column => (Column)Parent;
+
+            private Container hintContainer;
+
+            public ColumnTouchInputArea()
+            {
+                RelativeSizeAxes = Axes.X;
+                Anchor = Anchor.BottomCentre;
+                Origin = Anchor.BottomCentre;
+                Height = 100;
+                InternalChild = hintContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    BorderColour = Color4.Red,
+                    BorderThickness = 5,
+                    Masking = true,
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                hintContainer.Delay(1000).FadeOutFromOne(500, Easing.OutSine);
+            }
+
+            private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
+
+            private ManiaInputManager.RulesetKeyBindingContainer getKeyBindingContainer()
+            {
+                return keyBindingContainer ??= (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
+            }
+
+            protected override bool OnTouchDown(TouchDownEvent e)
+            {
+                getKeyBindingContainer().TriggerPressed(column.Action.Value);
+                return base.OnTouchDown(e);
+            }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                getKeyBindingContainer().TriggerPressed(column.Action.Value);
+
+                return base.OnMouseDown(e);
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                getKeyBindingContainer().TriggerReleased(column.Action.Value);
+            }
+
+            protected override void OnTouchUp(TouchUpEvent e)
+            {
+                getKeyBindingContainer().TriggerReleased(column.Action.Value);
+            }
+        }
+
         public Column(int index)
         {
             Index = index;
@@ -68,7 +125,8 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both
                 },
                 background,
-                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
+                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
+                new ColumnTouchInputArea()
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
