@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -67,32 +66,34 @@ namespace osu.Game.Skinning.Editor
 
         public override void Show()
         {
-            // base call intentionally omitted.
-            if (skinEditor == null)
+            // base call intentionally omitted as we have custom behaviour.
+
+            if (skinEditor != null)
             {
-                var editor = new SkinEditor(target);
-                editor.State.BindValueChanged(editorVisibilityChanged);
+                skinEditor.Show();
+                return;
+            }
 
-                skinEditor = editor;
+            var editor = new SkinEditor(target);
+            editor.State.BindValueChanged(editorVisibilityChanged);
 
-                // Schedule ensures that if `Show` is called before this overlay is loaded,
-                // it will not throw (LoadComponentAsync requires the load target to be in a loaded state).
-                Schedule(() =>
+            skinEditor = editor;
+
+            // Schedule ensures that if `Show` is called before this overlay is loaded,
+            // it will not throw (LoadComponentAsync requires the load target to be in a loaded state).
+            Schedule(() =>
+            {
+                if (editor != skinEditor)
+                    return;
+
+                LoadComponentAsync(editor, _ =>
                 {
                     if (editor != skinEditor)
                         return;
 
-                    LoadComponentAsync(editor, _ =>
-                    {
-                        if (editor != skinEditor)
-                            return;
-
-                        AddInternal(editor);
-                    });
+                    AddInternal(editor);
                 });
-            }
-            else
-                skinEditor.Show();
+            });
         }
 
         private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)
