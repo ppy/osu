@@ -68,20 +68,21 @@ namespace osu.Game.Online.Chat
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
-        private IBindable<bool> isIdle;
+        private readonly IBindable<bool> isIdle = new BindableBool();
 
         public ChannelManager()
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(permitNulls: true)]
         private void load(IdleTracker idleTracker)
         {
             HighPollRate.BindValueChanged(updatePollRate);
-
-            isIdle = idleTracker.IsIdle.GetBoundCopy();
             isIdle.BindValueChanged(updatePollRate, true);
+
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
         }
 
         private void updatePollRate(ValueChangedEvent<bool> valueChangedEvent)
