@@ -14,6 +14,7 @@ using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using osu.Game.Skinning;
+using osu.Game.Audio;
 
 namespace osu.Game.Database
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Database
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
         public DbSet<SkinInfo> SkinInfo { get; set; }
         public DbSet<ScoreInfo> ScoreInfo { get; set; }
+        public DbSet<ReplayGainInfo> ReplayGainInfo { get; set; }
+
 
         // migrated to realm
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
@@ -128,6 +131,7 @@ namespace osu.Game.Database
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
+            //modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.ReplayGainInfo).IsUnique();
 
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
@@ -145,6 +149,7 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+            modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.ReplayGainInfo);
 
             modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
         }

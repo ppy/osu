@@ -15,6 +15,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
@@ -95,6 +96,7 @@ namespace osu.Game.Beatmaps
                         Metadata = metadata,
                         WidescreenStoryboard = true,
                         SamplesMatchPlaybackRate = true,
+                        ReplayGainInfo = new ReplayGainInfo(),
                     }
                 }
             };

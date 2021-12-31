@@ -98,6 +98,8 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager { get; private set; }
 
+        protected ReplayGainStore ReplayGainStore { get; private set; }
+
         protected SkinManager SkinManager { get; private set; }
 
         protected RulesetStore RulesetStore { get; private set; }
@@ -234,6 +236,8 @@ namespace osu.Game
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
+            dependencies.Cache(ReplayGainStore = new ReplayGainStore(contextFactory, Audio, Storage));
+
             // the following realm components are not actively used yet, but initialised and kept up to date for initial testing.
             realmRulesetStore = new RealmRulesetStore(realmFactory, Storage);
 
@@ -279,7 +283,7 @@ namespace osu.Game
             // drop track volume game-wide to leave some head-room for UI effects / samples.
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
             // we may want to revisit this if users notice or complain about the difference (consider this a bit of a trial).
-            Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
+            // Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, globalTrackVolumeAdjust);
 
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
 

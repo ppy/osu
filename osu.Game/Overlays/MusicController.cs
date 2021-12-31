@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using osu.Game.Audio;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -26,7 +27,9 @@ namespace osu.Game.Overlays
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
+        private AudioTest aTest;
+        [Resolved]
+        private ReplayGainStore replayGainStore { get; set; }
         public IBindableList<BeatmapSetInfo> BeatmapSets
         {
             get
@@ -68,6 +71,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
+            aTest = new AudioTest(replayGainStore, beatmaps.BeatmapTrackStore);
             beatmaps.ItemUpdated += beatmapUpdated;
             beatmaps.ItemRemoved += beatmapRemoved;
 
@@ -320,10 +324,37 @@ namespace osu.Game.Overlays
 
             if (!audioEquals || CurrentTrack.IsDummyDevice)
             {
+                if(!CurrentTrack.IsDummyDevice)
+                {
+                    if (current.BeatmapInfo.ReplayGainInfoID != 0 && current.BeatmapInfo.ReplayGainInfo == null)
+                    {
+                        current.BeatmapInfo.ReplayGainInfo = aTest.GetInfo(current.BeatmapInfo.ReplayGainInfoID);
+                    }
+
+                    if (current.BeatmapInfo.ReplayGainInfo == null || current.BeatmapInfo.ReplayGainInfo.Version < AudioTest.CURR_REPLAYGAIN_VER)
+                    {
+                        ReplayGainInfo info = aTest.generateReplayGainInfo(current.BeatmapInfo, current.BeatmapSetInfo);
+                        aTest.saveReplayGainInfo(info, current.BeatmapInfo);
+                        List<BeatmapSetInfo> setinfos = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.All);
+                        BeatmapSetInfo bSetInfo = setinfos.Find(b => b.ID == current.BeatmapSetInfo.ID);
+                        current.BeatmapInfo.BeatmapSet = aTest.PopulateSet(current.BeatmapInfo, bSetInfo);
+                        if (current.BeatmapInfo.BeatmapSet != null)
+                            beatmaps.Update(current.BeatmapInfo.BeatmapSet);
+                    }
+
+                    if(current.BeatmapInfo.ReplayGainInfo != null)
+                        aTest.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
+                }
+
                 changeTrack();
             }
             else
             {
+                if (current.BeatmapInfo.ReplayGainInfo == null || current.BeatmapInfo.ReplayGainInfo.Version < AudioTest.CURR_REPLAYGAIN_VER)
+                {
+                    current.BeatmapInfo.ReplayGainInfo = lastWorking.BeatmapInfo.ReplayGainInfo;
+                    current.BeatmapInfo.ReplayGainInfoID = lastWorking.BeatmapInfo.ReplayGainInfoID;
+                }
                 // transfer still valid track to new working beatmap
                 current.TransferTrack(lastWorking.Track);
             }
@@ -347,6 +378,9 @@ namespace osu.Game.Overlays
             var queuedTrack = new DrawableTrack(current.LoadTrack());
             queuedTrack.Completed += () => onTrackCompleted(current);
 
+
+            
+            
             CurrentTrack = queuedTrack;
 
             // At this point we may potentially be in an async context from tests. This is extremely dangerous but we have to make do for now.

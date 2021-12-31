@@ -5,6 +5,7 @@ using System;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -124,5 +125,6 @@ namespace osu.Game.Models
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
+        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
     }
 }

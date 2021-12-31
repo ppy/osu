@@ -3,6 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
@@ -102,6 +103,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
+
+        [JsonIgnore]
+        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
 
         #endregion
 

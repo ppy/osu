@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
@@ -47,6 +48,11 @@ namespace osu.Game.Beatmaps
         public int BaseDifficultyID { get; set; }
 
         public BeatmapDifficulty BaseDifficulty { get; set; }
+
+        [JsonIgnore]
+        public int ReplayGainInfoID { get; set; }
+
+        public ReplayGainInfo ReplayGainInfo { get; set; }
 
         [NotMapped]
         public APIBeatmap OnlineInfo { get; set; }
@@ -197,6 +203,9 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+
+        [JsonIgnore]
+        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
 
         #endregion
     }

@@ -66,6 +66,7 @@ namespace osu.Game.Beatmaps
             base.AddIncludesForDeletion(query)
                 .Include(s => s.Metadata)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                .Include(s => s.Beatmaps).ThenInclude(b => b.ReplayGainInfo)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata);
 
         protected override IQueryable<BeatmapSetInfo> AddIncludesForConsumption(IQueryable<BeatmapSetInfo> query) =>

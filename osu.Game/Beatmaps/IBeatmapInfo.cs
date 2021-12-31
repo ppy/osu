@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 
@@ -28,6 +29,11 @@ namespace osu.Game.Beatmaps
         /// The difficulty settings for this beatmap.
         /// </summary>
         IBeatmapDifficultyInfo Difficulty { get; }
+
+        /// <summary>
+        /// The difficulty settings for this beatmap.
+        /// </summary>
+        IReplayGainInfo ReplayGainInfo { get; }
 
         /// <summary>
         /// The beatmap set this beatmap is part of.
