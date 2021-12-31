@@ -11,6 +11,8 @@ namespace osu.Game.Beatmaps
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public int BeatmapSetInfoID { get; set; }
 
         public int FileInfoID { get; set; }

@@ -11,21 +11,30 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osuTK;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.Beatmaps
 {
-    public class TestSceneBeatmapCard : OsuTestScene
+    public class TestSceneBeatmapCard : OsuManualInputManagerTestScene
     {
+        /// <summary>
+        /// All cards on this scene use a common online ID to ensure that map download, preview tracks, etc. can be tested manually with online sources.
+        /// </summary>
+        private const int online_id = 163112;
+
         private DummyAPIAccess dummyAPI => (DummyAPIAccess)API;
 
         private APIBeatmapSet[] testCases;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         #region Test case generation
 
@@ -38,7 +47,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
 
             var withStatistics = CreateAPIBeatmapSet(Ruleset.Value);
             withStatistics.Title = withStatistics.TitleUnicode = "play favourite stats";
-            withStatistics.Status = BeatmapSetOnlineStatus.Approved;
+            withStatistics.Status = BeatmapOnlineStatus.Approved;
             withStatistics.FavouriteCount = 284_239;
             withStatistics.PlayCount = 999_001;
             withStatistics.Ranked = DateTimeOffset.Now.AddDays(-45);
@@ -59,7 +68,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var someDifficulties = getManyDifficultiesBeatmapSet(11);
             someDifficulties.Title = someDifficulties.TitleUnicode = "favourited";
             someDifficulties.Title = someDifficulties.TitleUnicode = "some difficulties";
-            someDifficulties.Status = BeatmapSetOnlineStatus.Qualified;
+            someDifficulties.Status = BeatmapOnlineStatus.Qualified;
             someDifficulties.HasFavourited = true;
             someDifficulties.FavouriteCount = 1;
             someDifficulties.NominationStatus = new BeatmapSetNominationStatus
@@ -69,7 +78,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             };
 
             var manyDifficulties = getManyDifficultiesBeatmapSet(100);
-            manyDifficulties.Status = BeatmapSetOnlineStatus.Pending;
+            manyDifficulties.Status = BeatmapOnlineStatus.Pending;
 
             var explicitMap = CreateAPIBeatmapSet(Ruleset.Value);
             explicitMap.Title = someDifficulties.TitleUnicode = "explicit beatmap";
@@ -87,6 +96,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
             var longName = CreateAPIBeatmapSet(Ruleset.Value);
             longName.Title = longName.TitleUnicode = "this track has an incredibly and implausibly long title";
             longName.Artist = longName.ArtistUnicode = "and this artist! who would have thunk it. it's really such a long name.";
+            longName.Source = "wow. even the source field has an impossibly long string in it. this really takes the cake, doesn't it?";
             longName.HasExplicitContent = true;
             longName.TrackId = 444;
 
@@ -102,6 +112,9 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 explicitFeaturedMap,
                 longName
             };
+
+            foreach (var testCase in testCases)
+                testCase.OnlineID = online_id;
         }
 
         private APIBeatmapSet getUndownloadableBeatmapSet() => new APIBeatmapSet
@@ -180,6 +193,19 @@ namespace osu.Game.Tests.Visual.Beatmaps
                 request.TriggerSuccess();
                 return true;
             });
+
+            ensureSoleilyRemoved();
+        }
+
+        private void ensureSoleilyRemoved()
+        {
+            AddUntilStep("ensure manager loaded", () => beatmaps != null);
+            AddStep("remove map", () =>
+            {
+                var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == online_id);
+
+                if (beatmap != null) beatmaps.Delete(beatmap);
+            });
         }
 
         private Drawable createContent(OverlayColourScheme colourScheme, Func<APIBeatmapSet, Drawable> creationFunc)
@@ -203,7 +229,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
                     new BasicScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new FillFlowContainer
+                        Child = new ReverseChildIDFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -224,6 +250,41 @@ namespace osu.Game.Tests.Visual.Beatmaps
         }
 
         [Test]
-        public void TestNormal() => createTestCase(beatmapSetInfo => new BeatmapCard(beatmapSetInfo));
+        public void TestNormal()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardNormal(beatmapSetInfo));
+        }
+
+        [Test]
+        public void TestExtra()
+        {
+            createTestCase(beatmapSetInfo => new BeatmapCardExtra(beatmapSetInfo));
+        }
+
+        [Test]
+        public void TestHoverState()
+        {
+            AddStep("create cards", () => Child = createContent(OverlayColourScheme.Blue, s => new BeatmapCardNormal(s)));
+
+            AddStep("Hover card", () => InputManager.MoveMouseTo(firstCard()));
+            AddWaitStep("wait for potential state change", 5);
+            AddAssert("card is not expanded", () => !firstCard().Expanded.Value);
+
+            AddStep("Hover spectrum display", () => InputManager.MoveMouseTo(firstCard().ChildrenOfType<DifficultySpectrumDisplay>().Single()));
+            AddUntilStep("card is expanded", () => firstCard().Expanded.Value);
+
+            AddStep("Hover difficulty content", () => InputManager.MoveMouseTo(firstCard().ChildrenOfType<BeatmapCardDifficultyList>().Single()));
+            AddWaitStep("wait for potential state change", 5);
+            AddAssert("card is still expanded", () => firstCard().Expanded.Value);
+
+            AddStep("Hover main content again", () => InputManager.MoveMouseTo(firstCard()));
+            AddWaitStep("wait for potential state change", 5);
+            AddAssert("card is still expanded", () => firstCard().Expanded.Value);
+
+            AddStep("Hover away", () => InputManager.MoveMouseTo(this.ChildrenOfType<BeatmapCardNormal>().Last()));
+            AddUntilStep("card is not expanded", () => !firstCard().Expanded.Value);
+
+            BeatmapCardNormal firstCard() => this.ChildrenOfType<BeatmapCardNormal>().First();
+        }
     }
 }

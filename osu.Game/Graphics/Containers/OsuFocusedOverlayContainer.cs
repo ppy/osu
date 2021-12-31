@@ -90,6 +90,9 @@ namespace osu.Game.Graphics.Containers
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.Back:

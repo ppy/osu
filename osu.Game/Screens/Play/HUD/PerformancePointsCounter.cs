@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
 
             var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, scoreInfo);
 
-            Current.Value = (int)Math.Round(calculator?.Calculate() ?? 0, MidpointRounding.AwayFromZero);
+            Current.Value = (int)Math.Round(calculator?.Calculate().Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
 
@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Play.HUD
                 this.gameplayBeatmap = gameplayBeatmap;
             }
 
-            public override IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
+            public override IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken cancellationToken)
                 => gameplayBeatmap;
 
             protected override IBeatmap GetBeatmap() => gameplayBeatmap;

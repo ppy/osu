@@ -122,34 +122,34 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
-        /// Retrieves a colour for the given <see cref="BeatmapSetOnlineStatus"/>.
+        /// Retrieves a colour for the given <see cref="BeatmapOnlineStatus"/>.
         /// A <see langword="null"/> value indicates that a "background" shade from the local <see cref="OverlayColourProvider"/>
         /// (or another fallback colour) should be used.
         /// </summary>
         /// <remarks>
         /// Sourced from web: https://github.com/ppy/osu-web/blob/007eebb1916ed5cb6a7866d82d8011b1060a945e/resources/assets/less/layout.less#L36-L50
         /// </remarks>
-        public static Color4? ForBeatmapSetOnlineStatus(BeatmapSetOnlineStatus status)
+        public static Color4? ForBeatmapSetOnlineStatus(BeatmapOnlineStatus status)
         {
             switch (status)
             {
-                case BeatmapSetOnlineStatus.Ranked:
-                case BeatmapSetOnlineStatus.Approved:
+                case BeatmapOnlineStatus.Ranked:
+                case BeatmapOnlineStatus.Approved:
                     return Color4Extensions.FromHex(@"b3ff66");
 
-                case BeatmapSetOnlineStatus.Loved:
+                case BeatmapOnlineStatus.Loved:
                     return Color4Extensions.FromHex(@"ff66ab");
 
-                case BeatmapSetOnlineStatus.Qualified:
+                case BeatmapOnlineStatus.Qualified:
                     return Color4Extensions.FromHex(@"66ccff");
 
-                case BeatmapSetOnlineStatus.Pending:
+                case BeatmapOnlineStatus.Pending:
                     return Color4Extensions.FromHex(@"ffd966");
 
-                case BeatmapSetOnlineStatus.WIP:
+                case BeatmapOnlineStatus.WIP:
                     return Color4Extensions.FromHex(@"ff9966");
 
-                case BeatmapSetOnlineStatus.Graveyard:
+                case BeatmapOnlineStatus.Graveyard:
                     return Color4.Black;
 
                 default:
@@ -212,12 +212,12 @@ namespace osu.Game.Graphics
         public readonly Color4 GreySkyDark = Color4Extensions.FromHex(@"303d47");
         public readonly Color4 GreySkyDarker = Color4Extensions.FromHex(@"21272c");
 
-        public readonly Color4 Seafoam = Color4Extensions.FromHex(@"05ffa2");
-        public readonly Color4 GreySeafoamLighter = Color4Extensions.FromHex(@"9ebab1");
-        public readonly Color4 GreySeafoamLight = Color4Extensions.FromHex(@"4d7365");
-        public readonly Color4 GreySeafoam = Color4Extensions.FromHex(@"33413c");
-        public readonly Color4 GreySeafoamDark = Color4Extensions.FromHex(@"2c3532");
-        public readonly Color4 GreySeafoamDarker = Color4Extensions.FromHex(@"1e2422");
+        public readonly Color4 SeaFoam = Color4Extensions.FromHex(@"05ffa2");
+        public readonly Color4 GreySeaFoamLighter = Color4Extensions.FromHex(@"9ebab1");
+        public readonly Color4 GreySeaFoamLight = Color4Extensions.FromHex(@"4d7365");
+        public readonly Color4 GreySeaFoam = Color4Extensions.FromHex(@"33413c");
+        public readonly Color4 GreySeaFoamDark = Color4Extensions.FromHex(@"2c3532");
+        public readonly Color4 GreySeaFoamDarker = Color4Extensions.FromHex(@"1e2422");
 
         public readonly Color4 Cyan = Color4Extensions.FromHex(@"05f4fd");
         public readonly Color4 GreyCyanLighter = Color4Extensions.FromHex(@"77b1b3");

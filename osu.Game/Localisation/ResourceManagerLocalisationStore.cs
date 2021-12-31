@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Localisation;
 
@@ -75,7 +76,7 @@ namespace osu.Game.Localisation
             }
         }
 
-        public Task<string> GetAsync(string lookup)
+        public Task<string> GetAsync(string lookup, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(Get(lookup));
         }

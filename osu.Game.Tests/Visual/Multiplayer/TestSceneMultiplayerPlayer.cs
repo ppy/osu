@@ -3,7 +3,10 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 
@@ -25,8 +28,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("initialise gameplay", () =>
             {
-                Stack.Push(player = new MultiplayerPlayer(Client.APIRoom, Client.CurrentMatchPlayingItem.Value, Client.Room?.Users.ToArray()));
+                Stack.Push(player = new MultiplayerPlayer(Client.APIRoom, new PlaylistItem
+                {
+                    Beatmap = { Value = Beatmap.Value.BeatmapInfo },
+                    Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset }
+                }, Client.Room?.Users.ToArray()));
             });
+
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);
+            AddStep("start gameplay", () => ((IMultiplayerClient)Client).MatchStarted());
         }
 
         [Test]

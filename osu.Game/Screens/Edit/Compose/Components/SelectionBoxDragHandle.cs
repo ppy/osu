@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void OnDragEnd(DragEndEvent e)
         {
-            TriggerOperatoinEnded();
+            TriggerOperationEnded();
 
             UpdateHoverState();
             base.OnDragEnd(e);

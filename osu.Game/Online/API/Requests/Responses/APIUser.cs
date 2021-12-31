@@ -152,10 +152,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public int ScoresRecentCount;
 
         [JsonProperty(@"beatmap_playcounts_count")]
-        public int BeatmapPlaycountsCount;
+        public int BeatmapPlayCountsCount;
 
-        [JsonProperty]
-        private string[] playstyle
+        [JsonProperty(@"playstyle")]
+        private string[] playStyle
         {
             set => PlayStyles = value?.Select(str => Enum.Parse(typeof(APIPlayStyle), str, true)).Cast<APIPlayStyle>().ToArray();
         }
@@ -213,7 +213,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public APIUserAchievement[] Achievements;
 
         [JsonProperty("monthly_playcounts")]
-        public APIUserHistoryCount[] MonthlyPlaycounts;
+        public APIUserHistoryCount[] MonthlyPlayCounts;
 
         [JsonProperty("replays_watched_counts")]
         public APIUserHistoryCount[] ReplaysWatchedCounts;

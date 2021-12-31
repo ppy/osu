@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -29,6 +31,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
@@ -42,13 +45,6 @@ namespace osu.Game.Tests.Visual
         protected Bindable<IReadOnlyList<Mod>> SelectedMods;
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
-
-        private DrawableRulesetDependencies rulesetDependencies;
-
-        private Lazy<Storage> localStorage;
-        protected Storage LocalStorage => localStorage.Value;
-
-        private Lazy<DatabaseContextFactory> contextFactory;
 
         protected IResourceStore<byte[]> Resources;
 
@@ -65,8 +61,6 @@ namespace osu.Game.Tests.Visual
 
         private DummyAPIAccess dummyAPI;
 
-        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
-
         /// <summary>
         /// Whether this test scene requires real-world API access.
         /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
@@ -74,26 +68,58 @@ namespace osu.Game.Tests.Visual
         protected virtual bool UseOnlineAPI => false;
 
         /// <summary>
-        /// When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
-        /// This is because the host is recycled per TestScene execution in headless at an nunit level.
+        /// A database context factory to be used by test runs. Can be isolated and reset by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
         /// </summary>
-        private Storage isolatedHostStorage;
+        /// <remarks>
+        /// In interactive runs (ie. VisualTests) this will use the user's database if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
+        /// </remarks>
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
+        private Lazy<DatabaseContextFactory> contextFactory;
+
+        /// <summary>
+        /// Whether a fresh storage should be initialised per test (method) run.
+        /// </summary>
+        /// <remarks>
+        /// By default (ie. if not set to <c>true</c>):
+        /// - in interactive runs, the user's storage will be used
+        /// - in headless runs, a shared temporary storage will be used per test class.
+        /// </remarks>
+        protected virtual bool UseFreshStoragePerRun => false;
+
+        /// <summary>
+        /// A storage to be used by test runs. Can be isolated by setting <see cref="UseFreshStoragePerRun"/> to <c>true</c>.
+        /// </summary>
+        /// <remarks>
+        /// In interactive runs (ie. VisualTests) this will use the user's storage if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
+        /// </remarks>
+        protected Storage LocalStorage => localStorage.Value;
+
+        /// <summary>
+        /// A cache for ruleset configurations to be used in this test scene.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="IRulesetConfigCache"/> instance is provided to the children of this test scene via DI.
+        /// It is only exposed so that test scenes themselves can access the ruleset config cache in a safe manner
+        /// (<see cref="OsuTestScene"/>s cannot use DI themselves, as they will end up accessing the real cached instance from <see cref="OsuGameBase"/>).
+        /// </remarks>
+        protected IRulesetConfigCache RulesetConfigs { get; private set; }
+
+        private Lazy<Storage> localStorage;
+
+        private Storage headlessHostStorage;
+
+        private DrawableRulesetDependencies rulesetDependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            if (!UseFreshStoragePerRun)
-                isolatedHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
+            headlessHostStorage = (parent.Get<GameHost>() as HeadlessGameHost)?.Storage;
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
             contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {
                 var factory = new DatabaseContextFactory(LocalStorage);
-
-                // only reset the database if not using the host storage.
-                // if we reset the host storage, it will delete global key bindings.
-                if (isolatedHostStorage == null)
-                    factory.ResetDatabase();
 
                 using (var usage = factory.Get())
                     usage.Migrate();
@@ -103,6 +129,13 @@ namespace osu.Game.Tests.Visual
             RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
+
+            // to isolate ruleset configs in tests from the actual database and avoid state pollution problems,
+            // as well as problems due to the implementation details of the "real" implementation (the configs only being available at `LoadComplete()`),
+            // cache a test implementation of the ruleset config cache over the "real" one.
+            var isolatedBaseDependencies = new DependencyContainer(baseDependencies);
+            isolatedBaseDependencies.CacheAs(RulesetConfigs = new TestRulesetConfigCache());
+            baseDependencies = isolatedBaseDependencies;
 
             var providedRuleset = CreateRuleset();
             if (providedRuleset != null)
@@ -138,8 +171,6 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
-        protected virtual bool UseFreshStoragePerRun => false;
-
         public virtual void RecycleLocalStorage(bool isDisposing)
         {
             if (localStorage?.IsValueCreated == true)
@@ -154,8 +185,16 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            localStorage =
-                new Lazy<Storage>(() => isolatedHostStorage ?? new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            localStorage = new Lazy<Storage>(() =>
+            {
+                // When running headless, there is an opportunity to use the host storage rather than creating a second isolated one.
+                // This is because the host is recycled per TestScene execution in headless at an nunit level.
+                // Importantly, we can't use this optimisation when `UseFreshStoragePerRun` is true, as it doesn't reset per test method.
+                if (!UseFreshStoragePerRun && headlessHostStorage != null)
+                    return headlessHostStorage;
+
+                return new TemporaryNativeStorage($"{GetType().Name}-{Guid.NewGuid()}");
+            });
         }
 
         [Resolved]
@@ -201,23 +240,29 @@ namespace osu.Game.Tests.Visual
         {
             var beatmap = CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo;
 
+            Debug.Assert(beatmap.BeatmapSet != null);
+
             return new APIBeatmapSet
             {
                 OnlineID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
-                Status = BeatmapSetOnlineStatus.Ranked,
+                Status = BeatmapOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
                 {
                     Cover = "https://assets.ppy.sh/beatmaps/163112/covers/cover.jpg",
                     Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
                     List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
                 },
-                Title = beatmap.BeatmapSet.Metadata.Title,
-                TitleUnicode = beatmap.BeatmapSet.Metadata.TitleUnicode,
-                Artist = beatmap.BeatmapSet.Metadata.Artist,
-                ArtistUnicode = beatmap.BeatmapSet.Metadata.ArtistUnicode,
-                Author = beatmap.BeatmapSet.Metadata.Author,
-                Source = beatmap.BeatmapSet.Metadata.Source,
-                Tags = beatmap.BeatmapSet.Metadata.Tags,
+                Title = beatmap.Metadata.Title,
+                TitleUnicode = beatmap.Metadata.TitleUnicode,
+                Artist = beatmap.Metadata.Artist,
+                ArtistUnicode = beatmap.Metadata.ArtistUnicode,
+                Author = new APIUser
+                {
+                    Username = beatmap.Metadata.Author.Username,
+                    Id = beatmap.Metadata.Author.OnlineID
+                },
+                Source = beatmap.Metadata.Source,
+                Tags = beatmap.Metadata.Tags,
                 Beatmaps = new[]
                 {
                     new APIBeatmap
@@ -326,7 +371,7 @@ namespace osu.Game.Tests.Visual
 
                 public Track Get(string name) => throw new NotImplementedException();
 
-                public Task<Track> GetAsync(string name) => throw new NotImplementedException();
+                public Task<Track> GetAsync(string name, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
                 public Stream GetStream(string name) => throw new NotImplementedException();
 

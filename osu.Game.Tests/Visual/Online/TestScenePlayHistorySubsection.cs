@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Load user", () => user.Value = user_with_filled_values);
             AddAssert("Section is visible", () => section.Alpha == 1);
-            AddAssert("Array length is the same", () => user_with_filled_values.MonthlyPlaycounts.Length == getChartValuesLength());
+            AddAssert("Array length is the same", () => user_with_filled_values.MonthlyPlayCounts.Length == getChartValuesLength());
         }
 
         [Test]
@@ -108,13 +108,13 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly APIUser user_with_empty_values = new APIUser
         {
             Id = 2,
-            MonthlyPlaycounts = Array.Empty<APIUserHistoryCount>()
+            MonthlyPlayCounts = Array.Empty<APIUserHistoryCount>()
         };
 
         private static readonly APIUser user_with_one_value = new APIUser
         {
             Id = 3,
-            MonthlyPlaycounts = new[]
+            MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 100 }
             }
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly APIUser user_with_two_values = new APIUser
         {
             Id = 4,
-            MonthlyPlaycounts = new[]
+            MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 2 }
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly APIUser user_with_constant_values = new APIUser
         {
             Id = 5,
-            MonthlyPlaycounts = new[]
+            MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 5 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 5 },
@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly APIUser user_with_zero_values = new APIUser
         {
             Id = 6,
-            MonthlyPlaycounts = new[]
+            MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 0 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 0 },
@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly APIUser user_with_filled_values = new APIUser
         {
             Id = 7,
-            MonthlyPlaycounts = new[]
+            MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2010, 5, 1), Count = 1000 },
                 new APIUserHistoryCount { Date = new DateTime(2010, 6, 1), Count = 20 },
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly APIUser user_with_missing_values = new APIUser
         {
             Id = 8,
-            MonthlyPlaycounts = new[]
+            MonthlyPlayCounts = new[]
             {
                 new APIUserHistoryCount { Date = new DateTime(2020, 1, 1), Count = 100 },
                 new APIUserHistoryCount { Date = new DateTime(2020, 7, 1), Count = 200 }

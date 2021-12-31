@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Tournament.IO;
 using osu.Game.Tournament.IPC;
 
@@ -18,9 +19,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
         public void CheckIPCLocation()
         {
             // don't use clean run because files are being written before osu! launches.
-            using (HeadlessGameHost host = new HeadlessGameHost(nameof(CheckIPCLocation)))
+            using (var host = new TestRunHeadlessGameHost(nameof(CheckIPCLocation)))
             {
-                string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", nameof(CheckIPCLocation));
+                string basePath = Path.Combine(host.UserStoragePaths.First(), nameof(CheckIPCLocation));
 
                 // Set up a fake IPC client for the IPC Storage to switch to.
                 string testStableInstallDirectory = Path.Combine(basePath, "stable-ce");
@@ -42,8 +43,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 }
                 finally
                 {
-                    host.Storage.DeleteDirectory(testStableInstallDirectory);
-                    host.Storage.DeleteDirectory("tournaments");
                     host.Exit();
                 }
             }

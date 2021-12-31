@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -18,6 +20,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("id")]
         public long ID { get; set; }
 
+        [JsonProperty("owner_id")]
+        public int OwnerID { get; set; }
+
         [JsonProperty("beatmap_id")]
         public int BeatmapID { get; set; }
 
@@ -29,6 +34,12 @@ namespace osu.Game.Online.Rooms
         /// </summary>
         [JsonProperty("expired")]
         public bool Expired { get; set; }
+
+        [JsonProperty("playlist_order")]
+        public ushort? PlaylistOrder { get; set; }
+
+        [JsonProperty("played_at")]
+        public DateTimeOffset? PlayedAt { get; set; }
 
         [JsonIgnore]
         public IBindable<bool> Valid => valid;
@@ -76,10 +87,12 @@ namespace osu.Game.Online.Rooms
 
         public void MarkInvalid() => valid.Value = false;
 
-        public void MapObjects(RulesetStore rulesets)
+        public void MapObjects(IRulesetStore rulesets)
         {
             Beatmap.Value ??= apiBeatmap;
             Ruleset.Value ??= rulesets.GetRuleset(RulesetID);
+
+            Debug.Assert(Ruleset.Value != null);
 
             Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
 
@@ -100,9 +113,27 @@ namespace osu.Game.Online.Rooms
             }
         }
 
+        #region Newtonsoft.Json implicit ShouldSerialize() methods
+
+        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
+        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
+        // unless the fields are also renamed.
+
+        [UsedImplicitly]
         public bool ShouldSerializeID() => false;
+
+        // ReSharper disable once IdentifierTypo
+        [UsedImplicitly]
         public bool ShouldSerializeapiBeatmap() => false;
 
-        public bool Equals(PlaylistItem other) => ID == other?.ID && BeatmapID == other.BeatmapID && RulesetID == other.RulesetID;
+        #endregion
+
+        public bool Equals(PlaylistItem other)
+            => ID == other?.ID
+               && BeatmapID == other.BeatmapID
+               && RulesetID == other.RulesetID
+               && Expired == other.Expired
+               && allowedMods.SequenceEqual(other.allowedMods)
+               && requiredMods.SequenceEqual(other.requiredMods);
     }
 }

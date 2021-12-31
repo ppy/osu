@@ -17,14 +17,33 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
     public class StatefulMultiplayerClientTest : MultiplayerTestScene
     {
         [Test]
+        public void TestUserAddedOnJoin()
+        {
+            var user = new APIUser { Id = 33 };
+
+            AddRepeatStep("add user multiple times", () => Client.AddUser(user), 3);
+            AddAssert("room has 2 users", () => Client.Room?.Users.Count == 2);
+        }
+
+        [Test]
+        public void TestUserRemovedOnLeave()
+        {
+            var user = new APIUser { Id = 44 };
+
+            AddStep("add user", () => Client.AddUser(user));
+            AddAssert("room has 2 users", () => Client.Room?.Users.Count == 2);
+
+            AddRepeatStep("remove user multiple times", () => Client.RemoveUser(user), 3);
+            AddAssert("room has 1 user", () => Client.Room?.Users.Count == 1);
+        }
+
+        [Test]
         public void TestPlayingUserTracking()
         {
             int id = 2000;
 
             AddRepeatStep("add some users", () => Client.AddUser(new APIUser { Id = id++ }), 5);
             checkPlayingUserCount(0);
-
-            AddAssert("playlist item is available", () => Client.CurrentMatchPlayingItem.Value != null);
 
             changeState(3, MultiplayerUserState.WaitingForLoad);
             checkPlayingUserCount(3);
@@ -43,15 +62,13 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
 
             AddStep("leave room", () => Client.LeaveRoom());
             checkPlayingUserCount(0);
-
-            AddAssert("playlist item is null", () => Client.CurrentMatchPlayingItem.Value == null);
         }
 
         [Test]
         public void TestPlayingUsersUpdatedOnJoin()
         {
             AddStep("leave room", () => Client.LeaveRoom());
-            AddUntilStep("wait for room part", () => Client.Room == null);
+            AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddStep("create room initially in gameplay", () =>
             {
@@ -72,7 +89,7 @@ namespace osu.Game.Tests.NonVisual.Multiplayer
                 RoomManager.CreateRoom(newRoom);
             });
 
-            AddUntilStep("wait for room join", () => Client.Room != null);
+            AddUntilStep("wait for room join", () => RoomJoined);
             checkPlayingUserCount(1);
         }
 

@@ -3,11 +3,13 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Utils;
 
@@ -71,6 +73,18 @@ namespace osu.Game.Online.Rooms
         {
             get => Type.Value;
             set => Type.Value = value;
+        }
+
+        [Cached]
+        [JsonIgnore]
+        public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
+
+        [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
+        [JsonProperty("queue_mode")]
+        private QueueMode queueMode
+        {
+            get => QueueMode.Value;
+            set => QueueMode.Value = value;
         }
 
         [Cached]
@@ -169,6 +183,7 @@ namespace osu.Game.Online.Rooms
             ParticipantCount.Value = other.ParticipantCount.Value;
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
+            QueueMode.Value = other.QueueMode.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
@@ -197,8 +212,21 @@ namespace osu.Game.Online.Rooms
                 Playlist.RemoveAll(i => i.Expired);
         }
 
+        #region Newtonsoft.Json implicit ShouldSerialize() methods
+
+        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
+        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
+        // unless the fields are also renamed.
+
+        [UsedImplicitly]
         public bool ShouldSerializeRoomID() => false;
+
+        [UsedImplicitly]
         public bool ShouldSerializeHost() => false;
+
+        [UsedImplicitly]
         public bool ShouldSerializeEndDate() => false;
+
+        #endregion
     }
 }

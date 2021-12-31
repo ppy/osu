@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -25,9 +27,9 @@ using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -53,6 +55,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [CanBeNull]
         private IDisposable readyClickOperation;
 
+        private AddItemButton addItemButton;
+
         public MultiplayerMatchSubScreen(Room room)
             : base(room)
         {
@@ -63,8 +67,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            SelectedItem.BindTo(client.CurrentMatchPlayingItem);
 
             BeatmapAvailability.BindValueChanged(updateBeatmapAvailability, true);
             UserMods.BindValueChanged(onUserModsChanged);
@@ -80,117 +82,154 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }, true);
         }
 
-        protected override Drawable CreateMainContent() => new GridContainer
+        protected override Drawable CreateMainContent() => new Container
         {
             RelativeSizeAxes = Axes.Both,
-            Content = new[]
+            Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
+            Child = new GridContainer
             {
-                new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                ColumnDimensions = new[]
                 {
-                    new Container
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(),
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Horizontal = 5, Vertical = 10 },
-                        Child = new GridContainer
+                        // Participants column
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColumnDimensions = new[]
+                            RowDimensions = new[]
                             {
-                                new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 400),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.Relative, size: 0.5f, maxSize: 600),
+                                new Dimension(GridSizeMode.AutoSize)
                             },
                             Content = new[]
                             {
+                                new Drawable[] { new ParticipantsListHeader() },
                                 new Drawable[]
                                 {
-                                    // Main left column
-                                    new GridContainer
+                                    new ParticipantsList
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize)
-                                        },
-                                        Content = new[]
-                                        {
-                                            new Drawable[] { new ParticipantsListHeader() },
-                                            new Drawable[]
-                                            {
-                                                new ParticipantsList
-                                                {
-                                                    RelativeSizeAxes = Axes.Both
-                                                },
-                                            }
-                                        }
-                                    },
-                                    // Spacer
-                                    null,
-                                    // Main right column
-                                    new GridContainer
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Content = new[]
-                                        {
-                                            new Drawable[] { new OverlinedHeader("Beatmap") },
-                                            new Drawable[] { new BeatmapSelectionControl { RelativeSizeAxes = Axes.X } },
-                                            new[]
-                                            {
-                                                UserModsSection = new FillFlowContainer
-                                                {
-                                                    RelativeSizeAxes = Axes.X,
-                                                    AutoSizeAxes = Axes.Y,
-                                                    Margin = new MarginPadding { Top = 10 },
-                                                    Alpha = 0,
-                                                    Children = new Drawable[]
-                                                    {
-                                                        new OverlinedHeader("Extra mods"),
-                                                        new FillFlowContainer
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                            Direction = FillDirection.Horizontal,
-                                                            Spacing = new Vector2(10, 0),
-                                                            Children = new Drawable[]
-                                                            {
-                                                                new UserModSelectButton
-                                                                {
-                                                                    Anchor = Anchor.CentreLeft,
-                                                                    Origin = Anchor.CentreLeft,
-                                                                    Width = 90,
-                                                                    Text = "Select",
-                                                                    Action = ShowUserModSelect,
-                                                                },
-                                                                new ModDisplay
-                                                                {
-                                                                    Anchor = Anchor.CentreLeft,
-                                                                    Origin = Anchor.CentreLeft,
-                                                                    Current = UserMods,
-                                                                    Scale = new Vector2(0.8f),
-                                                                },
-                                                            }
-                                                        },
-                                                    }
-                                                },
-                                            },
-                                            new Drawable[] { new OverlinedHeader("Chat") { Margin = new MarginPadding { Vertical = 5 }, }, },
-                                            new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
-                                        },
-                                        RowDimensions = new[]
-                                        {
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension(GridSizeMode.AutoSize),
-                                            new Dimension(),
-                                        }
+                                        RelativeSizeAxes = Axes.Both
                                     },
                                 }
                             }
-                        }
+                        },
+                        // Spacer
+                        null,
+                        // Beatmap column
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Content = new[]
+                            {
+                                new Drawable[] { new OverlinedHeader("Beatmap") },
+                                new Drawable[]
+                                {
+                                    addItemButton = new AddItemButton
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = 40,
+                                        Text = "Add item",
+                                        Action = () => OpenSongSelection()
+                                    },
+                                },
+                                null,
+                                new Drawable[]
+                                {
+                                    new MultiplayerPlaylist
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        RequestEdit = item => OpenSongSelection(item.ID)
+                                    }
+                                },
+                                new[]
+                                {
+                                    UserModsSection = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Margin = new MarginPadding { Top = 10 },
+                                        Alpha = 0,
+                                        Children = new Drawable[]
+                                        {
+                                            new OverlinedHeader("Extra mods"),
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(10, 0),
+                                                Children = new Drawable[]
+                                                {
+                                                    new UserModSelectButton
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                        Width = 90,
+                                                        Text = "Select",
+                                                        Action = ShowUserModSelect,
+                                                    },
+                                                    new ModDisplay
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                        Current = UserMods,
+                                                        Scale = new Vector2(0.8f),
+                                                    },
+                                                }
+                                            },
+                                        }
+                                    },
+                                },
+                            },
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(GridSizeMode.Absolute, 5),
+                                new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
+                            }
+                        },
+                        // Spacer
+                        null,
+                        // Main right column
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Content = new[]
+                            {
+                                new Drawable[] { new OverlinedHeader("Chat") },
+                                new Drawable[] { new MatchChatDisplay(Room) { RelativeSizeAxes = Axes.Both } }
+                            },
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                            }
+                        },
                     }
-                },
-            },
+                }
+            }
         };
+
+        /// <summary>
+        /// Opens the song selection screen to add or edit an item.
+        /// </summary>
+        /// <param name="itemToEdit">An optional playlist item to edit. If null, a new item will be added instead.</param>
+        internal void OpenSongSelection(long? itemToEdit = null)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
+        }
 
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter
         {
@@ -287,10 +326,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (client.LocalUser?.State == MultiplayerUserState.Ready)
                     client.ChangeState(MultiplayerUserState.Idle);
             }
-            else
+            else if (client.LocalUser?.State == MultiplayerUserState.Spectating
+                     && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
             {
-                if (client.LocalUser?.State == MultiplayerUserState.Spectating && (client.Room?.State == MultiplayerRoomState.WaitingForLoad || client.Room?.State == MultiplayerRoomState.Playing))
-                    onLoadRequested();
+                onLoadRequested();
             }
         }
 
@@ -349,11 +388,54 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
+            updateCurrentItem();
+
+            addItemButton.Alpha = client.IsHost || Room.QueueMode.Value != QueueMode.HostOnly ? 1 : 0;
+
             Scheduler.AddOnce(UpdateMods);
+        }
+
+        private void updateCurrentItem()
+        {
+            Debug.Assert(client.Room != null);
+
+            var expectedSelectedItem = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
+
+            if (expectedSelectedItem == null)
+                return;
+
+            // There's no reason to renew the selected item if its content hasn't changed.
+            if (SelectedItem.Value?.Equals(expectedSelectedItem) == true && expectedSelectedItem.Beatmap.Value != null)
+                return;
+
+            // Clear the selected item while the lookup is performed, so components like the ready button can enter their disabled states.
+            SelectedItem.Value = null;
+
+            if (expectedSelectedItem.Beatmap.Value == null)
+            {
+                Task.Run(async () =>
+                {
+                    var beatmap = await client.GetAPIBeatmap(expectedSelectedItem.BeatmapID).ConfigureAwait(false);
+
+                    Schedule(() =>
+                    {
+                        expectedSelectedItem.Beatmap.Value = beatmap;
+
+                        if (Room.Playlist.SingleOrDefault(i => i.ID == client.Room?.Settings.PlaylistItemId)?.Equals(expectedSelectedItem) == true)
+                            applyCurrentItem();
+                    });
+                });
+            }
+            else
+                applyCurrentItem();
+
+            void applyCurrentItem() => SelectedItem.Value = expectedSelectedItem;
         }
 
         private void handleRoomLost() => Schedule(() =>
         {
+            Logger.Log($"{this} exiting due to loss of room or connection");
+
             if (this.IsCurrentScreen())
                 this.Exit();
             else
@@ -395,13 +477,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new PlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
+                    return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
             }
         }
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)
         {
             if (!this.IsCurrentScreen())
+                return;
+
+            if (client.Room == null)
                 return;
 
             if (!client.IsHost)
@@ -412,7 +497,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            this.Push(new MultiplayerMatchSongSelect(Room, beatmap, ruleset));
+            this.Push(new MultiplayerMatchSongSelect(Room, client.Room.Settings.PlaylistItemId, beatmap, ruleset));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -426,6 +511,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
 
             modSettingChangeTracker?.Dispose();
+        }
+
+        public class AddItemButton : PurpleTriangleButton
+        {
         }
     }
 }

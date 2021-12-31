@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Timing
 
         public SliderWithTextBoxInput(LocalisableString labelText)
         {
-            LabelledTextBox textbox;
+            LabelledTextBox textBox;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Timing
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textbox = new LabelledTextBox
+                        textBox = new LabelledTextBox
                         {
                             Label = labelText,
                         },
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             };
 
-            textbox.OnCommit += (t, isNew) =>
+            textBox.OnCommit += (t, isNew) =>
             {
                 if (!isNew) return;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             Current.BindValueChanged(val =>
             {
-                textbox.Text = val.NewValue.ToString();
+                textBox.Text = val.NewValue.ToString();
             }, true);
         }
 

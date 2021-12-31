@@ -15,7 +15,7 @@ using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedProfileSubsection<APIScoreInfo>
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<APIScore>
     {
         private readonly ScoreType type;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
-        protected override void OnItemsReceived(List<APIScoreInfo> items)
+        protected override void OnItemsReceived(List<APIScore> items)
         {
             if (VisiblePages == 0)
                 drawableItemIndex = 0;
@@ -59,12 +59,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScoreInfo>> CreateRequest() =>
+        protected override APIRequest<List<APIScore>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
         private int drawableItemIndex;
 
-        protected override Drawable CreateDrawableItem(APIScoreInfo model)
+        protected override Drawable CreateDrawableItem(APIScore model)
         {
             switch (type)
             {

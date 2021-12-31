@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Match;
 
@@ -59,17 +59,20 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<RoomAvailability> Availability { get; private set; }
 
-        [Resolved(typeof(Room), nameof(Room.Password))]
+        [Resolved(typeof(Room))]
         public Bindable<string> Password { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan?> Duration { get; private set; }
 
+        [Resolved(typeof(Room))]
+        protected Bindable<QueueMode> QueueMode { get; private set; }
+
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
 
         /// <summary>
-        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the last item from <see cref="Playlist"/>
+        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the current item from <see cref="Playlist"/>
         /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
         /// </summary>
         protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
@@ -84,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected virtual void UpdateSelectedItem()
             => SelectedItem.Value = RoomID.Value == null || subScreenSelectedItem == null
-                ? Playlist.LastOrDefault()
+                ? Playlist.GetCurrentItem()
                 : subScreenSelectedItem.Value;
     }
 }

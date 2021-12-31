@@ -14,6 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 using osu.Game.Utils;
 
 namespace osu.Game.Scoring
@@ -21,6 +22,8 @@ namespace osu.Game.Scoring
     public class ScoreInfo : IScoreInfo, IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>, IDeepCloneable<ScoreInfo>
     {
         public int ID { get; set; }
+
+        public bool IsManaged => ID > 0;
 
         public ScoreRank Rank { get; set; }
 
@@ -134,7 +137,14 @@ namespace osu.Game.Scoring
         [Column("Beatmap")]
         public BeatmapInfo BeatmapInfo { get; set; }
 
-        public long? OnlineScoreID { get; set; }
+        private long? onlineID;
+
+        [Column("OnlineScoreID")]
+        public long? OnlineID
+        {
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
+        }
 
         public DateTimeOffset Date { get; set; }
 
@@ -160,7 +170,7 @@ namespace osu.Game.Scoring
         [NotMapped]
         public List<HitEvent> HitEvents { get; set; }
 
-        public List<ScoreFileInfo> Files { get; set; }
+        public List<ScoreFileInfo> Files { get; } = new List<ScoreFileInfo>();
 
         public string Hash { get; set; }
 
@@ -229,24 +239,18 @@ namespace osu.Game.Scoring
 
         public bool Equals(ScoreInfo other)
         {
-            if (other == null)
-                return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
             if (ID != 0 && other.ID != 0)
                 return ID == other.ID;
 
-            if (OnlineScoreID.HasValue && other.OnlineScoreID.HasValue)
-                return OnlineScoreID == other.OnlineScoreID;
-
-            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
-                return Hash == other.Hash;
-
-            return ReferenceEquals(this, other);
+            return false;
         }
 
         #region Implementation of IHasOnlineID
 
-        public long OnlineID => OnlineScoreID ?? -1;
+        long IHasOnlineID<long>.OnlineID => OnlineID ?? -1;
 
         #endregion
 
@@ -254,8 +258,11 @@ namespace osu.Game.Scoring
 
         IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
+        IUser IScoreInfo.User => User;
         bool IScoreInfo.HasReplay => Files.Any();
 
         #endregion
+
+        IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }

@@ -66,6 +66,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
+        /// <summary>
+        /// Whether gameplay has completed without the user having failed.
+        /// </summary>
+        public bool GameplayPassed { get; private set; }
+
         public Action RestartRequested;
 
         public bool HasFailed { get; private set; }
@@ -666,6 +671,7 @@ namespace osu.Game.Screens.Play
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
 
+                GameplayPassed = false;
                 ValidForResume = true;
                 skipOutroOverlay.Hide();
                 return;
@@ -674,6 +680,8 @@ namespace osu.Game.Screens.Play
             // Only show the completion screen if the player hasn't failed
             if (HealthProcessor.HasFailed)
                 return;
+
+            GameplayPassed = true;
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
@@ -768,7 +776,15 @@ namespace osu.Game.Screens.Play
             Scheduler.Add(resultsDisplayDelegate);
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !GameplayClockContainer.IsPaused.Value;
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // During pause, allow global volume adjust regardless of settings.
+            if (GameplayClockContainer.IsPaused.Value)
+                return false;
+
+            // Block global volume adjust if the user has asked for it (special case when holding "Alt").
+            return mouseWheelDisabled.Value && !e.AltPressed;
+        }
 
         #region Fail Logic
 
@@ -913,6 +929,8 @@ namespace osu.Game.Screens.Play
                 b.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
                 b.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+
+                failAnimationLayer.Background = b;
             });
 
             HUDOverlay.IsBreakTime.BindTo(breakTracker.IsBreakTime);
@@ -1023,13 +1041,13 @@ namespace osu.Game.Screens.Play
             //
             // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
             // conflicts across various systems (ie. solo and multiplayer).
-            long? onlineScoreId = score.ScoreInfo.OnlineScoreID;
-            score.ScoreInfo.OnlineScoreID = null;
+            long? onlineScoreId = score.ScoreInfo.OnlineID;
+            score.ScoreInfo.OnlineID = -1;
 
             await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
 
             // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
-            score.ScoreInfo.OnlineScoreID = onlineScoreId;
+            score.ScoreInfo.OnlineID = onlineScoreId;
         }
 
         /// <summary>

@@ -15,6 +15,8 @@ using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Audio;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 
@@ -22,7 +24,7 @@ namespace osu.Game.Skinning
 {
     public abstract class Skin : IDisposable, ISkin
     {
-        public readonly SkinInfo SkinInfo;
+        public readonly ILive<SkinInfo> SkinInfo;
         private readonly IStorageResourceProvider resources;
 
         public SkinConfiguration Configuration { get; set; }
@@ -41,7 +43,11 @@ namespace osu.Game.Skinning
 
         protected Skin(SkinInfo skin, IStorageResourceProvider resources, [CanBeNull] Stream configurationStream = null)
         {
-            SkinInfo = skin;
+            SkinInfo = resources?.RealmContextFactory != null
+                ? skin.ToLive(resources.RealmContextFactory)
+                // This path should only be used in some tests.
+                : skin.ToLiveUnmanaged();
+
             this.resources = resources;
 
             configurationStream ??= getConfigurationStream();
@@ -52,37 +58,41 @@ namespace osu.Game.Skinning
             else
                 Configuration = new SkinConfiguration();
 
-            // we may want to move this to some kind of async operation in the future.
-            foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
+            // skininfo files may be null for default skin.
+            SkinInfo.PerformRead(s =>
             {
-                string filename = $"{skinnableTarget}.json";
-
-                // skininfo files may be null for default skin.
-                var fileInfo = SkinInfo.Files?.FirstOrDefault(f => f.Filename == filename);
-
-                if (fileInfo == null)
-                    continue;
-
-                byte[] bytes = resources?.Files.Get(fileInfo.FileInfo.StoragePath);
-
-                if (bytes == null)
-                    continue;
-
-                try
+                // we may want to move this to some kind of async operation in the future.
+                foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
                 {
-                    string jsonContent = Encoding.UTF8.GetString(bytes);
-                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
+                    string filename = $"{skinnableTarget}.json";
 
-                    if (deserializedContent == null)
+                    // skininfo files may be null for default skin.
+                    var fileInfo = s.Files.FirstOrDefault(f => f.Filename == filename);
+
+                    if (fileInfo == null)
                         continue;
 
-                    DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
+                    byte[] bytes = resources?.Files.Get(fileInfo.File.GetStoragePath());
+
+                    if (bytes == null)
+                        continue;
+
+                    try
+                    {
+                        string jsonContent = Encoding.UTF8.GetString(bytes);
+                        var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
+
+                        if (deserializedContent == null)
+                            continue;
+
+                        DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Failed to load skin configuration.");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex, "Failed to load skin configuration.");
-                }
-            }
+            });
         }
 
         protected virtual void ParseConfigurationStream(Stream stream)
@@ -93,7 +103,7 @@ namespace osu.Game.Skinning
 
         private Stream getConfigurationStream()
         {
-            string path = SkinInfo.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
+            string path = SkinInfo.PerformRead(s => s.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath());
 
             if (string.IsNullOrEmpty(path))
                 return null;

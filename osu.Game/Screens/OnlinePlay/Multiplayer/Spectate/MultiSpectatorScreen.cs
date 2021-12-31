@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -35,9 +36,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         [Resolved]
         private OsuColour colours { get; set; }
-
-        [Resolved]
-        private SpectatorClient spectatorClient { get; set; }
 
         [Resolved]
         private MultiplayerClient multiplayerClient { get; set; }
@@ -229,8 +227,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public override bool OnBackButton()
         {
-            // On a manual exit, set the player state back to idle.
-            multiplayerClient.ChangeState(MultiplayerUserState.Idle);
+            Debug.Assert(multiplayerClient.Room != null);
+
+            // On a manual exit, set the player back to idle unless gameplay has finished.
+            if (multiplayerClient.Room.State != MultiplayerRoomState.Open)
+                multiplayerClient.ChangeState(MultiplayerUserState.Idle);
+
             return base.OnBackButton();
         }
     }

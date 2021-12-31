@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using osu.Game.IO;
 
 namespace osu.Game.Database
 {
@@ -25,24 +22,6 @@ namespace osu.Game.Database
         /// Fired when an item is removed.
         /// </summary>
         event Action<TModel> ItemRemoved;
-
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
-        Task ImportFromStableAsync(StableStorage stableStorage);
-
-        /// <summary>
-        /// Exports an item to a legacy (.zip based) package.
-        /// </summary>
-        /// <param name="item">The item to export.</param>
-        void Export(TModel item);
-
-        /// <summary>
-        /// Exports an item to the given output stream.
-        /// </summary>
-        /// <param name="model">The item to export.</param>
-        /// <param name="outputStream">The output stream to export to.</param>
-        void ExportModelTo(TModel model, Stream outputStream);
 
         /// <summary>
         /// Perform an update of the specified item.
