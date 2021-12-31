@@ -18,6 +18,9 @@ namespace osu.Game.Audio
         public float PeakAmplitude { get; set; }
         public float Version { get; set; }
         public bool DeletePending { get; set; }
+
+        bool IHasPrimaryKey.IsManaged => ID > 0;
+
         public ReplayGainInfo()
         { }
         public bool Equals(ReplayGainInfo other)
