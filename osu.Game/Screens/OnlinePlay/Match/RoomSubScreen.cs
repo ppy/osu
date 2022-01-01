@@ -381,7 +381,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected virtual void UpdateMods()
         {
-            if (SelectedItem.Value == null)
+            if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
