@@ -146,8 +146,8 @@ namespace osu.Game.Collections
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                BackgroundUnfocused = colours.GreySeafoamDarker.Darken(0.5f);
-                BackgroundFocused = colours.GreySeafoam;
+                BackgroundUnfocused = colours.GreySeaFoamDarker.Darken(0.5f);
+                BackgroundFocused = colours.GreySeaFoam;
             }
         }
 
