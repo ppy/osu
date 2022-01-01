@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Import
                 {
                     new Box
                     {
-                        Colour = colours.GreySeafoamDark,
+                        Colour = colours.GreySeaFoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeafoamDarker,
+                                Colour = colours.GreySeaFoamDarker,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container

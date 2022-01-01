@@ -152,12 +152,12 @@ namespace osu.Game.Overlays.AccountCreation
             loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)
-                focusNextTextbox();
+                focusNextTextBox();
         }
 
         private void performRegistration()
         {
-            if (focusNextTextbox())
+            if (focusNextTextBox())
             {
                 registerShake.Shake();
                 return;
@@ -209,19 +209,19 @@ namespace osu.Game.Overlays.AccountCreation
             });
         }
 
-        private bool focusNextTextbox()
+        private bool focusNextTextBox()
         {
-            var nextTextbox = nextUnfilledTextbox();
+            var nextTextBox = nextUnfilledTextBox();
 
-            if (nextTextbox != null)
+            if (nextTextBox != null)
             {
-                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextbox));
+                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextBox));
                 return true;
             }
 
             return false;
         }
 
-        private OsuTextBox nextUnfilledTextbox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
+        private OsuTextBox nextUnfilledTextBox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
     }
 }

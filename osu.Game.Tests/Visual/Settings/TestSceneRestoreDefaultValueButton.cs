@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Settings
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeafoam
+                        Colour = colours.GreySeaFoam
                     },
                     restoreDefaultValueButton = new RestoreDefaultValueButton<float>
                     {

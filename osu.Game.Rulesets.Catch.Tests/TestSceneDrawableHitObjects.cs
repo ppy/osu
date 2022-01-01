@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestJuicestream()
+        public void TestJuiceStream()
         {
             AddStep("hit juicestream", () => spawnJuiceStream(true));
             AddUntilStep("wait for completion", () => playfieldIsEmpty);

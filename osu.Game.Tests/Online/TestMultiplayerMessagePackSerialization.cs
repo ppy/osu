@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Online
         }
 
         [Test]
-        public void TestSerialiseUnionFailsWithSingalR()
+        public void TestSerialiseUnionFailsWithSignalR()
         {
             var state = new TeamVersusUserState();
 
