@@ -35,6 +35,7 @@ namespace osu.Game.Audio
 
             //50 ms window to calculate rms
             int saplesPerWindow = (int)(info.Frequency * 0.05f * info.Channels);
+            int bytesPerWindow = saplesPerWindow * TrackBass.BYTES_PER_SAMPLE;
 
             //create a 50ms buffer and read the first segment of the track
             float[] sampleBuffer = new float[saplesPerWindow];
@@ -45,16 +46,41 @@ namespace osu.Game.Audio
             double max = -1;
 
             //array to apply the yulewalk filter
-            double[] pastX = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-            double[] pastZ = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+
+            //Variables to apply the yulewalk filter
+            double pastX0 = 0;
+            double pastX1 = 0;
+            double pastX2 = 0;
+            double pastX3 = 0;
+            double pastX4 = 0;
+            double pastX5 = 0;
+            double pastX6 = 0;
+            double pastX7 = 0;
+            double pastX8 = 0;
+            double pastX9 = 0;
+
+            double pastZ0 = 0;
+            double pastZ1 = 0;
+            double pastZ2 = 0;
+            double pastZ3 = 0;
+            double pastZ4 = 0;
+            double pastZ5 = 0;
+            double pastZ6 = 0;
+            double pastZ7 = 0;
+            double pastZ8 = 0;
+            double pastZ9 = 0;
 
             //yulewalk filter coeffs
             double[] yuleA;
             double[] yuleB;
 
-            //array for the high-pass filter
-            double[] pastZlow = { 0, 0 };
-            double[] pastY = { 0, 0 };
+            //Variables for the high-pass filter
+            double pastZlow0 = 0;
+            double pastZlow1 = 0;
+
+            double pastY0 = 0;
+            double pastY1 = 0;
 
             //high-pass coeffs
             double[] highPassA;
@@ -100,55 +126,47 @@ namespace osu.Game.Audio
             {
                 double squared = 0;
 
-                foreach (float sample in sampleBuffer)
+                for (int s = 0; s < sampleBuffer.Length; s++)
                 {
-                    //apply the yulewalk filter to the sample
-                    double yuleSample = yuleB[0] * sample;
+                    double yuleSample = yuleB[0] * sampleBuffer[s] + yuleB[1] * pastX0 + yuleB[2] * pastX1 + yuleB[3] * pastX2 + yuleB[4] * pastX3 + yuleB[5] * pastX4 + yuleB[6] * pastX5 + yuleB[7] * pastX6 + yuleB[8] * pastX7 + yuleB[9] * pastX8 + yuleB[10] * pastX9 + yuleA[0] * pastZ0 + yuleA[1] * pastZ1 + yuleA[2] * pastZ2 + yuleA[3] * pastZ3 + yuleA[4] * pastZ4 + yuleA[5] * pastZ5 + yuleA[6] * pastZ6 + yuleA[7] * pastZ7 + yuleA[8] * pastZ8 + yuleA[9] * pastZ9;
 
-                    for (int i = pastX.Length - 1; i >= 0; i--)
-                    {
-                        yuleSample += yuleB[i + 1] * pastX[i] + yuleA[i] * pastZ[i];
-
-                        if (i == 0)
-                        {
-                            pastX[i] = sample;
-                            pastZ[i] = yuleSample;
-                        }
-                        else
-                        {
-                            pastX[i] = pastX[i - 1];
-                            pastZ[i] = pastZ[i - 1];
-                        }
-                    }
+                    pastX9 = pastX8;
+                    pastZ9 = pastZ8;
+                    pastX8 = pastX7;
+                    pastZ8 = pastZ7;
+                    pastX7 = pastX6;
+                    pastZ7 = pastZ6;
+                    pastX6 = pastX5;
+                    pastZ6 = pastZ5;
+                    pastX5 = pastX4;
+                    pastZ5 = pastZ4;
+                    pastX4 = pastX3;
+                    pastZ4 = pastZ3;
+                    pastX3 = pastX2;
+                    pastZ3 = pastZ2;
+                    pastX2 = pastX1;
+                    pastZ2 = pastZ1;
+                    pastX1 = pastX0;
+                    pastZ1 = pastZ0;
+                    pastX0 = sampleBuffer[s];
+                    pastZ0 = yuleSample;
 
                     //apply the high-pass filter to the sample
-                    double tempsample = highPassB[0] * yuleSample;
+                    double tempsample = highPassB[0] * yuleSample + highPassB[1] * pastZlow0 + highPassB[2] * pastZlow1 + highPassA[0] * pastY0 + highPassA[1] * pastY1;
 
-                    for (int i = pastY.Length - 1; i >= 0; i--)
-                    {
-
-                        tempsample += highPassB[i + 1] * pastZlow[i] + highPassA[i] * pastY[i];
-
-                        if (i == 0)
-                        {
-                            pastZlow[i] = yuleSample;
-                            pastY[i] = tempsample;
-                        }
-                        else
-                        {
-                            pastZlow[i] = pastZlow[i - 1];
-                            pastY[i] = pastY[i - 1];
-                        }
-                    }
+                    pastZlow1 = pastZlow0;
+                    pastY1 = pastY0;
+                    pastZlow0 = yuleSample;
+                    pastY0 = tempsample;
 
                     squared += tempsample * tempsample; //for the rms calc
-                    if (sample > max)
+                    if (sampleBuffer[s] > max)
                     {
-                        max = sample;
+                        max = sampleBuffer[s];
                     }
-                    if (sample < min)
+                    if (sampleBuffer[s] < min)
                     {
-                        min = sample;
+                        min = sampleBuffer[s];
                     }
                 }
 
@@ -157,7 +175,7 @@ namespace osu.Game.Audio
                 if (temp != 0) listRms.Add(temp);
 
                 //read next segment
-                length = Bass.ChannelGetData(decodeStream, sampleBuffer, saplesPerWindow * TrackBass.BYTES_PER_SAMPLE);
+                length = Bass.ChannelGetData(decodeStream, sampleBuffer, bytesPerWindow);
             }
 
             Bass.StreamFree(decodeStream);

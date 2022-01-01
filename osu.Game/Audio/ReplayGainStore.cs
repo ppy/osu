@@ -51,6 +51,7 @@ namespace osu.Game.Audio
         {
             Add(info);
             beatmap.ReplayGainInfoID = curr != null ? curr.ID : 0;
+            beatmap.ReplayGainInfo = info;
         }
 
         public IQueryable<ReplayGainInfo> replayGainInfos => ContextFactory.Get().ReplayGainInfo;
