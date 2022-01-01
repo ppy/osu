@@ -53,8 +53,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
+            AddAssert("player is no longer current screen", () => !Player.IsCurrentScreen());
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
-            AddUntilStep("time less than storyboard duration", () => Player.GameplayClockContainer.GameplayClock.CurrentTime < currentStoryboardDuration);
         }
 
         [Test]
