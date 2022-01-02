@@ -256,13 +256,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
         }
 
+        // Miss penalty assumes that a player will miss on the relatively hard parts of a map, not the easy parts, hence the strain count.
+        private double calculateMissPenalty(double missCount, double strainCount) => 0.95 / ((missCount / (3 * Math.Sqrt(strainCount))) + 1);
+
         private double getComboScalingFactor() => Attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
-
-        private double calculateMissPenalty(double missCount, double strainCount)
-        {
-            return 0.95 / ((missCount / (3 * Math.Sqrt(strainCount))) + 1);
-        }
-
         private int totalHits => countGreat + countOk + countMeh + countMiss;
         private int totalSuccessfulHits => countGreat + countOk + countMeh;
     }
