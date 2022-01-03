@@ -223,7 +223,7 @@ namespace osu.Game.Overlays
 
         private void onCardSizeChanged()
         {
-            if (foundContent == null || !foundContent.Any())
+            if (foundContent?.IsAlive != true || !foundContent.Any())
                 return;
 
             Loading.Show();
