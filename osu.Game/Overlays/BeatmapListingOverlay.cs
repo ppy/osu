@@ -204,32 +204,16 @@ namespace osu.Game.Overlays
 
             if (lastContent != null)
             {
-                lastContent.FadeOut(100, Easing.OutQuint);
-
-                // Consider the case when the new content is smaller than the last content.
-                // If the auto-size computation is delayed until fade out completes, the background remain high for too long making the resulting transition to the smaller height look weird.
-                // At the same time, if the last content's height is bypassed immediately, there is a period where the new content is at Alpha = 0 when the auto-sized height will be 0.
-                // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
-                var sequence = lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
-
+                lastContent.FadeOut();
                 if (!isPlaceholderContent(lastContent))
-                {
-                    sequence.Then().Schedule(() =>
-                    {
-                        foundContent.Expire();
-                        foundContent = null;
-                    });
-                }
+                    lastContent.Expire();
             }
 
             if (!content.IsAlive)
                 panelTarget.Add(content);
 
-            content.FadeInFromZero(200, Easing.OutQuint);
+            content.FadeInFromZero();
             currentContent = content;
-            // currentContent may be one of the placeholders, and still have BypassAutoSizeAxes set to Y from the last fade-out.
-            // restore to the initial state.
-            currentContent.BypassAutoSizeAxes = Axes.None;
         }
 
         /// <summary>
@@ -265,10 +249,6 @@ namespace osu.Game.Overlays
 
         public class NotFoundDrawable : CompositeDrawable
         {
-            // required for scheduled tasks to complete correctly
-            // (see `addContentToPlaceholder()` and the scheduled `BypassAutoSizeAxes` set during fade-out in outer class above)
-            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
-
             public NotFoundDrawable()
             {
                 RelativeSizeAxes = Axes.X;
@@ -313,10 +293,6 @@ namespace osu.Game.Overlays
         // (https://github.com/ppy/osu-framework/issues/4530)
         public class SupporterRequiredDrawable : CompositeDrawable
         {
-            // required for scheduled tasks to complete correctly
-            // (see `addContentToPlaceholder()` and the scheduled `BypassAutoSizeAxes` set during fade-out in outer class above)
-            public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
-
             private LinkFlowContainer supporterRequiredText;
 
             public SupporterRequiredDrawable()
