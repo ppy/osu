@@ -140,7 +140,7 @@ namespace osu.Game.Overlays
             if (searchResult.Type == BeatmapListingFilterControl.SearchResultType.SupporterOnlyFilters)
             {
                 supporterRequiredContent.UpdateText(searchResult.SupporterOnlyFiltersUsed);
-                addContentToPlaceholder(supporterRequiredContent);
+                addContentToResultsArea(supporterRequiredContent);
                 return;
             }
 
@@ -151,13 +151,13 @@ namespace osu.Game.Overlays
                 //No matches case
                 if (!newCards.Any())
                 {
-                    addContentToPlaceholder(notFoundContent);
+                    addContentToResultsArea(notFoundContent);
                     return;
                 }
 
                 var content = createCardContainerFor(newCards);
 
-                panelLoadTask = LoadComponentAsync(foundContent = content, addContentToPlaceholder, (cancellationToken = new CancellationTokenSource()).Token);
+                panelLoadTask = LoadComponentAsync(foundContent = content, addContentToResultsArea, (cancellationToken = new CancellationTokenSource()).Token);
             }
             else
             {
@@ -192,7 +192,7 @@ namespace osu.Game.Overlays
             return content;
         }
 
-        private void addContentToPlaceholder(Drawable content)
+        private void addContentToResultsArea(Drawable content)
         {
             Loading.Hide();
             lastFetchDisplayedTime = Time.Current;
