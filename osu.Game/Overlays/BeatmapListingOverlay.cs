@@ -212,7 +212,7 @@ namespace osu.Game.Overlays
                 // To resolve both of these issues, the bypass is delayed until a point when the content transitions (fade-in and fade-out) overlap and it looks good to do so.
                 var sequence = lastContent.Delay(25).Schedule(() => lastContent.BypassAutoSizeAxes = Axes.Y);
 
-                if (lastContent == foundContent)
+                if (!isPlaceholderContent(lastContent))
                 {
                     sequence.Then().Schedule(() =>
                     {
@@ -231,6 +231,12 @@ namespace osu.Game.Overlays
             // restore to the initial state.
             currentContent.BypassAutoSizeAxes = Axes.None;
         }
+
+        /// <summary>
+        /// Whether <paramref name="drawable"/> is a static placeholder reused multiple times by this overlay.
+        /// </summary>
+        private bool isPlaceholderContent(Drawable drawable)
+            => drawable == notFoundContent || drawable == supporterRequiredContent;
 
         private void onCardSizeChanged()
         {
