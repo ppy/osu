@@ -85,11 +85,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             loopGroup.Scale.Add(Easing.None, -20000, -18000, 0, 1);
 
             var target = addEventToLoop ? loopGroup : sprite.TimelineGroup;
-            target.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+            double targetTime = addEventToLoop ? 20000 : 0;
+            target.Alpha.Add(Easing.None, targetTime + firstStoryboardEvent, targetTime + firstStoryboardEvent + 500, 0, 1);
 
             // these should be ignored due to being in the future.
             sprite.TimelineGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
-            loopGroup.Alpha.Add(Easing.None, 18000, 20000, 0, 1);
+            loopGroup.Alpha.Add(Easing.None, 38000, 40000, 0, 1);
 
             storyboard.GetLayer("Background").Add(sprite);
 

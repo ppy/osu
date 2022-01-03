@@ -39,6 +39,22 @@ namespace osu.Game.Online.Rooms
         [Key(7)]
         public bool Expired { get; set; }
 
+        /// <summary>
+        /// The order in which this <see cref="MultiplayerPlaylistItem"/> will be played relative to others.
+        /// Playlist items should be played in increasing order (lower values are played first).
+        /// </summary>
+        /// <remarks>
+        /// This is only valid for items which are not <see cref="Expired"/>. The value for expired items is undefined and should not be used.
+        /// </remarks>
+        [Key(8)]
+        public ushort PlaylistOrder { get; set; }
+
+        /// <summary>
+        /// The date when this <see cref="MultiplayerPlaylistItem"/> was played.
+        /// </summary>
+        [Key(9)]
+        public DateTimeOffset? PlayedAt { get; set; }
+
         public MultiplayerPlaylistItem()
         {
         }
@@ -46,12 +62,15 @@ namespace osu.Game.Online.Rooms
         public MultiplayerPlaylistItem(PlaylistItem item)
         {
             ID = item.ID;
+            OwnerID = item.OwnerID;
             BeatmapID = item.BeatmapID;
             BeatmapChecksum = item.Beatmap.Value?.MD5Hash ?? string.Empty;
             RulesetID = item.RulesetID;
             RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray();
             AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
             Expired = item.Expired;
+            PlaylistOrder = item.PlaylistOrder ?? 0;
+            PlayedAt = item.PlayedAt;
         }
     }
 }

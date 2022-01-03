@@ -5,6 +5,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Game.Database;
+using osu.Game.Models;
 
 #nullable enable
 
@@ -30,6 +32,39 @@ namespace osu.Game.Tests.Database
                 using (realmFactory.BlockAllOperations())
                 {
                 }
+            });
+        }
+
+        /// <summary>
+        /// Test to ensure that a `CreateContext` call nested inside a subscription doesn't cause any deadlocks
+        /// due to context fetching semaphores.
+        /// </summary>
+        [Test]
+        public void TestNestedContextCreationWithSubscription()
+        {
+            RunTestWithRealm((realmFactory, _) =>
+            {
+                bool callbackRan = false;
+
+                using (var context = realmFactory.CreateContext())
+                {
+                    var subscription = context.All<RealmBeatmap>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    {
+                        using (realmFactory.CreateContext())
+                        {
+                            callbackRan = true;
+                        }
+                    });
+
+                    // Force the callback above to run.
+                    using (realmFactory.CreateContext())
+                    {
+                    }
+
+                    subscription?.Dispose();
+                }
+
+                Assert.IsTrue(callbackRan);
             });
         }
 

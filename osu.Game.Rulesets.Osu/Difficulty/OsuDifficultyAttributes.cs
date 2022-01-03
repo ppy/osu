@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
-        [JsonProperty("aim_strain")]
-        public double AimStrain { get; set; }
+        [JsonProperty("aim_difficulty")]
+        public double AimDifficulty { get; set; }
 
-        [JsonProperty("speed_strain")]
-        public double SpeedStrain { get; set; }
+        [JsonProperty("speed_difficulty")]
+        public double SpeedDifficulty { get; set; }
 
-        [JsonProperty("flashlight_rating")]
-        public double FlashlightRating { get; set; }
+        [JsonProperty("flashlight_difficulty")]
+        public double FlashlightDifficulty { get; set; }
 
         [JsonProperty("slider_factor")]
         public double SliderFactor { get; set; }
@@ -43,15 +43,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             foreach (var v in base.ToDatabaseAttributes())
                 yield return v;
 
-            yield return (ATTRIB_ID_AIM, AimStrain);
-            yield return (ATTRIB_ID_SPEED, SpeedStrain);
+            yield return (ATTRIB_ID_AIM, AimDifficulty);
+            yield return (ATTRIB_ID_SPEED, SpeedDifficulty);
             yield return (ATTRIB_ID_OVERALL_DIFFICULTY, OverallDifficulty);
             yield return (ATTRIB_ID_APPROACH_RATE, ApproachRate);
             yield return (ATTRIB_ID_MAX_COMBO, MaxCombo);
-            yield return (ATTRIB_ID_STRAIN, StarRating);
+            yield return (ATTRIB_ID_DIFFICULTY, StarRating);
 
             if (ShouldSerializeFlashlightRating())
-                yield return (ATTRIB_ID_FLASHLIGHT, FlashlightRating);
+                yield return (ATTRIB_ID_FLASHLIGHT, FlashlightDifficulty);
 
             yield return (ATTRIB_ID_SLIDER_FACTOR, SliderFactor);
         }
@@ -60,18 +60,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             base.FromDatabaseAttributes(values);
 
-            AimStrain = values[ATTRIB_ID_AIM];
-            SpeedStrain = values[ATTRIB_ID_SPEED];
+            AimDifficulty = values[ATTRIB_ID_AIM];
+            SpeedDifficulty = values[ATTRIB_ID_SPEED];
             OverallDifficulty = values[ATTRIB_ID_OVERALL_DIFFICULTY];
             ApproachRate = values[ATTRIB_ID_APPROACH_RATE];
             MaxCombo = (int)values[ATTRIB_ID_MAX_COMBO];
-            StarRating = values[ATTRIB_ID_STRAIN];
-            FlashlightRating = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
+            StarRating = values[ATTRIB_ID_DIFFICULTY];
+            FlashlightDifficulty = values.GetValueOrDefault(ATTRIB_ID_FLASHLIGHT);
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
         }
 
-        // Used implicitly by Newtonsoft.Json to not serialize flashlight property in some cases.
+        #region Newtonsoft.Json implicit ShouldSerialize() methods
+
+        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
+        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
+        // unless the fields are also renamed.
+
         [UsedImplicitly]
         public bool ShouldSerializeFlashlightRating() => Mods.Any(m => m is ModFlashlight);
+
+        #endregion
     }
 }
