@@ -153,6 +153,5 @@ namespace osu.Game.Beatmaps.Drawables.Cards
                 Hollow = true,
             }, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
         }
-
     }
 }
