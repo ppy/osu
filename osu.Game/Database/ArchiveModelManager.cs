@@ -453,13 +453,12 @@ namespace osu.Game.Database
         /// <param name="model">The item to operate on.</param>
         /// <param name="file">The existing file to be replaced.</param>
         /// <param name="contents">The new file contents.</param>
-        /// <param name="filename">An optional filename for the new file. Will use the previous filename if not specified.</param>
-        public void ReplaceFile(TModel model, TFileModel file, Stream contents, string filename = null)
+        public void ReplaceFile(TModel model, TFileModel file, Stream contents)
         {
             using (ContextFactory.GetForWrite())
             {
                 DeleteFile(model, file);
-                AddFile(model, contents, filename ?? file.Filename);
+                AddFile(model, contents, file.Filename);
             }
         }
 
@@ -477,7 +476,7 @@ namespace osu.Game.Database
                 {
                     Files.Dereference(file.FileInfo);
 
-                    if (file.ID > 0)
+                    if (file.IsManaged)
                     {
                         // This shouldn't be required, but here for safety in case the provided TModel is not being change tracked
                         // Definitely can be removed once we rework the database backend.
@@ -506,7 +505,7 @@ namespace osu.Game.Database
                 });
             }
 
-            if (model.ID > 0)
+            if (model.IsManaged)
                 Update(model);
         }
 
@@ -738,7 +737,7 @@ namespace osu.Game.Database
         /// <param name="items">The usable items present in the store.</param>
         /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
         protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
-            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
+            => model.IsManaged && items.Any(i => i.ID == model.ID && i.Files.Any());
 
         /// <summary>
         /// Whether import can be skipped after finding an existing import early in the process.

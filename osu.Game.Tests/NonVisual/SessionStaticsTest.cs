@@ -1,9 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using NUnit.Framework;
 using osu.Game.Configuration;
-using osu.Game.Input;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.NonVisual
 {
@@ -11,37 +12,32 @@ namespace osu.Game.Tests.NonVisual
     public class SessionStaticsTest
     {
         private SessionStatics sessionStatics;
-        private IdleTracker sessionIdleTracker;
 
-        [SetUp]
-        public void SetUp()
+        [Test]
+        public void TestSessionStaticsReset()
         {
             sessionStatics = new SessionStatics();
-            sessionIdleTracker = new GameIdleTracker(1000);
 
             sessionStatics.SetValue(Static.LoginOverlayDisplayed, true);
             sessionStatics.SetValue(Static.MutedAudioNotificationShownOnce, true);
             sessionStatics.SetValue(Static.LowBatteryNotificationShownOnce, true);
             sessionStatics.SetValue(Static.LastHoverSoundPlaybackTime, (double?)1d);
+            sessionStatics.SetValue(Static.SeasonalBackgrounds, new APISeasonalBackgrounds { EndDate = new DateTimeOffset(2022, 1, 1, 0, 0, 0, TimeSpan.Zero) });
 
-            sessionIdleTracker.IsIdle.BindValueChanged(e =>
-            {
-                if (e.NewValue)
-                    sessionStatics.ResetValues();
-            });
-        }
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.LoginOverlayDisplayed).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds).IsDefault);
 
-        [Test]
-        [Timeout(2000)]
-        public void TestSessionStaticsReset()
-        {
-            sessionIdleTracker.IsIdle.BindValueChanged(e =>
-            {
-                Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LoginOverlayDisplayed).IsDefault);
-                Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).IsDefault);
-                Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).IsDefault);
-                Assert.IsTrue(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
-            });
+            sessionStatics.ResetAfterInactivity();
+
+            Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LoginOverlayDisplayed).IsDefault);
+            Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).IsDefault);
+            Assert.IsTrue(sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce).IsDefault);
+            // some statics should not reset despite inactivity.
+            Assert.IsFalse(sessionStatics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime).IsDefault);
+            Assert.IsFalse(sessionStatics.GetBindable<APISeasonalBackgrounds>(Static.SeasonalBackgrounds).IsDefault);
         }
     }
 }

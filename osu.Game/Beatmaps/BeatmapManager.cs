@@ -288,9 +288,9 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelFileManager<in BeatmapSetInfo,in BeatmapSetFileInfo>
 
-        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents, string filename = null)
+        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents)
         {
-            beatmapModelManager.ReplaceFile(model, file, contents, filename);
+            beatmapModelManager.ReplaceFile(model, file, contents);
         }
 
         public void DeleteFile(BeatmapSetInfo model, BeatmapSetFileInfo file)

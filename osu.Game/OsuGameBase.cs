@@ -142,6 +142,7 @@ namespace osu.Game
         private BeatmapDifficultyCache difficultyCache;
 
         private UserLookupCache userCache;
+        private BeatmapLookupCache beatmapCache;
 
         private FileStore fileStore;
 
@@ -195,8 +196,11 @@ namespace osu.Game
             runMigrations();
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory, Storage));
+            dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
+
+            new EFToRealmMigrator(contextFactory, realmFactory, LocalConfig).Run();
 
             dependencies.CacheAs(Storage);
 
@@ -211,16 +215,8 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Resources, Audio));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, realmFactory, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            // needs to be done here rather than inside SkinManager to ensure thread safety of CurrentSkinInfo.
-            SkinManager.ItemRemoved += item => Schedule(() =>
-            {
-                // check the removed skin is not the current user choice. if it is, switch back to default.
-                if (item.Equals(SkinManager.CurrentSkinInfo.Value))
-                    SkinManager.CurrentSkinInfo.Value = SkinInfo.Default;
-            });
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
@@ -265,11 +261,14 @@ namespace osu.Game
             dependencies.Cache(userCache = new UserLookupCache());
             AddInternal(userCache);
 
+            dependencies.Cache(beatmapCache = new BeatmapLookupCache());
+            AddInternal(beatmapCache);
+
             var scorePerformanceManager = new ScorePerformanceCache();
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.Cache(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
+            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -377,6 +376,13 @@ namespace osu.Game
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            realmFactory.Refresh();
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -441,10 +447,6 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
-
-        private void migrateDataToRealm()
-        {
-        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {

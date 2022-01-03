@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 yield return v;
 
             // Todo: osu!mania doesn't output MaxCombo attribute for some reason.
-            yield return (ATTRIB_ID_STRAIN, StarRating);
+            yield return (ATTRIB_ID_DIFFICULTY, StarRating);
             yield return (ATTRIB_ID_GREAT_HIT_WINDOW, GreatHitWindow);
             yield return (ATTRIB_ID_SCORE_MULTIPLIER, ScoreMultiplier);
         }
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             base.FromDatabaseAttributes(values);
 
-            StarRating = values[ATTRIB_ID_STRAIN];
+            StarRating = values[ATTRIB_ID_DIFFICULTY];
             GreatHitWindow = values[ATTRIB_ID_GREAT_HIT_WINDOW];
             ScoreMultiplier = values[ATTRIB_ID_SCORE_MULTIPLIER];
         }

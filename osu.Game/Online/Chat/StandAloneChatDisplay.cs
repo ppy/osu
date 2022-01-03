@@ -23,27 +23,27 @@ namespace osu.Game.Online.Chat
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
-        protected readonly ChatTextBox Textbox;
+        protected readonly ChatTextBox TextBox;
 
         protected ChannelManager ChannelManager;
 
         private StandAloneDrawableChannel drawableChannel;
 
-        private readonly bool postingTextbox;
+        private readonly bool postingTextBox;
 
         protected readonly Box Background;
 
-        private const float textbox_height = 30;
+        private const float text_box_height = 30;
 
         /// <summary>
         /// Construct a new instance.
         /// </summary>
-        /// <param name="postingTextbox">Whether a textbox for posting new messages should be displayed.</param>
-        public StandAloneChatDisplay(bool postingTextbox = false)
+        /// <param name="postingTextBox">Whether a textbox for posting new messages should be displayed.</param>
+        public StandAloneChatDisplay(bool postingTextBox = false)
         {
             const float corner_radius = 10;
 
-            this.postingTextbox = postingTextbox;
+            this.postingTextBox = postingTextBox;
             CornerRadius = corner_radius;
             Masking = true;
 
@@ -57,12 +57,12 @@ namespace osu.Game.Online.Chat
                 },
             };
 
-            if (postingTextbox)
+            if (postingTextBox)
             {
-                AddInternal(Textbox = new ChatTextBox
+                AddInternal(TextBox = new ChatTextBox
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = textbox_height,
+                    Height = text_box_height,
                     PlaceholderText = "type your message",
                     CornerRadius = corner_radius,
                     ReleaseFocusOnCommit = false,
@@ -71,7 +71,7 @@ namespace osu.Game.Online.Chat
                     Origin = Anchor.BottomLeft,
                 });
 
-                Textbox.OnCommit += postMessage;
+                TextBox.OnCommit += postMessage;
             }
 
             Channel.BindValueChanged(channelChanged);
@@ -86,9 +86,9 @@ namespace osu.Game.Online.Chat
         protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>
             new StandAloneDrawableChannel(channel);
 
-        private void postMessage(TextBox sender, bool newtext)
+        private void postMessage(TextBox sender, bool newText)
         {
-            string text = Textbox.Text.Trim();
+            string text = TextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;
@@ -98,7 +98,7 @@ namespace osu.Game.Online.Chat
             else
                 ChannelManager?.PostMessage(text, target: Channel.Value);
 
-            Textbox.Text = string.Empty;
+            TextBox.Text = string.Empty;
         }
 
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
@@ -111,7 +111,7 @@ namespace osu.Game.Online.Chat
 
             drawableChannel = CreateDrawableChannel(e.NewValue);
             drawableChannel.CreateChatLineAction = CreateMessage;
-            drawableChannel.Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 };
+            drawableChannel.Padding = new MarginPadding { Bottom = postingTextBox ? text_box_height : 0 };
 
             AddInternal(drawableChannel);
         }

@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
-        public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
+        public Bindable<bool> ShowHealthBar = new Bindable<bool>(true);
 
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Play
 
         protected FailingLayer CreateFailingLayer() => new FailingLayer
         {
-            ShowHealth = { BindTarget = ShowHealthbar }
+            ShowHealth = { BindTarget = ShowHealthBar }
         };
 
         protected KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay

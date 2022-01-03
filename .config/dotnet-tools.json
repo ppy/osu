@@ -27,7 +27,7 @@
       ]
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2021.725.0",
+      "version": "2021.1210.0",
       "commands": [
         "localisation"
       ]

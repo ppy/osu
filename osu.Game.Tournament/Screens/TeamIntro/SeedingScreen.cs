@@ -197,7 +197,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     {
                         row.Add(new Sprite
                         {
-                            Texture = textures.Get($"mods/{mods.ToLower()}"),
+                            Texture = textures.Get($"Mods/{mods.ToLower()}"),
                             Scale = new Vector2(0.5f)
                         });
                     }
