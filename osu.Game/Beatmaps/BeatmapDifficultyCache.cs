@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
@@ -266,8 +267,11 @@ namespace osu.Game.Beatmaps
                     // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
                     Schedule(() =>
                     {
-                        if (!cancellationToken.IsCancellationRequested && t.Result != null)
-                            bindable.Value = t.Result;
+                        if (cancellationToken.IsCancellationRequested)
+                            return;
+
+                        if (t.WaitSafelyForResult() is StarDifficulty sd)
+                            bindable.Value = sd;
                     });
                 }, cancellationToken);
         }

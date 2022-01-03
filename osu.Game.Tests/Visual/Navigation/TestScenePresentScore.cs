@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result.Value;
+                }).WaitSafelyForResult().Value;
             });
         }
 
@@ -131,7 +132,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
-                }).Result.Value;
+                }).WaitSafelyForResult().Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

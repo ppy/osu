@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -91,7 +92,7 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var imported = beatmapModelManager.Import(set).Result.Value;
+            var imported = beatmapModelManager.Import(set).WaitSafelyForResult().Value;
 
             return GetWorkingBeatmap(imported.Beatmaps.First());
         }

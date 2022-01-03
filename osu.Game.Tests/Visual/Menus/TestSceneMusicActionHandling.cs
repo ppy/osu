@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("import beatmap with track", () =>
             {
-                var setWithTrack = Game.BeatmapManager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).Result;
+                var setWithTrack = Game.BeatmapManager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).WaitSafelyForResult();
                 Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(setWithTrack.Value.Beatmaps.First());
             });
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -533,11 +534,10 @@ namespace osu.Game.Online.Chat
                 else if (lastClosedChannel.Type == ChannelType.PM)
                 {
                     // Try to get user in order to open PM chat
-                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
+                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(task =>
                     {
-                        if (u.Result == null) return;
-
-                        Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
+                        if (task.WaitSafelyForResult() is APIUser u)
+                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u)));
                     });
                 }
 

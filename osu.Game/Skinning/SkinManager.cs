@@ -11,6 +11,7 @@ using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -153,7 +154,7 @@ namespace osu.Game.Skinning
                     Name = s.Name + @" (modified)",
                     Creator = s.Creator,
                     InstantiationInfo = s.InstantiationInfo,
-                }).Result;
+                }).WaitSafelyForResult();
 
                 if (result != null)
                 {
