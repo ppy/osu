@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -85,7 +86,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
 
-            beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).Result.Value.Beatmaps[0];
+            beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).WaitSafelyForResult().Value.Beatmaps[0];
 
             for (int i = 0; i < 50; i++)
             {
@@ -101,7 +102,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     User = new APIUser { Username = "TestUser" },
                 };
 
-                importedScores.Add(scoreManager.Import(score).Result.Value);
+                importedScores.Add(scoreManager.Import(score).WaitSafelyForResult().Value);
             }
 
             return dependencies;

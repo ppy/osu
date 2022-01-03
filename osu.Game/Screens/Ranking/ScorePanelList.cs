@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -151,9 +152,9 @@ namespace osu.Game.Screens.Ranking
 
             // Calculating score can take a while in extreme scenarios, so only display scores after the process completes.
             scoreManager.GetTotalScoreAsync(score)
-                        .ContinueWith(totalScore => Schedule(() =>
+                        .ContinueWith(task => Schedule(() =>
                         {
-                            flow.SetLayoutPosition(trackingContainer, totalScore.Result);
+                            flow.SetLayoutPosition(trackingContainer, task.WaitSafelyForResult());
 
                             trackingContainer.Show();
 

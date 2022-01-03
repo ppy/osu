@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -770,7 +771,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
-                this.Push(CreateResults(prepareScoreForDisplayTask.Result));
+                this.Push(CreateResults(prepareScoreForDisplayTask.WaitSafelyForResult()));
             }, Time.Current + delay, 50);
 
             Scheduler.Add(resultsDisplayDelegate);
