@@ -174,11 +174,6 @@ namespace osu.Game.Configuration
             if (!int.TryParse(pieces[1], out int monthDay)) return;
 
             int combined = (year * 10000) + monthDay;
-
-            if (combined < 20210413)
-            {
-                SetValue(OsuSetting.EditorWaveformOpacity, 0.25f);
-            }
         }
 
         public override TrackedSettings CreateTrackedSettings()
