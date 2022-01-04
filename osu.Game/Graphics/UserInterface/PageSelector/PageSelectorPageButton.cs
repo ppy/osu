@@ -54,7 +54,9 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         private void onSelectedChanged(ValueChangedEvent<bool> selected)
         {
             Background.FadeTo(selected.NewValue ? 1 : 0, DURATION, Easing.OutQuint);
+
             text.FadeColour(selected.NewValue ? ColourProvider.Dark4 : ColourProvider.Light3, DURATION, Easing.OutQuint);
+            text.Font = text.Font.With(weight: IsHovered ? FontWeight.SemiBold : FontWeight.Regular);
         }
 
         protected override void UpdateHoverState()
