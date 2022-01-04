@@ -35,14 +35,24 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             setAvailablePages(100);
 
-            AddAssert("Correct page buttons", () => pageSelector.ChildrenOfType<PageSelectorPageButton>().Select(p => p.PageNumber).SequenceEqual(new[] { 1, 2, 3, 100 }));
+            selectPageIndex(0);
+            checkVisiblePageNumbers(new[] { 1, 2, 3, 100 });
+
+            selectPageIndex(6);
+            checkVisiblePageNumbers(new[] { 1, 5, 6, 7, 8, 9, 100 });
+
+            selectPageIndex(49);
+            checkVisiblePageNumbers(new[] { 1, 48, 49, 50, 51, 52, 100 });
+
+            selectPageIndex(99);
+            checkVisiblePageNumbers(new[] { 1, 98, 99, 100 });
         }
 
         [Test]
         public void TestResetCurrentPage()
         {
             setAvailablePages(10);
-            selectPage(6);
+            selectPageIndex(6);
             setAvailablePages(11);
             AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 0);
         }
@@ -51,14 +61,16 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestOutOfBoundsSelection()
         {
             setAvailablePages(10);
-            selectPage(11);
+            selectPageIndex(11);
             AddAssert("Page 10 is current", () => pageSelector.CurrentPage.Value == pageSelector.AvailablePages.Value - 1);
 
-            selectPage(-1);
+            selectPageIndex(-1);
             AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 0);
         }
 
-        private void selectPage(int pageIndex) =>
+        private void checkVisiblePageNumbers(int[] expected) => AddAssert($"Sequence is {string.Join(',', expected.Select(i => i.ToString()))}", () => pageSelector.ChildrenOfType<PageSelectorPageButton>().Select(p => p.PageNumber).SequenceEqual(expected));
+
+        private void selectPageIndex(int pageIndex) =>
             AddStep($"Select page {pageIndex}", () => pageSelector.CurrentPage.Value = pageIndex);
 
         private void setAvailablePages(int availablePages) =>
