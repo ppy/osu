@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
@@ -50,43 +50,47 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         {
             base.LoadComplete();
 
-            CurrentPage.BindValueChanged(onCurrentPageChanged);
+            CurrentPage.BindValueChanged(_ => redraw());
             AvailablePages.BindValueChanged(_ => redraw(), true);
         }
 
-        private void onCurrentPageChanged(ValueChangedEvent<int> currentPage)
+        private void redraw()
         {
-            if (currentPage.NewValue >= AvailablePages.Value)
+            if (CurrentPage.Value >= AvailablePages.Value)
             {
                 CurrentPage.Value = AvailablePages.Value - 1;
                 return;
             }
 
-            foreach (var page in itemsFlow.OfType<PageSelectorPageButton>())
-                page.Selected = page.PageNumber == currentPage.NewValue + 1;
+            previousPageButton.Enabled.Value = CurrentPage.Value != 0;
+            nextPageButton.Enabled.Value = CurrentPage.Value < AvailablePages.Value - 1;
 
-            previousPageButton.Enabled.Value = currentPage.NewValue != 0;
-            nextPageButton.Enabled.Value = currentPage.NewValue < AvailablePages.Value - 1;
-        }
-
-        private void redraw()
-        {
             itemsFlow.Clear();
 
-            for (int i = 0; i < AvailablePages.Value; i++)
+            int totalPages = AvailablePages.Value;
+            bool lastWasEllipsis = false;
+
+            for (int i = 0; i < totalPages; i++)
             {
                 int pageIndex = i;
 
-                itemsFlow.Add(new PageSelectorPageButton(pageIndex + 1)
-                {
-                    Action = () => CurrentPage.Value = pageIndex,
-                });
-            }
+                bool shouldShowPage = pageIndex == 0 || pageIndex == totalPages - 1 || Math.Abs(pageIndex - CurrentPage.Value) <= 2;
 
-            if (CurrentPage.Value != 0)
-                CurrentPage.Value = 0;
-            else
-                CurrentPage.TriggerChange();
+                if (shouldShowPage)
+                {
+                    lastWasEllipsis = false;
+                    itemsFlow.Add(new PageSelectorPageButton(pageIndex + 1)
+                    {
+                        Action = () => CurrentPage.Value = pageIndex,
+                        Selected = CurrentPage.Value == pageIndex,
+                    });
+                }
+                else if (!lastWasEllipsis)
+                {
+                    lastWasEllipsis = true;
+                    itemsFlow.Add(new PageEllipsis());
+                }
+            }
         }
     }
 }
