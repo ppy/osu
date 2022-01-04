@@ -13,10 +13,10 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         public readonly BindableInt CurrentPage = new BindableInt(1);
         public readonly BindableInt MaxPages = new BindableInt(1);
 
-        private readonly FillFlowContainer<DrawablePage> itemsFlow;
+        private readonly FillFlowContainer<PageSelectorPageButton> itemsFlow;
 
-        private readonly PageSelectorButton previousPageButton;
-        private readonly PageSelectorButton nextPageButton;
+        private readonly PageSelectorPrevNextButton previousPageButton;
+        private readonly PageSelectorPrevNextButton nextPageButton;
 
         public PageSelector()
         {
@@ -28,16 +28,16 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    previousPageButton = new PageSelectorButton(false, "prev")
+                    previousPageButton = new PageSelectorPrevNextButton(false, "prev")
                     {
                         Action = () => CurrentPage.Value -= 1,
                     },
-                    itemsFlow = new FillFlowContainer<DrawablePage>
+                    itemsFlow = new FillFlowContainer<PageSelectorPageButton>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                     },
-                    nextPageButton = new PageSelectorButton(true, "next")
+                    nextPageButton = new PageSelectorPrevNextButton(true, "next")
                     {
                         Action = () => CurrentPage.Value += 1
                     }
@@ -100,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
             nextPageButton.Enabled.Value = newPage != maxPages;
         }
 
-        private void addDrawablePage(int page) => itemsFlow.Add(new DrawablePage(page)
+        private void addDrawablePage(int page) => itemsFlow.Add(new PageSelectorPageButton(page)
         {
             Action = () => CurrentPage.Value = page,
         });
