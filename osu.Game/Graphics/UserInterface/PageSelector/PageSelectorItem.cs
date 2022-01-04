@@ -18,16 +18,20 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         [Resolved]
         protected OsuColour Colours { get; private set; }
 
-        protected override Container<Drawable> Content => content;
+        protected Box Background;
 
-        protected readonly Box Background;
-        private readonly CircularContainer content;
+        public CircularContainer CircularContent { get; private set; }
 
         protected PageSelectorItem()
         {
             AutoSizeAxes = Axes.X;
             Height = 20;
-            base.Content.Add(content = new CircularContainer
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Add(CircularContent = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,

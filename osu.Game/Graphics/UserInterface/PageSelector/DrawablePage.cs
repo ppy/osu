@@ -15,20 +15,16 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
 
         public bool Selected
         {
-            get => selected.Value;
             set => selected.Value = value;
         }
 
-        public int Page { get; private set; }
+        public int Page { get; }
 
         private OsuSpriteText text;
 
         public DrawablePage(int page)
         {
             Page = page;
-            text.Text = page.ToString();
-
-            Background.Alpha = 0;
 
             Action = () =>
             {
@@ -40,12 +36,14 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         protected override Drawable CreateContent() => text = new OsuSpriteText
         {
             Font = OsuFont.GetFont(size: 12),
+            Text = Page.ToString(),
         };
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Background.Colour = Colours.Lime;
+            Background.Alpha = 0;
         }
 
         protected override void LoadComplete()
