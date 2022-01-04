@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -26,23 +24,19 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
-        public const float SPIN_RADIUS = 50; // same as OsuAutoGeneratorBase.SPIN_RADIUS
-
-        private DrawableSpinner activeSpinner;
-        private float spinnerAngle; // in radians
+        private const float spin_radius = 30;
+        private Vector2? prevCursorPos;
 
         public void Update(Playfield playfield)
         {
             var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
             double currentTime = playfield.Clock.CurrentTime;
 
-            // Judgment displays would all be cramped onto the cursor
+            // Hide judgment displays and follow points
             playfield.DisplayJudgements.Value = false;
+            (playfield as OsuPlayfield)?.FollowPoints.Clear();
 
-            // FIXME: Hide follow points
-            //(playfield as OsuPlayfield)?.ConnectionLayer.Hide();
-
-            // If object too old, remove from movingObjects list, otherwise move to new destination
+            // Move all currently alive object to new destination
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
                 var h = drawable.HitObject;
@@ -79,64 +73,32 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // Move spinner to cursor
                         if (currentTime < h.StartTime)
                         {
-                            spinner.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
+                            spinner.MoveTo(cursorPos + new Vector2(0, -spin_radius), Math.Max(0, h.StartTime - currentTime - 10));
                         }
                         else
                         {
-                            // TODO:
-                            //   - get current angle to cursor
-                            //   - move clockwise(?)
-                            //   - call spinner.RotationTracker.AddRotation
+                            // Move spinner visually
+                            Vector2 delta = spin_radius * (spinner.Position - prevCursorPos ?? cursorPos).Normalized();
+                            const float angle = 3 * MathF.PI / 180; // radians per update, arbitrary value
 
-                            // TODO: Remove
-                            //spinnerAngle = 0;
-                            //activeSpinner = spinner;
+                            // Rotation matrix
+                            var targetPos = new Vector2(
+                                delta.X * MathF.Cos(angle) - delta.Y * MathF.Sin(angle) + cursorPos.X,
+                                delta.X * MathF.Sin(angle) + delta.Y * MathF.Cos(angle) + cursorPos.Y
+                            );
+
+                            spinner.MoveTo(targetPos);
+
+                            // Logically finish spinner immediatly, no need for the user to click.
+                            // Temporary workaround until spinner rotations are easier to handle, similar as Autopilot mod.
+                            spinner.Result.RateAdjustedRotation = spinner.HitObject.SpinsRequired * 360;
                         }
 
                         break;
-
-                    default:
-                        continue;
                 }
             }
 
-            // Move active spinner around the cursor
-            if (activeSpinner != null)
-            {
-                double spinnerEndTime = activeSpinner.HitObject.GetEndTime();
-
-                if (currentTime > spinnerEndTime)
-                {
-                    activeSpinner = null;
-                    spinnerAngle = 0;
-                }
-                else
-                {
-                    const float additional_degrees = 4;
-                    float added_degrees = additional_degrees * (float)Math.PI / 180;
-                    spinnerAngle += added_degrees;
-
-                    //int spinsRequired = activeSpinner.HitObject.SpinsRequired;
-                    //float spunDegrees = activeSpinner.Result.RateAdjustedRotation;
-                    //double timeLeft = spinnerEndTime - currentTime;
-
-                    // Visual progress
-                    activeSpinner.MoveTo(new Vector2((float)(SPIN_RADIUS * Math.Cos(spinnerAngle) + cursorPos.X), (float)(SPIN_RADIUS * Math.Sin(spinnerAngle) + cursorPos.Y)));
-
-                    // Logical progress
-                    activeSpinner.RotationTracker.AddRotation(added_degrees);
-                    Console.WriteLine($"added_degrees={added_degrees}");
-                    //activeSpinner.Disc.RotationAbsolute += additional_degrees;
-                }
-            }
+            prevCursorPos = cursorPos;
         }
     }
-
-    /*
-     * TODOs
-     *  - fix sliders reappearing at original position after their EndTime (see https://puu.sh/E7zT4/111cf9cdc8.gif)
-     *  - find nicer way to handle slider headcircle explosion, flash, ...
-     *  - add Aim Assist as incompatible mod for Autoplay (?)
-     *
-     */
 }
