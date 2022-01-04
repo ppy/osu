@@ -63,16 +63,16 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Artist:
-                    return string.Compare(BeatmapSet.Metadata?.Artist, otherSet.BeatmapSet.Metadata?.Artist, StringComparison.OrdinalIgnoreCase);
+                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Title:
-                    return string.Compare(BeatmapSet.Metadata?.Title, otherSet.BeatmapSet.Metadata?.Title, StringComparison.OrdinalIgnoreCase);
+                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Author:
-                    return string.Compare(BeatmapSet.Metadata?.Author.Username, otherSet.BeatmapSet.Metadata?.Author.Username, StringComparison.OrdinalIgnoreCase);
+                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.Source:
-                    return string.Compare(BeatmapSet.Metadata?.Source, otherSet.BeatmapSet.Metadata?.Source, StringComparison.OrdinalIgnoreCase);
+                    return string.Compare(BeatmapSet.Metadata.Source, otherSet.BeatmapSet.Metadata.Source, StringComparison.OrdinalIgnoreCase);
 
                 case SortMode.DateAdded:
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
