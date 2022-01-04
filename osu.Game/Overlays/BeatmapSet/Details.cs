@@ -2,15 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Select.Details;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -21,10 +20,11 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly PreviewButton preview;
         private readonly BasicStats basic;
         private readonly AdvancedStats advanced;
+        private readonly DetailBox ratingBox;
 
-        private BeatmapSetInfo beatmapSet;
+        private APIBeatmapSet beatmapSet;
 
-        public BeatmapSetInfo BeatmapSet
+        public APIBeatmapSet BeatmapSet
         {
             get => beatmapSet;
             set
@@ -38,22 +38,23 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private BeatmapInfo beatmap;
+        private IBeatmapInfo beatmapInfo;
 
-        public BeatmapInfo Beatmap
+        public IBeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (value == beatmap) return;
+                if (value == beatmapInfo) return;
 
-                basic.Beatmap = advanced.Beatmap = beatmap = value;
+                basic.BeatmapInfo = advanced.BeatmapInfo = beatmapInfo = value;
             }
         }
 
         private void updateDisplay()
         {
-            Ratings.Metrics = BeatmapSet?.Metrics;
+            Ratings.Ratings = BeatmapSet?.Ratings;
+            ratingBox.Alpha = BeatmapSet?.Status > 0 ? 1 : 0;
         }
 
         public Details()
@@ -74,7 +75,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Vertical = 10 },
+                        Padding = new MarginPadding { Vertical = 10 }
                     },
                 },
                 new DetailBox
@@ -86,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Vertical = 7.5f },
                     },
                 },
-                new DetailBox
+                ratingBox = new DetailBox
                 {
                     Child = Ratings = new UserRatings
                     {
@@ -107,6 +108,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private class DetailBox : Container
         {
             private readonly Container content;
+            private readonly Box background;
+
             protected override Container<Drawable> Content => content;
 
             public DetailBox()
@@ -116,10 +119,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
+                        Alpha = 0.5f
                     },
                     content = new Container
                     {
@@ -128,6 +131,12 @@ namespace osu.Game.Overlays.BeatmapSet
                         Padding = new MarginPadding { Horizontal = 15 },
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                background.Colour = colourProvider.Background6;
             }
         }
     }

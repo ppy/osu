@@ -1,10 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Net.Http;
+using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
 {
@@ -33,30 +34,46 @@ namespace osu.Game.Online.API
             this.endpoint = endpoint;
         }
 
-        internal bool AuthenticateWithLogin(string username, string password)
+        internal void AuthenticateWithLogin(string username, string password)
         {
-            if (string.IsNullOrEmpty(username)) return false;
-            if (string.IsNullOrEmpty(password)) return false;
+            if (string.IsNullOrEmpty(username)) throw new ArgumentException("Missing username.");
+            if (string.IsNullOrEmpty(password)) throw new ArgumentException("Missing password.");
 
-            using (var req = new AccessTokenRequestPassword(username, password)
+            var accessTokenRequest = new AccessTokenRequestPassword(username, password)
             {
                 Url = $@"{endpoint}/oauth/token",
                 Method = HttpMethod.Post,
                 ClientId = clientId,
                 ClientSecret = clientSecret
-            })
+            };
+
+            using (accessTokenRequest)
             {
                 try
                 {
-                    req.Perform();
+                    accessTokenRequest.Perform();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    return false;
+                    Token.Value = null;
+
+                    var throwableException = ex;
+
+                    try
+                    {
+                        // attempt to decode a displayable error string.
+                        var error = JsonConvert.DeserializeObject<OAuthError>(accessTokenRequest.GetResponseString() ?? string.Empty);
+                        if (error != null)
+                            throwableException = new APIException(error.UserDisplayableError, ex);
+                    }
+                    catch
+                    {
+                    }
+
+                    throw throwableException;
                 }
 
-                Token.Value = req.ResponseObject;
-                return true;
+                Token.Value = accessTokenRequest.ResponseObject;
             }
         }
 
@@ -64,17 +81,19 @@ namespace osu.Game.Online.API
         {
             try
             {
-                using (var req = new AccessTokenRequestRefresh(refresh)
+                var refreshRequest = new AccessTokenRequestRefresh(refresh)
                 {
                     Url = $@"{endpoint}/oauth/token",
                     Method = HttpMethod.Post,
                     ClientId = clientId,
                     ClientSecret = clientSecret
-                })
-                {
-                    req.Perform();
+                };
 
-                    Token.Value = req.ResponseObject;
+                using (refreshRequest)
+                {
+                    refreshRequest.Perform();
+
+                    Token.Value = refreshRequest.ResponseObject;
                     return true;
                 }
             }
@@ -166,7 +185,7 @@ namespace osu.Game.Online.API
             }
         }
 
-        private class AccessTokenRequest : JsonWebRequest<OAuthToken>
+        private class AccessTokenRequest : OsuJsonWebRequest<OAuthToken>
         {
             protected string GrantType;
 
@@ -182,6 +201,20 @@ namespace osu.Game.Online.API
 
                 base.PrePerform();
             }
+        }
+
+        private class OAuthError
+        {
+            public string UserDisplayableError => !string.IsNullOrEmpty(Hint) ? Hint : ErrorIdentifier;
+
+            [JsonProperty("error")]
+            public string ErrorIdentifier { get; set; }
+
+            [JsonProperty("hint")]
+            public string Hint { get; set; }
+
+            [JsonProperty("message")]
+            public string Message { get; set; }
         }
     }
 }

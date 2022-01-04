@@ -14,7 +14,9 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// We never fail, 'yo.
         /// </summary>
-        public bool AllowFail => false;
+        public bool PerformFail() => false;
+
+        public bool RestartOnFail => false;
 
         public void ReadFromConfig(OsuConfigManager config)
         {
@@ -23,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            overlay.ShowHealthbar.BindTo(showHealthBar);
+            overlay.ShowHealthBar.BindTo(showHealthBar);
         }
     }
 }

@@ -1,16 +1,16 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -29,30 +29,33 @@ namespace osu.Game.Rulesets.Mania.Tests
     [TestFixture]
     public class TestSceneNotes : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        [Test]
+        public void TestVariousNotes()
         {
-            typeof(DrawableNote),
-            typeof(DrawableHoldNote)
-        };
+            DrawableNote note1 = null;
+            DrawableNote note2 = null;
+            DrawableHoldNote holdNote1 = null;
+            DrawableHoldNote holdNote2 = null;
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Child = new FillFlowContainer
+            AddStep("create notes", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(20),
-                Children = new[]
+                Child = new FillFlowContainer
                 {
-                    createNoteDisplay(ScrollingDirection.Down, 1, out var note1),
-                    createNoteDisplay(ScrollingDirection.Up, 2, out var note2),
-                    createHoldNoteDisplay(ScrollingDirection.Down, 1, out var holdNote1),
-                    createHoldNoteDisplay(ScrollingDirection.Up, 2, out var holdNote2),
-                }
-            };
+                    Clock = new FramedClock(new ManualClock()),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(20),
+                    Children = new[]
+                    {
+                        createNoteDisplay(ScrollingDirection.Down, 1, out note1),
+                        createNoteDisplay(ScrollingDirection.Up, 2, out note2),
+                        createHoldNoteDisplay(ScrollingDirection.Down, 1, out holdNote1),
+                        createHoldNoteDisplay(ScrollingDirection.Up, 2, out holdNote2),
+                    }
+                };
+            });
 
             AddAssert("note 1 facing downwards", () => verifyAnchors(note1, Anchor.y2));
             AddAssert("note 2 facing upwards", () => verifyAnchors(note2, Anchor.y0));
@@ -62,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createNoteDisplay(ScrollingDirection direction, int identifier, out DrawableNote hitObject)
         {
-            var note = new Note { StartTime = 999999999 };
+            var note = new Note { StartTime = 0 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
@@ -77,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createHoldNoteDisplay(ScrollingDirection direction, int identifier, out DrawableHoldNote hitObject)
         {
-            var note = new HoldNote { StartTime = 999999999, Duration = 5000 };
+            var note = new HoldNote { StartTime = 0, Duration = 5000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
@@ -95,7 +98,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         private bool verifyAnchors(DrawableHitObject hitObject, Anchor expectedAnchor)
-            => hitObject.Anchor.HasFlag(expectedAnchor) && hitObject.Origin.HasFlag(expectedAnchor);
+            => hitObject.Anchor.HasFlagFast(expectedAnchor) && hitObject.Origin.HasFlagFast(expectedAnchor);
 
         private bool verifyAnchors(DrawableHoldNote holdNote, Anchor expectedAnchor)
             => verifyAnchors((DrawableHitObject)holdNote, expectedAnchor) && holdNote.NestedHitObjects.All(n => verifyAnchors(n, expectedAnchor));
@@ -133,7 +136,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 1.25f,
-                                    Colour = Color4.Black.Opacity(0.5f)
+                                    Colour = Color4.Green.Opacity(0.5f)
                                 },
                                 content = new Container { RelativeSizeAxes = Axes.Both }
                             }
@@ -162,7 +165,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
                 foreach (var obj in content.OfType<DrawableHitObject>())
                 {
-                    if (!(obj.HitObject is IHasEndTime endTime))
+                    if (!(obj.HitObject is IHasDuration endTime))
                         continue;
 
                     foreach (var nested in obj.NestedHitObjects)

@@ -8,389 +8,319 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Lists;
-using osu.Framework.Logging;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osu.Framework.Threading;
-using osu.Game.Beatmaps.Formats;
+using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
+    /// Handles general operations related to global beatmap management.
     /// </summary>
-    public partial class BeatmapManager : DownloadableArchiveModelManager<BeatmapSetInfo, BeatmapSetFileInfo>
+    [ExcludeFromDynamicCompile]
+    public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
+        public ITrackStore BeatmapTrackStore { get; }
+
+        private readonly BeatmapModelManager beatmapModelManager;
+
+        private readonly WorkingBeatmapCache workingBeatmapCache;
+        private readonly BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
+
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
+        {
+            var userResources = new FileStore(contextFactory, storage).Store;
+
+            BeatmapTrackStore = audioManager.GetTrackStore(userResources);
+
+            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host);
+            workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
+
+            workingBeatmapCache.BeatmapManager = beatmapModelManager;
+            beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
+
+            if (performOnlineLookups)
+            {
+                onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+                beatmapModelManager.OnlineLookupQueue = onlineBeatmapLookupQueue;
+            }
+        }
+
+        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
+        {
+            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
+        }
+
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host) =>
+            new BeatmapModelManager(storage, contextFactory, rulesets, host);
+
+        /// <summary>
+        /// Create a new <see cref="WorkingBeatmap"/>.
+        /// </summary>
+        public WorkingBeatmap CreateNew(RulesetInfo ruleset, APIUser user)
+        {
+            var metadata = new BeatmapMetadata
+            {
+                Author = user,
+            };
+
+            var set = new BeatmapSetInfo
+            {
+                Metadata = metadata,
+                Beatmaps =
+                {
+                    new BeatmapInfo
+                    {
+                        BaseDifficulty = new BeatmapDifficulty(),
+                        Ruleset = ruleset,
+                        Metadata = metadata,
+                        WidescreenStoryboard = true,
+                        SamplesMatchPlaybackRate = true,
+                    }
+                }
+            };
+
+            var imported = beatmapModelManager.Import(set).Result.Value;
+
+            return GetWorkingBeatmap(imported.Beatmaps.First());
+        }
+
+        #region Delegation to BeatmapModelManager (methods which previously existed locally).
+
         /// <summary>
         /// Fired when a single difficulty has been hidden.
         /// </summary>
-        public event Action<BeatmapInfo> BeatmapHidden;
+        public event Action<BeatmapInfo> BeatmapHidden
+        {
+            add => beatmapModelManager.BeatmapHidden += value;
+            remove => beatmapModelManager.BeatmapHidden -= value;
+        }
 
         /// <summary>
         /// Fired when a single difficulty has been restored.
         /// </summary>
-        public event Action<BeatmapInfo> BeatmapRestored;
+        public event Action<BeatmapInfo> BeatmapRestored
+        {
+            add => beatmapModelManager.BeatmapRestored += value;
+            remove => beatmapModelManager.BeatmapRestored -= value;
+        }
+
+        /// <summary>
+        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
+        /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
+        public virtual void Save(BeatmapInfo info, IBeatmap beatmapContent, ISkin beatmapSkin = null) =>
+            beatmapModelManager.Save(info, beatmapContent, beatmapSkin);
+
+        /// <summary>
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(IncludedDetails includes = IncludedDetails.All, bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSets(includes, includeProtected);
+
+        /// <summary>
+        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s. Note that files are not populated.
+        /// </summary>
+        /// <param name="includes">The level of detail to include in the returned objects.</param>
+        /// <param name="includeProtected">Whether to include protected (system) beatmaps. These should not be included for gameplay playable use cases.</param>
+        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
+        public IEnumerable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable(IncludedDetails includes, bool includeProtected = false) => beatmapModelManager.GetAllUsableBeatmapSetsEnumerable(includes, includeProtected);
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <param name="includes">The level of detail to include in the returned objects.</param>
+        /// <returns>Results from the provided query.</returns>
+        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query, IncludedDetails includes = IncludedDetails.All) => beatmapModelManager.QueryBeatmapSets(query, includes);
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmapModelManager.QueryBeatmapSet(query);
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>Results from the provided query.</returns>
+        public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmaps(query);
+
+        /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public BeatmapInfo QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmap(query);
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public readonly WorkingBeatmap DefaultBeatmap;
+        public IWorkingBeatmap DefaultBeatmap => workingBeatmapCache.DefaultBeatmap;
 
-        public override string[] HandledExtensions => new[] { ".osz" };
-
-        protected override string[] HashableFileTypes => new[] { ".osu" };
-
-        protected override string ImportFromStablePath => "Songs";
-
-        private readonly RulesetStore rulesets;
-
-        private readonly BeatmapStore beatmaps;
-
-        private readonly AudioManager audioManager;
-
-        private readonly GameHost host;
-
-        private readonly BeatmapUpdateQueue updateQueue;
-
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
-                              WorkingBeatmap defaultBeatmap = null)
-            : base(storage, contextFactory, api, new BeatmapStore(contextFactory), host)
+        /// <summary>
+        /// Fired when a notification should be presented to the user.
+        /// </summary>
+        public Action<Notification> PostNotification
         {
-            this.rulesets = rulesets;
-            this.audioManager = audioManager;
-            this.host = host;
-
-            DefaultBeatmap = defaultBeatmap;
-
-            beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-
-            updateQueue = new BeatmapUpdateQueue(api);
+            set => beatmapModelManager.PostNotification = value;
         }
-
-        protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
-            new DownloadBeatmapSetRequest(set, minimiseDownloadSize);
-
-        protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
-
-        protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
-        {
-            if (archive != null)
-                beatmapSet.Beatmaps = createBeatmapDifficulties(archive);
-
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-            {
-                // remove metadata from difficulties where it matches the set
-                if (beatmapSet.Metadata.Equals(b.Metadata))
-                    b.Metadata = null;
-
-                b.BeatmapSet = beatmapSet;
-            }
-
-            validateOnlineIds(beatmapSet);
-
-            return updateQueue.UpdateAsync(beatmapSet, cancellationToken);
-        }
-
-        protected override void PreImport(BeatmapSetInfo beatmapSet)
-        {
-            if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
-                throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
-
-            // check if a set already exists with the same online id, delete if it does.
-            if (beatmapSet.OnlineBeatmapSetID != null)
-            {
-                var existingOnlineId = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID);
-
-                if (existingOnlineId != null)
-                {
-                    Delete(existingOnlineId);
-                    beatmaps.PurgeDeletable(s => s.ID == existingOnlineId.ID);
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.");
-                }
-            }
-        }
-
-        private void validateOnlineIds(BeatmapSetInfo beatmapSet)
-        {
-            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
-
-            // ensure all IDs are unique
-            if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
-            {
-                resetIds();
-                return;
-            }
-
-            // find any existing beatmaps in the database that have matching online ids
-            var existingBeatmaps = QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).ToList();
-
-            if (existingBeatmaps.Count > 0)
-            {
-                // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
-                // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
-                var existing = CheckForExisting(beatmapSet);
-                if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
-                    resetIds();
-            }
-
-            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
-        }
-
-        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items) => items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
 
         /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
-        /// <param name="beatmap">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
+        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
+        public void Hide(BeatmapInfo beatmapInfo) => beatmapModelManager.Hide(beatmapInfo);
 
         /// <summary>
         /// Restore a beatmap difficulty.
         /// </summary>
-        /// <param name="beatmap">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
+        /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
+        public void Restore(BeatmapInfo beatmapInfo) => beatmapModelManager.Restore(beatmapInfo);
 
-        private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
+        #endregion
 
-        /// <summary>
-        /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
-        /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
-        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
+        #region Implementation of IModelManager<BeatmapSetInfo>
+
+        public bool IsAvailableLocally(BeatmapSetInfo model)
         {
-            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
-                return previous;
-
-            if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
-                return DefaultBeatmap;
-
-            lock (workingCache)
-            {
-                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
-
-                if (working == null)
-                {
-                    if (beatmapInfo.Metadata == null)
-                        beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
-
-                    workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
-                        new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
-                }
-
-                previous?.TransferTo(working);
-                return working;
-            }
+            return beatmapModelManager.IsAvailableLocally(model);
         }
 
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().FirstOrDefault(query);
-
-        protected override bool CanUndelete(BeatmapSetInfo existing, BeatmapSetInfo import)
+        public event Action<BeatmapSetInfo> ItemUpdated
         {
-            if (!base.CanUndelete(existing, import))
-                return false;
-
-            var existingIds = existing.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
-            var importIds = import.Beatmaps.Select(b => b.OnlineBeatmapID).OrderBy(i => i);
-
-            // force re-import if we are not in a sane state.
-            return existing.OnlineBeatmapSetID == import.OnlineBeatmapSetID && existingIds.SequenceEqual(importIds);
+            add => beatmapModelManager.ItemUpdated += value;
+            remove => beatmapModelManager.ItemUpdated -= value;
         }
 
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets() => GetAllUsableBeatmapSetsEnumerable().ToList();
-
-        /// <summary>
-        /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public IQueryable<BeatmapSetInfo> GetAllUsableBeatmapSetsEnumerable() => beatmaps.ConsumableItems.Where(s => !s.DeletePending && !s.Protected);
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.ConsumableItems.AsNoTracking().Where(query);
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().FirstOrDefault(query);
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
-
-        protected override string HumanisedModelName => "beatmap";
-
-        protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
+        public event Action<BeatmapSetInfo> ItemRemoved
         {
-            // let's make sure there are actually .osu files to import.
-            string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
-
-            if (string.IsNullOrEmpty(mapName))
-            {
-                Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
-                return null;
-            }
-
-            Beatmap beatmap;
-            using (var stream = new StreamReader(reader.GetStream(mapName)))
-                beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
-
-            return new BeatmapSetInfo
-            {
-                OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
-                Beatmaps = new List<BeatmapInfo>(),
-                Metadata = beatmap.Metadata,
-                DateAdded = DateTimeOffset.UtcNow
-            };
+            add => beatmapModelManager.ItemRemoved += value;
+            remove => beatmapModelManager.ItemRemoved -= value;
         }
 
-        /// <summary>
-        /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
-        /// </summary>
-        private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
+        public void Update(BeatmapSetInfo item)
         {
-            var beatmapInfos = new List<BeatmapInfo>();
-
-            foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
-            {
-                using (var raw = reader.GetStream(name))
-                using (var ms = new MemoryStream()) //we need a memory stream so we can seek
-                using (var sr = new StreamReader(ms))
-                {
-                    raw.CopyTo(ms);
-                    ms.Position = 0;
-
-                    var decoder = Decoder.GetDecoder<Beatmap>(sr);
-                    IBeatmap beatmap = decoder.Decode(sr);
-
-                    beatmap.BeatmapInfo.Path = name;
-                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
-                    beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
-
-                    var ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
-                    beatmap.BeatmapInfo.Ruleset = ruleset;
-                    // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
-                    beatmap.BeatmapInfo.Length = calculateLength(beatmap);
-                    beatmap.BeatmapInfo.BPM = beatmap.ControlPointInfo.BPMMode;
-
-                    beatmapInfos.Add(beatmap.BeatmapInfo);
-                }
-            }
-
-            return beatmapInfos;
+            beatmapModelManager.Update(item);
         }
 
-        private double calculateLength(IBeatmap b)
+        public bool Delete(BeatmapSetInfo item)
         {
-            if (!b.HitObjects.Any())
-                return 0;
-
-            var lastObject = b.HitObjects.Last();
-
-            double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
-            double startTime = b.HitObjects.First().StartTime;
-
-            return endTime - startTime;
+            return beatmapModelManager.Delete(item);
         }
 
-        /// <summary>
-        /// A dummy WorkingBeatmap for the purpose of retrieving a beatmap for star difficulty calculation.
-        /// </summary>
-        private class DummyConversionBeatmap : WorkingBeatmap
+        public void Delete(List<BeatmapSetInfo> items, bool silent = false)
         {
-            private readonly IBeatmap beatmap;
-
-            public DummyConversionBeatmap(IBeatmap beatmap)
-                : base(beatmap.BeatmapInfo, null)
-            {
-                this.beatmap = beatmap;
-            }
-
-            protected override IBeatmap GetBeatmap() => beatmap;
-            protected override Texture GetBackground() => null;
-            protected override Track GetTrack() => null;
+            beatmapModelManager.Delete(items, silent);
         }
 
-        private class BeatmapUpdateQueue
+        public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
         {
-            private readonly IAPIProvider api;
-
-            private const int update_queue_request_concurrency = 4;
-
-            private readonly ThreadedTaskScheduler updateScheduler = new ThreadedTaskScheduler(update_queue_request_concurrency, nameof(BeatmapUpdateQueue));
-
-            public BeatmapUpdateQueue(IAPIProvider api)
-            {
-                this.api = api;
-            }
-
-            public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
-            {
-                if (api?.State != APIState.Online)
-                    return Task.CompletedTask;
-
-                LogForModel(beatmapSet, "Performing online lookups...");
-                return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
-            }
-
-            // todo: expose this when we need to do individual difficulty lookups.
-            protected Task UpdateAsync(BeatmapSetInfo beatmapSet, BeatmapInfo beatmap, CancellationToken cancellationToken)
-                => Task.Factory.StartNew(() => update(beatmapSet, beatmap), cancellationToken, TaskCreationOptions.HideScheduler, updateScheduler);
-
-            private void update(BeatmapSetInfo set, BeatmapInfo beatmap)
-            {
-                if (api?.State != APIState.Online)
-                    return;
-
-                var req = new GetBeatmapRequest(beatmap);
-
-                req.Success += res =>
-                {
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
-
-                    beatmap.Status = res.Status;
-                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-                };
-
-                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
-
-                // intentionally blocking to limit web request concurrency
-                req.Perform(api);
-            }
+            beatmapModelManager.Undelete(items, silent);
         }
+
+        public void Undelete(BeatmapSetInfo item)
+        {
+            beatmapModelManager.Undelete(item);
+        }
+
+        #endregion
+
+        #region Implementation of ICanAcceptFiles
+
+        public Task Import(params string[] paths)
+        {
+            return beatmapModelManager.Import(paths);
+        }
+
+        public Task Import(params ImportTask[] tasks)
+        {
+            return beatmapModelManager.Import(tasks);
+        }
+
+        public Task<IEnumerable<ILive<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        {
+            return beatmapModelManager.Import(notification, tasks);
+        }
+
+        public Task<ILive<BeatmapSetInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return beatmapModelManager.Import(task, lowPriority, cancellationToken);
+        }
+
+        public Task<ILive<BeatmapSetInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return beatmapModelManager.Import(archive, lowPriority, cancellationToken);
+        }
+
+        public Task<ILive<BeatmapSetInfo>> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        {
+            return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
+        }
+
+        public IEnumerable<string> HandledExtensions => beatmapModelManager.HandledExtensions;
+
+        #endregion
+
+        #region Implementation of IWorkingBeatmapCache
+
+        public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo importedBeatmap) => workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
+
+        void IWorkingBeatmapCache.Invalidate(BeatmapSetInfo beatmapSetInfo) => workingBeatmapCache.Invalidate(beatmapSetInfo);
+        void IWorkingBeatmapCache.Invalidate(BeatmapInfo beatmapInfo) => workingBeatmapCache.Invalidate(beatmapInfo);
+
+        #endregion
+
+        #region Implementation of IModelFileManager<in BeatmapSetInfo,in BeatmapSetFileInfo>
+
+        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents)
+        {
+            beatmapModelManager.ReplaceFile(model, file, contents);
+        }
+
+        public void DeleteFile(BeatmapSetInfo model, BeatmapSetFileInfo file)
+        {
+            beatmapModelManager.DeleteFile(model, file);
+        }
+
+        public void AddFile(BeatmapSetInfo model, Stream contents, string filename)
+        {
+            beatmapModelManager.AddFile(model, contents, filename);
+        }
+
+        #endregion
+
+        #region Implementation of IDisposable
+
+        public void Dispose()
+        {
+            onlineBeatmapLookupQueue?.Dispose();
+        }
+
+        #endregion
+
+        #region Implementation of IPostImports<out BeatmapSetInfo>
+
+        public Action<IEnumerable<ILive<BeatmapSetInfo>>> PostImport
+        {
+            set => beatmapModelManager.PostImport = value;
+        }
+
+        #endregion
     }
 }

@@ -11,17 +11,16 @@ using osu.Game.Overlays.Settings;
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class PlayerSliderBar<T> : SettingsSlider<T>
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
 
-        protected override Drawable CreateControl() => new Sliderbar
+        protected override Drawable CreateControl() => new SliderBar
         {
-            Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X
         };
 
-        private class Sliderbar : OsuSliderBar<T>
+        private class SliderBar : OsuSliderBar<T>
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 AccentColour = colours.Yellow;
                 Nub.AccentColour = colours.Yellow;
                 Nub.GlowingAccentColour = colours.YellowLighter;
-                Nub.GlowColour = colours.YellowDarker;
+                Nub.GlowColour = colours.YellowDark;
             }
         }
     }

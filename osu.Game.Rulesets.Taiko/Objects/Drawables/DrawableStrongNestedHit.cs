@@ -1,25 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Objects.Drawables;
+using JetBrains.Annotations;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     /// <summary>
-    /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgement"/>s for <see cref="DrawableTaikoHitObject"/>s.
+    /// Used as a nested hitobject to provide <see cref="TaikoStrongJudgement"/>s for <see cref="DrawableTaikoStrongableHitObject{TObject,TStrongNestedObject}"/>s.
     /// </summary>
     public abstract class DrawableStrongNestedHit : DrawableTaikoHitObject
     {
-        public readonly DrawableHitObject MainObject;
+        public new DrawableTaikoHitObject ParentHitObject => (DrawableTaikoHitObject)base.ParentHitObject;
 
-        protected DrawableStrongNestedHit(StrongHitObject strong, DrawableHitObject mainObject)
-            : base(strong)
-        {
-            MainObject = mainObject;
-        }
-
-        protected override void UpdateState(ArmedState state)
+        protected DrawableStrongNestedHit([CanBeNull] StrongNestedHitObject nestedHit)
+            : base(nestedHit)
         {
         }
     }

@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Menu
         public IntroSequence()
         {
             RelativeSizeAxes = Axes.Both;
+            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.Menu
                         },
                     }
                 },
-                bigRing = new Ring(OsuColour.FromHex(@"B6C5E9"), 0.85f),
+                bigRing = new Ring(Color4Extensions.FromHex(@"B6C5E9"), 0.85f),
                 mediumRing = new Ring(Color4.White.Opacity(130), 0.7f),
                 smallRing = new Ring(Color4.White, 0.6f),
                 welcomeText = new OsuSpriteText
@@ -120,7 +121,7 @@ namespace osu.Game.Screens.Menu
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             Height = 0,
-                            Colour = OsuColour.FromHex(@"C6D8FF").Opacity(160),
+                            Colour = Color4Extensions.FromHex(@"C6D8FF").Opacity(160),
                         },
                         foregroundFill = new Box
                         {
@@ -138,28 +139,28 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Position = new Vector2(0, circle_offset),
-                    Colour = OsuColour.FromHex(@"AA92FF"),
+                    Colour = Color4Extensions.FromHex(@"AA92FF"),
                 },
                 blueCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Position = new Vector2(-circle_offset, 0),
-                    Colour = OsuColour.FromHex(@"8FE5FE"),
+                    Colour = Color4Extensions.FromHex(@"8FE5FE"),
                 },
                 yellowCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     Position = new Vector2(0, -circle_offset),
-                    Colour = OsuColour.FromHex(@"FFD64C"),
+                    Colour = Color4Extensions.FromHex(@"FFD64C"),
                 },
                 pinkCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     Position = new Vector2(circle_offset, 0),
-                    Colour = OsuColour.FromHex(@"e967a1"),
+                    Colour = Color4Extensions.FromHex(@"e967a1"),
                 },
             };
 
@@ -188,7 +189,7 @@ namespace osu.Game.Screens.Menu
 
             double remainingTime() => length - TransformDelay;
 
-            using (BeginDelayedSequence(250, true))
+            using (BeginDelayedSequence(250))
             {
                 welcomeText.FadeIn(700);
                 welcomeText.TransformSpacingTo(new Vector2(20, 0), remainingTime(), Easing.Out);
@@ -204,23 +205,24 @@ namespace osu.Game.Screens.Menu
                 const int line_end_offset = 120;
 
                 smallRing.Foreground.ResizeTo(1, line_duration, Easing.OutQuint);
+                smallRing.Delay(400).FadeColour(Color4.Black, 300);
 
                 lineTopLeft.MoveTo(new Vector2(-line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
                 lineTopRight.MoveTo(new Vector2(line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
                 lineBottomLeft.MoveTo(new Vector2(-line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
                 lineBottomRight.MoveTo(new Vector2(line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
 
-                using (BeginDelayedSequence(length * 0.56, true))
+                using (BeginDelayedSequence(length * 0.56))
                 {
                     bigRing.ResizeTo(logo_size, 500, Easing.InOutQuint);
                     bigRing.Foreground.Delay(250).ResizeTo(1, 850, Easing.OutQuint);
 
-                    using (BeginDelayedSequence(250, true))
+                    using (BeginDelayedSequence(250))
                     {
                         backgroundFill.ResizeHeightTo(1, remainingTime(), Easing.InOutQuart);
                         backgroundFill.RotateTo(-90, remainingTime(), Easing.InOutQuart);
 
-                        using (BeginDelayedSequence(50, true))
+                        using (BeginDelayedSequence(50))
                         {
                             foregroundFill.ResizeWidthTo(1, remainingTime(), Easing.InOutQuart);
                             foregroundFill.RotateTo(-90, remainingTime(), Easing.InOutQuart);
@@ -237,19 +239,19 @@ namespace osu.Game.Screens.Menu
                         purpleCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.InOutQuart);
                         purpleCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuart);
 
-                        using (BeginDelayedSequence(appear_delay, true))
+                        using (BeginDelayedSequence(appear_delay))
                         {
                             yellowCircle.MoveToY(-circle_size / 2, remainingTime(), Easing.InOutQuart);
                             yellowCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.InOutQuart);
                             yellowCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuart);
 
-                            using (BeginDelayedSequence(appear_delay, true))
+                            using (BeginDelayedSequence(appear_delay))
                             {
                                 blueCircle.MoveToX(-circle_size / 2, remainingTime(), Easing.InOutQuart);
                                 blueCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.InOutQuart);
                                 blueCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuart);
 
-                                using (BeginDelayedSequence(appear_delay, true))
+                                using (BeginDelayedSequence(appear_delay))
                                 {
                                     pinkCircle.MoveToX(circle_size / 2, remainingTime(), Easing.InOutQuart);
                                     pinkCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.InOutQuart);

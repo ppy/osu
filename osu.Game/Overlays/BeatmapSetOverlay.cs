@@ -2,86 +2,68 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
-using osu.Game.Rulesets;
+using osu.Game.Overlays.Comments;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : FullscreenOverlay
+    public class BeatmapSetOverlay : OnlineOverlay<BeatmapSetHeader>
     {
         public const float X_PADDING = 40;
-        public const float TOP_PADDING = 25;
+        public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-        protected readonly Header Header;
 
-        private RulesetStore rulesets;
-
-        private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
+        private readonly Bindable<APIBeatmapSet> beatmapSet = new Bindable<APIBeatmapSet>();
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
+            : base(OverlayColourScheme.Blue)
         {
-            OsuScrollContainer scroll;
             Info info;
-            ScoresContainer scoreContainer;
+            CommentsSection comments;
 
-            Children = new Drawable[]
+            Child = new FillFlowContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
-                },
-                scroll = new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    info = new Info(),
+                    new ScoresContainer
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            Header = new Header(),
-                            info = new Info(),
-                            scoreContainer = new ScoresContainer(),
-                        },
+                        Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
                     },
-                },
+                    comments = new CommentsSection()
+                }
             };
 
             Header.BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
+            comments.BeatmapSet.BindTo(beatmapSet);
 
-            Header.Picker.Beatmap.ValueChanged += b =>
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
             {
-                info.Beatmap = b.NewValue;
-                scoreContainer.Beatmap = b.NewValue;
-
-                scroll.ScrollToStart();
+                info.BeatmapInfo = b.NewValue;
+                ScrollFlow.ScrollToStart();
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            this.rulesets = rulesets;
-        }
+        protected override BeatmapSetHeader CreateHeader() => new BeatmapSetHeader();
+
+        protected override Color4 BackgroundColour => ColourProvider.Background6;
 
         protected override void PopOutComplete()
         {
@@ -102,8 +84,8 @@ namespace osu.Game.Overlays
             var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
             req.Success += res =>
             {
-                beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                beatmapSet.Value = res;
+                Header.HeaderContent.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineID == beatmapId);
             };
             API.Queue(req);
 
@@ -115,7 +97,7 @@ namespace osu.Game.Overlays
             beatmapSet.Value = null;
 
             var req = new GetBeatmapSetRequest(beatmapSetId);
-            req.Success += res => beatmapSet.Value = res.ToBeatmapSet(rulesets);
+            req.Success += res => beatmapSet.Value = res;
             API.Queue(req);
 
             Show();
@@ -125,10 +107,35 @@ namespace osu.Game.Overlays
         /// Show an already fully-populated beatmap set.
         /// </summary>
         /// <param name="set">The set to show.</param>
-        public void ShowBeatmapSet(BeatmapSetInfo set)
+        public void ShowBeatmapSet(APIBeatmapSet set)
         {
             beatmapSet.Value = set;
             Show();
+        }
+
+        private class CommentsSection : BeatmapSetLayoutSection
+        {
+            public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
+
+            public CommentsSection()
+            {
+                CommentsContainer comments;
+
+                Add(comments = new CommentsContainer());
+
+                BeatmapSet.BindValueChanged(beatmapSet =>
+                {
+                    if (beatmapSet.NewValue?.OnlineID > 0)
+                    {
+                        Show();
+                        comments.ShowComments(CommentableType.Beatmapset, beatmapSet.NewValue.OnlineID);
+                    }
+                    else
+                    {
+                        Hide();
+                    }
+                }, true);
+            }
         }
     }
 }

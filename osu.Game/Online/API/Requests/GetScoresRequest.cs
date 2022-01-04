@@ -12,47 +12,28 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetScoresRequest : APIRequest<APILegacyScores>
+    public class GetScoresRequest : APIRequest<APIScoresCollection>
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly IBeatmapInfo beatmapInfo;
         private readonly BeatmapLeaderboardScope scope;
-        private readonly RulesetInfo ruleset;
-        private readonly IEnumerable<Mod> mods;
+        private readonly IRulesetInfo ruleset;
+        private readonly IEnumerable<IMod> mods;
 
-        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<Mod> mods = null)
+        public GetScoresRequest(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<IMod> mods = null)
         {
-            if (!beatmap.OnlineBeatmapID.HasValue)
-                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
+            if (beatmapInfo.OnlineID <= 0)
+                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(IBeatmapInfo.OnlineID)}.");
 
             if (scope == BeatmapLeaderboardScope.Local)
                 throw new InvalidOperationException("Should not attempt to request online scores for a local scoped leaderboard");
 
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
             this.scope = scope;
             this.ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
-            this.mods = mods ?? Array.Empty<Mod>();
-
-            Success += onSuccess;
+            this.mods = mods ?? Array.Empty<IMod>();
         }
 
-        private void onSuccess(APILegacyScores r)
-        {
-            foreach (APILegacyScoreInfo score in r.Scores)
-            {
-                score.Beatmap = beatmap;
-                score.Ruleset = ruleset;
-            }
-
-            var userScore = r.UserScore;
-
-            if (userScore != null)
-            {
-                userScore.Score.Beatmap = beatmap;
-                userScore.Score.Ruleset = ruleset;
-            }
-        }
-
-        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores{createQueryParameters()}";
+        protected override string Target => $@"beatmaps/{beatmapInfo.OnlineID}/scores{createQueryParameters()}";
 
         private string createQueryParameters()
         {

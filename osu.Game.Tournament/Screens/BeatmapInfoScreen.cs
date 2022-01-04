@@ -4,14 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class BeatmapInfoScreen : TournamentScreen
+    public abstract class BeatmapInfoScreen : TournamentMatchScreen
     {
         protected readonly SongBar SongBar;
 
@@ -21,6 +21,7 @@ namespace osu.Game.Tournament.Screens
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
+                Depth = float.MinValue,
             });
         }
 
@@ -36,7 +37,7 @@ namespace osu.Game.Tournament.Screens
             SongBar.Mods = mods.NewValue;
         }
 
-        private void beatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
+        private void beatmapChanged(ValueChangedEvent<APIBeatmap> beatmap)
         {
             SongBar.FadeInFromZero(300, Easing.OutQuint);
             SongBar.Beatmap = beatmap.NewValue;

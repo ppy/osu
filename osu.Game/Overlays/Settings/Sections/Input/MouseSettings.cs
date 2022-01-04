@@ -1,79 +1,127 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class MouseSettings : SettingsSubsection
     {
-        protected override string Header => "Mouse";
+        private readonly MouseHandler mouseHandler;
 
-        private readonly BindableBool rawInputToggle = new BindableBool();
-        private Bindable<string> ignoredInputHandler;
-        private SensitivitySetting sensitivity;
+        protected override LocalisableString Header => MouseSettingsStrings.Mouse;
+
+        private Bindable<double> handlerSensitivity;
+
+        private Bindable<double> localSensitivity;
+
+        private Bindable<WindowMode> windowMode;
+        private SettingsEnumDropdown<OsuConfineMouseMode> confineMouseModeSetting;
+        private Bindable<bool> relativeMode;
+
+        private SettingsCheckbox highPrecisionMouse;
+
+        public MouseSettings(MouseHandler mouseHandler)
+        {
+            this.mouseHandler = mouseHandler;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
+            // use local bindable to avoid changing enabled state of game host's bindable.
+            handlerSensitivity = mouseHandler.Sensitivity.GetBoundCopy();
+            localSensitivity = handlerSensitivity.GetUnboundCopy();
+
+            relativeMode = mouseHandler.UseRelativeMode.GetBoundCopy();
+            windowMode = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode);
+
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                highPrecisionMouse = new SettingsCheckbox
                 {
-                    LabelText = "Raw input",
-                    Bindable = rawInputToggle
+                    LabelText = MouseSettingsStrings.HighPrecisionMouse,
+                    TooltipText = MouseSettingsStrings.HighPrecisionMouseTooltip,
+                    Current = relativeMode,
+                    Keywords = new[] { @"raw", @"input", @"relative", @"cursor" }
                 },
-                sensitivity = new SensitivitySetting
+                new SensitivitySetting
                 {
-                    LabelText = "Cursor sensitivity",
-                    Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
+                    LabelText = MouseSettingsStrings.CursorSensitivity,
+                    Current = localSensitivity
                 },
-                new SettingsCheckbox
+                confineMouseModeSetting = new SettingsEnumDropdown<OsuConfineMouseMode>
                 {
-                    LabelText = "Map absolute input to window",
-                    Bindable = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
-                },
-                new SettingsEnumDropdown<ConfineMouseMode>
-                {
-                    LabelText = "Confine mouse cursor to window",
-                    Bindable = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
+                    LabelText = MouseSettingsStrings.ConfineMouseMode,
+                    Current = osuConfig.GetBindable<OsuConfineMouseMode>(OsuSetting.ConfineMouseMode)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Disable mouse wheel during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
+                    LabelText = MouseSettingsStrings.DisableMouseWheelVolumeAdjust,
+                    TooltipText = MouseSettingsStrings.DisableMouseWheelVolumeAdjustTooltip,
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Disable mouse buttons during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+                    LabelText = MouseSettingsStrings.DisableMouseButtons,
+                    Current = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
+        }
 
-            rawInputToggle.ValueChanged += enabled =>
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            relativeMode.BindValueChanged(relative => localSensitivity.Disabled = !relative.NewValue, true);
+
+            handlerSensitivity.BindValueChanged(val =>
             {
-                // this is temporary until we support per-handler settings.
-                const string raw_mouse_handler = @"OsuTKRawMouseHandler";
-                const string standard_mouse_handler = @"OsuTKMouseHandler";
+                bool disabled = localSensitivity.Disabled;
 
-                ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
-            };
+                localSensitivity.Disabled = false;
+                localSensitivity.Value = val.NewValue;
+                localSensitivity.Disabled = disabled;
+            }, true);
 
-            ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
-            ignoredInputHandler.ValueChanged += handler =>
+            localSensitivity.BindValueChanged(val => handlerSensitivity.Value = val.NewValue);
+
+            windowMode.BindValueChanged(mode =>
             {
-                bool raw = !handler.NewValue.Contains("Raw");
-                rawInputToggle.Value = raw;
-                sensitivity.Bindable.Disabled = !raw;
-            };
+                bool isFullscreen = mode.NewValue == WindowMode.Fullscreen;
 
-            ignoredInputHandler.TriggerChange();
+                if (isFullscreen)
+                {
+                    confineMouseModeSetting.Current.Disabled = true;
+                    confineMouseModeSetting.TooltipText = MouseSettingsStrings.NotApplicableFullscreen;
+                }
+                else
+                {
+                    confineMouseModeSetting.Current.Disabled = false;
+                    confineMouseModeSetting.TooltipText = string.Empty;
+                }
+            }, true);
+
+            highPrecisionMouse.Current.BindValueChanged(highPrecision =>
+            {
+                if (RuntimeInfo.OS != RuntimeInfo.Platform.Windows)
+                {
+                    if (highPrecision.NewValue)
+                        highPrecisionMouse.WarningText = MouseSettingsStrings.HighPrecisionPlatformWarning;
+                    else
+                        highPrecisionMouse.WarningText = null;
+                }
+            }, true);
         }
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
@@ -87,7 +135,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : $"{base.TooltipText}x";
+            public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
         }
     }
 }

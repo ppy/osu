@@ -1,112 +1,268 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointPiece : CompositeDrawable
+    /// <summary>
+    /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
+    /// </summary>
+    public class PathControlPointPiece : BlueprintPiece<Slider>, IHasTooltip
     {
-        private readonly Slider slider;
-        private readonly int index;
+        public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
-        private readonly Path path;
-        private readonly CircularContainer marker;
+        public Action<PathControlPoint> DragStarted;
+        public Action<DragEvent> DragInProgress;
+        public Action DragEnded;
+
+        public List<PathControlPoint> PointsInSegment;
+
+        public readonly BindableBool IsSelected = new BindableBool();
+        public readonly PathControlPoint ControlPoint;
+
+        private readonly Slider slider;
+        private readonly Container marker;
+        private readonly Drawable markerRing;
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public PathControlPointPiece(Slider slider, int index)
+        private IBindable<Vector2> sliderPosition;
+        private IBindable<float> sliderScale;
+
+        public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
-            this.index = index;
+            ControlPoint = controlPoint;
+
+            // we don't want to run the path type update on construction as it may inadvertently change the slider.
+            cachePoints(slider);
+
+            slider.Path.Version.BindValueChanged(_ =>
+            {
+                cachePoints(slider);
+                updatePathType();
+            });
+
+            controlPoint.Changed += updateMarkerDisplay;
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                path = new SmoothPath
-                {
-                    Anchor = Anchor.Centre,
-                    PathRadius = 1
-                },
-                marker = new CircularContainer
+                marker = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(10),
-                    Masking = true,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    AutoSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(20),
+                        },
+                        markerRing = new CircularContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(28),
+                            Masking = true,
+                            BorderThickness = 2,
+                            BorderColour = Color4.White,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true
+                            }
+                        }
+                    }
                 }
             };
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
-            Position = slider.StackedPosition + slider.Path.ControlPoints[index];
+            sliderPosition = slider.PositionBindable.GetBoundCopy();
+            sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
 
-            marker.Colour = isSegmentSeparator ? colours.Red : colours.Yellow;
+            sliderScale = slider.ScaleBindable.GetBoundCopy();
+            sliderScale.BindValueChanged(_ => updateMarkerDisplay());
 
-            path.ClearVertices();
+            IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
-            if (index != slider.Path.ControlPoints.Length - 1)
-            {
-                path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[index + 1] - slider.Path.ControlPoints[index]);
-            }
-
-            path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
+            updateMarkerDisplay();
         }
 
+        // The connecting path is excluded from positional input
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnDragStart(DragStartEvent e) => true;
-
-        protected override bool OnDrag(DragEvent e)
+        protected override bool OnHover(HoverEvent e)
         {
-            var newControlPoints = slider.Path.ControlPoints.ToArray();
-
-            if (index == 0)
-            {
-                // Special handling for the head - only the position of the slider changes
-                slider.Position += e.Delta;
-
-                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
-                for (int i = 1; i < newControlPoints.Length; i++)
-                    newControlPoints[i] -= e.Delta;
-            }
-            else
-                newControlPoints[index] += e.Delta;
-
-            if (isSegmentSeparatorWithNext)
-                newControlPoints[index + 1] = newControlPoints[index];
-
-            if (isSegmentSeparatorWithPrevious)
-                newControlPoints[index - 1] = newControlPoints[index];
-
-            slider.Path = new SliderPath(slider.Path.Type, newControlPoints);
-
-            return true;
+            updateMarkerDisplay();
+            return false;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e) => true;
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateMarkerDisplay();
+        }
 
-        private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
+        // Used to pair up mouse down/drag events with their corresponding mouse up events,
+        // to avoid deselecting the piece by accident when the mouse up corresponding to the mouse down/drag fires.
+        private bool keepSelection;
 
-        private bool isSegmentSeparatorWithNext => index < slider.Path.ControlPoints.Length - 1 && slider.Path.ControlPoints[index + 1] == slider.Path.ControlPoints[index];
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (RequestSelection == null)
+                return false;
 
-        private bool isSegmentSeparatorWithPrevious => index > 0 && slider.Path.ControlPoints[index - 1] == slider.Path.ControlPoints[index];
+            switch (e.Button)
+            {
+                case MouseButton.Left:
+                    // if control is pressed, do not do anything as the user may be adding to current selection
+                    // or dragging all currently selected control points.
+                    // if it isn't and the user's intent is to deselect, deselection will happen on mouse up.
+                    if (e.ControlPressed && IsSelected.Value)
+                        return true;
+
+                    RequestSelection.Invoke(this, e);
+                    keepSelection = true;
+
+                    return true;
+
+                case MouseButton.Right:
+                    if (!IsSelected.Value)
+                        RequestSelection.Invoke(this, e);
+
+                    keepSelection = true;
+                    return false; // Allow context menu to show
+            }
+
+            return false;
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            base.OnMouseUp(e);
+
+            // ctrl+click deselects this piece, but only if this event
+            // wasn't immediately preceded by a matching mouse down or drag.
+            if (IsSelected.Value && e.ControlPressed && !keepSelection)
+                IsSelected.Value = false;
+
+            keepSelection = false;
+        }
+
+        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (RequestSelection == null)
+                return false;
+
+            if (e.Button == MouseButton.Left)
+            {
+                DragStarted?.Invoke(ControlPoint);
+                keepSelection = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override void OnDrag(DragEvent e) => DragInProgress?.Invoke(e);
+
+        protected override void OnDragEnd(DragEndEvent e) => DragEnded?.Invoke();
+
+        private void cachePoints(Slider slider) => PointsInSegment = slider.Path.PointsInSegment(ControlPoint);
+
+        /// <summary>
+        /// Handles correction of invalid path types.
+        /// </summary>
+        private void updatePathType()
+        {
+            if (ControlPoint.Type != PathType.PerfectCurve)
+                return;
+
+            if (PointsInSegment.Count > 3)
+                ControlPoint.Type = PathType.Bezier;
+
+            if (PointsInSegment.Count != 3)
+                return;
+
+            ReadOnlySpan<Vector2> points = PointsInSegment.Select(p => p.Position).ToArray();
+            RectangleF boundingBox = PathApproximator.CircularArcBoundingBox(points);
+            if (boundingBox.Width >= 640 || boundingBox.Height >= 480)
+                ControlPoint.Type = PathType.Bezier;
+        }
+
+        /// <summary>
+        /// Updates the state of the circular control point marker.
+        /// </summary>
+        private void updateMarkerDisplay()
+        {
+            Position = slider.StackedPosition + ControlPoint.Position;
+
+            markerRing.Alpha = IsSelected.Value ? 1 : 0;
+
+            Color4 colour = getColourFromNodeType();
+
+            if (IsHovered || IsSelected.Value)
+                colour = colour.Lighten(1);
+
+            marker.Colour = colour;
+            marker.Scale = new Vector2(slider.Scale);
+        }
+
+        private Color4 getColourFromNodeType()
+        {
+            if (!(ControlPoint.Type is PathType pathType))
+                return colours.Yellow;
+
+            switch (pathType)
+            {
+                case PathType.Catmull:
+                    return colours.SeaFoam;
+
+                case PathType.Bezier:
+                    return colours.Pink;
+
+                case PathType.PerfectCurve:
+                    return colours.PurpleDark;
+
+                default:
+                    return colours.Red;
+            }
+        }
+
+        public LocalisableString TooltipText => ControlPoint.Type.ToString() ?? string.Empty;
     }
 }

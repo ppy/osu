@@ -4,23 +4,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osuTK;
+using System.Threading;
 
 namespace osu.Game.Rulesets.Objects
 {
     public static class SliderEventGenerator
     {
+        // ReSharper disable once MethodOverloadWithOptionalParameter
         public static IEnumerable<SliderEventDescriptor> Generate(double startTime, double spanDuration, double velocity, double tickDistance, double totalDistance, int spanCount,
-                                                                  double? legacyLastTickOffset)
+                                                                  double? legacyLastTickOffset, CancellationToken cancellationToken = default)
         {
             // A very lenient maximum length of a slider for ticks to be generated.
             // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
             const double max_length = 100000;
 
-            var length = Math.Min(max_length, totalDistance);
-            tickDistance = MathHelper.Clamp(tickDistance, 0, length);
+            double length = Math.Min(max_length, totalDistance);
+            tickDistance = Math.Clamp(tickDistance, 0, length);
 
-            var minDistanceFromEnd = velocity * 10;
+            double minDistanceFromEnd = velocity * 10;
 
             yield return new SliderEventDescriptor
             {
@@ -33,12 +34,12 @@ namespace osu.Game.Rulesets.Objects
 
             if (tickDistance != 0)
             {
-                for (var span = 0; span < spanCount; span++)
+                for (int span = 0; span < spanCount; span++)
                 {
-                    var spanStartTime = startTime + span * spanDuration;
-                    var reversed = span % 2 == 1;
+                    double spanStartTime = startTime + span * spanDuration;
+                    bool reversed = span % 2 == 1;
 
-                    var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd);
+                    var ticks = generateTicks(span, spanStartTime, spanDuration, reversed, length, tickDistance, minDistanceFromEnd, cancellationToken);
 
                     if (reversed)
                     {
@@ -109,18 +110,21 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="length">The length of the path.</param>
         /// <param name="tickDistance">The distance between each tick.</param>
         /// <param name="minDistanceFromEnd">The distance from the end of the path at which ticks are not allowed to be added.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A <see cref="SliderEventDescriptor"/> for each tick. If <paramref name="reversed"/> is true, the ticks will be returned in reverse-StartTime order.</returns>
         private static IEnumerable<SliderEventDescriptor> generateTicks(int spanIndex, double spanStartTime, double spanDuration, bool reversed, double length, double tickDistance,
-                                                                        double minDistanceFromEnd)
+                                                                        double minDistanceFromEnd, CancellationToken cancellationToken = default)
         {
-            for (var d = tickDistance; d <= length; d += tickDistance)
+            for (double d = tickDistance; d <= length; d += tickDistance)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (d >= length - minDistanceFromEnd)
                     break;
 
                 // Always generate ticks from the start of the path rather than the span to ensure that ticks in repeat spans are positioned identically to those in non-repeat spans
-                var pathProgress = d / length;
-                var timeProgress = reversed ? 1 - pathProgress : pathProgress;
+                double pathProgress = d / length;
+                double timeProgress = reversed ? 1 - pathProgress : pathProgress;
 
                 yield return new SliderEventDescriptor
                 {

@@ -2,16 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 
 namespace osu.Game.IO
 {
@@ -30,13 +28,6 @@ namespace osu.Game.IO
             Store = new StorageBackedResourceStore(Storage);
         }
 
-        /// <summary>
-        /// Perform a lookup query on available <see cref="FileInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public IEnumerable<FileInfo> QueryFiles(Expression<Func<FileInfo, bool>> query) => ContextFactory.Get().Set<FileInfo>().AsNoTracking().Where(f => f.ReferenceCount > 0).Where(query);
-
         public FileInfo Add(Stream data, bool reference = true)
         {
             using (var usage = ContextFactory.GetForWrite())
@@ -47,10 +38,19 @@ namespace osu.Game.IO
 
                 var info = existing ?? new FileInfo { Hash = hash };
 
-                string path = info.StoragePath;
+                string path = info.GetStoragePath();
 
                 // we may be re-adding a file to fix missing store entries.
-                if (!Storage.Exists(path))
+                bool requiresCopy = !Storage.Exists(path);
+
+                if (!requiresCopy)
+                {
+                    // even if the file already exists, check the existing checksum for safety.
+                    using (var stream = Storage.GetStream(path))
+                        requiresCopy |= stream.ComputeSHA2Hash() != hash;
+                }
+
+                if (requiresCopy)
                 {
                     data.Seek(0, SeekOrigin.Begin);
 
@@ -111,7 +111,7 @@ namespace osu.Game.IO
                 {
                     try
                     {
-                        Storage.Delete(f.StoragePath);
+                        Storage.Delete(f.GetStoragePath());
                         context.FileInfo.Remove(f);
                     }
                     catch (Exception e)

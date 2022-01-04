@@ -3,12 +3,16 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
@@ -18,6 +22,15 @@ namespace osu.Game.Overlays.OSD
     public class TrackedSettingToast : Toast
     {
         private const int lights_bottom_margin = 40;
+
+        private readonly int optionCount;
+        private readonly int selectedOption = -1;
+
+        private Sample sampleOn;
+        private Sample sampleOff;
+        private Sample sampleChange;
+
+        private Bindable<double?> lastPlaybackTime;
 
         public TrackedSettingToast(SettingDescription description)
             : base(description.Name, description.Value, description.Shortcut)
@@ -46,9 +59,6 @@ namespace osu.Game.Overlays.OSD
                 }
             };
 
-            int optionCount = 0;
-            int selectedOption = -1;
-
             switch (description.RawValue)
             {
                 case bool val:
@@ -67,6 +77,54 @@ namespace osu.Game.Overlays.OSD
 
             for (int i = 0; i < optionCount; i++)
                 optionLights.Add(new OptionLight { Glowing = i == selectedOption });
+        }
+
+        [Resolved]
+        private SessionStatics statics { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            playSound();
+        }
+
+        private void playSound()
+        {
+            // This debounce code roughly follows what we're using in HoverSampleDebounceComponent.
+            // We're sharing the existing static for hover sounds because it doesn't really matter if they block each other.
+            // This is a simple solution, but if this ever becomes a problem (or other performance issues arise),
+            // the whole toast system should be rewritten to avoid recreating this drawable each time a value changes.
+            lastPlaybackTime = statics.GetBindable<double?>(Static.LastHoverSoundPlaybackTime);
+
+            bool enoughTimePassedSinceLastPlayback = !lastPlaybackTime.Value.HasValue || Time.Current - lastPlaybackTime.Value >= OsuGameBase.SAMPLE_DEBOUNCE_TIME;
+
+            if (!enoughTimePassedSinceLastPlayback) return;
+
+            if (optionCount == 1)
+            {
+                if (selectedOption == 0)
+                    sampleOn?.Play();
+                else
+                    sampleOff?.Play();
+            }
+            else
+            {
+                if (sampleChange == null) return;
+
+                sampleChange.Frequency.Value = 1 + (double)selectedOption / (optionCount - 1) * 0.25f;
+                sampleChange.Play();
+            }
+
+            lastPlaybackTime.Value = Time.Current;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleOn = audio.Samples.Get("UI/osd-on");
+            sampleOff = audio.Samples.Get("UI/osd-off");
+            sampleChange = audio.Samples.Get("UI/osd-change");
         }
 
         private class OptionLight : Container

@@ -8,26 +8,26 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Lists;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Chat
 {
     public class Channel
     {
-        public readonly int MaxHistory = 300;
+        public const int MAX_HISTORY = 300;
 
         /// <summary>
         /// Contains every joined user except the current logged in user. Currently only returned for PM channels.
         /// </summary>
-        public readonly ObservableCollection<User> Users = new ObservableCollection<User>();
+        public readonly ObservableCollection<APIUser> Users = new ObservableCollection<APIUser>();
 
         [JsonProperty(@"users")]
-        private long[] userIds
+        private int[] userIds
         {
             set
             {
-                foreach (var id in value)
-                    Users.Add(new User { Id = id });
+                foreach (int id in value)
+                    Users.Add(new APIUser { Id = id });
             }
         }
 
@@ -35,6 +35,11 @@ namespace osu.Game.Online.Chat
         /// Contains all the messages send in the channel.
         /// </summary>
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+
+        /// <summary>
+        /// Contains all the messages that weren't read by the user.
+        /// </summary>
+        public IEnumerable<Message> UnreadMessages => Messages.Where(m => LastReadId < m.Id);
 
         /// <summary>
         /// Contains all the messages that are still pending for submission to the server.
@@ -56,7 +61,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public event Action<Message> MessageRemoved;
 
-        public bool ReadOnly => false; //todo not yet used.
+        public bool ReadOnly => false; // todo: not yet used.
 
         public override string ToString() => Name;
 
@@ -75,12 +80,14 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"last_message_id")]
         public long? LastMessageId;
 
+        [JsonProperty(@"last_read_id")]
+        public long? LastReadId;
+
         /// <summary>
-        /// Signalles if the current user joined this channel or not. Defaults to false.
+        /// Signals if the current user joined this channel or not. Defaults to false.
+        /// Note that this does not guarantee a join has completed. Check Id > 0 for confirmation.
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
-
-        public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
         public Channel()
@@ -91,7 +98,7 @@ namespace osu.Game.Online.Chat
         /// Create a private messaging channel with the specified user.
         /// </summary>
         /// <param name="user">The user to create the private conversation with.</param>
-        public Channel(User user)
+        public Channel(APIUser user)
         {
             Type = ChannelType.PM;
             Users.Add(user);
@@ -124,7 +131,7 @@ namespace osu.Game.Online.Chat
 
             Messages.AddRange(messages);
 
-            var maxMessageId = messages.Max(m => m.Id);
+            long? maxMessageId = messages.Max(m => m.Id);
             if (maxMessageId > LastMessageId)
                 LastMessageId = maxMessageId;
 
@@ -162,8 +169,8 @@ namespace osu.Game.Online.Chat
         {
             // never purge local echos
             int messageCount = Messages.Count - pendingMessages.Count;
-            if (messageCount > MaxHistory)
-                Messages.RemoveRange(0, messageCount - MaxHistory);
+            if (messageCount > MAX_HISTORY)
+                Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
     }
 }

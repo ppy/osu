@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -20,17 +22,20 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         public Action<ScoreInfo> ScoreSelected;
 
-        private BeatmapInfo beatmap;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
-        public BeatmapInfo Beatmap
+        private BeatmapInfo beatmapInfo;
+
+        public BeatmapInfo BeatmapInfo
         {
-            get => beatmap;
+            get => beatmapInfo;
             set
             {
-                if (beatmap == value)
+                if (beatmapInfo == value)
                     return;
 
-                beatmap = value;
+                beatmapInfo = value;
                 Scores = null;
 
                 UpdateScores();
@@ -77,16 +82,51 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     UpdateScores();
             };
+
+            scoreManager.ItemRemoved += scoreStoreChanged;
+            scoreManager.ItemUpdated += scoreStoreChanged;
+        }
+
+        protected override void Reset()
+        {
+            base.Reset();
+            TopScore = null;
+        }
+
+        private void scoreStoreChanged(ScoreInfo score)
+        {
+            if (Scope != BeatmapLeaderboardScope.Local)
+                return;
+
+            if (BeatmapInfo?.ID != score.BeatmapInfoID)
+                return;
+
+            RefreshScores();
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
+        private CancellationTokenSource loadCancellationSource;
+
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
+            loadCancellationSource?.Cancel();
+            loadCancellationSource = new CancellationTokenSource();
+
+            var cancellationToken = loadCancellationSource.Token;
+
+            var fetchBeatmapInfo = BeatmapInfo;
+
+            if (fetchBeatmapInfo == null)
+            {
+                PlaceholderState = PlaceholderState.NoneSelected;
+                return null;
+            }
+
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.Beatmap.ID == Beatmap.ID && s.Ruleset.ID == ruleset.Value.ID);
+                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
 
                 if (filterMods && !mods.Value.Any())
                 {
@@ -101,8 +141,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                 }
 
-                Scores = scores.OrderByDescending(s => s.TotalScore).ToArray();
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
+                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
             }
@@ -113,7 +153,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (Beatmap?.OnlineBeatmapID == null || Beatmap?.Status <= BeatmapSetOnlineStatus.Pending)
+            if (fetchBeatmapInfo.OnlineID == null || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
@@ -133,16 +173,43 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(fetchBeatmapInfo, ruleset.Value ?? fetchBeatmapInfo.Ruleset, Scope, requestMods);
 
-            req.Success += r => scoresCallback?.Invoke(r.Scores);
+            req.Success += r =>
+            {
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
+                            .ContinueWith(ordered => Schedule(() =>
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                    return;
+
+                                scoresCallback?.Invoke(ordered.Result);
+                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
+            };
 
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index)
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index, IsOnlineScope)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
+
+        protected override LeaderboardScore CreateDrawableTopScore(ScoreInfo model) => new LeaderboardScore(model, model.Position, false)
+        {
+            Action = () => ScoreSelected?.Invoke(model)
+        };
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (scoreManager != null)
+            {
+                scoreManager.ItemRemoved -= scoreStoreChanged;
+                scoreManager.ItemUpdated -= scoreStoreChanged;
+            }
+        }
     }
 }

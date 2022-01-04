@@ -12,7 +12,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -45,7 +46,6 @@ namespace osu.Game.Screens.Play.HUD
             {
                 text = new OsuSpriteText
                 {
-                    Text = "hold for menu",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
@@ -60,9 +60,23 @@ namespace osu.Game.Screens.Play.HUD
             AutoSizeAxes = Axes.Both;
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private Bindable<float> activationDelay;
+
         protected override void LoadComplete()
         {
+            activationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            activationDelay.BindValueChanged(v =>
+            {
+                text.Text = v.NewValue > 0
+                    ? "hold for menu"
+                    : "press for menu";
+            }, true);
+
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+
             base.LoadComplete();
         }
 
@@ -74,11 +88,6 @@ namespace osu.Game.Screens.Play.HUD
             return base.OnMouseMove(e);
         }
 
-        public bool PauseOnFocusLost
-        {
-            set => button.PauseOnFocusLost = value;
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -86,9 +95,11 @@ namespace osu.Game.Screens.Play.HUD
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
             else
+            {
                 Alpha = Interpolation.ValueAt(
-                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
+                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+            }
         }
 
         private class Button : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
@@ -103,8 +114,6 @@ namespace osu.Game.Screens.Play.HUD
 
             public Action HoverGained;
             public Action HoverLost;
-
-            private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, Framework.Game game)
@@ -148,14 +157,6 @@ namespace osu.Game.Screens.Play.HUD
                 };
 
                 bind();
-
-                gameActive.BindTo(game.IsActive);
-            }
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-                gameActive.BindValueChanged(_ => updateActive(), true);
             }
 
             private void bind()
@@ -205,36 +206,15 @@ namespace osu.Game.Screens.Play.HUD
                 base.OnHoverLost(e);
             }
 
-            private bool pauseOnFocusLost = true;
-
-            public bool PauseOnFocusLost
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                set
-                {
-                    if (pauseOnFocusLost == value)
-                        return;
+                if (e.Repeat)
+                    return false;
 
-                    pauseOnFocusLost = value;
-                    if (IsLoaded)
-                        updateActive();
-                }
-            }
-
-            private void updateActive()
-            {
-                if (!pauseOnFocusLost || IsPaused.Value) return;
-
-                if (gameActive.Value)
-                    AbortConfirm();
-                else
-                    BeginConfirm();
-            }
-
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
+                switch (e.Action)
                 {
                     case GlobalAction.Back:
+                    case GlobalAction.PauseGameplay: // in the future this behaviour will differ for replays etc.
                         if (!pendingAnimation)
                             BeginConfirm();
                         return true;
@@ -243,16 +223,15 @@ namespace osu.Game.Screens.Play.HUD
                 return false;
             }
 
-            public bool OnReleased(GlobalAction action)
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
             {
-                switch (action)
+                switch (e.Action)
                 {
                     case GlobalAction.Back:
+                    case GlobalAction.PauseGameplay:
                         AbortConfirm();
-                        return true;
+                        break;
                 }
-
-                return false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
@@ -262,11 +241,10 @@ namespace osu.Game.Screens.Play.HUD
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 if (!e.HasAnyButtonPressed)
                     AbortConfirm();
-                return true;
             }
         }
     }

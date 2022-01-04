@@ -3,7 +3,8 @@
 
 using System;
 using System.Threading.Tasks;
-using osu.Framework.Graphics;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
 namespace osu.Game.Online
@@ -11,7 +12,7 @@ namespace osu.Game.Online
     /// <summary>
     /// A component which requires a constant polling process.
     /// </summary>
-    public abstract class PollingComponent : Component
+    public abstract class PollingComponent : CompositeDrawable // switch away from Component because InternalChildren are used in usages.
     {
         private double? lastTimePolled;
 
@@ -19,22 +20,11 @@ namespace osu.Game.Online
 
         private bool pollingActive;
 
-        private double timeBetweenPolls;
-
         /// <summary>
         /// The time in milliseconds to wait between polls.
         /// Setting to zero stops all polling.
         /// </summary>
-        public double TimeBetweenPolls
-        {
-            get => timeBetweenPolls;
-            set
-            {
-                timeBetweenPolls = value;
-                scheduledPoll?.Cancel();
-                pollIfNecessary();
-            }
-        }
+        public readonly Bindable<double> TimeBetweenPolls = new Bindable<double>();
 
         /// <summary>
         ///
@@ -42,7 +32,13 @@ namespace osu.Game.Online
         /// <param name="timeBetweenPolls">The initial time in milliseconds to wait between polls. Setting to zero stops all polling.</param>
         protected PollingComponent(double timeBetweenPolls = 0)
         {
-            TimeBetweenPolls = timeBetweenPolls;
+            TimeBetweenPolls.BindValueChanged(_ =>
+            {
+                scheduledPoll?.Cancel();
+                pollIfNecessary();
+            });
+
+            TimeBetweenPolls.Value = timeBetweenPolls;
         }
 
         protected override void LoadComplete()
@@ -51,39 +47,13 @@ namespace osu.Game.Online
             pollIfNecessary();
         }
 
-        private bool pollIfNecessary()
+        /// <summary>
+        /// Immediately performs a <see cref="Poll"/>.
+        /// </summary>
+        public void PollImmediately()
         {
-            // we must be loaded so we have access to clock.
-            if (!IsLoaded) return false;
-
-            // there's already a poll process running.
-            if (pollingActive) return false;
-
-            // don't try polling if the time between polls hasn't been set.
-            if (timeBetweenPolls == 0) return false;
-
-            if (!lastTimePolled.HasValue)
-            {
-                doPoll();
-                return true;
-            }
-
-            if (Time.Current - lastTimePolled.Value > timeBetweenPolls)
-            {
-                doPoll();
-                return true;
-            }
-
-            // not ennough time has passed since the last poll. we do want to schedule a poll to happen, though.
+            lastTimePolled = Time.Current - TimeBetweenPolls.Value;
             scheduleNextPoll();
-            return false;
-        }
-
-        private void doPoll()
-        {
-            scheduledPoll = null;
-            pollingActive = true;
-            Poll().ContinueWith(_ => pollComplete());
         }
 
         /// <summary>
@@ -94,13 +64,11 @@ namespace osu.Game.Online
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Immediately performs a <see cref="Poll"/>.
-        /// </summary>
-        public void PollImmediately()
+        private void doPoll()
         {
-            lastTimePolled = Time.Current - timeBetweenPolls;
-            scheduleNextPoll();
+            scheduledPoll = null;
+            pollingActive = true;
+            Poll().ContinueWith(_ => pollComplete());
         }
 
         /// <summary>
@@ -115,13 +83,40 @@ namespace osu.Game.Online
                 pollIfNecessary();
         }
 
+        private void pollIfNecessary()
+        {
+            // we must be loaded so we have access to clock.
+            if (!IsLoaded) return;
+
+            // there's already a poll process running.
+            if (pollingActive) return;
+
+            // don't try polling if the time between polls hasn't been set.
+            if (TimeBetweenPolls.Value == 0) return;
+
+            if (!lastTimePolled.HasValue)
+            {
+                doPoll();
+                return;
+            }
+
+            if (Time.Current - lastTimePolled.Value > TimeBetweenPolls.Value)
+            {
+                doPoll();
+                return;
+            }
+
+            // not enough time has passed since the last poll. we do want to schedule a poll to happen, though.
+            scheduleNextPoll();
+        }
+
         private void scheduleNextPoll()
         {
             scheduledPoll?.Cancel();
 
             double lastPollDuration = lastTimePolled.HasValue ? Time.Current - lastTimePolled.Value : 0;
 
-            scheduledPoll = Scheduler.AddDelayed(doPoll, Math.Max(0, timeBetweenPolls - lastPollDuration));
+            scheduledPoll = Scheduler.AddDelayed(doPoll, Math.Max(0, TimeBetweenPolls.Value - lastPollDuration));
         }
     }
 }

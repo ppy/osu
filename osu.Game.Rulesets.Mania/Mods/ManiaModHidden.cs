@@ -2,15 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mods;
+using System.Linq;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModHidden : ModHidden
+    public class ManiaModHidden : ManiaModPlayfieldCover
     {
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
+
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModFadeIn)).ToArray();
+
+        protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AgainstScroll;
     }
 }

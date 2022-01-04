@@ -15,7 +15,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public abstract int KeyCount { get; }
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
-        public override bool Ranked => true;
 
         public void ApplyToBeatmapConverter(IBeatmapConverter beatmapConverter)
         {
@@ -39,6 +38,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             typeof(ManiaModKey7),
             typeof(ManiaModKey8),
             typeof(ManiaModKey9),
+            typeof(ManiaModKey10),
         }.Except(new[] { GetType() }).ToArray();
     }
 }

@@ -1,131 +1,154 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
+using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Game.Beatmaps;
+using osu.Game.Extensions;
+using osu.Game.IO.Serialization;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose
 {
-    [Cached(Type = typeof(IPlacementHandler))]
-    public class ComposeScreen : EditorScreen, IPlacementHandler
+    public class ComposeScreen : EditorScreenWithTimeline
     {
-        private const float vertical_margins = 10;
-        private const float horizontal_margins = 20;
+        [Resolved]
+        private GameHost host { get; set; }
 
-        private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+        [Resolved]
+        private EditorClock clock { get; set; }
+
+        private Bindable<string> clipboard { get; set; }
 
         private HitObjectComposer composer;
 
-        [BackgroundDependencyLoader(true)]
-        private void load([CanBeNull] BindableBeatDivisor beatDivisor)
+        public ComposeScreen()
+            : base(EditorScreenMode.Compose)
         {
-            if (beatDivisor != null)
-                this.beatDivisor.BindTo(beatDivisor);
+        }
 
-            Container composerContainer;
+        private Ruleset ruleset;
 
-            Children = new Drawable[]
-            {
-                new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            new Container
-                            {
-                                Name = "Timeline",
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black.Opacity(0.5f)
-                                    },
-                                    new Container
-                                    {
-                                        Name = "Timeline content",
-                                        RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                                        Child = new GridContainer
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Content = new[]
-                                            {
-                                                new Drawable[]
-                                                {
-                                                    new Container
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Padding = new MarginPadding { Right = 5 },
-                                                        Child = new TimelineArea { RelativeSizeAxes = Axes.Both }
-                                                    },
-                                                    new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
-                                                },
-                                            },
-                                            ColumnDimensions = new[]
-                                            {
-                                                new Dimension(),
-                                                new Dimension(GridSizeMode.Absolute, 90),
-                                            }
-                                        },
-                                    }
-                                }
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            composerContainer = new Container
-                            {
-                                Name = "Composer content",
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Horizontal = horizontal_margins, Vertical = vertical_margins },
-                            }
-                        }
-                    },
-                    RowDimensions = new[] { new Dimension(GridSizeMode.Absolute, 110) }
-                },
-            };
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
+            ruleset = parent.Get<IBindable<WorkingBeatmap>>().Value.BeatmapInfo.Ruleset?.CreateInstance();
+            composer = ruleset?.CreateHitObjectComposer();
 
-            if (ruleset == null)
-            {
-                Logger.Log("Beatmap doesn't have a ruleset assigned.");
-                // ExitRequested?.Invoke();
-                return;
-            }
+            // make the composer available to the timeline and other components in this screen.
+            if (composer != null)
+                dependencies.CacheAs(composer);
 
-            composer = ruleset.CreateHitObjectComposer();
+            return dependencies;
+        }
 
+        protected override Drawable CreateMainContent()
+        {
+            if (ruleset == null || composer == null)
+                return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
+
+            return wrapSkinnableContent(composer);
+        }
+
+        protected override Drawable CreateTimelineContent()
+        {
+            if (ruleset == null || composer == null)
+                return base.CreateTimelineContent();
+
+            return wrapSkinnableContent(new TimelineBlueprintContainer(composer));
+        }
+
+        private Drawable wrapSkinnableContent(Drawable content)
+        {
+            Debug.Assert(ruleset != null);
+
+            return new EditorSkinProvidingContainer(EditorBeatmap).WithChild(content);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(EditorClipboard clipboard)
+        {
+            this.clipboard = clipboard.Content.GetBoundCopy();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
+            clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
+            composer.OnLoadComplete += _ => updateClipboardActionAvailability();
+            updateClipboardActionAvailability();
+        }
+
+        #region Clipboard operations
+
+        protected override void PerformCut()
+        {
+            base.PerformCut();
+
+            Copy();
+            EditorBeatmap.RemoveRange(EditorBeatmap.SelectedHitObjects.ToArray());
+        }
+
+        protected override void PerformCopy()
+        {
+            base.PerformCopy();
+
+            clipboard.Value = new ClipboardContent(EditorBeatmap).Serialize();
+
+            host.GetClipboard()?.SetText(formatSelectionAsString());
+        }
+
+        protected override void PerformPaste()
+        {
+            base.PerformPaste();
+
+            var objects = clipboard.Value.Deserialize<ClipboardContent>().HitObjects;
+
+            Debug.Assert(objects.Any());
+
+            double timeOffset = clock.CurrentTime - objects.Min(o => o.StartTime);
+
+            foreach (var h in objects)
+                h.StartTime += timeOffset;
+
+            EditorBeatmap.BeginChange();
+
+            EditorBeatmap.SelectedHitObjects.Clear();
+
+            EditorBeatmap.AddRange(objects);
+            EditorBeatmap.SelectedHitObjects.AddRange(objects);
+
+            EditorBeatmap.EndChange();
+        }
+
+        private void updateClipboardActionAvailability()
+        {
+            CanCut.Value = CanCopy.Value = EditorBeatmap.SelectedHitObjects.Any();
+            CanPaste.Value = composer.IsLoaded && !string.IsNullOrEmpty(clipboard.Value);
+        }
+
+        private string formatSelectionAsString()
+        {
             if (composer == null)
-            {
-                Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
-                // ExitRequested?.Invoke();
-                return;
-            }
+                return string.Empty;
 
-            composerContainer.Child = composer;
+            double displayTime = EditorBeatmap.SelectedHitObjects.OrderBy(h => h.StartTime).FirstOrDefault()?.StartTime ?? clock.CurrentTime;
+            string selectionAsString = composer.ConvertSelectionToString();
+
+            return !string.IsNullOrEmpty(selectionAsString)
+                ? $"{displayTime.ToEditorFormattedString()} ({selectionAsString}) - "
+                : $"{displayTime.ToEditorFormattedString()} - ";
         }
 
-        public void BeginPlacement(HitObject hitObject)
-        {
-        }
-
-        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
-
-        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
+        #endregion
     }
 }

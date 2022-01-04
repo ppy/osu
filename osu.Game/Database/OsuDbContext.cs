@@ -12,7 +12,6 @@ using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using DatabasedKeyBinding = osu.Game.Input.Bindings.DatabasedKeyBinding;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using osu.Game.Skinning;
 
@@ -24,12 +23,13 @@ namespace osu.Game.Database
         public DbSet<BeatmapDifficulty> BeatmapDifficulty { get; set; }
         public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
-        public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
-        public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
-        public DbSet<SkinInfo> SkinInfo { get; set; }
+        public DbSet<EFSkinInfo> SkinInfo { get; set; }
         public DbSet<ScoreInfo> ScoreInfo { get; set; }
+
+        // migrated to realm
+        public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
 
         private readonly string connectionString;
 
@@ -74,6 +74,9 @@ namespace osu.Game.Database
                 using (var cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = "PRAGMA journal_mode=WAL;";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = "PRAGMA foreign_keys=OFF;";
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -122,19 +125,17 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineBeatmapID).IsUnique();
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
 
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.Hash).IsUnique();
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.DeletePending);
-
-            modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => new { b.RulesetID, b.Variant });
-            modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasMany(s => s.Files).WithOne(f => f.SkinInfo);
 
             modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
@@ -146,7 +147,7 @@ namespace osu.Game.Database
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
 
-            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
+            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
@@ -164,19 +165,6 @@ namespace osu.Game.Database
             public void AddProvider(ILoggerProvider provider)
             {
                 // no-op. called by tooling.
-            }
-
-            private class OsuDbLoggerProvider : ILoggerProvider
-            {
-                #region Disposal
-
-                public void Dispose()
-                {
-                }
-
-                #endregion
-
-                public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
             }
 
             private class OsuDbLogger : ILogger

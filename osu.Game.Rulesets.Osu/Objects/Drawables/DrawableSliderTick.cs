@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Containers;
 
@@ -24,15 +22,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool DisplayResult => false;
 
-        private readonly SkinnableDrawable scaleContainer;
+        protected DrawableSlider DrawableSlider => (DrawableSlider)ParentHitObject;
+
+        private SkinnableDrawable scaleContainer;
+
+        public DrawableSliderTick()
+            : base(null)
+        {
+        }
 
         public DrawableSliderTick(SliderTick sliderTick)
             : base(sliderTick)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/sliderscorepoint", _ => new CircularContainer
+            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
             {
                 Masking = true,
                 Origin = Anchor.Centre,
@@ -50,21 +60,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
+
+            ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
-
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void OnApply()
         {
-            scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
-            scaleBindable.BindTo(HitObject.ScaleBindable);
+            base.OnApply();
+
+            Position = HitObject.Position - DrawableSlider.HitObject.Position;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = Tracking ? r.Judgement.MaxResult : r.Judgement.MinResult);
         }
 
         protected override void UpdateInitialTransforms()
@@ -73,8 +83,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.ScaleTo(0.5f).ScaleTo(1f, ANIM_DURATION * 4, Easing.OutElasticHalf);
         }
 
-        protected override void UpdateStateTransforms(ArmedState state)
+        protected override void UpdateHitStateTransforms(ArmedState state)
         {
+            base.UpdateHitStateTransforms(state);
+
             switch (state)
             {
                 case ArmedState.Idle:

@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -17,13 +19,13 @@ namespace osu.Game.Overlays.BeatmapSet
         protected readonly FailRetryGraph Graph;
 
         private readonly FillFlowContainer header;
-        private readonly OsuSpriteText successRateLabel, successPercent, graphLabel;
+        private readonly OsuSpriteText successPercent;
         private readonly Bar successRate;
         private readonly Container percentContainer;
 
-        private BeatmapInfo beatmap;
+        private APIBeatmap beatmap;
 
-        public BeatmapInfo Beatmap
+        public APIBeatmap Beatmap
         {
             get => beatmap;
             set
@@ -38,15 +40,15 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            int passCount = beatmap?.OnlineInfo?.PassCount ?? 0;
-            int playCount = beatmap?.OnlineInfo?.PlayCount ?? 0;
+            int passCount = beatmap?.PassCount ?? 0;
+            int playCount = beatmap?.PlayCount ?? 0;
 
-            var rate = playCount != 0 ? (float)passCount / playCount : 0;
-            successPercent.Text = rate.ToString("P0");
+            float rate = playCount != 0 ? (float)passCount / playCount : 0;
+            successPercent.Text = rate.ToLocalisableString(@"0.#%");
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
-            Graph.Metrics = beatmap?.Metrics;
+            Graph.FailTimes = beatmap?.FailTimes;
         }
 
         public SuccessRate()
@@ -60,12 +62,12 @@ namespace osu.Game.Overlays.BeatmapSet
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        successRateLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "Success Rate",
-                            Font = OsuFont.GetFont(size: 13)
+                            Text = BeatmapsetsStrings.ShowInfoSuccessRate,
+                            Font = OsuFont.GetFont(size: 12)
                         },
                         successRate = new Bar
                         {
@@ -82,15 +84,15 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
-                                Font = OsuFont.GetFont(size: 13),
+                                Font = OsuFont.GetFont(size: 12),
                             },
                         },
-                        graphLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "Points of Failure",
-                            Font = OsuFont.GetFont(size: 13),
+                            Text = BeatmapsetsStrings.ShowInfoPointsOfFailure,
+                            Font = OsuFont.GetFont(size: 12),
                             Margin = new MarginPadding { Vertical = 20 },
                         },
                     },
@@ -105,11 +107,10 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
-            successRateLabel.Colour = successPercent.Colour = graphLabel.Colour = colours.Gray5;
             successRate.AccentColour = colours.Green;
-            successRate.BackgroundColour = colours.GrayD;
+            successRate.BackgroundColour = colourProvider.Background6;
 
             updateDisplay();
         }

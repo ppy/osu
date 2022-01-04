@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int SpanIndex { get; set; }
         public double SpanStartTime { get; set; }
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
@@ -29,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimePreempt = (StartTime - SpanStartTime) / 2 + offset;
         }
 
-        public override Judgement CreateJudgement() => new OsuJudgement();
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+
+        public override Judgement CreateJudgement() => new SliderTickJudgement();
     }
 }

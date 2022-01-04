@@ -1,19 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SelectionBlueprintTestScene : OsuTestScene
+    public abstract class SelectionBlueprintTestScene : OsuManualInputManagerTestScene
     {
-        private SelectionBlueprint blueprint;
-
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
 
@@ -26,25 +24,14 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected void AddBlueprint(HitObjectSelectionBlueprint blueprint, [CanBeNull] DrawableHitObject drawableObject = null)
         {
-            blueprint = CreateBlueprint();
-            blueprint.Depth = float.MinValue;
-            blueprint.SelectionRequested += (_, __) => blueprint.Select();
-
-            Add(blueprint);
-
-            AddStep("Select", () => blueprint.Select());
-            AddStep("Deselect", () => blueprint.Deselect());
+            Add(blueprint.With(d =>
+            {
+                d.DrawableObject = drawableObject;
+                d.Depth = float.MinValue;
+                d.Select();
+            }));
         }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            blueprint.Deselect();
-            return true;
-        }
-
-        protected abstract SelectionBlueprint CreateBlueprint();
     }
 }

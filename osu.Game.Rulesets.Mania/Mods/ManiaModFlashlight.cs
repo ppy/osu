@@ -3,8 +3,8 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -22,21 +22,13 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         private class ManiaFlashlight : Flashlight
         {
-            private readonly Cached flashlightProperties = new Cached();
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
 
             public ManiaFlashlight()
             {
                 FlashlightSize = new Vector2(0, default_flashlight_size);
-            }
 
-            public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-            {
-                if ((invalidation & Invalidation.DrawSize) > 0)
-                {
-                    flashlightProperties.Invalidate();
-                }
-
-                return base.Invalidate(invalidation, source, shallPropagate);
+                AddLayout(flashlightProperties);
             }
 
             protected override void Update()

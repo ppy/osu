@@ -6,21 +6,58 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override string Header => "Devices";
+        protected override LocalisableString Header => AudioSettingsStrings.AudioDevicesHeader;
 
-        private AudioManager audio;
+        [Resolved]
+        private AudioManager audio { get; set; }
+
         private SettingsDropdown<string> dropdown;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            this.audio = audio;
+            Children = new Drawable[]
+            {
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    LabelText = AudioSettingsStrings.OutputDevice,
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
+            };
+
+            updateItems();
+
+            audio.OnNewDevice += onDeviceChanged;
+            audio.OnLostDevice += onDeviceChanged;
+            dropdown.Current = audio.AudioDevice;
+        }
+
+        private void onDeviceChanged(string name) => updateItems();
+
+        private void updateItems()
+        {
+            var deviceItems = new List<string> { string.Empty };
+            deviceItems.AddRange(audio.AudioDeviceNames);
+
+            string preferredDeviceName = audio.AudioDevice.Value;
+            if (deviceItems.All(kv => kv != preferredDeviceName))
+                deviceItems.Add(preferredDeviceName);
+
+            // The option dropdown for audio device selection lists all audio
+            // device names. Dropdowns, however, may not have multiple identical
+            // keys. Thus, we remove duplicate audio device names from
+            // the dropdown. BASS does not give us a simple mechanism to select
+            // specific audio devices in such a case anyways. Such
+            // functionality would require involved OS-specific code.
+            dropdown.Items = deviceItems.Distinct().ToList();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -34,51 +71,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             }
         }
 
-        private void updateItems()
-        {
-            var deviceItems = new List<string> { string.Empty };
-            deviceItems.AddRange(audio.AudioDeviceNames);
-
-            var preferredDeviceName = audio.AudioDevice.Value;
-            if (deviceItems.All(kv => kv != preferredDeviceName))
-                deviceItems.Add(preferredDeviceName);
-
-            // The option dropdown for audio device selection lists all audio
-            // device names. Dropdowns, however, may not have multiple identical
-            // keys. Thus, we remove duplicate audio device names from
-            // the dropdown. BASS does not give us a simple mechanism to select
-            // specific audio devices in such a case anyways. Such
-            // functionality would require involved OS-specific code.
-            dropdown.Items = deviceItems.Distinct().ToList();
-        }
-
-        private void onDeviceChanged(string name) => updateItems();
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Children = new Drawable[]
-            {
-                dropdown = new AudioDeviceSettingsDropdown()
-            };
-
-            updateItems();
-
-            dropdown.Bindable = audio.AudioDevice;
-
-            audio.OnNewDevice += onDeviceChanged;
-            audio.OnLostDevice += onDeviceChanged;
-        }
-
         private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
         {
             protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
 
             private class AudioDeviceDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(string item)
-                    => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
+                protected override LocalisableString GenerateItemText(string item)
+                    => string.IsNullOrEmpty(item) ? CommonStrings.Default : base.GenerateItemText(item);
             }
         }
     }

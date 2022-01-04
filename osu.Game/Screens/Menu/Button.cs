@@ -6,6 +6,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,10 +16,10 @@ using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
@@ -30,6 +31,8 @@ namespace osu.Game.Screens.Menu
     public class Button : BeatSyncedContainer, IStateful<ButtonState>
     {
         public event Action<ButtonState> StateChanged;
+
+        public readonly Key TriggerKey;
 
         private readonly Container iconText;
         private readonly Container box;
@@ -43,17 +46,16 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
-        private readonly Key triggerKey;
-        private SampleChannel sampleClick;
-        private SampleChannel sampleHover;
+        private Sample sampleClick;
+        private Sample sampleHover;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public Button(string text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public Button(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
-            this.triggerKey = triggerKey;
+            TriggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
@@ -92,7 +94,7 @@ namespace osu.Game.Screens.Menu
                         {
                             EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                             Colour = Color4.White,
                             Alpha = 0,
                         },
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Menu
 
         private bool rightward;
 
-        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, ChannelAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
@@ -193,10 +195,10 @@ namespace osu.Game.Screens.Menu
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -210,7 +212,7 @@ namespace osu.Game.Screens.Menu
             if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
                 return false;
 
-            if (triggerKey == e.Key && triggerKey != Key.Unknown)
+            if (TriggerKey == e.Key && TriggerKey != Key.Unknown)
             {
                 trigger();
                 return true;
@@ -235,7 +237,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
+            iconText.Alpha = Math.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
             base.Update();
         }
 

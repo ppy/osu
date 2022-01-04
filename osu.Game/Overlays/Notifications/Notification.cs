@@ -8,13 +8,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -39,6 +39,8 @@ namespace osu.Game.Overlays.Notifications
         /// Should we show at the top of our section on display?
         /// </summary>
         public virtual bool DisplayOnTop => true;
+
+        public virtual string PopInSampleName => "UI/notification-pop-in";
 
         protected NotificationLight Light;
         private readonly CloseButton closeButton;
@@ -143,6 +145,7 @@ namespace osu.Game.Overlays.Notifications
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             this.FadeInFromZero(200);
             NotificationContent.MoveToX(DrawSize.X);
             NotificationContent.MoveToX(0, 500, Easing.OutQuint);

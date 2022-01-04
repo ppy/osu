@@ -1,56 +1,39 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class PaginatedMostPlayedBeatmapContainer : PaginatedContainer
+    public class PaginatedMostPlayedBeatmapContainer : PaginatedProfileSubsection<APIUserMostPlayedBeatmap>
     {
-        private GetUserMostPlayedBeatmapsRequest request;
-
-        public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
-            : base(user, "Most Played Beatmaps", "No records. :(")
+        public PaginatedMostPlayedBeatmapContainer(Bindable<APIUser> user)
+            : base(user, UsersStrings.ShowExtraHistoricalMostPlayedTitle)
         {
             ItemsPerPage = 5;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override void ShowMore()
-        {
-            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
-            request.Success += beatmaps => Schedule(() =>
-            {
-                MoreButton.FadeTo(beatmaps.Count == ItemsPerPage ? 1 : 0);
-                MoreButton.IsLoading = false;
+        protected override int GetCount(APIUser user) => user.BeatmapPlayCountsCount;
 
-                if (!beatmaps.Any() && VisiblePages == 1)
-                {
-                    MissingText.Show();
-                    return;
-                }
+        protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
+            new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
 
-                MissingText.Hide();
-
-                foreach (var beatmap in beatmaps)
-                {
-                    ItemsContainer.Add(new DrawableMostPlayedBeatmap(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
-                }
-            });
-
-            Api.Queue(request);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            request?.Cancel();
-        }
+        protected override Drawable CreateDrawableItem(APIUserMostPlayedBeatmap mostPlayed) =>
+            new DrawableMostPlayedBeatmap(mostPlayed);
     }
 }

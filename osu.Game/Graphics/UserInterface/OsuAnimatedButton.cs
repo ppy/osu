@@ -38,12 +38,16 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         protected override Container<Drawable> Content => content;
 
         private readonly Container content;
         private readonly Box hover;
 
         public OsuAnimatedButton()
+            : base(HoverSampleSet.Button)
         {
             base.Content.Add(content = new Container
             {
@@ -64,7 +68,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = HoverColour,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                         Alpha = 0,
                     },
                 }
@@ -72,16 +76,24 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             if (AutoSizeAxes != Axes.None)
             {
                 content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
                 content.AutoSizeAxes = AutoSizeAxes;
             }
-
-            Enabled.BindValueChanged(enabled => this.FadeColour(enabled.NewValue ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Colour = dimColour;
+            Enabled.BindValueChanged(_ => this.FadeColour(dimColour, 200, Easing.OutQuint));
+        }
+
+        private Color4 dimColour => Enabled.Value ? Color4.White : colours.Gray9;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -107,10 +119,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
     }
 }

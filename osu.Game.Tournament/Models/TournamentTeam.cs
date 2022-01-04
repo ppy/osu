@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tournament.Models
 {
@@ -29,8 +30,34 @@ namespace osu.Game.Tournament.Models
         /// </summary>
         public Bindable<string> Acronym = new Bindable<string>(string.Empty);
 
+        public BindableList<SeedingResult> SeedingResults = new BindableList<SeedingResult>();
+
+        public double AverageRank
+        {
+            get
+            {
+                int[] ranks = Players.Select(p => p.Statistics?.GlobalRank)
+                                     .Where(i => i.HasValue)
+                                     .Select(i => i.Value)
+                                     .ToArray();
+
+                if (ranks.Length == 0)
+                    return 0;
+
+                return ranks.Average();
+            }
+        }
+
+        public Bindable<string> Seed = new Bindable<string>(string.Empty);
+
+        public Bindable<int> LastYearPlacing = new BindableInt
+        {
+            MinValue = 1,
+            MaxValue = 64
+        };
+
         [JsonProperty]
-        public BindableList<User> Players { get; set; } = new BindableList<User>();
+        public BindableList<APIUser> Players { get; set; } = new BindableList<APIUser>();
 
         public TournamentTeam()
         {

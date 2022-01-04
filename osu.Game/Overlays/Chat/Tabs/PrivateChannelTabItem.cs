@@ -50,8 +50,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Masking = true,
                             Child = new DelayedLoadWrapper(avatar = new DrawableAvatar(value.Users.First())
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                OpenOnClick = { Value = false },
+                                RelativeSizeAxes = Axes.Both
                             })
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -89,7 +88,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             var user = Value.Users.First();
 
-            BackgroundActive = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
+            BackgroundActive = user.Colour != null ? Color4Extensions.FromHex(user.Colour) : colours.BlueDark;
             BackgroundInactive = BackgroundActive.Darken(0.5f);
         }
     }

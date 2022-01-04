@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
@@ -14,50 +15,53 @@ namespace osu.Game.Skinning
 
         protected override void ParseLine(SkinConfiguration skin, Section section, string line)
         {
-            line = StripComments(line);
-
-            var pair = SplitKeyVal(line);
-
-            switch (section)
+            if (section != Section.Colours)
             {
-                case Section.General:
-                    switch (pair.Key)
-                    {
-                        case @"Name":
-                            skin.SkinInfo.Name = pair.Value;
-                            break;
+                var pair = SplitKeyVal(line);
 
-                        case @"Author":
-                            skin.SkinInfo.Creator = pair.Value;
-                            break;
+                switch (section)
+                {
+                    case Section.General:
+                        switch (pair.Key)
+                        {
+                            case @"Name":
+                                skin.SkinInfo.Name = pair.Value;
+                                return;
 
-                        case @"CursorExpand":
-                            skin.CursorExpand = pair.Value != "0";
-                            break;
+                            case @"Author":
+                                skin.SkinInfo.Creator = pair.Value;
+                                return;
 
-                        case @"SliderBorderSize":
-                            skin.SliderBorderSize = Parsing.ParseFloat(pair.Value);
-                            break;
-                    }
+                            case @"Version":
+                                if (pair.Value == "latest")
+                                    skin.LegacyVersion = SkinConfiguration.LATEST_VERSION;
+                                else if (decimal.TryParse(pair.Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal version))
+                                    skin.LegacyVersion = version;
 
-                    break;
+                                return;
+                        }
 
-                case Section.Fonts:
-                    switch (pair.Key)
-                    {
-                        case "HitCirclePrefix":
-                            skin.HitCircleFont = pair.Value;
-                            break;
+                        break;
 
-                        case "HitCircleOverlap":
-                            skin.HitCircleOverlap = int.Parse(pair.Value);
-                            break;
-                    }
+                    // osu!catch section only has colour settings
+                    // so no harm in handling the entire section
+                    case Section.CatchTheBeat:
+                        HandleColours(skin, line);
+                        return;
+                }
 
-                    break;
+                if (!string.IsNullOrEmpty(pair.Key))
+                    skin.ConfigDictionary[pair.Key] = pair.Value;
             }
 
             base.ParseLine(skin, section, line);
+        }
+
+        protected override SkinConfiguration CreateTemplateObject()
+        {
+            var config = base.CreateTemplateObject();
+            config.LegacyVersion = 1.0m;
+            return config;
         }
     }
 }

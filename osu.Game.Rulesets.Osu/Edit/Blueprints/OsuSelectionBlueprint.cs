@@ -2,16 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {
-    public class OsuSelectionBlueprint : SelectionBlueprint
+    public abstract class OsuSelectionBlueprint<T> : HitObjectSelectionBlueprint<T>
+        where T : OsuHitObject
     {
-        protected OsuHitObject OsuObject => (OsuHitObject)HitObject.HitObject;
+        protected new DrawableOsuHitObject DrawableObject => (DrawableOsuHitObject)base.DrawableObject;
 
-        public OsuSelectionBlueprint(DrawableHitObject hitObject)
+        protected override bool AlwaysShowWhenSelected => true;
+
+        protected OsuSelectionBlueprint(T hitObject)
             : base(hitObject)
         {
         }

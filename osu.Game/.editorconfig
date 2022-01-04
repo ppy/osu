@@ -1,0 +1,3 @@
+[*.cs]
+dotnet_diagnostic.OLOC001.prefix_namespace = osu.Game.Resources.Localisation
+dotnet_diagnostic.OLOC001.license_header = // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.\n// See the LICENCE file in the repository root for full licence text.

@@ -1,0 +1,9 @@
+osu file format v14
+
+[Events]
+Animation,Foreground,Centre,"forever-string.png",330,240,10,108,LoopForever
+Animation,Foreground,Centre,"once-string.png",330,240,10,108,LoopOnce
+Animation,Foreground,Centre,"forever-number.png",330,240,10,108,0
+Animation,Foreground,Centre,"once-number.png",330,240,10,108,1
+Animation,Foreground,Centre,"undefined-number.png",330,240,10,108,16
+Animation,Foreground,Centre,"omitted.png",330,240,10,108

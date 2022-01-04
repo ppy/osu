@@ -4,93 +4,107 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
+
+#nullable enable
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIBeatmap : BeatmapMetadata
+    public class APIBeatmap : IBeatmapInfo, IBeatmapOnlineInfo
     {
         [JsonProperty(@"id")]
-        public int OnlineBeatmapID { get; set; }
+        public int OnlineID { get; set; }
 
         [JsonProperty(@"beatmapset_id")]
         public int OnlineBeatmapSetID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
+
+        [JsonProperty("checksum")]
+        public string Checksum { get; set; } = string.Empty;
+
+        [JsonProperty(@"user_id")]
+        public int AuthorID { get; set; }
 
         [JsonProperty(@"beatmapset")]
-        public APIBeatmapSet BeatmapSet { get; set; }
+        public APIBeatmapSet? BeatmapSet { get; set; }
 
         [JsonProperty(@"playcount")]
-        private int playCount { get; set; }
+        public int PlayCount { get; set; }
 
         [JsonProperty(@"passcount")]
-        private int passCount { get; set; }
+        public int PassCount { get; set; }
 
         [JsonProperty(@"mode_int")]
-        private int ruleset { get; set; }
+        public int RulesetID { get; set; }
 
         [JsonProperty(@"difficulty_rating")]
-        private double starDifficulty { get; set; }
+        public double StarRating { get; set; }
 
         [JsonProperty(@"drain")]
-        private float drainRate { get; set; }
+        public float DrainRate { get; set; }
 
         [JsonProperty(@"cs")]
-        private float circleSize { get; set; }
+        public float CircleSize { get; set; }
 
         [JsonProperty(@"ar")]
-        private float approachRate { get; set; }
+        public float ApproachRate { get; set; }
 
         [JsonProperty(@"accuracy")]
-        private float overallDifficulty { get; set; }
+        public float OverallDifficulty { get; set; }
+
+        [JsonIgnore]
+        public double Length { get; set; }
 
         [JsonProperty(@"total_length")]
-        private double length { get; set; }
+        private double lengthInSeconds
+        {
+            get => TimeSpan.FromMilliseconds(Length).TotalSeconds;
+            set => Length = TimeSpan.FromSeconds(value).TotalMilliseconds;
+        }
 
         [JsonProperty(@"count_circles")]
-        private int circleCount { get; set; }
+        public int CircleCount { get; set; }
 
         [JsonProperty(@"count_sliders")]
-        private int sliderCount { get; set; }
+        public int SliderCount { get; set; }
 
         [JsonProperty(@"version")]
-        private string version { get; set; }
+        public string DifficultyName { get; set; } = string.Empty;
 
         [JsonProperty(@"failtimes")]
-        private BeatmapMetrics metrics { get; set; }
+        public APIFailTimes? FailTimes { get; set; }
 
-        public BeatmapInfo ToBeatmap(RulesetStore rulesets)
+        [JsonProperty(@"max_combo")]
+        public int? MaxCombo { get; set; }
+
+        public double BPM { get; set; }
+
+        #region Implementation of IBeatmapInfo
+
+        public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
+
+        public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
         {
-            var set = BeatmapSet?.ToBeatmapSet(rulesets);
+            DrainRate = DrainRate,
+            CircleSize = CircleSize,
+            ApproachRate = ApproachRate,
+            OverallDifficulty = OverallDifficulty,
+        };
 
-            return new BeatmapInfo
-            {
-                Metadata = set?.Metadata ?? this,
-                Ruleset = rulesets.GetRuleset(ruleset),
-                StarDifficulty = starDifficulty,
-                OnlineBeatmapID = OnlineBeatmapID,
-                Version = version,
-                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
-                Status = Status,
-                BeatmapSet = set,
-                Metrics = metrics,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = drainRate,
-                    CircleSize = circleSize,
-                    ApproachRate = approachRate,
-                    OverallDifficulty = overallDifficulty,
-                },
-                OnlineInfo = new BeatmapOnlineInfo
-                {
-                    PlayCount = playCount,
-                    PassCount = passCount,
-                    CircleCount = circleCount,
-                    SliderCount = sliderCount,
-                },
-            };
-        }
+        IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        public string MD5Hash => Checksum;
+
+        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
+
+        [JsonIgnore]
+        public string Hash => throw new NotImplementedException();
+
+        #endregion
+
+        public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
     }
 }

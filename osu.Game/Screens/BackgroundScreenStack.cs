@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
-using osuTK;
 
 namespace osu.Game.Screens
 {
@@ -13,23 +12,26 @@ namespace osu.Game.Screens
         public BackgroundScreenStack()
             : base(false)
         {
-            Scale = new Vector2(1.06f);
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
 
-        //public float ParallaxAmount { set => parallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * value; }
-
-        public void Push(BackgroundScreen screen)
+        /// <summary>
+        /// Attempt to push a new background screen to this stack.
+        /// </summary>
+        /// <param name="screen">The screen to attempt to push.</param>
+        /// <returns>Whether the push succeeded. For example, if the existing screen was already of the correct type this will return <c>false</c>.</returns>
+        public bool Push(BackgroundScreen screen)
         {
             if (screen == null)
-                return;
+                return false;
 
             if (EqualityComparer<BackgroundScreen>.Default.Equals((BackgroundScreen)CurrentScreen, screen))
-                return;
+                return false;
 
             base.Push(screen);
+            return true;
         }
     }
 }

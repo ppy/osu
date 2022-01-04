@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,8 +15,10 @@ namespace osu.Game.Graphics.Backgrounds
     /// <summary>
     /// A background which offers blurring via a <see cref="BufferedContainer"/> on demand.
     /// </summary>
-    public class Background : CompositeDrawable
+    public class Background : CompositeDrawable, IEquatable<Background>
     {
+        private const float blur_scale = 0.5f;
+
         public readonly Sprite Sprite;
 
         private readonly string textureName;
@@ -43,7 +46,7 @@ namespace osu.Game.Graphics.Backgrounds
                 Sprite.Texture = textures.Get(textureName);
         }
 
-        public Vector2 BlurSigma => bufferedContainer?.BlurSigma ?? Vector2.Zero;
+        public Vector2 BlurSigma => bufferedContainer?.BlurSigma / blur_scale ?? Vector2.Zero;
 
         /// <summary>
         /// Smoothly adjusts <see cref="IBufferedContainer.BlurSigma"/> over time.
@@ -55,15 +58,27 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RemoveInternal(Sprite);
 
-                AddInternal(bufferedContainer = new BufferedContainer
+                AddInternal(bufferedContainer = new BufferedContainer(cachedFrameBuffer: true)
                 {
-                    CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
+                    RedrawOnScale = false,
                     Child = Sprite
                 });
             }
 
-            bufferedContainer?.BlurTo(newBlurSigma, duration, easing);
+            if (bufferedContainer != null)
+                bufferedContainer.FrameBufferScale = newBlurSigma == Vector2.Zero ? Vector2.One : new Vector2(blur_scale);
+
+            bufferedContainer?.BlurTo(newBlurSigma * blur_scale, duration, easing);
+        }
+
+        public virtual bool Equals(Background other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return other.GetType() == GetType()
+                   && other.textureName == textureName;
         }
     }
 }

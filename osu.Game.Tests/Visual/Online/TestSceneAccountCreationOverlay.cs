@@ -1,41 +1,32 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
+using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
+using osu.Game.Overlays.Settings;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneAccountCreationOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ErrorTextFlowContainer),
-            typeof(AccountCreationBackground),
-            typeof(ScreenEntry),
-            typeof(ScreenWarning),
-            typeof(ScreenWelcome),
-            typeof(AccountCreationScreen),
-        };
+        private readonly Container userPanelArea;
+        private readonly AccountCreationOverlay accountCreation;
 
-        [Cached(typeof(IAPIProvider))]
-        private DummyAPIAccess api = new DummyAPIAccess();
+        private IBindable<APIUser> localUser;
 
         public TestSceneAccountCreationOverlay()
         {
-            Container userPanelArea;
-            AccountCreationOverlay accountCreation;
-
             Children = new Drawable[]
             {
-                api,
                 accountCreation = new AccountCreationOverlay(),
                 userPanelArea = new Container
                 {
@@ -45,12 +36,29 @@ namespace osu.Game.Tests.Visual.Online
                     Origin = Anchor.TopRight,
                 },
             };
+        }
 
-            api.Logout();
-            api.LocalUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            localUser = API.LocalUser.GetBoundCopy();
+            localUser.BindValueChanged(user => { userPanelArea.Child = new UserGridPanel(user.NewValue) { Width = 200 }; }, true);
+        }
 
-            AddStep("show", () => accountCreation.Show());
-            AddStep("logout", () => api.Logout());
+        [Test]
+        public void TestOverlayVisibility()
+        {
+            AddStep("start hidden", () => accountCreation.Hide());
+            AddStep("log out", () => API.Logout());
+
+            AddStep("show manually", () => accountCreation.Show());
+            AddUntilStep("overlay is visible", () => accountCreation.State.Value == Visibility.Visible);
+
+            AddStep("click button", () => accountCreation.ChildrenOfType<SettingsButton>().Single().TriggerClick());
+            AddUntilStep("warning screen is present", () => accountCreation.ChildrenOfType<ScreenWarning>().SingleOrDefault()?.IsPresent == true);
+
+            AddStep("log back in", () => API.Login("dummy", "password"));
+            AddUntilStep("overlay is hidden", () => accountCreation.State.Value == Visibility.Hidden);
         }
     }
 }
