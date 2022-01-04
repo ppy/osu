@@ -10,7 +10,6 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestScenePageSelector : OsuTestScene
     {
         private readonly PageSelector pageSelector;
-        private readonly PageSelectorPageButton pageSelectorPageButton;
 
         public TestScenePageSelector()
         {
@@ -21,12 +20,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                pageSelectorPageButton = new PageSelectorPageButton(1234)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding { Top = 50 },
-                }
             });
         }
 
@@ -56,13 +49,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Set -10 pages", () => setMaxPages(-10));
             AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 1);
             AddAssert("Max is 1", () => pageSelector.MaxPages.Value == 1);
-        }
-
-        [Test]
-        public void TestDrawablePage()
-        {
-            AddStep("Select", () => pageSelectorPageButton.Selected = true);
-            AddStep("Deselect", () => pageSelectorPageButton.Selected = false);
         }
 
         private void setMaxPages(int maxPages) => pageSelector.MaxPages.Value = maxPages;
