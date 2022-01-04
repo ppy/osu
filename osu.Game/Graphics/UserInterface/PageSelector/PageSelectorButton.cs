@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
 using JetBrains.Annotations;
+using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
@@ -16,11 +17,9 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         protected const int DURATION = 200;
 
         [Resolved]
-        protected OsuColour Colours { get; private set; }
+        protected OverlayColourProvider ColourProvider { get; private set; }
 
         protected Box Background;
-
-        public CircularContainer CircularContent { get; private set; }
 
         protected PageSelectorButton()
         {
@@ -31,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(CircularContent = new CircularContainer
+            Add(new CircularContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,

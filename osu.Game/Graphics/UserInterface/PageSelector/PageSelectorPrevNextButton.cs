@@ -2,31 +2,26 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
     public class PageSelectorPrevNextButton : PageSelectorButton
     {
+        private readonly bool rightAligned;
         private readonly string text;
 
-        private Box fadeBox;
         private SpriteIcon icon;
         private OsuSpriteText name;
 
-        private readonly Anchor alignment;
-
         public PageSelectorPrevNextButton(bool rightAligned, string text)
         {
+            this.rightAligned = rightAligned;
             this.text = text;
-            alignment = rightAligned ? Anchor.x0 : Anchor.x2;
         }
 
         protected override Drawable CreateContent() => new Container
@@ -47,16 +42,16 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                         name = new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 12),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                            Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
                             Text = text.ToUpper(),
                         },
                         icon = new SpriteIcon
                         {
-                            Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronLeft : FontAwesome.Solid.ChevronRight,
+                            Icon = rightAligned ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft,
                             Size = new Vector2(8),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Anchor = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
+                            Origin = rightAligned ? Anchor.CentreLeft : Anchor.CentreRight,
                         },
                     }
                 },
@@ -66,23 +61,18 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.Colour = Colours.GreySeaFoamDark;
-            name.Colour = icon.Colour = Colours.Lime;
+            Background.Colour = ColourProvider.Dark4;
+            name.Colour = icon.Colour = ColourProvider.Light1;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            CircularContent.Add(fadeBox = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black.Opacity(100)
-            });
-
-            Enabled.BindValueChanged(enabled => fadeBox.FadeTo(enabled.NewValue ? 0 : 1, DURATION), true);
+            Enabled.BindValueChanged(enabled => Background.FadeTo(enabled.NewValue ? 1 : 0.5f, DURATION), true);
         }
 
-        protected override void UpdateHoverState() => Background.FadeColour(IsHovered ? Colours.GreySeaFoam : Colours.GreySeaFoamDark, DURATION, Easing.OutQuint);
+        protected override void UpdateHoverState() =>
+            Background.FadeColour(IsHovered ? ColourProvider.Dark3 : ColourProvider.Dark4, DURATION, Easing.OutQuint);
     }
 }
