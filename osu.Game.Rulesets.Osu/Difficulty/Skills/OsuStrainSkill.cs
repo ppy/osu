@@ -62,12 +62,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Returns the number of strains above a threshold averaged as the threshold varies.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public int CountDifficultStrains(double clockRate)
+        public double CountDifficultStrains(double clockRate)
         {
             List<double> strains = GetCurrentStrainPeaks().ToList();
             // This is the average value of strains.Count(s => s > p * strains.Max()) for p between 0 and 1.
             double realtimeCount = strains.Sum() / strains.Max();
-            return (int)(clockRate * realtimeCount);
+            return clockRate * realtimeCount;
         }
     }
 }
