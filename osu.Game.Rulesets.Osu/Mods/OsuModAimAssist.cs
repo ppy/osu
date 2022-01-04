@@ -7,54 +7,55 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModAimAssist : Mod, IApplicableToDrawableHitObjects, IUpdatableByPlayfield
+    internal class OsuModAimAssist : Mod, IUpdatableByPlayfield
     {
         public override string Name => "Aim Assist";
         public override string Acronym => "AA";
-        public override IconUsage Icon => FontAwesome.Solid.MousePointer;
+        public override IconUsage? Icon => FontAwesome.Solid.MousePointer;
         public override ModType Type => ModType.Fun;
         public override string Description => "No need to chase the circle, the circle chases you";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
-        private readonly List<DrawableOsuHitObject> movingObjects = new List<DrawableOsuHitObject>();
+        public const float SPIN_RADIUS = 50; // same as OsuAutoGeneratorBase.SPIN_RADIUS
+
         private DrawableSpinner activeSpinner;
-        private double spinnerAngle; // in radians
+        private float spinnerAngle; // in radians
 
         public void Update(Playfield playfield)
         {
             var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
-            var currentTime = playfield.Clock.CurrentTime;
+            double currentTime = playfield.Clock.CurrentTime;
 
-            // Avoid relocating judgment displays and hide follow points
+            // Judgment displays would all be cramped onto the cursor
             playfield.DisplayJudgements.Value = false;
-            (playfield as OsuPlayfield)?.ConnectionLayer.Hide();
+
+            // FIXME: Hide follow points
+            //(playfield as OsuPlayfield)?.ConnectionLayer.Hide();
 
             // If object too old, remove from movingObjects list, otherwise move to new destination
-            movingObjects.RemoveAll(d =>
+            foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
-                var h = d.HitObject;
-                var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+                var h = drawable.HitObject;
+                double endTime = h.GetEndTime();
 
-                // Object no longer required to be moved -> remove from list
-                if (currentTime > endTime)
-                    return true;
-
-                switch (d)
+                switch (drawable)
                 {
                     case DrawableHitCircle circle:
 
                         // 10ms earlier on the note to reduce chance of missing when clicking early / cursor moves fast
                         circle.MoveTo(cursorPos, Math.Max(0, endTime - currentTime - 10));
-                        return false;
+
+                        break;
 
                     case DrawableSlider slider:
 
@@ -66,11 +67,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // Move slider so that sliderball stays on the cursor
                         else
                         {
-                            slider.HeadCircle.Hide(); // temporary solution to supress HeadCircle's explosion, flash, ... at wrong location
+                            // FIXME: Hide flashes
+                            //slider.HeadCircle.Hide();
                             slider.MoveTo(cursorPos - slider.Ball.DrawPosition);
                         }
 
-                        return false;
+                        break;
 
                     case DrawableSpinner spinner:
 
@@ -78,23 +80,32 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (currentTime < h.StartTime)
                         {
                             spinner.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
-                            return false;
                         }
                         else
                         {
-                            spinnerAngle = 0;
-                            activeSpinner = spinner;
-                            return true;
+                            // TODO:
+                            //   - get current angle to cursor
+                            //   - move clockwise(?)
+                            //   - call spinner.RotationTracker.AddRotation
+
+                            // TODO: Remove
+                            //spinnerAngle = 0;
+                            //activeSpinner = spinner;
                         }
 
-                    default:
-                        return true;
-                }
-            });
+                        break;
 
+                    default:
+                        continue;
+                }
+            }
+
+            // Move active spinner around the cursor
             if (activeSpinner != null)
             {
-                if (currentTime > (activeSpinner.HitObject as IHasEndTime)?.EndTime)
+                double spinnerEndTime = activeSpinner.HitObject.GetEndTime();
+
+                if (currentTime > spinnerEndTime)
                 {
                     activeSpinner = null;
                     spinnerAngle = 0;
@@ -102,28 +113,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                 else
                 {
                     const float additional_degrees = 4;
-                    const int dist_from_cursor = 30;
-                    spinnerAngle += additional_degrees * Math.PI / 180;
+                    float added_degrees = additional_degrees * (float)Math.PI / 180;
+                    spinnerAngle += added_degrees;
+
+                    //int spinsRequired = activeSpinner.HitObject.SpinsRequired;
+                    //float spunDegrees = activeSpinner.Result.RateAdjustedRotation;
+                    //double timeLeft = spinnerEndTime - currentTime;
 
                     // Visual progress
-                    activeSpinner.MoveTo(new Vector2((float)(dist_from_cursor * Math.Cos(spinnerAngle) + cursorPos.X), (float)(dist_from_cursor * Math.Sin(spinnerAngle) + cursorPos.Y)));
+                    activeSpinner.MoveTo(new Vector2((float)(SPIN_RADIUS * Math.Cos(spinnerAngle) + cursorPos.X), (float)(SPIN_RADIUS * Math.Sin(spinnerAngle) + cursorPos.Y)));
 
                     // Logical progress
-                    activeSpinner.Disc.RotationAbsolute += additional_degrees;
+                    activeSpinner.RotationTracker.AddRotation(added_degrees);
+                    Console.WriteLine($"added_degrees={added_degrees}");
+                    //activeSpinner.Disc.RotationAbsolute += additional_degrees;
                 }
             }
-        }
-
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
-        {
-            foreach (var drawable in drawables)
-                drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
-        }
-
-        private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
-        {
-            if (drawable is DrawableOsuHitObject hitobject)
-                movingObjects.Add(hitobject);
         }
     }
 
