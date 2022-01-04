@@ -185,7 +185,11 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10),
                 Alpha = 0,
-                Margin = new MarginPadding { Vertical = 15 },
+                Margin = new MarginPadding
+                {
+                    Vertical = 15,
+                    Bottom = ExpandedContentScrollContainer.HEIGHT
+                },
                 ChildrenEnumerable = newCards
             };
             return content;
