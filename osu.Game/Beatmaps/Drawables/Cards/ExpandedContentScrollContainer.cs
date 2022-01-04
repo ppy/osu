@@ -10,7 +10,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards
 {
     public class ExpandedContentScrollContainer : OsuScrollContainer
     {
-        public const float HEIGHT = 400;
+        public const float HEIGHT = 200;
 
         public ExpandedContentScrollContainer()
         {
