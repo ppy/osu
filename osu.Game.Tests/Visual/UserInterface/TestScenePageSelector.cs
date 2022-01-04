@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface.PageSelector;
 using osu.Game.Overlays;
 
@@ -29,35 +31,37 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestOmittedPages()
+        {
+            setAvailablePages(100);
+
+            AddAssert("Correct page buttons", () => pageSelector.ChildrenOfType<PageSelectorPageButton>().Select(p => p.PageNumber).SequenceEqual(new[] { 1, 2, 3, 100 }));
+        }
+
+        [Test]
         public void TestResetCurrentPage()
         {
-            AddStep("Set 10 pages", () => setMaxPages(10));
-            AddStep("Select page 5", () => setCurrentPage(5));
-            AddStep("Set 11 pages", () => setMaxPages(11));
-            AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 1);
+            setAvailablePages(10);
+            selectPage(6);
+            setAvailablePages(11);
+            AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 0);
         }
 
         [Test]
         public void TestOutOfBoundsSelection()
         {
-            AddStep("Set 10 pages", () => setMaxPages(10));
-            AddStep("Select page 11", () => setCurrentPage(11));
-            AddAssert("Page 10 is current", () => pageSelector.CurrentPage.Value == pageSelector.MaxPages.Value);
+            setAvailablePages(10);
+            selectPage(11);
+            AddAssert("Page 10 is current", () => pageSelector.CurrentPage.Value == pageSelector.AvailablePages.Value - 1);
 
-            AddStep("Select page -1", () => setCurrentPage(-1));
-            AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 1);
+            selectPage(-1);
+            AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 0);
         }
 
-        [Test]
-        public void TestNegativeMaxPages()
-        {
-            AddStep("Set -10 pages", () => setMaxPages(-10));
-            AddAssert("Page 1 is current", () => pageSelector.CurrentPage.Value == 1);
-            AddAssert("Max is 1", () => pageSelector.MaxPages.Value == 1);
-        }
+        private void selectPage(int pageIndex) =>
+            AddStep($"Select page {pageIndex}", () => pageSelector.CurrentPage.Value = pageIndex);
 
-        private void setMaxPages(int maxPages) => pageSelector.MaxPages.Value = maxPages;
-
-        private void setCurrentPage(int currentPage) => pageSelector.CurrentPage.Value = currentPage;
+        private void setAvailablePages(int availablePages) =>
+            AddStep($"Set available pages to {availablePages}", () => pageSelector.AvailablePages.Value = availablePages);
     }
 }
