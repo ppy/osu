@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
@@ -35,14 +34,14 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
 
         protected override Drawable CreateContent() => text = new OsuSpriteText
         {
-            Font = OsuFont.GetFont(size: 12),
+            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
             Text = Page.ToString(),
         };
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.Colour = Colours.Lime;
+            Background.Colour = ColourProvider.Highlight1;
             Background.Alpha = 0;
         }
 
@@ -55,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         private void onSelectedChanged(ValueChangedEvent<bool> selected)
         {
             Background.FadeTo(selected.NewValue ? 1 : 0, DURATION, Easing.OutQuint);
-            text.FadeColour(selected.NewValue ? Colours.GreySeaFoamDarker : Colours.Lime, DURATION, Easing.OutQuint);
+            text.FadeColour(selected.NewValue ? ColourProvider.Dark4 : ColourProvider.Light3, DURATION, Easing.OutQuint);
         }
 
         protected override void UpdateHoverState()
@@ -63,7 +62,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
             if (selected.Value)
                 return;
 
-            text.FadeColour(IsHovered ? Colours.Lime.Lighten(20f) : Colours.Lime, DURATION, Easing.OutQuint);
+            text.FadeColour(IsHovered ? ColourProvider.Light2 : ColourProvider.Light1, DURATION, Easing.OutQuint);
         }
     }
 }

@@ -2,13 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface.PageSelector;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePageSelector : OsuTestScene
     {
+        [Cached]
+        private OverlayColourProvider provider { get; } = new OverlayColourProvider(OverlayColourScheme.Green);
+
         private readonly PageSelector pageSelector;
 
         public TestScenePageSelector()
