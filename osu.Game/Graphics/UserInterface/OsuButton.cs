@@ -3,7 +3,6 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
@@ -21,9 +21,9 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class OsuButton : Button
     {
-        public string Text
+        public LocalisableString Text
         {
-            get => SpriteText?.Text;
+            get => SpriteText?.Text ?? default;
             set
             {
                 if (SpriteText != null)
@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 BackgroundColour
         {
+            get => backgroundColour ?? Color4.White;
             set
             {
                 backgroundColour = value;
@@ -48,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
-        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Loud)
+        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Button)
         {
             Height = 40;
 
@@ -83,8 +84,6 @@ namespace osu.Game.Graphics.UserInterface
 
             if (hoverSounds.HasValue)
                 AddInternal(new HoverClickSounds(hoverSounds.Value));
-
-            Enabled.BindValueChanged(enabledChanged, true);
         }
 
         [BackgroundDependencyLoader]
@@ -92,10 +91,17 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (backgroundColour == null)
                 BackgroundColour = colours.BlueDark;
-
-            Enabled.ValueChanged += enabledChanged;
-            Enabled.TriggerChange();
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Colour = dimColour;
+            Enabled.BindValueChanged(_ => this.FadeColour(dimColour, 200, Easing.OutQuint));
+        }
+
+        private Color4 dimColour => Enabled.Value ? Color4.White : Color4.Gray;
 
         protected override bool OnClick(ClickEvent e)
         {
@@ -129,10 +135,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected virtual SpriteText CreateText() => new OsuSpriteText
@@ -142,10 +148,5 @@ namespace osu.Game.Graphics.UserInterface
             Anchor = Anchor.Centre,
             Font = OsuFont.GetFont(weight: FontWeight.Bold)
         };
-
-        private void enabledChanged(ValueChangedEvent<bool> e)
-        {
-            this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
-        }
     }
 }

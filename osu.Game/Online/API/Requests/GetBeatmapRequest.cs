@@ -1,20 +1,41 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
+
+#nullable enable
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapRequest : APIRequest<APIBeatmap>
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly IBeatmapInfo beatmapInfo;
 
-        public GetBeatmapRequest(BeatmapInfo beatmap)
+        private readonly string filename;
+
+        public GetBeatmapRequest(IBeatmapInfo beatmapInfo)
         {
-            this.beatmap = beatmap;
+            this.beatmapInfo = beatmapInfo;
+
+            filename = (beatmapInfo as BeatmapInfo)?.Path ?? string.Empty;
         }
 
-        protected override string Target => $@"beatmaps/lookup?id={beatmap.OnlineBeatmapID}&checksum={beatmap.MD5Hash}&filename={System.Uri.EscapeUriString(beatmap.Path ?? string.Empty)}";
+        protected override WebRequest CreateWebRequest()
+        {
+            var request = base.CreateWebRequest();
+
+            if (beatmapInfo.OnlineID > 0)
+                request.AddParameter(@"id", beatmapInfo.OnlineID.ToString());
+            if (!string.IsNullOrEmpty(beatmapInfo.MD5Hash))
+                request.AddParameter(@"checksum", beatmapInfo.MD5Hash);
+            if (!string.IsNullOrEmpty(filename))
+                request.AddParameter(@"filename", filename);
+
+            return request;
+        }
+
+        protected override string Target => @"beatmaps/lookup";
     }
 }

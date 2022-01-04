@@ -5,35 +5,39 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.IO.Serialization;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
 namespace osu.Game.Beatmaps
 {
+    [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public int BeatmapVersion;
 
-        private int? onlineBeatmapID;
+        private int? onlineID;
 
         [JsonProperty("id")]
-        public int? OnlineBeatmapID
+        [Column("OnlineBeatmapID")]
+        public int? OnlineID
         {
-            get => onlineBeatmapID;
-            set => onlineBeatmapID = value > 0 ? value : null;
+            get => onlineID;
+            set => onlineID = value > 0 ? value : null;
         }
 
         [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
-        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
+        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
         [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
@@ -46,10 +50,10 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty BaseDifficulty { get; set; }
 
         [NotMapped]
-        public BeatmapMetrics Metrics { get; set; }
+        public APIBeatmap OnlineInfo { get; set; }
 
         [NotMapped]
-        public BeatmapOnlineInfo OnlineInfo { get; set; }
+        public int? MaxCombo { get; set; }
 
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
@@ -77,7 +81,6 @@ namespace osu.Game.Beatmaps
 
         // General
         public double AudioLeadIn { get; set; }
-        public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
@@ -87,28 +90,20 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
+        public bool EpilepsyWarning { get; set; }
 
-        // Editor
-        // This bookmarks stuff is necessary because DB doesn't know how to store int[]
-        [JsonIgnore]
-        public string StoredBookmarks
-        {
-            get => string.Join(",", Bookmarks);
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    Bookmarks = Array.Empty<int>();
-                    return;
-                }
+        /// <summary>
+        /// Whether or not sound samples should change rate when playing with speed-changing mods.
+        /// TODO: only read/write supported for now, requires implementation in gameplay.
+        /// </summary>
+        public bool SamplesMatchPlaybackRate { get; set; }
 
-                Bookmarks = value.Split(',').Select(v =>
-                {
-                    bool result = int.TryParse(v, out int val);
-                    return new { result, val };
-                }).Where(p => p.result).Select(p => p.val).ToArray();
-            }
-        }
+        public CountdownType Countdown { get; set; } = CountdownType.Normal;
+
+        /// <summary>
+        /// The number of beats to move the countdown backwards (compared to its default location).
+        /// </summary>
+        public int CountdownOffset { get; set; }
 
         [NotMapped]
         public int[] Bookmarks { get; set; } = Array.Empty<int>();
@@ -119,10 +114,12 @@ namespace osu.Game.Beatmaps
         public double TimelineZoom { get; set; }
 
         // Metadata
-        public string Version { get; set; }
+        [Column("Version")]
+        public string DifficultyName { get; set; }
 
         [JsonProperty("difficulty_rating")]
-        public double StarDifficulty { get; set; }
+        [Column("StarDifficulty")]
+        public double StarRating { get; set; }
 
         /// <summary>
         /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
@@ -130,33 +127,22 @@ namespace osu.Game.Beatmaps
         public List<ScoreInfo> Scores { get; set; }
 
         [JsonIgnore]
-        public DifficultyRating DifficultyRating
-        {
-            get
-            {
-                var rating = StarDifficulty;
+        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
 
-                if (rating < 2.0) return DifficultyRating.Easy;
-                if (rating < 2.7) return DifficultyRating.Normal;
-                if (rating < 4.0) return DifficultyRating.Hard;
-                if (rating < 5.3) return DifficultyRating.Insane;
-                if (rating < 6.5) return DifficultyRating.Expert;
-
-                return DifficultyRating.ExpertPlus;
-            }
-        }
-
-        public override string ToString() => $"{Metadata} [{Version}]".Trim();
+        public override string ToString() => this.GetDisplayTitle();
 
         public bool Equals(BeatmapInfo other)
         {
-            if (ID == 0 || other?.ID == 0)
-                // one of the two BeatmapInfos we are comparing isn't sourced from a database.
-                // fall back to reference equality.
-                return ReferenceEquals(this, other);
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
 
-            return ID == other?.ID;
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
+
+            return false;
         }
+
+        public bool Equals(IBeatmapInfo other) => other is BeatmapInfo b && Equals(b);
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
                                                       BeatmapSet.Hash == other.BeatmapSet.Hash &&
@@ -170,5 +156,27 @@ namespace osu.Game.Beatmaps
         /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
         /// </summary>
         public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
+
+        #region Implementation of IHasOnlineID
+
+        int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
+
+        #endregion
+
+        #region Implementation of IBeatmapInfo
+
+        [JsonIgnore]
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();
+
+        [JsonIgnore]
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
+
+        [JsonIgnore]
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+
+        [JsonIgnore]
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+
+        #endregion
     }
 }

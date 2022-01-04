@@ -13,25 +13,28 @@ using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class LeaderboardModSelector : CompositeDrawable
     {
-        public readonly BindableList<Mod> SelectedMods = new BindableList<Mod>();
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly BindableList<IMod> SelectedMods = new BindableList<IMod>();
+        public readonly Bindable<IRulesetInfo> Ruleset = new Bindable<IRulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
 
         public LeaderboardModSelector()
         {
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             InternalChild = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Full,
                 Spacing = new Vector2(4),
             };
@@ -43,7 +46,10 @@ namespace osu.Game.Overlays.BeatmapSet
             Ruleset.BindValueChanged(onRulesetChanged, true);
         }
 
-        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        [Resolved]
+        private IRulesetStore rulesets { get; set; }
+
+        private void onRulesetChanged(ValueChangedEvent<IRulesetInfo> ruleset)
         {
             SelectedMods.Clear();
             modsContainer.Clear();
@@ -51,10 +57,20 @@ namespace osu.Game.Overlays.BeatmapSet
             if (ruleset.NewValue == null)
                 return;
 
-            modsContainer.Add(new ModButton(new ModNoMod()));
-            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
+            var rulesetInstance = rulesets.GetRuleset(ruleset.NewValue.OnlineID)?.CreateInstance();
 
-            modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
+            if (rulesetInstance == null)
+                return;
+
+            modsContainer.Add(new ModButton(new ModNoMod()));
+            modsContainer.AddRange(rulesetInstance.AllMods.Where(m => m.UserPlayable).Select(m => new ModButton(m)));
+
+            modsContainer.ForEach(button =>
+            {
+                button.Anchor = Anchor.TopCentre;
+                button.Origin = Anchor.TopCentre;
+                button.OnSelectionChanged = selectionChanged;
+            });
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -69,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapSet
             updateHighlighted();
         }
 
-        private void selectionChanged(Mod mod, bool selected)
+        private void selectionChanged(IMod mod, bool selected)
         {
             if (selected)
                 SelectedMods.Add(mod);
@@ -94,9 +110,9 @@ namespace osu.Game.Overlays.BeatmapSet
             private const int duration = 200;
 
             public readonly BindableBool Highlighted = new BindableBool();
-            public Action<Mod, bool> OnSelectionChanged;
+            public Action<IMod, bool> OnSelectionChanged;
 
-            public ModButton(Mod mod)
+            public ModButton(IMod mod)
                 : base(mod)
             {
                 Scale = new Vector2(0.4f);

@@ -2,16 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Taiko.Audio;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -22,48 +24,54 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float middle_split = 0.025f;
 
-        private readonly ControlPointInfo controlPoints;
+        [Cached]
+        private DrumSampleTriggerSource sampleTriggerSource;
 
-        public InputDrum(ControlPointInfo controlPoints)
+        public InputDrum(HitObjectContainer hitObjectContainer)
         {
-            this.controlPoints = controlPoints;
+            sampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer);
 
             RelativeSizeAxes = Axes.Both;
-            FillMode = FillMode.Fit;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var sampleMappings = new DrumSampleMapping(controlPoints);
-
             Children = new Drawable[]
             {
-                new TaikoHalfDrum(false, sampleMappings)
+                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
                 {
-                    Name = "Left Half",
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.X,
-                    X = -middle_split / 2,
-                    RimAction = TaikoAction.LeftRim,
-                    CentreAction = TaikoAction.LeftCentre
-                },
-                new TaikoHalfDrum(true, sampleMappings)
-                {
-                    Name = "Right Half",
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.X,
-                    X = middle_split / 2,
-                    RimAction = TaikoAction.RightRim,
-                    CentreAction = TaikoAction.RightCentre
-                }
+                    FillMode = FillMode.Fit,
+                    Scale = new Vector2(0.9f),
+                    Children = new Drawable[]
+                    {
+                        new TaikoHalfDrum(false)
+                        {
+                            Name = "Left Half",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            X = -middle_split / 2,
+                            RimAction = TaikoAction.LeftRim,
+                            CentreAction = TaikoAction.LeftCentre
+                        },
+                        new TaikoHalfDrum(true)
+                        {
+                            Name = "Right Half",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.X,
+                            X = middle_split / 2,
+                            RimAction = TaikoAction.RightRim,
+                            CentreAction = TaikoAction.RightCentre
+                        }
+                    }
+                }),
+                sampleTriggerSource
             };
-
-            AddRangeInternal(sampleMappings.Sounds);
         }
 
         /// <summary>
@@ -86,12 +94,11 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centre;
             private readonly Sprite centreHit;
 
-            private readonly DrumSampleMapping sampleMappings;
+            [Resolved]
+            private DrumSampleTriggerSource sampleTriggerSource { get; set; }
 
-            public TaikoHalfDrum(bool flipped, DrumSampleMapping sampleMappings)
+            public TaikoHalfDrum(bool flipped)
             {
-                this.sampleMappings = sampleMappings;
-
                 Masking = true;
 
                 Children = new Drawable[]
@@ -141,26 +148,24 @@ namespace osu.Game.Rulesets.Taiko.UI
                 centreHit.Colour = colours.Pink;
             }
 
-            public bool OnPressed(TaikoAction action)
+            public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
             {
                 Drawable target = null;
                 Drawable back = null;
 
-                var drumSample = sampleMappings.SampleAt(Time.Current);
-
-                if (action == CentreAction)
+                if (e.Action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
 
-                    drumSample.Centre?.Play();
+                    sampleTriggerSource.Play(HitType.Centre);
                 }
-                else if (action == RimAction)
+                else if (e.Action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
 
-                    drumSample.Rim?.Play();
+                    sampleTriggerSource.Play(HitType.Rim);
                 }
 
                 if (target != null)
@@ -187,7 +192,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return false;
             }
 
-            public bool OnReleased(TaikoAction action) => false;
+            public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
+            {
+            }
         }
     }
 }

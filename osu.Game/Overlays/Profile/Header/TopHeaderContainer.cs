@@ -1,17 +1,21 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
-using osu.Game.Users;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -21,7 +25,10 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private const float avatar_size = 110;
 
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private SupporterIcon supporterTag;
         private UpdateableAvatar avatar;
@@ -33,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer userStats;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             Height = 150;
 
@@ -42,7 +49,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDark,
+                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -54,13 +61,11 @@ namespace osu.Game.Overlays.Profile.Header
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        avatar = new UpdateableAvatar
+                        avatar = new UpdateableAvatar(isInteractive: false, showGuestOnNull: false)
                         {
                             Size = new Vector2(avatar_size),
                             Masking = true,
                             CornerRadius = avatar_size * 0.25f,
-                            OpenOnClick = { Value = false },
-                            ShowGuestOnNull = false,
                         },
                         new Container
                         {
@@ -117,7 +122,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             RelativeSizeAxes = Axes.X,
                                             Height = 1.5f,
                                             Margin = new MarginPadding { Top = 10 },
-                                            Colour = colours.GreySeafoamLighter,
+                                            Colour = colourProvider.Light1,
                                         },
                                         new FillFlowContainer
                                         {
@@ -137,7 +142,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Margin = new MarginPadding { Left = 10 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Colour = colours.GreySeafoamLighter,
+                                                    Colour = colourProvider.Light1,
                                                 }
                                             }
                                         },
@@ -162,34 +167,34 @@ namespace osu.Game.Overlays.Profile.Header
             User.BindValueChanged(user => updateUser(user.NewValue));
         }
 
-        private void updateUser(User user)
+        private void updateUser(APIUser user)
         {
             avatar.User = user;
             usernameText.Text = user?.Username ?? string.Empty;
-            openUserExternally.Link = $@"https://osu.ppy.sh/users/{user?.Id ?? 0}";
+            openUserExternally.Link = $@"{api.WebsiteRootUrl}/users/{user?.Id ?? 0}";
             userFlag.Country = user?.Country;
             userCountryText.Text = user?.Country?.FullName ?? "Alien";
             supporterTag.SupportLevel = user?.SupportLevel ?? 0;
             titleText.Text = user?.Title ?? string.Empty;
-            titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
+            titleText.Colour = Color4Extensions.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Hit Accuracy", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
-                userStats.Add(new UserStatsLine("Play Count", user.Statistics.PlayCount.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Total Score", user.Statistics.TotalScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Total Hits", user.Statistics.TotalHits.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Maximum Combo", user.Statistics.MaxCombo.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("Replays Watched by Others", user.Statistics.ReplaysWatched.ToString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsRankedScore, user.Statistics.RankedScore.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsHitAccuracy, user.Statistics.DisplayAccuracy));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsPlayCount, user.Statistics.PlayCount.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalScore, user.Statistics.TotalScore.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsTotalHits, user.Statistics.TotalHits.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsMaximumCombo, user.Statistics.MaxCombo.ToLocalisableString("#,##0")));
+                userStats.Add(new UserStatsLine(UsersStrings.ShowStatsReplaysWatchedByOthers, user.Statistics.ReplaysWatched.ToLocalisableString("#,##0")));
             }
         }
 
         private class UserStatsLine : Container
         {
-            public UserStatsLine(string left, string right)
+            public UserStatsLine(LocalisableString left, LocalisableString right)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;

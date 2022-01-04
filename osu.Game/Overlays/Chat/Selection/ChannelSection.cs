@@ -4,19 +4,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osuTK;
 
 namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSection : Container, IHasFilterableChildren
     {
-        private readonly OsuSpriteText header;
-
         public readonly FillFlowContainer<ChannelListItem> ChannelFlow;
 
         public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
@@ -28,12 +26,6 @@ namespace osu.Game.Overlays.Chat.Selection
         }
 
         public bool FilteringActive { get; set; }
-
-        public string Header
-        {
-            get => header.Text;
-            set => header.Text = value.ToUpperInvariant();
-        }
 
         public IEnumerable<Channel> Channels
         {
@@ -47,9 +39,10 @@ namespace osu.Game.Overlays.Chat.Selection
 
             Children = new Drawable[]
             {
-                header = new OsuSpriteText
+                new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
+                    Text = "All Channels".ToUpperInvariant()
                 },
                 ChannelFlow = new FillFlowContainer<ChannelListItem>
                 {

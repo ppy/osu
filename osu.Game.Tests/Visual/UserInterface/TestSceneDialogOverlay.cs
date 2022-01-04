@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
 
@@ -11,13 +13,21 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneDialogOverlay : OsuTestScene
     {
-        public TestSceneDialogOverlay()
+        private DialogOverlay overlay;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            DialogOverlay overlay;
+            AddStep("create dialog overlay", () => Child = overlay = new DialogOverlay());
+        }
 
-            Add(overlay = new DialogOverlay());
+        [Test]
+        public void TestBasic()
+        {
+            TestPopupDialog firstDialog = null;
+            TestPopupDialog secondDialog = null;
 
-            AddStep("dialog #1", () => overlay.Push(new TestPopupDialog
+            AddStep("dialog #1", () => overlay.Push(firstDialog = new TestPopupDialog
             {
                 Icon = FontAwesome.Regular.TrashAlt,
                 HeaderText = @"Confirm deletion of",
@@ -37,7 +47,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             }));
 
-            AddStep("dialog #2", () => overlay.Push(new TestPopupDialog
+            AddAssert("first dialog displayed", () => overlay.CurrentDialog == firstDialog);
+
+            AddStep("dialog #2", () => overlay.Push(secondDialog = new TestPopupDialog
             {
                 Icon = FontAwesome.Solid.Cog,
                 HeaderText = @"What do you want to do with",
@@ -70,6 +82,46 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 },
             }));
+
+            AddAssert("second dialog displayed", () => overlay.CurrentDialog == secondDialog);
+            AddAssert("first dialog is not part of hierarchy", () => firstDialog.Parent == null);
+        }
+
+        [Test]
+        public void TestDismissBeforePush()
+        {
+            TestPopupDialog testDialog = null;
+            AddStep("dismissed dialog push", () =>
+            {
+                overlay.Push(testDialog = new TestPopupDialog
+                {
+                    State = { Value = Visibility.Hidden }
+                });
+            });
+
+            AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
+            AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
+        }
+
+        [Test]
+        public void TestDismissBeforePushViaButtonPress()
+        {
+            TestPopupDialog testDialog = null;
+            AddStep("dismissed dialog push", () =>
+            {
+                overlay.Push(testDialog = new TestPopupDialog
+                {
+                    Buttons = new PopupDialogButton[]
+                    {
+                        new PopupDialogOkButton { Text = @"OK" },
+                    },
+                });
+
+                testDialog.PerformOkAction();
+            });
+
+            AddAssert("no dialog pushed", () => overlay.CurrentDialog == null);
+            AddAssert("dialog is not part of hierarchy", () => testDialog.Parent == null);
         }
 
         private class TestPopupDialog : PopupDialog

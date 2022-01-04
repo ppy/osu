@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.MedalSplash
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Scale = new Vector2(0.81f),
+                            Scale = new Vector2(0.41f),
                         },
                         medalGlow = new Sprite
                         {

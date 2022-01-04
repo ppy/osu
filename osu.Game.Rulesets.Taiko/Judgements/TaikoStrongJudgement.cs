@@ -7,9 +7,9 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoStrongJudgement : TaikoJudgement
     {
+        public override HitResult MaxResult => HitResult.SmallBonus;
+
         // MainObject already changes the HP
         protected override double HealthIncreaseFor(HitResult result) => 0;
-
-        public override bool AffectsCombo => false;
     }
 }

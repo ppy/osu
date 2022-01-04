@@ -5,6 +5,8 @@ namespace osu.Game.Rulesets
 {
     public interface ILegacyRuleset
     {
+        const int MAX_LEGACY_RULESET_ID = 3;
+
         /// <summary>
         /// Identifies the server-side ID of a legacy ruleset.
         /// </summary>

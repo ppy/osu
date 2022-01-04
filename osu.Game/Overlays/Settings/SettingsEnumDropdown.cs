@@ -16,9 +16,10 @@ namespace osu.Game.Overlays.Settings
         {
             public DropdownControl()
             {
-                Margin = new MarginPadding { Top = 5 };
                 RelativeSizeAxes = Axes.X;
             }
+
+            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
         }
     }
 }

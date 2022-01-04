@@ -8,10 +8,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -29,51 +31,36 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
-        public Bindable<float> CursorScale;
+        public IBindable<float> CursorScale => cursorScale;
+
+        private readonly Bindable<float> cursorScale = new BindableFloat(1);
+
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling)
+                Children = new[]
+                {
+                    cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling),
+                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorParticles), confineMode: ConfineMode.NoScaling),
+                }
             };
         }
 
+        [Resolved(canBeNull: true)]
+        private GameplayState state { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig, IBindable<WorkingBeatmap> beatmap)
+        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
-
-            this.beatmap.BindTo(beatmap);
-            this.beatmap.ValueChanged += _ => calculateScale();
-
-            userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
-            userCursorScale.ValueChanged += _ => calculateScale();
-
-            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
-            autoCursorScale.ValueChanged += _ => calculateScale();
-
-            CursorScale = new Bindable<float>();
-            CursorScale.ValueChanged += e => ActiveCursor.Scale = cursorTrail.Scale = new Vector2(e.NewValue);
-
-            calculateScale();
-        }
-
-        private void calculateScale()
-        {
-            float scale = userCursorScale.Value;
-
-            if (autoCursorScale.Value && beatmap.Value != null)
-            {
-                // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
-                scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
-            }
-
-            CursorScale.Value = scale;
         }
 
         protected override void LoadComplete()
@@ -81,6 +68,46 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             base.LoadComplete();
 
             showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
+
+            userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
+            userCursorScale.ValueChanged += _ => calculateScale();
+
+            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+            autoCursorScale.ValueChanged += _ => calculateScale();
+
+            CursorScale.BindValueChanged(e =>
+            {
+                var newScale = new Vector2(e.NewValue);
+
+                ActiveCursor.Scale = newScale;
+                cursorTrail.Scale = newScale;
+            }, true);
+
+            calculateScale();
+        }
+
+        /// <summary>
+        /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
+        /// </summary>
+        public static float GetScaleForCircleSize(float circleSize) =>
+            1f - 0.7f * (1f + circleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
+        private void calculateScale()
+        {
+            float scale = userCursorScale.Value;
+
+            if (autoCursorScale.Value && state != null)
+            {
+                // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
+                scale *= GetScaleForCircleSize(state.Beatmap.Difficulty.CircleSize);
+            }
+
+            cursorScale.Value = scale;
+
+            var newScale = new Vector2(scale);
+
+            ActiveCursor.ScaleTo(newScale, 400, Easing.OutQuint);
+            cursorTrail.Scale = newScale;
         }
 
         private int downCount;
@@ -93,9 +120,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 (ActiveCursor as OsuCursor)?.Contract();
         }
 
-        public bool OnPressed(OsuAction action)
+        public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
@@ -107,9 +134,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return false;
         }
 
-        public bool OnReleased(OsuAction action)
+        public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
         {
-            switch (action)
+            switch (e.Action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
@@ -120,8 +147,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         updateExpandedState();
                     break;
             }
-
-            return false;
         }
 
         public override bool HandlePositionalInput => true; // OverlayContainer will set this false when we go hidden, but we always want to receive input.

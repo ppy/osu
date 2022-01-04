@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public interface IApplicableToTrack : IApplicableMod
     {
-        void ApplyToTrack(Track track);
+        void ApplyToTrack(ITrack track);
     }
 }

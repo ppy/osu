@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Storyboards;
 using osu.Game.Storyboards.Drawables;
@@ -13,8 +15,18 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class DimmableStoryboard : UserDimContainer
     {
+        public Container OverlayLayerContainer { get; private set; }
+
         private readonly Storyboard storyboard;
         private DrawableStoryboard drawableStoryboard;
+
+        /// <summary>
+        /// Whether the storyboard is considered finished.
+        /// </summary>
+        /// <remarks>
+        /// This is true by default in here, until an actual drawable storyboard is loaded, in which case it'll bind to it.
+        /// </remarks>
+        public IBindable<bool> HasStoryboardEnded = new BindableBool(true);
 
         public DimmableStoryboard(Storyboard storyboard)
         {
@@ -24,6 +36,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
+            Add(OverlayLayerContainer = new Container());
+
             initializeStoryboard(false);
         }
 
@@ -44,12 +58,18 @@ namespace osu.Game.Screens.Play
                 return;
 
             drawableStoryboard = storyboard.CreateDrawable();
-            drawableStoryboard.Masking = true;
+            HasStoryboardEnded.BindTo(drawableStoryboard.HasStoryboardEnded);
 
             if (async)
-                LoadComponentAsync(drawableStoryboard, Add);
+                LoadComponentAsync(drawableStoryboard, onStoryboardCreated);
             else
-                Add(drawableStoryboard);
+                onStoryboardCreated(drawableStoryboard);
+        }
+
+        private void onStoryboardCreated(DrawableStoryboard storyboard)
+        {
+            Add(storyboard);
+            OverlayLayerContainer.Add(storyboard.OverlayLayer.CreateProxy());
         }
     }
 }

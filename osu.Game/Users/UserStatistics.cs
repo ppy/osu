@@ -3,15 +3,17 @@
 
 using System;
 using Newtonsoft.Json;
+using osu.Framework.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
-using static osu.Game.Users.User;
+using osu.Game.Utils;
 
 namespace osu.Game.Users
 {
     public class UserStatistics
     {
         [JsonProperty]
-        public User User;
+        public APIUser User;
 
         [JsonProperty(@"level")]
         public LevelInfo Level;
@@ -25,23 +27,29 @@ namespace osu.Game.Users
             public int Progress;
         }
 
+        [JsonProperty(@"is_ranked")]
+        public bool IsRanked;
+
+        [JsonProperty(@"global_rank")]
+        public int? GlobalRank;
+
+        [JsonProperty(@"country_rank")]
+        public int? CountryRank;
+
+        // populated via User model, as that's where the data currently lives.
+        public APIRankHistory RankHistory;
+
         [JsonProperty(@"pp")]
         public decimal? PP;
-
-        [JsonProperty(@"pp_rank")] // the API sometimes only returns this value in condensed user responses
-        private int rank
-        {
-            set => Ranks.Global = value;
-        }
-
-        [JsonProperty(@"rank")]
-        public UserRanks Ranks;
 
         [JsonProperty(@"ranked_score")]
         public long RankedScore;
 
         [JsonProperty(@"hit_accuracy")]
-        public decimal Accuracy;
+        public double Accuracy;
+
+        [JsonIgnore]
+        public LocalisableString DisplayAccuracy => (Accuracy / 100).FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;
@@ -67,13 +75,13 @@ namespace osu.Game.Users
         public struct Grades
         {
             [JsonProperty(@"ssh")]
-            public int SSPlus;
+            public int? SSPlus;
 
             [JsonProperty(@"ss")]
             public int SS;
 
             [JsonProperty(@"sh")]
-            public int SPlus;
+            public int? SPlus;
 
             [JsonProperty(@"s")]
             public int S;
@@ -88,13 +96,13 @@ namespace osu.Game.Users
                     switch (rank)
                     {
                         case ScoreRank.XH:
-                            return SSPlus;
+                            return SSPlus ?? 0;
 
                         case ScoreRank.X:
                             return SS;
 
                         case ScoreRank.SH:
-                            return SPlus;
+                            return SPlus ?? 0;
 
                         case ScoreRank.S:
                             return S;
@@ -108,16 +116,5 @@ namespace osu.Game.Users
                 }
             }
         }
-
-        public struct UserRanks
-        {
-            [JsonProperty(@"global")]
-            public int? Global;
-
-            [JsonProperty(@"country")]
-            public int? Country;
-        }
-
-        public RankHistoryData RankHistory;
     }
 }

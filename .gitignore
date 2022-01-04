@@ -331,3 +331,11 @@ fastlane/report.xml
 # inspectcode
 inspectcodereport.xml
 inspectcode
+
+# BenchmarkDotNet
+/BenchmarkDotNet.Artifacts
+
+*.GeneratedMSBuildEditorConfig.editorconfig
+
+# Fody (pulled in by Realm) - schema file
+FodyWeavers.xsd

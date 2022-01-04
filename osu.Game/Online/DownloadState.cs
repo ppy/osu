@@ -7,7 +7,7 @@ namespace osu.Game.Online
     {
         NotDownloaded,
         Downloading,
-        Downloaded,
+        Importing,
         LocallyAvailable
     }
 }

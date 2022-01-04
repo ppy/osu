@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -13,14 +14,14 @@ namespace osu.Game.Rulesets.Scoring
     public abstract class JudgementProcessor : Component
     {
         /// <summary>
-        /// Invoked when all <see cref="HitObject"/>s have been judged by this <see cref="JudgementProcessor"/>.
-        /// </summary>
-        public event Action AllJudged;
-
-        /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by this <see cref="JudgementProcessor"/>.
         /// </summary>
         public event Action<JudgementResult> NewJudgement;
+
+        /// <summary>
+        /// Invoked when a judgement is reverted, usually due to rewinding gameplay.
+        /// </summary>
+        public event Action<JudgementResult> JudgementReverted;
 
         /// <summary>
         /// The maximum number of hits that can be judged.
@@ -32,10 +33,14 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public int JudgedHits { get; private set; }
 
+        private JudgementResult lastAppliedResult;
+
+        private readonly BindableBool hasCompleted = new BindableBool();
+
         /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
-        public bool HasCompleted => JudgedHits == MaxHits;
+        public IBindable<bool> HasCompleted => hasCompleted;
 
         /// <summary>
         /// Applies a <see cref="IBeatmap"/> to this <see cref="ScoreProcessor"/>.
@@ -55,13 +60,11 @@ namespace osu.Game.Rulesets.Scoring
         public void ApplyResult(JudgementResult result)
         {
             JudgedHits++;
+            lastAppliedResult = result;
 
             ApplyResultInternal(result);
 
             NewJudgement?.Invoke(result);
-
-            if (HasCompleted)
-                AllJudged?.Invoke();
         }
 
         /// <summary>
@@ -73,6 +76,8 @@ namespace osu.Game.Rulesets.Scoring
             JudgedHits--;
 
             RevertResultInternal(result);
+
+            JudgementReverted?.Invoke(result);
         }
 
         /// <summary>
@@ -125,8 +130,6 @@ namespace osu.Game.Rulesets.Scoring
                     simulate(nested);
 
                 var judgement = obj.CreateJudgement();
-                if (judgement == null)
-                    return;
 
                 var result = CreateResult(obj, judgement);
                 if (result == null)
@@ -135,6 +138,12 @@ namespace osu.Game.Rulesets.Scoring
                 result.Type = judgement.MaxResult;
                 ApplyResult(result);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult.TimeAbsolute < Clock.CurrentTime);
         }
     }
 }

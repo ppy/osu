@@ -9,7 +9,7 @@ using osu.Game.Tournament.Screens.TeamIntro;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamIntroScreen : LadderTestScene
+    public class TestSceneTeamIntroScreen : TournamentTestScene
     {
         [Cached]
         private readonly LadderInfo ladder = new LadderInfo();
@@ -17,11 +17,12 @@ namespace osu.Game.Tournament.Tests.Screens
         [BackgroundDependencyLoader]
         private void load()
         {
-            var match = new TournamentMatch();
-            match.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
-            match.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
-            match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
-            ladder.CurrentMatch.Value = match;
+            ladder.CurrentMatch.Value = new TournamentMatch
+            {
+                Team1 = { Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA") },
+                Team2 = { Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN") },
+                Round = { Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals") }
+            };
 
             Add(new TeamIntroScreen
             {

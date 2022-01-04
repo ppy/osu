@@ -14,11 +14,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneFooterButtonMods : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(FooterButtonMods)
-        };
-
         private readonly TestFooterButtonMods footerButtonMods;
 
         public TestSceneFooterButtonMods()
@@ -41,9 +36,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"Add DoubleTime", () => changeMods(doubleTimeMod));
             AddAssert(@"Check DoubleTime multiplier", () => assertModsMultiplier(doubleTimeMod));
 
-            var mutlipleIncrementMods = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModHardRock() };
-            AddStep(@"Add multiple Mods", () => changeMods(mutlipleIncrementMods));
-            AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(mutlipleIncrementMods));
+            var multipleIncrementMods = new Mod[] { new OsuModDoubleTime(), new OsuModHidden(), new OsuModHardRock() };
+            AddStep(@"Add multiple Mods", () => changeMods(multipleIncrementMods));
+            AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(multipleIncrementMods));
         }
 
         [Test]
@@ -78,10 +73,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private bool assertModsMultiplier(IEnumerable<Mod> mods)
         {
-            var multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
-            var expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
+            double multiplier = mods.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            string expectedValue = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
 
-            return expectedValue == footerButtonMods.MultiplierText.Text;
+            return expectedValue == footerButtonMods.MultiplierText.Current.Value;
         }
 
         private class TestFooterButtonMods : FooterButtonMods

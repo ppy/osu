@@ -2,29 +2,48 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class NotePlacementBlueprint : ManiaPlacementBlueprint<Note>
     {
+        private readonly EditNotePiece piece;
+
         public NotePlacementBlueprint()
             : base(new Note())
         {
-            Origin = Anchor.Centre;
+            RelativeSizeAxes = Axes.Both;
 
-            AutoSizeAxes = Axes.Y;
-
-            InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
+            InternalChild = piece = new EditNotePiece { Origin = Anchor.Centre };
         }
 
-        protected override void Update()
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            base.Update();
+            base.UpdateTimeAndPosition(result);
 
-            Width = SnappedWidth;
-            Position = SnappedMousePosition;
+            if (result.Playfield != null)
+            {
+                piece.Width = result.Playfield.DrawWidth;
+                piece.Position = ToLocalSpace(result.ScreenSpacePosition);
+            }
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (e.Button != MouseButton.Left)
+                return false;
+
+            base.OnMouseDown(e);
+
+            // Place the note immediately.
+            EndPlacement(true);
+
+            return true;
         }
     }
 }

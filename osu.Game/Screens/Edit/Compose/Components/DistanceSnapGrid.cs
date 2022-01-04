@@ -1,13 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -42,7 +44,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IDistanceSnapProvider SnapProvider { get; private set; }
+        protected IPositionSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -50,22 +52,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private readonly Cached gridCache = new Cached();
+        private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;
+
+        protected readonly HitObject ReferenceObject;
 
         /// <summary>
         /// Creates a new <see cref="DistanceSnapGrid"/>.
         /// </summary>
+        /// <param name="referenceObject">A reference object to gather relevant difficulty values from.</param>
         /// <param name="startPosition">The position at which the grid should start. The first tick is located one distance spacing length away from this point.</param>
         /// <param name="startTime">The snapping time at <see cref="StartPosition"/>.</param>
         /// <param name="endTime">The time at which the snapping grid should end. If null, the grid will continue until the bounds of the screen are exceeded.</param>
-        protected DistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null)
+        protected DistanceSnapGrid(HitObject referenceObject, Vector2 startPosition, double startTime, double? endTime = null)
         {
+            ReferenceObject = referenceObject;
             this.endTime = endTime;
+
             StartPosition = startPosition;
             StartTime = startTime;
 
             RelativeSizeAxes = Axes.Both;
+
+            AddLayout(gridCache);
         }
 
         protected override void LoadComplete()
@@ -77,7 +86,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(StartTime);
+            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;
@@ -85,18 +94,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
                 double maxDuration = endTime.Value - StartTime + 1;
-                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(StartTime, DistanceSpacing));
+                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceSpacing));
             }
 
             gridCache.Invalidate();
-        }
-
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.RequiredParentSizeToFit) > 0)
-                gridCache.Invalidate();
-
-            return base.Invalidate(invalidation, source, shallPropagate);
         }
 
         protected override void Update()
@@ -106,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!gridCache.IsValid)
             {
                 ClearInternal();
-                CreateContent(StartPosition);
+                CreateContent();
                 gridCache.Validate();
             }
         }
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Creates the content which visualises the grid ticks.
         /// </summary>
-        protected abstract void CreateContent(Vector2 startPosition);
+        protected abstract void CreateContent();
 
         /// <summary>
         /// Snaps a position to this grid.
@@ -126,26 +127,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
         /// </summary>
-        /// <param name="index">The 0-based beat index.</param>
+        /// <param name="placementIndex">The 0-based beat index from the point of placement.</param>
         /// <returns>The applicable colour.</returns>
-        protected ColourInfo GetColourForBeatIndex(int index)
+        protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
         {
-            int beat = (index + 1) % beatDivisor.Value;
-            ColourInfo colour = Colours.Gray5;
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
+            double beatLength = timingPoint.BeatLength / beatDivisor.Value;
+            int beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
 
-            for (int i = 0; i < BindableBeatDivisor.VALID_DIVISORS.Length; i++)
-            {
-                int divisor = BindableBeatDivisor.VALID_DIVISORS[i];
+            var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
-                if ((beat * divisor) % beatDivisor.Value == 0)
-                {
-                    colour = BindableBeatDivisor.GetColourFor(divisor, Colours);
-                    break;
-                }
-            }
-
-            int repeatIndex = index / beatDivisor.Value;
-            return colour.MultiplyAlpha(0.5f / (repeatIndex + 1));
+            int repeatIndex = placementIndex / beatDivisor.Value;
+            return ColourInfo.SingleColour(colour).MultiplyAlpha(0.5f / (repeatIndex + 1));
         }
     }
 }

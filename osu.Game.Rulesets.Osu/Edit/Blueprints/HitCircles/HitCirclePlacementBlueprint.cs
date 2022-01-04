@@ -5,7 +5,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
@@ -21,6 +21,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             InternalChild = circlePiece = new HitCirclePiece();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            BeginPlacement();
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -28,15 +34,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             circlePiece.UpdateFrom(HitObject);
         }
 
-        protected override bool OnClick(ClickEvent e)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            EndPlacement();
-            return true;
+            if (e.Button == MouseButton.Left)
+            {
+                EndPlacement(true);
+                return true;
+            }
+
+            return base.OnMouseDown(e);
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        public override void UpdateTimeAndPosition(SnapResult result)
         {
-            HitObject.Position = ToLocalSpace(screenSpacePosition);
+            base.UpdateTimeAndPosition(result);
+            HitObject.Position = ToLocalSpace(result.ScreenSpacePosition);
         }
     }
 }

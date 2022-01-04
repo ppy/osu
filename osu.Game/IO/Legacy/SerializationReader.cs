@@ -38,6 +38,7 @@ namespace osu.Game.IO.Legacy
         /// <summary> Reads a string from the buffer.  Overrides the base implementation so it can cope with nulls. </summary>
         public override string ReadString()
         {
+            // ReSharper disable once AssignNullToNotNullAttribute
             if (ReadByte() == 0) return null;
 
             return base.ReadString();
@@ -234,9 +235,9 @@ namespace osu.Game.IO.Legacy
 
                     if (typeName.Contains("System.Collections.Generic") && typeName.Contains("[["))
                     {
-                        string[] splitTyps = typeName.Split('[');
+                        string[] splitTypes = typeName.Split('[');
 
-                        foreach (string typ in splitTyps)
+                        foreach (string typ in splitTypes)
                         {
                             if (typ.Contains("Version"))
                             {

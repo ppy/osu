@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
@@ -32,9 +33,17 @@ namespace osu.Game.Users.Drawables
             if (country == null && !ShowPlaceholderOnNull)
                 return null;
 
-            return new DrawableFlag(country)
+            return new Container
             {
                 RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new DrawableFlag(country)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    new HoverClickSounds(HoverSampleSet.Submit)
+                }
             };
         }
 

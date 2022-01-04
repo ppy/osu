@@ -8,15 +8,21 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using static osu.Game.Tests.Visual.Components.TestScenePreviewTrackManager.TestPreviewTrackManager;
 
 namespace osu.Game.Tests.Visual.Components
 {
     public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
-        private readonly TestPreviewTrackManager trackManager = new TestPreviewTrackManager();
+        private readonly IAdjustableAudioComponent gameTrackAudio = new AudioAdjustments();
+
+        private readonly TestPreviewTrackManager trackManager;
 
         private AudioManager audio;
+
+        public TestScenePreviewTrackManager()
+        {
+            trackManager = new TestPreviewTrackManager(gameTrackAudio);
+        }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -100,7 +106,7 @@ namespace osu.Game.Tests.Visual.Components
         [Test]
         public void TestNonPresentTrack()
         {
-            TestPreviewTrack track = null;
+            TestPreviewTrackManager.TestPreviewTrack track = null;
 
             AddStep("get non-present track", () =>
             {
@@ -152,24 +158,39 @@ namespace osu.Game.Tests.Visual.Components
                     audio.VolumeTrack.Value = 1;
             });
 
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+            AddAssert("game not muted", () => gameTrackAudio.AggregateVolume.Value != 0);
 
             AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
             AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start track", () => track.Start());
-            AddAssert("game is muted", () => audio.Tracks.AggregateVolume.Value == 0);
+            AddAssert("game is muted", () => gameTrackAudio.AggregateVolume.Value == 0);
 
             if (stopAnyPlaying)
                 AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
             else
                 AddStep("stop track", () => track.Stop());
 
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+            AddAssert("game not muted", () => gameTrackAudio.AggregateVolume.Value != 0);
         }
 
-        private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
+        [Test]
+        public void TestOwnerNotRegistered()
+        {
+            PreviewTrack track = null;
 
-        private TestPreviewTrack getOwnedTrack()
+            AddStep("get track", () => Add(new TestTrackOwner(track = getTrack(), registerAsOwner: false)));
+            AddUntilStep("wait for loaded", () => track.IsLoaded);
+
+            AddStep("start track", () => track.Start());
+            AddUntilStep("track is running", () => track.IsRunning);
+
+            AddStep("cancel from anyone", () => trackManager.StopAnyPlaying(this));
+            AddAssert("track stopped", () => !track.IsRunning);
+        }
+
+        private TestPreviewTrackManager.TestPreviewTrack getTrack() => (TestPreviewTrackManager.TestPreviewTrack)trackManager.Get(null);
+
+        private TestPreviewTrackManager.TestPreviewTrack getOwnedTrack()
         {
             var track = getTrack();
 
@@ -181,10 +202,12 @@ namespace osu.Game.Tests.Visual.Components
         private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
             private readonly PreviewTrack track;
+            private readonly bool registerAsOwner;
 
-            public TestTrackOwner(PreviewTrack track)
+            public TestTrackOwner(PreviewTrack track, bool registerAsOwner = true)
             {
                 this.track = track;
+                this.registerAsOwner = registerAsOwner;
             }
 
             [BackgroundDependencyLoader]
@@ -196,7 +219,8 @@ namespace osu.Game.Tests.Visual.Components
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             {
                 var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs<IPreviewTrackOwner>(this);
+                if (registerAsOwner)
+                    dependencies.CacheAs<IPreviewTrackOwner>(this);
                 return dependencies;
             }
         }
@@ -207,7 +231,12 @@ namespace osu.Game.Tests.Visual.Components
 
             public new PreviewTrack CurrentTrack => base.CurrentTrack;
 
-            protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
+            public TestPreviewTrackManager(IAdjustableAudioComponent mainTrackAdjustments)
+                : base(mainTrackAdjustments)
+            {
+            }
+
+            protected override TrackManagerPreviewTrack CreatePreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
             public override bool UpdateSubTree()
             {
@@ -223,7 +252,7 @@ namespace osu.Game.Tests.Visual.Components
 
                 public new Track Track => base.Track;
 
-                public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
+                public TestPreviewTrack(IBeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
                 {
                     this.trackManager = trackManager;

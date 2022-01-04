@@ -8,13 +8,13 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetMessagesRequest : APIRequest<List<Message>>
     {
-        private readonly Channel channel;
+        public readonly Channel Channel;
 
         public GetMessagesRequest(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
         }
 
-        protected override string Target => $@"chat/channels/{channel.Id}/messages";
+        protected override string Target => $@"chat/channels/{Channel.Id}/messages";
     }
 }

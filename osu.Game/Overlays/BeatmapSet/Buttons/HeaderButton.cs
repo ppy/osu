@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         [BackgroundDependencyLoader]
         private void load()
         {
-            BackgroundColour = OsuColour.FromHex(@"094c5f");
-            Triangles.ColourLight = OsuColour.FromHex(@"0f7c9b");
-            Triangles.ColourDark = OsuColour.FromHex(@"094c5f");
+            BackgroundColour = Color4Extensions.FromHex(@"094c5f");
+            Triangles.ColourLight = Color4Extensions.FromHex(@"0f7c9b");
+            Triangles.ColourDark = Color4Extensions.FromHex(@"094c5f");
             Triangles.TriangleScale = 1.5f;
         }
     }

@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
@@ -22,30 +23,37 @@ namespace osu.Game.Tests.Beatmaps
         protected abstract string ResourceAssembly { get; }
 
         protected void Test(double expected, string name, params Mod[] mods)
-            => Assert.AreEqual(expected, CreateDifficultyCalculator(getBeatmap(name)).Calculate(mods).StarRating);
+        {
+            // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.
+            Assert.That(CreateDifficultyCalculator(getBeatmap(name)).Calculate(mods).StarRating, Is.EqualTo(expected).Within(0.00001));
+        }
 
-        private WorkingBeatmap getBeatmap(string name)
+        private IWorkingBeatmap getBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
             using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
+
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
 
-                var working = new TestWorkingBeatmap(decoder.Decode(stream));
-                working.BeatmapInfo.Ruleset = CreateRuleset().RulesetInfo;
-
-                return working;
+                return new TestWorkingBeatmap(decoder.Decode(stream))
+                {
+                    BeatmapInfo =
+                    {
+                        Ruleset = CreateRuleset().RulesetInfo
+                    }
+                };
             }
         }
 
         private Stream openResource(string name)
         {
-            var localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path));
+            string localPath = Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path)).AsNonNull();
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 
-        protected abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
+        protected abstract DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap);
 
         protected abstract Ruleset CreateRuleset();
     }

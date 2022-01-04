@@ -6,31 +6,27 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.TeamWin;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
-    public class GameplayScreen : BeatmapInfoScreen
+    public class GameplayScreen : BeatmapInfoScreen, IProvideVideo
     {
         private readonly BindableBool warmup = new BindableBool();
-
-        private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private OsuButton warmupButton;
         private MatchIPCInfo ipc;
-
-        private readonly Color4 red = new Color4(186, 0, 18, 255);
-        private readonly Color4 blue = new Color4(17, 136, 170, 255);
 
         [Resolved(canBeNull: true)]
         private TournamentSceneManager sceneManager { get; set; }
@@ -38,66 +34,63 @@ namespace osu.Game.Tournament.Screens.Gameplay
         [Resolved]
         private TournamentMatchChatDisplay chat { get; set; }
 
+        private Drawable chroma;
+
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
         {
             this.ipc = ipc;
 
             AddRangeInternal(new Drawable[]
             {
-                new MatchHeader(),
+                new TourneyVideo("gameplay")
+                {
+                    Loop = true,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                header = new MatchHeader
+                {
+                    ShowLogo = false
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Y = 5,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Children = new Drawable[]
+                    Y = 110,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Children = new[]
                     {
-                        new Box
+                        chroma = new Container
                         {
-                            // chroma key area for stable gameplay
-                            Name = "chroma",
-                            RelativeSizeAxes = Axes.X,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Height = 512,
-                            Colour = new Color4(0, 255, 0, 255),
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Y = -4,
                             Children = new Drawable[]
                             {
-                                new Circle
+                                new ChromaArea
                                 {
-                                    Name = "top bar red",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
+                                    Name = "Left chroma",
+                                    RelativeSizeAxes = Axes.Both,
                                     Width = 0.5f,
-                                    Colour = red,
                                 },
-                                new Circle
+                                new ChromaArea
                                 {
-                                    Name = "top bar blue",
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 8,
-                                    Width = 0.5f,
-                                    Colour = blue,
+                                    Name = "Right chroma",
+                                    RelativeSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                },
+                                    Width = 0.5f,
+                                }
                             }
                         },
                     }
                 },
-                scoreDisplay = new MatchScoreDisplay
+                scoreDisplay = new TournamentMatchScoreDisplay
                 {
-                    Y = -60,
-                    Scale = new Vector2(0.8f),
+                    Y = -147,
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Origin = Anchor.TopCentre,
                 },
                 new ControlPanel
                 {
@@ -114,29 +107,56 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",
                             Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Chroma width",
+                            Current = LadderInfo.ChromaKeyWidth,
+                            KeyboardStep = 1,
+                        },
+                        new SettingsSlider<int>
+                        {
+                            LabelText = "Players per team",
+                            Current = LadderInfo.PlayersPerTeam,
+                            KeyboardStep = 1,
                         }
                     }
                 }
             });
 
+            ladder.ChromaKeyWidth.BindValueChanged(width => chroma.Width = width.NewValue, true);
+
+            warmup.BindValueChanged(w =>
+            {
+                warmupButton.Alpha = !w.NewValue ? 0.5f : 1;
+                header.ShowScores = !w.NewValue;
+            }, true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             State.BindTo(ipc.State);
             State.BindValueChanged(stateChanged, true);
+        }
 
-            currentMatch.BindValueChanged(m =>
-            {
-                warmup.Value = m.NewValue.Team1Score.Value + m.NewValue.Team2Score.Value == 0;
-                scheduledOperation?.Cancel();
-            });
+        protected override void CurrentMatchChanged(ValueChangedEvent<TournamentMatch> match)
+        {
+            base.CurrentMatchChanged(match);
 
-            currentMatch.BindTo(ladder.CurrentMatch);
+            if (match.NewValue == null)
+                return;
 
-            warmup.BindValueChanged(w => warmupButton.Alpha = !w.NewValue ? 0.5f : 1, true);
+            warmup.Value = match.NewValue.Team1Score.Value + match.NewValue.Team2Score.Value == 0;
+            scheduledOperation?.Cancel();
         }
 
         private ScheduledDelegate scheduledOperation;
-        private MatchScoreDisplay scoreDisplay;
+        private TournamentMatchScoreDisplay scoreDisplay;
 
         private TourneyState lastState;
+        private MatchHeader header;
 
         private void stateChanged(ValueChangedEvent<TourneyState> state)
         {
@@ -144,21 +164,21 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 if (state.NewValue == TourneyState.Ranking)
                 {
-                    if (warmup.Value) return;
+                    if (warmup.Value || CurrentMatch.Value == null) return;
 
                     if (ipc.Score1.Value > ipc.Score2.Value)
-                        currentMatch.Value.Team1Score.Value++;
+                        CurrentMatch.Value.Team1Score.Value++;
                     else
-                        currentMatch.Value.Team2Score.Value++;
+                        CurrentMatch.Value.Team2Score.Value++;
                 }
 
                 scheduledOperation?.Cancel();
 
                 void expand()
                 {
-                    chat?.Expand();
+                    chat?.Contract();
 
-                    using (BeginDelayedSequence(300, true))
+                    using (BeginDelayedSequence(300))
                     {
                         scoreDisplay.FadeIn(100);
                         SongBar.Expanded = true;
@@ -170,7 +190,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     SongBar.Expanded = false;
                     scoreDisplay.FadeOut(100);
                     using (chat?.BeginDelayedSequence(500))
-                        chat?.Contract();
+                        chat?.Expand();
                 }
 
                 switch (state.NewValue)
@@ -184,9 +204,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         // we should automatically proceed after a short delay
                         if (lastState == TourneyState.Ranking && !warmup.Value)
                         {
-                            if (currentMatch.Value?.Completed.Value == true)
+                            if (CurrentMatch.Value?.Completed.Value == true)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, delay_before_progression);
-                            else if (currentMatch.Value?.Completed.Value == false)
+                            else if (CurrentMatch.Value?.Completed.Value == false)
                                 scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, delay_before_progression);
                         }
 
@@ -197,7 +217,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         break;
 
                     default:
-                        chat.Expand();
+                        chat.Contract();
                         expand();
                         break;
                 }
@@ -205,6 +225,55 @@ namespace osu.Game.Tournament.Screens.Gameplay
             finally
             {
                 lastState = state.NewValue;
+            }
+        }
+
+        private class ChromaArea : CompositeDrawable
+        {
+            [Resolved]
+            private LadderInfo ladder { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                // chroma key area for stable gameplay
+                Colour = new Color4(0, 255, 0, 255);
+
+                ladder.PlayersPerTeam.BindValueChanged(performLayout, true);
+            }
+
+            private void performLayout(ValueChangedEvent<int> playerCount)
+            {
+                switch (playerCount.NewValue)
+                {
+                    case 3:
+                        InternalChildren = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Width = 0.5f,
+                                Height = 0.5f,
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            },
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Height = 0.5f,
+                            },
+                        };
+                        break;
+
+                    default:
+                        InternalChild = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        };
+                        break;
+                }
             }
         }
     }

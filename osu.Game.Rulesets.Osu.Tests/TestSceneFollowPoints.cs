@@ -2,9 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Framework.Timing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
@@ -91,9 +95,19 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             addMultipleObjectsStep();
 
-            AddStep("move hitobject", () => getObject(2).HitObject.Position = new Vector2(300, 100));
+            AddStep("move hitobject", () =>
+            {
+                var manualClock = new ManualClock();
+                followPointRenderer.Clock = new FramedClock(manualClock);
+
+                manualClock.CurrentTime = getObject(1).HitObject.StartTime;
+                followPointRenderer.UpdateSubTree();
+
+                getObject(2).HitObject.Position = new Vector2(300, 100);
+            });
 
             assertGroups();
+            assertDirections();
         }
 
         [TestCase(0, 0)] // Start -> Start
@@ -112,6 +126,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             reorderObjectStep(startIndex, endIndex);
 
             assertGroups();
+        }
+
+        [Test]
+        public void TestStackedObjects()
+        {
+            addObjectsStep(() => new OsuHitObject[]
+            {
+                new HitCircle { Position = new Vector2(300, 100) },
+                new HitCircle
+                {
+                    Position = new Vector2(300, 300),
+                    StackHeight = 20
+                },
+            });
+
+            assertDirections();
         }
 
         private void addMultipleObjectsStep() => addObjectsStep(() => new OsuHitObject[]
@@ -152,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     }
 
                     hitObjectContainer.Add(drawableObject);
-                    followPointRenderer.AddFollowPoints(drawableObject);
+                    followPointRenderer.AddFollowPoints(objects[i]);
                 }
             });
         }
@@ -161,10 +191,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("remove hitobject", () =>
             {
-                var drawableObject = getFunc?.Invoke();
+                var drawableObject = getFunc.Invoke();
 
                 hitObjectContainer.Remove(drawableObject);
-                followPointRenderer.RemoveFollowPoints(drawableObject);
+                followPointRenderer.RemoveFollowPoints(drawableObject.HitObject);
             });
         }
 
@@ -188,7 +218,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertGroups()
         {
-            AddAssert("has correct group count", () => followPointRenderer.Connections.Count == hitObjectContainer.Count);
+            AddAssert("has correct group count", () => followPointRenderer.Entries.Count == hitObjectContainer.Count);
             AddAssert("group endpoints are correct", () =>
             {
                 for (int i = 0; i < hitObjectContainer.Count; i++)
@@ -196,11 +226,44 @@ namespace osu.Game.Rulesets.Osu.Tests
                     DrawableOsuHitObject expectedStart = getObject(i);
                     DrawableOsuHitObject expectedEnd = i < hitObjectContainer.Count - 1 ? getObject(i + 1) : null;
 
-                    if (getGroup(i).Start != expectedStart)
+                    if (getEntry(i).Start != expectedStart.HitObject)
                         throw new AssertionException($"Object {i} expected to be the start of group {i}.");
 
-                    if (getGroup(i).End != expectedEnd)
+                    if (getEntry(i).End != expectedEnd?.HitObject)
                         throw new AssertionException($"Object {(expectedEnd == null ? "null" : i.ToString())} expected to be the end of group {i}.");
+                }
+
+                return true;
+            });
+        }
+
+        private void assertDirections()
+        {
+            AddAssert("group directions are correct", () =>
+            {
+                for (int i = 0; i < hitObjectContainer.Count; i++)
+                {
+                    DrawableOsuHitObject expectedStart = getObject(i);
+                    DrawableOsuHitObject expectedEnd = i < hitObjectContainer.Count - 1 ? getObject(i + 1) : null;
+
+                    if (expectedEnd == null)
+                        continue;
+
+                    var manualClock = new ManualClock();
+                    followPointRenderer.Clock = new FramedClock(manualClock);
+
+                    manualClock.CurrentTime = expectedStart.HitObject.StartTime;
+                    followPointRenderer.UpdateSubTree();
+
+                    var points = getGroup(i).ChildrenOfType<FollowPoint>().ToArray();
+                    if (points.Length == 0)
+                        continue;
+
+                    float expectedDirection = MathF.Atan2(expectedStart.Position.Y - expectedEnd.Position.Y, expectedStart.Position.X - expectedEnd.Position.X);
+                    float realDirection = MathF.Atan2(expectedStart.Position.Y - points[^1].Position.Y, expectedStart.Position.X - points[^1].Position.X);
+
+                    if (!Precision.AlmostEquals(expectedDirection, realDirection))
+                        throw new AssertionException($"Expected group {i} in direction {expectedDirection}, but was {realDirection}.");
                 }
 
                 return true;
@@ -209,7 +272,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private DrawableOsuHitObject getObject(int index) => hitObjectContainer[index];
 
-        private FollowPointConnection getGroup(int index) => followPointRenderer.Connections[index];
+        private FollowPointLifetimeEntry getEntry(int index) => followPointRenderer.Entries[index];
+
+        private FollowPointConnection getGroup(int index) => followPointRenderer.ChildrenOfType<FollowPointConnection>().Single(c => c.Entry == getEntry(index));
 
         private class TestHitObjectContainer : Container<DrawableOsuHitObject>
         {

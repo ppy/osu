@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         double stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
 
                         if (objectN.StartTime - endTime > stackThreshold)
-                            //We are no longer within stacking range of the next object.
+                            // We are no longer within stacking range of the next object.
                             break;
 
                         if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 }
             }
 
-            //Reverse pass for stack calculation.
+            // Reverse pass for stack calculation.
             int extendedStartIndex = startIndex;
 
             for (int i = extendedEndIndex; i > startIndex; i--)
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         double endTime = objectN.GetEndTime();
 
                         if (objectI.StartTime - endTime > stackThreshold)
-                            //We are no longer within stacking range of the previous object.
+                            // We are no longer within stacking range of the previous object.
                             break;
 
                         // HitObjects before the specified update range haven't been reset yet
@@ -145,20 +145,20 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
                             for (int j = n + 1; j <= i; j++)
                             {
-                                //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
+                                // For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
                                 OsuHitObject objectJ = beatmap.HitObjects[j];
                                 if (Vector2Extensions.Distance(objectN.EndPosition, objectJ.Position) < stack_distance)
                                     objectJ.StackHeight -= offset;
                             }
 
-                            //We have hit a slider.  We should restart calculation using this as the new base.
-                            //Breaking here will mean that the slider still has StackCount of 0, so will be handled in the i-outer-loop.
+                            // We have hit a slider.  We should restart calculation using this as the new base.
+                            // Breaking here will mean that the slider still has StackCount of 0, so will be handled in the i-outer-loop.
                             break;
                         }
 
                         if (Vector2Extensions.Distance(objectN.Position, objectI.Position) < stack_distance)
                         {
-                            //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
+                            // Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                             //NOTE: Sliders with start positions stacking are a special case that is also handled here.
 
                             objectN.StackHeight = objectI.StackHeight + 1;
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Spinner) continue;
 
                         if (objectI.StartTime - objectN.StartTime > stackThreshold)
-                            //We are no longer within stacking range of the previous object.
+                            // We are no longer within stacking range of the previous object.
                             break;
 
                         if (Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     }
                     else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
-                        //Case for sliders - bump notes down and right, rather than up and left.
+                        // Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
                         startTime = beatmap.HitObjects[j].GetEndTime();

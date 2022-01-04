@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
 using osuTK;
@@ -32,6 +33,8 @@ namespace osu.Game.Overlays
 
         public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
+        private SelectionCycleFillFlowContainer<VolumeMeter> volumeMeters;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
@@ -46,7 +49,14 @@ namespace osu.Game.Overlays
                     Width = 300,
                     Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.75f), Color4.Black.Opacity(0))
                 },
-                new FillFlowContainer
+                muteButton = new MuteButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding(10),
+                    Current = { BindTarget = IsMuted }
+                },
+                volumeMeters = new SelectionCycleFillFlowContainer<VolumeMeter>
                 {
                     Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
@@ -54,21 +64,13 @@ namespace osu.Game.Overlays
                     Origin = Anchor.CentreLeft,
                     Spacing = new Vector2(0, offset),
                     Margin = new MarginPadding { Left = offset },
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
-                        {
-                            Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } //to counter the mute button and re-center the volume meters
-                        },
+                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker),
                         volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
-                        muteButton = new MuteButton
-                        {
-                            Margin = new MarginPadding { Top = 100 },
-                            Current = { BindTarget = IsMuted }
-                        }
                     }
-                },
+                }
             });
 
             volumeMeterMaster.Bindable.BindTo(audio.Volume);
@@ -88,9 +90,9 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            volumeMeterMaster.Bindable.ValueChanged += _ => Show();
-            volumeMeterEffect.Bindable.ValueChanged += _ => Show();
-            volumeMeterMusic.Bindable.ValueChanged += _ => Show();
+            foreach (var volumeMeter in volumeMeters)
+                volumeMeter.Bindable.ValueChanged += _ => Show();
+
             muteButton.Current.ValueChanged += _ => Show();
         }
 
@@ -103,23 +105,27 @@ namespace osu.Game.Overlays
                 case GlobalAction.DecreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
-                    else if (volumeMeterMusic.IsHovered)
-                        volumeMeterMusic.Decrease(amount, isPrecise);
-                    else if (volumeMeterEffect.IsHovered)
-                        volumeMeterEffect.Decrease(amount, isPrecise);
                     else
-                        volumeMeterMaster.Decrease(amount, isPrecise);
+                        volumeMeters.Selected?.Decrease(amount, isPrecise);
                     return true;
 
                 case GlobalAction.IncreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
-                    else if (volumeMeterMusic.IsHovered)
-                        volumeMeterMusic.Increase(amount, isPrecise);
-                    else if (volumeMeterEffect.IsHovered)
-                        volumeMeterEffect.Increase(amount, isPrecise);
                     else
-                        volumeMeterMaster.Increase(amount, isPrecise);
+                        volumeMeters.Selected?.Increase(amount, isPrecise);
+                    return true;
+
+                case GlobalAction.NextVolumeMeter:
+                    if (State.Value == Visibility.Visible)
+                        volumeMeters.SelectNext();
+                    Show();
+                    return true;
+
+                case GlobalAction.PreviousVolumeMeter:
+                    if (State.Value == Visibility.Visible)
+                        volumeMeters.SelectPrevious();
+                    Show();
                     return true;
 
                 case GlobalAction.ToggleMute:
@@ -135,6 +141,10 @@ namespace osu.Game.Overlays
 
         public override void Show()
         {
+            // Focus on the master meter as a default if previously hidden
+            if (State.Value == Visibility.Hidden)
+                volumeMeters.Select(volumeMeterMaster);
+
             if (State.Value == Visibility.Visible)
                 schedulePopOut();
 

@@ -5,37 +5,38 @@ using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Beatmaps;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Users;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class FavouriteButton : HeaderButton, IHasTooltip
     {
-        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<APIBeatmapSet> BeatmapSet = new Bindable<APIBeatmapSet>();
 
         private readonly BindableBool favourited = new BindableBool();
 
         private PostBeatmapFavouriteRequest request;
-        private DimmedLoadingLayer loading;
+        private LoadingLayer loading;
 
-        private readonly Bindable<User> localUser = new Bindable<User>();
+        private readonly IBindable<APIUser> localUser = new Bindable<APIUser>();
 
-        public string TooltipText
+        public LocalisableString TooltipText
         {
             get
             {
                 if (!Enabled.Value) return string.Empty;
 
-                return (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+                return favourited.Value ? BeatmapsetsStrings.ShowDetailsUnfavourite : BeatmapsetsStrings.ShowDetailsFavourite;
             }
         }
 
@@ -54,22 +55,19 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Size = new Vector2(18),
                     Shadow = false,
                 },
-                loading = new DimmedLoadingLayer(0.8f, 0.5f),
+                loading = new LoadingLayer(true, false),
             });
 
             Action = () =>
             {
-                if (loading.State.Value == Visibility.Visible)
-                    return;
-
                 // guaranteed by disabled state above.
-                Debug.Assert(BeatmapSet.Value.OnlineBeatmapSetID != null);
+                Debug.Assert(BeatmapSet.Value.OnlineID > 0);
 
                 loading.Show();
 
                 request?.Cancel();
 
-                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineBeatmapSetID.Value, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
+                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineID, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
 
                 request.Success += () =>
                 {
@@ -100,11 +98,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 updateEnabled();
-                favourited.Value = setInfo.NewValue?.OnlineInfo?.HasFavourited ?? false;
+                favourited.Value = setInfo.NewValue?.HasFavourited ?? false;
             }, true);
         }
 
-        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && BeatmapSet.Value?.OnlineBeatmapSetID > 0;
+        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && BeatmapSet.Value?.OnlineID > 0;
 
         protected override void UpdateAfterChildren()
         {

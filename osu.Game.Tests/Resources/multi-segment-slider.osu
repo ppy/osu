@@ -1,0 +1,24 @@
+osu file format v128
+
+[HitObjects]
+// Multi-segment
+63,301,1000,6,0,P|224:57|B|439:298|131:316|322:169|155:194,1,1040,0|0,0:0|0:0,0:0:0:0:
+
+// Single-segment
+63,301,2000,6,0,P|224:57|439:298,1,1040,0|0,0:0|0:0,0:0:0:0:
+
+// Implicit multi-segment
+32,192,3000,6,0,B|32:384|256:384|256:192|256:192|256:0|512:0|512:192,1,800
+
+// Last control point duplicated
+0,0,4000,2,0,B|1:1|2:2|3:3|3:3,2,200
+
+// Last control point in segment duplicated
+0,0,5000,2,0,B|1:1|2:2|3:3|3:3|B|4:4|5:5,2,200
+
+// Implicit perfect-curve multi-segment (Should convert to bezier to match stable)
+0,0,6000,2,0,P|75:145|170:75|170:75|300:145|410:20,1,475,0:0:0:0:
+
+// Explicit perfect-curve multi-segment (Should not convert to bezier)
+0,0,7000,2,0,P|75:145|P|170:75|300:145|410:20,1,650,0:0:0:0:
+

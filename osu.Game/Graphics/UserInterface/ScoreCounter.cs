@@ -1,61 +1,45 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScoreCounter : RollingCounter<double>
+    public abstract class ScoreCounter : RollingCounter<double>
     {
         protected override double RollingDuration => 1000;
         protected override Easing RollingEasing => Easing.Out;
 
-        public bool UseCommaSeparator;
+        public Bindable<int> RequiredDisplayDigits { get; } = new Bindable<int>();
 
-        /// <summary>
-        /// How many leading zeroes the counter has.
-        /// </summary>
-        public uint LeadingZeroes
-        {
-            get;
-            protected set;
-        }
+        private string formatString;
 
         /// <summary>
         /// Displays score.
         /// </summary>
         /// <param name="leading">How many leading zeroes the counter will have.</param>
-        public ScoreCounter(uint leading = 0)
+        protected ScoreCounter(int leading = 0)
         {
-            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
-            LeadingZeroes = leading;
+            RequiredDisplayDigits.Value = leading;
+            RequiredDisplayDigits.BindValueChanged(displayDigitsChanged, true);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
-
-        protected override double GetProportionalDuration(double currentValue, double newValue)
+        private void displayDigitsChanged(ValueChangedEvent<int> _)
         {
-            return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
+            formatString = new string('0', RequiredDisplayDigits.Value);
+            UpdateDisplay();
         }
 
-        protected override string FormatCount(double count)
-        {
-            string format = new string('0', (int)LeadingZeroes);
+        protected override double GetProportionalDuration(double currentValue, double newValue) =>
+            currentValue > newValue ? currentValue - newValue : newValue - currentValue;
 
-            if (UseCommaSeparator)
-            {
-                for (int i = format.Length - 3; i > 0; i -= 3)
-                    format = format.Insert(i, @",");
-            }
+        protected override LocalisableString FormatCount(double count) => ((long)count).ToLocalisableString(formatString);
 
-            return ((long)count).ToString(format);
-        }
-
-        public override void Increment(double amount)
-        {
-            Current.Value += amount;
-        }
+        protected override OsuSpriteText CreateSpriteText()
+            => base.CreateSpriteText().With(s => s.Font = s.Font.With(fixedWidth: true));
     }
 }

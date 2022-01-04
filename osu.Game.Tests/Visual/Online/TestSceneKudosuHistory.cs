@@ -16,11 +16,6 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneKudosuHistory : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(DrawableKudosuHistoryItem),
-        };
-
         private readonly Box background;
 
         public TestSceneKudosuHistory()
@@ -49,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoam;
+            background.Colour = colours.GreySeaFoam;
         }
 
         private readonly IEnumerable<APIKudosuHistory> items = new[]

@@ -22,10 +22,11 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
-        protected override bool OnDrag(DragEvent e)
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds) => false;
+
+        protected override void OnDrag(DragEvent e)
         {
             this.MoveTo(target += e.Delta, 1000, Easing.OutQuint);
-            return true;
         }
 
         private const float min_scale = 0.6f;
@@ -33,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            var newScale = Math.Clamp(scale + e.ScrollDelta.Y / 15 * scale, min_scale, max_scale);
+            float newScale = Math.Clamp(scale + e.ScrollDelta.Y / 15 * scale, min_scale, max_scale);
 
             this.MoveTo(target -= e.MousePosition * (newScale - scale), 2000, Easing.OutQuint);
             this.ScaleTo(scale = newScale, 2000, Easing.OutQuint);

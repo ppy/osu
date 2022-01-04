@@ -48,9 +48,12 @@ desc 'Deploy to play store'
 
   desc 'Compile the project'
   lane :build do |options|
-    nuget_restore(
-      project_path: 'osu.sln'
-    )
+    nuget_restore(project_path: 'osu.Android/osu.Android.csproj')
+    nuget_restore(project_path: 'osu.Game/osu.Game.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Osu/osu.Game.Rulesets.Osu.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Taiko/osu.Game.Rulesets.Taiko.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Catch/osu.Game.Rulesets.Catch.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Mania/osu.Game.Rulesets.Mania.csproj')
 
     souyuz(
       build_configuration: 'Release',
@@ -97,22 +100,26 @@ platform :ios do
     changelog.gsub!('$BUILD_ID', options[:build])
 
     pilot(
-      wait_processing_interval: 1800,
+      wait_processing_interval: 900,
       changelog: changelog,
+      groups: ['osu! supporters', 'public'],
+      distribute_external: true,
       ipa: './osu.iOS/bin/iPhone/Release/osu.iOS.ipa'
     )
   end
 
   desc 'Compile the project'
   lane :build do
-    nuget_restore(
-      project_path: 'osu.sln'
-    )
+    nuget_restore(project_path: 'osu.iOS/osu.iOS.csproj')
+    nuget_restore(project_path: 'osu.Game/osu.Game.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Osu/osu.Game.Rulesets.Osu.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Taiko/osu.Game.Rulesets.Taiko.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Catch/osu.Game.Rulesets.Catch.csproj')
+    nuget_restore(project_path: 'osu.Game.Rulesets.Mania/osu.Game.Rulesets.Mania.csproj')
 
     souyuz(
       platform: "ios",
-      build_target: "osu_iOS",
-      plist_path: "../osu.iOS/Info.plist"
+      plist_path: "osu.iOS/Info.plist"
     )
   end
 
@@ -126,7 +133,7 @@ platform :ios do
   end
 
   lane :update_version do |options|
-    options[:plist_path] = '../osu.iOS/Info.plist'
+    options[:plist_path] = 'osu.iOS/Info.plist'
     app_version(options)
   end
 

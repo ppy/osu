@@ -22,20 +22,30 @@ namespace osu.Game.Beatmaps
         {
             IHasComboInformation lastObj = null;
 
+            bool isFirst = true;
+
             foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
+                if (isFirst)
+                {
+                    obj.NewCombo = true;
+
+                    // first hitobject should always be marked as a new combo for sanity.
+                    isFirst = false;
+                }
+
+                obj.ComboIndex = lastObj?.ComboIndex ?? 0;
+                obj.ComboIndexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+                obj.IndexInCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
                 if (obj.NewCombo)
                 {
                     obj.IndexInCurrentCombo = 0;
-                    obj.ComboIndex = (lastObj?.ComboIndex ?? 0) + obj.ComboOffset + 1;
+                    obj.ComboIndex++;
+                    obj.ComboIndexWithOffsets += obj.ComboOffset + 1;
 
                     if (lastObj != null)
                         lastObj.LastInCombo = true;
-                }
-                else if (lastObj != null)
-                {
-                    obj.IndexInCurrentCombo = lastObj.IndexInCurrentCombo + 1;
-                    obj.ComboIndex = lastObj.ComboIndex;
                 }
 
                 lastObj = obj;

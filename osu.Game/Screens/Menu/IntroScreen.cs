@@ -1,17 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
+using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
@@ -41,22 +45,39 @@ namespace osu.Game.Screens.Menu
 
         protected IBindable<bool> MenuMusic { get; private set; }
 
-        private WorkingBeatmap introBeatmap;
+        private WorkingBeatmap initialBeatmap;
 
-        protected Track Track { get; private set; }
-
-        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
+        protected ITrack Track { get; private set; }
 
         private const int exit_delay = 3000;
 
-        private SampleChannel seeya;
+        private Sample seeya;
+
+        protected virtual string SeeyaSampleName => "Intro/seeya";
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
-        private MainMenu mainMenu;
+        private OsuScreen nextScreen;
 
         [Resolved]
         private AudioManager audio { get; set; }
+
+        [Resolved]
+        private MusicController musicController { get; set; }
+
+        [CanBeNull]
+        private readonly Func<OsuScreen> createNextScreen;
+
+        /// <summary>
+        /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
+        /// Only valid during or after <see cref="LogoArriving"/>.
+        /// </summary>
+        protected bool UsingThemedIntro { get; private set; }
+
+        protected IntroScreen([CanBeNull] Func<MainMenu> createNextScreen = null)
+        {
+            this.createNextScreen = createNextScreen;
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
@@ -66,54 +87,88 @@ namespace osu.Game.Screens.Menu
 
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
-
-            seeya = audio.Samples.Get(@"seeya");
+            seeya = audio.Samples.Get(SeeyaSampleName);
 
             BeatmapSetInfo setInfo = null;
 
+            // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
+                var sets = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal);
+
                 if (sets.Count > 0)
-                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-            }
-
-            if (setInfo == null)
-            {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
-
-                if (setInfo == null)
                 {
-                    // we need to import the default menu background beatmap
-                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
-
-                    setInfo.Protected = true;
-                    beatmaps.Update(setInfo);
+                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
                 }
             }
 
-            introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-            Track = introBeatmap.Track;
-        }
+            // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
+            if (setInfo == null)
+            {
+                if (!loadThemedIntro())
+                {
+                    // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
+                    // this could happen if a user has nuked their files store. for now, reimport to repair this.
+                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
 
-        public override bool OnExiting(IScreen next) => !DidLoadMenu;
+                    import.PerformWrite(b =>
+                    {
+                        b.Protected = true;
+                        beatmaps.Update(b);
+                    });
+
+                    loadThemedIntro();
+                }
+            }
+
+            bool loadThemedIntro()
+            {
+                setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash, IncludedDetails.AllButRuleset).FirstOrDefault();
+
+                if (setInfo == null)
+                    return false;
+
+                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+
+                return UsingThemedIntro = initialBeatmap != null;
+            }
+        }
 
         public override void OnResuming(IScreen last)
         {
             this.FadeIn(300);
 
             double fadeOutTime = exit_delay;
-            //we also handle the exit transition.
+
+            var track = musicController.CurrentTrack;
+
+            // ensure the track doesn't change or loop as we are exiting.
+            track.Looping = false;
+            Beatmap.Disabled = true;
+
+            // we also handle the exit transition.
             if (MenuVoice.Value)
+            {
                 seeya.Play();
+
+                // if playing the outro voice, we have more time to have fun with the background track.
+                // initially fade to almost silent then ramp out over the remaining time.
+                const double initial_fade = 200;
+                track
+                    .VolumeTo(0.03f, initial_fade).Then()
+                    .VolumeTo(0, fadeOutTime - initial_fade, Easing.In);
+            }
             else
+            {
                 fadeOutTime = 500;
 
-            audio.AddAdjustment(AdjustableProperty.Volume, exitingVolumeFade);
-            this.TransformBindableTo(exitingVolumeFade, 0, fadeOutTime).OnComplete(_ => this.Exit());
+                // if outro voice is turned off, just do a simple fade out.
+                track.VolumeTo(0, fadeOutTime, Easing.Out);
+            }
 
             //don't want to fade out completely else we will stop running updates.
-            Game.FadeTo(0.01f, fadeOutTime);
+            Game.FadeTo(0.01f, fadeOutTime).OnComplete(_ => this.Exit());
 
             base.OnResuming(last);
         }
@@ -121,16 +176,16 @@ namespace osu.Game.Screens.Menu
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-            Track = null;
+            initialBeatmap = null;
         }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
-        protected void StartTrack()
+        protected virtual void StartTrack()
         {
             // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (MenuMusic.Value)
-                Track.Restart();
+            if (UsingThemedIntro)
+                Track.Start();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -143,8 +198,11 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmap.Value = introBeatmap;
-                introBeatmap = null;
+                beatmap.Value = initialBeatmap;
+                Track = initialBeatmap.Track;
+
+                // ensure the track starts at maximum volume
+                musicController.CurrentTrack.FinishTransforms();
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);
@@ -153,7 +211,7 @@ namespace osu.Game.Screens.Menu
             else
             {
                 const int quick_appear = 350;
-                var initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
+                int initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
 
                 logo.MoveTo(new Vector2(0.5f), initialMovementTime, Easing.OutQuint);
 
@@ -166,14 +224,21 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected void PrepareMenuLoad() => LoadComponentAsync(mainMenu = new MainMenu());
+        protected void PrepareMenuLoad()
+        {
+            nextScreen = createNextScreen?.Invoke();
+
+            if (nextScreen != null)
+                LoadComponentAsync(nextScreen);
+        }
 
         protected void LoadMenu()
         {
             beatmap.Return();
 
             DidLoadMenu = true;
-            this.Push(mainMenu);
+            if (nextScreen != null)
+                this.Push(nextScreen);
         }
     }
 }

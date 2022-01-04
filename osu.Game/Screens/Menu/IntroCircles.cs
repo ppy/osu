@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -18,13 +20,18 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
-        private SampleChannel welcome;
+        private Sample welcome;
+
+        public IntroCircles([CanBeNull] Func<MainMenu> createNextScreen = null)
+            : base(createNextScreen)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             if (MenuVoice.Value)
-                welcome = audio.Samples.Get(@"welcome");
+                welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

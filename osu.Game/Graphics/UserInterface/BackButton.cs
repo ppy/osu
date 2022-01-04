@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
@@ -16,13 +17,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly TwoLayerButton button;
 
-        public BackButton(Receptor receptor)
+        public BackButton(Receptor receptor = null)
         {
-            receptor.OnBackPressed = () => button.Click();
-
             Size = TwoLayerButton.SIZE_EXTENDED;
 
-            Child = button = new TwoLayerButton
+            Child = button = new TwoLayerButton(HoverSampleSet.Submit)
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -30,6 +29,14 @@ namespace osu.Game.Graphics.UserInterface
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
             };
+
+            if (receptor == null)
+            {
+                // if a receptor wasn't provided, create our own locally.
+                Add(receptor = new Receptor());
+            }
+
+            receptor.OnBackPressed = () => button.TriggerClick();
         }
 
         [BackgroundDependencyLoader]
@@ -55,9 +62,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             public Action OnBackPressed;
 
-            public bool OnPressed(GlobalAction action)
+            public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
             {
-                switch (action)
+                if (e.Repeat)
+                    return false;
+
+                switch (e.Action)
                 {
                     case GlobalAction.Back:
                         OnBackPressed?.Invoke();
@@ -67,7 +77,9 @@ namespace osu.Game.Graphics.UserInterface
                 return false;
             }
 
-            public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+            public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+            {
+            }
         }
     }
 }

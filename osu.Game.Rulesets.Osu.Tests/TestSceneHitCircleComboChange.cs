@@ -16,11 +16,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             Scheduler.AddDelayed(() => comboIndex.Value++, 250, true);
         }
 
-        protected override TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto)
+        protected override TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto, double hitOffset = 0)
         {
             circle.ComboIndexBindable.BindTo(comboIndex);
             circle.IndexInCurrentComboBindable.BindTo(comboIndex);
-            return base.CreateDrawableHitCircle(circle, auto);
+            return base.CreateDrawableHitCircle(circle, auto, hitOffset);
         }
     }
 }

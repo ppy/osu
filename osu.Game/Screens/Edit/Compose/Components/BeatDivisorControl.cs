@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                foreach (var t in availableDivisors)
+                foreach (int t in availableDivisors)
                 {
                     AddInternal(new Tick
                     {
@@ -262,10 +262,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 marker.Active = false;
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
 
             protected override bool OnClick(ClickEvent e)
@@ -274,16 +274,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return true;
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 handleMouseInput(e.ScreenSpaceMousePosition);
-                return true;
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                handleMouseInput(e.ScreenSpaceMousePosition);
             }
 
             private void handleMouseInput(Vector2 screenSpaceMousePosition)
             {
                 // copied from SliderBar so we can do custom spacing logic.
-                var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
+                float xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange(Current.Value);

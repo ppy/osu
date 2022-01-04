@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            var time = gameplayClock?.CurrentTime ?? Time.Current;
+            double time = gameplayClock?.CurrentTime ?? Time.Current;
 
             double songCurrentTime = time - startTime;
             int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));

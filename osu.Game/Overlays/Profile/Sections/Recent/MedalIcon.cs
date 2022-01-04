@@ -23,8 +23,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
             Child = sprite = new Sprite
             {
-                Height = 40,
-                Width = 40,
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };

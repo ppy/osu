@@ -3,13 +3,13 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetUsersResponse : ResponseWithCursor
     {
-        [JsonProperty("ranking")]
-        public List<UserStatistics> Users;
+        [JsonProperty("users")]
+        public List<APIUser> Users;
     }
 }

@@ -1,14 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.IO.Network;
 using osu.Framework.Platform;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
@@ -20,33 +20,36 @@ namespace osu.Game.Updater
     public class SimpleUpdateManager : UpdateManager
     {
         private string version;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, GameHost host)
+        private void load(OsuGameBase game)
         {
-            this.host = host;
             version = game.Version;
-
-            if (game.IsDeployedBuild)
-                Schedule(() => Task.Run(checkForUpdateAsync));
         }
 
-        private async void checkForUpdateAsync()
+        protected override async Task<bool> PerformUpdateCheck()
         {
             try
             {
-                var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
-                await releases.PerformAsync();
+                await releases.PerformAsync().ConfigureAwait(false);
 
                 var latest = releases.ResponseObject;
 
-                if (latest.TagName != version)
+                // avoid any discrepancies due to build suffixes for now.
+                // eventually we will want to support release streams and consider these.
+                version = version.Split('-').First();
+                string latestTagName = latest.TagName.Split('-').First();
+
+                if (latestTagName != version)
                 {
                     Notifications.Post(new SimpleNotification
                     {
-                        Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
+                        Text = $"A newer release of osu! has been found ({version} → {latestTagName}).\n\n"
                                + "Click here to download the new version, which can be installed over the top of your existing installation",
                         Icon = FontAwesome.Solid.Upload,
                         Activated = () =>
@@ -55,12 +58,17 @@ namespace osu.Game.Updater
                             return true;
                         }
                     });
+
+                    return true;
                 }
             }
             catch
             {
                 // we shouldn't crash on a web failure. or any failure for the matter.
+                return true;
             }
+
+            return false;
         }
 
         private string getBestUrl(GitHubRelease release)
@@ -70,12 +78,21 @@ namespace osu.Game.Updater
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe", StringComparison.Ordinal));
                     break;
 
-                case RuntimeInfo.Platform.MacOsx:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
+                case RuntimeInfo.Platform.macOS:
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip", StringComparison.Ordinal));
                     break;
+
+                case RuntimeInfo.Platform.Linux:
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".AppImage", StringComparison.Ordinal));
+                    break;
+
+                case RuntimeInfo.Platform.iOS:
+                    // iOS releases are available via testflight. this link seems to work well enough for now.
+                    // see https://stackoverflow.com/a/32960501
+                    return "itms-beta://beta.itunes.apple.com/v1/app/1447765923";
 
                 case RuntimeInfo.Platform.Android:
                     // on our testing device this causes the download to magically disappear.
@@ -84,27 +101,6 @@ namespace osu.Game.Updater
             }
 
             return bestAsset?.BrowserDownloadUrl ?? release.HtmlUrl;
-        }
-
-        public class GitHubRelease
-        {
-            [JsonProperty("html_url")]
-            public string HtmlUrl { get; set; }
-
-            [JsonProperty("tag_name")]
-            public string TagName { get; set; }
-
-            [JsonProperty("assets")]
-            public List<GitHubAsset> Assets { get; set; }
-        }
-
-        public class GitHubAsset
-        {
-            [JsonProperty("name")]
-            public string Name { get; set; }
-
-            [JsonProperty("browser_download_url")]
-            public string BrowserDownloadUrl { get; set; }
         }
     }
 }

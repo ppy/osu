@@ -1,5 +1,18 @@
 {
     "Mappings": [{
+        "StartTime": 114993,
+        "Objects": [{
+            "StartTime": 114993,
+            "EndTime": 114993,
+            "X": 493,
+            "Y": 92
+        }, {
+            "StartTime": 115290,
+            "EndTime": 115290,
+            "X": 451.659241,
+            "Y": 267.188
+        }]
+    }, {
         "StartTime": 118858.0,
         "Objects": [{
             "StartTime": 118858.0,

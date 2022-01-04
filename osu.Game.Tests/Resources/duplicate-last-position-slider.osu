@@ -1,0 +1,19 @@
+osu file format v14
+
+[Difficulty]
+HPDrainRate:7
+CircleSize:10
+OverallDifficulty:9
+ApproachRate:10
+SliderMultiplier:0.4
+SliderTickRate:1
+
+[TimingPoints]
+382,923.076923076923,3,2,1,75,1,0
+382,-1000,3,2,1,75,0,0
+
+[HitObjects]
+
+// Importantly, the last position is specified twice.
+// In this case, osu-stable doesn't extend the slider length even when the "expected" length is higher than the actual.
+261,171,25305,6,0,B|262:171|262:171|262:171,1,2,8|0,0:0|0:0,0:0:0:0:

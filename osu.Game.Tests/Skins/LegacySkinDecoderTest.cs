@@ -92,12 +92,21 @@ namespace osu.Game.Tests.Skins
         }
 
         [Test]
+        public void TestStripWhitespace()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-with-space.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
+        }
+
+        [Test]
         public void TestDecodeLatestVersion()
         {
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-latest.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.AreEqual(LegacySkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
+                Assert.AreEqual(SkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
         }
 
         [Test]
@@ -106,7 +115,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
             using (var resStream = TestResources.OpenResource("skin-empty.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.IsNull(decoder.Decode(stream).LegacyVersion);
+                Assert.That(decoder.Decode(stream).LegacyVersion, Is.EqualTo(1.0m));
         }
     }
 }

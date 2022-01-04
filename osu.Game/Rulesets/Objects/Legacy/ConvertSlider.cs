@@ -3,13 +3,14 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : HitObject, IHasCurve, IHasLegacyLastTickOffset
+    internal abstract class ConvertSlider : ConvertHitObject, IHasPathWithRepeats, IHasLegacyLastTickOffset
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
@@ -23,22 +24,27 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Distance => Path.Distance;
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; }
+        public IList<IList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
-        public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;
-        public double Duration => EndTime - StartTime;
+        [JsonIgnore]
+        public double Duration
+        {
+            get => this.SpanCount() * Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
+
+        public double EndTime => StartTime + Duration;
 
         public double Velocity = 1;
 
-        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * DifficultyControlPoint.SliderVelocity;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }

@@ -1,0 +1,62 @@
+osu file format v14
+
+[General]
+AudioFilename: audio.mp3
+AudioLeadIn: 0
+PreviewTime: -1
+Countdown: 0
+SampleSet: Normal
+StackLeniency: 0.5
+Mode: 1
+LetterboxInBreaks: 0
+WidescreenStoryboard: 1
+
+[Editor]
+Bookmarks: 110,13824,54967,82395,109824
+DistanceSpacing: 0.1
+BeatDivisor: 4
+GridSize: 32
+TimelineZoom: 3.099999
+
+[Metadata]
+Title:test
+TitleUnicode:test
+Artist:sample conversion
+ArtistUnicode:sample conversion
+Creator:banchobot
+Version:sample test
+Source:
+Tags:
+BeatmapID:0
+BeatmapSetID:-1
+
+[Difficulty]
+HPDrainRate:6
+CircleSize:2
+OverallDifficulty:6
+ApproachRate:7
+SliderMultiplier:1.4
+SliderTickRate:4
+
+[Events]
+//Background and Video events
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+
+[TimingPoints]
+110,428.571428571429,4,1,0,100,1,0
+
+[HitObjects]
+256,192,110,5,0,0:0:0:0:
+256,192,538,1,8,0:0:0:0:
+256,192,967,1,2,0:0:0:0:
+256,192,1395,1,10,0:0:0:0:
+256,192,1824,1,4,0:0:0:0:
+256,192,2252,1,12,0:0:0:0:
+256,192,2681,1,6,0:0:0:0:
+256,192,3110,1,14,0:0:0:0:

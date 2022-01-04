@@ -1,19 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -23,14 +22,15 @@ namespace osu.Game.Tournament.Components
 {
     public class SongBar : CompositeDrawable
     {
-        private BeatmapInfo beatmap;
+        private APIBeatmap beatmap;
+
+        public const float HEIGHT = 145 / 2f;
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
-        public BeatmapInfo Beatmap
+        public APIBeatmap Beatmap
         {
-            get => beatmap;
             set
             {
                 if (beatmap == value)
@@ -53,15 +53,7 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        private Container panelContents;
-        private Container innerPanel;
-        private Container outerPanel;
-        private TournamentBeatmapPanel panel;
-
-        private float panelWidth => expanded ? 0.6f : 1;
-
-        private const float main_width = 0.97f;
-        private const float inner_panel_width = 0.7f;
+        private FillFlowContainer flow;
 
         private bool expanded;
 
@@ -71,86 +63,30 @@ namespace osu.Game.Tournament.Components
             set
             {
                 expanded = value;
-                panel?.ResizeWidthTo(panelWidth, 800, Easing.OutQuint);
-
-                if (expanded)
-                {
-                    innerPanel.ResizeWidthTo(inner_panel_width, 800, Easing.OutQuint);
-                    outerPanel.ResizeWidthTo(main_width, 800, Easing.OutQuint);
-                }
-                else
-                {
-                    innerPanel.ResizeWidthTo(1, 800, Easing.OutQuint);
-                    outerPanel.ResizeWidthTo(0.25f, 800, Easing.OutQuint);
-                }
+                flow.Direction = expanded ? FillDirection.Full : FillDirection.Vertical;
             }
         }
+
+        // Todo: This is a hack for https://github.com/ppy/osu-framework/issues/3617 since this container is at the very edge of the screen and potentially initially masked away.
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
-                outerPanel = new Container
+                flow = new FillFlowContainer
                 {
-                    Masking = true,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Colour = Color4.Black.Opacity(0.2f),
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5,
-                    },
                     RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    LayoutDuration = 500,
+                    LayoutEasing = Easing.OutQuint,
+                    Direction = FillDirection.Full,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    RelativePositionAxes = Axes.X,
-                    X = -(1 - main_width) / 2,
-                    Y = -10,
-                    Width = main_width,
-                    Height = TournamentBeatmapPanel.HEIGHT,
-                    CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
-                    CornerExponent = 2,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.Gray(0.93f),
-                        },
-                        new OsuLogo
-                        {
-                            Triangles = false,
-                            Colour = OsuColour.Gray(0.33f),
-                            Scale = new Vector2(0.08f),
-                            Margin = new MarginPadding(50),
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                        },
-                        innerPanel = new Container
-                        {
-                            Masking = true,
-                            CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
-                            CornerExponent = 2,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = inner_panel_width,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.86f),
-                                },
-                                panelContents = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                }
-                            }
-                        }
-                    }
                 }
             };
 
@@ -161,16 +97,16 @@ namespace osu.Game.Tournament.Components
         {
             if (beatmap == null)
             {
-                panelContents.Clear();
+                flow.Clear();
                 return;
             }
 
-            var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
-            var length = beatmap.Length;
+            double bpm = beatmap.BPM;
+            double length = beatmap.Length;
             string hardRockExtra = "";
             string srExtra = "";
 
-            var ar = beatmap.BaseDifficulty.ApproachRate;
+            float ar = beatmap.Difficulty.ApproachRate;
 
             if ((mods & LegacyMods.HardRock) > 0)
             {
@@ -181,7 +117,7 @@ namespace osu.Game.Tournament.Components
             if ((mods & LegacyMods.DoubleTime) > 0)
             {
                 // temporary local calculation (taken from OsuDifficultyCalculator)
-                double preempt = (int)BeatmapDifficulty.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
+                double preempt = (int)IBeatmapDifficultyInfo.DifficultyRange(ar, 1800, 1200, 450) / 1.5;
                 ar = (float)(preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5);
 
                 bpm *= 1.5f;
@@ -191,14 +127,14 @@ namespace osu.Game.Tournament.Components
 
             (string heading, string content)[] stats;
 
-            switch (ruleset.Value.ID)
+            switch (ruleset.Value.OnlineID)
             {
                 default:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                        ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}{hardRockExtra}"),
-                        ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
                     };
                     break;
 
@@ -206,48 +142,100 @@ namespace osu.Game.Tournament.Components
                 case 3:
                     stats = new (string heading, string content)[]
                     {
-                        ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                        ("HP", $"{beatmap.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
+                        ("OD", $"{beatmap.Difficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                        ("HP", $"{beatmap.Difficulty.DrainRate:0.#}{hardRockExtra}")
                     };
                     break;
 
                 case 2:
                     stats = new (string heading, string content)[]
                     {
-                        ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                        ("CS", $"{beatmap.Difficulty.CircleSize:0.#}{hardRockExtra}"),
                         ("AR", $"{ar:0.#}"),
                     };
                     break;
             }
 
-            panelContents.Children = new Drawable[]
+            flow.Children = new Drawable[]
             {
-                new DiffPiece(("Length", TimeSpan.FromMilliseconds(length).ToString(@"mm\:ss")))
+                new Container
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = HEIGHT,
+                    Width = 0.5f,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+
+                    Children = new Drawable[]
+                    {
+                        new GridContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new DiffPiece(stats),
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.#}{srExtra}"))
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Direction = FillDirection.Vertical,
+                                        Children = new Drawable[]
+                                        {
+                                            new DiffPiece(("Length", length.ToFormattedDuration().ToString())),
+                                            new DiffPiece(("BPM", $"{bpm:0.#}")),
+                                        }
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                Colour = Color4.Black,
+                                                RelativeSizeAxes = Axes.Both,
+                                                Alpha = 0.1f,
+                                            },
+                                            new OsuLogo
+                                            {
+                                                Triangles = false,
+                                                Scale = new Vector2(0.08f),
+                                                Margin = new MarginPadding(50),
+                                                X = -10,
+                                                Anchor = Anchor.CentreRight,
+                                                Origin = Anchor.CentreRight,
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        }
+                    }
                 },
-                new DiffPiece(("BPM", $"{bpm:0.#}"))
+                new TournamentBeatmapPanel(beatmap)
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.TopLeft
-                },
-                new DiffPiece(stats)
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.BottomRight
-                },
-                new DiffPiece(("Star Rating", $"{beatmap.StarDifficulty:0.#}{srExtra}"))
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.TopRight
-                },
-                panel = new TournamentBeatmapPanel(beatmap)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(panelWidth, 1)
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.5f,
+                    Height = HEIGHT,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
                 }
             };
         }
@@ -259,28 +247,27 @@ namespace osu.Game.Tournament.Components
                 Margin = new MarginPadding { Horizontal = 15, Vertical = 1 };
                 AutoSizeAxes = Axes.Both;
 
-                static void cp(SpriteText s, Color4 colour)
+                static void cp(SpriteText s, bool bold)
                 {
-                    s.Colour = colour;
-                    s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
+                    s.Font = OsuFont.Torus.With(weight: bold ? FontWeight.Bold : FontWeight.Regular, size: 15);
                 }
 
-                for (var i = 0; i < tuples.Length; i++)
+                for (int i = 0; i < tuples.Length; i++)
                 {
-                    var (heading, content) = tuples[i];
+                    (string heading, string content) = tuples[i];
 
                     if (i > 0)
                     {
                         AddText(" / ", s =>
                         {
-                            cp(s, OsuColour.Gray(0.33f));
+                            cp(s, false);
                             s.Spacing = new Vector2(-2, 0);
                         });
                     }
 
-                    AddText(new OsuSpriteText { Text = heading }, s => cp(s, OsuColour.Gray(0.33f)));
-                    AddText(" ", s => cp(s, OsuColour.Gray(0.33f)));
-                    AddText(new OsuSpriteText { Text = content }, s => cp(s, OsuColour.Gray(0.5f)));
+                    AddText(new TournamentSpriteText { Text = heading }, s => cp(s, false));
+                    AddText(" ", s => cp(s, false));
+                    AddText(new TournamentSpriteText { Text = content }, s => cp(s, true));
                 }
             }
         }

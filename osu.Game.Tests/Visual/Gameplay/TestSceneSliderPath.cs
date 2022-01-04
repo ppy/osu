@@ -74,14 +74,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestAddControlPoint()
         {
             AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100))));
-            AddStep("add point", () => path.ControlPoints.Add(new PathControlPoint { Position = { Value = new Vector2(100) } }));
+            AddStep("add point", () => path.ControlPoints.Add(new PathControlPoint { Position = new Vector2(100) }));
         }
 
         [Test]
         public void TestInsertControlPoint()
         {
             AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(100))));
-            AddStep("insert point", () => path.ControlPoints.Insert(1, new PathControlPoint { Position = { Value = new Vector2(0, 100) } }));
+            AddStep("insert point", () => path.ControlPoints.Insert(1, new PathControlPoint { Position = new Vector2(0, 100) }));
         }
 
         [Test]
@@ -95,14 +95,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestChangePathType()
         {
             AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
-            AddStep("change type to bezier", () => path.ControlPoints[0].Type.Value = PathType.Bezier);
+            AddStep("change type to bezier", () => path.ControlPoints[0].Type = PathType.Bezier);
         }
 
         [Test]
         public void TestAddSegmentByChangingType()
         {
             AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0))));
-            AddStep("change second point type to bezier", () => path.ControlPoints[1].Type.Value = PathType.Bezier);
+            AddStep("change second point type to bezier", () => path.ControlPoints[1].Type = PathType.Bezier);
         }
 
         [Test]
@@ -111,10 +111,10 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("create path", () =>
             {
                 path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
-                path.ControlPoints[1].Type.Value = PathType.Bezier;
+                path.ControlPoints[1].Type = PathType.Bezier;
             });
 
-            AddStep("change second point type to null", () => path.ControlPoints[1].Type.Value = null);
+            AddStep("change second point type to null", () => path.ControlPoints[1].Type = null);
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("create path", () =>
             {
                 path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
-                path.ControlPoints[1].Type.Value = PathType.Bezier;
+                path.ControlPoints[1].Type = PathType.Bezier;
             });
 
             AddStep("remove second point", () => path.ControlPoints.RemoveAt(1));
@@ -185,8 +185,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private List<PathControlPoint> createSegment(PathType type, params Vector2[] controlPoints)
         {
-            var points = controlPoints.Select(p => new PathControlPoint { Position = { Value = p } }).ToList();
-            points[0].Type.Value = type;
+            var points = controlPoints.Select(p => new PathControlPoint { Position = p }).ToList();
+            points[0].Type = type;
             return points;
         }
     }

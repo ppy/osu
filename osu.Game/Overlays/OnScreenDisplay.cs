@@ -3,16 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osuTK;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
-using osu.Game.Configuration;
 using osu.Game.Overlays.OSD;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -45,13 +43,6 @@ namespace osu.Game.Overlays
                     CornerRadius = 20,
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager osuConfig)
-        {
-            BeginTracking(this, frameworkConfig);
-            BeginTracking(this, osuConfig);
         }
 
         private readonly Dictionary<(object, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(object, IConfigManager), TrackedSettings>();
@@ -104,13 +95,13 @@ namespace osu.Game.Overlays
         /// Displays the provided <see cref="Toast"/> temporarily.
         /// </summary>
         /// <param name="toast"></param>
-        public void Display(Toast toast)
+        public void Display(Toast toast) => Schedule(() =>
         {
             box.Child = toast;
             DisplayTemporarily(box);
-        }
+        });
 
-        private void displayTrackedSettingChange(SettingDescription description) => Schedule(() => Display(new TrackedSettingToast(description)));
+        private void displayTrackedSettingChange(SettingDescription description) => Scheduler.AddOnce(Display, new TrackedSettingToast(description));
 
         private TransformSequence<Drawable> fadeIn;
         private ScheduledDelegate fadeOut;

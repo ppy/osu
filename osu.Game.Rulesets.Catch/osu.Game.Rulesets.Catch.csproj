@@ -5,6 +5,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>catch the fruit. to the beat.</Description>
   </PropertyGroup>
+
+  <PropertyGroup Label="Nuget">
+    <Title>osu!catch (ruleset)</Title>
+    <PackageId>ppy.osu.Game.Rulesets.Catch</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>

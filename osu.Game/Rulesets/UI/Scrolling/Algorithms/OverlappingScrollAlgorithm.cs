@@ -20,11 +20,12 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             searchPoint = new MultiplierControlPoint();
         }
 
-        public double GetDisplayStartTime(double time, double timeRange)
+        public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
         {
+            var controlPoint = controlPointAt(originTime);
             // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
-            double visibleDuration = timeRange / controlPointAt(time).Multiplier;
-            return time - visibleDuration;
+            double visibleDuration = (scrollLength + offset) * timeRange / controlPoint.Multiplier / scrollLength;
+            return originTime - visibleDuration;
         }
 
         public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
