@@ -17,13 +17,13 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
             set => selected.Value = value;
         }
 
-        public int Page { get; }
+        public int PageNumber { get; }
 
         private OsuSpriteText text;
 
-        public PageSelectorPageButton(int page)
+        public PageSelectorPageButton(int pageNumber)
         {
-            Page = page;
+            PageNumber = pageNumber;
 
             Action = () =>
             {
@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         protected override Drawable CreateContent() => text = new OsuSpriteText
         {
             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-            Text = Page.ToString(),
+            Text = PageNumber.ToString(),
         };
 
         [BackgroundDependencyLoader]

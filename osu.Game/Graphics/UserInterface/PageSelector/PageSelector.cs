@@ -1,19 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
     public class PageSelector : CompositeDrawable
     {
-        public readonly BindableInt CurrentPage = new BindableInt(1);
-        public readonly BindableInt MaxPages = new BindableInt(1);
+        public readonly BindableInt CurrentPage = new BindableInt { MinValue = 0, };
 
-        private readonly FillFlowContainer<PageSelectorPageButton> itemsFlow;
+        public readonly BindableInt AvailablePages = new BindableInt(1) { MinValue = 1, };
+
+        private readonly FillFlowContainer itemsFlow;
 
         private readonly PageSelectorPrevNextButton previousPageButton;
         private readonly PageSelectorPrevNextButton nextPageButton;
@@ -32,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                     {
                         Action = () => CurrentPage.Value -= 1,
                     },
-                    itemsFlow = new FillFlowContainer<PageSelectorPageButton>
+                    itemsFlow = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
@@ -49,60 +50,43 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         {
             base.LoadComplete();
 
-            MaxPages.BindValueChanged(_ => redraw());
-            CurrentPage.BindValueChanged(page => onCurrentPageChanged(page.NewValue));
-            redraw();
+            CurrentPage.BindValueChanged(onCurrentPageChanged);
+            AvailablePages.BindValueChanged(_ => redraw(), true);
         }
 
-        private void onCurrentPageChanged(int newPage)
+        private void onCurrentPageChanged(ValueChangedEvent<int> currentPage)
         {
-            if (newPage < 1)
+            if (currentPage.NewValue >= AvailablePages.Value)
             {
-                CurrentPage.Value = 1;
+                CurrentPage.Value = AvailablePages.Value - 1;
                 return;
             }
 
-            if (newPage > MaxPages.Value)
-            {
-                CurrentPage.Value = MaxPages.Value;
-                return;
-            }
+            foreach (var page in itemsFlow.OfType<PageSelectorPageButton>())
+                page.Selected = page.PageNumber == currentPage.NewValue + 1;
 
-            itemsFlow.ForEach(page => page.Selected = page.Page == newPage);
-            updateButtonsState();
+            previousPageButton.Enabled.Value = currentPage.NewValue != 0;
+            nextPageButton.Enabled.Value = currentPage.NewValue < AvailablePages.Value - 1;
         }
 
         private void redraw()
         {
             itemsFlow.Clear();
 
-            if (MaxPages.Value < 1)
+            for (int i = 0; i < AvailablePages.Value; i++)
             {
-                MaxPages.Value = 1;
-                return;
+                int pageIndex = i;
+
+                itemsFlow.Add(new PageSelectorPageButton(pageIndex + 1)
+                {
+                    Action = () => CurrentPage.Value = pageIndex,
+                });
             }
 
-            for (int i = 1; i <= MaxPages.Value; i++)
-                addDrawablePage(i);
-
-            if (CurrentPage.Value == 1)
-                CurrentPage.TriggerChange();
+            if (CurrentPage.Value != 0)
+                CurrentPage.Value = 0;
             else
-                CurrentPage.Value = 1;
+                CurrentPage.TriggerChange();
         }
-
-        private void updateButtonsState()
-        {
-            int newPage = CurrentPage.Value;
-            int maxPages = MaxPages.Value;
-
-            previousPageButton.Enabled.Value = newPage != 1;
-            nextPageButton.Enabled.Value = newPage != maxPages;
-        }
-
-        private void addDrawablePage(int page) => itemsFlow.Add(new PageSelectorPageButton(page)
-        {
-            Action = () => CurrentPage.Value = page,
-        });
     }
 }
