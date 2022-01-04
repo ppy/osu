@@ -744,7 +744,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("Check ruleset changed to mania", () => Ruleset.Value.OnlineID == 3);
 
-            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmapInfo.BeatmapSet.OnlineID == previousSetID);
+            AddAssert("Selected beatmap still same set", () => songSelect.Carousel.SelectedBeatmapInfo.BeatmapSet?.OnlineID == previousSetID);
             AddAssert("Selected beatmap is mania", () => Beatmap.Value.BeatmapInfo.Ruleset.OnlineID == 3);
         }
 
@@ -760,7 +760,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import huge difficulty count map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                imported = manager.Import(TestResources.CreateTestBeatmapSetInfo(50, usableRulesets)).GetResultSafely().Value;
+                imported = manager.Import(TestResources.CreateTestBeatmapSetInfo(50, usableRulesets)).GetResultSafely()?.Value;
             });
 
             AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported.Beatmaps.First()));

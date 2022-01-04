@@ -85,11 +85,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
-            WorkingBeatmap working = null;
-
-            working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this);
-
-            return working;
+            return new BeatmapManagerWorkingBeatmap(beatmapInfo, this);
         }
 
         #region IResourceStorageProvider
