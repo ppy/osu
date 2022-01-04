@@ -14,10 +14,30 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
+        public const decimal LATEST_VERSION = 2.7m;
+
         /// <summary>
         /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.
         /// </summary>
         internal bool AllowDefaultComboColoursFallback = true;
+
+        /// <summary>
+        /// Legacy version of this skin.
+        /// </summary>
+        public decimal? LegacyVersion { get; internal set; }
+
+        public enum LegacySetting
+        {
+            Version,
+            ComboPrefix,
+            ComboOverlap,
+            ScorePrefix,
+            ScoreOverlap,
+            HitCirclePrefix,
+            HitCircleOverlap,
+            AnimationFramerate,
+            LayeredHitSounds
+        }
 
         public static List<Color4> DefaultComboColours { get; } = new List<Color4>
         {
@@ -27,14 +47,14 @@ namespace osu.Game.Skinning
             new Color4(242, 24, 57, 255),
         };
 
-        private readonly List<Color4> comboColours = new List<Color4>();
+        public List<Color4> CustomComboColours { get; set; } = new List<Color4>();
 
         public IReadOnlyList<Color4> ComboColours
         {
             get
             {
-                if (comboColours.Count > 0)
-                    return comboColours;
+                if (CustomComboColours.Count > 0)
+                    return CustomComboColours;
 
                 if (AllowDefaultComboColoursFallback)
                     return DefaultComboColours;
@@ -43,9 +63,9 @@ namespace osu.Game.Skinning
             }
         }
 
-        public void AddComboColours(params Color4[] colours) => comboColours.AddRange(colours);
+        void IHasComboColours.AddComboColours(params Color4[] colours) => CustomComboColours.AddRange(colours);
 
-        public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+        public Dictionary<string, Color4> CustomColours { get; } = new Dictionary<string, Color4>();
 
         public readonly Dictionary<string, string> ConfigDictionary = new Dictionary<string, string>();
     }

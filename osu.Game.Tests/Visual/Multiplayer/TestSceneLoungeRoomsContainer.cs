@@ -1,102 +1,164 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
+using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Users;
-using osuTK.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Testing;
+using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.OnlinePlay.Lounge;
+using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Tests.Visual.OnlinePlay;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneLoungeRoomsContainer : MultiplayerTestScene
+    public class TestSceneLoungeRoomsContainer : OnlinePlayTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        protected new TestRoomManager RoomManager => (TestRoomManager)base.RoomManager;
+
+        private RoomsContainer container;
+
+        [SetUp]
+        public new void Setup() => Schedule(() =>
         {
-            typeof(RoomsContainer),
-            typeof(DrawableRoom)
-        };
-
-        [Cached(Type = typeof(IRoomManager))]
-        private TestRoomManager roomManager = new TestRoomManager();
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            RoomsContainer container;
-
-            Child = container = new RoomsContainer
+            Child = new PopoverContainer
             {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Width = 0.5f,
-                JoinRequested = joinRequested
-            };
 
-            AddStep("clear rooms", () => roomManager.Rooms.Clear());
-
-            AddStep("add rooms", () =>
-            {
-                for (int i = 0; i < 3; i++)
+                Child = container = new RoomsContainer
                 {
-                    roomManager.Rooms.Add(new Room
-                    {
-                        RoomID = { Value = i },
-                        Name = { Value = $"Room {i}" },
-                        Host = { Value = new User { Username = "Host" } },
-                        EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) }
-                    });
+                    SelectedRoom = { BindTarget = SelectedRoom }
                 }
-            });
+            };
+        });
 
-            AddAssert("has 2 rooms", () => container.Rooms.Count == 3);
-            AddStep("remove first room", () => roomManager.Rooms.Remove(roomManager.Rooms.FirstOrDefault()));
+        [Test]
+        public void TestBasicListChanges()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
+
+            AddAssert("has 3 rooms", () => container.Rooms.Count == 3);
+            AddStep("remove first room", () => RoomManager.RemoveRoom(RoomManager.Rooms.FirstOrDefault()));
             AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
-            AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => Room == roomManager.Rooms.First());
-
-            AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
+            AddStep("select first room", () => container.Rooms.First().TriggerClick());
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
         }
 
-        private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
-
-        private class TestRoomManager : IRoomManager
+        [Test]
+        public void TestKeyboardNavigation()
         {
-            public event Action RoomsUpdated
-            {
-                add { }
-                remove { }
-            }
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
 
-            public readonly BindableList<Room> Rooms = new BindableList<Room>();
-            IBindableList<Room> IRoomManager.Rooms => Rooms;
+            AddAssert("no selection", () => checkRoomSelected(null));
 
-            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
 
-            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-            {
-            }
+            press(Key.Up);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
 
-            public void PartRoom()
-            {
-            }
+            press(Key.Down);
+            press(Key.Down);
+            AddAssert("last room selected", () => checkRoomSelected(RoomManager.Rooms.Last()));
         }
 
-        private class JoinedRoomStatus : RoomStatus
+        [Test]
+        public void TestKeyboardNavigationAfterOrderChange()
         {
-            public override string Message => "Joined";
+            AddStep("add rooms", () => RoomManager.AddRooms(3));
 
-            public override Color4 GetAppropriateColour(OsuColour colours) => colours.Yellow;
+            AddStep("reorder rooms", () =>
+            {
+                var room = RoomManager.Rooms[1];
+
+                RoomManager.RemoveRoom(room);
+                RoomManager.AddOrUpdateRoom(room);
+            });
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(getRoomInFlow(0)));
+
+            press(Key.Down);
+            AddAssert("second room selected", () => checkRoomSelected(getRoomInFlow(1)));
+
+            press(Key.Down);
+            AddAssert("third room selected", () => checkRoomSelected(getRoomInFlow(2)));
         }
+
+        [Test]
+        public void TestClickDeselection()
+        {
+            AddStep("add room", () => RoomManager.AddRooms(1));
+
+            AddAssert("no selection", () => checkRoomSelected(null));
+
+            press(Key.Down);
+            AddAssert("first room selected", () => checkRoomSelected(RoomManager.Rooms.First()));
+
+            AddStep("click away", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no selection", () => checkRoomSelected(null));
+        }
+
+        private void press(Key down)
+        {
+            AddStep($"press {down}", () => InputManager.Key(down));
+        }
+
+        [Test]
+        public void TestStringFiltering()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(4));
+
+            AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
+
+            AddStep("filter one room", () => container.Filter.Value = new FilterCriteria { SearchString = "1" });
+
+            AddUntilStep("1 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 1);
+
+            AddStep("remove filter", () => container.Filter.Value = null);
+
+            AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
+        }
+
+        [Test]
+        public void TestRulesetFiltering()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(2, new OsuRuleset().RulesetInfo));
+            AddStep("add rooms", () => RoomManager.AddRooms(3, new CatchRuleset().RulesetInfo));
+
+            // Todo: What even is this case...?
+            AddStep("set empty filter criteria", () => container.Filter.Value = null);
+            AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
+
+            AddStep("filter osu! rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo });
+            AddUntilStep("2 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
+
+            AddStep("filter catch rooms", () => container.Filter.Value = new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo });
+            AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
+        }
+
+        [Test]
+        public void TestPasswordProtectedRooms()
+        {
+            AddStep("add rooms", () => RoomManager.AddRooms(3, withPassword: true));
+        }
+
+        private bool checkRoomSelected(Room room) => SelectedRoom.Value == room;
+
+        private Room getRoomInFlow(int index) =>
+            (container.ChildrenOfType<FillFlowContainer<DrawableLoungeRoom>>().First().FlowingChildren.ElementAt(index) as DrawableRoom)?.Room;
     }
 }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,18 +11,10 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneStatefulMenuItem : ManualInputManagerTestScene
+    public class TestSceneStatefulMenuItem : OsuManualInputManagerTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(OsuMenu),
-            typeof(StatefulMenuItem),
-            typeof(TernaryStateMenuItem),
-            typeof(DrawableStatefulMenuItem),
-        };
-
         [Test]
-        public void TestTernaryMenuItem()
+        public void TestTernaryRadioMenuItem()
         {
             OsuMenu menu = null;
 
@@ -39,9 +30,57 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Items = new[]
                     {
-                        new TernaryStateMenuItem("First"),
-                        new TernaryStateMenuItem("Second") { State = { BindTarget = state } },
-                        new TernaryStateMenuItem("Third") { State = { Value = TernaryState.True } },
+                        new TernaryStateRadioMenuItem("First"),
+                        new TernaryStateRadioMenuItem("Second") { State = { BindTarget = state } },
+                        new TernaryStateRadioMenuItem("Third") { State = { Value = TernaryState.True } },
+                    }
+                };
+            });
+
+            checkState(TernaryState.Indeterminate);
+
+            click();
+            checkState(TernaryState.True);
+
+            click();
+            checkState(TernaryState.True);
+
+            click();
+            checkState(TernaryState.True);
+
+            AddStep("change state via bindable", () => state.Value = TernaryState.True);
+
+            void click() =>
+                AddStep("click", () =>
+                {
+                    InputManager.MoveMouseTo(menu.ScreenSpaceDrawQuad.Centre);
+                    InputManager.Click(MouseButton.Left);
+                });
+
+            void checkState(TernaryState expected)
+                => AddAssert($"state is {expected}", () => state.Value == expected);
+        }
+
+        [Test]
+        public void TestTernaryToggleMenuItem()
+        {
+            OsuMenu menu = null;
+
+            Bindable<TernaryState> state = new Bindable<TernaryState>(TernaryState.Indeterminate);
+
+            AddStep("create menu", () =>
+            {
+                state.Value = TernaryState.Indeterminate;
+
+                Child = menu = new OsuMenu(Direction.Vertical, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Items = new[]
+                    {
+                        new TernaryStateToggleMenuItem("First"),
+                        new TernaryStateToggleMenuItem("Second") { State = { BindTarget = state } },
+                        new TernaryStateToggleMenuItem("Third") { State = { Value = TernaryState.True } },
                     }
                 };
             });

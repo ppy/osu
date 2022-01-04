@@ -1,107 +1,72 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
+using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
-using System;
+using osu.Framework.Localisation;
+using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.News
 {
     public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        private const string front_page_string = "frontpage";
-
-        private NewsHeaderTitle title;
-
-        public readonly Bindable<string> Current = new Bindable<string>(null);
+        public static LocalisableString FrontPageString => NewsStrings.IndexTitleInfo;
 
         public Action ShowFrontPage;
 
+        private readonly Bindable<string> article = new Bindable<string>();
+
         public NewsHeader()
         {
-            BreadcrumbControl.AddItem(front_page_string);
+            TabControl.AddItem(FrontPageString);
 
-            BreadcrumbControl.Current.ValueChanged += e =>
-            {
-                if (e.NewValue == front_page_string)
-                    ShowFrontPage?.Invoke();
-            };
-
-            Current.ValueChanged += showPost;
+            article.BindValueChanged(onArticleChanged, true);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected override void LoadComplete()
         {
-            BreadcrumbControl.AccentColour = colours.Violet;
-            TitleBackgroundColour = colours.GreyVioletDarker;
-            ControlBackgroundColour = colours.GreyVioletDark;
+            base.LoadComplete();
+
+            Current.BindValueChanged(e =>
+            {
+                if (e.NewValue == FrontPageString)
+                    ShowFrontPage?.Invoke();
+            });
         }
 
-        private void showPost(ValueChangedEvent<string> e)
+        public void SetFrontPage() => article.Value = null;
+
+        public void SetArticle(string slug) => article.Value = slug;
+
+        private void onArticleChanged(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
-                BreadcrumbControl.RemoveItem(e.OldValue);
+                TabControl.RemoveItem(e.OldValue);
 
             if (e.NewValue != null)
             {
-                BreadcrumbControl.AddItem(e.NewValue);
-                BreadcrumbControl.Current.Value = e.NewValue;
-
-                title.IsReadingPost = true;
+                TabControl.AddItem(e.NewValue);
+                Current.Value = e.NewValue;
             }
             else
             {
-                BreadcrumbControl.Current.Value = front_page_string;
-                title.IsReadingPost = false;
+                Current.Value = FrontPageString;
             }
         }
 
-        protected override Drawable CreateBackground() => new NewsHeaderBackground();
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/news");
 
-        protected override ScreenTitle CreateTitle() => title = new NewsHeaderTitle();
+        protected override OverlayTitle CreateTitle() => new NewsHeaderTitle();
 
-        private class NewsHeaderBackground : Sprite
+        private class NewsHeaderTitle : OverlayTitle
         {
-            public NewsHeaderBackground()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fill;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(@"Headers/news");
-            }
-        }
-
-        private class NewsHeaderTitle : ScreenTitle
-        {
-            private const string post_string = "post";
-
-            public bool IsReadingPost
-            {
-                set => Section = value ? post_string : front_page_string;
-            }
-
             public NewsHeaderTitle()
             {
-                Title = "news";
-                IsReadingPost = false;
-            }
-
-            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
+                Title = PageTitleStrings.MainNewsControllerDefault;
+                Description = NamedOverlayComponentStrings.NewsDescription;
+                IconTexture = "Icons/Hexacons/news";
             }
         }
     }

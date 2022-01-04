@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -13,7 +14,6 @@ using osu.Game.Tournament.Models;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -23,7 +23,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly bool editor;
         protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
-        private readonly Drawable currentMatchSelectionBox;
+        protected readonly Drawable CurrentMatchSelectionBox;
         private Bindable<TournamentMatch> globalSelection;
 
         [Resolved(CanBeNull = true)]
@@ -45,9 +45,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 selectionBox = new Container
                 {
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(1.05f),
+                    Scale = new Vector2(1.1f),
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -55,16 +53,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Colour = Color4.YellowGreen,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                currentMatchSelectionBox = new Container
+                CurrentMatchSelectionBox = new Container
                 {
-                    CornerRadius = 5,
-                    Masking = true,
-                    Scale = new Vector2(1.05f),
+                    Scale = new Vector2(1.05f, 1.1f),
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0,
-                    Colour = Color4.OrangeRed,
+                    Colour = Color4.White,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 Flow = new FillFlowContainer<DrawableMatchTeam>
@@ -128,9 +124,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private void updateCurrentMatch()
         {
             if (Match.Current.Value)
-                currentMatchSelectionBox.Show();
+                CurrentMatchSelectionBox.Show();
             else
-                currentMatchSelectionBox.Hide();
+                CurrentMatchSelectionBox.Hide();
         }
 
         private bool selected;
@@ -148,9 +144,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (selected)
                 {
                     selectionBox.Show();
-                    if (editor)
+                    if (editor && editorInfo != null)
                         editorInfo.Selected.Value = Match;
-                    else
+                    else if (ladderInfo != null)
                         ladderInfo.CurrentMatch.Value = Match;
                 }
                 else
@@ -212,10 +208,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (Match.Round.Value == null) return;
 
-            var instaWinAmount = Match.Round.Value.BestOf.Value / 2;
+            int instantWinAmount = Match.Round.Value.BestOf.Value / 2;
 
             Match.Completed.Value = Match.Round.Value.BestOf.Value > 0
-                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instaWinAmount || Match.Team2Score.Value > instaWinAmount);
+                                    && (Match.Team1Score.Value + Match.Team2Score.Value >= Match.Round.Value.BestOf.Value || Match.Team1Score.Value > instantWinAmount || Match.Team2Score.Value > instantWinAmount);
         }
 
         protected override void LoadComplete()
@@ -247,8 +243,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 foreach (var conditional in Match.ConditionalMatches)
                 {
-                    var team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
-                    var team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
+                    bool team1Match = conditional.Acronyms.Contains(Match.Team1Acronym);
+                    bool team2Match = conditional.Acronyms.Contains(Match.Team2Acronym);
 
                     if (team1Match && team2Match)
                         Match.Date.Value = conditional.Date.Value;
@@ -289,16 +285,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
-            if (base.OnDrag(e)) return true;
+            base.OnDrag(e);
 
             Selected = true;
             this.MoveToOffset(e.Delta);
 
             var pos = Position;
             Match.Position.Value = new Point((int)pos.X, (int)pos.Y);
-            return true;
         }
 
         public void Remove()
@@ -308,6 +303,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Match.LosersProgression.Value = null;
 
             ladderInfo.Matches.Remove(Match);
+
+            foreach (var m in ladderInfo.Matches)
+            {
+                if (m.Progression.Value == Match)
+                    m.Progression.Value = null;
+
+                if (m.LosersProgression.Value == Match)
+                    m.LosersProgression.Value = null;
+            }
         }
     }
 }

@@ -7,9 +7,11 @@ using osu.Game.IO;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreFileInfo : INamedFileInfo, IHasPrimaryKey
+    public class ScoreFileInfo : INamedFileInfo, IHasPrimaryKey, INamedFileUsage
     {
         public int ID { get; set; }
+
+        public bool IsManaged => ID > 0;
 
         public int FileInfoID { get; set; }
 
@@ -17,5 +19,7 @@ namespace osu.Game.Scoring
 
         [Required]
         public string Filename { get; set; }
+
+        IFileInfo INamedFileUsage.File => FileInfo;
     }
 }

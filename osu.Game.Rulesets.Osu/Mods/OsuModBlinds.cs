@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
@@ -24,17 +25,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override IconUsage Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
-
-        public override bool Ranked => false;
 
         public override double ScoreMultiplier => 1.12;
         private DrawableOsuBlinds blinds;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap));
         }
 
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
@@ -64,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float target_clamp = 1;
 
-            private readonly float targetBreakMultiplier = 0;
-            private readonly float easing = 1;
+            private readonly float targetBreakMultiplier;
+            private readonly float easing;
 
             private readonly CompositeDrawable restrictTo;
 
@@ -86,6 +85,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
+
+                targetBreakMultiplier = 0;
+                easing = 1;
             }
 
             [BackgroundDependencyLoader]
@@ -127,8 +129,21 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             protected override void Update()
             {
-                float start = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopLeft).X;
-                float end = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopRight).X;
+                float start, end;
+
+                if (Precision.AlmostEquals(restrictTo.Rotation, 0))
+                {
+                    start = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopLeft).X;
+                    end = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopRight).X;
+                }
+                else
+                {
+                    float center = restrictTo.ToSpaceOfOtherDrawable(restrictTo.OriginPosition, Parent).X;
+                    float halfDiagonal = (restrictTo.DrawSize / 2).LengthFast;
+
+                    start = center - halfDiagonal;
+                    end = center + halfDiagonal;
+                }
 
                 float rawWidth = end - start;
 
@@ -155,19 +170,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                 base.LoadComplete();
 
                 var firstObj = beatmap.HitObjects[0];
-                var startDelay = firstObj.StartTime - firstObj.TimePreempt;
+                double startDelay = firstObj.StartTime - firstObj.TimePreempt;
 
-                using (BeginAbsoluteSequence(startDelay + break_close_late, true))
+                using (BeginAbsoluteSequence(startDelay + break_close_late))
                     leaveBreak();
 
                 foreach (var breakInfo in beatmap.Breaks)
                 {
                     if (breakInfo.HasEffect)
                     {
-                        using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early, true))
+                        using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early))
                         {
                             enterBreak();
-                            using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late, true))
+                            using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late))
                                 leaveBreak();
                         }
                     }

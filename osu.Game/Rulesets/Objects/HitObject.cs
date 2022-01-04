@@ -3,13 +3,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ListExtensions;
+using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -32,9 +35,9 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
         /// </summary>
-        public event Action DefaultsApplied;
+        public event Action<HitObject> DefaultsApplied;
 
-        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
+        public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
         /// <summary>
         /// The time at which the HitObject starts.
@@ -64,8 +67,8 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        [JsonIgnore]
-        public SampleControlPoint SampleControlPoint;
+        public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
+        public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
@@ -76,12 +79,13 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
+        [JsonIgnore]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
 
         [JsonIgnore]
-        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
+        public SlimReadOnlyListWrapper<HitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
         public HitObject()
         {
@@ -89,8 +93,14 @@ namespace osu.Game.Rulesets.Objects
             {
                 double offset = time.NewValue - time.OldValue;
 
-                foreach (var nested in NestedHitObjects)
+                foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
+
+                if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
+                    DifficultyControlPoint.Time = time.NewValue;
+
+                if (SampleControlPoint != SampleControlPoint.DEFAULT)
+                    SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             };
         }
 
@@ -99,44 +109,64 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
-        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty, CancellationToken cancellationToken = default)
         {
+            var legacyInfo = controlPointInfo as LegacyControlPointInfo;
+
+            if (legacyInfo != null)
+            {
+                DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
+                DifficultyControlPoint.Time = StartTime;
+            }
+            else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
+                DifficultyControlPoint = new DifficultyControlPoint();
+
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-            SampleControlPoint = controlPointInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
+            // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
+            if (legacyInfo != null)
+            {
+                SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
+                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
+            }
+            else if (SampleControlPoint == SampleControlPoint.DEFAULT)
+                SampleControlPoint = new SampleControlPoint();
 
             nestedHitObjects.Clear();
 
-            CreateNestedHitObjects();
+            CreateNestedHitObjects(cancellationToken);
 
             if (this is IHasComboInformation hasCombo)
             {
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                foreach (HitObject hitObject in nestedHitObjects)
                 {
-                    n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
-                    n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
+                    if (hitObject is IHasComboInformation n)
+                    {
+                        n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
+                        n.ComboIndexWithOffsetsBindable.BindTo(hasCombo.ComboIndexWithOffsetsBindable);
+                        n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
+                    }
                 }
             }
 
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
-                h.ApplyDefaults(controlPointInfo, difficulty);
+                h.ApplyDefaults(controlPointInfo, difficulty, cancellationToken);
 
-            DefaultsApplied?.Invoke();
+            DefaultsApplied?.Invoke(this);
         }
 
-        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
             Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
-            if (HitWindows == null)
-                HitWindows = CreateHitWindows();
+            HitWindows ??= CreateHitWindows();
             HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
 
-        protected virtual void CreateNestedHitObjects()
+        protected virtual void CreateNestedHitObjects(CancellationToken cancellationToken)
         {
         }
 
@@ -144,9 +174,9 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
-        /// May be null.
         /// </summary>
-        public virtual Judgement CreateJudgement() => null;
+        [NotNull]
+        public virtual Judgement CreateJudgement() => new Judgement();
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
@@ -165,10 +195,10 @@ namespace osu.Game.Rulesets.Objects
         /// Returns the end time of this object.
         /// </summary>
         /// <remarks>
-        /// This returns the <see cref="IHasEndTime.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
+        /// This returns the <see cref="IHasDuration.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
         /// </remarks>
         /// <param name="hitObject">The object.</param>
         /// <returns>The end time of this object.</returns>
-        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
+        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasDuration)?.EndTime ?? hitObject.StartTime;
     }
 }

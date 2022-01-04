@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning.Default;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,12 +15,21 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         private readonly ManualSliderBody body;
 
+        /// <summary>
+        /// Offset in absolute (local) coordinates from the start of the curve.
+        /// </summary>
+        public Vector2 PathStartLocation => body.PathOffset;
+
         public SliderBodyPiece()
         {
             InternalChild = body = new ManualSliderBody
             {
                 AccentColour = Color4.Transparent
             };
+
+            // SliderSelectionBlueprint relies on calling ReceivePositionalInputAt on this drawable to determine whether selection should occur.
+            // Without AlwaysPresent, a movement in a parent container (ie. the editor composer area resizing) could cause incorrect input handling.
+            AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader]
@@ -43,6 +52,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             Size = body.Size;
             OriginPosition = body.PathOffset;
         }
+
+        public void RecyclePath() => body.RecyclePath();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
     }

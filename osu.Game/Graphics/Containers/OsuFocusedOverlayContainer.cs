@@ -18,13 +18,17 @@ namespace osu.Game.Graphics.Containers
     [Cached(typeof(IPreviewTrackOwner))]
     public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
-        private SampleChannel samplePopIn;
-        private SampleChannel samplePopOut;
+        private Sample samplePopIn;
+        private Sample samplePopOut;
+        protected virtual string PopInSampleName => "UI/overlay-pop-in";
+        protected virtual string PopOutSampleName => "UI/overlay-pop-out";
+
+        protected override bool BlockScrollInput => false;
 
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>
-        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Temporary to allow for overlays in the main screen content to not dim themselves.
         /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
         /// </summary>
         protected virtual bool DimMainContent => true;
@@ -35,13 +39,13 @@ namespace osu.Game.Graphics.Containers
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+        protected readonly IBindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
-            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
-            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+            samplePopIn = audio.Samples.Get(PopInSampleName);
+            samplePopOut = audio.Samples.Get(PopOutSampleName);
         }
 
         protected override void LoadComplete()
@@ -76,17 +80,20 @@ namespace osu.Game.Graphics.Containers
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (closeOnMouseUp && !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
                 Hide();
 
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
                 case GlobalAction.Back:
                     Hide();
@@ -99,25 +106,34 @@ namespace osu.Game.Graphics.Containers
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
+            bool didChange = state.NewValue != state.OldValue;
+
             switch (state.NewValue)
             {
                 case Visibility.Visible:
                     if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                     {
+                        // todo: visual/audible feedback that this operation could not complete.
                         State.Value = Visibility.Hidden;
                         return;
                     }
 
-                    samplePopIn?.Play();
+                    if (didChange)
+                        samplePopIn?.Play();
+
                     if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    samplePopOut?.Play();
+                    if (didChange)
+                        samplePopOut?.Play();
+
                     if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }

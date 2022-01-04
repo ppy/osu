@@ -2,15 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -18,14 +16,6 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneChatLineTruncation : OsuTestScene
     {
         private readonly TestChatLineContainer textContainer;
-
-        public override IReadOnlyList<Type> RequiredTypes => new[]
-        {
-            typeof(ChatLine),
-            typeof(Message),
-            typeof(LinkFlowContainer),
-            typeof(MessageFormatter)
-        };
 
         public TestSceneChatLineTruncation()
         {
@@ -65,14 +55,14 @@ namespace osu.Game.Tests.Visual.Online
         {
             private static long messageCounter;
 
-            internal static readonly User TEST_SENDER_BACKGROUND = new User
+            internal static readonly APIUser TEST_SENDER_BACKGROUND = new APIUser
             {
                 Username = @"i-am-important",
                 Id = 42,
                 Colour = "#250cc9",
             };
 
-            internal static readonly User TEST_SENDER = new User
+            internal static readonly APIUser TEST_SENDER = new APIUser
             {
                 Username = @"Somebody",
                 Id = 1,
@@ -85,7 +75,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Content = text;
                 IsAction = isAction;
-                Sender = new User
+                Sender = new APIUser
                 {
                     Username = username ?? $"user {number}",
                     Id = number,

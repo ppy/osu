@@ -5,45 +5,93 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// TODO: eventually make this inherit Screen and add a local screen stack inside the Editor.
     /// </summary>
-    public abstract class EditorScreen : Container
+    public abstract class EditorScreen : VisibilityContainer
     {
-        [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
-
         [Resolved]
         protected EditorBeatmap EditorBeatmap { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        protected EditorScreen()
+        public readonly EditorScreenMode Type;
+
+        protected EditorScreen(EditorScreenMode type)
         {
+            Type = type;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
+            InternalChild = content = new PopoverContainer { RelativeSizeAxes = Axes.Both };
         }
 
-        protected override void LoadComplete()
+        protected override void PopIn()
         {
-            base.LoadComplete();
-
-            this.FadeTo(0)
-                .Then()
-                .FadeTo(1f, 250, Easing.OutQuint);
+            this.ScaleTo(1f, 200, Easing.OutQuint)
+                .FadeIn(200, Easing.OutQuint);
         }
 
-        public void Exit()
+        protected override void PopOut()
         {
-            this.FadeOut(250).Expire();
+            this.ScaleTo(0.98f, 200, Easing.OutQuint)
+                .FadeOut(200, Easing.OutQuint);
         }
+
+        #region Clipboard operations
+
+        public BindableBool CanCut { get; } = new BindableBool();
+
+        /// <summary>
+        /// Performs a "cut to clipboard" operation appropriate for the given screen.
+        /// </summary>
+        protected virtual void PerformCut()
+        {
+        }
+
+        public void Cut()
+        {
+            if (CanCut.Value)
+                PerformCut();
+        }
+
+        public BindableBool CanCopy { get; } = new BindableBool();
+
+        /// <summary>
+        /// Performs a "copy to clipboard" operation appropriate for the given screen.
+        /// </summary>
+        protected virtual void PerformCopy()
+        {
+        }
+
+        public virtual void Copy()
+        {
+            if (CanCopy.Value)
+                PerformCopy();
+        }
+
+        public BindableBool CanPaste { get; } = new BindableBool();
+
+        /// <summary>
+        /// Performs a "paste from clipboard" operation appropriate for the given screen.
+        /// </summary>
+        protected virtual void PerformPaste()
+        {
+        }
+
+        public virtual void Paste()
+        {
+            if (CanPaste.Value)
+                PerformPaste();
+        }
+
+        #endregion
     }
 }

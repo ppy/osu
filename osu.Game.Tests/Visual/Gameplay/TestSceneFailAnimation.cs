@@ -2,15 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailAnimation : AllPlayersTestScene
+    public class TestSceneFailAnimation : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -18,22 +19,29 @@ namespace osu.Game.Tests.Visual.Gameplay
             return new FailPlayer();
         }
 
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        [Test]
+        public void TestOsuWithoutRedTint()
         {
-            typeof(AllPlayersTestScene),
-            typeof(TestPlayer),
-            typeof(Player),
-        };
+            AddStep("Disable red tint", () => Config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, false));
+            TestOsu();
+            AddStep("Enable red tint", () => Config.SetValue(OsuSetting.FadePlayfieldWhenHealthLow, true));
+        }
 
         protected override void AddCheckSteps()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
             AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State.Value == Visibility.Visible);
+
+            // The pause screen and fail animation both ramp frequency.
+            // This tests to ensure that it doesn't reset during that handoff.
+            AddAssert("frequency only ever decreased", () => !((FailPlayer)Player).FrequencyIncreased);
         }
 
         private class FailPlayer : TestPlayer
         {
             public new FailOverlay FailOverlay => base.FailOverlay;
+
+            public bool FrequencyIncreased { get; private set; }
 
             public FailPlayer()
                 : base(false, false)
@@ -44,6 +52,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 base.LoadComplete();
                 HealthProcessor.FailConditions += (_, __) => true;
+            }
+
+            private double lastFrequency = double.MaxValue;
+
+            protected override void Update()
+            {
+                base.Update();
+
+                double freq = Beatmap.Value.Track.AggregateFrequency.Value;
+
+                FrequencyIncreased |= freq > lastFrequency;
+
+                lastFrequency = freq;
             }
         }
     }

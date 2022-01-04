@@ -2,12 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using osu.Framework.Testing;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetInfo : IEquatable<RulesetInfo>
+    [ExcludeFromDynamicCompile]
+    public sealed class RulesetInfo : IEquatable<RulesetInfo>, IRulesetInfo
     {
         public int? ID { get; set; }
 
@@ -21,11 +24,20 @@ namespace osu.Game.Rulesets
         public bool Available { get; set; }
 
         // TODO: this should probably be moved to RulesetStore.
-        public virtual Ruleset CreateInstance()
+        public Ruleset CreateInstance()
         {
-            if (!Available) return null;
+            if (!Available)
+                throw new RulesetLoadException(@"Ruleset not available");
 
-            var ruleset = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+            var type = Type.GetType(InstantiationInfo);
+
+            if (type == null)
+                throw new RulesetLoadException(@"Type lookup failure");
+
+            var ruleset = Activator.CreateInstance(type) as Ruleset;
+
+            if (ruleset == null)
+                throw new RulesetLoadException(@"Instantiation failure");
 
             // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
             ruleset.RulesetInfo = this;
@@ -37,12 +49,14 @@ namespace osu.Game.Rulesets
 
         public override bool Equals(object obj) => obj is RulesetInfo rulesetInfo && Equals(rulesetInfo);
 
+        public bool Equals(IRulesetInfo other) => other is RulesetInfo b && Equals(b);
+
         [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = ID.HasValue ? ID.GetHashCode() : 0;
+                int hashCode = ID.HasValue ? ID.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (InstantiationInfo != null ? InstantiationInfo.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Available.GetHashCode();
@@ -50,6 +64,17 @@ namespace osu.Game.Rulesets
             }
         }
 
-        public override string ToString() => $"{Name} ({ShortName}) ID: {ID}";
+        public override string ToString() => Name ?? $"{Name} ({ShortName}) ID: {ID}";
+
+        #region Implementation of IHasOnlineID
+
+        [NotMapped]
+        public int OnlineID
+        {
+            get => ID ?? -1;
+            set => ID = value >= 0 ? value : (int?)null;
+        }
+
+        #endregion
     }
 }

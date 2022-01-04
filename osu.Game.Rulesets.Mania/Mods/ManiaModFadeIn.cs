@@ -2,22 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mods;
+using System.Linq;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModFadeIn : Mod
+    public class ManiaModFadeIn : ManiaModPlayfieldCover
     {
         public override string Name => "Fade In";
         public override string Acronym => "FI";
-        public override IconUsage Icon => OsuIcon.ModHidden;
-        public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"Keys appear out of nowhere!";
         public override double ScoreMultiplier => 1;
-        public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
+
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ManiaModHidden)).ToArray();
+
+        protected override CoverExpandDirection ExpandDirection => CoverExpandDirection.AlongScroll;
     }
 }

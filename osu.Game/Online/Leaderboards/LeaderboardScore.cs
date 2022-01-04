@@ -11,23 +11,32 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Select;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using Humanizer;
 using osu.Game.Online.API;
+using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer
+    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu
     {
         public const float HEIGHT = 60;
+
+        public readonly ScoreInfo Score;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
@@ -36,8 +45,7 @@ namespace osu.Game.Online.Leaderboards
 
         protected Container RankContainer { get; private set; }
 
-        private readonly ScoreInfo score;
-        private readonly int rank;
+        private readonly int? rank;
         private readonly bool allowHighlight;
 
         private Box background;
@@ -51,9 +59,19 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
+        [Resolved(CanBeNull = true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private SongSelect songSelect { get; set; }
+
+        [Resolved]
+        private Storage storage { get; set; }
+
+        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
         {
-            this.score = score;
+            Score = score;
+
             this.rank = rank;
             this.allowHighlight = allowHighlight;
 
@@ -62,30 +80,20 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour)
+        private void load(IAPIProvider api, OsuColour colour, ScoreManager scoreManager)
         {
-            var user = score.User;
+            var user = Score.User;
 
-            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
+            statisticsLabels = GetStatistics(Score).Select(s => new ScoreComponentLabel(s)).ToList();
 
-            DrawableAvatar innerAvatar;
+            ClickableAvatar innerAvatar;
 
             Children = new Drawable[]
             {
-                new Container
+                new RankLabel(rank)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = rank_width,
-                    Children = new[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
-                        },
-                    },
                 },
                 content = new Container
                 {
@@ -103,7 +111,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
+                                    Colour = user.OnlineID == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -115,7 +123,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new DrawableAvatar(user)
+                                    innerAvatar = new ClickableAvatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -193,8 +201,8 @@ namespace osu.Game.Online.Leaderboards
                                         scoreLabel = new GlowingSpriteText
                                         {
                                             TextColour = Color4.White,
-                                            GlowColour = OsuColour.FromHex(@"83ccfa"),
-                                            Text = score.TotalScore.ToString(@"N0"),
+                                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
+                                            Current = scoreManager.GetBindableTotalScoreString(Score),
                                             Font = OsuFont.Numeric.With(size: 23),
                                         },
                                         RankContainer = new Container
@@ -202,7 +210,7 @@ namespace osu.Game.Online.Leaderboards
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new UpdateableRank(score.Rank)
+                                                scoreRank = new UpdateableRank(Score.Rank)
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -219,7 +227,7 @@ namespace osu.Game.Online.Leaderboards
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(1),
-                                    ChildrenEnumerable = score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },
@@ -244,7 +252,7 @@ namespace osu.Game.Online.Leaderboards
             this.FadeIn(200);
             content.MoveToY(0, 800, Easing.OutQuint);
 
-            using (BeginDelayedSequence(100, true))
+            using (BeginDelayedSequence(100))
             {
                 avatar.FadeIn(300, Easing.OutQuint);
                 nameLabel.FadeIn(350, Easing.OutQuint);
@@ -252,12 +260,12 @@ namespace osu.Game.Online.Leaderboards
                 avatar.MoveToX(0, 300, Easing.OutQuint);
                 nameLabel.MoveToX(0, 350, Easing.OutQuint);
 
-                using (BeginDelayedSequence(250, true))
+                using (BeginDelayedSequence(250))
                 {
                     scoreLabel.FadeIn(200);
                     scoreRank.FadeIn(200);
 
-                    using (BeginDelayedSequence(50, true))
+                    using (BeginDelayedSequence(50))
                     {
                         var drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
@@ -270,7 +278,7 @@ namespace osu.Game.Online.Leaderboards
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
             new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy)
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -292,7 +300,7 @@ namespace osu.Game.Online.Leaderboards
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText { get; }
+            public LocalisableString TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
@@ -318,7 +326,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size),
                                     Rotation = 45,
-                                    Colour = OsuColour.FromHex(@"3087ac"),
+                                    Colour = Color4Extensions.FromHex(@"3087ac"),
                                     Icon = FontAwesome.Solid.Square,
                                     Shadow = true,
                                 },
@@ -327,7 +335,7 @@ namespace osu.Game.Online.Leaderboards
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size - 6),
-                                    Colour = OsuColour.FromHex(@"a4edff"),
+                                    Colour = Color4Extensions.FromHex(@"a4edff"),
                                     Icon = statistic.Icon,
                                 },
                             },
@@ -337,7 +345,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TextColour = Color4.White,
-                            GlowColour = OsuColour.FromHex(@"83ccfa"),
+                            GlowColour = Color4Extensions.FromHex(@"83ccfa"),
                             Text = statistic.Value,
                             Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
                         },
@@ -346,17 +354,55 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        private class RankLabel : Container, IHasTooltip
+        {
+            public RankLabel(int? rank)
+            {
+                if (rank >= 1000)
+                    TooltipText = $"#{rank:N0}";
+
+                Child = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Font = OsuFont.GetFont(size: 20, italics: true),
+                    Text = rank == null ? "-" : rank.Value.FormatRank()
+                };
+            }
+
+            public LocalisableString TooltipText { get; }
+        }
+
         public class LeaderboardScoreStatistic
         {
             public IconUsage Icon;
-            public string Value;
+            public LocalisableString Value;
             public string Name;
 
-            public LeaderboardScoreStatistic(IconUsage icon, string name, string value)
+            public LeaderboardScoreStatistic(IconUsage icon, string name, LocalisableString value)
             {
                 Icon = icon;
                 Name = name;
                 Value = value;
+            }
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (Score.Mods.Length > 0 && modsContainer.Any(s => s.IsHovered) && songSelect != null)
+                    items.Add(new OsuMenuItem("Use these mods", MenuItemType.Highlighted, () => songSelect.Mods.Value = Score.Mods));
+
+                if (Score.Files.Count > 0)
+                    items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
+
+                if (Score.ID != 0)
+                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+
+                return items.ToArray();
             }
         }
     }

@@ -8,8 +8,10 @@ using osu.Game.Rulesets.Osu.Objects;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Types;
 using System.Linq;
+using System.Threading;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
@@ -22,14 +24,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
         public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasPosition);
 
-        protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
+        protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
             var positionData = original as IHasPosition;
             var comboData = original as IHasCombo;
 
             switch (original)
             {
-                case IHasCurve curveData:
+                case IHasPathWithRepeats curveData:
                     return new Slider
                     {
                         StartTime = original.StartTime,
@@ -43,10 +45,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         LegacyLastTickOffset = (original as IHasLegacyLastTickOffset)?.LegacyLastTickOffset,
                         // prior to v8, speed multipliers don't adjust for how many ticks are generated over the same distance.
                         // this results in more (or less) ticks being generated in <v8 maps for the same time duration.
-                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / beatmap.ControlPointInfo.DifficultyPointAt(original.StartTime).SpeedMultiplier : 1
+                        TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / ((LegacyControlPointInfo)beatmap.ControlPointInfo).DifficultyPointAt(original.StartTime).SliderVelocity : 1
                     }.Yield();
 
-                case IHasEndTime endTimeData:
+                case IHasDuration endTimeData:
                     return new Spinner
                     {
                         StartTime = original.StartTime,

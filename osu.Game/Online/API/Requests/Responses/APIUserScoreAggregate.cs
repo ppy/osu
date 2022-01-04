@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -22,7 +21,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public double? PP { get; set; }
 
         [JsonProperty(@"room_id")]
-        public int RoomID { get; set; }
+        public long RoomID { get; set; }
 
         [JsonProperty("total_score")]
         public long TotalScore { get; set; }
@@ -31,7 +30,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public long UserID { get; set; }
 
         [JsonProperty("user")]
-        public User User { get; set; }
+        public APIUser User { get; set; }
+
+        [JsonProperty("position")]
+        public int? Position { get; set; }
 
         public ScoreInfo CreateScoreInfo() =>
             new ScoreInfo
@@ -40,6 +42,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 PP = PP,
                 TotalScore = TotalScore,
                 User = User,
+                Position = Position
             };
     }
 }

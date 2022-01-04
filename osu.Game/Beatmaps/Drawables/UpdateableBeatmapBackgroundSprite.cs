@@ -12,9 +12,11 @@ namespace osu.Game.Beatmaps.Drawables
     /// <summary>
     /// Display a beatmap background from a local source, but fallback to online source if not available.
     /// </summary>
-    public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
+    public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<IBeatmapInfo>
     {
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
+
+        protected override double LoadDelay => 500;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -32,12 +34,12 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         protected virtual double UnloadDelay => 10000;
 
-        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
-            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad) =>
+            new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay) { RelativeSizeAxes = Axes.Both };
 
         protected override double TransformDuration => 400;
 
-        protected override Drawable CreateDrawable(BeatmapInfo model)
+        protected override Drawable CreateDrawable(IBeatmapInfo model)
         {
             var drawable = getDrawableForModel(model);
             drawable.RelativeSizeAxes = Axes.Both;
@@ -48,15 +50,16 @@ namespace osu.Game.Beatmaps.Drawables
             return drawable;
         }
 
-        private Drawable getDrawableForModel(BeatmapInfo model)
+        private Drawable getDrawableForModel(IBeatmapInfo model)
         {
             // prefer online cover where available.
-            if (model?.BeatmapSet?.OnlineInfo != null)
-                return new BeatmapSetCover(model.BeatmapSet, beatmapSetCoverType);
+            if (model?.BeatmapSet is IBeatmapSetOnlineInfo online)
+                return new OnlineBeatmapSetCover(online, beatmapSetCoverType);
 
-            return model?.ID > 0
-                ? new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model))
-                : new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
+            if (model is BeatmapInfo localModel)
+                return new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(localModel));
+
+            return new BeatmapBackgroundSprite(beatmaps.DefaultBeatmap);
         }
     }
 }

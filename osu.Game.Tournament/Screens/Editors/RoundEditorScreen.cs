@@ -7,10 +7,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
@@ -63,25 +63,25 @@ namespace osu.Game.Tournament.Screens.Editors
                             {
                                 LabelText = "Name",
                                 Width = 0.33f,
-                                Bindable = Model.Name
+                                Current = Model.Name
                             },
                             new SettingsTextBox
                             {
                                 LabelText = "Description",
                                 Width = 0.33f,
-                                Bindable = Model.Description
+                                Current = Model.Description
                             },
                             new DateTextBox
                             {
                                 LabelText = "Start Time",
                                 Width = 0.33f,
-                                Bindable = Model.StartDate
+                                Current = Model.StartDate
                             },
                             new SettingsSlider<int>
                             {
                                 LabelText = "Best of",
                                 Width = 0.33f,
-                                Bindable = Model.BestOf
+                                Current = Model.BestOf
                             },
                             new SettingsButton
                             {
@@ -129,8 +129,6 @@ namespace osu.Game.Tournament.Screens.Editors
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        LayoutDuration = 200,
-                        LayoutEasing = Easing.OutQuint,
                         ChildrenEnumerable = round.Beatmaps.Select(p => new RoundBeatmapRow(round, p))
                     };
                 }
@@ -149,9 +147,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
 
-                    private readonly Bindable<string> beatmapId = new Bindable<string>();
+                    private readonly Bindable<int?> beatmapId = new Bindable<int?>();
 
-                    private readonly Bindable<string> mods = new Bindable<string>();
+                    private readonly Bindable<string> mods = new Bindable<string>(string.Empty);
 
                     private readonly Container drawableContainer;
 
@@ -188,14 +186,14 @@ namespace osu.Game.Tournament.Screens.Editors
                                         LabelText = "Beatmap ID",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = beatmapId,
+                                        Current = beatmapId,
                                     },
                                     new SettingsTextBox
                                     {
                                         LabelText = "Mods",
                                         RelativeSizeAxes = Axes.None,
                                         Width = 200,
-                                        Bindable = mods,
+                                        Current = mods,
                                     },
                                     drawableContainer = new Container
                                     {
@@ -222,33 +220,31 @@ namespace osu.Game.Tournament.Screens.Editors
                     [BackgroundDependencyLoader]
                     private void load(RulesetStore rulesets)
                     {
-                        beatmapId.Value = Model.ID.ToString();
-                        beatmapId.BindValueChanged(idString =>
+                        beatmapId.Value = Model.ID;
+                        beatmapId.BindValueChanged(id =>
                         {
-                            int.TryParse(idString.NewValue, out var parsed);
+                            Model.ID = id.NewValue ?? 0;
 
-                            Model.ID = parsed;
+                            if (id.NewValue != id.OldValue)
+                                Model.Beatmap = null;
 
-                            if (idString.NewValue != idString.OldValue)
-                                Model.BeatmapInfo = null;
-
-                            if (Model.BeatmapInfo != null)
+                            if (Model.Beatmap != null)
                             {
                                 updatePanel();
                                 return;
                             }
 
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = Model.ID });
+                            var req = new GetBeatmapRequest(new APIBeatmap { OnlineID = Model.ID });
 
                             req.Success += res =>
                             {
-                                Model.BeatmapInfo = res.ToBeatmap(rulesets);
+                                Model.Beatmap = res;
                                 updatePanel();
                             };
 
                             req.Failure += _ =>
                             {
-                                Model.BeatmapInfo = null;
+                                Model.Beatmap = null;
                                 updatePanel();
                             };
 
@@ -263,9 +259,9 @@ namespace osu.Game.Tournament.Screens.Editors
                     {
                         drawableContainer.Clear();
 
-                        if (Model.BeatmapInfo != null)
+                        if (Model.Beatmap != null)
                         {
-                            drawableContainer.Child = new TournamentBeatmapPanel(Model.BeatmapInfo, Model.Mods)
+                            drawableContainer.Child = new TournamentBeatmapPanel(Model.Beatmap, Model.Mods)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,

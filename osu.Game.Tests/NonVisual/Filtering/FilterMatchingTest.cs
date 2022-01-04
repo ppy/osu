@@ -4,8 +4,10 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Filter;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
+using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.NonVisual.Filtering
 {
@@ -14,8 +16,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
     {
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
-            Ruleset = new RulesetInfo { ID = 5 },
-            StarDifficulty = 4.0d,
+            Ruleset = new RulesetInfo { OnlineID = 5 },
+            StarRating = 4.0d,
             BaseDifficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5.0f,
@@ -32,11 +34,11 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 Source = "unit tests",
                 Tags = "look for tags too",
             },
-            Version = "version as well",
+            DifficultyName = "version as well",
             Length = 2500,
             BPM = 160,
             BeatDivisor = 12,
-            Status = BeatmapSetOnlineStatus.Loved
+            Status = BeatmapOnlineStatus.Loved
         };
 
         [Test]
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 }
+                Ruleset = new RulesetInfo { OnlineID = 6 }
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -68,7 +70,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
@@ -84,7 +86,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
                 ApproachRate = new FilterCriteria.OptionalRange<float>
                 {
@@ -105,7 +107,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
                 BPM = new FilterCriteria.OptionalRange<double>
                 {
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { ID = 6 },
+                Ruleset = new RulesetInfo { OnlineID = 6 },
                 AllowConvertedBeatmaps = true,
                 SearchText = terms
             };
@@ -187,7 +189,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         public void TestCriteriaMatchingArtistWithNullUnicodeName(string artistName, bool filtered)
         {
             var exampleBeatmapInfo = getExampleBeatmap();
-            exampleBeatmapInfo.Metadata.ArtistUnicode = null;
+            exampleBeatmapInfo.Metadata.ArtistUnicode = string.Empty;
 
             var criteria = new FilterCriteria
             {
@@ -196,6 +198,49 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
             Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [TestCase("202010", true)]
+        [TestCase("20201010", false)]
+        [TestCase("153", true)]
+        [TestCase("1535", false)]
+        public void TestCriteriaMatchingBeatmapIDs(string query, bool filtered)
+        {
+            var beatmap = getExampleBeatmap();
+            beatmap.OnlineID = 20201010;
+            beatmap.BeatmapSet = new BeatmapSetInfo { OnlineID = 1535 };
+
+            var criteria = new FilterCriteria { SearchText = query };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        public void TestCustomRulesetCriteria([Values(null, true, false)] bool? matchCustomCriteria)
+        {
+            var beatmap = getExampleBeatmap();
+
+            var customCriteria = matchCustomCriteria is bool match ? new CustomCriteria(match) : null;
+            var criteria = new FilterCriteria { RulesetCriteria = customCriteria };
+            var carouselItem = new CarouselBeatmap(beatmap);
+            carouselItem.Filter(criteria);
+
+            Assert.AreEqual(matchCustomCriteria == false, carouselItem.Filtered.Value);
+        }
+
+        private class CustomCriteria : IRulesetFilterCriteria
+        {
+            private readonly bool match;
+
+            public CustomCriteria(bool shouldMatch)
+            {
+                match = shouldMatch;
+            }
+
+            public bool Matches(BeatmapInfo beatmapInfo) => match;
+            public bool TryParseCustomKeywordCriteria(string key, Operator op, string value) => false;
         }
     }
 }

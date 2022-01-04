@@ -9,9 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
@@ -19,10 +20,11 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -35,18 +37,20 @@ namespace osu.Game.Graphics
         private Bindable<ScreenshotFormat> screenshotFormat;
         private Bindable<bool> captureMenuCursor;
 
-        private GameHost host;
-        private Storage storage;
-        private NotificationOverlay notificationOverlay;
+        [Resolved]
+        private GameHost host { get; set; }
 
-        private SampleChannel shutter;
+        private Storage storage;
+
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; }
+
+        private Sample shutter;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(OsuConfigManager config, Storage storage, AudioManager audio)
         {
-            this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
-            this.notificationOverlay = notificationOverlay;
 
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
@@ -54,9 +58,12 @@ namespace osu.Game.Graphics
             shutter = audio.Samples.Get("UI/shutter");
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
                     shutter.Play();
@@ -67,7 +74,9 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
         private volatile int screenShotTasks;
 
@@ -88,7 +97,7 @@ namespace osu.Game.Graphics
                 {
                     ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
                     {
-                        if (framesWaited++ < frames_to_wait)
+                        if (framesWaited++ >= frames_to_wait)
                             // ReSharper disable once AccessToDisposedClosure
                             framesWaitedEvent.Set();
                     }, 10, true);
@@ -98,54 +107,58 @@ namespace osu.Game.Graphics
                 }
             }
 
-            using (var image = await host.TakeScreenshotAsync())
+            using (var image = await host.TakeScreenshotAsync().ConfigureAwait(false))
             {
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
 
-                var fileName = getFileName();
-                if (fileName == null) return;
+                string filename = getFilename();
 
-                var stream = storage.GetStream(fileName, FileAccess.Write);
+                if (filename == null) return;
 
-                switch (screenshotFormat.Value)
+                using (var stream = storage.GetStream(filename, FileAccess.Write))
                 {
-                    case ScreenshotFormat.Png:
-                        image.SaveAsPng(stream);
-                        break;
+                    switch (screenshotFormat.Value)
+                    {
+                        case ScreenshotFormat.Png:
+                            await image.SaveAsPngAsync(stream).ConfigureAwait(false);
+                            break;
 
-                    case ScreenshotFormat.Jpg:
-                        image.SaveAsJpeg(stream);
-                        break;
+                        case ScreenshotFormat.Jpg:
+                            const int jpeg_quality = 92;
 
-                    default:
-                        throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                            await image.SaveAsJpegAsync(stream, new JpegEncoder { Quality = jpeg_quality }).ConfigureAwait(false);
+                            break;
+
+                        default:
+                            throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
+                    }
                 }
 
                 notificationOverlay.Post(new SimpleNotification
                 {
-                    Text = $"{fileName} saved!",
+                    Text = $"{filename} saved!",
                     Activated = () =>
                     {
-                        storage.OpenInNativeExplorer();
+                        storage.PresentFileExternally(filename);
                         return true;
                     }
                 });
             }
         });
 
-        private string getFileName()
+        private string getFilename()
         {
             var dt = DateTime.Now;
-            var fileExt = screenshotFormat.ToString().ToLowerInvariant();
+            string fileExt = screenshotFormat.ToString().ToLowerInvariant();
 
-            var withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
+            string withoutIndex = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}.{fileExt}";
             if (!storage.Exists(withoutIndex))
                 return withoutIndex;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
-                var indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
+                string indexedName = $"osu_{dt:yyyy-MM-dd_HH-mm-ss}-{i}.{fileExt}";
                 if (!storage.Exists(indexedName))
                     return indexedName;
             }

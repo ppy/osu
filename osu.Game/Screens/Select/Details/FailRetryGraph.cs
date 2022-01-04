@@ -16,27 +16,41 @@ namespace osu.Game.Screens.Select.Details
     {
         private readonly BarGraph retryGraph, failGraph;
 
-        private BeatmapMetrics metrics;
+        private APIFailTimes failTimes;
 
-        public BeatmapMetrics Metrics
+        public APIFailTimes FailTimes
         {
-            get => metrics;
+            get => failTimes;
             set
             {
-                if (value == metrics) return;
+                if (value == failTimes) return;
 
-                metrics = value;
+                failTimes = value;
 
-                var retries = Metrics?.Retries ?? Array.Empty<int>();
-                var fails = Metrics?.Fails ?? Array.Empty<int>();
+                int[] retries = FailTimes?.Retries ?? Array.Empty<int>();
+                int[] fails = FailTimes?.Fails ?? Array.Empty<int>();
+                int[] retriesAndFails = sumRetriesAndFails(retries, fails);
 
-                float maxValue = fails.Any() ? fails.Zip(retries, (fail, retry) => fail + retry).Max() : 0;
+                float maxValue = retriesAndFails.Any() ? retriesAndFails.Max() : 0;
                 failGraph.MaxValue = maxValue;
                 retryGraph.MaxValue = maxValue;
 
-                failGraph.Values = fails.Select(f => (float)f);
-                retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + Math.Clamp(fail, 0, maxValue));
+                failGraph.Values = fails.Select(v => (float)v);
+                retryGraph.Values = retriesAndFails.Select(v => (float)v);
             }
+        }
+
+        private int[] sumRetriesAndFails(int[] retries, int[] fails)
+        {
+            int[] result = new int[Math.Max(retries.Length, fails.Length)];
+
+            for (int i = 0; i < retries.Length; ++i)
+                result[i] = retries[i];
+
+            for (int i = 0; i < fails.Length; ++i)
+                result[i] += fails[i];
+
+            return result;
         }
 
         public FailRetryGraph()

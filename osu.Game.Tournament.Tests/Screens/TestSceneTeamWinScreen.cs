@@ -2,32 +2,30 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Allocation;
+using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.TeamWin;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneTeamWinScreen : LadderTestScene
+    public class TestSceneTeamWinScreen : TournamentTestScene
     {
-        [Cached]
-        private readonly LadderInfo ladder = new LadderInfo();
-
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestBasic()
         {
-            var match = new TournamentMatch();
-            match.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "USA");
-            match.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym.Value == "JPN");
-            match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
-            ladder.CurrentMatch.Value = match;
+            AddStep("set up match", () =>
+            {
+                var match = Ladder.CurrentMatch.Value;
 
-            Add(new TeamWinScreen
+                match.Round.Value = Ladder.Rounds.FirstOrDefault(g => g.Name.Value == "Finals");
+                match.Completed.Value = true;
+            });
+
+            AddStep("create screen", () => Add(new TeamWinScreen
             {
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 16 / 9f
-            });
+            }));
         }
     }
 }

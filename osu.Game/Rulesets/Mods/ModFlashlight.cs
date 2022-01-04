@@ -28,10 +28,9 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
-        public override IconUsage Icon => OsuIcon.ModFlashlight;
+        public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
-        public override bool Ranked => true;
 
         internal ModFlashlight()
         {
@@ -47,16 +46,34 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             Combo.BindTo(scoreProcessor.Combo);
+
+            // Default value of ScoreProcessor's Rank in Flashlight Mod should be SS+
+            scoreProcessor.Rank.Value = ScoreRank.XH;
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy)
+        {
+            switch (rank)
+            {
+                case ScoreRank.X:
+                    return ScoreRank.XH;
+
+                case ScoreRank.S:
+                    return ScoreRank.SH;
+
+                default:
+                    return rank;
+            }
+        }
 
         public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
         {
             var flashlight = CreateFlashlight();
-            flashlight.Combo = Combo;
+
             flashlight.RelativeSizeAxes = Axes.Both;
             flashlight.Colour = Color4.Black;
+
+            flashlight.Combo.BindTo(Combo);
             drawableRuleset.KeyBindingInputManager.Add(flashlight);
 
             flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
@@ -66,7 +83,8 @@ namespace osu.Game.Rulesets.Mods
 
         public abstract class Flashlight : Drawable
         {
-            internal BindableInt Combo;
+            public readonly BindableInt Combo = new BindableInt();
+
             private IShader shader;
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode(this);
@@ -91,6 +109,9 @@ namespace osu.Game.Rulesets.Mods
                 {
                     foreach (var breakPeriod in Breaks)
                     {
+                        if (!breakPeriod.HasEffect)
+                            continue;
+
                         if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
 
                         this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);

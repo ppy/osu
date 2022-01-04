@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 
@@ -24,36 +25,57 @@ namespace osu.Game.Users
             public override string Status => "Choosing a beatmap";
         }
 
-        public class MultiplayerGame : UserActivity
+        public abstract class InGame : UserActivity
         {
-            public override string Status => "Playing with others";
-        }
+            public IBeatmapInfo BeatmapInfo { get; }
 
-        public class Editing : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
+            public IRulesetInfo Ruleset { get; }
 
-            public Editing(BeatmapInfo info)
+            protected InGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
             {
-                Beatmap = info;
-            }
-
-            public override string Status => @"Editing a beatmap";
-        }
-
-        public class SoloGame : UserActivity
-        {
-            public BeatmapInfo Beatmap { get; }
-
-            public RulesetInfo Ruleset { get; }
-
-            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
-            {
-                Beatmap = info;
+                BeatmapInfo = beatmapInfo;
                 Ruleset = ruleset;
             }
 
             public override string Status => Ruleset.CreateInstance().PlayingVerb;
+        }
+
+        public class InMultiplayerGame : InGame
+        {
+            public InMultiplayerGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            public override string Status => $@"{base.Status} with others";
+        }
+
+        public class InPlaylistGame : InGame
+        {
+            public InPlaylistGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+        }
+
+        public class InSoloGame : InGame
+        {
+            public InSoloGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+        }
+
+        public class Editing : UserActivity
+        {
+            public IBeatmapInfo BeatmapInfo { get; }
+
+            public Editing(IBeatmapInfo info)
+            {
+                BeatmapInfo = info;
+            }
+
+            public override string Status => @"Editing a beatmap";
         }
 
         public class Spectating : UserActivity
@@ -61,9 +83,21 @@ namespace osu.Game.Users
             public override string Status => @"Spectating a game";
         }
 
+        public class SearchingForLobby : UserActivity
+        {
+            public override string Status => @"Looking for a lobby";
+        }
+
         public class InLobby : UserActivity
         {
-            public override string Status => @"In a multiplayer lobby";
+            public override string Status => @"In a lobby";
+
+            public readonly Room Room;
+
+            public InLobby(Room room)
+            {
+                Room = room;
+            }
         }
     }
 }

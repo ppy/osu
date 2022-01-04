@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Retrieves a mapping of <see cref="HitResult"/>s to their timing windows for all allowed <see cref="HitResult"/>s.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<(HitResult result, double length)> GetAllAvailableWindows()
         {
             for (var result = HitResult.Meh; result <= HitResult.Perfect; ++result)
@@ -87,7 +86,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             foreach (var range in GetRanges())
             {
-                var value = BeatmapDifficulty.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
+                double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
 
                 switch (range.Result)
                 {

@@ -85,14 +85,14 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
         private ScrollState scrollState;
 
-        private void setScrollState(ScrollState newstate)
+        private void setScrollState(ScrollState newState)
         {
-            if (scrollState == newstate)
+            if (scrollState == newState)
                 return;
 
             delayedStateChangeDelegate?.Cancel();
 
-            switch (scrollState = newstate)
+            switch (scrollState = newState)
             {
                 case ScrollState.Scrolling:
                     resetSelected();
@@ -345,7 +345,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                 Flag.Anchor = Anchor.Centre;
                 Flag.Origin = Anchor.Centre;
-                Flag.Scale = new Vector2(0.9f);
+                Flag.Scale = new Vector2(0.7f);
 
                 InternalChildren = new Drawable[]
                 {

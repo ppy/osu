@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -12,8 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -41,44 +40,72 @@ namespace osu.Game.Screens.Menu
 
         private BackgroundScreenDefault background;
 
-        private SampleChannel welcome;
+        private Sample welcome;
+
+        private DecoupleableInterpolatingFramedClock decoupledClock;
+        private TrianglesIntroSequence intro;
+
+        public IntroTriangles([CanBeNull] Func<MainMenu> createNextScreen = null)
+            : base(createNextScreen)
+        {
+        }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            if (MenuVoice.Value && !MenuMusic.Value)
-                welcome = audio.Samples.Get(@"welcome");
+            if (MenuVoice.Value)
+                welcome = audio.Samples.Get(@"Intro/welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
 
-            logo.Triangles = true;
-
             if (!resuming)
             {
                 PrepareMenuLoad();
 
-                LoadComponentAsync(new TrianglesIntroSequence(logo, background)
+                decoupledClock = new DecoupleableInterpolatingFramedClock
+                {
+                    IsCoupled = false
+                };
+
+                if (UsingThemedIntro)
+                    decoupledClock.ChangeSource(Track);
+
+                LoadComponentAsync(intro = new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(MenuMusic.Value ? Track : null),
+                    Clock = decoupledClock,
                     LoadMenu = LoadMenu
                 }, t =>
                 {
                     AddInternal(t);
-                    welcome?.Play();
+                    if (!UsingThemedIntro)
+                        welcome?.Play();
 
                     StartTrack();
                 });
             }
         }
 
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+
+            // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
+            intro.Expire();
+        }
+
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
             background.FadeOut(100);
+        }
+
+        protected override void StartTrack()
+        {
+            decoupledClock.Start();
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
@@ -90,7 +117,7 @@ namespace osu.Game.Screens.Menu
             private RulesetFlow rulesets;
             private Container rulesetsScale;
             private Container logoContainerSecondary;
-            private Drawable lazerLogo;
+            private LazerLogo lazerLogo;
 
             private GlitchingTriangles triangles;
 
@@ -102,13 +129,12 @@ namespace osu.Game.Screens.Menu
                 this.background = background;
             }
 
-            private OsuGameBase game;
+            [Resolved]
+            private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuGameBase game)
+            private void load(TextureStore textures)
             {
-                this.game = game;
-
                 InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
@@ -142,10 +168,10 @@ namespace osu.Game.Screens.Menu
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Child = lazerLogo = new LazerLogo(textures.GetStream("Menu/logo-triangles.mp4"))
+                        Child = lazerLogo = new LazerLogo
                         {
                             Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Origin = Anchor.Centre
                         }
                     },
                 };
@@ -174,29 +200,29 @@ namespace osu.Game.Screens.Menu
 
                 rulesets.Hide();
                 lazerLogo.Hide();
-                background.Hide();
+                background.ApplyToBackground(b => b.Hide());
 
-                using (BeginAbsoluteSequence(0, true))
+                using (BeginAbsoluteSequence(0))
                 {
-                    using (BeginDelayedSequence(text_1, true))
+                    using (BeginDelayedSequence(text_1))
                         welcomeText.FadeIn().OnComplete(t => t.Text = "wel");
 
-                    using (BeginDelayedSequence(text_2, true))
+                    using (BeginDelayedSequence(text_2))
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome");
 
-                    using (BeginDelayedSequence(text_3, true))
+                    using (BeginDelayedSequence(text_3))
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to");
 
-                    using (BeginDelayedSequence(text_4, true))
+                    using (BeginDelayedSequence(text_4))
                     {
                         welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to osu!");
                         welcomeText.TransformTo(nameof(welcomeText.Spacing), new Vector2(50, 0), 5000);
                     }
 
-                    using (BeginDelayedSequence(text_glitch, true))
+                    using (BeginDelayedSequence(text_glitch))
                         triangles.FadeIn();
 
-                    using (BeginDelayedSequence(rulesets_1, true))
+                    using (BeginDelayedSequence(rulesets_1))
                     {
                         rulesetsScale.ScaleTo(0.8f, 1000);
                         rulesets.FadeIn().ScaleTo(1).TransformSpacingTo(new Vector2(200, 0));
@@ -204,27 +230,30 @@ namespace osu.Game.Screens.Menu
                         triangles.FadeOut();
                     }
 
-                    using (BeginDelayedSequence(rulesets_2, true))
+                    using (BeginDelayedSequence(rulesets_2))
                     {
                         rulesets.ScaleTo(2).TransformSpacingTo(new Vector2(30, 0));
                     }
 
-                    using (BeginDelayedSequence(rulesets_3, true))
+                    using (BeginDelayedSequence(rulesets_3))
                     {
                         rulesets.ScaleTo(4).TransformSpacingTo(new Vector2(10, 0));
                         rulesetsScale.ScaleTo(1.3f, 1000);
                     }
 
-                    using (BeginDelayedSequence(logo_1, true))
+                    using (BeginDelayedSequence(logo_1))
                     {
                         rulesets.FadeOut();
 
                         // matching flyte curve y = 0.25x^2 + (max(0, x - 0.7) / 0.3) ^ 5
                         lazerLogo.FadeIn().ScaleTo(scale_start).Then().Delay(logo_scale_duration * 0.7f).ScaleTo(scale_start - scale_adjust, logo_scale_duration * 0.3f, Easing.InQuint);
+
+                        lazerLogo.TransformTo(nameof(LazerLogo.Progress), 1f, logo_scale_duration);
+
                         logoContainerSecondary.ScaleTo(scale_start).Then().ScaleTo(scale_start - scale_adjust * 0.25f, logo_scale_duration, Easing.InQuad);
                     }
 
-                    using (BeginDelayedSequence(logo_2, true))
+                    using (BeginDelayedSequence(logo_2))
                     {
                         lazerLogo.FadeOut().OnComplete(_ =>
                         {
@@ -232,7 +261,8 @@ namespace osu.Game.Screens.Menu
                             lazerLogo.Dispose(); // explicit disposal as we are pushing a new screen and the expire may not get run.
 
                             logo.FadeIn();
-                            background.FadeIn();
+
+                            background.ApplyToBackground(b => b.Show());
 
                             game.Add(new GameWideFlash());
 
@@ -262,14 +292,40 @@ namespace osu.Game.Screens.Menu
 
             private class LazerLogo : CompositeDrawable
             {
-                public LazerLogo(Stream videoStream)
+                private LogoAnimation highlight, background;
+
+                public float Progress
+                {
+                    get => background.AnimationProgress;
+                    set
+                    {
+                        background.AnimationProgress = value;
+                        highlight.AnimationProgress = value;
+                    }
+                }
+
+                public LazerLogo()
                 {
                     Size = new Vector2(960);
+                }
 
-                    InternalChild = new VideoSprite(videoStream)
+                [BackgroundDependencyLoader]
+                private void load(TextureStore textures)
+                {
+                    InternalChildren = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Clock = new FramedOffsetClock(Clock) { Offset = -logo_1 }
+                        highlight = new LogoAnimation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Texture = textures.Get(@"Intro/Triangles/logo-highlight"),
+                            Colour = Color4.White,
+                        },
+                        background = new LogoAnimation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Texture = textures.Get(@"Intro/Triangles/logo-background"),
+                            Colour = OsuColour.Gray(0.6f),
+                        },
                     };
                 }
             }
@@ -337,6 +393,7 @@ namespace osu.Game.Screens.Menu
                 public class OutlineTriangle : BufferedContainer
                 {
                     public OutlineTriangle(bool outlineOnly, float size)
+                        : base(cachedFrameBuffer: true)
                     {
                         Size = new Vector2(size);
 
@@ -358,7 +415,6 @@ namespace osu.Game.Screens.Menu
                         }
 
                         Blending = BlendingParameters.Additive;
-                        CacheDrawnFrameBuffer = true;
                     }
                 }
             }

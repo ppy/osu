@@ -2,38 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
-using osu.Game.Users;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
     public class CommentBundle
     {
-        private List<Comment> comments;
-
         [JsonProperty(@"comments")]
-        public List<Comment> Comments
-        {
-            get => comments;
-            set
-            {
-                comments = value;
-                comments.ForEach(child =>
-                {
-                    if (child.ParentId != null)
-                    {
-                        comments.ForEach(parent =>
-                        {
-                            if (parent.Id == child.ParentId)
-                            {
-                                parent.ChildComments.Add(child);
-                                child.ParentComment = parent;
-                            }
-                        });
-                    }
-                });
-            }
-        }
+        public List<Comment> Comments { get; set; }
 
         [JsonProperty(@"has_more")]
         public bool HasMore { get; set; }
@@ -47,40 +24,45 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
+        [JsonProperty(@"pinned_comments")]
+        public List<Comment> PinnedComments { get; set; }
+
+        private List<long> userVotes;
+
         [JsonProperty(@"user_votes")]
-        private List<long> userVotes
+        public List<long> UserVotes
         {
-            set => value.ForEach(v =>
+            get => userVotes;
+            set
             {
-                Comments.ForEach(c =>
-                {
-                    if (v == c.Id)
-                        c.IsVoted = true;
-                });
-            });
+                userVotes = value;
+
+                Comments.ForEach(c => c.IsVoted = value.Contains(c.Id));
+                IncludedComments.ForEach(c => c.IsVoted = value.Contains(c.Id));
+            }
         }
 
-        private List<User> users;
+        private List<APIUser> users;
 
         [JsonProperty(@"users")]
-        public List<User> Users
+        public List<APIUser> Users
         {
             get => users;
             set
             {
                 users = value;
 
-                value.ForEach(u =>
+                foreach (var user in value)
                 {
-                    Comments.ForEach(c =>
+                    foreach (var comment in Comments.Concat(IncludedComments).Concat(PinnedComments))
                     {
-                        if (c.UserId == u.Id)
-                            c.User = u;
+                        if (comment.UserId == user.Id)
+                            comment.User = user;
 
-                        if (c.EditedById == u.Id)
-                            c.EditedUser = u;
-                    });
-                });
+                        if (comment.EditedById == user.Id)
+                            comment.EditedUser = user;
+                    }
+                }
             }
         }
 

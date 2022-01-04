@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -22,15 +24,9 @@ namespace osu.Game.Graphics.UserInterface
                 Enabled.Value = !isLoading;
 
                 if (value)
-                {
                     loading.Show();
-                    OnLoadStarted();
-                }
                 else
-                {
                     loading.Hide();
-                    OnLoadFinished();
-                }
             }
         }
 
@@ -40,20 +36,36 @@ namespace osu.Game.Graphics.UserInterface
             set => loading.Size = value;
         }
 
-        private readonly LoadingAnimation loading;
+        private readonly LoadingSpinner loading;
 
         protected LoadingButton()
         {
-            AddRange(new[]
+            Add(loading = new LoadingSpinner
             {
-                CreateContent(),
-                loading = new LoadingAnimation
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(12)
-                }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Size = new Vector2(12),
+                Depth = -1,
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Add(CreateContent());
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            loading.State.BindValueChanged(s =>
+            {
+                if (s.NewValue == Visibility.Visible)
+                    OnLoadStarted();
+                else
+                    OnLoadFinished();
+            }, true);
         }
 
         protected override bool OnClick(ClickEvent e)
