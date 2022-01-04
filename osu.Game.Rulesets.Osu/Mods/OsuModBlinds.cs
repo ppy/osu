@@ -1,45 +1,44 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToScoreProcessor
+    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override IconUsage Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
-
-        public override bool Ranked => false;
 
         public override double ScoreMultiplier => 1.12;
         private DrawableOsuBlinds blinds;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
+            drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield, drawableRuleset.Beatmap));
         }
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
+            healthProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
@@ -64,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float target_clamp = 1;
 
-            private readonly float targetBreakMultiplier = 0;
-            private readonly float easing = 1;
+            private readonly float targetBreakMultiplier;
+            private readonly float easing;
 
             private readonly CompositeDrawable restrictTo;
 
@@ -86,6 +85,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
+
+                targetBreakMultiplier = 0;
+                easing = 1;
             }
 
             [BackgroundDependencyLoader]
@@ -120,15 +122,28 @@ namespace osu.Game.Rulesets.Osu.Mods
                 };
             }
 
-            private float calculateGap(float value) => MathHelper.Clamp(value, 0, target_clamp) * targetBreakMultiplier;
+            private float calculateGap(float value) => Math.Clamp(value, 0, target_clamp) * targetBreakMultiplier;
 
             // lagrange polinominal for (0,0) (0.6,0.4) (1,1) should make a good curve
             private static float applyAdjustmentCurve(float value) => 0.6f * value * value + 0.4f * value;
 
             protected override void Update()
             {
-                float start = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopLeft).X;
-                float end = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopRight).X;
+                float start, end;
+
+                if (Precision.AlmostEquals(restrictTo.Rotation, 0))
+                {
+                    start = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopLeft).X;
+                    end = Parent.ToLocalSpace(restrictTo.ScreenSpaceDrawQuad.TopRight).X;
+                }
+                else
+                {
+                    float center = restrictTo.ToSpaceOfOtherDrawable(restrictTo.OriginPosition, Parent).X;
+                    float halfDiagonal = (restrictTo.DrawSize / 2).LengthFast;
+
+                    start = center - halfDiagonal;
+                    end = center + halfDiagonal;
+                }
 
                 float rawWidth = end - start;
 
@@ -155,19 +170,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                 base.LoadComplete();
 
                 var firstObj = beatmap.HitObjects[0];
-                var startDelay = firstObj.StartTime - firstObj.TimePreempt;
+                double startDelay = firstObj.StartTime - firstObj.TimePreempt;
 
-                using (BeginAbsoluteSequence(startDelay + break_close_late, true))
+                using (BeginAbsoluteSequence(startDelay + break_close_late))
                     leaveBreak();
 
                 foreach (var breakInfo in beatmap.Breaks)
                 {
                     if (breakInfo.HasEffect)
                     {
-                        using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early, true))
+                        using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early))
                         {
                             enterBreak();
-                            using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late, true))
+                            using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late))
                                 leaveBreak();
                         }
                     }
@@ -188,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
-                    Texture = textures.Get("Play/osu/blinds-panel");
+                    Texture = textures.Get("Gameplay/osu/blinds-panel");
                 }
             }
         }

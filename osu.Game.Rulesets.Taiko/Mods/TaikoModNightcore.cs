@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModNightcore : ModNightcore
+    public class TaikoModNightcore : ModNightcore<TaikoHitObject>
     {
         public override double ScoreMultiplier => 1.12;
     }

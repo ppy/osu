@@ -8,9 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,10 +19,10 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private FillFlowContainer badgeFlowContainer;
 
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
@@ -34,9 +33,9 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDarker,
+                    Colour = colourProvider.Background5,
                 },
-                new Container //artificial shadow
+                new Container // artificial shadow
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 3,
@@ -64,7 +63,7 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(User user)
+        private void updateDisplay(APIUser user)
         {
             var badges = user.Badges;
             badgeFlowContainer.Clear();
@@ -73,7 +72,7 @@ namespace osu.Game.Overlays.Profile.Header
             {
                 Show();
 
-                for (var index = 0; index < badges.Length; index++)
+                for (int index = 0; index < badges.Length; index++)
                 {
                     int displayIndex = index;
                     LoadComponentAsync(new DrawableBadge(badges[index]), asyncBadge =>

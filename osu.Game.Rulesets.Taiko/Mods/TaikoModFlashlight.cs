@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using osu.Framework.Layout;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -30,41 +30,36 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoFlashlight : Flashlight
         {
-            private readonly Cached flashlightProperties = new Cached();
+            private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
             private readonly TaikoPlayfield taikoPlayfield;
 
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FlashlightSize = getSizeFor(0);
+
+                AddLayout(flashlightProperties);
             }
 
-            private float getSizeFor(int combo)
+            private Vector2 getSizeFor(int combo)
             {
+                float size = default_flashlight_size;
+
                 if (combo > 200)
-                    return default_flashlight_size * 0.8f;
+                    size *= 0.8f;
                 else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
+                    size *= 0.9f;
+
+                // Preserve flashlight size through the playfield's aspect adjustment.
+                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), getSizeFor(e.NewValue), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
-
-            public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-            {
-                if ((invalidation & Invalidation.DrawSize) > 0)
-                {
-                    flashlightProperties.Invalidate();
-                }
-
-                return base.Invalidate(invalidation, source, shallPropagate);
-            }
 
             protected override void Update()
             {
@@ -72,7 +67,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
                 if (!flashlightProperties.IsValid)
                 {
-                    FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
+                    FlashlightPosition = ToLocalSpace(taikoPlayfield.HitTarget.ScreenSpaceDrawQuad.Centre);
+
+                    ClearTransforms(targetMember: nameof(FlashlightSize));
+                    FlashlightSize = getSizeFor(Combo.Value);
+
                     flashlightProperties.Validate();
                 }
             }

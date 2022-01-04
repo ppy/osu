@@ -8,6 +8,5 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// </summary>
     internal sealed class ConvertSlider : Legacy.ConvertSlider
     {
-        protected override HitWindows CreateHitWindows() => null;
     }
 }

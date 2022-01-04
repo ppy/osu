@@ -3,52 +3,34 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API;
+using System.Collections.Generic;
+using osuTK;
+using osu.Framework.Allocation;
+using osu.Game.Resources.Localisation.Web;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class PaginatedRecentActivityContainer : PaginatedContainer
+    public class PaginatedRecentActivityContainer : PaginatedProfileSubsection<APIRecentActivity>
     {
-        private GetUserRecentActivitiesRequest request;
-
-        public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
-            : base(user, header, missing)
+        public PaginatedRecentActivityContainer(Bindable<APIUser> user)
+            : base(user, missingText: EventsStrings.Empty)
         {
-            ItemsPerPage = 5;
+            ItemsPerPage = 10;
         }
 
-        protected override void ShowMore()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
-            request.Success += activities => Schedule(() =>
-            {
-                MoreButton.FadeTo(activities.Count == ItemsPerPage ? 1 : 0);
-                MoreButton.IsLoading = false;
-
-                if (!activities.Any() && VisiblePages == 1)
-                {
-                    MissingText.Show();
-                    return;
-                }
-
-                MissingText.Hide();
-
-                foreach (APIRecentActivity activity in activities)
-                {
-                    ItemsContainer.Add(new DrawableRecentActivity(activity));
-                }
-            });
-
-            Api.Queue(request);
+            ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            request?.Cancel();
-        }
+        protected override APIRequest<List<APIRecentActivity>> CreateRequest() =>
+            new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
+
+        protected override Drawable CreateDrawableItem(APIRecentActivity model) => new DrawableRecentActivity(model);
     }
 }

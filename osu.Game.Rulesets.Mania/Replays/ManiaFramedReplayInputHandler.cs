@@ -18,6 +18,9 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         protected override bool IsImportant(ManiaReplayFrame frame) => frame.Actions.Any();
 
-        public override List<IInput> GetPendingInputs() => new List<IInput> { new ReplayState<ManiaAction> { PressedActions = CurrentFrame?.Actions ?? new List<ManiaAction>() } };
+        public override void CollectPendingInputs(List<IInput> inputs)
+        {
+            inputs.Add(new ReplayState<ManiaAction> { PressedActions = CurrentFrame?.Actions ?? new List<ManiaAction>() });
+        }
     }
 }

@@ -1,29 +1,46 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class FullscreenOverlay : WaveOverlayContainer, IOnlineComponent
+    public abstract class FullscreenOverlay<T> : WaveOverlayContainer, INamedOverlayComponent
+        where T : OverlayHeader
     {
+        public virtual string IconTexture => Header.Title.IconTexture ?? string.Empty;
+        public virtual LocalisableString Title => Header.Title.Title;
+        public virtual LocalisableString Description => Header.Title.Description;
+
+        public T Header { get; }
+
+        protected virtual Color4 BackgroundColour => ColourProvider.Background5;
+
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected FullscreenOverlay()
+        [Cached]
+        protected readonly OverlayColourProvider ColourProvider;
+
+        protected override Container<Drawable> Content => content;
+
+        private readonly Container content;
+
+        protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
+            Header = CreateHeader();
+
+            ColourProvider = new OverlayColourProvider(colourScheme);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -39,7 +56,32 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+
+            base.Content.AddRange(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = BackgroundColour
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                }
+            });
         }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Waves.FirstWaveColour = ColourProvider.Light4;
+            Waves.SecondWaveColour = ColourProvider.Light3;
+            Waves.ThirdWaveColour = ColourProvider.Dark4;
+            Waves.FourthWaveColour = ColourProvider.Dark3;
+        }
+
+        [NotNull]
+        protected abstract T CreateHeader();
 
         public override void Show()
         {
@@ -67,22 +109,6 @@ namespace osu.Game.Overlays
         }
 
         protected virtual void PopOutComplete()
-        {
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            API.Register(this);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            API?.Unregister(this);
-        }
-
-        public virtual void APIStateChanged(IAPIProvider api, APIState state)
         {
         }
     }

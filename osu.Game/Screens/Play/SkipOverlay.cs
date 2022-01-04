@@ -8,35 +8,40 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Threading;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Screens.Ranking;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
-        public Action<double> RequestSeek;
+        public Action RequestSkip;
 
         private Button button;
+        private ButtonContainer buttonContainer;
         private Box remainingTimeBox;
 
         private FadeContainer fadeContainer;
         private double displayTime;
 
+        private bool isClickable;
+
+        [Resolved]
+        private GameplayClock gameplayClock { get; set; }
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-        protected override bool BlockPositionalInput => false;
 
         /// <summary>
         /// Displays a skip overlay, giving the user the ability to skip forward.
@@ -45,8 +50,6 @@ namespace osu.Game.Screens.Play
         public SkipOverlay(double startTime)
         {
             this.startTime = startTime;
-
-            Show();
 
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.X;
@@ -58,23 +61,18 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
+        private void load(OsuColour colours)
         {
-            var baseClock = Clock;
-
-            if (clock != null)
-                Clock = clock;
-
-            Children = new Drawable[]
+            InternalChild = buttonContainer = new ButtonContainer
             {
-                fadeContainer = new FadeContainer
+                RelativeSizeAxes = Axes.Both,
+                Child = fadeContainer = new FadeContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
                         button = new Button
                         {
-                            Clock = baseClock,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -91,99 +89,127 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        /// <summary>
-        /// Duration before gameplay start time required before skip button displays.
-        /// </summary>
-        private const double skip_buffer = 1000;
-
         private const double fade_time = 300;
 
-        private double beginFadeTime => startTime - fade_time;
+        private double fadeOutBeginTime => startTime - MasterGameplayClockContainer.MINIMUM_SKIP_TIME;
+
+        public override void Hide()
+        {
+            base.Hide();
+            fadeContainer.Hide();
+        }
+
+        public override void Show()
+        {
+            base.Show();
+            fadeContainer.TriggerShow();
+        }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             // skip is not required if there is no extra "empty" time to skip.
-            if (Clock.CurrentTime > beginFadeTime - skip_buffer)
+            // we may need to remove this if rewinding before the initial player load position becomes a thing.
+            if (fadeOutBeginTime < gameplayClock.CurrentTime)
             {
-                Alpha = 0;
                 Expire();
                 return;
             }
 
-            this.FadeInFromZero(fade_time);
-            using (BeginAbsoluteSequence(beginFadeTime))
-                this.FadeOut(fade_time);
+            button.Action = () => RequestSkip?.Invoke();
+            displayTime = gameplayClock.CurrentTime;
 
-            button.Action = () => RequestSeek?.Invoke(beginFadeTime);
-
-            displayTime = Time.Current;
-
-            Expire();
+            fadeContainer.TriggerShow();
         }
-
-        protected override void PopIn() => this.FadeIn();
-
-        protected override void PopOut() => this.FadeOut();
 
         protected override void Update()
         {
             base.Update();
-            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
+
+            double progress = fadeOutBeginTime <= displayTime ? 1 : Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+
+            remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+
+            isClickable = progress > 0;
+            button.Enabled.Value = isClickable;
+            buttonContainer.State.Value = isClickable ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!e.HasAnyButtonPressed)
-                fadeContainer.Show();
+            if (isClickable && !e.HasAnyButtonPressed)
+                fadeContainer.TriggerShow();
+
             return base.OnMouseMove(e);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            switch (action)
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
             {
                 case GlobalAction.SkipCutscene:
-                    button.Click();
+                    if (!button.Enabled.Value)
+                        return false;
+
+                    button.TriggerClick();
                     return true;
             }
 
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
+        }
 
-        private class FadeContainer : Container, IStateful<Visibility>
+        public class FadeContainer : Container, IStateful<Visibility>
         {
             public event Action<Visibility> StateChanged;
 
             private Visibility state;
-            private ScheduledDelegate scheduledHide;
+            private double? nextHideTime;
 
             public override bool IsPresent => true;
+
+            public void TriggerShow()
+            {
+                Show();
+
+                if (!IsHovered && !IsDragged)
+                    nextHideTime = Time.Current + 1000;
+                else
+                    nextHideTime = null;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (nextHideTime != null && nextHideTime <= Time.Current)
+                {
+                    Hide();
+                    nextHideTime = null;
+                }
+            }
 
             public Visibility State
             {
                 get => state;
                 set
                 {
-                    bool stateChanged = value != state;
+                    if (value == state)
+                        return;
 
                     state = value;
-
-                    scheduledHide?.Cancel();
 
                     switch (state)
                     {
                         case Visibility.Visible:
-                            // we may be triggered to become visible mnultiple times but we only want to transform once.
-                            if (stateChanged)
-                                this.FadeIn(500, Easing.OutExpo);
-
-                            if (!IsHovered && !IsDragged)
-                                using (BeginDelayedSequence(1000))
-                                    scheduledHide = Schedule(Hide);
+                            this.FadeIn(500, Easing.OutExpo);
                             break;
 
                         case Visibility.Hidden:
@@ -204,19 +230,25 @@ namespace osu.Game.Screens.Play
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 Show();
-                scheduledHide?.Cancel();
+                nextHideTime = null;
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 Show();
-                return true;
             }
 
             public override void Hide() => State = Visibility.Hidden;
 
             public override void Show() => State = Visibility.Visible;
+        }
+
+        private class ButtonContainer : VisibilityContainer
+        {
+            protected override void PopIn() => this.FadeIn(fade_time);
+
+            protected override void PopOut() => this.FadeOut(fade_time);
         }
 
         private class Button : OsuClickableContainer
@@ -228,7 +260,7 @@ namespace osu.Game.Screens.Play
             private Box background;
             private AspectContainer aspect;
 
-            private SampleChannel sampleConfirm;
+            private Sample sampleConfirm;
 
             public Button()
             {
@@ -241,7 +273,7 @@ namespace osu.Game.Screens.Play
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
-                sampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
+                sampleConfirm = audio.Samples.Get(@"UI/submit-select");
 
                 Children = new Drawable[]
                 {
@@ -317,10 +349,10 @@ namespace osu.Game.Screens.Play
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
 
             protected override bool OnClick(ClickEvent e)
@@ -333,13 +365,7 @@ namespace osu.Game.Screens.Play
                 box.FlashColour(Color4.White, 500, Easing.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);
 
-                bool result = base.OnClick(e);
-
-                // for now, let's disable the skip button after the first press.
-                // this will likely need to be contextual in the future (bound from external components).
-                Enabled.Value = false;
-
-                return result;
+                return base.OnClick(e);
             }
         }
     }

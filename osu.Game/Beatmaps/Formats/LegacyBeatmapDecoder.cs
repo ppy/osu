@@ -2,19 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using osu.Framework.IO.File;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Rulesets.Objects.Legacy;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.IO;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
-        public const int LATEST_VERSION = 14;
-
         private Beatmap beatmap;
 
         private ConvertHitObjectParser parser;
@@ -25,6 +27,7 @@ namespace osu.Game.Beatmaps.Formats
         public static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
+            SetFallbackDecoder<Beatmap>(() => new LegacyBeatmapDecoder());
         }
 
         /// <summary>
@@ -41,12 +44,21 @@ namespace osu.Game.Beatmaps.Formats
             offset = FormatVersion < 5 ? 24 : 0;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
+        protected override Beatmap CreateTemplateObject()
+        {
+            var templateBeatmap = base.CreateTemplateObject();
+            templateBeatmap.ControlPointInfo = new LegacyControlPointInfo();
+            return templateBeatmap;
+        }
+
+        protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
             base.ParseStreamInto(stream, beatmap);
+
+            flushPendingPoints();
 
             // Objects may be out of order *only* if a user has manually edited an .osu file.
             // Unfortunately there are ranked maps in this state (example: https://osu.ppy.sh/s/594828).
@@ -55,23 +67,21 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap.HitObjects = this.beatmap.HitObjects.OrderBy(h => h.StartTime).ToList();
 
             foreach (var hitObject in this.beatmap.HitObjects)
-                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
+                hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
         }
 
-        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal);
+        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
-            var strippedLine = StripComments(line);
-
             switch (section)
             {
                 case Section.General:
-                    handleGeneral(strippedLine);
+                    handleGeneral(line);
                     return;
 
                 case Section.Editor:
-                    handleEditor(strippedLine);
+                    handleEditor(line);
                     return;
 
                 case Section.Metadata:
@@ -79,19 +89,19 @@ namespace osu.Game.Beatmaps.Formats
                     return;
 
                 case Section.Difficulty:
-                    handleDifficulty(strippedLine);
+                    handleDifficulty(line);
                     return;
 
                 case Section.Events:
-                    handleEvent(strippedLine);
+                    handleEvent(line);
                     return;
 
                 case Section.TimingPoints:
-                    handleTimingPoint(strippedLine);
+                    handleTimingPoint(line);
                     return;
 
                 case Section.HitObjects:
-                    handleHitObject(strippedLine);
+                    handleHitObject(line);
                     return;
             }
 
@@ -107,7 +117,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"AudioFilename":
-                    metadata.AudioFile = FileSafety.PathStandardise(pair.Value);
+                    metadata.AudioFile = pair.Value.ToStandardisedPath();
                     break;
 
                 case @"AudioLeadIn":
@@ -116,10 +126,6 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"PreviewTime":
                     metadata.PreviewTime = getOffsetTime(Parsing.ParseInt(pair.Value));
-                    break;
-
-                case @"Countdown":
-                    beatmap.BeatmapInfo.Countdown = Parsing.ParseInt(pair.Value) == 1;
                     break;
 
                 case @"SampleSet":
@@ -169,6 +175,22 @@ namespace osu.Game.Beatmaps.Formats
                 case @"WidescreenStoryboard":
                     beatmap.BeatmapInfo.WidescreenStoryboard = Parsing.ParseInt(pair.Value) == 1;
                     break;
+
+                case @"EpilepsyWarning":
+                    beatmap.BeatmapInfo.EpilepsyWarning = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
+                case @"SamplesMatchPlaybackRate":
+                    beatmap.BeatmapInfo.SamplesMatchPlaybackRate = Parsing.ParseInt(pair.Value) == 1;
+                    break;
+
+                case @"Countdown":
+                    beatmap.BeatmapInfo.Countdown = (CountdownType)Enum.Parse(typeof(CountdownType), pair.Value);
+                    break;
+
+                case @"CountdownOffset":
+                    beatmap.BeatmapInfo.CountdownOffset = Parsing.ParseInt(pair.Value);
+                    break;
             }
         }
 
@@ -179,7 +201,11 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"Bookmarks":
-                    beatmap.BeatmapInfo.StoredBookmarks = pair.Value;
+                    beatmap.BeatmapInfo.Bookmarks = pair.Value.Split(',').Select(v =>
+                    {
+                        bool result = int.TryParse(v, out int val);
+                        return new { result, val };
+                    }).Where(p => p.result).Select(p => p.val).ToArray();
                     break;
 
                 case @"DistanceSpacing":
@@ -229,23 +255,23 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Version":
-                    beatmap.BeatmapInfo.Version = pair.Value;
+                    beatmap.BeatmapInfo.DifficultyName = pair.Value;
                     break;
 
                 case @"Source":
-                    beatmap.BeatmapInfo.Metadata.Source = pair.Value;
+                    metadata.Source = pair.Value;
                     break;
 
                 case @"Tags":
-                    beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
+                    metadata.Tags = pair.Value;
                     break;
 
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.OnlineBeatmapID = Parsing.ParseInt(pair.Value);
+                    beatmap.BeatmapInfo.OnlineID = Parsing.ParseInt(pair.Value);
                     break;
 
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = Parsing.ParseInt(pair.Value) };
+                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineID = Parsing.ParseInt(pair.Value) };
                     break;
             }
         }
@@ -254,7 +280,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = SplitKeyVal(line);
 
-            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
+            var difficulty = beatmap.Difficulty;
 
             switch (pair.Key)
             {
@@ -288,31 +314,20 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            EventType type;
-
-            if (!Enum.TryParse(split[0], out type))
+            if (!Enum.TryParse(split[0], out LegacyEventType type))
                 throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
             switch (type)
             {
-                case EventType.Background:
-                    string filename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(filename);
+                case LegacyEventType.Background:
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
 
-                case EventType.Break:
+                case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
+                    double end = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])));
 
-                    var breakEvent = new BreakPeriod
-                    {
-                        StartTime = start,
-                        EndTime = Math.Max(start, getOffsetTime(Parsing.ParseDouble(split[2])))
-                    };
-
-                    if (!breakEvent.HasEffect)
-                        return;
-
-                    beatmap.Breaks.Add(breakEvent);
+                    beatmap.Breaks.Add(new BreakPeriod(start, end));
                     break;
             }
         }
@@ -350,9 +365,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length >= 8)
             {
-                EffectFlags effectFlags = (EffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
+                kiaiMode = effectFlags.HasFlagFast(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlagFast(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
@@ -362,115 +377,88 @@ namespace osu.Game.Beatmaps.Formats
             if (timingChange)
             {
                 var controlPoint = CreateTimingControlPoint();
-                controlPoint.Time = time;
+
                 controlPoint.BeatLength = beatLength;
                 controlPoint.TimeSignature = timeSignature;
 
-                handleTimingControlPoint(controlPoint);
+                addControlPoint(time, controlPoint, true);
             }
 
-            handleDifficultyControlPoint(new DifficultyControlPoint
+#pragma warning disable 618
+            addControlPoint(time, new LegacyDifficultyControlPoint(beatLength)
+#pragma warning restore 618
             {
-                Time = time,
-                SpeedMultiplier = speedMultiplier,
-                AutoGenerated = timingChange
-            });
+                SliderVelocity = speedMultiplier,
+            }, timingChange);
 
-            handleEffectControlPoint(new EffectControlPoint
+            var effectPoint = new EffectControlPoint
             {
-                Time = time,
                 KiaiMode = kiaiMode,
                 OmitFirstBarLine = omitFirstBarSignature,
-                AutoGenerated = timingChange
-            });
+            };
 
-            handleSampleControlPoint(new LegacySampleControlPoint
+            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+            // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
+            if (!isOsuRuleset)
+                effectPoint.ScrollSpeed = speedMultiplier;
+
+            addControlPoint(time, effectPoint, timingChange);
+
+            addControlPoint(time, new LegacySampleControlPoint
             {
-                Time = time,
                 SampleBank = stringSampleSet,
                 SampleVolume = sampleVolume,
                 CustomSampleBank = customSampleBank,
-                AutoGenerated = timingChange
-            });
+            }, timingChange);
         }
 
-        private void handleTimingControlPoint(TimingControlPoint newPoint)
+        private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
+        private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
+        private double pendingControlPointsTime;
+
+        private void addControlPoint(double time, ControlPoint point, bool timingChange)
         {
-            var existing = beatmap.ControlPointInfo.TimingPointAt(newPoint.Time);
+            if (time != pendingControlPointsTime)
+                flushPendingPoints();
 
-            if (existing.Time == newPoint.Time)
-            {
-                // autogenerated points should not replace non-autogenerated.
-                // this allows for incorrectly ordered timing points to still be correctly handled.
-                if (newPoint.AutoGenerated && !existing.AutoGenerated)
-                    return;
+            if (timingChange)
+                pendingControlPoints.Insert(0, point);
+            else
+                pendingControlPoints.Add(point);
 
-                beatmap.ControlPointInfo.TimingPoints.Remove(existing);
-            }
-
-            beatmap.ControlPointInfo.TimingPoints.Add(newPoint);
+            pendingControlPointsTime = time;
         }
 
-        private void handleDifficultyControlPoint(DifficultyControlPoint newPoint)
+        private void flushPendingPoints()
         {
-            var existing = beatmap.ControlPointInfo.DifficultyPointAt(newPoint.Time);
-
-            if (existing.Time == newPoint.Time)
+            // Changes from non-timing-points are added to the end of the list (see addControlPoint()) and should override any changes from timing-points (added to the start of the list).
+            for (int i = pendingControlPoints.Count - 1; i >= 0; i--)
             {
-                // autogenerated points should not replace non-autogenerated.
-                // this allows for incorrectly ordered timing points to still be correctly handled.
-                if (newPoint.AutoGenerated && !existing.AutoGenerated)
-                    return;
+                var type = pendingControlPoints[i].GetType();
+                if (pendingControlPointTypes.Contains(type))
+                    continue;
 
-                beatmap.ControlPointInfo.DifficultyPoints.Remove(existing);
+                pendingControlPointTypes.Add(type);
+                beatmap.ControlPointInfo.Add(pendingControlPointsTime, pendingControlPoints[i]);
             }
 
-            beatmap.ControlPointInfo.DifficultyPoints.Add(newPoint);
-        }
-
-        private void handleEffectControlPoint(EffectControlPoint newPoint)
-        {
-            var existing = beatmap.ControlPointInfo.EffectPointAt(newPoint.Time);
-
-            if (existing.Time == newPoint.Time)
-            {
-                // autogenerated points should not replace non-autogenerated.
-                // this allows for incorrectly ordered timing points to still be correctly handled.
-                if (newPoint.AutoGenerated && !existing.AutoGenerated)
-                    return;
-
-                beatmap.ControlPointInfo.EffectPoints.Remove(existing);
-            }
-
-            beatmap.ControlPointInfo.EffectPoints.Add(newPoint);
-        }
-
-        private void handleSampleControlPoint(SampleControlPoint newPoint)
-        {
-            var existing = beatmap.ControlPointInfo.SamplePointAt(newPoint.Time);
-
-            if (existing.Time == newPoint.Time)
-            {
-                // autogenerated points should not replace non-autogenerated.
-                // this allows for incorrectly ordered timing points to still be correctly handled.
-                if (newPoint.AutoGenerated && !existing.AutoGenerated)
-                    return;
-
-                beatmap.ControlPointInfo.SamplePoints.Remove(existing);
-            }
-
-            beatmap.ControlPointInfo.SamplePoints.Add(newPoint);
+            pendingControlPoints.Clear();
+            pendingControlPointTypes.Clear();
         }
 
         private void handleHitObject(string line)
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
-            if (parser == null)
-                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
+            parser ??= new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
+
             if (obj != null)
+            {
+                obj.ApplyDefaults(beatmap.ControlPointInfo, beatmap.Difficulty);
+
                 beatmap.HitObjects.Add(obj);
+            }
         }
 
         private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);
@@ -480,13 +468,5 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
 
         protected virtual TimingControlPoint CreateTimingControlPoint() => new TimingControlPoint();
-
-        [Flags]
-        internal enum EffectFlags
-        {
-            None = 0,
-            Kiai = 1,
-            OmitFirstBarLine = 8
-        }
     }
 }

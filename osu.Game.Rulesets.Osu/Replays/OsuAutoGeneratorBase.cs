@@ -5,7 +5,9 @@ using osuTK;
 using osu.Game.Beatmaps;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 
@@ -20,12 +22,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </summary>
         protected static readonly Vector2 SPINNER_CENTRE = OsuPlayfield.BASE_SIZE / 2;
 
-        protected const float SPIN_RADIUS = 50;
-
-        /// <summary>
-        /// The time in ms between each ReplayFrame.
-        /// </summary>
-        protected readonly double FrameDelay;
+        public const float SPIN_RADIUS = 50;
 
         #endregion
 
@@ -33,22 +30,55 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         protected Replay Replay;
         protected List<ReplayFrame> Frames => Replay.Frames;
+        private readonly IReadOnlyList<IApplicableToRate> timeAffectingMods;
 
-        protected OsuAutoGeneratorBase(IBeatmap beatmap)
+        protected OsuAutoGeneratorBase(IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(beatmap)
         {
             Replay = new Replay();
 
-            // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
-            FrameDelay = ApplyModsToRate(1000.0 / 60.0);
+            timeAffectingMods = mods.OfType<IApplicableToRate>().ToList();
         }
 
         #endregion
 
         #region Utilities
 
-        protected double ApplyModsToTime(double v) => v;
-        protected double ApplyModsToRate(double v) => v;
+        /// <summary>
+        /// Returns the real duration of time between <paramref name="startTime"/> and <paramref name="endTime"/>
+        /// after applying rate-affecting mods.
+        /// </summary>
+        /// <remarks>
+        /// This method should only be used when <paramref name="startTime"/> and <paramref name="endTime"/> are very close.
+        /// That is because the track rate might be changing with time,
+        /// and the method used here is a rough instantaneous approximation.
+        /// </remarks>
+        /// <param name="startTime">The start time of the time delta, in original track time.</param>
+        /// <param name="endTime">The end time of the time delta, in original track time.</param>
+        protected double ApplyModsToTimeDelta(double startTime, double endTime)
+        {
+            double delta = endTime - startTime;
+
+            foreach (var mod in timeAffectingMods)
+                delta /= mod.ApplyToRate(startTime);
+
+            return delta;
+        }
+
+        protected double ApplyModsToRate(double time, double rate)
+        {
+            foreach (var mod in timeAffectingMods)
+                rate = mod.ApplyToRate(time, rate);
+            return rate;
+        }
+
+        /// <summary>
+        /// Calculates the interval after which the next <see cref="ReplayFrame"/> should be generated,
+        /// in milliseconds.
+        /// </summary>
+        /// <param name="time">The time of the previous frame.</param>
+        protected double GetFrameDelay(double time)
+            => ApplyModsToRate(time, 1000.0 / 60);
 
         private class ReplayFrameComparer : IComparer<ReplayFrame>
         {

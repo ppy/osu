@@ -2,190 +2,197 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Play
 {
     /// <summary>
-    /// Encapsulates gameplay timing logic and provides a <see cref="Play.GameplayClock"/> for children.
+    /// Encapsulates gameplay timing logic and provides a <see cref="GameplayClock"/> via DI for gameplay components to use.
     /// </summary>
-    public class GameplayClockContainer : Container
+    [Cached]
+    public abstract class GameplayClockContainer : Container, IAdjustableClock
     {
-        private readonly WorkingBeatmap beatmap;
-        private readonly IReadOnlyList<Mod> mods;
+        /// <summary>
+        /// The final clock which is exposed to gameplay components.
+        /// </summary>
+        public GameplayClock GameplayClock { get; private set; }
 
         /// <summary>
-        /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
+        /// Whether gameplay is paused.
         /// </summary>
-        private readonly IAdjustableClock sourceClock;
-
         public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
-        /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
+        /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
-        private readonly DecoupleableInterpolatingFramedClock adjustableClock;
-
-        private readonly double gameplayStartTime;
-
-        public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
-        {
-            Default = 1,
-            MinValue = 0.5,
-            MaxValue = 2,
-            Precision = 0.1,
-        };
+        protected readonly DecoupleableInterpolatingFramedClock AdjustableSource;
 
         /// <summary>
-        /// The final clock which is exposed to underlying components.
+        /// The source clock.
         /// </summary>
-        [Cached]
-        public readonly GameplayClock GameplayClock;
+        protected IClock SourceClock { get; private set; }
 
-        private Bindable<double> userAudioOffset;
+        /// <summary>
+        /// Invoked when a seek has been performed via <see cref="Seek"/>
+        /// </summary>
+        public event Action OnSeek;
 
-        private readonly FramedOffsetClock userOffsetClock;
-
-        private readonly FramedOffsetClock platformOffsetClock;
-
-        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
+        /// <summary>
+        /// Creates a new <see cref="GameplayClockContainer"/>.
+        /// </summary>
+        /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
+        protected GameplayClockContainer(IClock sourceClock)
         {
-            this.beatmap = beatmap;
-            this.mods = mods;
-            this.gameplayStartTime = gameplayStartTime;
+            SourceClock = sourceClock;
 
             RelativeSizeAxes = Axes.Both;
 
-            sourceClock = (IAdjustableClock)beatmap.Track ?? new StopwatchClock();
-            (sourceClock as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            AdjustableSource = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+            IsPaused.BindValueChanged(OnIsPausedChanged);
+        }
 
-            adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
-            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
-            platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
-
-            // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new FramedOffsetClock(platformOffsetClock);
-
-            // the clock to be exposed via DI to children.
-            GameplayClock = new GameplayClock(userOffsetClock);
-
+            dependencies.CacheAs(GameplayClock = CreateGameplayClock(AdjustableSource));
             GameplayClock.IsPaused.BindTo(IsPaused);
+
+            return dependencies;
         }
 
-        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
-
-        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        /// <summary>
+        /// Starts gameplay.
+        /// </summary>
+        public virtual void Start()
         {
-            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
+            ensureSourceClockSet();
 
-            UserPlaybackRate.ValueChanged += _ => updateRate();
-
-            Seek(Math.Min(-beatmap.BeatmapInfo.AudioLeadIn, gameplayStartTime));
-        }
-
-        public void Restart()
-        {
-            Task.Run(() =>
+            if (!AdjustableSource.IsRunning)
             {
-                sourceClock.Reset();
+                // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
+                // This accounts for the clock source potentially taking time to enter a completely stopped state
+                Seek(GameplayClock.CurrentTime);
 
-                Schedule(() =>
-                {
-                    adjustableClock.ChangeSource(sourceClock);
-                    updateRate();
+                AdjustableSource.Start();
+            }
 
-                    if (!IsPaused.Value)
-                        Start();
-                });
-            });
-        }
-
-        public void Start()
-        {
-            // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
-            // This accounts for the audio clock source potentially taking time to enter a completely stopped state
-            Seek(GameplayClock.CurrentTime);
-            adjustableClock.Start();
             IsPaused.Value = false;
-
-            this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
         }
 
         /// <summary>
         /// Seek to a specific time in gameplay.
-        /// <remarks>
-        /// Adjusts for any offsets which have been applied (so the seek may not be the expected point in time on the underlying audio track).
-        /// </remarks>
         /// </summary>
         /// <param name="time">The destination time to seek to.</param>
-        public void Seek(double time)
+        public virtual void Seek(double time)
         {
-            // remove the offset component here because most of the time we want the seek to be aligned to gameplay, not the audio track.
-            // we may want to consider reversing the application of offsets in the future as it may feel more correct.
-            adjustableClock.Seek(time - totalOffset);
+            AdjustableSource.Seek(time);
 
-            // manually process frame to ensure GameplayClock is correctly updated after a seek.
-            userOffsetClock.ProcessFrame();
+            // Manually process to make sure the gameplay clock is correctly updated after a seek.
+            GameplayClock.UnderlyingClock.ProcessFrame();
+
+            OnSeek?.Invoke();
         }
 
-        public void Stop()
-        {
-            this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => adjustableClock.Stop());
+        /// <summary>
+        /// Stops gameplay.
+        /// </summary>
+        public virtual void Stop() => IsPaused.Value = true;
 
-            IsPaused.Value = true;
+        /// <summary>
+        /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
+        /// </summary>
+        public virtual void Reset()
+        {
+            ensureSourceClockSet();
+            Seek(0);
+
+            // Manually stop the source in order to not affect the IsPaused state.
+            AdjustableSource.Stop();
+
+            if (!IsPaused.Value)
+                Start();
         }
 
-        public void ResetLocalAdjustments()
+        /// <summary>
+        /// Changes the source clock.
+        /// </summary>
+        /// <param name="sourceClock">The new source.</param>
+        protected void ChangeSource(IClock sourceClock) => AdjustableSource.ChangeSource(SourceClock = sourceClock);
+
+        /// <summary>
+        /// Ensures that the <see cref="AdjustableSource"/> is set to <see cref="SourceClock"/>, if it hasn't been given a source yet.
+        /// This is usually done before a seek to avoid accidentally seeking only the adjustable source in decoupled mode,
+        /// but not the actual source clock.
+        /// That will pretty much only happen on the very first call of this method, as the source clock is passed in the constructor,
+        /// but it is not yet set on the adjustable source there.
+        /// </summary>
+        private void ensureSourceClockSet()
         {
-            // In the case of replays, we may have changed the playback rate.
-            UserPlaybackRate.Value = 1;
+            if (AdjustableSource.Source == null)
+                ChangeSource(SourceClock);
         }
 
         protected override void Update()
         {
             if (!IsPaused.Value)
-                userOffsetClock.ProcessFrame();
+                GameplayClock.UnderlyingClock.ProcessFrame();
 
             base.Update();
         }
 
-        private void updateRate()
+        /// <summary>
+        /// Invoked when the value of <see cref="IsPaused"/> is changed to start or stop the <see cref="AdjustableSource"/> clock.
+        /// </summary>
+        /// <param name="isPaused">Whether the clock should now be paused.</param>
+        protected virtual void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
         {
-            if (sourceClock == null) return;
-
-            sourceClock.ResetSpeedAdjustments();
-
-            if (sourceClock is IHasTempoAdjust tempo)
-                tempo.TempoAdjust = UserPlaybackRate.Value;
+            if (isPaused.NewValue)
+                AdjustableSource.Stop();
             else
-                sourceClock.Rate = UserPlaybackRate.Value;
-
-            foreach (var mod in mods.OfType<IApplicableToClock>())
-                mod.ApplyToClock(sourceClock);
+                AdjustableSource.Start();
         }
 
-        protected override void Dispose(bool isDisposing)
+        /// <summary>
+        /// Creates the final <see cref="GameplayClock"/> which is exposed via DI to be used by gameplay components.
+        /// </summary>
+        /// <remarks>
+        /// Any intermediate clocks such as platform offsets should be applied here.
+        /// </remarks>
+        /// <param name="source">The <see cref="IFrameBasedClock"/> providing the source time.</param>
+        /// <returns>The final <see cref="GameplayClock"/>.</returns>
+        protected abstract GameplayClock CreateGameplayClock(IFrameBasedClock source);
+
+        #region IAdjustableClock
+
+        bool IAdjustableClock.Seek(double position)
         {
-            base.Dispose(isDisposing);
-            (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            Seek(position);
+            return true;
         }
+
+        void IAdjustableClock.Reset() => Reset();
+
+        public void ResetSpeedAdjustments()
+        {
+        }
+
+        double IAdjustableClock.Rate
+        {
+            get => GameplayClock.Rate;
+            set => throw new NotSupportedException();
+        }
+
+        double IClock.Rate => GameplayClock.Rate;
+
+        public double CurrentTime => GameplayClock.CurrentTime;
+
+        public bool IsRunning => GameplayClock.IsRunning;
+
+        #endregion
     }
 }

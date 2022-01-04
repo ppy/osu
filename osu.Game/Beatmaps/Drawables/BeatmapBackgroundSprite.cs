@@ -9,9 +9,9 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class BeatmapBackgroundSprite : Sprite
     {
-        private readonly WorkingBeatmap working;
+        private readonly IWorkingBeatmap working;
 
-        public BeatmapBackgroundSprite(WorkingBeatmap working)
+        public BeatmapBackgroundSprite(IWorkingBeatmap working)
         {
             if (working == null)
                 throw new ArgumentNullException(nameof(working));

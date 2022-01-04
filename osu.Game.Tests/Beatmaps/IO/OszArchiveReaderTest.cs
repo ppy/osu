@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Tests.Beatmaps.IO
@@ -35,8 +36,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.Filenames.ToArray();
-                foreach (var map in expected)
+                string[] maps = reader.Filenames.ToArray();
+                foreach (string map in expected)
                     Assert.Contains(map, maps);
             }
         }
@@ -50,16 +51,16 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Beatmap beatmap;
 
-                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                using (var stream = new LineBufferedReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                     beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
                 var meta = beatmap.Metadata;
 
-                Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID);
+                Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineID);
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
-                Assert.AreEqual("Deif", meta.AuthorString);
+                Assert.AreEqual("Deif", meta.Author.Username);
                 Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
                 Assert.AreEqual(164471, meta.PreviewTime);
                 Assert.AreEqual(string.Empty, meta.Source);
@@ -76,8 +77,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 var reader = new ZipArchiveReader(osz);
 
-                using (var stream = new StreamReader(
-                    reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
                     Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }

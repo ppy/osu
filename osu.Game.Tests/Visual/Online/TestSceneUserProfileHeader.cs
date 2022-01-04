@@ -2,94 +2,90 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Profile;
-using osu.Game.Overlays.Profile.Header;
-using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneUserProfileHeader : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[]
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        private ProfileHeader header;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            typeof(ProfileHeader),
-            typeof(RankGraph),
-            typeof(LineGraph),
-            typeof(OverlayHeaderTabControl),
-            typeof(CentreHeaderContainer),
-            typeof(BottomHeaderContainer),
-            typeof(DetailHeaderContainer),
-            typeof(ProfileHeaderButton)
-        };
+            AddStep("create header", () => Child = header = new ProfileHeader());
+        }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
-        private readonly ProfileHeader header;
-
-        public TestSceneUserProfileHeader()
+        [Test]
+        public void TestBasic()
         {
-            header = new ProfileHeader();
-            Add(header);
+            AddStep("Show example user", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
+        }
 
-            AddStep("Show test dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);
-
-            AddStep("Show null dummy", () => header.User.Value = new User
+        [Test]
+        public void TestOnlineState()
+        {
+            AddStep("Show online user", () => header.User.Value = new APIUser
             {
-                Username = "Null"
-            });
-
-            AddStep("Show online dummy", () => header.User.Value = new User
-            {
+                Id = 1001,
                 Username = "IAmOnline",
                 LastVisit = DateTimeOffset.Now,
                 IsOnline = true,
             });
 
-            AddStep("Show offline dummy", () => header.User.Value = new User
+            AddStep("Show offline user", () => header.User.Value = new APIUser
             {
+                Id = 1002,
                 Username = "IAmOffline",
-                LastVisit = DateTimeOffset.Now,
+                LastVisit = DateTimeOffset.Now.AddDays(-10),
                 IsOnline = false,
-            });
-
-            addOnlineStep("Show ppy", new User
-            {
-                Username = @"peppy",
-                Id = 2,
-                IsSupporter = true,
-                Country = new Country { FullName = @"Australia", FlagName = @"AU" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            });
-
-            addOnlineStep("Show flyte", new User
-            {
-                Username = @"flyte",
-                Id = 3103765,
-                Country = new Country { FullName = @"Japan", FlagName = @"JP" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             });
         }
 
-        private void addOnlineStep(string name, User fallback)
+        [Test]
+        public void TestRankedState()
         {
-            AddStep(name, () =>
+            AddStep("Show ranked user", () => header.User.Value = new APIUser
             {
-                if (api.IsLoggedIn)
+                Id = 2001,
+                Username = "RankedUser",
+                Statistics = new UserStatistics
                 {
-                    var request = new GetUserRequest(fallback.Id);
-                    request.Success += user => header.User.Value = user;
-                    api.Queue(request);
+                    IsRanked = true,
+                    GlobalRank = 15000,
+                    CountryRank = 1500,
+                    RankHistory = new APIRankHistory
+                    {
+                        Mode = @"osu",
+                        Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                    },
                 }
-                else
-                    header.User.Value = fallback;
+            });
+
+            AddStep("Show unranked user", () => header.User.Value = new APIUser
+            {
+                Id = 2002,
+                Username = "UnrankedUser",
+                Statistics = new UserStatistics
+                {
+                    IsRanked = false,
+                    // web will sometimes return non-empty rank history even for unranked users.
+                    RankHistory = new APIRankHistory
+                    {
+                        Mode = @"osu",
+                        Data = Enumerable.Range(2345, 85).ToArray()
+                    },
+                }
             });
         }
     }

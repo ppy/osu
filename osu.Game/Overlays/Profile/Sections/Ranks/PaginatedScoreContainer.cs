@@ -3,78 +3,77 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
+using System.Collections.Generic;
+using osu.Game.Online.API;
+using osu.Framework.Allocation;
+using osu.Framework.Localisation;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedContainer
+    public class PaginatedScoreContainer : PaginatedProfileSubsection<APIScore>
     {
-        private readonly bool includeWeight;
         private readonly ScoreType type;
-        private GetUserScoresRequest request;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
-            : base(user, header, missing)
+        public PaginatedScoreContainer(ScoreType type, Bindable<APIUser> user, LocalisableString headerText)
+            : base(user, headerText)
         {
             this.type = type;
-            this.includeWeight = includeWeight;
 
             ItemsPerPage = 5;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override void ShowMore()
+        protected override int GetCount(APIUser user)
         {
-            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
-            request.Success += scores => Schedule(() =>
+            switch (type)
             {
-                foreach (var s in scores)
-                    s.Ruleset = Rulesets.GetRuleset(s.RulesetID);
+                case ScoreType.Best:
+                    return user.ScoresBestCount;
 
-                if (!scores.Any() && VisiblePages == 1)
-                {
-                    MoreButton.Hide();
-                    MoreButton.IsLoading = false;
-                    MissingText.Show();
-                    return;
-                }
+                case ScoreType.Firsts:
+                    return user.ScoresFirstCount;
 
-                IEnumerable<DrawableProfileScore> drawableScores;
+                case ScoreType.Recent:
+                    return user.ScoresRecentCount;
 
-                switch (type)
-                {
-                    default:
-                        drawableScores = scores.Select(score => new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null));
-                        break;
-
-                    case ScoreType.Recent:
-                        drawableScores = scores.Select(score => new DrawableTotalScore(score));
-                        break;
-                }
-
-                LoadComponentsAsync(drawableScores, s =>
-                {
-                    MissingText.Hide();
-                    MoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
-                    MoreButton.IsLoading = false;
-
-                    ItemsContainer.AddRange(s);
-                });
-            });
-
-            Api.Queue(request);
+                default:
+                    return 0;
+            }
         }
 
-        protected override void Dispose(bool isDisposing)
+        protected override void OnItemsReceived(List<APIScore> items)
         {
-            base.Dispose(isDisposing);
-            request?.Cancel();
+            if (VisiblePages == 0)
+                drawableItemIndex = 0;
+
+            base.OnItemsReceived(items);
+        }
+
+        protected override APIRequest<List<APIScore>> CreateRequest() =>
+            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+
+        private int drawableItemIndex;
+
+        protected override Drawable CreateDrawableItem(APIScore model)
+        {
+            switch (type)
+            {
+                default:
+                    return new DrawableProfileScore(model);
+
+                case ScoreType.Best:
+                    return new DrawableProfileWeightedScore(model, Math.Pow(0.95, drawableItemIndex++));
+            }
         }
     }
 }

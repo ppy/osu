@@ -13,7 +13,7 @@ namespace osu.Game.Database
     {
         private readonly Storage storage;
 
-        private const string database_name = @"client";
+        private const string database_name = @"client.db";
 
         private ThreadLocal<OsuDbContext> threadContexts;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Database
             threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
         }
 
-        protected virtual OsuDbContext CreateContext() => new OsuDbContext(storage.GetDatabaseConnectionString(database_name))
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(database_name, storage))
         {
             Database = { AutoTransactionsEnabled = false }
         };
@@ -149,8 +149,29 @@ namespace osu.Game.Database
             lock (writeLock)
             {
                 recycleThreadContexts();
-                storage.DeleteDatabase(database_name);
+
+                try
+                {
+                    storage.Delete(database_name);
+                }
+                catch
+                {
+                    // for now we are not sure why file handles are kept open by EF, but this is generally only used in testing
+                }
             }
         }
+
+        public void FlushConnections()
+        {
+            if (threadContexts != null)
+            {
+                foreach (var context in threadContexts.Values)
+                    context.Dispose();
+            }
+
+            recycleThreadContexts();
+        }
+
+        public static string CreateDatabaseConnectionString(string filename, Storage storage) => string.Concat("Data Source=", storage.GetFullPath($@"{filename}", true));
     }
 }

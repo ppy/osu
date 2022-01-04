@@ -2,39 +2,62 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets
 {
-    /// <summary>
-    /// A cache that provides a single <see cref="IRulesetConfigManager"/> per-ruleset.
-    /// This is done to support referring to and updating ruleset configs from multiple locations in the absence of inter-config bindings.
-    /// </summary>
-    public class RulesetConfigCache : Component
+    public class RulesetConfigCache : Component, IRulesetConfigCache
     {
-        private readonly ConcurrentDictionary<int, IRulesetConfigManager> configCache = new ConcurrentDictionary<int, IRulesetConfigManager>();
-        private readonly SettingsStore settingsStore;
+        private readonly RealmContextFactory realmFactory;
+        private readonly RulesetStore rulesets;
 
-        public RulesetConfigCache(SettingsStore settingsStore)
+        private readonly Dictionary<string, IRulesetConfigManager> configCache = new Dictionary<string, IRulesetConfigManager>();
+
+        public RulesetConfigCache(RealmContextFactory realmFactory, RulesetStore rulesets)
         {
-            this.settingsStore = settingsStore;
+            this.realmFactory = realmFactory;
+            this.rulesets = rulesets;
         }
 
-        /// <summary>
-        /// Retrieves the <see cref="IRulesetConfigManager"/> for a <see cref="Ruleset"/>.
-        /// </summary>
-        /// <param name="ruleset">The <see cref="Ruleset"/> to retrieve the <see cref="IRulesetConfigManager"/> for.</param>
-        /// <returns>The <see cref="IRulesetConfigManager"/> defined by <paramref name="ruleset"/>, null if <paramref name="ruleset"/> doesn't define one.</returns>
-        /// <exception cref="InvalidOperationException">If <paramref name="ruleset"/> doesn't have a valid <see cref="RulesetInfo.ID"/>.</exception>
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var settingsStore = new SettingsStore(realmFactory);
+
+            // let's keep things simple for now and just retrieve all the required configs at startup..
+            foreach (var ruleset in rulesets.AvailableRulesets)
+            {
+                if (string.IsNullOrEmpty(ruleset.ShortName))
+                    continue;
+
+                configCache[ruleset.ShortName] = ruleset.CreateInstance().CreateConfig(settingsStore);
+            }
+        }
+
         public IRulesetConfigManager GetConfigFor(Ruleset ruleset)
         {
-            if (ruleset.RulesetInfo.ID == null)
-                throw new InvalidOperationException("The provided ruleset doesn't have a valid id.");
+            if (!IsLoaded)
+                throw new InvalidOperationException($@"Cannot retrieve {nameof(IRulesetConfigManager)} before {nameof(RulesetConfigCache)} has loaded");
 
-            return configCache.GetOrAdd(ruleset.RulesetInfo.ID.Value, _ => ruleset.CreateConfig(settingsStore));
+            if (!configCache.TryGetValue(ruleset.RulesetInfo.ShortName, out var config))
+                throw new InvalidOperationException($@"Attempted to retrieve {nameof(IRulesetConfigManager)} for an unavailable ruleset {ruleset.GetDisplayString()}");
+
+            return config;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // ensures any potential database operations are finalised before game destruction.
+            foreach (var c in configCache.Values)
+                c?.Dispose();
         }
     }
 }

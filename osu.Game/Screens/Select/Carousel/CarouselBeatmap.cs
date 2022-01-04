@@ -10,26 +10,72 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselBeatmap : CarouselItem
     {
-        public readonly BeatmapInfo Beatmap;
+        public override float TotalHeight => DrawableCarouselBeatmap.HEIGHT;
 
-        public CarouselBeatmap(BeatmapInfo beatmap)
+        public readonly BeatmapInfo BeatmapInfo;
+
+        public CarouselBeatmap(BeatmapInfo beatmapInfo)
         {
-            Beatmap = beatmap;
+            BeatmapInfo = beatmapInfo;
             State.Value = CarouselItemState.Collapsed;
         }
 
-        protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
+        public override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmap(this);
 
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
 
-            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
+            bool match =
+                criteria.Ruleset == null ||
+                BeatmapInfo.RulesetID == criteria.Ruleset.ID ||
+                (BeatmapInfo.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
-            foreach (var criteriaTerm in criteria.SearchTerms)
-                match &=
-                    Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
-                    Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            if (BeatmapInfo.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
+            {
+                // only check ruleset equality or convertability for selected beatmap
+                Filtered.Value = !match;
+                return;
+            }
+
+            match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating);
+            match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(BeatmapInfo.BaseDifficulty.ApproachRate);
+            match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(BeatmapInfo.BaseDifficulty.DrainRate);
+            match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(BeatmapInfo.BaseDifficulty.CircleSize);
+            match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            match &= !criteria.Length.HasFilter || criteria.Length.IsInRange(BeatmapInfo.Length);
+            match &= !criteria.BPM.HasFilter || criteria.BPM.IsInRange(BeatmapInfo.BPM);
+
+            match &= !criteria.BeatDivisor.HasFilter || criteria.BeatDivisor.IsInRange(BeatmapInfo.BeatDivisor);
+            match &= !criteria.OnlineStatus.HasFilter || criteria.OnlineStatus.IsInRange(BeatmapInfo.Status);
+
+            match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(BeatmapInfo.Metadata.Author.Username);
+            match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(BeatmapInfo.Metadata.Artist) ||
+                     criteria.Artist.Matches(BeatmapInfo.Metadata.ArtistUnicode);
+
+            match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
+
+            if (match)
+            {
+                string[] terms = BeatmapInfo.GetSearchableTerms();
+
+                foreach (string criteriaTerm in criteria.SearchTerms)
+                    match &= terms.Any(term => term.Contains(criteriaTerm, StringComparison.InvariantCultureIgnoreCase));
+
+                // if a match wasn't found via text matching of terms, do a second catch-all check matching against online IDs.
+                // this should be done after text matching so we can prioritise matching numbers in metadata.
+                if (!match && criteria.SearchNumber.HasValue)
+                {
+                    match = (BeatmapInfo.OnlineID == criteria.SearchNumber.Value) ||
+                            (BeatmapInfo.BeatmapSet?.OnlineID == criteria.SearchNumber.Value);
+                }
+            }
+
+            if (match)
+                match &= criteria.Collection?.Beatmaps.Contains(BeatmapInfo) ?? true;
+
+            if (match && criteria.RulesetCriteria != null)
+                match &= criteria.RulesetCriteria.Matches(BeatmapInfo);
 
             Filtered.Value = !match;
         }
@@ -43,13 +89,13 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Difficulty:
-                    var ruleset = Beatmap.RulesetID.CompareTo(otherBeatmap.Beatmap.RulesetID);
+                    int ruleset = BeatmapInfo.RulesetID.CompareTo(otherBeatmap.BeatmapInfo.RulesetID);
                     if (ruleset != 0) return ruleset;
 
-                    return Beatmap.StarDifficulty.CompareTo(otherBeatmap.Beatmap.StarDifficulty);
+                    return BeatmapInfo.StarRating.CompareTo(otherBeatmap.BeatmapInfo.StarRating);
             }
         }
 
-        public override string ToString() => Beatmap.ToString();
+        public override string ToString() => BeatmapInfo.ToString();
     }
 }

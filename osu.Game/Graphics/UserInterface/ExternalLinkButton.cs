@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osuTK;
 using osuTK.Graphics;
@@ -18,35 +19,42 @@ namespace osu.Game.Graphics.UserInterface
         public string Link { get; set; }
 
         private Color4 hoverColour;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
+
+        private readonly SpriteIcon linkIcon;
 
         public ExternalLinkButton(string link = null)
         {
             Link = link;
             Size = new Vector2(12);
-            InternalChild = new SpriteIcon
+            InternalChildren = new Drawable[]
             {
-                Icon = FontAwesome.Solid.ExternalLinkAlt,
-                RelativeSizeAxes = Axes.Both
+                linkIcon = new SpriteIcon
+                {
+                    Icon = FontAwesome.Solid.ExternalLinkAlt,
+                    RelativeSizeAxes = Axes.Both
+                },
+                new HoverClickSounds(HoverSampleSet.Submit)
             };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, GameHost host)
+        private void load(OsuColour colours)
         {
             hoverColour = colours.Yellow;
-            this.host = host;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            InternalChild.FadeColour(hoverColour, 500, Easing.OutQuint);
+            linkIcon.FadeColour(hoverColour, 500, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            InternalChild.FadeColour(Color4.White, 500, Easing.OutQuint);
+            linkIcon.FadeColour(Color4.White, 500, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -57,6 +65,6 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public string TooltipText => "View in browser";
+        public LocalisableString TooltipText => "view in browser";
     }
 }

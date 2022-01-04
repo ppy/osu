@@ -8,9 +8,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Logging;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Users;
 
 namespace osu.Game.Graphics.Containers
@@ -22,23 +22,11 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        private OsuGame game;
-        private ChannelManager channelManager;
-        private Action showNotImplementedError;
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager channelManager)
-        {
-            // will be null in tests
-            this.game = game;
-            this.channelManager = channelManager;
-
-            showNotImplementedError = () => notifications?.Post(new SimpleNotification
-            {
-                Text = @"This link type is not yet supported!",
-                Icon = FontAwesome.Solid.LifeRing,
-            });
-        }
+        [Resolved]
+        private GameHost host { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -55,87 +43,84 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
-                AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
-                AddLink(text.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
+                AddText(text[previousLinkEnd..link.Index]);
+
+                string displayText = text.Substring(link.Index, link.Length);
+                object linkArgument = link.Argument;
+                string tooltip = displayText == link.Url ? null : link.Url;
+
+                AddLink(displayText, link.Action, linkArgument, tooltip);
                 previousLinkEnd = link.Index + link.Length;
             }
 
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public IEnumerable<Drawable> AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
+        public void AddLink(LocalisableString text, string url, Action<SpriteText> creationParameters = null) =>
+            createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
-        public IEnumerable<Drawable> AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
+        public void AddLink(LocalisableString text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.Custom, string.Empty), tooltipText, action);
 
-        public IEnumerable<Drawable> AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(LocalisableString text, LinkAction action, object argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(CreateChunkFor(text, true, CreateSpriteText, creationParameters), new LinkDetails(action, argument), tooltipText);
+
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action, object linkArgument, string tooltipText = null)
         {
-            foreach (var t in text)
-                AddArbitraryDrawable(t);
-
-            return createLink(text, null, url, linkType, linkArgument, tooltipText);
+            createLink(new TextPartManual(text), new LinkDetails(action, linkArgument), tooltipText);
         }
 
-        public IEnumerable<Drawable> AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), user.Username, null, LinkAction.OpenUserProfile, user.Id.ToString(), "View profile");
+        public void AddUserLink(IUser user, Action<SpriteText> creationParameters = null)
+            => createLink(CreateChunkFor(user.Username, true, CreateSpriteText, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user), "view profile");
 
-        private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
+        private void createLink(ITextPart textPart, LinkDetails link, LocalisableString tooltipText, Action action = null)
         {
-            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
+            Action onClickAction = () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = action ?? (() =>
-                {
-                    switch (linkType)
-                    {
-                        case LinkAction.OpenBeatmap:
-                            // TODO: proper query params handling
-                            if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
-                                game?.ShowBeatmap(beatmapId);
-                            break;
+                if (action != null)
+                    action();
+                else if (game != null)
+                    game.HandleLink(link);
+                // fallback to handle cases where OsuGame is not available, ie. tournament client.
+                else if (link.Action == LinkAction.External)
+                    host.OpenUrlExternally(link.Argument.ToString());
+            };
 
-                        case LinkAction.OpenBeatmapSet:
-                            if (int.TryParse(linkArgument, out int setId))
-                                game?.ShowBeatmapSet(setId);
-                            break;
-
-                        case LinkAction.OpenChannel:
-                            try
-                            {
-                                channelManager?.OpenChannel(linkArgument);
-                            }
-                            catch (ChannelNotFoundException)
-                            {
-                                Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
-                            }
-
-                            break;
-
-                        case LinkAction.OpenEditorTimestamp:
-                        case LinkAction.JoinMultiplayerMatch:
-                        case LinkAction.Spectate:
-                            showNotImplementedError?.Invoke();
-                            break;
-
-                        case LinkAction.External:
-                            game?.OpenUrlExternally(url);
-                            break;
-
-                        case LinkAction.OpenUserProfile:
-                            if (long.TryParse(linkArgument, out long userId))
-                                game?.ShowUser(userId);
-                            break;
-
-                        default:
-                            throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
-                    }
-                }),
-            });
-
-            return drawables;
+            AddPart(new TextLink(textPart, tooltipText, onClickAction));
         }
+
+        private class TextLink : TextPart
+        {
+            private readonly ITextPart innerPart;
+            private readonly LocalisableString tooltipText;
+            private readonly Action action;
+
+            public TextLink(ITextPart innerPart, LocalisableString tooltipText, Action action)
+            {
+                this.innerPart = innerPart;
+                this.tooltipText = tooltipText;
+                this.action = action;
+            }
+
+            protected override IEnumerable<Drawable> CreateDrawablesFor(TextFlowContainer textFlowContainer)
+            {
+                var linkFlowContainer = (LinkFlowContainer)textFlowContainer;
+
+                innerPart.RecreateDrawablesFor(linkFlowContainer);
+                var drawables = innerPart.Drawables.ToList();
+
+                drawables.Add(linkFlowContainer.CreateLinkCompiler(innerPart).With(c =>
+                {
+                    c.RelativeSizeAxes = Axes.Both;
+                    c.TooltipText = tooltipText;
+                    c.Action = action;
+                }));
+
+                return drawables;
+            }
+        }
+
+        protected virtual DrawableLinkCompiler CreateLinkCompiler(ITextPart textPart) => new DrawableLinkCompiler(textPart);
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
         // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.

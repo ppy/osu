@@ -3,36 +3,49 @@
 
 using System;
 using System.Globalization;
+using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Framework.Utils;
+using osu.Game.Overlays;
+using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
         private const int max_decimal_digits = 5;
 
-        private SampleChannel sample;
+        private Sample sample;
         private double lastSampleTime;
         private T lastSampleValue;
 
         protected readonly Nub Nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+        private readonly Container nubContainer;
 
-        public virtual string TooltipText { get; private set; }
+        public virtual LocalisableString TooltipText { get; private set; }
+
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
+        public bool DisplayAsPercentage { get; set; }
 
         private Color4 accentColour;
 
@@ -43,39 +56,73 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
                 leftBox.Colour = value;
+            }
+        }
+
+        private Colour4 backgroundColour;
+
+        public Color4 BackgroundColour
+        {
+            get => backgroundColour;
+            set
+            {
+                backgroundColour = value;
                 rightBox.Colour = value;
             }
         }
 
         public OsuSliderBar()
         {
-            Height = 12;
-            RangePadding = 20;
+            Height = Nub.HEIGHT;
+            RangePadding = Nub.EXPANDED_SIZE / 2;
             Children = new Drawable[]
             {
-                leftBox = new Box
+                new Container
                 {
-                    Height = 2,
-                    EdgeSmoothness = new Vector2(0, 0.5f),
-                    Position = new Vector2(2, 0),
-                    RelativeSizeAxes = Axes.None,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    Padding = new MarginPadding { Horizontal = 2 },
+                    Child = new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Masking = true,
+                        CornerRadius = 5f,
+                        Children = new Drawable[]
+                        {
+                            leftBox = new Box
+                            {
+                                Height = 5,
+                                EdgeSmoothness = new Vector2(0, 0.5f),
+                                RelativeSizeAxes = Axes.None,
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                            },
+                            rightBox = new Box
+                            {
+                                Height = 5,
+                                EdgeSmoothness = new Vector2(0, 0.5f),
+                                RelativeSizeAxes = Axes.None,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Alpha = 0.5f,
+                            },
+                        },
+                    },
                 },
-                rightBox = new Box
+                nubContainer = new Container
                 {
-                    Height = 2,
-                    EdgeSmoothness = new Vector2(0, 0.5f),
-                    Position = new Vector2(-2, 0),
-                    RelativeSizeAxes = Axes.None,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Alpha = 0.5f,
-                },
-                Nub = new Nub
-                {
-                    Origin = Anchor.TopCentre,
-                    Expanded = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Nub = new Nub
+                    {
+                        Origin = Anchor.TopCentre,
+                        RelativePositionAxes = Axes.X,
+                        Current = { Value = true }
+                    },
                 },
                 new HoverClickSounds()
             };
@@ -83,11 +130,19 @@ namespace osu.Game.Graphics.UserInterface
             Current.DisabledChanged += disabled => { Alpha = disabled ? 0.3f : 1; };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio, [CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            sample = audio.Samples.Get(@"UI/sliderbar-notch");
-            AccentColour = colours.Pink;
+            sample = audio.Samples.Get(@"UI/notch-tick");
+            AccentColour = colourProvider?.Highlight1 ?? colours.Pink;
+            BackgroundColour = colourProvider?.Background5 ?? colours.Pink.Opacity(0.5f);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            nubContainer.Padding = new MarginPadding { Horizontal = RangePadding };
         }
 
         protected override void LoadComplete()
@@ -98,26 +153,25 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(HoverEvent e)
         {
-            Nub.Glowing = true;
+            updateGlow();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            Nub.Glowing = false;
+            updateGlow();
             base.OnHoverLost(e);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
-            Nub.Current.Value = true;
-            return base.OnMouseDown(e);
+            updateGlow();
+            base.OnDragEnd(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        private void updateGlow()
         {
-            Nub.Current.Value = false;
-            return base.OnMouseUp(e);
+            Nub.Glowing = IsHovered || IsDragged;
         }
 
         protected override void OnUserChange(T value)
@@ -129,43 +183,44 @@ namespace osu.Game.Graphics.UserInterface
 
         private void playSample(T value)
         {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 30)
                 return;
 
             if (value.Equals(lastSampleValue))
                 return;
 
             lastSampleValue = value;
-
             lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
 
-            if (NormalizedValue == 0)
-                sample.Frequency.Value -= 0.4f;
-            else if (NormalizedValue == 1)
-                sample.Frequency.Value += 0.4f;
+            var channel = sample.GetChannel();
 
-            sample.Play();
+            channel.Frequency.Value = 0.99f + RNG.NextDouble(0.02f) + NormalizedValue * 0.2f;
+
+            // intentionally pitched down, even when hitting max.
+            if (NormalizedValue == 0 || NormalizedValue == 1)
+                channel.Frequency.Value -= 0.5f;
+
+            channel.Play();
         }
 
         private void updateTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                TooltipText = ((int)Convert.ChangeType(value, typeof(int))).ToString("N0");
+                TooltipText = value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
             else
             {
-                double floatValue = (double)Convert.ChangeType(value, typeof(double));
-                double floatMinValue = (double)Convert.ChangeType(CurrentNumber.MinValue, typeof(double));
-                double floatMaxValue = (double)Convert.ChangeType(CurrentNumber.MaxValue, typeof(double));
+                double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                if (floatMaxValue == 1 && floatMinValue >= -1)
-                    TooltipText = floatValue.ToString("P0");
+                if (DisplayAsPercentage)
+                {
+                    TooltipText = floatValue.ToString("0%");
+                }
                 else
                 {
-                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+                    decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
-                    var significantDigits = findPrecision(decimalPrecision);
+                    int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
 
                     TooltipText = floatValue.ToString($"N{significantDigits}");
                 }
@@ -175,15 +230,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(MathHelper.Clamp(
-                Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(MathHelper.Clamp(
-                DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            leftBox.Scale = new Vector2(Math.Clamp(
+                RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            rightBox.Scale = new Vector2(Math.Clamp(
+                DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+            Nub.MoveToX(value, 250, Easing.OutQuint);
         }
 
         /// <summary>
@@ -194,23 +249,5 @@ namespace osu.Game.Graphics.UserInterface
         /// <returns>The normalised decimal.</returns>
         private decimal normalise(decimal d, int sd)
             => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
-
-        /// <summary>
-        /// Finds the number of digits after the decimal.
-        /// </summary>
-        /// <param name="d">The value to find the number of decimal digits for.</param>
-        /// <returns>The number decimal digits.</returns>
-        private int findPrecision(decimal d)
-        {
-            int precision = 0;
-
-            while (d != Math.Round(d))
-            {
-                d *= 10;
-                precision++;
-            }
-
-            return precision;
-        }
     }
 }

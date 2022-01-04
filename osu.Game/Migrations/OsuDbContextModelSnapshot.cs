@@ -14,7 +14,7 @@ namespace osu.Game.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
                 {
@@ -43,7 +43,7 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AudioLeadIn");
+                    b.Property<double>("AudioLeadIn");
 
                     b.Property<double>("BPM");
 
@@ -53,9 +53,13 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("BeatmapSetInfoID");
 
-                    b.Property<bool>("Countdown");
+                    b.Property<int>("Countdown");
+
+                    b.Property<int>("CountdownOffset");
 
                     b.Property<double>("DistanceSpacing");
+
+                    b.Property<bool>("EpilepsyWarning");
 
                     b.Property<int>("GridSize");
 
@@ -76,6 +80,8 @@ namespace osu.Game.Migrations
                     b.Property<string>("Path");
 
                     b.Property<int>("RulesetID");
+
+                    b.Property<bool>("SamplesMatchPlaybackRate");
 
                     b.Property<bool>("SpecialStyle");
 
@@ -123,6 +129,9 @@ namespace osu.Game.Migrations
                     b.Property<string>("ArtistUnicode");
 
                     b.Property<string>("AudioFile");
+
+                    b.Property<int>("AuthorID")
+                        .HasColumnName("AuthorID");
 
                     b.Property<string>("AuthorString")
                         .HasColumnName("Author");
@@ -348,7 +357,7 @@ namespace osu.Game.Migrations
 
                     b.Property<long>("TotalScore");
 
-                    b.Property<long?>("UserID")
+                    b.Property<int?>("UserID")
                         .HasColumnName("UserID");
 
                     b.Property<string>("UserString")
@@ -397,6 +406,8 @@ namespace osu.Game.Migrations
                     b.Property<bool>("DeletePending");
 
                     b.Property<string>("Hash");
+
+                    b.Property<string>("InstantiationInfo");
 
                     b.Property<string>("Name");
 

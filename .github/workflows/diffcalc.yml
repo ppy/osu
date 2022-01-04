@@ -1,0 +1,206 @@
+# Listens for new PR comments containing !pp check [id], and runs a diffcalc comparison against master.
+# Usage:
+#   !pp check 0        | Runs only the osu! ruleset.
+#   !pp check 0 2      | Runs only the osu! and catch rulesets.
+#
+
+name: Difficulty Calculation
+on:
+  issue_comment:
+    types: [ created ]
+
+env:
+  CONCURRENCY: 4
+  ALLOW_DOWNLOAD: 1
+  SAVE_DOWNLOADED: 1
+  SKIP_INSERT_ATTRIBUTES: 1
+
+jobs:
+  metadata:
+    name: Check for requests
+    runs-on: self-hosted
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '!pp check') && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER')
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+      continue: ${{ steps.generate-matrix.outputs.continue }}
+    steps:
+      - name: Construct build matrix
+        id: generate-matrix
+        run: |
+          if [[ "${{ github.event.comment.body }}" =~ "osu" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "osu", "id": 0 },'
+          fi
+          if [[ "${{ github.event.comment.body }}" =~ "taiko" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "taiko", "id": 1 },'
+          fi
+          if [[ "${{ github.event.comment.body }}" =~ "catch" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "catch", "id": 2 },'
+          fi
+          if [[ "${{ github.event.comment.body }}" =~ "mania" ]] ; then
+            MATRIX_PROJECTS_JSON+='{ "name": "mania", "id": 3 },'
+          fi
+
+          if [[ "${MATRIX_PROJECTS_JSON}" != "" ]]; then
+            MATRIX_JSON="{ \"ruleset\": [ ${MATRIX_PROJECTS_JSON} ] }"
+            echo "${MATRIX_JSON}"
+            CONTINUE="yes"
+          else
+            CONTINUE="no"
+          fi
+
+          echo "::set-output name=continue::${CONTINUE}"
+          echo "::set-output name=matrix::${MATRIX_JSON}"
+  diffcalc:
+    name: Run
+    runs-on: self-hosted
+    timeout-minutes: 1440
+    if: needs.metadata.outputs.continue == 'yes'
+    needs: metadata
+    strategy:
+      matrix: ${{ fromJson(needs.metadata.outputs.matrix) }}
+    steps:
+      - name: Verify MySQL connection from host
+        run: |
+          mysql -e "SHOW DATABASES"
+
+      - name: Drop previous databases
+        run: |
+          for db in osu_master osu_pr
+          do
+            mysql -e "DROP DATABASE IF EXISTS $db"
+          done
+
+      - name: Create directory structure
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/master/
+          mkdir -p $GITHUB_WORKSPACE/pr/
+
+      - name: Get upstream branch # https://akaimo.hatenablog.jp/entry/2020/05/16/101251
+        id: upstreambranch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::set-output name=branchname::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.ref' | sed 's/\"//g')"
+          echo "::set-output name=repo::$(curl -H "Authorization: token ${GITHUB_TOKEN}" ${{ github.event.issue.pull_request.url }} | jq '.head.repo.full_name' | sed 's/\"//g')"
+
+      # Checkout osu
+      - name: Checkout osu (master)
+        uses: actions/checkout@v2
+        with:
+          path: 'master/osu'
+      - name: Checkout osu (pr)
+        uses: actions/checkout@v2
+        with:
+          path: 'pr/osu'
+          repository: ${{ steps.upstreambranch.outputs.repo }}
+          ref: ${{ steps.upstreambranch.outputs.branchname }}
+
+      - name: Checkout osu-difficulty-calculator (master)
+        uses: actions/checkout@v2
+        with:
+          repository: ppy/osu-difficulty-calculator
+          path: 'master/osu-difficulty-calculator'
+      - name: Checkout osu-difficulty-calculator (pr)
+        uses: actions/checkout@v2
+        with:
+          repository: ppy/osu-difficulty-calculator
+          path: 'pr/osu-difficulty-calculator'
+
+      - name: Install .NET 5.0.x
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      # Sanity checks to make sure diffcalc is not run when incompatible.
+      - name: Build diffcalc (master)
+        run: |
+          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator
+          ./UseLocalOsu.sh
+          dotnet build
+      - name: Build diffcalc (pr)
+        run: |
+          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator
+          ./UseLocalOsu.sh
+          dotnet build
+
+      - name: Download + import data
+        run: |
+          PERFORMANCE_DATA_NAME=$(curl https://data.ppy.sh/ | grep performance_${{ matrix.ruleset.name }}_top_1000 | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
+          BEATMAPS_DATA_NAME=$(curl https://data.ppy.sh/ | grep osu_files | tail -1 | awk -F "\"" '{print $2}' | sed 's/\.tar\.bz2//g')
+
+          # Set env variable for further steps.
+          echo "BEATMAPS_PATH=$GITHUB_WORKSPACE/$BEATMAPS_DATA_NAME" >> $GITHUB_ENV
+
+          cd $GITHUB_WORKSPACE
+
+          echo "Downloading database dump $PERFORMANCE_DATA_NAME.."
+          wget -q -nc https://data.ppy.sh/$PERFORMANCE_DATA_NAME.tar.bz2
+          echo "Extracting.."
+          tar -xf $PERFORMANCE_DATA_NAME.tar.bz2
+
+          echo "Downloading beatmap dump $BEATMAPS_DATA_NAME.."
+          wget -q -nc https://data.ppy.sh/$BEATMAPS_DATA_NAME.tar.bz2
+          echo "Extracting.."
+          tar -xf $BEATMAPS_DATA_NAME.tar.bz2
+
+          cd $PERFORMANCE_DATA_NAME
+
+          for db in osu_master osu_pr
+          do
+            echo "Setting up database $db.."
+
+            mysql -e "CREATE DATABASE $db"
+
+            echo "Importing beatmaps.."
+            cat osu_beatmaps.sql | mysql $db
+            echo "Importing beatmapsets.."
+            cat osu_beatmapsets.sql | mysql $db
+
+            echo "Creating table structure.."
+            mysql $db -e 'CREATE TABLE `osu_beatmap_difficulty` (
+                `beatmap_id` int unsigned NOT NULL,
+                `mode` tinyint NOT NULL DEFAULT 0,
+                `mods` int unsigned NOT NULL,
+                `diff_unified` float NOT NULL,
+                `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`beatmap_id`,`mode`,`mods`),
+                KEY `diff_sort` (`mode`,`mods`,`diff_unified`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;'
+          done
+
+      - name: Run diffcalc (master)
+        env:
+          DB_NAME: osu_master
+        run: |
+          cd $GITHUB_WORKSPACE/master/osu-difficulty-calculator/osu.Server.DifficultyCalculator
+          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
+      - name: Run diffcalc (pr)
+        env:
+          DB_NAME: osu_pr
+        run: |
+          cd $GITHUB_WORKSPACE/pr/osu-difficulty-calculator/osu.Server.DifficultyCalculator
+          dotnet run -c:Release -- all -m ${{ matrix.ruleset.id }} -ac -c ${{ env.CONCURRENCY }}
+
+      - name: Print diffs
+        run: |
+          mysql -e "
+            SELECT
+              m.beatmap_id,
+              m.mods,
+              b.filename,
+              m.diff_unified as 'sr_master',
+              p.diff_unified as 'sr_pr',
+              (p.diff_unified - m.diff_unified) as 'diff'
+            FROM osu_master.osu_beatmap_difficulty m
+            JOIN osu_pr.osu_beatmap_difficulty p
+              ON m.beatmap_id = p.beatmap_id
+              AND m.mode = p.mode
+              AND m.mods = p.mods
+            JOIN osu_pr.osu_beatmaps b
+              ON b.beatmap_id = p.beatmap_id
+            WHERE abs(m.diff_unified - p.diff_unified) > 0.1
+            ORDER BY abs(m.diff_unified - p.diff_unified)
+              DESC
+            LIMIT 10000;"
+
+      # Todo: Run ppcalc

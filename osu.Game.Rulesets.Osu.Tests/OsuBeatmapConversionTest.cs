@@ -4,15 +4,15 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
+    [Timeout(10000)]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("repeat-slider")]
         [TestCase("uneven-repeat-slider")]
         [TestCase("old-stacking")]
+        [TestCase("multi-segment-slider")]
         public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -41,10 +42,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                     break;
             }
 
-            ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
+            static ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
             {
                 StartTime = obj.StartTime,
-                EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
+                EndTime = obj.GetEndTime(),
                 X = obj.StackedPosition.X,
                 Y = obj.StackedPosition.Y
             };

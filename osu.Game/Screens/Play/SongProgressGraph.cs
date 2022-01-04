@@ -4,7 +4,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play
@@ -25,17 +24,17 @@ namespace osu.Game.Screens.Play
                 if (!objects.Any())
                     return;
 
-                var firstHit = objects.First().StartTime;
-                var lastHit = objects.Max(o => (o as IHasEndTime)?.EndTime ?? o.StartTime);
+                double firstHit = objects.First().StartTime;
+                double lastHit = objects.Max(o => o.GetEndTime());
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
 
-                var interval = (lastHit - firstHit + 1) / granularity;
+                double interval = (lastHit - firstHit + 1) / granularity;
 
                 foreach (var h in objects)
                 {
-                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+                    double endTime = h.GetEndTime();
 
                     Debug.Assert(endTime >= h.StartTime);
 

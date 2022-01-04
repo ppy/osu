@@ -2,83 +2,65 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint
+    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint<HoldNote>
     {
-        public new DrawableHoldNote HitObject => (DrawableHoldNote)base.HitObject;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
-        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+        private EditNotePiece head;
+        private EditNotePiece tail;
 
-        private readonly BodyPiece body;
-
-        public HoldNoteSelectionBlueprint(DrawableHoldNote hold)
+        public HoldNoteSelectionBlueprint(HoldNote hold)
             : base(hold)
         {
-            InternalChildren = new Drawable[]
-            {
-                new HoldNoteNoteSelectionBlueprint(hold.Head),
-                new HoldNoteNoteSelectionBlueprint(hold.Tail),
-                body = new BodyPiece
-                {
-                    AccentColour = Color4.Transparent
-                },
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo)
         {
-            body.BorderColour = colours.Yellow;
-
-            direction.BindTo(scrollingInfo.Direction);
+            InternalChildren = new Drawable[]
+            {
+                head = new EditNotePiece { RelativeSizeAxes = Axes.X },
+                tail = new EditNotePiece { RelativeSizeAxes = Axes.X },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 1,
+                    BorderColour = colours.Yellow,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    }
+                }
+            };
         }
 
         protected override void Update()
         {
             base.Update();
 
-            Size = HitObject.DrawSize + new Vector2(0, HitObject.Tail.DrawHeight);
-
-            // This is a side-effect of not matching the hitobject's anchors/origins, which is kinda hard to do
-            // When scrolling upwards our origin is already at the top of the head note (which is the intended location),
-            // but when scrolling downwards our origin is at the _bottom_ of the tail note (where we need to be at the _top_ of the tail note)
-            if (direction.Value == ScrollingDirection.Down)
-                Y -= HitObject.Tail.DrawHeight;
+            head.Y = HitObjectContainer.PositionAtTime(HitObject.Head.StartTime, HitObject.StartTime);
+            tail.Y = HitObjectContainer.PositionAtTime(HitObject.Tail.StartTime, HitObject.StartTime);
+            Height = HitObjectContainer.LengthAtTime(HitObject.StartTime, HitObject.EndTime) + tail.DrawHeight;
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
 
-        private class HoldNoteNoteSelectionBlueprint : NoteSelectionBlueprint
-        {
-            public HoldNoteNoteSelectionBlueprint(DrawableNote note)
-                : base(note)
-            {
-                Select();
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                Anchor = HitObject.Anchor;
-                Origin = HitObject.Origin;
-
-                Position = HitObject.DrawPosition;
-            }
-
-            // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
-            public override bool HandlePositionalInput => false;
-        }
+        public override Vector2 ScreenSpaceSelectionPoint => head.ScreenSpaceDrawQuad.Centre;
     }
 }

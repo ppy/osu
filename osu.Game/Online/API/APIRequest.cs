@@ -2,8 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Framework.Logging;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API
 {
@@ -11,24 +14,47 @@ namespace osu.Game.Online.API
     /// An API request with a well-defined response type.
     /// </summary>
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    public abstract class APIRequest<T> : APIRequest
+    public abstract class APIRequest<T> : APIRequest where T : class
     {
-        protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
+        protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
-
-        protected APIRequest()
-        {
-            base.Success += onSuccess;
-        }
-
-        private void onSuccess() => Success?.Invoke(Result);
+        /// <summary>
+        /// The deserialised response object. May be null if the request or deserialisation failed.
+        /// </summary>
+        [CanBeNull]
+        public T Response { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        protected APIRequest()
+        {
+            base.Success += () => Success?.Invoke(Response);
+        }
+
+        protected override void PostProcess()
+        {
+            base.PostProcess();
+
+            if (WebRequest != null)
+            {
+                Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
+                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
+            }
+        }
+
+        internal void TriggerSuccess(T result)
+        {
+            if (Response != null)
+                throw new InvalidOperationException("Attempted to trigger success more than once");
+
+            Response = result;
+
+            TriggerSuccess();
+        }
     }
 
     /// <summary>
@@ -38,12 +64,17 @@ namespace osu.Game.Online.API
     {
         protected abstract string Target { get; }
 
-        protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
+        protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
-        protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
+        protected virtual string Uri => $@"{API.APIEndpointUrl}/api/v2/{Target}";
 
         protected APIAccess API;
         protected WebRequest WebRequest;
+
+        /// <summary>
+        /// The currently logged in user. Note that this will only be populated during <see cref="Perform"/>.
+        /// </summary>
+        protected APIUser User { get; private set; }
 
         /// <summary>
         /// Invoked on successful completion of an API request.
@@ -57,74 +88,137 @@ namespace osu.Game.Online.API
         /// </summary>
         public event APIFailureHandler Failure;
 
-        private bool cancelled;
+        private readonly object completionStateLock = new object();
 
-        private Action pendingFailure;
+        /// <summary>
+        /// The state of this request, from an outside perspective.
+        /// This is used to ensure correct notification events are fired.
+        /// </summary>
+        public APIRequestCompletionState CompletionState { get; private set; }
 
         public void Perform(IAPIProvider api)
         {
             if (!(api is APIAccess apiAccess))
-                throw new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests.");
+            {
+                Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
+                return;
+            }
 
             API = apiAccess;
+            User = apiAccess.LocalUser.Value;
 
-            if (checkAndScheduleFailure())
-                return;
+            if (isFailing) return;
 
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
-            WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
+            if (!string.IsNullOrEmpty(API.AccessToken))
+                WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 
-            if (checkAndScheduleFailure())
-                return;
+            if (isFailing) return;
 
-            if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
+            Logger.Log($@"Performing request {this}", LoggingTarget.Network);
+            WebRequest.Perform();
+
+            if (isFailing) return;
+
+            PostProcess();
+
+            TriggerSuccess();
+        }
+
+        /// <summary>
+        /// Perform any post-processing actions after a successful request.
+        /// </summary>
+        protected virtual void PostProcess()
+        {
+        }
+
+        internal void TriggerSuccess()
+        {
+            lock (completionStateLock)
             {
-                Logger.Log($@"Performing request {this}", LoggingTarget.Network);
-                WebRequest.Perform();
+                if (CompletionState != APIRequestCompletionState.Waiting)
+                    return;
+
+                CompletionState = APIRequestCompletionState.Completed;
             }
 
-            if (checkAndScheduleFailure())
-                return;
-
-            API.Schedule(delegate
-            {
-                if (cancelled) return;
-
+            if (API == null)
                 Success?.Invoke();
-            });
+            else
+                API.Schedule(() => Success?.Invoke());
+        }
+
+        internal void TriggerFailure(Exception e)
+        {
+            lock (completionStateLock)
+            {
+                if (CompletionState != APIRequestCompletionState.Waiting)
+                    return;
+
+                CompletionState = APIRequestCompletionState.Failed;
+            }
+
+            if (API == null)
+                Failure?.Invoke(e);
+            else
+                API.Schedule(() => Failure?.Invoke(e));
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
 
         public void Fail(Exception e)
         {
-            if (WebRequest?.Completed == true)
-                return;
+            lock (completionStateLock)
+            {
+                if (CompletionState != APIRequestCompletionState.Waiting)
+                    return;
 
-            if (cancelled)
-                return;
+                WebRequest?.Abort();
 
-            cancelled = true;
-            WebRequest?.Abort();
+                // in the case of a cancellation we don't care about whether there's an error in the response.
+                if (!(e is OperationCanceledException))
+                {
+                    string responseString = WebRequest?.GetResponseString();
 
-            Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
-            pendingFailure = () => Failure?.Invoke(e);
-            checkAndScheduleFailure();
+                    // naive check whether there's an error in the response to avoid unnecessary JSON deserialisation.
+                    if (!string.IsNullOrEmpty(responseString) && responseString.Contains(@"""error"""))
+                    {
+                        try
+                        {
+                            // attempt to decode a displayable error string.
+                            var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
+                            if (error != null)
+                                e = new APIException(error.ErrorMessage, e);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+
+                Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
+                TriggerFailure(e);
+            }
         }
 
         /// <summary>
-        /// Checked for cancellation or error. Also queues up the Failed event if we can.
+        /// Whether this request is in a failing or failed state.
         /// </summary>
-        /// <returns>Whether we are in a failed or cancelled state.</returns>
-        private bool checkAndScheduleFailure()
+        private bool isFailing
         {
-            if (API == null || pendingFailure == null) return cancelled;
+            get
+            {
+                lock (completionStateLock)
+                    return CompletionState == APIRequestCompletionState.Failed;
+            }
+        }
 
-            API.Schedule(pendingFailure);
-            pendingFailure = null;
-            return true;
+        private class DisplayableError
+        {
+            [JsonProperty("error")]
+            public string ErrorMessage { get; set; }
         }
     }
 

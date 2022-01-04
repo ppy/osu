@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModNightcore : ModNightcore
+    public class OsuModNightcore : ModNightcore<OsuHitObject>
     {
         public override double ScoreMultiplier => 1.12;
     }

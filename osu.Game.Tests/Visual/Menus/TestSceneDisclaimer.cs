@@ -3,30 +3,25 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Screens.Menu;
-using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Menus
 {
     public class TestSceneDisclaimer : ScreenTestScene
     {
-        [Cached(typeof(IAPIProvider))]
-        private readonly DummyAPIAccess api = new DummyAPIAccess();
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(api);
-
             AddStep("load disclaimer", () => LoadScreen(new Disclaimer()));
 
             AddStep("toggle support", () =>
             {
-                api.LocalUser.Value = new User
+                ((DummyAPIAccess)API).LocalUser.Value = new APIUser
                 {
-                    Username = api.LocalUser.Value.Username,
-                    Id = api.LocalUser.Value.Id,
-                    IsSupporter = !api.LocalUser.Value.IsSupporter,
+                    Username = API.LocalUser.Value.Username,
+                    Id = API.LocalUser.Value.Id + 1,
+                    IsSupporter = !API.LocalUser.Value.IsSupporter,
                 };
             });
         }

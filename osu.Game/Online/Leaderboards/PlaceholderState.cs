@@ -9,6 +9,7 @@ namespace osu.Game.Online.Leaderboards
         Retrieving,
         NetworkFailure,
         Unavailable,
+        NoneSelected,
         NoScores,
         NotLoggedIn,
         NotSupporter,
