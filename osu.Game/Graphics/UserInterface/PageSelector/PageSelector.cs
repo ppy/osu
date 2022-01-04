@@ -21,6 +21,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         public PageSelector()
         {
             AutoSizeAxes = Axes.Both;
+
             InternalChild = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,

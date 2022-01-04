@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         [BackgroundDependencyLoader]
         private void load()
         {
-            Background.Colour = Colours.GreySeafoamDark;
+            Background.Colour = Colours.GreySeaFoamDark;
             name.Colour = icon.Colour = Colours.Lime;
         }
 
@@ -73,6 +73,6 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
             Enabled.BindValueChanged(enabled => fadeBox.FadeTo(enabled.NewValue ? 0 : 1, DURATION), true);
         }
 
-        protected override void UpdateHoverState() => Background.FadeColour(IsHovered ? Colours.GreySeafoam : Colours.GreySeafoamDark, DURATION, Easing.OutQuint);
+        protected override void UpdateHoverState() => Background.FadeColour(IsHovered ? Colours.GreySeaFoam : Colours.GreySeaFoamDark, DURATION, Easing.OutQuint);
     }
 }
