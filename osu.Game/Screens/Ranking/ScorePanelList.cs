@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Ranking
 
                             trackingContainer.Show();
 
-                            if (SelectedScore.Value.Equals(score))
+                            if (SelectedScore.Value?.Equals(score) == true)
                             {
                                 SelectedScore.TriggerChange();
                             }
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Ranking
         private void selectedScoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
             // avoid contracting panels unnecessarily when TriggerChange is fired manually.
-            if (!score.OldValue.Equals(score.NewValue))
+            if (score.OldValue != null && !score.OldValue.Equals(score.NewValue))
             {
                 // Contract the old panel.
                 foreach (var t in flow.Where(t => t.Panel.Score.Equals(score.OldValue)))
