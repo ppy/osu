@@ -10,6 +10,7 @@ using osu.Game.Extensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -84,15 +85,15 @@ namespace osu.Game.Rulesets.Osu.Edit
             return true;
         }
 
-        public override bool HandleFlip(Direction direction)
+        public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
             var hitObjects = selectedMovableObjects;
 
-            var selectedObjectsQuad = getSurroundingQuad(hitObjects);
+            var flipQuad = flipOverOrigin ? new Quad(0, 0, OsuPlayfield.BASE_SIZE.X, OsuPlayfield.BASE_SIZE.Y) : getSurroundingQuad(hitObjects);
 
             foreach (var h in hitObjects)
             {
-                h.Position = GetFlippedPosition(direction, selectedObjectsQuad, h.Position);
+                h.Position = GetFlippedPosition(direction, flipQuad, h.Position);
 
                 if (h is Slider slider)
                 {

@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public Func<float, bool> OnRotation;
         public Func<Vector2, Anchor, bool> OnScale;
-        public Func<Direction, bool> OnFlip;
+        public Func<Direction, bool, bool> OnFlip;
         public Func<bool> OnReverse;
 
         public Action OperationStarted;
@@ -281,12 +281,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addXFlipComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal));
+            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal, false));
         }
 
         private void addYFlipComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical));
+            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
         }
 
         private void addButton(IconUsage icon, string tooltip, Action action)
