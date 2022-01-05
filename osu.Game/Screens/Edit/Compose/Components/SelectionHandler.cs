@@ -147,12 +147,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (e.Action)
             {
                 case GlobalAction.EditorFlipHorizontally:
-                    HandleFlip(Direction.Horizontal, true);
-                    return true;
+                    return HandleFlip(Direction.Horizontal, true);
 
                 case GlobalAction.EditorFlipVertically:
-                    HandleFlip(Direction.Vertical, true);
-                    return true;
+                    return HandleFlip(Direction.Vertical, true);
             }
 
             return false;

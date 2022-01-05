@@ -89,6 +89,9 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
+            if (hitObjects.Length == 1 && !flipOverOrigin)
+                return false;
+
             var flipQuad = flipOverOrigin ? new Quad(0, 0, OsuPlayfield.BASE_SIZE.X, OsuPlayfield.BASE_SIZE.Y) : getSurroundingQuad(hitObjects);
 
             foreach (var h in hitObjects)
