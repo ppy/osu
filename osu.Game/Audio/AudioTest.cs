@@ -166,6 +166,7 @@ namespace osu.Game.Audio
                     if (beatmap.ReplayGainInfoID == 0 && beatmap.AudioEquals(beatmapInfo))
                     {
                         beatmap.ReplayGainInfoID = beatmapInfo.ReplayGainInfoID;
+                        beatmap.ReplayGainInfo = beatmapInfo.ReplayGainInfo;
                     }
                 }
             }

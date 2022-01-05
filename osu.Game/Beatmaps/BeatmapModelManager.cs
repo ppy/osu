@@ -61,7 +61,6 @@ namespace osu.Game.Beatmaps
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
         private AudioTest aTest;
-        private ReplayGainStore replayGainStore;
         private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
 
@@ -69,7 +68,6 @@ namespace osu.Game.Beatmaps
             : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
-            this.replayGainStore = replayGainStore;
             aTest = new AudioTest(replayGainStore, trackStore);
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
@@ -91,11 +89,17 @@ namespace osu.Game.Beatmaps
                 if (beatmapSet.Metadata.Equals(b.Metadata))
                     b.Metadata = null;
 
-                ReplayGainInfo info = aTest.generateReplayGainInfo(b, beatmapSet);
-                await aTest.saveReplayGainInfo(info, b).ConfigureAwait(false);
-                beatmapSet = aTest.PopulateSet(b, beatmapSet);
-
                 b.BeatmapSet = beatmapSet;
+            }
+
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+            {
+                if (aTest != null && b.ReplayGainInfo == null)
+                {
+                    ReplayGainInfo info = aTest.generateReplayGainInfo(b, beatmapSet);
+                    await aTest.saveReplayGainInfo(info, b).ConfigureAwait(false);
+                    beatmapSet = aTest.PopulateSet(b, beatmapSet);
+                }
             }
 
             validateOnlineIds(beatmapSet);
