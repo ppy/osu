@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 if (loadCancellationSource.IsCancellationRequested)
                                     return;
 
-                                var scores = task.WaitSafelyForResult();
+                                var scores = task.GetCompletedResult();
 
                                 var topScore = scores.First();
 

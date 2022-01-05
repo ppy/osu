@@ -153,8 +153,8 @@ namespace osu.Game.Screens.Select.Details
 
             Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
             {
-                var normalDifficulty = normalStarDifficultyTask.WaitSafelyForResult();
-                var moddeDifficulty = moddedStarDifficultyTask.WaitSafelyForResult();
+                var normalDifficulty = normalStarDifficultyTask.GetCompletedResult();
+                var moddeDifficulty = moddedStarDifficultyTask.GetCompletedResult();
 
                 if (normalDifficulty == null || moddeDifficulty == null)
                     return;

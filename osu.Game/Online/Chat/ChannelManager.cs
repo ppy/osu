@@ -536,8 +536,10 @@ namespace osu.Game.Online.Chat
                     // Try to get user in order to open PM chat
                     users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(task =>
                     {
-                        if (task.WaitSafelyForResult() is APIUser u)
-                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u)));
+                        var user = task.GetCompletedResult();
+
+                        if (user != null)
+                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(user)));
                     });
                 }
 

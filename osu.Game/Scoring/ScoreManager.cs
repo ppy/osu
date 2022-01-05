@@ -113,7 +113,7 @@ namespace osu.Game.Scoring
         public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             GetTotalScoreAsync(score, mode, cancellationToken)
-                .ContinueWith(task => scheduler.Add(() => callback(task.WaitSafelyForResult())), TaskContinuationOptions.OnlyOnRanToCompletion);
+                .ContinueWith(task => scheduler.Add(() => callback(task.GetCompletedResult())), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         /// <summary>

@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
 
                 scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.WaitSafelyForResult()), TaskContinuationOptions.OnlyOnRanToCompletion);
+                            .ContinueWith(task => scoresCallback?.Invoke(task.GetCompletedResult()), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
             }
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 if (cancellationToken.IsCancellationRequested)
                                     return;
 
-                                scoresCallback?.Invoke(task.WaitSafelyForResult());
+                                scoresCallback?.Invoke(task.GetCompletedResult());
                                 TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
