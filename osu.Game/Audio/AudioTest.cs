@@ -9,13 +9,13 @@ using System.Linq;
 using osu.Framework.Audio.Callbacks;
 using System.Threading.Tasks;
 using ManagedBass.Fx;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Audio
 {
     public class AudioTest
     {
         public const float CURR_REPLAYGAIN_VER = 0.1f;
-
         private string filePath = "";
         private ITrackStore trackStore;
         private FileCallbacks fileCallbacks;

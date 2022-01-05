@@ -331,17 +331,6 @@ namespace osu.Game.Overlays
                         current.BeatmapInfo.ReplayGainInfo = aTest.GetInfo(current.BeatmapInfo.ReplayGainInfoID);
                     }
 
-                    if (current.BeatmapInfo.ReplayGainInfo == null || current.BeatmapInfo.ReplayGainInfo.Version < AudioTest.CURR_REPLAYGAIN_VER)
-                    {
-                        ReplayGainInfo info = aTest.generateReplayGainInfo(current.BeatmapInfo, current.BeatmapSetInfo);
-                        aTest.saveReplayGainInfo(info, current.BeatmapInfo);
-                        List<BeatmapSetInfo> setinfos = beatmaps.GetAllUsableBeatmapSets(IncludedDetails.All);
-                        BeatmapSetInfo bSetInfo = setinfos.Find(b => b.ID == current.BeatmapSetInfo.ID);
-                        current.BeatmapInfo.BeatmapSet = aTest.PopulateSet(current.BeatmapInfo, bSetInfo);
-                        if (current.BeatmapInfo.BeatmapSet != null)
-                            beatmaps.Update(current.BeatmapInfo.BeatmapSet);
-                    }
-
                     if(current.BeatmapInfo.ReplayGainInfo != null)
                         aTest.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
                 }

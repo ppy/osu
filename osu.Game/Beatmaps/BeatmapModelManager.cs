@@ -10,12 +10,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -58,14 +60,17 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
+        private AudioTest aTest;
+        private ReplayGainStore replayGainStore;
         private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
 
-        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null)
+        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null, ReplayGainStore replayGainStore = null, ITrackStore trackStore = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
-
+            this.replayGainStore = replayGainStore;
+            aTest = new AudioTest(replayGainStore, trackStore);
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
@@ -85,6 +90,10 @@ namespace osu.Game.Beatmaps
                 // remove metadata from difficulties where it matches the set
                 if (beatmapSet.Metadata.Equals(b.Metadata))
                     b.Metadata = null;
+
+                ReplayGainInfo info = aTest.generateReplayGainInfo(b, beatmapSet);
+                await aTest.saveReplayGainInfo(info, b).ConfigureAwait(false);
+                beatmapSet = aTest.PopulateSet(b, beatmapSet);
 
                 b.BeatmapSet = beatmapSet;
             }
