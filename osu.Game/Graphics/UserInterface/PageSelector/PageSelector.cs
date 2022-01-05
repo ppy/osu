@@ -50,8 +50,14 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         {
             base.LoadComplete();
 
-            CurrentPage.BindValueChanged(_ => redraw());
-            AvailablePages.BindValueChanged(_ => redraw(), true);
+            CurrentPage.BindValueChanged(_ => Scheduler.AddOnce(redraw));
+            AvailablePages.BindValueChanged(_ =>
+            {
+                CurrentPage.Value = 0;
+
+                // AddOnce as the reset of CurrentPage may also trigger a redraw.
+                Scheduler.AddOnce(redraw);
+            }, true);
         }
 
         private void redraw()
