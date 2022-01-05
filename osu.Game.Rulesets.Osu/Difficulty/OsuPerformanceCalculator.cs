@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        private int effectiveMissCount;
+        private double effectiveMissCount;
 
         public OsuPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
             : base(ruleset, attributes, score)
@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private int calculateEffectiveMissCount()
+        private double calculateEffectiveMissCount()
         {
             // Guess the number of misses + slider breaks from combo
             double comboBasedMissCount = 0.0;
@@ -256,10 +256,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
-            // Clamp misscount since it's derived from combo and can be higher than total hits and that breaks some calculations
+            // Clamp miss count since it's derived from combo and can be higher than total hits and that breaks some calculations
             comboBasedMissCount = Math.Min(comboBasedMissCount, totalHits);
 
-            return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
+            return Math.Max(countMiss, comboBasedMissCount);
         }
 
         private double getComboScalingFactor() => Attributes.MaxCombo <= 0 ? 1.0 : Math.Min(Math.Pow(scoreMaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
