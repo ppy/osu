@@ -126,9 +126,9 @@ namespace osu.Game.Skinning.Editor
             return true;
         }
 
-        public override bool HandleFlip(Direction direction)
+        public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
-            var selectionQuad = getSelectionQuad();
+            var selectionQuad = flipOverOrigin ? ScreenSpaceDrawQuad : getSelectionQuad();
             Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
 
             foreach (var b in SelectedBlueprints)
