@@ -5,16 +5,16 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 using System.Linq;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModAimAssist : Mod, IUpdatableByPlayfield
+    internal class OsuModAimAssist : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => "Aim Assist";
         public override string Acronym => "AA";
@@ -25,7 +25,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
         private const float spin_radius = 30;
+
         private Vector2? prevCursorPos;
+        private OsuInputManager inputManager;
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            // Grab the input manager for future use
+            inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+        }
 
         public void Update(Playfield playfield)
         {
@@ -34,20 +42,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             // Hide judgment displays and follow points
             playfield.DisplayJudgements.Value = false;
-            (playfield as OsuPlayfield)?.FollowPoints.Clear();
+            (playfield as OsuPlayfield)?.FollowPoints.Hide();
 
             // Move all currently alive object to new destination
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
                 var h = drawable.HitObject;
-                double endTime = h.GetEndTime();
 
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
 
                         // 10ms earlier on the note to reduce chance of missing when clicking early / cursor moves fast
-                        circle.MoveTo(cursorPos, Math.Max(0, endTime - currentTime - 10));
+                        circle.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
+                        // FIXME: some circles cause flash at original(?) position when clicked too early
 
                         break;
 
@@ -61,16 +69,16 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // Move slider so that sliderball stays on the cursor
                         else
                         {
-                            // FIXME: Hide flashes
-                            //slider.HeadCircle.Hide();
+                            slider.HeadCircle.Hide(); // hide flash, triangles, ... so they don't move with slider
                             slider.MoveTo(cursorPos - slider.Ball.DrawPosition);
+                            // FIXME: some sliders re-appearing at their original position for a single frame when they're done
                         }
 
                         break;
 
                     case DrawableSpinner spinner:
 
-                        // Move spinner to cursor
+                        // Move spinner _next_ to cursor
                         if (currentTime < h.StartTime)
                         {
                             spinner.MoveTo(cursorPos + new Vector2(0, -spin_radius), Math.Max(0, h.StartTime - currentTime - 10));
@@ -89,9 +97,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                             spinner.MoveTo(targetPos);
 
-                            // Logically finish spinner immediatly, no need for the user to click.
-                            // Temporary workaround until spinner rotations are easier to handle, similar as Autopilot mod.
-                            spinner.Result.RateAdjustedRotation = spinner.HitObject.SpinsRequired * 360;
+                            // Move spinner logically
+                            if (inputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false)
+                            {
+                                // Arbitrary value, might lead to some inconsistencies depending on clock rate, replay, ...
+                                spinner.RotationTracker.AddRotation(2 * MathF.PI);
+                            }
                         }
 
                         break;
