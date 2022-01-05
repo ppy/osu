@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         checkForUpdatesButton.Enabled.Value = false;
                         Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(task => Schedule(() =>
                         {
-                            if (!task.WaitSafelyForResult())
+                            if (!task.GetCompletedResult())
                             {
                                 notifications?.Post(new SimpleNotification
                                 {

@@ -59,7 +59,7 @@ namespace osu.Game.Database
                     if (!task.IsCompletedSuccessfully)
                         return null;
 
-                    return task.WaitSafelyForResult();
+                    return task.GetCompletedResult();
                 }, token));
             }
 

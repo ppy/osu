@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Dashboard
                     {
                         users.GetUserAsync(id).ContinueWith(task =>
                         {
-                            var user = task.WaitSafelyForResult();
+                            var user = task.GetCompletedResult();
 
                             if (user == null) return;
 

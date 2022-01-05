@@ -262,7 +262,7 @@ namespace osu.Game.Beatmaps
             // GetDifficultyAsync will fall back to existing data from IBeatmapInfo if not locally available
             // (contrary to GetAsync)
             GetDifficultyAsync(bindable.BeatmapInfo, rulesetInfo, mods, cancellationToken)
-                .ContinueWith(t =>
+                .ContinueWith(task =>
                 {
                     // We're on a threadpool thread, but we should exit back to the update thread so consumers can safely handle value-changed events.
                     Schedule(() =>
@@ -270,8 +270,10 @@ namespace osu.Game.Beatmaps
                         if (cancellationToken.IsCancellationRequested)
                             return;
 
-                        if (t.WaitSafelyForResult() is StarDifficulty sd)
-                            bindable.Value = sd;
+                        var starDifficulty = task.GetCompletedResult();
+
+                        if (starDifficulty != null)
+                            bindable.Value = starDifficulty.Value;
                     });
                 }, cancellationToken);
         }

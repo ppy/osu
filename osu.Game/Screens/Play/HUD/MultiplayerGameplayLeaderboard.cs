@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play.HUD
 
             userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(task => Schedule(() =>
             {
-                var users = task.WaitSafelyForResult();
+                var users = task.GetCompletedResult();
 
                 foreach (var user in users)
                 {
