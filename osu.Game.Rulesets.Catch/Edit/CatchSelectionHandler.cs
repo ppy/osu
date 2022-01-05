@@ -54,14 +54,19 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
+            if (SelectedItems.Count == 0 && !flipOverOrigin)
+                return false;
+
             var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
 
             bool changed = false;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h is CatchHitObject catchObject)
                     changed |= handleFlip(selectionRange, catchObject, flipOverOrigin);
             });
+
             return changed;
         }
 

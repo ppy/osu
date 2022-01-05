@@ -28,9 +28,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            // Importantly, we block the base call here.
-            // Other key operations will be handled by the composer view's SelectionHandler instead.
-
             switch (e.Action)
             {
                 case GlobalAction.EditorNudgeLeft:
@@ -42,7 +39,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     return true;
             }
 
-            return false;
+            return base.OnPressed(e);
         }
 
         /// <summary>
