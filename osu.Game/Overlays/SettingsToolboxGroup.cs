@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,6 +25,11 @@ namespace osu.Game.Overlays
         private const int border_thickness = 2;
         private const int header_height = 30;
         private const int corner_radius = 5;
+
+        private const float fade_duration = 800;
+        private const float inactive_alpha = 0.5f;
+
+        private readonly Cached headerTextVisibilityCache = new Cached();
 
         private readonly FillFlowContainer content;
         private readonly IconButton button;
@@ -131,17 +137,22 @@ namespace osu.Game.Overlays
             };
         }
 
-        private const float fade_duration = 800;
-        private const float inactive_alpha = 0.5f;
-
         protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
         {
-            // These toolbox grouped may be contracted to only show icons.
-            // For now, let's hide the header to avoid text truncation weirdness in such cases.
             if (invalidation.HasFlagFast(Invalidation.DrawSize))
-                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+                headerTextVisibilityCache.Invalidate();
 
             return base.OnInvalidate(invalidation, source);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!headerTextVisibilityCache.IsValid)
+                // These toolbox grouped may be contracted to only show icons.
+                // For now, let's hide the header to avoid text truncation weirdness in such cases.
+                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
