@@ -54,7 +54,11 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
-            if (SelectedItems.Count == 0 && !flipOverOrigin)
+            if (SelectedItems.Count == 0)
+                return false;
+
+            // This could be implemented in the future if there's a requirement for it.
+            if (direction == Direction.Vertical)
                 return false;
 
             var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
