@@ -139,6 +139,7 @@ namespace osu.Game.Screens.Select
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
+        private readonly Stack<CarouselBeatmap> randomSelectedPreviousBeatmaps = new Stack<CarouselBeatmap>();
 
         private CarouselRoot root;
 
@@ -341,9 +342,11 @@ namespace osu.Game.Screens.Select
                     previouslyVisitedRandomSets.Add(selectedBeatmapSet);
             }
 
-            CarouselBeatmapSet set;
+            CarouselItem carouselItem;
 
-            if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+            if (randomSelectedPreviousBeatmaps.Any())
+                carouselItem = nextBeatmapFromRandomStack(randomSelectedPreviousBeatmaps);
+            else if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
             {
                 var notYetVisitedSets = visibleSets.Except(previouslyVisitedRandomSets).ToList();
 
@@ -353,30 +356,39 @@ namespace osu.Game.Screens.Select
                     notYetVisitedSets = visibleSets;
                 }
 
-                set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
+                var set = notYetVisitedSets.ElementAt(RNG.Next(notYetVisitedSets.Count));
                 previouslyVisitedRandomSets.Add(set);
+                carouselItem = set;
             }
             else
-                set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
+                carouselItem = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
-            select(set);
+            select(carouselItem);
             return true;
         }
 
         public void SelectPreviousRandom()
         {
-            while (randomSelectedBeatmaps.Any())
+            if (randomSelectedBeatmaps.Any())
+                randomSelectedPreviousBeatmaps.Push(selectedBeatmap);
+            select(nextBeatmapFromRandomStack(randomSelectedBeatmaps, cleanVisitedSets: true));
+        }
+
+        private CarouselItem nextBeatmapFromRandomStack(Stack<CarouselBeatmap> stack, bool cleanVisitedSets = false)
+        {
+            while (stack.Any())
             {
-                var beatmap = randomSelectedBeatmaps.Pop();
+                var beatmap = stack.Pop();
 
                 if (!beatmap.Filtered.Value)
                 {
-                    if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
+                    if (cleanVisitedSets && RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
                         previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
-                    select(beatmap);
-                    break;
+                    return beatmap;
                 }
             }
+
+            return null;
         }
 
         private void select(CarouselItem item)
