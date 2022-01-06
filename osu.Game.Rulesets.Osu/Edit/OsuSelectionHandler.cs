@@ -10,6 +10,7 @@ using osu.Game.Extensions;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -84,18 +85,28 @@ namespace osu.Game.Rulesets.Osu.Edit
             return true;
         }
 
-        public override bool HandleFlip(Direction direction)
+        public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
             var hitObjects = selectedMovableObjects;
 
-            var selectedObjectsQuad = getSurroundingQuad(hitObjects);
+            var flipQuad = flipOverOrigin ? new Quad(0, 0, OsuPlayfield.BASE_SIZE.X, OsuPlayfield.BASE_SIZE.Y) : getSurroundingQuad(hitObjects);
+
+            bool didFlip = false;
 
             foreach (var h in hitObjects)
             {
-                h.Position = GetFlippedPosition(direction, selectedObjectsQuad, h.Position);
+                var flippedPosition = GetFlippedPosition(direction, flipQuad, h.Position);
+
+                if (!Precision.AlmostEquals(flippedPosition, h.Position))
+                {
+                    h.Position = flippedPosition;
+                    didFlip = true;
+                }
 
                 if (h is Slider slider)
                 {
+                    didFlip = true;
+
                     foreach (var point in slider.Path.ControlPoints)
                     {
                         point.Position = new Vector2(
@@ -106,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
-            return true;
+            return didFlip;
         }
 
         public override bool HandleScale(Vector2 scale, Anchor reference)
