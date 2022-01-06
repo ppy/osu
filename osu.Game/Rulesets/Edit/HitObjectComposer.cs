@@ -105,7 +105,6 @@ namespace osu.Game.Rulesets.Edit
                 new Container
                 {
                     Name = "Content",
-                    Padding = new MarginPadding { Left = toolbar_width },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
