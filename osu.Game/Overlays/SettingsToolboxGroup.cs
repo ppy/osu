@@ -158,7 +158,9 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            updateExpanded();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -177,8 +179,6 @@ namespace osu.Game.Overlays
         private void load(OsuColour colours)
         {
             expandedColour = colours.Yellow;
-
-            updateExpanded();
         }
 
         private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
