@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Layout;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -53,6 +55,8 @@ namespace osu.Game.Overlays
 
         private Color4 expandedColour;
 
+        private readonly OsuSpriteText headerText;
+
         /// <summary>
         /// Create a new instance.
         /// </summary>
@@ -90,12 +94,10 @@ namespace osu.Game.Overlays
                             Height = header_height,
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                headerText = new OsuSpriteText
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Truncate = true,
                                     Text = title.ToUpperInvariant(),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                     Padding = new MarginPadding { Left = 10, Right = 30 },
@@ -131,6 +133,16 @@ namespace osu.Game.Overlays
 
         private const float fade_duration = 800;
         private const float inactive_alpha = 0.5f;
+
+        protected override bool OnInvalidate(Invalidation invalidation, InvalidationSource source)
+        {
+            // These toolbox grouped may be contracted to only show icons.
+            // For now, let's hide the header to avoid text truncation weirdness in such cases.
+            if (invalidation.HasFlagFast(Invalidation.DrawSize))
+                headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
+
+            return base.OnInvalidate(invalidation, source);
+        }
 
         protected override void LoadComplete()
         {
