@@ -1,47 +1,47 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Testing;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osuTK;
 
-namespace osu.Game.Overlays.Settings
+namespace osu.Game.Overlays
 {
-    public class Sidebar : Container<SidebarIconButton>, IStateful<ExpandedState>
+    public abstract class ExpandingButtonContainer : Container, IStateful<ExpandedState>
     {
-        private readonly Box background;
-        private readonly FillFlowContainer<SidebarIconButton> content;
-        public const float DEFAULT_WIDTH = 70;
-        public const int EXPANDED_WIDTH = 200;
+        private readonly float contractedWidth;
+        private readonly float expandedWidth;
 
         public event Action<ExpandedState> StateChanged;
 
-        protected override Container<SidebarIconButton> Content => content;
+        protected override Container<Drawable> Content => FillFlow;
 
-        public Sidebar()
+        protected FillFlowContainer FillFlow { get; }
+
+        protected ExpandingButtonContainer(float contractedWidth, float expandedWidth)
         {
+            this.contractedWidth = contractedWidth;
+            this.expandedWidth = expandedWidth;
+
             RelativeSizeAxes = Axes.Y;
+            Width = contractedWidth;
+
             InternalChildren = new Drawable[]
             {
-                background = new Box
-                {
-                    Colour = OsuColour.Gray(0.02f),
-                    RelativeSizeAxes = Axes.Both,
-                },
                 new SidebarScrollContainer
                 {
                     Children = new[]
                     {
-                        content = new FillFlowContainer<SidebarIconButton>
+                        FillFlow = new FillFlowContainer
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
@@ -52,12 +52,6 @@ namespace osu.Game.Overlays.Settings
                     }
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            background.Colour = colourProvider.Background5;
         }
 
         private ScheduledDelegate expandEvent;
@@ -107,11 +101,11 @@ namespace osu.Game.Overlays.Settings
                 switch (state)
                 {
                     default:
-                        this.ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, Easing.OutQuint);
+                        this.ResizeTo(new Vector2(contractedWidth, Height), 500, Easing.OutQuint);
                         break;
 
                     case ExpandedState.Expanded:
-                        this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
+                        this.ResizeTo(new Vector2(expandedWidth, Height), 500, Easing.OutQuint);
                         break;
                 }
 
@@ -121,14 +115,12 @@ namespace osu.Game.Overlays.Settings
 
         private Drawable lastHoveredButton;
 
-        private Drawable hoveredButton => content.Children.FirstOrDefault(c => c.IsHovered);
+        private Drawable hoveredButton => FillFlow.ChildrenOfType<OsuButton>().FirstOrDefault(c => c.IsHovered);
 
         private void queueExpandIfHovering()
         {
             // only expand when we hover a different button.
             if (lastHoveredButton == hoveredButton) return;
-
-            if (!IsHovered) return;
 
             if (State != ExpandedState.Expanded)
             {
@@ -138,11 +130,5 @@ namespace osu.Game.Overlays.Settings
 
             lastHoveredButton = hoveredButton;
         }
-    }
-
-    public enum ExpandedState
-    {
-        Contracted,
-        Expanded,
     }
 }
