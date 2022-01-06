@@ -226,7 +226,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("exit", () => Player.Exit());
             AddStep("allow import to proceed", () => Player.AllowImportCompletion.Release(1));
-            AddAssert("ensure submission", () => Player.SubmittedScore != null && Player.ImportedScore != null);
+            AddUntilStep("ensure submission", () => Player.SubmittedScore != null && Player.ImportedScore != null);
         }
 
         [Test]
