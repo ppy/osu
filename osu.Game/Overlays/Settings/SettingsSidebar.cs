@@ -28,10 +28,4 @@ namespace osu.Game.Overlays.Settings
             });
         }
     }
-
-    public enum ExpandedState
-    {
-        Contracted,
-        Expanded,
-    }
 }
