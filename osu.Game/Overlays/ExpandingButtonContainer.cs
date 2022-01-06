@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
         protected override void OnHoverLost(HoverLostEvent e)
         {
             expandEvent?.Cancel();
-            lastHoveredButton = null;
+            hoveredButton = null;
             State = ExpandedState.Contracted;
 
             base.OnHoverLost(e);
@@ -112,22 +112,24 @@ namespace osu.Game.Overlays
             }
         }
 
-        private Drawable lastHoveredButton;
-
-        private Drawable hoveredButton => FillFlow.ChildrenOfType<OsuButton>().FirstOrDefault(c => c.IsHovered);
+        private Drawable hoveredButton;
 
         private void queueExpandIfHovering()
         {
-            // only expand when we hover a different button.
-            if (lastHoveredButton == hoveredButton) return;
+            // if the same button is hovered, let the scheduled expand play out..
+            if (hoveredButton?.IsHovered == true)
+                return;
 
-            if (State != ExpandedState.Expanded)
-            {
-                expandEvent?.Cancel();
+            // ..otherwise check whether a new button is hovered, and if so, queue a new hover operation.
+
+            // usually we wouldn't use ChildrenOfType in implementations, but this is the simplest way
+            // to handle cases like the editor where the buttons may be nested within a child hierarchy.
+            hoveredButton = FillFlow.ChildrenOfType<OsuButton>().FirstOrDefault(c => c.IsHovered);
+
+            expandEvent?.Cancel();
+
+            if (hoveredButton?.IsHovered == true && State != ExpandedState.Expanded)
                 expandEvent = Scheduler.AddDelayed(() => State = ExpandedState.Expanded, 750);
-            }
-
-            lastHoveredButton = hoveredButton;
         }
     }
 
