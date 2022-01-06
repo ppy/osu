@@ -94,9 +94,11 @@ namespace osu.Game.Overlays
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
+                                    RelativeSizeAxes = Axes.X,
+                                    Truncate = true,
                                     Text = title.ToUpperInvariant(),
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
-                                    Margin = new MarginPadding { Left = 10 },
+                                    Padding = new MarginPadding { Left = 10, Right = 30 },
                                 },
                                 button = new IconButton
                                 {
