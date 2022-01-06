@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Spectate
 
             userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(task => Schedule(() =>
             {
-                var foundUsers = task.GetCompletedResult();
+                var foundUsers = task.GetResultSafely();
 
                 foreach (var u in foundUsers)
                 {

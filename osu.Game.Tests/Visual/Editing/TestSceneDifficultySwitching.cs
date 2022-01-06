@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Editing
 
         public override void SetUpSteps()
         {
-            AddStep("import test beatmap", () => importedBeatmapSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).WaitSafelyForResult());
+            AddStep("import test beatmap", () => importedBeatmapSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely());
             base.SetUpSteps();
         }
 

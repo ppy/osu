@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).WaitSafelyForResult());
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).GetResultSafely());
 
             AddStep("create leaderboard", () =>
             {

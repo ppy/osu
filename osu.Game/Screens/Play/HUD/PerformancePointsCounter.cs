@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play.HUD
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
                                .ContinueWith(task => Schedule(() =>
                                {
-                                   timedAttributes = task.GetCompletedResult();
+                                   timedAttributes = task.GetResultSafely();
 
                                    IsValid = true;
 

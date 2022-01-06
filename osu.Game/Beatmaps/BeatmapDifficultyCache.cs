@@ -270,7 +270,7 @@ namespace osu.Game.Beatmaps
                         if (cancellationToken.IsCancellationRequested)
                             return;
 
-                        var starDifficulty = task.GetCompletedResult();
+                        var starDifficulty = task.GetResultSafely();
 
                         if (starDifficulty != null)
                             bindable.Value = starDifficulty.Value;

@@ -771,7 +771,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
-                this.Push(CreateResults(prepareScoreForDisplayTask.WaitSafelyForResult()));
+                this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
             Scheduler.Add(resultsDisplayDelegate);

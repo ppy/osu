@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            importedSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).WaitSafelyForResult();
+            importedSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
             importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
             importedBeatmapId = importedBeatmap.OnlineID ?? -1;
         }

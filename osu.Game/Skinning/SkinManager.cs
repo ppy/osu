@@ -154,7 +154,7 @@ namespace osu.Game.Skinning
                     Name = s.Name + @" (modified)",
                     Creator = s.Creator,
                     InstantiationInfo = s.InstantiationInfo,
-                }).WaitSafelyForResult();
+                }).GetResultSafely();
 
                 if (result != null)
                 {

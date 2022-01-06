@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Beatmaps
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu)
         {
-            importedSet = ImportBeatmapTest.LoadQuickOszIntoOsu(osu).WaitSafelyForResult();
+            importedSet = ImportBeatmapTest.LoadQuickOszIntoOsu(osu).GetResultSafely();
         }
 
         [SetUpSteps]

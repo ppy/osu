@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return loadBeatmapAsync().WaitSafelyForResult();
+                    return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)
                 {

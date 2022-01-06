@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Beatmaps
             if (!conversionTask.Wait(10000))
                 Assert.Fail("Conversion timed out");
 
-            return conversionTask.GetCompletedResult();
+            return conversionTask.GetResultSafely();
         }
 
         protected virtual void OnConversionGenerated(HitObject original, IEnumerable<HitObject> result, IBeatmapConverter beatmapConverter)

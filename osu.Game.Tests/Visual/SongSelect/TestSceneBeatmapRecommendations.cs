@@ -182,7 +182,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmap.DifficultyName = $"SR{i + 1}";
             }
 
-            return Game.BeatmapManager.Import(beatmapSet).WaitSafelyForResult().Value;
+            return Game.BeatmapManager.Import(beatmapSet).GetResultSafely().Value;
         }
 
         private bool ensureAllBeatmapSetsImported(IEnumerable<BeatmapSetInfo> beatmapSets) => beatmapSets.All(set => set != null);
