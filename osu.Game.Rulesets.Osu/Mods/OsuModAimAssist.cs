@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 1.0f,
         };
 
+        private DateTime? lastUpdate;
+
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Hide judgment displays and follow points
@@ -43,6 +45,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
+            if (DateTime.Now - (lastUpdate ?? DateTime.MinValue) < TimeSpan.FromMilliseconds(100))
+                return;
+
             Vector2 cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
             double currentTime = playfield.Clock.CurrentTime;
 
@@ -60,6 +65,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     drawable.MoveTo(targetPos, h.StartTime - currentTime);
                 }
             }
+
+            lastUpdate = DateTime.Now;
         }
     }
 }
