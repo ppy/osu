@@ -33,16 +33,16 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // Grab the input manager for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+
+            // Hide judgment displays and follow points
+            drawableRuleset.Playfield.DisplayJudgements.Value = false;
+            (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
 
         public void Update(Playfield playfield)
         {
             var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
             double currentTime = playfield.Clock.CurrentTime;
-
-            // Hide judgment displays and follow points
-            playfield.DisplayJudgements.Value = false;
-            (playfield as OsuPlayfield)?.FollowPoints.Hide();
 
             // Move all currently alive object to new destination
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
