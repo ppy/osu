@@ -89,17 +89,24 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             var hitObjects = selectedMovableObjects;
 
-            if (hitObjects.Length == 1 && !flipOverOrigin)
-                return false;
-
             var flipQuad = flipOverOrigin ? new Quad(0, 0, OsuPlayfield.BASE_SIZE.X, OsuPlayfield.BASE_SIZE.Y) : getSurroundingQuad(hitObjects);
+
+            bool didFlip = false;
 
             foreach (var h in hitObjects)
             {
-                h.Position = GetFlippedPosition(direction, flipQuad, h.Position);
+                var flippedPosition = GetFlippedPosition(direction, flipQuad, h.Position);
+
+                if (!Precision.AlmostEquals(flippedPosition, h.Position))
+                {
+                    h.Position = flippedPosition;
+                    didFlip = true;
+                }
 
                 if (h is Slider slider)
                 {
+                    didFlip = true;
+
                     foreach (var point in slider.Path.ControlPoints)
                     {
                         point.Position = new Vector2(
@@ -110,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 }
             }
 
-            return true;
+            return didFlip;
         }
 
         public override bool HandleScale(Vector2 scale, Anchor reference)
