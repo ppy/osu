@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Playlists
             });
         }
 
-        private void importBeatmap() => AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).WaitSafelyForResult());
+        private void importBeatmap() => AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).GetResultSafely());
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {

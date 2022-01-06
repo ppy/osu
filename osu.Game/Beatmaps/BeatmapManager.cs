@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var imported = beatmapModelManager.Import(set).WaitSafelyForResult().Value;
+            var imported = beatmapModelManager.Import(set).GetResultSafely().Value;
 
             return GetWorkingBeatmap(imported.Beatmaps.First());
         }

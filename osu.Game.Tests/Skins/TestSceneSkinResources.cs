@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Skins
         [BackgroundDependencyLoader]
         private void load()
         {
-            var imported = skins.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-skin.osk"))).WaitSafelyForResult();
+            var imported = skins.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-skin.osk"))).GetResultSafely();
             skin = imported.PerformRead(skinInfo => skins.GetSkin(skinInfo));
         }
 

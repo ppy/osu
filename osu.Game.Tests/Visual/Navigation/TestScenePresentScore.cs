@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                }).WaitSafelyForResult().Value;
+                }).GetResultSafely().Value;
             });
         }
 
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
                     Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
-                }).WaitSafelyForResult().Value;
+                }).GetResultSafely().Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

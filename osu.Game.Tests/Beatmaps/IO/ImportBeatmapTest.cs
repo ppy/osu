@@ -984,7 +984,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
-            var importedSet = manager.Import(new ImportTask(temp)).WaitSafelyForResult();
+            var importedSet = manager.Import(new ImportTask(temp)).GetResultSafely();
 
             ensureLoaded(osu).WaitSafely();
 
@@ -999,7 +999,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 
-            var importedSet = manager.Import(new ImportTask(temp)).WaitSafelyForResult();
+            var importedSet = manager.Import(new ImportTask(temp)).GetResultSafely();
 
             ensureLoaded(osu).WaitSafely();
 

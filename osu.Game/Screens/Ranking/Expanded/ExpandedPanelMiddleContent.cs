@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
 
-            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).WaitSafelyForResult();
+            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
 
             AddInternal(new FillFlowContainer
             {

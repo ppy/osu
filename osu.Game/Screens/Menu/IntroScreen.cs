@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Menu
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).WaitSafelyForResult();
+                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
                     import.PerformWrite(b =>
                     {

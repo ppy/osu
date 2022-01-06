@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Skins.IO
 
             var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
-            imported.WaitSafelyForResult().PerformRead(s =>
+            imported.GetResultSafely().PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
@@ -223,7 +223,7 @@ namespace osu.Game.Tests.Skins.IO
 
             var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
-            imported.WaitSafelyForResult().PerformRead(s =>
+            imported.GetResultSafely().PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
