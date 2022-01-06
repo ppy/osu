@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 1.0f,
         };
 
-        private DateTime? lastUpdate;
+        private double? lastUpdate;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -45,11 +45,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            if (DateTime.Now - (lastUpdate ?? DateTime.MinValue) < TimeSpan.FromMilliseconds(100))
+            double currentTime = playfield.Clock.CurrentTime;
+
+            if (currentTime - (lastUpdate ?? double.MinValue) < 100)
                 return;
 
             Vector2 cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
-            double currentTime = playfield.Clock.CurrentTime;
 
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
 
-            lastUpdate = DateTime.Now;
+            lastUpdate = currentTime;
         }
     }
 }
