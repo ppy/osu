@@ -482,7 +482,7 @@ namespace osu.Game.Screens.Select
             else
                 selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
 
-            if (!beatmap.Equals(beatmapInfoPrevious))
+            if (beatmap?.Equals(beatmapInfoPrevious) != true)
             {
                 if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
                 {
