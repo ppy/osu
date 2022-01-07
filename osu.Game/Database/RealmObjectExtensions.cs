@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using osu.Framework.Development;
+using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
+using osu.Game.Models;
+using osu.Game.Rulesets;
 using Realms;
 
 #nullable enable
@@ -18,9 +21,23 @@ namespace osu.Game.Database
         private static readonly IMapper mapper = new MapperConfiguration(c =>
         {
             c.ShouldMapField = fi => false;
-            c.ShouldMapProperty = pi => pi.SetMethod != null && pi.SetMethod.IsPublic;
+            c.ShouldMapProperty = pi => true;
 
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
+            c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
+            c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
+            c.CreateMap<RulesetInfo, RulesetInfo>();
+            c.CreateMap<RealmUser, RealmUser>();
+            c.CreateMap<RealmFile, RealmFile>();
+            c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            c.CreateMap<BeatmapInfo, BeatmapInfo>();
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>();
+
+            c.ForAllMaps((a, b) =>
+            {
+                b.PreserveReferences();
+                b.MaxDepth(2);
+            });
         }).CreateMapper();
 
         /// <summary>
@@ -32,7 +49,7 @@ namespace osu.Game.Database
         /// <param name="items">A list of managed <see cref="RealmObject"/>s to detach.</param>
         /// <typeparam name="T">The type of object.</typeparam>
         /// <returns>A list containing non-managed copies of provided items.</returns>
-        public static List<T> Detach<T>(this IEnumerable<T> items) where T : RealmObject
+        public static List<T> Detach<T>(this IEnumerable<T> items) where T : RealmObjectBase
         {
             var list = new List<T>();
 
@@ -51,7 +68,7 @@ namespace osu.Game.Database
         /// <param name="item">The managed <see cref="RealmObject"/> to detach.</param>
         /// <typeparam name="T">The type of object.</typeparam>
         /// <returns>A non-managed copy of provided item. Will return the provided item if already detached.</returns>
-        public static T Detach<T>(this T item) where T : RealmObject
+        public static T Detach<T>(this T item) where T : RealmObjectBase
         {
             if (!item.IsManaged)
                 return item;
@@ -65,7 +82,8 @@ namespace osu.Game.Database
             return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
         }
 
-        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
+        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject
+        )
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLiveUnmanaged<T>(realmObject);

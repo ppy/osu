@@ -82,6 +82,10 @@ namespace osu.Game.Beatmaps
                 beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
             }
 
+            // TODO: FUCK THE WORLD :D
+            if (beatmapInfo?.IsManaged == true)
+                beatmapInfo = beatmapInfo.Detach();
+
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 

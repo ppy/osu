@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -75,7 +76,10 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(IBeatmapSetInfo? other) => other is BeatmapSetInfo b && Equals(b);
 
+        [IgnoreMap]
         IEnumerable<IBeatmapInfo> IBeatmapSetInfo.Beatmaps => Beatmaps;
+
+        [IgnoreMap]
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
     }
 }

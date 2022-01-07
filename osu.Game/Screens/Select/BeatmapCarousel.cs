@@ -662,6 +662,10 @@ namespace osu.Game.Screens.Select
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
 
+            // TODO: FUCK THE WORLD :D
+            if (beatmapSet?.IsManaged == true)
+                beatmapSet = beatmapSet.Detach();
+
             // todo: probably not required any more.
             // foreach (var b in beatmapSet.Beatmaps)
             //     b.Metadata ??= beatmapSet.Metadata;

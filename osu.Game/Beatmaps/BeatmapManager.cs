@@ -151,7 +151,7 @@ namespace osu.Game.Beatmaps
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
             using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending).ToList();
+                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmap(query);
+        public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmap(query)?.Detach();
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
