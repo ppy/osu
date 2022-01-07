@@ -21,7 +21,7 @@ namespace osu.Game.Scoring.Legacy
             this.beatmaps = beatmaps;
         }
 
-        protected override Ruleset GetRuleset(int rulesetId) => rulesets.GetRuleset(rulesetId).CreateInstance();
-        protected override WorkingBeatmap GetBeatmap(string md5Hash) => beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.MD5Hash == md5Hash));
+        protected override Ruleset GetRuleset(int rulesetId) => rulesets.GetRuleset(rulesetId)?.CreateInstance();
+        protected override WorkingBeatmap GetBeatmap(string md5Hash) => beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(b => b.MD5Hash == md5Hash));
     }
 }

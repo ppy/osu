@@ -55,6 +55,15 @@ namespace osu.Game.Scoring
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
         protected override Task Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+        {
+            // Ensure the beatmap is not detached.
+            if (!model.Beatmap.IsManaged)
+                model.Beatmap = realm.Find<BeatmapInfo>(model.Beatmap.ID);
+
+            if (!model.Ruleset.IsManaged)
+                model.Ruleset = realm.Find<RulesetInfo>(model.Ruleset.ShortName);
+
+            return Task.CompletedTask;
+        }
     }
 }

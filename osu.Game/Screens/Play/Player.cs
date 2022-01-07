@@ -1038,19 +1038,17 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
+            // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
+            var importableScore = score.ScoreInfo.DeepClone();
+
             // For the time being, online ID responses are not really useful for anything.
             // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
             //
             // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
             // conflicts across various systems (ie. solo and multiplayer).
-            long onlineScoreId = score.ScoreInfo.OnlineID;
+            importableScore.OnlineID = -1;
 
-            score.ScoreInfo.OnlineID = -1;
-
-            await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
-
-            // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
-            score.ScoreInfo.OnlineID = onlineScoreId;
+            await scoreManager.Import(importableScore, replayReader).ConfigureAwait(false);
         }
 
         /// <summary>

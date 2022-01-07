@@ -149,7 +149,10 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 using (var realm = realmFactory.CreateContext())
                 {
-                    var scores = realm.All<ScoreInfo>().Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
+                    var scores = realm.All<ScoreInfo>()
+                                      .AsEnumerable()
+                                      // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
+                                      .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
 
                     if (filterMods && !mods.Value.Any())
                     {
@@ -163,6 +166,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                         var selectedMods = mods.Value.Select(m => m.Acronym);
                         scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
                     }
+
+                    scores = scores.Detach();
 
                     scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
                                 .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
