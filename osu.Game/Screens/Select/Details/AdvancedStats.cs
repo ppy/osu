@@ -154,12 +154,12 @@ namespace osu.Game.Screens.Select.Details
             Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
             {
                 var normalDifficulty = normalStarDifficultyTask.GetResultSafely();
-                var moddeDifficulty = moddedStarDifficultyTask.GetResultSafely();
+                var moddedDifficulty = moddedStarDifficultyTask.GetResultSafely();
 
-                if (normalDifficulty == null || moddeDifficulty == null)
+                if (normalDifficulty == null || moddedDifficulty == null)
                     return;
 
-                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddeDifficulty.Value.Stars);
+                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 
