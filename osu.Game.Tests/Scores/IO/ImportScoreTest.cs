@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.Scores.IO
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 
                     beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.BeatmapInfo.ID))!.Value);
-                    Assert.That(scoreManager.Query(s => s.Equals(imported)).Value.DeletePending, Is.EqualTo(true));
+                    Assert.That(scoreManager.Query(s => s.Equals(imported)).DeletePending, Is.EqualTo(true));
 
                     var secondImport = await LoadScoreIntoOsu(osu, imported);
                     Assert.That(secondImport, Is.Null);
@@ -187,7 +188,7 @@ namespace osu.Game.Tests.Scores.IO
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             await scoreManager.Import(score, archive);
 
-            return scoreManager.Query(_ => true).Value;
+            return scoreManager.Query(_ => true).Detach();
         }
 
         internal class TestArchiveReader : ArchiveReader

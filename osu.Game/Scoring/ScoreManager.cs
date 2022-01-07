@@ -49,10 +49,10 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<ScoreInfo> Query(Expression<Func<ScoreInfo, bool>> query)
+        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query)
         {
             using (var context = contextFactory.CreateContext())
-                return context.All<ScoreInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
+                return context.All<ScoreInfo>().FirstOrDefault(query)?.Detach();
         }
 
         /// <summary>

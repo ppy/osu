@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -62,6 +63,9 @@ namespace osu.Game.Scoring
 
             if (!model.Ruleset.IsManaged)
                 model.Ruleset = realm.Find<RulesetInfo>(model.Ruleset.ShortName);
+
+            if (string.IsNullOrEmpty(model.StatisticsJson))
+                model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
 
             return Task.CompletedTask;
         }

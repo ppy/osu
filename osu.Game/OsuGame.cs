@@ -491,10 +491,10 @@ namespace osu.Game
             ScoreInfo databasedScoreInfo = null;
 
             if (score.OnlineID > 0)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID)?.Value;
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
 
             if (score is ScoreInfo scoreInfo)
-                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash)?.Value;
+                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
