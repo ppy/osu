@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Ranking
             scoreManager.GetTotalScoreAsync(score)
                         .ContinueWith(task => Schedule(() =>
                         {
-                            flow.SetLayoutPosition(trackingContainer, task.GetCompletedResult());
+                            flow.SetLayoutPosition(trackingContainer, task.GetResultSafely());
 
                             trackingContainer.Show();
 
