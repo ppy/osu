@@ -13,6 +13,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -47,13 +48,15 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.LoadComplete();
 
-            scoreSubscription = realmFactory.Context.All<ScoreInfo>().Where(s => s.BeatmapInfo.ID == beatmapInfo.ID).QueryAsyncWithNotifications((_, changes, ___) =>
-            {
-                if (changes == null)
-                    return;
+            scoreSubscription = realmFactory.Context.All<ScoreInfo>()
+                                            .Filter($"{nameof(ScoreInfo.Beatmap)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
+                                            .QueryAsyncWithNotifications((_, changes, ___) =>
+                                            {
+                                                if (changes == null)
+                                                    return;
 
-                fetchTopScoreRank();
-            });
+                                                fetchTopScoreRank();
+                                            });
         }
 
         private IDisposable scoreSubscription;
@@ -84,7 +87,10 @@ namespace osu.Game.Screens.Select.Carousel
 
             using (var realm = realmFactory.CreateContext())
             {
-                return realm.All<ScoreInfo>().Where(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
+                return realm.All<ScoreInfo>()
+                            .AsEnumerable()
+                            // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
+                            .Where(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
                             .OrderByDescending(s => s.TotalScore)
                             .FirstOrDefault()
                             ?.Rank;
