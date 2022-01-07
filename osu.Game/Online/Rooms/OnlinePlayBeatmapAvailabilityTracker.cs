@@ -83,13 +83,10 @@ namespace osu.Game.Online.Rooms
                         progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
                 }, true);
 
-                // These events are needed for a fringe case where a modified/altered beatmap is imported with matching OnlineIDs.
-                // During the import process this will cause the existing beatmap set to be silently deleted and replaced with the new one.
-                // This is not exposed to us via `BeatmapDownloadTracker` so we have to take it into our own hands (as we care about the hash matching).
                 realmSubscription?.Dispose();
                 realmSubscription = realmContextFactory.Context
                                                        .All<BeatmapSetInfo>()
-                                                       .Where(s => s.OnlineID == SelectedItem.Value.BeatmapID || (matchingHash != null && s.ID == matchingHash.ID))
+                                                       .Where(s => s.OnlineID == SelectedItem.Value.BeatmapID) // TODO: figure out if we need this hash match in the subscription || s.ID == matchingHash?.ID)
                                                        .QueryAsyncWithNotifications((items, changes, ___) =>
                                                        {
                                                            if (changes == null)
@@ -145,7 +142,13 @@ namespace osu.Game.Online.Rooms
             int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            return beatmapManager.QueryBeatmap(b => b.OnlineID == onlineId && b.MD5Hash == checksum && !b.BeatmapSet.DeletePending);
+            var foundBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == onlineId && b.MD5Hash == checksum);
+
+            // can't be included in the above query due to realm limitations.
+            if (foundBeatmap?.BeatmapSet?.DeletePending == true)
+                return null;
+
+            return foundBeatmap;
         }
 
         protected override void Dispose(bool isDisposing)
