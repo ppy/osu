@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets
                     List<RulesetInfo> detachedRulesets = new List<RulesetInfo>();
 
                     // perform a consistency check and detach final rulesets from realm for cross-thread runtime usage.
-                    foreach (var r in rulesets)
+                    foreach (var r in rulesets.OrderBy(r => r.OnlineID))
                     {
                         try
                         {
