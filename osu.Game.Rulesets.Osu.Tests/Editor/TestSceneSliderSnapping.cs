@@ -54,6 +54,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                     ControlPoints =
                     {
                         new PathControlPoint(Vector2.Zero),
+                        new PathControlPoint(OsuPlayfield.BASE_SIZE * 2 / 5),
                         new PathControlPoint(OsuPlayfield.BASE_SIZE * 3 / 5)
                     }
                 }
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
             AddStep("select slider end", () =>
             {
-                sliderEnd = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint.Position != Vector2.Zero);
+                sliderEnd = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints.Last());
                 InputManager.MoveMouseTo(sliderEnd.ScreenSpaceDrawQuad.Centre);
             });
             AddStep("move slider end", () =>
@@ -83,6 +84,47 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 InputManager.PressButton(MouseButton.Left);
                 InputManager.MoveMouseTo(sliderEnd.ScreenSpaceDrawQuad.Centre - new Vector2(0, 20));
                 InputManager.ReleaseButton(MouseButton.Left);
+            });
+            assertSliderSnapped(true);
+        }
+
+        [Test]
+        public void TestAddingControlPointToUnsnappedSliderNodesSnaps()
+        {
+            assertSliderSnapped(false);
+
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+            AddStep("move mouse to new point location", () =>
+            {
+                var firstPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[0]);
+                var secondPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
+                InputManager.MoveMouseTo((firstPiece.ScreenSpaceDrawQuad.Centre + secondPiece.ScreenSpaceDrawQuad.Centre) / 2);
+            });
+            AddStep("move slider end", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            assertSliderSnapped(true);
+        }
+
+        [Test]
+        public void TestRemovingControlPointFromUnsnappedSliderNodesSnaps()
+        {
+            assertSliderSnapped(false);
+
+            AddStep("select slider", () => EditorBeatmap.SelectedHitObjects.Add(slider));
+            AddStep("move mouse to second control point", () =>
+            {
+                var secondPiece = this.ChildrenOfType<PathControlPointPiece>().Single(piece => piece.ControlPoint == slider.Path.ControlPoints[1]);
+                InputManager.MoveMouseTo(secondPiece);
+            });
+            AddStep("quick delete", () =>
+            {
+                InputManager.PressKey(Key.ShiftLeft);
+                InputManager.PressButton(MouseButton.Right);
+                InputManager.ReleaseKey(Key.ShiftLeft);
             });
             assertSliderSnapped(true);
         }
