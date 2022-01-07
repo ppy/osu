@@ -17,6 +17,7 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -80,9 +81,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -111,13 +109,15 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (beatmapInfo == null)
                 return;
 
-            scoreSubscription = realmContextFactory.Context.All<ScoreInfo>().Where(s => s.BeatmapInfo.ID == beatmapInfo.ID).QueryAsyncWithNotifications((_, changes, ___) =>
-            {
-                if (changes == null)
-                    return;
+            scoreSubscription = realmFactory.Context.All<ScoreInfo>()
+                                            .Filter($"{nameof(ScoreInfo.Beatmap)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
+                                            .QueryAsyncWithNotifications((_, changes, ___) =>
+                                            {
+                                                if (changes == null)
+                                                    return;
 
-                RefreshScores();
-            });
+                                                RefreshScores();
+                                            });
         }
 
         protected override void Reset()
