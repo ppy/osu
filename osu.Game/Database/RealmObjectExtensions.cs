@@ -22,7 +22,9 @@ namespace osu.Game.Database
         private static readonly IMapper mapper = new MapperConfiguration(c =>
         {
             c.ShouldMapField = fi => false;
-            c.ShouldMapProperty = pi => true;
+            // If we want to limit this further, we can avoid mapping properties with no setter that are not IList<>.
+            // Takes a bit of effort to determine whether this is the case though, see https://stackoverflow.com/questions/951536/how-do-i-tell-whether-a-type-implements-ilist
+            c.ShouldMapProperty = pi => pi.GetMethod?.IsPublic == true;
 
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();

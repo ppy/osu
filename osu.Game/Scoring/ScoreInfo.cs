@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -113,16 +112,9 @@ namespace osu.Game.Scoring
         [MapTo(nameof(Rank))]
         public int RankInt { get; set; }
 
-        [IgnoreMap]
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
-
-        [IgnoreMap]
         IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
-
-        [IgnoreMap]
         IUser IScoreInfo.User => User;
-
-        [IgnoreMap]
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
