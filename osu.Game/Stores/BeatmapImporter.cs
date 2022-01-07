@@ -59,7 +59,14 @@ namespace osu.Game.Stores
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet.Files, realm));
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+            {
                 b.BeatmapSet = beatmapSet;
+
+                // ensure we aren't trying to add a new ruleset to the database
+                // this can happen in tests, mostly
+                if (!b.Ruleset.IsManaged)
+                    b.Ruleset = realm.Find<RulesetInfo>(b.Ruleset.ShortName);
+            }
 
             validateOnlineIds(beatmapSet, realm);
 

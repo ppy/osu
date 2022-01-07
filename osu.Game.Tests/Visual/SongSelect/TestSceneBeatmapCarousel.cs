@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     AddStep("store selection", () => selection = carousel.SelectedBeatmapInfo);
                     if (isIterating)
-                        AddUntilStep("selection changed", () => !carousel.SelectedBeatmapInfo.Equals(selection));
+                        AddUntilStep("selection changed", () => !carousel.SelectedBeatmapInfo?.Equals(selection) == true);
                     else
                         AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo.Equals(selection));
                 }
