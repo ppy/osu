@@ -83,21 +83,22 @@ namespace osu.Game.Scoring
 
         public RulesetInfo Ruleset { get; set; } = null!;
 
+        private Dictionary<HitResult, int>? statistics;
+
         [Ignored]
         public Dictionary<HitResult, int> Statistics
         {
-            // TODO: this is dangerous. a get operation may then modify the dictionary, which would be a fresh copy that is not persisted with the model.
-            // this is already the case in multiple locations.
             get
             {
-                if (string.IsNullOrEmpty(StatisticsJson))
-                    return new Dictionary<HitResult, int>();
+                if (statistics != null)
+                    return statistics;
 
-                return JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson) ?? new Dictionary<HitResult, int>();
+                if (!string.IsNullOrEmpty(StatisticsJson))
+                    statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson);
+
+                return statistics ??= new Dictionary<HitResult, int>();
             }
-            // .. todo
-            // ReSharper disable once ValueParameterNotUsed
-            set => JsonConvert.SerializeObject(StatisticsJson);
+            set => statistics = value;
         }
 
         [MapTo("Statistics")]
