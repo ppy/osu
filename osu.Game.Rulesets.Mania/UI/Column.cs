@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
+        public const float TOUCH_AREA_HEIGHT = 100;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -44,60 +45,34 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly GameplaySampleTriggerSource sampleTriggerSource;
 
-        public class ColumnTouchInputArea : Container
+        public class ColumnTouchInputArea : Drawable
         {
-            private Column column => (Column)Parent;
-
-            private Container hintContainer;
-
             public ColumnTouchInputArea()
             {
                 RelativeSizeAxes = Axes.X;
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
-                Height = 100;
-                InternalChild = hintContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    BorderColour = Color4.Red,
-                    BorderThickness = 5,
-                    Masking = true,
-                };
+                Height = TOUCH_AREA_HEIGHT;
             }
+
+            private Column column => (Column)Parent;
 
             protected override void LoadComplete()
             {
-                hintContainer.Delay(1000).FadeOutFromOne(500, Easing.OutSine);
+                keyBindingContainer = (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
             }
 
             private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
 
-            private ManiaInputManager.RulesetKeyBindingContainer getKeyBindingContainer()
-            {
-                return keyBindingContainer ??= (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
-            }
-
             protected override bool OnTouchDown(TouchDownEvent e)
             {
-                getKeyBindingContainer().TriggerPressed(column.Action.Value);
-                return base.OnTouchDown(e);
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                getKeyBindingContainer().TriggerPressed(column.Action.Value);
-
-                return base.OnMouseDown(e);
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                getKeyBindingContainer().TriggerReleased(column.Action.Value);
+                keyBindingContainer.TriggerPressed(column.Action.Value);
+                return false;
             }
 
             protected override void OnTouchUp(TouchUpEvent e)
             {
-                getKeyBindingContainer().TriggerReleased(column.Action.Value);
+                keyBindingContainer.TriggerReleased(column.Action.Value);
             }
         }
 
