@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using Realms;
 
 #nullable enable
@@ -27,6 +28,7 @@ namespace osu.Game.Database
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
+            c.CreateMap<ScoreInfo, ScoreInfo>();
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
