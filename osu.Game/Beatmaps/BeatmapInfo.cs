@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using AutoMapper;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
@@ -143,6 +144,7 @@ namespace osu.Game.Beatmaps
         private int rulesetID;
 
         [Ignored]
+        [IgnoreMap]
         public int RulesetID
         {
             // ReSharper disable once ConstantConditionalAccessQualifier
@@ -181,6 +183,8 @@ namespace osu.Game.Beatmaps
         public int BeatmapVersion;
 
         public BeatmapInfo Clone() => this.Detach();
+
+        public override string ToString() => Metadata?.ToString() ?? base.ToString();
 
         #endregion
     }

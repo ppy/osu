@@ -107,7 +107,7 @@ namespace osu.Game.Beatmaps
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query)
         {
             using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapInfo>().FirstOrDefault(query); // TODO: ?.ToLive();
+                return context.All<BeatmapInfo>().FirstOrDefault(query)?.Detach();
         }
     }
 }

@@ -36,6 +36,51 @@ namespace osu.Game.Tests.Database
     public class BeatmapImporterTests : RealmTest
     {
         [Test]
+        public void TestDetach()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using (var importer = new BeatmapModelManager(realmFactory, storage))
+                using (new RulesetStore(realmFactory, storage))
+                {
+                    ILive<BeatmapSetInfo>? imported;
+
+                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
+                        imported = await importer.Import(reader);
+
+                    Assert.NotNull(imported);
+                    Debug.Assert(imported != null);
+
+                    BeatmapSetInfo? detached = null;
+
+                    imported.PerformRead(live =>
+                    {
+                        var timer = new Stopwatch();
+                        timer.Start();
+                        detached = live.Detach();
+                        Logger.Log($"Detach took {timer.ElapsedMilliseconds} ms");
+
+                        Logger.Log($"NamedFiles: {live.Files.Count} {detached.Files.Count}");
+                        Logger.Log($"Files: {live.Files.Select(f => f.File).Count()} {detached.Files.Select(f => f.File).Count()}");
+                        Logger.Log($"Difficulties: {live.Beatmaps.Count} {detached.Beatmaps.Count}");
+                        Logger.Log($"BeatmapDifficulties: {live.Beatmaps.Select(f => f.Difficulty).Count()} {detached.Beatmaps.Select(f => f.Difficulty).Count()}");
+                        Logger.Log($"Metadata: {live.Metadata} {detached.Metadata}");
+                    });
+
+                    Logger.Log("Testing detached-ness");
+
+                    Debug.Assert(detached != null);
+
+                    Logger.Log($"NamedFiles: {detached.Files.Count}");
+                    Logger.Log($"Files: {detached.Files.Select(f => f.File).Count()}");
+                    Logger.Log($"Difficulties: {detached.Beatmaps.Count}");
+                    Logger.Log($"BeatmapDifficulties: {detached.Beatmaps.Select(f => f.Difficulty).Count()}");
+                    Logger.Log($"Metadata: {detached.Metadata}");
+                }
+            });
+        }
+
+        [Test]
         public void TestImportBeatmapThenCleanup()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
