@@ -86,7 +86,7 @@ namespace osu.Game.Online.Rooms
                 realmSubscription?.Dispose();
                 realmSubscription = realmContextFactory.Context
                                                        .All<BeatmapSetInfo>()
-                                                       .Where(s => s.OnlineID == SelectedItem.Value.BeatmapID) // TODO: figure out if we need this hash match in the subscription || s.ID == matchingHash?.ID)
+                                                       .Where(s => s.OnlineID == item.NewValue.BeatmapID) // TODO: figure out if we need this hash match in the subscription || s.ID == matchingHash?.ID)
                                                        .QueryAsyncWithNotifications((items, changes, ___) =>
                                                        {
                                                            if (changes == null)
