@@ -4,15 +4,19 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.Play;
@@ -108,22 +112,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("exit player", () => CurrentScreen.Exit());
         }
 
-        private void addItem(Func<BeatmapInfo> beatmap, RulesetInfo? ruleset = null)
+        [Test]
+        public void TestCorrectModsSelectedAfterNewItemAdded()
         {
+            addItem(() => OtherBeatmap, mods: new Mod[] { new OsuModDoubleTime() });
+            AddUntilStep("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
+
+            AddUntilStep("wait for idle", () => Client.LocalUser?.State == MultiplayerUserState.Idle);
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddUntilStep("wait for ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddUntilStep("wait for player", () => CurrentScreen is Player player && player.IsLoaded);
+            AddAssert("mods are correct", () => !((Player)CurrentScreen).Mods.Value.Any());
+            AddStep("exit player", () => CurrentScreen.Exit());
+        }
+
+        private void addItem(Func<BeatmapInfo> beatmap, RulesetInfo? ruleset = null, IReadOnlyList<Mod>? mods = null)
+        {
+            Screens.Select.SongSelect? songSelect = null;
+
             AddStep("click add button", () =>
             {
                 InputManager.MoveMouseTo(this.ChildrenOfType<MultiplayerMatchSubScreen.AddItemButton>().Single());
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for song select", () => CurrentSubScreen is Screens.Select.SongSelect select && select.BeatmapSetsLoaded);
+            AddUntilStep("wait for song select", () => (songSelect = CurrentSubScreen as Screens.Select.SongSelect) != null);
+            AddUntilStep("wait for loaded", () => songSelect.AsNonNull().BeatmapSetsLoaded);
 
             if (ruleset != null)
-            {
-                AddStep($"set {ruleset.Name} ruleset", () => ((Screens.Select.SongSelect)CurrentSubScreen).Ruleset.Value = ruleset);
-            }
+                AddStep($"set {ruleset.Name} ruleset", () => songSelect.AsNonNull().Ruleset.Value = ruleset);
 
-            AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(beatmap()));
+            if (mods != null)
+                AddStep($"set mods to {string.Join(",", mods.Select(m => m.Acronym))}", () => songSelect.AsNonNull().Mods.Value = mods);
+
+            AddStep("select other beatmap", () => songSelect.AsNonNull().FinaliseSelection(beatmap()));
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
         }
     }
