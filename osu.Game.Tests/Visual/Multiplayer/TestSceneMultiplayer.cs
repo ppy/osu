@@ -22,6 +22,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -436,6 +437,45 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
             AddAssert("Beatmap matches current item", () => Beatmap.Value.BeatmapInfo.OnlineID == client.Room?.Playlist.First().BeatmapID);
+        }
+
+        [Test]
+        public void TestPlayStartsWithCorrectRulesetWhileAtSongSelect()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            pressReadyButton();
+
+            AddStep("Enter song select", () =>
+            {
+                var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(client.Room?.Settings.PlaylistItemId);
+            });
+
+            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+
+            AddAssert("Ruleset matches current item", () => Ruleset.Value.OnlineID == client.Room?.Playlist.First().RulesetID);
+
+            AddStep("Switch ruleset", () => ((MultiplayerMatchSongSelect)multiplayerComponents.MultiplayerScreen.CurrentSubScreen).Ruleset.Value = new CatchRuleset().RulesetInfo);
+
+            AddUntilStep("Ruleset doesn't match current item", () => Ruleset.Value.OnlineID != client.Room?.Playlist.First().RulesetID);
+
+            AddStep("start match externally", () => client.StartMatch());
+
+            AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
+
+            AddAssert("Ruleset matches current item", () => Ruleset.Value.OnlineID == client.Room?.Playlist.First().RulesetID);
         }
 
         [Test]
