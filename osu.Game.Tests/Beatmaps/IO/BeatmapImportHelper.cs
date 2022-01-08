@@ -15,7 +15,6 @@ using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
-    [TestFixture]
     public static class BeatmapImportHelper
     {
         public static async Task<BeatmapSetInfo> LoadQuickOszIntoOsu(OsuGameBase osu)
