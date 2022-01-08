@@ -156,19 +156,31 @@ namespace osu.Game.Stores
 
         public bool Delete(TModel item)
         {
-            if (item.DeletePending)
-                return false;
+            using (var realm = ContextFactory.CreateContext())
+            {
+                if (!item.IsManaged)
+                    item = realm.Find<TModel>(item.ID);
 
-            item.Realm.Write(r => item.DeletePending = true);
-            return true;
+                if (item?.DeletePending != false)
+                    return false;
+
+                realm.Write(r => item.DeletePending = true);
+                return true;
+            }
         }
 
         public void Undelete(TModel item)
         {
-            if (!item.DeletePending)
-                return;
+            using (var realm = ContextFactory.CreateContext())
+            {
+                if (!item.IsManaged)
+                    item = realm.Find<TModel>(item.ID);
 
-            item.Realm.Write(r => item.DeletePending = false);
+                if (item?.DeletePending != true)
+                    return;
+
+                realm.Write(r => item.DeletePending = false);
+            }
         }
 
         // TODO: delete or abstract
