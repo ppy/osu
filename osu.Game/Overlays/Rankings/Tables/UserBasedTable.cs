@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             var background = base.CreateRowBackground(item);
 
+            // see: https://github.com/ppy/osu-web/blob/9de00a0b874c56893d98261d558d78d76259d81b/resources/views/multiplayer/rooms/_rankings_table.blade.php#L23
             if (!item.User.Active)
                 background.Alpha = 0.5f;
 
@@ -38,6 +39,7 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             var content = base.CreateRowContent(index, item);
 
+            // see: https://github.com/ppy/osu-web/blob/9de00a0b874c56893d98261d558d78d76259d81b/resources/views/multiplayer/rooms/_rankings_table.blade.php#L23
             if (!item.User.Active)
             {
                 foreach (var d in content)
