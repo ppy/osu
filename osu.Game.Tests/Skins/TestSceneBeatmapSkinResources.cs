@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Skins
         [BackgroundDependencyLoader]
         private void load()
         {
-            var imported = beatmaps.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-beatmap.osz"))).Result;
+            var imported = beatmaps.Import(new ZipArchiveReader(TestResources.OpenResource("Archives/ogg-beatmap.osz"))).GetResultSafely();
             beatmap = beatmaps.GetWorkingBeatmap(imported.Value.Beatmaps[0]);
             beatmap.LoadTrack();
         }
