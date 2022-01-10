@@ -50,7 +50,6 @@ namespace osu.Game.Tests.Scores.IO
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
                     Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
                     Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
-                    Assert.AreEqual(toImport.Combo, imported.Combo);
                     Assert.AreEqual(toImport.User.Username, imported.User.Username);
                     Assert.AreEqual(toImport.Date, imported.Date);
                     Assert.AreEqual(toImport.OnlineID, imported.OnlineID);
