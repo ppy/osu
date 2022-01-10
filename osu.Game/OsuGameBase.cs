@@ -424,9 +424,21 @@ namespace osu.Game
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
-            Ruleset instance;
+            Ruleset instance = null;
 
-            if (r.NewValue?.Available != true || (instance = r.NewValue.CreateInstance()) == null)
+            try
+            {
+                if (r.NewValue?.Available == true)
+                {
+                    instance = r.NewValue.CreateInstance();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Ruleset load failed and has been rolled back");
+            }
+
+            if (instance == null)
             {
                 // reject the change if the ruleset is not available.
                 Ruleset.Value = r.OldValue?.Available == true ? r.OldValue : RulesetStore.AvailableRulesets.First();
