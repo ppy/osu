@@ -71,7 +71,7 @@ namespace osu.Game.Online.Rooms
 
                 AddInternal(downloadTracker);
 
-                downloadTracker.State.BindValueChanged(_ => updateAvailability(), true);
+                downloadTracker.State.BindValueChanged(_ => Scheduler.AddOnce(updateAvailability), true);
                 downloadTracker.Progress.BindValueChanged(_ =>
                 {
                     if (downloadTracker.State.Value != DownloadState.Downloading)
@@ -85,14 +85,14 @@ namespace osu.Game.Online.Rooms
 
                 realmSubscription?.Dispose();
                 realmSubscription = realmContextFactory.Context
-                                                       .All<BeatmapSetInfo>()
-                                                       .Where(s => s.OnlineID == item.NewValue.BeatmapID) // TODO: figure out if we need this hash match in the subscription || s.ID == matchingHash?.ID)
+                                                       .All<BeatmapInfo>()
+                                                       .Where(b => b.OnlineID == item.NewValue.BeatmapID && b.MD5Hash == item.NewValue.Beatmap.Value.MD5Hash)
                                                        .QueryAsyncWithNotifications((items, changes, ___) =>
                                                        {
                                                            if (changes == null)
                                                                return;
 
-                                                           Schedule(updateAvailability);
+                                                           Scheduler.AddOnce(updateAvailability);
                                                        });
             }, true);
         }
