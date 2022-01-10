@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -126,7 +127,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result.Value;
+                }).GetResultSafely().Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);
