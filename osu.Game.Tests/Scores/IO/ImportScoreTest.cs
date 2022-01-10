@@ -192,6 +192,8 @@ namespace osu.Game.Tests.Scores.IO
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
+            // clone to avoid attaching the input score to realm.
+            score = score.DeepClone();
             score.BeatmapInfo ??= beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
             score.Ruleset ??= new OsuRuleset().RulesetInfo;
 
