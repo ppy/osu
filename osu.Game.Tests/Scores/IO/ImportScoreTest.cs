@@ -72,6 +72,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var toImport = new ScoreInfo
                     {
+                        User = new APIUser { Username = "Test user" },
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
@@ -98,6 +99,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var toImport = new ScoreInfo
                     {
+                        User = new APIUser { Username = "Test user" },
                         Statistics = new Dictionary<HitResult, int>
                         {
                             { HitResult.Perfect, 100 },
@@ -128,6 +130,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var toImport = new ScoreInfo
                     {
+                        User = new APIUser { Username = "Test user" },
                         Hash = Guid.NewGuid().ToString(),
                         Statistics = new Dictionary<HitResult, int>
                         {
@@ -163,12 +166,20 @@ namespace osu.Game.Tests.Scores.IO
                 {
                     var osu = LoadOsuIntoHost(host, true);
 
-                    await LoadScoreIntoOsu(osu, new ScoreInfo { OnlineID = 2 }, new TestArchiveReader());
+                    await LoadScoreIntoOsu(osu, new ScoreInfo
+                    {
+                        User = new APIUser { Username = "Test user" },
+                        OnlineID = 2
+                    }, new TestArchiveReader());
 
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 
                     // Note: A new score reference is used here since the import process mutates the original object to set an ID
-                    Assert.That(scoreManager.IsAvailableLocally(new ScoreInfo { OnlineID = 2 }));
+                    Assert.That(scoreManager.IsAvailableLocally(new ScoreInfo
+                    {
+                        User = new APIUser { Username = "Test user" },
+                        OnlineID = 2
+                    }));
                 }
                 finally
                 {
