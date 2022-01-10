@@ -120,44 +120,6 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public async Task TestImportWithDeletedBeatmapSet()
-        {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
-            {
-                try
-                {
-                    var osu = LoadOsuIntoHost(host, true);
-
-                    var toImport = new ScoreInfo
-                    {
-                        User = new APIUser { Username = "Test user" },
-                        Hash = Guid.NewGuid().ToString(),
-                        Statistics = new Dictionary<HitResult, int>
-                        {
-                            { HitResult.Perfect, 100 },
-                            { HitResult.Miss, 50 }
-                        }
-                    };
-
-                    var imported = await LoadScoreIntoOsu(osu, toImport);
-
-                    var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-                    var scoreManager = osu.Dependencies.Get<ScoreManager>();
-
-                    beatmapManager.Delete(beatmapManager.GetAllUsableBeatmapSets().First(s => s.Beatmaps.Any(b => b.ID == imported.BeatmapInfo.ID)));
-                    Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
-
-                    var secondImport = await LoadScoreIntoOsu(osu, imported);
-                    Assert.That(secondImport, Is.Null);
-                }
-                finally
-                {
-                    host.Exit();
-                }
-            }
-        }
-
-        [Test]
         public async Task TestOnlineScoreIsAvailableLocally()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
