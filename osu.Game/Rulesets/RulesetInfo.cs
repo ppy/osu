@@ -47,7 +47,11 @@ namespace osu.Game.Rulesets
 
         public bool Available { get; set; }
 
-        public bool Equals(RulesetInfo? other) => other != null && OnlineID == other.OnlineID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
+        public bool Equals(RulesetInfo? other) => other != null
+                                                  && OnlineID == other.OnlineID
+                                                  && Available == other.Available
+                                                  && Name == other.Name
+                                                  && InstantiationInfo == other.InstantiationInfo;
 
         public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
 
