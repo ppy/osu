@@ -184,7 +184,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapInfo Clone() => this.Detach();
 
-        public override string ToString() => Metadata?.ToString() ?? base.ToString();
+        public override string ToString() => this.GetDisplayTitle();
 
         #endregion
     }
