@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            subscriptionSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending).QueryAsyncWithNotifications(beatmapSetsChanged);
+            subscriptionSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).QueryAsyncWithNotifications(beatmapSetsChanged);
             subscriptionBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
         }
 
