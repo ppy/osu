@@ -50,7 +50,13 @@ namespace osu.Game.Screens.Play
         {
             Beatmap = beatmap;
             Ruleset = ruleset;
-            Score = score ?? new Score();
+            Score = score ?? new Score
+            {
+                ScoreInfo =
+                {
+                    Ruleset = ruleset.RulesetInfo
+                }
+            };
             Mods = mods ?? ArraySegment<Mod>.Empty;
         }
 
