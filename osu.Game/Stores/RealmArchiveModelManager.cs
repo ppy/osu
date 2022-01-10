@@ -183,8 +183,7 @@ namespace osu.Game.Stores
             }
         }
 
-        // TODO: delete or abstract
-        public virtual bool IsAvailableLocally(TModel model) => false; // Not relevant for skins since they can't be downloaded yet.
+        public abstract bool IsAvailableLocally(TModel model);
 
         public void Update(TModel skin)
         {

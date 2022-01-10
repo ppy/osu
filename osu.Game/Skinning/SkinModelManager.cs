@@ -262,5 +262,7 @@ namespace osu.Game.Skinning
                 s.Hash = ComputeHash(s);
             });
         }
+
+        public override bool IsAvailableLocally(SkinInfo model) => false;
     }
 }

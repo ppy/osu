@@ -170,6 +170,12 @@ namespace osu.Game.Stores
             return existing.OnlineID == import.OnlineID && existingIds.SequenceEqual(importIds);
         }
 
+        public override bool IsAvailableLocally(BeatmapSetInfo model)
+        {
+            using (var context = ContextFactory.CreateContext())
+                return context.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID);
+        }
+
         public override string HumanisedModelName => "beatmap";
 
         protected override BeatmapSetInfo? CreateModel(ArchiveReader reader)
