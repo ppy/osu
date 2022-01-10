@@ -32,9 +32,21 @@ namespace osu.Game.Beatmaps
 
         public RulesetInfo Ruleset { get; set; } = null!;
 
-        public BeatmapDifficulty Difficulty { get; set; } = null!;
+        public BeatmapDifficulty Difficulty { get; set; } = new BeatmapDifficulty();
 
-        public BeatmapMetadata Metadata { get; set; } = null!;
+        public BeatmapMetadata Metadata { get; set; } = new BeatmapMetadata();
+
+        public BeatmapInfo(RulesetInfo ruleset, BeatmapDifficulty difficulty, BeatmapMetadata metadata)
+        {
+            Ruleset = ruleset;
+            Difficulty = difficulty;
+            Metadata = metadata;
+        }
+
+        [UsedImplicitly]
+        public BeatmapInfo() // TODO: this bypasses null safeties. needs to be hidden from user api (only should be used by realm).
+        {
+        }
 
         public BeatmapSetInfo? BeatmapSet { get; set; }
 
@@ -65,18 +77,6 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         public bool Hidden { get; set; }
-
-        public BeatmapInfo(RulesetInfo ruleset, BeatmapDifficulty difficulty, BeatmapMetadata metadata)
-        {
-            Ruleset = ruleset;
-            Difficulty = difficulty;
-            Metadata = metadata;
-        }
-
-        [UsedImplicitly]
-        public BeatmapInfo() // TODO: this bypasses null safeties. needs to be hidden from user api (only should be used by realm).
-        {
-        }
 
         #region Properties we may not want persisted (but also maybe no harm?)
 
