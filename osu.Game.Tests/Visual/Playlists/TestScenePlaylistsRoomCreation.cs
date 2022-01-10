@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private TestPlaylistsRoomSubScreen match;
 
-        private ILive<BeatmapSetInfo> importedBeatmap;
+        private BeatmapSetInfo importedBeatmap;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 room.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
+                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
                 room.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
+                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Host.Value = API.LocalUser.Value;
                 room.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = { Value = importedBeatmap.Value.Beatmaps.First() },
+                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
                     Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
             });
@@ -122,9 +122,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("store real beatmap values", () =>
             {
-                realHash = importedBeatmap.Value.Beatmaps[0].MD5Hash;
-                realOnlineId = importedBeatmap.Value.Beatmaps[0].OnlineID;
-                realOnlineSetId = importedBeatmap.Value.OnlineID;
+                realHash = importedBeatmap.Beatmaps[0].MD5Hash;
+                realOnlineId = importedBeatmap.Beatmaps[0].OnlineID;
+                realOnlineSetId = importedBeatmap.OnlineID;
             });
 
             AddStep("import modified beatmap", () =>
@@ -134,6 +134,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     BeatmapInfo =
                     {
                         OnlineID = realOnlineId,
+                        Metadata = new BeatmapMetadata(),
                         BeatmapSet =
                         {
                             OnlineID = realOnlineSetId
@@ -160,6 +161,7 @@ namespace osu.Game.Tests.Visual.Playlists
                         {
                             MD5Hash = realHash,
                             OnlineID = realOnlineId,
+                            Metadata = new BeatmapMetadata(),
                             BeatmapSet = new BeatmapSetInfo
                             {
                                 OnlineID = realOnlineSetId,
@@ -211,7 +213,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
 
-            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet).GetResultSafely();
+            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet).GetResultSafely()?.Value.Detach();
         });
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
