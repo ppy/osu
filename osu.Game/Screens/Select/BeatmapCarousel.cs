@@ -98,10 +98,16 @@ namespace osu.Game.Screens.Select
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
         // todo: only used for testing, maybe remove.
+        private bool loadedTestBeatmaps;
+
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get => beatmapSets.Select(g => g.BeatmapSet);
-            set => loadBeatmapSets(value);
+            set
+            {
+                loadedTestBeatmaps = true;
+                loadBeatmapSets(value);
+            }
         }
 
         private void loadBeatmapSets(IEnumerable<BeatmapSetInfo> beatmapSets)
@@ -190,6 +196,10 @@ namespace osu.Game.Screens.Select
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
         {
+            // If loading test beatmaps, avoid overwriting with realm subscription callbacks.
+            if (loadedTestBeatmaps)
+                return;
+
             if (changes == null)
             {
                 // initial load

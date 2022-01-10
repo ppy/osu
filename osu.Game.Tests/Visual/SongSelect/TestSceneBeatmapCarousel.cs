@@ -698,10 +698,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 for (int i = 1; i <= 15; i++)
                 {
-                    set.Beatmaps.Add(new BeatmapInfo
+                    set.Beatmaps.Add(new BeatmapInfo(new OsuRuleset().RulesetInfo, new BeatmapDifficulty(), new BeatmapMetadata())
                     {
                         DifficultyName = $"Stars: {i}",
-                        Ruleset = new OsuRuleset().RulesetInfo,
                         StarRating = i,
                     });
                 }
