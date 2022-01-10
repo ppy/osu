@@ -183,6 +183,10 @@ namespace osu.Game.Scoring
         [Ignored]
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
+        // Used for database serialisation/deserialisation.
+        [MapTo("Mods")]
+        public string ModsJson { get; set; } = string.Empty;
+
         [Ignored]
         public Mod[] Mods
         {
@@ -203,6 +207,7 @@ namespace osu.Game.Scoring
             {
                 localAPIMods = null;
                 mods = value;
+                ModsJson = JsonConvert.SerializeObject(APIMods);
             }
         }
 
@@ -212,13 +217,18 @@ namespace osu.Game.Scoring
         {
             get
             {
-                if (localAPIMods != null)
-                    return localAPIMods;
+                if (localAPIMods == null)
+                {
+                    // prioritise reading from realm backing
+                    if (!string.IsNullOrEmpty(ModsJson))
+                        localAPIMods = JsonConvert.DeserializeObject<APIMod[]>(ModsJson);
 
-                if (mods == null)
-                    return Array.Empty<APIMod>();
+                    // then check mods set via Mods property.
+                    if (mods != null)
+                        localAPIMods = mods.Select(m => new APIMod(m)).ToArray();
+                }
 
-                return localAPIMods = mods.Select(m => new APIMod(m)).ToArray();
+                return localAPIMods ?? Array.Empty<APIMod>();
             }
             set
             {
@@ -226,6 +236,7 @@ namespace osu.Game.Scoring
 
                 // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
                 mods = null;
+                ModsJson = JsonConvert.SerializeObject(APIMods);
             }
         }
 
