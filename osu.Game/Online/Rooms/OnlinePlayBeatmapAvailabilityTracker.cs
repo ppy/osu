@@ -12,6 +12,7 @@ using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using Realms;
 
 namespace osu.Game.Online.Rooms
 {
@@ -29,9 +30,6 @@ namespace osu.Game.Online.Rooms
         protected override bool RequiresChildrenUpdate => true;
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
-        [Resolved]
         private RealmContextFactory realmContextFactory { get; set; } = null!;
 
         /// <summary>
@@ -44,11 +42,6 @@ namespace osu.Game.Online.Rooms
         private ScheduledDelegate progressUpdate;
 
         private BeatmapDownloadTracker downloadTracker;
-
-        /// <summary>
-        /// The beatmap matching the required hash (and providing a final <see cref="BeatmapAvailability.LocallyAvailable"/> state).
-        /// </summary>
-        private BeatmapInfo matchingHash;
 
         private IDisposable realmSubscription;
 
@@ -83,17 +76,15 @@ namespace osu.Game.Online.Rooms
                         progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
                 }, true);
 
+                // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
                 realmSubscription?.Dispose();
-                realmSubscription = realmContextFactory.Context
-                                                       .All<BeatmapInfo>()
-                                                       .Where(b => b.OnlineID == item.NewValue.BeatmapID && b.MD5Hash == item.NewValue.Beatmap.Value.MD5Hash)
-                                                       .QueryAsyncWithNotifications((items, changes, ___) =>
-                                                       {
-                                                           if (changes == null)
-                                                               return;
+                realmSubscription = filteredBeatmaps().QueryAsyncWithNotifications((items, changes, ___) =>
+                {
+                    if (changes == null)
+                        return;
 
-                                                           Scheduler.AddOnce(updateAvailability);
-                                                       });
+                    Scheduler.AddOnce(updateAvailability);
+                });
             }, true);
         }
 
@@ -101,9 +92,6 @@ namespace osu.Game.Online.Rooms
         {
             if (downloadTracker == null)
                 return;
-
-            // will be repopulated below if still valid.
-            matchingHash = null;
 
             switch (downloadTracker.State.Value)
             {
@@ -120,9 +108,7 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    matchingHash = findMatchingHash();
-
-                    bool hashMatches = matchingHash != null;
+                    bool hashMatches = filteredBeatmaps().Any();
 
                     availability.Value = hashMatches ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
@@ -137,18 +123,14 @@ namespace osu.Game.Online.Rooms
             }
         }
 
-        private BeatmapInfo findMatchingHash()
+        private IQueryable<BeatmapInfo> filteredBeatmaps()
         {
             int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            var foundBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == onlineId && b.MD5Hash == checksum);
-
-            // can't be included in the above query due to realm limitations.
-            if (foundBeatmap?.BeatmapSet?.DeletePending == true)
-                return null;
-
-            return foundBeatmap;
+            return realmContextFactory.Context
+                                      .All<BeatmapInfo>()
+                                      .Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", onlineId, checksum);
         }
 
         protected override void Dispose(bool isDisposing)
