@@ -300,6 +300,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             updateWorkingBeatmap();
             beginHandlingTrack();
             Scheduler.AddOnce(UpdateMods);
+            Scheduler.AddOnce(updateRuleset);
         }
 
         public override bool OnExiting(IScreen next)
@@ -353,8 +354,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                      .ToList();
 
             UpdateMods();
-
-            Ruleset.Value = rulesets.GetRuleset(selected.RulesetID);
+            updateRuleset();
 
             if (!selected.AllowedMods.Any())
             {
@@ -385,6 +385,14 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 return;
 
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
+        }
+
+        private void updateRuleset()
+        {
+            if (SelectedItem.Value == null || !this.IsCurrentScreen())
+                return;
+
+            Ruleset.Value = rulesets.GetRuleset(SelectedItem.Value.RulesetID);
         }
 
         private void beginHandlingTrack()
