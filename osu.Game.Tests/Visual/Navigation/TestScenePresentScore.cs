@@ -8,6 +8,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
@@ -28,14 +29,6 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             AddStep("import beatmap", () =>
             {
-                var difficulty = new BeatmapDifficulty();
-                var metadata = new BeatmapMetadata
-                {
-                    Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
-                    Title = "import"
-                };
-
                 beatmap = Game.BeatmapManager.Import(new BeatmapSetInfo
                 {
                     Hash = Guid.NewGuid().ToString(),
@@ -45,19 +38,29 @@ namespace osu.Game.Tests.Visual.Navigation
                         new BeatmapInfo
                         {
                             OnlineID = 1 * 1024,
-                            Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "SomeArtist",
+                                AuthorString = "SomeAuthor",
+                                Title = "import"
+                            },
+                            BaseDifficulty = new BeatmapDifficulty(),
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
                             OnlineID = 1 * 2048,
-                            Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "SomeArtist",
+                                AuthorString = "SomeAuthor",
+                                Title = "import"
+                            },
+                            BaseDifficulty = new BeatmapDifficulty(),
                             Ruleset = new OsuRuleset().RulesetInfo
                         },
                     }
-                }).GetResultSafely().Value;
+                }).GetResultSafely()?.Value;
             });
         }
 
@@ -130,7 +133,8 @@ namespace osu.Game.Tests.Visual.Navigation
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = i,
                     BeatmapInfo = beatmap.Beatmaps.First(),
-                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
+                    Ruleset = ruleset ?? new OsuRuleset().RulesetInfo,
+                    User = new GuestUser(),
                 }).GetResultSafely().Value;
             });
 
