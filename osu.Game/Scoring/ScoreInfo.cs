@@ -44,7 +44,7 @@ namespace osu.Game.Scoring
         public long OnlineID { get; set; } = -1;
 
         [MapTo("User")]
-        public RealmUser RealmUser { get; set; } = null!;
+        public RealmUser RealmUser { get; set; } = new RealmUser();
 
         public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser realmUser)
         {
@@ -54,7 +54,7 @@ namespace osu.Game.Scoring
         }
 
         [UsedImplicitly]
-        public ScoreInfo() // TODO: this bypasses null safeties. needs to be hidden from user api (only should be used by realm).
+        public ScoreInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
         {
         }
 
