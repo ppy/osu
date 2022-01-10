@@ -22,6 +22,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Resources;
@@ -90,23 +91,29 @@ namespace osu.Game.Tests.Visual.UserInterface
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, dependencies.Get<RealmContextFactory>(), Scheduler));
 
-            beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely().Value.Beatmaps[0];
+            var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
-            for (int i = 0; i < 50; i++)
+            imported?.PerformRead(s =>
             {
-                var score = new ScoreInfo
-                {
-                    OnlineID = i,
-                    BeatmapInfo = beatmapInfo,
-                    Accuracy = RNG.NextDouble(),
-                    TotalScore = RNG.Next(1, 1000000),
-                    MaxCombo = RNG.Next(1, 1000),
-                    Rank = ScoreRank.XH,
-                    User = new APIUser { Username = "TestUser" },
-                };
+                beatmapInfo = s.Beatmaps[0].Detach();
 
-                importedScores.Add(scoreManager.Import(score).GetResultSafely().Value);
-            }
+                for (int i = 0; i < 50; i++)
+                {
+                    var score = new ScoreInfo
+                    {
+                        OnlineID = i,
+                        BeatmapInfo = beatmapInfo,
+                        Accuracy = RNG.NextDouble(),
+                        TotalScore = RNG.Next(1, 1000000),
+                        MaxCombo = RNG.Next(1, 1000),
+                        Rank = ScoreRank.XH,
+                        User = new APIUser { Username = "TestUser" },
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    };
+
+                    importedScores.Add(scoreManager.Import(score).GetResultSafely().Value);
+                }
+            });
 
             return dependencies;
         }
