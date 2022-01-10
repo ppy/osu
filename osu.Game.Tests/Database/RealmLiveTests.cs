@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Models;
@@ -104,7 +105,7 @@ namespace osu.Game.Tests.Database
 
                         liveBeatmap = beatmap.ToLive(realmFactory);
                     }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -115,7 +116,7 @@ namespace osu.Game.Tests.Database
                         Assert.IsTrue(beatmap.IsValid);
                         Assert.IsFalse(beatmap.Hidden);
                     });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
@@ -133,7 +134,7 @@ namespace osu.Game.Tests.Database
 
                         liveBeatmap = beatmap.ToLive(realmFactory);
                     }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -141,7 +142,7 @@ namespace osu.Game.Tests.Database
                 {
                     liveBeatmap.PerformWrite(beatmap => { beatmap.Hidden = true; });
                     liveBeatmap.PerformRead(beatmap => { Assert.IsTrue(beatmap.Hidden); });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
@@ -175,7 +176,7 @@ namespace osu.Game.Tests.Database
 
                         liveBeatmap = beatmap.ToLive(realmFactory);
                     }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -195,7 +196,7 @@ namespace osu.Game.Tests.Database
                             var __ = liveBeatmap.Value;
                         });
                     }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
@@ -213,7 +214,7 @@ namespace osu.Game.Tests.Database
 
                         liveBeatmap = beatmap.ToLive(realmFactory);
                     }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -223,7 +224,7 @@ namespace osu.Game.Tests.Database
                     {
                         var unused = liveBeatmap.Value;
                     });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
@@ -252,7 +253,7 @@ namespace osu.Game.Tests.Database
 
                             liveBeatmap = beatmap.ToLive(realmFactory);
                         }
-                    }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                    }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                     Debug.Assert(liveBeatmap != null);
 
