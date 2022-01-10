@@ -796,8 +796,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestChangeRulesetWhilePresentingScore()
         {
-            BeatmapInfo getPresentBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 0);
-            BeatmapInfo getSwitchBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 1);
+            BeatmapInfo getPresentBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 0);
+            BeatmapInfo getSwitchBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 1);
 
             changeRuleset(0);
 
@@ -828,8 +828,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestChangeBeatmapWhilePresentingScore()
         {
-            BeatmapInfo getPresentBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 0);
-            BeatmapInfo getSwitchBeatmap() => manager.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.RulesetID == 1);
+            BeatmapInfo getPresentBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 0);
+            BeatmapInfo getSwitchBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 1);
 
             changeRuleset(0);
 
