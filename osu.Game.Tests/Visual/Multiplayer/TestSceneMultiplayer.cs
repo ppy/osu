@@ -7,6 +7,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -70,7 +71,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
@@ -586,7 +587,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("restore beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
