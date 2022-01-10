@@ -255,7 +255,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             prepareTestAPI(true);
 
-            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { OnlineID = rulesetId ?? -1 } });
+            createPlayerTest(false, createRuleset: () => new OsuRuleset
+            {
+                RulesetInfo =
+                {
+                    Name = "custom",
+                    ShortName = $"custom{rulesetId}",
+                    OnlineID = rulesetId ?? -1
+                }
+            });
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 

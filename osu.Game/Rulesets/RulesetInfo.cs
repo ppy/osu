@@ -47,13 +47,24 @@ namespace osu.Game.Rulesets
 
         public bool Available { get; set; }
 
-        public bool Equals(RulesetInfo? other) => other != null
-                                                  && OnlineID == other.OnlineID
-                                                  && Available == other.Available
-                                                  && Name == other.Name
-                                                  && InstantiationInfo == other.InstantiationInfo;
+        public bool Equals(RulesetInfo? other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (other == null) return false;
+
+            return ShortName == other.ShortName;
+        }
 
         public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
+
+        public override int GetHashCode()
+        {
+            // Importantly, ignore the underlying realm hash code, as it will usually not match.
+            var hashCode = new HashCode();
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            hashCode.Add(ShortName);
+            return hashCode.ToHashCode();
+        }
 
         public override string ToString() => Name;
 
