@@ -42,7 +42,7 @@ namespace osu.Game.Online
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineID = TrackedItem.OnlineID };
 
-            realmSubscription = realmContextFactory.Context.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID).QueryAsyncWithNotifications((items, changes, ___) =>
+            realmSubscription = realmContextFactory.Context.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID && !s.DeletePending).QueryAsyncWithNotifications((items, changes, ___) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));
