@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
@@ -45,11 +46,11 @@ namespace osu.Game.Scoring
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = null!;
 
-        public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser user)
+        public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser realmUser)
         {
             Ruleset = ruleset;
             Beatmap = beatmap;
-            RealmUser = user;
+            RealmUser = realmUser;
         }
 
         [UsedImplicitly]
@@ -61,6 +62,7 @@ namespace osu.Game.Scoring
         // Eventually we should either persist enough information to realm to not require the API lookups, or perform the API lookups locally.
         private APIUser? user;
 
+        [IgnoreMap]
         public APIUser User
         {
             get => user ??= new APIUser
@@ -164,7 +166,6 @@ namespace osu.Game.Scoring
         [Ignored]
         public bool Passed { get; set; } = true;
 
-        [Ignored]
         public int Combo { get; set; }
 
         /// <summary>
