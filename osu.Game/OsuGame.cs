@@ -451,32 +451,31 @@ namespace osu.Game
                 return;
             }
 
+            var detachedSet = databasedSet.PerformRead(s => s.Detach());
+
             PerformFromScreen(screen =>
             {
-                databasedSet.PerformRead(set =>
+                // Find beatmaps that match our predicate.
+                var beatmaps = detachedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
+
+                // Use all beatmaps if predicate matched nothing
+                if (beatmaps.Count == 0)
+                    beatmaps = detachedSet.Beatmaps.ToList();
+
+                // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
+                var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
+                                ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
+                                ?? beatmaps.First();
+
+                if (screen is IHandlePresentBeatmap presentableScreen)
                 {
-                    // Find beatmaps that match our predicate.
-                    var beatmaps = set.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
-
-                    // Use all beatmaps if predicate matched nothing
-                    if (beatmaps.Count == 0)
-                        beatmaps = set.Beatmaps.ToList();
-
-                    // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
-                    var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
-                                    ?? beatmaps.FirstOrDefault(b => b.Ruleset.Equals(Ruleset.Value))
-                                    ?? beatmaps.First();
-
-                    if (screen is IHandlePresentBeatmap presentableScreen)
-                    {
-                        presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
-                    }
-                    else
-                    {
-                        Ruleset.Value = selection.Ruleset;
-                        Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
-                    }
-                });
+                    presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
+                }
+                else
+                {
+                    Ruleset.Value = selection.Ruleset;
+                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                }
             }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
         }
 
