@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps
         }
 
         [UsedImplicitly]
-        public BeatmapInfo()
+        public BeatmapInfo() // TODO: this bypasses null safeties. needs to be hidden from user api (only should be used by realm).
         {
         }
 

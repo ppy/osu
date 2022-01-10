@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
 using osu.Framework.Testing;
@@ -43,6 +44,18 @@ namespace osu.Game.Scoring
 
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = null!;
+
+        public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser user)
+        {
+            Ruleset = ruleset;
+            Beatmap = beatmap;
+            RealmUser = user;
+        }
+
+        [UsedImplicitly]
+        public ScoreInfo() // TODO: this bypasses null safeties. needs to be hidden from user api (only should be used by realm).
+        {
+        }
 
         // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
         // Eventually we should either persist enough information to realm to not require the API lookups, or perform the API lookups locally.
