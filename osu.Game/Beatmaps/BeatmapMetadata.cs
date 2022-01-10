@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps
         [JsonProperty("artist_unicode")]
         public string ArtistUnicode { get; set; } = string.Empty;
 
-        public RealmUser Author { get; set; } = new RealmUser();
+        public RealmUser Author { get; set; } = new RealmUser(); // TODO: not sure we want to initialise this only to have it overwritten by retrieval.
 
         public string Source { get; set; } = string.Empty;
 
