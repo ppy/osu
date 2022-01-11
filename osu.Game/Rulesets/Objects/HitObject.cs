@@ -146,11 +146,8 @@ namespace osu.Game.Rulesets.Objects
                 foreach (var nested in nestedHitObjects)
                     nested.StartTime += offset;
 
-                if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
-                    DifficultyControlPoint.Time = time.NewValue;
-
-                if (SampleControlPoint != SampleControlPoint.DEFAULT)
-                    SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
+                DifficultyControlPoint.Time = time.NewValue;
+                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
             };
 
             DefaultsApplied?.Invoke(this);
