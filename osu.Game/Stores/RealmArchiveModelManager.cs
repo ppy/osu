@@ -202,8 +202,13 @@ namespace osu.Game.Stores
 
         public abstract bool IsAvailableLocally(TModel model);
 
-        public void Update(TModel skin)
+        public void Update(TModel model)
         {
+            using (var realm = ContextFactory.CreateContext())
+            {
+                var existing = realm.Find<TModel>(model.ID);
+                realm.Write(r => model.CopyChangesToRealm(existing));
+            }
         }
     }
 }
