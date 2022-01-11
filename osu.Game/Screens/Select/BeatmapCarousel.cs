@@ -151,7 +151,9 @@ namespace osu.Game.Screens.Select
         private CarouselRoot root;
 
         private IDisposable subscriptionSets;
+        private IDisposable subscriptionDeletedSets;
         private IDisposable subscriptionBeatmaps;
+        private IDisposable subscriptionHiddenBeatmaps;
 
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
@@ -192,6 +194,24 @@ namespace osu.Game.Screens.Select
 
             subscriptionSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).QueryAsyncWithNotifications(beatmapSetsChanged);
             subscriptionBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+
+            // Can't use main subscriptions because we can't lookup deleted indices.
+            // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
+            subscriptionDeletedSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected).QueryAsyncWithNotifications(deletedBeatmapSetsChanged);
+            subscriptionHiddenBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+        }
+
+        private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        {
+            // If loading test beatmaps, avoid overwriting with realm subscription callbacks.
+            if (loadedTestBeatmaps)
+                return;
+
+            if (changes == null)
+                return;
+
+            foreach (int i in changes.InsertedIndices)
+                RemoveBeatmapSet(sender[i]);
         }
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -210,16 +230,8 @@ namespace osu.Game.Screens.Select
             foreach (int i in changes.NewModifiedIndices)
                 UpdateBeatmapSet(sender[i]);
 
-            // moves also appear as deletes / inserts but aren't important to us.
-            if (!changes.Moves.Any())
-            {
-                foreach (int i in changes.InsertedIndices)
-                    UpdateBeatmapSet(sender[i]);
-
-                // TODO: This can not work, as we recently found out https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-                foreach (int i in changes.DeletedIndices)
-                    RemoveBeatmapSet(sender[i]);
-            }
+            foreach (int i in changes.InsertedIndices)
+                UpdateBeatmapSet(sender[i]);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)
@@ -228,9 +240,7 @@ namespace osu.Game.Screens.Select
             if (changes == null)
                 return;
 
-            // TODO: we can probably handle hidden items at a per-panel level (ie. start a realm subscription from there)?
-            // might be cleaner than handling via reconstruction of the whole set's panels.
-            foreach (int i in changes.NewModifiedIndices)
+            foreach (int i in changes.InsertedIndices)
                 UpdateBeatmapSet(sender[i].BeatmapSet);
         }
 
@@ -673,7 +683,7 @@ namespace osu.Game.Screens.Select
                 return null;
 
             // TODO: FUCK THE WORLD :D
-            if (beatmapSet?.IsManaged == true)
+            if (beatmapSet.IsManaged)
                 beatmapSet = beatmapSet.Detach();
 
             var set = new CarouselBeatmapSet(beatmapSet)
@@ -930,7 +940,9 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
 
             subscriptionSets?.Dispose();
+            subscriptionDeletedSets?.Dispose();
             subscriptionBeatmaps?.Dispose();
+            subscriptionHiddenBeatmaps?.Dispose();
         }
     }
 }
