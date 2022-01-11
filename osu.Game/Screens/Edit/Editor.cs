@@ -356,9 +356,6 @@ namespace osu.Game.Screens.Edit
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
 
-            // apply any set-level metadata changes.
-            beatmapManager.Update(editorBeatmap.BeatmapInfo.BeatmapSet);
-
             // save the loaded beatmap's data stream.
             beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
 

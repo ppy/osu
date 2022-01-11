@@ -70,33 +70,25 @@ namespace osu.Game.Beatmaps
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                using (var realm = ContextFactory.CreateContext())
-                using (var transaction = realm.BeginWrite())
-                {
-                    beatmapInfo = setInfo.Beatmaps.Single(b => b.Equals(beatmapInfo));
+                // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
+                var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                if (existingFileInfo != null)
+                    DeleteFile(setInfo, existingFileInfo);
 
-                    // grab the original file (or create a new one if not found).
-                    var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
+                beatmapInfo.Hash = stream.ComputeSHA2Hash();
 
-                    if (existingFileInfo != null)
-                    {
-                        DeleteFile(setInfo, existingFileInfo);
-                    }
-
-                    // metadata may have changed; update the path with the standard format.
-                    var metadata = beatmapInfo.Metadata;
-                    string filename = $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
-
-                    beatmapInfo.MD5Hash = stream.ComputeMD5Hash();
-
-                    stream.Seek(0, SeekOrigin.Begin);
-                    AddFile(setInfo, stream, filename, realm);
-
-                    transaction.Commit();
-                }
+                AddFile(setInfo, stream, getFilename(beatmapInfo));
+                Update(setInfo);
             }
 
             WorkingBeatmapCache?.Invalidate(beatmapInfo);
+        }
+
+        private static string getFilename(BeatmapInfo beatmapInfo)
+        {
+            var metadata = beatmapInfo.Metadata;
+            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
         }
 
         /// <summary>
