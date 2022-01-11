@@ -149,8 +149,6 @@ namespace osu.Game
 
         private MultiplayerClient multiplayerClient;
 
-        private DatabaseContextFactory contextFactory;
-
         private RealmContextFactory realmFactory;
 
         protected override Container<Drawable> Content => content;
@@ -186,13 +184,13 @@ namespace osu.Game
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
-            dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
+            DatabaseContextFactory efContextFactory = Storage.Exists(DatabaseContextFactory.DATABASE_NAME)
+                ? new DatabaseContextFactory(Storage)
+                : null;
 
-            runMigrations();
-
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", contextFactory));
-
-            new EFToRealmMigrator(contextFactory, realmFactory, LocalConfig).Run();
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", efContextFactory));
+            if (efContextFactory != null)
+                new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig).Run();
 
             dependencies.CacheAs(Storage);
 
@@ -397,7 +395,6 @@ namespace osu.Game
                 Scheduler.Add(() =>
                 {
                     realmBlocker = realmFactory.BlockAllOperations();
-                    contextFactory.FlushConnections();
 
                     readyToRun.Set();
                 }, false);
@@ -458,29 +455,6 @@ namespace osu.Game
             AvailableMods.Value = dict;
         }
 
-        private void runMigrations()
-        {
-            try
-            {
-                using (var db = contextFactory.GetForWrite(false))
-                    db.Context.Migrate();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
-
-                // if we failed, let's delete the database and start fresh.
-                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
-                contextFactory.ResetDatabase();
-
-                Logger.Log("Database purged successfully.", LoggingTarget.Database);
-
-                // only run once more, then hard bail.
-                using (var db = contextFactory.GetForWrite(false))
-                    db.Context.Migrate();
-            }
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -488,8 +462,6 @@ namespace osu.Game
             RulesetStore?.Dispose();
             BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
-
-            contextFactory?.FlushConnections();
 
             realmFactory?.Dispose();
         }

@@ -12,7 +12,6 @@ using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -57,7 +56,6 @@ namespace osu.Game.Tests.Visual.Navigation
         private IReadOnlyList<Type> requiredGameBaseDependencies => new[]
         {
             typeof(OsuGameBase),
-            typeof(DatabaseContextFactory),
             typeof(Bindable<RulesetInfo>),
             typeof(IBindable<RulesetInfo>),
             typeof(Bindable<IReadOnlyList<Mod>>),
