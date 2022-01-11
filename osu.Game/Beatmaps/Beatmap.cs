@@ -93,6 +93,8 @@ namespace osu.Game.Beatmaps
                                     if (t.Time > lastTime)
                                         return (beatLength: t.BeatLength, 0);
 
+                                    // osu-stable forced the first control point to start at 0.
+                                    // This is reproduced here to maintain compatibility around osu!mania scroll speed and song select display.
                                     double currentTime = i == 0 ? 0 : t.Time;
                                     double nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
 
