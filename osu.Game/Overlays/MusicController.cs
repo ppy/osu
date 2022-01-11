@@ -284,11 +284,12 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playableSet = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playableBeatmap = playableSet?.Beatmaps?.FirstOrDefault();
 
-            if (playable != null)
+            if (playableBeatmap != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playableBeatmap));
                 restartTrack();
                 return true;
             }
