@@ -262,7 +262,7 @@ namespace osu.Game.Online.Chat
             handleMatches(old_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '(', ')' });
 
             // handle wiki links
-            handleMatches(wiki_regex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
+            handleMatches(wiki_regex, "{1}", $"https://{websiteRootUrl}/wiki/{{1}}", result, startIndex);
 
             // handle bare links
             handleAdvanced(advanced_link_regex, result, startIndex);

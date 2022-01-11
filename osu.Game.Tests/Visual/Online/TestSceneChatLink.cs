@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("dev.ppy.sh!");
             addMessageWithChecks("https://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("00:12:345 (1,2) - Test?", 1, expectedActions: LinkAction.OpenEditorTimestamp);
-            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.OpenWiki);
             addMessageWithChecks("(osu forums)[https://dev.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[https://dev.ppy.sh/home New site] (new link format)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[osu forums](https://dev.ppy.sh/forum) (new link format 2)", 1, expectedActions: LinkAction.External);
@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("[https://dev.ppy.sh/home New link format with escaped [and \\[ paired] braces]", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[Markdown link format with escaped [and \\[ paired] braces](https://dev.ppy.sh/home)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("(Old link format with escaped (and \\( paired) parentheses)[https://dev.ppy.sh/home] and [[also a rogue wiki link]]", 2,
-                expectedActions: new[] { LinkAction.External, LinkAction.External });
+                expectedActions: new[] { LinkAction.External, LinkAction.OpenWiki });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
             addMessageWithChecks("I am important!", 0, false, true);
