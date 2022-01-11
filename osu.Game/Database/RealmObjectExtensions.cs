@@ -34,15 +34,23 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<BeatmapInfo, BeatmapInfo>();
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>();
-            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
-
-            c.ForAllMaps((a, b) =>
+            c.CreateMap<BeatmapInfo, BeatmapInfo>().MaxDepth(2).AfterMap((s, d) =>
             {
-                b.PreserveReferences();
-                b.MaxDepth(2);
+                for (int i = 0; i < d.BeatmapSet?.Beatmaps.Count; i++)
+                {
+                    if (d.BeatmapSet.Beatmaps[i].Equals(d))
+                    {
+                        d.BeatmapSet.Beatmaps[i] = d;
+                        break;
+                    }
+                }
             });
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>().MaxDepth(2).AfterMap((s, d) =>
+            {
+                foreach (var beatmap in d.Beatmaps)
+                    beatmap.BeatmapSet = d;
+            });
+            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
         }).CreateMapper();
 
         private static readonly IMapper read_mapper = new MapperConfiguration(c =>
@@ -60,15 +68,23 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<BeatmapInfo, BeatmapInfo>();
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>();
-            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
-
-            c.ForAllMaps((a, b) =>
+            c.CreateMap<BeatmapInfo, BeatmapInfo>().MaxDepth(2).AfterMap((s, d) =>
             {
-                b.PreserveReferences();
-                b.MaxDepth(2);
+                for (int i = 0; i < d.BeatmapSet?.Beatmaps.Count; i++)
+                {
+                    if (d.BeatmapSet.Beatmaps[i].Equals(d))
+                    {
+                        d.BeatmapSet.Beatmaps[i] = d;
+                        break;
+                    }
+                }
             });
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>().MaxDepth(2).AfterMap((s, d) =>
+            {
+                foreach (var beatmap in d.Beatmaps)
+                    beatmap.BeatmapSet = d;
+            });
+            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
         }).CreateMapper();
 
         /// <summary>
