@@ -114,16 +114,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Fired when a single difficulty has been hidden.
-        /// </summary>
-        public event Action<BeatmapInfo>? BeatmapHidden;
-
-        /// <summary>
-        /// Fired when a single difficulty has been restored.
-        /// </summary>
-        public event Action<BeatmapInfo>? BeatmapRestored;
-
-        /// <summary>
         /// Delete a beatmap difficulty.
         /// </summary>
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
@@ -134,8 +124,6 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo.Hidden = true;
                 transaction.Commit();
-
-                BeatmapHidden?.Invoke(beatmapInfo);
             }
         }
 
@@ -150,8 +138,6 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo.Hidden = false;
                 transaction.Commit();
-
-                BeatmapRestored?.Invoke(beatmapInfo);
             }
         }
 
