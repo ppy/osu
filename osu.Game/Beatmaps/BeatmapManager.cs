@@ -122,6 +122,9 @@ namespace osu.Game.Beatmaps
             using (var realm = contextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
             {
+                if (!beatmapInfo.IsManaged)
+                    beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+
                 beatmapInfo.Hidden = true;
                 transaction.Commit();
             }
@@ -136,6 +139,9 @@ namespace osu.Game.Beatmaps
             using (var realm = contextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
             {
+                if (!beatmapInfo.IsManaged)
+                    beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+
                 beatmapInfo.Hidden = false;
                 transaction.Commit();
             }
