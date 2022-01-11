@@ -84,12 +84,16 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
+            var availableBeatmaps = realmFactory.Context
+                                                .All<BeatmapSetInfo>()
+                                                .Where(s => !s.DeletePending);
+
             // ensure we're ready before completing async load.
             // probably not a good way of handling this (as there is a period we aren't watching for changes until the realm subscription finishes up.
-            foreach (var s in realmFactory.Context.All<BeatmapSetInfo>())
+            foreach (var s in availableBeatmaps)
                 beatmapSets.Add(s);
 
-            beatmapSubscription = realmFactory.Context.All<BeatmapSetInfo>().QueryAsyncWithNotifications(beatmapsChanged);
+            beatmapSubscription = availableBeatmaps.QueryAsyncWithNotifications(beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -98,7 +102,7 @@ namespace osu.Game.Overlays
                 return;
 
             foreach (int i in changes.InsertedIndices)
-                beatmapSets.Insert(i, sender[i]);
+                beatmapSets.Insert(i, sender[i].Detach());
 
             foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
                 beatmapSets.RemoveAt(i);
@@ -285,7 +289,7 @@ namespace osu.Game.Overlays
             queuedDirection = TrackChangeDirection.Next;
 
             var playableSet = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
-            var playableBeatmap = playableSet?.Beatmaps?.FirstOrDefault();
+            var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
 
             if (playableBeatmap != null)
             {
