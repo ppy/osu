@@ -12,6 +12,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
@@ -75,21 +76,27 @@ namespace osu.Game.Beatmaps
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
-            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
-            {
-                var lookupId = beatmapInfo.ID;
-                beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
-            }
-
-            // TODO: FUCK THE WORLD :D
-            if (beatmapInfo?.IsManaged == true)
-                beatmapInfo = beatmapInfo.Detach();
-
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
-            return new BeatmapManagerWorkingBeatmap(beatmapInfo, this);
+            lock (workingCache)
+            {
+                var working = workingCache.FirstOrDefault(w => beatmapInfo.Equals(w.BeatmapInfo));
+
+                if (working != null)
+                    return working;
+
+                // TODO: FUCK THE WORLD :D
+                if (beatmapInfo?.IsManaged == true)
+                    beatmapInfo = beatmapInfo.Detach();
+
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
+
+                // best effort; may be higher than expected.
+                GlobalStatistics.Get<int>("Beatmaps", $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
+
+                return working;
+            }
         }
 
         #region IResourceStorageProvider
