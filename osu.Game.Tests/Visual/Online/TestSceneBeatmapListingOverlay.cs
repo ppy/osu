@@ -108,18 +108,30 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestCorrectOldContentExpiration()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(100);
+
+            AddStep("show more results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 30).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(30);
+        }
+
+        [Test]
         public void TestCardSizeSwitching()
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
             AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
-            assertAllCardsOfType<BeatmapCardNormal>();
+            assertAllCardsOfType<BeatmapCardNormal>(100);
 
             setCardSize(BeatmapCardSize.Extra);
-            assertAllCardsOfType<BeatmapCardExtra>();
+            assertAllCardsOfType<BeatmapCardExtra>(100);
 
             setCardSize(BeatmapCardSize.Normal);
-            assertAllCardsOfType<BeatmapCardNormal>();
+            assertAllCardsOfType<BeatmapCardNormal>(100);
 
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
@@ -323,13 +335,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void setCardSize(BeatmapCardSize cardSize) => AddStep($"set card size to {cardSize}", () => overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize);
 
-        private void assertAllCardsOfType<T>()
+        private void assertAllCardsOfType<T>(int expectedCount)
             where T : BeatmapCard =>
             AddUntilStep($"all loaded beatmap cards are {typeof(T)}", () =>
             {
                 int loadedCorrectCount = this.ChildrenOfType<BeatmapCard>().Count(card => card.IsLoaded && card.GetType() == typeof(T));
-                int totalCount = this.ChildrenOfType<BeatmapCard>().Count();
-                return loadedCorrectCount > 0 && loadedCorrectCount == totalCount;
+                return loadedCorrectCount > 0 && loadedCorrectCount == expectedCount;
             });
     }
 }

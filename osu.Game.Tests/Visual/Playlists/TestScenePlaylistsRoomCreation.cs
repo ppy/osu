@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 modifiedBeatmap.HitObjects.Clear();
                 modifiedBeatmap.HitObjects.Add(new HitCircle { StartTime = 5000 });
 
-                manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet).Wait();
+                manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet).WaitSafely();
             });
 
             // Create the room using the real beatmap values.
@@ -184,7 +185,7 @@ namespace osu.Game.Tests.Visual.Playlists
                     },
                 };
 
-                manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet).Wait();
+                manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet).WaitSafely();
             });
 
             AddUntilStep("match has correct beatmap", () => realHash == match.Beatmap.Value.BeatmapInfo.MD5Hash);
@@ -201,7 +202,7 @@ namespace osu.Game.Tests.Visual.Playlists
             });
         }
 
-        private void importBeatmap() => AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).Result);
+        private void importBeatmap() => AddStep("import beatmap", () => importedBeatmap = manager.Import(CreateBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapSet).GetResultSafely());
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen
         {

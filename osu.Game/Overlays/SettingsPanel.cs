@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        private const float sidebar_width = Sidebar.DEFAULT_WIDTH;
+        private const float sidebar_width = SettingsSidebar.DEFAULT_WIDTH;
 
         /// <summary>
         /// The width of the settings panel content, excluding the sidebar.
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
 
         protected override Container<Drawable> Content => ContentContainer;
 
-        protected Sidebar Sidebar;
+        protected SettingsSidebar Sidebar;
         private SidebarIconButton selectedSidebarButton;
 
         public SettingsSectionsContainer SectionsContainer { get; private set; }
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays
 
             if (showSidebar)
             {
-                AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
+                AddInternal(Sidebar = new SettingsSidebar { Width = sidebar_width });
             }
 
             CreateSections()?.ForEach(AddSection);
@@ -244,7 +244,7 @@ namespace osu.Game.Overlays
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = false;
 
-                    selectedSidebarButton = Sidebar.Children.FirstOrDefault(b => b.Section == section.NewValue);
+                    selectedSidebarButton = Sidebar.Children.OfType<SidebarIconButton>().FirstOrDefault(b => b.Section == section.NewValue);
 
                     if (selectedSidebarButton != null)
                         selectedSidebarButton.Selected = true;

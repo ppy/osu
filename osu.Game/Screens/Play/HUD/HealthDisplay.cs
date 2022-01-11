@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.HUD
     /// </summary>
     public abstract class HealthDisplay : CompositeDrawable
     {
-        private readonly Bindable<bool> showHealthbar = new Bindable<bool>(true);
+        private readonly Bindable<bool> showHealthBar = new Bindable<bool>(true);
 
         [Resolved]
         protected HealthProcessor HealthProcessor { get; private set; }
@@ -43,10 +43,10 @@ namespace osu.Game.Screens.Play.HUD
             HealthProcessor.NewJudgement += onNewJudgement;
 
             if (hudOverlay != null)
-                showHealthbar.BindTo(hudOverlay.ShowHealthbar);
+                showHealthBar.BindTo(hudOverlay.ShowHealthBar);
 
             // this probably shouldn't be operating on `this.`
-            showHealthbar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
+            showHealthBar.BindValueChanged(healthBar => this.FadeTo(healthBar.NewValue ? 1 : 0, HUDOverlay.FADE_DURATION, HUDOverlay.FADE_EASING), true);
         }
 
         private void onNewJudgement(JudgementResult judgement)
