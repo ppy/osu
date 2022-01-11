@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.Backgrounds
 {
     public class BeatmapBackgroundWithStoryboard : BeatmapBackground
     {
-        private InterpolatingFramedClock storyboardClock = null!;
+        private readonly InterpolatingFramedClock storyboardClock;
 
         [Resolved(CanBeNull = true)]
         private MusicController? musicController { get; set; }
@@ -23,6 +23,7 @@ namespace osu.Game.Graphics.Backgrounds
         public BeatmapBackgroundWithStoryboard(WorkingBeatmap beatmap, string fallbackTextureName = "Backgrounds/bg1")
             : base(beatmap, fallbackTextureName)
         {
+            storyboardClock = new InterpolatingFramedClock();
         }
 
         [BackgroundDependencyLoader]
@@ -38,7 +39,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 RelativeSizeAxes = Axes.Both,
                 Volume = { Value = 0 },
-                Child = new DrawableStoryboard(Beatmap.Storyboard) { Clock = storyboardClock = new InterpolatingFramedClock(Beatmap.Track) }
+                Child = new DrawableStoryboard(Beatmap.Storyboard) { Clock = storyboardClock }
             }, AddInternal);
         }
 
@@ -47,9 +48,13 @@ namespace osu.Game.Graphics.Backgrounds
             base.LoadComplete();
             if (musicController != null)
                 musicController.TrackChanged += onTrackChanged;
+
+            updateStoryboardClockSource(Beatmap);
         }
 
-        private void onTrackChanged(WorkingBeatmap newBeatmap, TrackChangeDirection _)
+        private void onTrackChanged(WorkingBeatmap newBeatmap, TrackChangeDirection _) => updateStoryboardClockSource(newBeatmap);
+
+        private void updateStoryboardClockSource(WorkingBeatmap newBeatmap)
         {
             if (newBeatmap != Beatmap)
                 return;
