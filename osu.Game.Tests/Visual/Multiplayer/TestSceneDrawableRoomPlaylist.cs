@@ -153,19 +153,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            ILive<BeatmapSetInfo> imported = null;
 
             Debug.Assert(beatmap.BeatmapSet != null);
 
-            AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).WaitSafely());
+            AddStep("import beatmap", () => imported = manager.Import(beatmap.BeatmapSet).GetResultSafely());
 
-            createPlaylistWithBeatmaps(beatmap);
+            createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
 
             assertDownloadButtonVisible(false);
 
-            AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single().Value));
+            AddStep("delete beatmap set", () => imported.PerformWrite(s => s.DeletePending = true));
             assertDownloadButtonVisible(true);
 
-            AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single().Value));
+            AddStep("undelete beatmap set", () => imported.PerformWrite(s => s.DeletePending = false));
             assertDownloadButtonVisible(false);
 
             void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
@@ -181,7 +182,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var byChecksum = CreateAPIBeatmap();
             byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
-            createPlaylistWithBeatmaps(byOnlineId, byChecksum);
+            createPlaylistWithBeatmaps(() => new[] { byOnlineId, byChecksum });
 
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadButton>().All(d => d.IsPresent));
         }
@@ -195,7 +196,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             beatmap.BeatmapSet.HasExplicitContent = true;
 
-            createPlaylistWithBeatmaps(beatmap);
+            createPlaylistWithBeatmaps(() => new[] { beatmap });
         }
 
         [Test]
@@ -327,7 +328,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylistWithBeatmaps(params IBeatmapInfo[] beatmaps)
+        private void createPlaylistWithBeatmaps(Func<IEnumerable<IBeatmapInfo>> beatmaps)
         {
             AddStep("create playlist", () =>
             {
@@ -340,7 +341,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 int index = 0;
 
-                foreach (var b in beatmaps)
+                foreach (var b in beatmaps())
                 {
                     playlist.Items.Add(new PlaylistItem
                     {
