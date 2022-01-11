@@ -43,11 +43,17 @@ namespace osu.Game.Beatmaps
 
         private readonly RealmContextFactory contextFactory;
 
-        public BeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
         {
             this.contextFactory = contextFactory;
+
             if (performOnlineLookups)
+            {
+                if (api == null)
+                    throw new ArgumentNullException(nameof(api), "API must be provided if online lookups are required.");
+
                 onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
+            }
 
             var userResources = new RealmFileStore(contextFactory, storage).Store;
 
@@ -56,7 +62,6 @@ namespace osu.Game.Beatmaps
             beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, onlineBeatmapLookupQueue);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
-            workingBeatmapCache.BeatmapManager = beatmapModelManager;
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
         }
 
