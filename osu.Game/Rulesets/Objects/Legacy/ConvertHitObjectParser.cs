@@ -188,12 +188,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             string[] split = str.Split(':');
 
             var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
-            var addbank = (LegacySampleBank)Parsing.ParseInt(split[1]);
+            var addBank = (LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
                 stringBank = null;
-            string stringAddBank = addbank.ToString().ToLowerInvariant();
+            string stringAddBank = addBank.ToString().ToLowerInvariant();
             if (stringAddBank == @"none")
                 stringAddBank = null;
 

@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -77,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void addUser(MultiplayerRoomUser user)
         {
-            ((IMultiplayerClient)this).UserJoined(user).Wait();
+            ((IMultiplayerClient)this).UserJoined(user).WaitSafely();
 
             // We want the user to be immediately available for testing, so force a scheduler update to run the update-bound continuation.
             Scheduler.Update();
@@ -93,7 +94,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                              .Select(team => (teamID: team.ID, userCount: Room.Users.Count(u => (u.MatchState as TeamVersusUserState)?.TeamID == team.ID)))
                                              .OrderBy(pair => pair.userCount)
                                              .First().teamID;
-                    ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState { TeamID = bestTeam }).Wait();
+                    ((IMultiplayerClient)this).MatchUserStateChanged(user.UserID, new TeamVersusUserState { TeamID = bestTeam }).WaitSafely();
                     break;
             }
         }
@@ -156,7 +157,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             ChangeRoomState(MultiplayerRoomState.Open);
                             ((IMultiplayerClient)this).ResultsReady();
 
-                            FinishCurrentItem().Wait();
+                            FinishCurrentItem().WaitSafely();
                         }
 
                         break;
@@ -216,7 +217,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
 
             // emulate the server sending this after the join room. scheduler required to make sure the join room event is fired first (in Join).
-            changeMatchType(Room.Settings.MatchType).Wait();
+            changeMatchType(Room.Settings.MatchType).WaitSafely();
 
             RoomJoined = true;
         }

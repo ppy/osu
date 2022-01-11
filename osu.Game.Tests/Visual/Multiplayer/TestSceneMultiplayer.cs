@@ -7,6 +7,8 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -22,6 +24,8 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -67,7 +71,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
@@ -439,6 +443,84 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestPlayStartsWithCorrectRulesetWhileAtSongSelect()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            pressReadyButton();
+
+            AddStep("Enter song select", () =>
+            {
+                var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(client.Room?.Settings.PlaylistItemId);
+            });
+
+            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+
+            AddAssert("Ruleset matches current item", () => Ruleset.Value.OnlineID == client.Room?.Playlist.First().RulesetID);
+
+            AddStep("Switch ruleset", () => ((MultiplayerMatchSongSelect)multiplayerComponents.MultiplayerScreen.CurrentSubScreen).Ruleset.Value = new CatchRuleset().RulesetInfo);
+
+            AddUntilStep("Ruleset doesn't match current item", () => Ruleset.Value.OnlineID != client.Room?.Playlist.First().RulesetID);
+
+            AddStep("start match externally", () => client.StartMatch());
+
+            AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
+
+            AddAssert("Ruleset matches current item", () => Ruleset.Value.OnlineID == client.Room?.Playlist.First().RulesetID);
+        }
+
+        [Test]
+        public void TestPlayStartsWithCorrectModsWhileAtSongSelect()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem
+                    {
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                    }
+                }
+            });
+
+            pressReadyButton();
+
+            AddStep("Enter song select", () =>
+            {
+                var currentSubScreen = ((Screens.OnlinePlay.Multiplayer.Multiplayer)multiplayerComponents.CurrentScreen).CurrentSubScreen;
+                ((MultiplayerMatchSubScreen)currentSubScreen).OpenSongSelection(client.Room?.Settings.PlaylistItemId);
+            });
+
+            AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
+
+            AddAssert("Mods match current item", () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(client.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+
+            AddStep("Switch required mods", () => ((MultiplayerMatchSongSelect)multiplayerComponents.MultiplayerScreen.CurrentSubScreen).Mods.Value = new Mod[] { new OsuModDoubleTime() });
+
+            AddAssert("Mods don't match current item", () => !SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(client.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+
+            AddStep("start match externally", () => client.StartMatch());
+
+            AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
+
+            AddAssert("Mods match current item", () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(client.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+        }
+
+        [Test]
         public void TestLocalPlayDoesNotStartWhileSpectatingWithNoBeatmap()
         {
             createRoom(() => new Room
@@ -505,7 +587,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("restore beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 
