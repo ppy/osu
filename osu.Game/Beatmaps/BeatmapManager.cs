@@ -97,9 +97,12 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var imported = beatmapModelManager.Import(set).GetResultSafely()?.Value;
+            var imported = beatmapModelManager.Import(set).GetResultSafely();
 
-            return GetWorkingBeatmap(imported?.Beatmaps.First());
+            if (imported == null)
+                throw new InvalidOperationException("Failed to import new beatmap");
+
+            return imported.PerformRead(s => GetWorkingBeatmap(s.Beatmaps.First()));
         }
 
         /// <summary>
