@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
@@ -33,13 +34,29 @@ namespace osu.Game.Stores
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
-            item.Realm.Write(() => DeleteFile(item, file, item.Realm));
+            performFileOperation(item, managed => DeleteFile(managed, file, managed.Realm));
 
-        public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents)
-            => item.Realm.Write(() => ReplaceFile(file, contents, item.Realm));
+        public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents) =>
+            performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm));
 
-        public void AddFile(TModel item, Stream contents, string filename)
-            => item.Realm.Write(() => AddFile(item, contents, filename, item.Realm));
+        public void AddFile(TModel item, Stream contents, string filename) =>
+            performFileOperation(item, managed => AddFile(managed, contents, filename, managed.Realm));
+
+        private void performFileOperation(TModel item, Action<TModel> operation)
+        {
+            // While we are detaching so often, this seems like the easiest way to keep things in sync.
+            // This method should be removed as soon as all the surrounding pieces support non-detached operations.
+            if (!item.IsManaged)
+            {
+                var managed = ContextFactory.Context.Find<TModel>(item.ID);
+                managed.Realm.Write(() => operation(managed));
+
+                item.Files.Clear();
+                item.Files.AddRange(managed.Files.Detach());
+            }
+            else
+                operation(item);
+        }
 
         /// <summary>
         /// Delete a file from within an ongoing realm transaction.
