@@ -640,8 +640,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("Get filtered icon", () =>
             {
-                filteredBeatmap = songSelect.Carousel.SelectedBeatmapSet.Beatmaps.First(b => b.BPM < maxBPM);
-                int filteredBeatmapIndex = getBeatmapIndex(filteredBeatmap.BeatmapSet, filteredBeatmap);
+                var selectedSet = songSelect.Carousel.SelectedBeatmapSet;
+                filteredBeatmap = selectedSet.Beatmaps.First(b => b.BPM < maxBPM);
+                int filteredBeatmapIndex = getBeatmapIndex(selectedSet, filteredBeatmap);
                 filteredIcon = set.ChildrenOfType<FilterableDifficultyIcon>().ElementAt(filteredBeatmapIndex);
             });
 
