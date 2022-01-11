@@ -223,7 +223,7 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 beatmap.Value = initialBeatmap;
-                Track = initialBeatmap.Track;
+                Track = beatmap.Value.Track;
 
                 // ensure the track starts at maximum volume
                 musicController.CurrentTrack.FinishTransforms();

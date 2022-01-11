@@ -676,10 +676,6 @@ namespace osu.Game.Screens.Select
             if (beatmapSet?.IsManaged == true)
                 beatmapSet = beatmapSet.Detach();
 
-            // todo: probably not required any more.
-            // foreach (var b in beatmapSet.Beatmaps)
-            //     b.Metadata ??= beatmapSet.Metadata;
-
             var set = new CarouselBeatmapSet(beatmapSet)
             {
                 GetRecommendedBeatmap = beatmaps => GetRecommendedBeatmap?.Invoke(beatmaps)
