@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     scores = scores.Detach();
 
                     scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                                .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+                                .ContinueWith(ordered => scoresCallback?.Invoke(ordered.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                     return null;
                 }
