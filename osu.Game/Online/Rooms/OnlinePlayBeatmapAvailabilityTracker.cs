@@ -90,7 +90,7 @@ namespace osu.Game.Online.Rooms
 
         private void updateAvailability()
         {
-            if (downloadTracker == null)
+            if (downloadTracker == null || SelectedItem.Value == null)
                 return;
 
             switch (downloadTracker.State.Value)

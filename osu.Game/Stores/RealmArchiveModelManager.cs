@@ -34,7 +34,7 @@ namespace osu.Game.Stores
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
-            performFileOperation(item, managed => DeleteFile(managed, file, managed.Realm));
+            performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm));
 
         public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents) =>
             performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm));

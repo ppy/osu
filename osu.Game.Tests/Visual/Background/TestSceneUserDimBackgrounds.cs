@@ -50,6 +50,7 @@ namespace osu.Game.Tests.Visual.Background
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
+            Dependencies.Cache(ContextFactory);
 
             manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
