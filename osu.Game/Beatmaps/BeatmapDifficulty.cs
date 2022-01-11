@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public BeatmapDifficulty Clone()
         {
-            var diff = new BeatmapDifficulty();
+            var diff = (BeatmapDifficulty)MemberwiseClone();
             CopyTo(diff);
             return diff;
         }
