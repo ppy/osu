@@ -31,8 +31,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public readonly WorkingBeatmap DefaultBeatmap;
 
-        public BeatmapModelManager BeatmapManager { private get; set; }
-
         private readonly AudioManager audioManager;
         private readonly IResourceStore<byte[]> resources;
         private readonly LargeTextureStore largeTextureStore;
@@ -87,8 +85,7 @@ namespace osu.Game.Beatmaps
                     return working;
 
                 // TODO: FUCK THE WORLD :D
-                if (beatmapInfo?.IsManaged == true)
-                    beatmapInfo = beatmapInfo.Detach();
+                beatmapInfo = beatmapInfo.Detach();
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
@@ -192,6 +189,9 @@ namespace osu.Game.Beatmaps
             protected override Storyboard GetStoryboard()
             {
                 Storyboard storyboard;
+
+                if (BeatmapInfo.Path == null)
+                    return new Storyboard();
 
                 try
                 {
