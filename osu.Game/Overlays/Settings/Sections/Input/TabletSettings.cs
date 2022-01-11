@@ -107,8 +107,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 t.NewLine();
                                 t.AddText("If your tablet is not detected, please read ");
                                 t.AddLink("this FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                    ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
-                                    : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
+                                    ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
+                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
                                 t.AddText(" for troubleshooting steps.");
                             }
                         }),
