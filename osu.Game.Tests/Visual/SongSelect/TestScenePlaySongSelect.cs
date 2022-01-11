@@ -45,7 +45,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
+            // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
+            // At a point we have isolated interactive test runs enough, this can likely be removed.
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
+            Dependencies.Cache(ContextFactory);
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
 
             Dependencies.Cache(music = new MusicController());
