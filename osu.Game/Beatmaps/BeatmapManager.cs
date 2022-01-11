@@ -147,6 +147,18 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        public void RestoreAll()
+        {
+            using (var realm = contextFactory.CreateContext())
+            using (var transaction = realm.BeginWrite())
+            {
+                foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
+                    beatmap.Hidden = false;
+
+                transaction.Commit();
+            }
+        }
+
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
@@ -166,17 +178,6 @@ namespace osu.Game.Beatmaps
         {
             using (var context = contextFactory.CreateContext())
                 return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
-        }
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
-        {
-            using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapInfo>().Where(query);
         }
 
         #region Delegation to BeatmapModelManager (methods which previously existed locally).
@@ -245,6 +246,12 @@ namespace osu.Game.Beatmaps
 
                 beatmapModelManager.Delete(items.ToList(), silent);
             }
+        }
+
+        public void UndeleteAll()
+        {
+            using (var context = contextFactory.CreateContext())
+                beatmapModelManager.Undelete(context.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList());
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
