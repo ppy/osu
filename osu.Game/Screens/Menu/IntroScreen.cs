@@ -141,22 +141,11 @@ namespace osu.Game.Screens.Menu
                     if (s.Beatmaps.Count == 0)
                         return;
 
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0].ToLive(realmContextFactory));
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
                 });
 
                 return UsingThemedIntro = initialBeatmap != null;
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // TODO: This is temporary to get the setInfo on the update thread, to make things work "better" without using ILive everywhere.
-            var setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash).FirstOrDefault();
-
-            if (setInfo?.Value.Beatmaps.Count > 0)
-                initialBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Value.Beatmaps.First());
         }
 
         public override void OnResuming(IScreen last)
@@ -222,7 +211,10 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmap.Value = initialBeatmap;
+                // generally this can never be null
+                // an exception is running ruleset tests, where the osu! ruleset may not be prsent (causing importing the intro to fail).
+                if (initialBeatmap != null)
+                    beatmap.Value = initialBeatmap;
                 Track = beatmap.Value.Track;
 
                 // ensure the track starts at maximum volume
