@@ -389,6 +389,9 @@ namespace osu.Game.Tests.Visual.Background
                 while (BlockLoad && !token.IsCancellationRequested)
                     Thread.Sleep(1);
 
+                if (!LoadedBeatmapSuccessfully)
+                    return;
+
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);
             }
