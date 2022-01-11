@@ -234,6 +234,19 @@ namespace osu.Game.Beatmaps
             beatmapModelManager.Delete(items, silent);
         }
 
+        public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
+        {
+            using (var context = contextFactory.CreateContext())
+            {
+                var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
+
+                if (filter != null)
+                    items = items.Where(filter);
+
+                beatmapModelManager.Delete(items.ToList(), silent);
+            }
+        }
+
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
         {
             beatmapModelManager.Undelete(items, silent);
