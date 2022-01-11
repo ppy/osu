@@ -87,23 +87,6 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public SlimReadOnlyListWrapper<HitObject> NestedHitObjects => nestedHitObjects.AsSlimReadOnly();
 
-        public HitObject()
-        {
-            StartTimeBindable.ValueChanged += time =>
-            {
-                double offset = time.NewValue - time.OldValue;
-
-                foreach (var nested in nestedHitObjects)
-                    nested.StartTime += offset;
-
-                if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
-                    DifficultyControlPoint.Time = time.NewValue;
-
-                if (SampleControlPoint != SampleControlPoint.DEFAULT)
-                    SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
-            };
-        }
-
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
@@ -115,23 +98,21 @@ namespace osu.Game.Rulesets.Objects
             var legacyInfo = controlPointInfo as LegacyControlPointInfo;
 
             if (legacyInfo != null)
-            {
                 DifficultyControlPoint = (DifficultyControlPoint)legacyInfo.DifficultyPointAt(StartTime).DeepClone();
-                DifficultyControlPoint.Time = StartTime;
-            }
             else if (DifficultyControlPoint == DifficultyControlPoint.DEFAULT)
                 DifficultyControlPoint = new DifficultyControlPoint();
+
+            DifficultyControlPoint.Time = StartTime;
 
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // This is done here after ApplyDefaultsToSelf as we may require custom defaults to be applied to have an accurate end time.
             if (legacyInfo != null)
-            {
                 SampleControlPoint = (SampleControlPoint)legacyInfo.SamplePointAt(this.GetEndTime() + control_point_leniency).DeepClone();
-                SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
-            }
             else if (SampleControlPoint == SampleControlPoint.DEFAULT)
                 SampleControlPoint = new SampleControlPoint();
+
+            SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
 
             nestedHitObjects.Clear();
 
@@ -154,6 +135,23 @@ namespace osu.Game.Rulesets.Objects
 
             foreach (var h in nestedHitObjects)
                 h.ApplyDefaults(controlPointInfo, difficulty, cancellationToken);
+
+            // importantly, this callback is only registered after default application
+            // to ensure that the read of `this.GetEndTime()` within doesn't return an invalid value
+            // if `StartTimeBindable` is changed prior to default application.
+            StartTimeBindable.ValueChanged += time =>
+            {
+                double offset = time.NewValue - time.OldValue;
+
+                foreach (var nested in nestedHitObjects)
+                    nested.StartTime += offset;
+
+                if (DifficultyControlPoint != DifficultyControlPoint.DEFAULT)
+                    DifficultyControlPoint.Time = time.NewValue;
+
+                if (SampleControlPoint != SampleControlPoint.DEFAULT)
+                    SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
+            };
 
             DefaultsApplied?.Invoke(this);
         }
