@@ -295,7 +295,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     // if we have no beatmaps, let's prompt the user to import from over a stable install if he has one.
-                    if (!beatmaps.GetAllUsableBeatmapSets().Any() && DisplayStableImportPrompt)
+                    if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null && DisplayStableImportPrompt)
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
