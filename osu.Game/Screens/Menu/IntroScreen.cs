@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Menu
 
             bool loadThemedIntro()
             {
-                setInfo = beatmaps.QueryBeatmapSets(b => b.Hash == BeatmapHash).FirstOrDefault();
+                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
 
                 if (setInfo == null)
                     return false;

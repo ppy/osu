@@ -155,22 +155,6 @@ namespace osu.Game.Beatmaps
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
-        /// <returns>Results from the provided query.</returns>
-        public List<ILive<BeatmapSetInfo>> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
-        {
-            using (var context = contextFactory.CreateContext())
-            {
-                return context.All<BeatmapSetInfo>()
-                              .Where(b => !b.DeletePending)
-                              .Where(query)
-                              .ToLive(contextFactory);
-            }
-        }
-
-        /// <summary>
-        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
-        /// </summary>
-        /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
@@ -197,7 +181,6 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmapModelManager.QueryBeatmap(query)?.Detach();
-        // TODO: move detach to usages?
 
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
