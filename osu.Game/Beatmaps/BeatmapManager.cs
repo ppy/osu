@@ -239,7 +239,7 @@ namespace osu.Game.Beatmaps
         {
             using (var context = contextFactory.CreateContext())
             {
-                var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending);
+                var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
                 if (filter != null)
                     items = items.Where(filter);
