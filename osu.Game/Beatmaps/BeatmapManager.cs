@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var set = new BeatmapSetInfo
+            var beatmapSet = new BeatmapSetInfo
             {
                 Beatmaps =
                 {
@@ -97,7 +97,10 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var imported = beatmapModelManager.Import(set).GetResultSafely();
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+                b.BeatmapSet = beatmapSet;
+
+            var imported = beatmapModelManager.Import(beatmapSet).GetResultSafely();
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
