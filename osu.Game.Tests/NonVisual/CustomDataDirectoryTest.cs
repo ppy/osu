@@ -179,7 +179,7 @@ namespace osu.Game.Tests.NonVisual
                 {
                     var osu = LoadOsuIntoHost(host);
 
-                    const string database_filename = "client.db";
+                    const string database_filename = "client.realm";
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
