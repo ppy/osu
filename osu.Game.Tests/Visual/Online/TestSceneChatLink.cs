@@ -50,63 +50,24 @@ namespace osu.Game.Tests.Visual.Online
 
             Dependencies.Cache(new ChatOverlay());
             Dependencies.Cache(dialogOverlay);
-
-            testLinksGeneral();
-            testEcho();
         }
 
-        private void clear() => AddStep("clear messages", textContainer.Clear);
-
-        private void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
-            int index = textContainer.Count + 1;
-            var newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index));
-            textContainer.Add(newLine);
+            textContainer.Clear();
+        });
 
-            AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
-            AddAssert($"msg #{index} has the right action", hasExpectedActions);
-            //AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
-            AddAssert($"msg #{index} shows {linkAmount} link(s)", isShowingLinks);
-
-            bool hasExpectedActions()
-            {
-                var expectedActionsList = expectedActions.ToList();
-
-                if (expectedActionsList.Count != newLine.Message.Links.Count)
-                    return false;
-
-                for (int i = 0; i < newLine.Message.Links.Count; i++)
-                {
-                    var action = newLine.Message.Links[i].Action;
-                    if (action != expectedActions[i]) return false;
-                }
-
-                return true;
-            }
-
-            //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
-
-            bool isShowingLinks()
-            {
-                bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
-
-                Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
-
-                var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
-                var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
-
-                return linkSprites.All(d => d.Colour == linkColour)
-                       && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
-            }
-        }
-
-        private void testLinksGeneral()
+        [Test]
+        public void TestLinksGeneral()
         {
+            int messageIndex = 0;
+
             addMessageWithChecks("test!");
             addMessageWithChecks("dev.ppy.sh!");
             addMessageWithChecks("https://dev.ppy.sh!", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("00:12:345 (1,2) - Test?", 1, expectedActions: LinkAction.OpenEditorTimestamp);
-            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.External);
+            addMessageWithChecks("Wiki link for tasty [[Performance Points]]", 1, expectedActions: LinkAction.OpenWiki);
             addMessageWithChecks("(osu forums)[https://dev.ppy.sh/forum] (old link format)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[https://dev.ppy.sh/home New site] (new link format)", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[osu forums](https://dev.ppy.sh/forum) (new link format 2)", 1, expectedActions: LinkAction.External);
@@ -117,7 +78,8 @@ namespace osu.Game.Tests.Visual.Online
                 expectedActions: new[] { LinkAction.External, LinkAction.OpenBeatmap, LinkAction.External });
             addMessageWithChecks("[https://dev.ppy.sh/home New link format with escaped [and \\[ paired] braces]", 1, expectedActions: LinkAction.External);
             addMessageWithChecks("[Markdown link format with escaped [and \\[ paired] braces](https://dev.ppy.sh/home)", 1, expectedActions: LinkAction.External);
-            addMessageWithChecks("(Old link format with escaped (and \\( paired) parentheses)[https://dev.ppy.sh/home] and [[also a rogue wiki link]]", 2, expectedActions: new[] { LinkAction.External, LinkAction.External });
+            addMessageWithChecks("(Old link format with escaped (and \\( paired) parentheses)[https://dev.ppy.sh/home] and [[also a rogue wiki link]]", 2,
+                expectedActions: new[] { LinkAction.External, LinkAction.OpenWiki });
             // note that there's 0 links here (they get removed if a channel is not found)
             addMessageWithChecks("#lobby or #osu would be blue (and work) in the ChatDisplay test (when a proper ChatOverlay is present).");
             addMessageWithChecks("I am important!", 0, false, true);
@@ -129,11 +91,60 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("Join my osu://chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", 1, expectedActions: LinkAction.OpenChannel);
+
+            void addMessageWithChecks(string text, int linkAmount = 0, bool isAction = false, bool isImportant = false, params LinkAction[] expectedActions)
+            {
+                ChatLine newLine = null;
+                int index = messageIndex++;
+
+                AddStep("add message", () =>
+                {
+                    newLine = new ChatLine(new DummyMessage(text, isAction, isImportant, index));
+                    textContainer.Add(newLine);
+                });
+
+                AddAssert($"msg #{index} has {linkAmount} link(s)", () => newLine.Message.Links.Count == linkAmount);
+                AddAssert($"msg #{index} has the right action", hasExpectedActions);
+                //AddAssert($"msg #{index} is " + (isAction ? "italic" : "not italic"), () => newLine.ContentFlow.Any() && isAction == isItalic());
+                AddAssert($"msg #{index} shows {linkAmount} link(s)", isShowingLinks);
+
+                bool hasExpectedActions()
+                {
+                    var expectedActionsList = expectedActions.ToList();
+
+                    if (expectedActionsList.Count != newLine.Message.Links.Count)
+                        return false;
+
+                    for (int i = 0; i < newLine.Message.Links.Count; i++)
+                    {
+                        var action = newLine.Message.Links[i].Action;
+                        if (action != expectedActions[i]) return false;
+                    }
+
+                    return true;
+                }
+
+                //bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
+
+                bool isShowingLinks()
+                {
+                    bool hasBackground = !string.IsNullOrEmpty(newLine.Message.Sender.Colour);
+
+                    Color4 textColour = isAction && hasBackground ? Color4Extensions.FromHex(newLine.Message.Sender.Colour) : Color4.White;
+
+                    var linkCompilers = newLine.ContentFlow.Where(d => d is DrawableLinkCompiler).ToList();
+                    var linkSprites = linkCompilers.SelectMany(comp => ((DrawableLinkCompiler)comp).Parts);
+
+                    return linkSprites.All(d => d.Colour == linkColour)
+                           && newLine.ContentFlow.Except(linkSprites.Concat(linkCompilers)).All(d => d.Colour == textColour);
+                }
+            }
         }
 
-        private void testEcho()
+        [Test]
+        public void TestEcho()
         {
-            int echoCounter = 0;
+            int messageIndex = 0;
 
             addEchoWithWait("sent!", "received!");
             addEchoWithWait("https://dev.ppy.sh/home", null, 500);
@@ -142,15 +153,16 @@ namespace osu.Game.Tests.Visual.Online
 
             void addEchoWithWait(string text, string completeText = null, double delay = 250)
             {
-                var newLine = new ChatLine(new DummyEchoMessage(text));
+                int index = messageIndex++;
 
-                AddStep($"send msg #{++echoCounter} after {delay}ms", () =>
+                AddStep($"send msg #{index} after {delay}ms", () =>
                 {
+                    ChatLine newLine = new ChatLine(new DummyEchoMessage(text));
                     textContainer.Add(newLine);
                     Scheduler.AddDelayed(() => newLine.Message = new DummyMessage(completeText ?? text), delay);
                 });
 
-                AddUntilStep($"wait for msg #{echoCounter}", () => textContainer.All(line => line.Message is DummyMessage));
+                AddUntilStep($"wait for msg #{index}", () => textContainer.All(line => line.Message is DummyMessage));
             }
         }
 

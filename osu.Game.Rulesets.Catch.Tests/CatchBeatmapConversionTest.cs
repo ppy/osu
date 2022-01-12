@@ -14,7 +14,6 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    [Timeout(10000)]
     public class CatchBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";

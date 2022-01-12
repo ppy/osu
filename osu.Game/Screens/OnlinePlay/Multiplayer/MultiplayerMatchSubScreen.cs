@@ -241,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void UpdateMods()
         {
-            if (SelectedItem.Value == null || client.LocalUser == null)
+            if (SelectedItem.Value == null || client.LocalUser == null || !this.IsCurrentScreen())
                 return;
 
             // update local mods based on room's reported status for the local user (omitting the base call implementation).

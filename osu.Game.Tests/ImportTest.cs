@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Collections;
 using osu.Game.Tests.Resources;
@@ -58,7 +59,7 @@ namespace osu.Game.Tests
             {
                 // Beatmap must be imported before the collection manager is loaded.
                 if (withBeatmap)
-                    BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).Wait();
+                    BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
 
                 AddInternal(CollectionManager = new CollectionManager(Storage));
             }

@@ -140,6 +140,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Bottom = ExpandedContentScrollContainer.HEIGHT },
                     Spacing = new Vector2(10),
                     Children = response.BeatmapSets.Select(b => new BeatmapCardNormal(b)
                     {

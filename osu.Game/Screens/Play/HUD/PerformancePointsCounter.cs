@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -73,10 +74,12 @@ namespace osu.Game.Screens.Play.HUD
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
-                               .ContinueWith(r => Schedule(() =>
+                               .ContinueWith(task => Schedule(() =>
                                {
-                                   timedAttributes = r.Result;
+                                   timedAttributes = task.GetResultSafely();
+
                                    IsValid = true;
+
                                    if (lastJudgement != null)
                                        onJudgementChanged(lastJudgement);
                                }), TaskContinuationOptions.OnlyOnRanToCompletion);
