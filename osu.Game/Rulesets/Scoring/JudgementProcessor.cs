@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Scoring
                 if (result == null)
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
-                result.Type = judgement.MaxResult;
+                result.Type = GetSimulatedHitResult(judgement);
                 ApplyResult(result);
             }
         }
@@ -145,5 +145,12 @@ namespace osu.Game.Rulesets.Scoring
             base.Update();
             hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult.TimeAbsolute < Clock.CurrentTime);
         }
+
+        /// <summary>
+        /// Gets a simulated <see cref="HitResult"/> for a judgement. Used during <see cref="SimulateAutoplay"/> to simulate a "perfect" play.
+        /// </summary>
+        /// <param name="judgement">The judgement to simulate a <see cref="HitResult"/> for.</param>
+        /// <returns>The simulated <see cref="HitResult"/> for the judgement.</returns>
+        protected virtual HitResult GetSimulatedHitResult(Judgement judgement) => judgement.MaxResult;
     }
 }
