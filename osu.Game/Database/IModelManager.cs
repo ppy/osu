@@ -13,13 +13,6 @@ namespace osu.Game.Database
         where TModel : class
     {
         /// <summary>
-        /// Perform an update of the specified item.
-        /// TODO: Support file additions/removals.
-        /// </summary>
-        /// <param name="item">The item to update.</param>
-        void Update(TModel item);
-
-        /// <summary>
         /// Delete an item from the manager.
         /// Is a no-op for already deleted items.
         /// </summary>
