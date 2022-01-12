@@ -162,6 +162,7 @@ namespace osu.Game.Beatmaps
         public Guid BeatmapSetInfoID => BeatmapSet?.ID ?? Guid.Empty;
 
         [Ignored]
+        [IgnoreMap]
         public BeatmapDifficulty BaseDifficulty
         {
             get => Difficulty;

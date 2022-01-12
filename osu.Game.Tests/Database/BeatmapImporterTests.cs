@@ -110,13 +110,25 @@ namespace osu.Game.Tests.Database
                     Assert.AreNotEqual(detachedBeatmapSet.Status, BeatmapOnlineStatus.Ranked);
                     detachedBeatmapSet.Status = BeatmapOnlineStatus.Ranked;
 
-                    beatmapSet.PerformWrite(s => detachedBeatmapSet.CopyChangesToRealm(s));
+                    beatmapSet.PerformWrite(s =>
+                    {
+                        detachedBeatmapSet.CopyChangesToRealm(s);
+                    });
 
                     beatmapSet.PerformRead(s =>
                     {
+                        // Check above changes explicitly.
                         Assert.AreEqual(BeatmapOnlineStatus.Ranked, s.Status);
                         Assert.AreEqual("New Artist", s.Beatmaps.First().Metadata.Artist);
                         Assert.AreEqual(newUser, s.Beatmaps.First().Metadata.Author);
+                        Assert.NotZero(s.Files.Count);
+
+                        // Check nothing was lost in the copy operation.
+                        Assert.AreEqual(s.Files.Count, detachedBeatmapSet.Files.Count);
+                        Assert.AreEqual(s.Files.Select(f => f.File).Count(), detachedBeatmapSet.Files.Select(f => f.File).Count());
+                        Assert.AreEqual(s.Beatmaps.Count, detachedBeatmapSet.Beatmaps.Count);
+                        Assert.AreEqual(s.Beatmaps.Select(f => f.Difficulty).Count(), detachedBeatmapSet.Beatmaps.Select(f => f.Difficulty).Count());
+                        Assert.AreEqual(s.Metadata, detachedBeatmapSet.Metadata);
                     });
                 }
             });
