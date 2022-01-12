@@ -101,5 +101,14 @@ namespace osu.Game.Beatmaps
             using (var context = ContextFactory.CreateContext())
                 return context.All<BeatmapInfo>().FirstOrDefault(query)?.Detach();
         }
+
+        public void Update(BeatmapSetInfo item)
+        {
+            using (var realm = ContextFactory.CreateContext())
+            {
+                var existing = realm.Find<BeatmapSetInfo>(item.ID);
+                realm.Write(r => item.CopyChangesToRealm(existing));
+            }
+        }
     }
 }

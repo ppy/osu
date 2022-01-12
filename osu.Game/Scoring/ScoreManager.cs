@@ -251,11 +251,6 @@ namespace osu.Game.Scoring
 
         #region Implementation of IModelManager<ScoreInfo>
 
-        public void Update(ScoreInfo item)
-        {
-            scoreModelManager.Update(item);
-        }
-
         public bool Delete(ScoreInfo item)
         {
             return scoreModelManager.Delete(item);
