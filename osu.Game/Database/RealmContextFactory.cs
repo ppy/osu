@@ -121,6 +121,8 @@ namespace osu.Game.Database
                         foreach (var score in beatmap.Scores)
                             realm.Remove(score);
 
+                        realm.Remove(beatmap.Metadata);
+
                         realm.Remove(beatmap);
                     }
 
