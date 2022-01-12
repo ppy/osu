@@ -31,15 +31,5 @@ namespace osu.Game.Models
         }
 
         IFileInfo INamedFileUsage.File => File;
-
-        #region Compatibility properties
-
-        public RealmFile FileInfo
-        {
-            get => File;
-            set => File = value;
-        }
-
-        #endregion
     }
 }
