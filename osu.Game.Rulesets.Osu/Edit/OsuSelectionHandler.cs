@@ -1,12 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -18,6 +22,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuSelectionHandler : EditorSelectionHandler
     {
+        [Resolved(CanBeNull = true)]
+        private IPositionSnapProvider? positionSnapProvider { get; set; }
+
         /// <summary>
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
         /// </summary>
@@ -27,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// During a transform, the initial path types of a single selected slider are stored so they
         /// can be maintained throughout the operation.
         /// </summary>
-        private List<PathType?> referencePathTypes;
+        private List<PathType?>? referencePathTypes;
 
         protected override void OnSelectionChanged()
         {
@@ -197,6 +204,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             for (int i = 0; i < slider.Path.ControlPoints.Count; ++i)
                 slider.Path.ControlPoints[i].Type = referencePathTypes[i];
 
+            // Snap the slider's length to the current beat divisor
+            // to calculate the final resulting duration / bounding box before the final checks.
+            slider.SnapTo(positionSnapProvider);
+
             //if sliderhead or sliderend end up outside playfield, revert scaling.
             Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });
             (bool xInBounds, bool yInBounds) = isQuadInBounds(scaledQuad);
@@ -206,6 +217,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             foreach (var point in slider.Path.ControlPoints)
                 point.Position = oldControlPoints.Dequeue();
+
+            // Snap the slider's length again to undo the potentially-invalid length applied by the previous snap.
+            slider.SnapTo(positionSnapProvider);
         }
 
         private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)
