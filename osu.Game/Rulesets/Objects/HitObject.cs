@@ -136,10 +136,19 @@ namespace osu.Game.Rulesets.Objects
             foreach (var h in nestedHitObjects)
                 h.ApplyDefaults(controlPointInfo, difficulty, cancellationToken);
 
-            // importantly, this callback is only registered after default application
-            // to ensure that the read of `this.GetEndTime()` within doesn't return an invalid value
+            // `ApplyDefaults()` may be called multiple times on a single hitobject.
+            // to prevent subscribing to `StartTimeBindable.ValueChanged` multiple times with the same callback,
+            // remove the previous subscription (if present) before (re-)registering.
+            StartTimeBindable.ValueChanged -= onStartTimeChanged;
+
+            // this callback must be (re-)registered after default application
+            // to ensure that the read of `this.GetEndTime()` within `onStartTimeChanged` doesn't return an invalid value
             // if `StartTimeBindable` is changed prior to default application.
-            StartTimeBindable.ValueChanged += time =>
+            StartTimeBindable.ValueChanged += onStartTimeChanged;
+
+            DefaultsApplied?.Invoke(this);
+
+            void onStartTimeChanged(ValueChangedEvent<double> time)
             {
                 double offset = time.NewValue - time.OldValue;
 
@@ -148,9 +157,7 @@ namespace osu.Game.Rulesets.Objects
 
                 DifficultyControlPoint.Time = time.NewValue;
                 SampleControlPoint.Time = this.GetEndTime() + control_point_leniency;
-            };
-
-            DefaultsApplied?.Invoke(this);
+            }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
