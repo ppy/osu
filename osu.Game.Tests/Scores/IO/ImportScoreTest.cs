@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -39,6 +41,8 @@ namespace osu.Game.Tests.Scores.IO
                         User = new APIUser { Username = "Test user" },
                         Date = DateTimeOffset.Now,
                         OnlineID = 12345,
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                        BeatmapInfo = new BeatmapInfo()
                     };
 
                     var imported = await LoadScoreIntoOsu(osu, toImport);
@@ -70,6 +74,8 @@ namespace osu.Game.Tests.Scores.IO
                     var toImport = new ScoreInfo
                     {
                         User = new APIUser { Username = "Test user" },
+                        BeatmapInfo = new BeatmapInfo(),
+                        Ruleset = new OsuRuleset().RulesetInfo,
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
@@ -97,6 +103,8 @@ namespace osu.Game.Tests.Scores.IO
                     var toImport = new ScoreInfo
                     {
                         User = new APIUser { Username = "Test user" },
+                        BeatmapInfo = new BeatmapInfo(),
+                        Ruleset = new OsuRuleset().RulesetInfo,
                         Statistics = new Dictionary<HitResult, int>
                         {
                             { HitResult.Perfect, 100 },
@@ -128,6 +136,8 @@ namespace osu.Game.Tests.Scores.IO
                     await LoadScoreIntoOsu(osu, new ScoreInfo
                     {
                         User = new APIUser { Username = "Test user" },
+                        BeatmapInfo = new BeatmapInfo(),
+                        Ruleset = new OsuRuleset().RulesetInfo,
                         OnlineID = 2
                     }, new TestArchiveReader());
 
@@ -137,6 +147,7 @@ namespace osu.Game.Tests.Scores.IO
                     Assert.That(scoreManager.IsAvailableLocally(new ScoreInfo
                     {
                         User = new APIUser { Username = "Test user" },
+                        BeatmapInfo = new BeatmapInfo(),
                         OnlineID = 2
                     }));
                 }

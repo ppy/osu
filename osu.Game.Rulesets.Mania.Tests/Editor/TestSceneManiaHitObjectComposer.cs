@@ -203,10 +203,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             {
                 InternalChildren = new Drawable[]
                 {
-                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                    EditorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
                     {
                         BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo }
-                    },
+                    }),
                     Composer = new ManiaHitObjectComposer(new ManiaRuleset())
                 };
 
