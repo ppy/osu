@@ -47,13 +47,13 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected sealed override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            if (Previous.Count == 0)
+            if (current.Previous.Count == 0)
                 currentSectionEnd = Math.Ceiling(current.StartTime / SectionLength) * SectionLength;
 
             while (current.StartTime > currentSectionEnd)
             {
                 saveCurrentPeak();
-                startNewSectionFrom(currentSectionEnd);
+                startNewSectionFrom(currentSectionEnd, current);
                 currentSectionEnd += SectionLength;
             }
 
@@ -72,19 +72,21 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// Sets the initial strain level for a new section.
         /// </summary>
         /// <param name="time">The beginning of the new section in milliseconds.</param>
-        private void startNewSectionFrom(double time)
+        /// <param name="current"></param>
+        private void startNewSectionFrom(double time, DifficultyHitObject current)
         {
             // The maximum strain of the new section is not zero by default
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
-            currentSectionPeak = CalculateInitialStrain(time);
+            currentSectionPeak = CalculateInitialStrain(time, current);
         }
 
         /// <summary>
         /// Retrieves the peak strain at a point in time.
         /// </summary>
         /// <param name="time">The time to retrieve the peak strain at.</param>
+        /// <param name="current"></param>
         /// <returns>The peak strain.</returns>
-        protected abstract double CalculateInitialStrain(double time);
+        protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,

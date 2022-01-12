@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 
@@ -61,13 +62,19 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
 
+            DifficultyHitObject lastObject = null;
+
             foreach (var hitObject in getDifficultyHitObjects())
             {
+                hitObject.PreviousBacking = new ObjectLink<DifficultyHitObject>(hitObject, lastObject?.PreviousBacking);
+
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     skill.ProcessInternal(hitObject);
                 }
+
+                lastObject = hitObject;
             }
 
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
@@ -100,9 +107,11 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
+            DifficultyHitObject lastObject = null;
+
             foreach (var hitObject in getDifficultyHitObjects())
             {
-                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
+                hitObject.PreviousBacking = new ObjectLink<DifficultyHitObject>(hitObject, lastObject?.PreviousBacking);
 
                 foreach (var skill in skills)
                 {
@@ -110,7 +119,10 @@ namespace osu.Game.Rulesets.Difficulty
                     skill.ProcessInternal(hitObject);
                 }
 
+                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
                 attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
+
+                lastObject = hitObject;
             }
 
             return attribs;

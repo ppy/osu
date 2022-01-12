@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private readonly bool withSliders;
 
-        protected override int HistoryLength => 2;
-
         private const double wide_angle_multiplier = 1.5;
         private const double acute_angle_multiplier = 2.0;
         private const double slider_multiplier = 1.5;
@@ -36,12 +34,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainValueOf(DifficultyHitObject current)
         {
-            if (current.BaseObject is Spinner || Previous.Count <= 1 || Previous[0].BaseObject is Spinner)
+            if (current.BaseObject is Spinner || current.Previous.Count <= 1 || current.Previous[0].BaseObject is Spinner)
                 return 0;
 
             var osuCurrObj = (OsuDifficultyHitObject)current;
-            var osuLastObj = (OsuDifficultyHitObject)Previous[0];
-            var osuLastLastObj = (OsuDifficultyHitObject)Previous[1];
+            var osuLastObj = (OsuDifficultyHitObject)current.Previous[0];
+            var osuLastLastObj = (OsuDifficultyHitObject)current.Previous[1];
 
             // Calculate the velocity to the current hitobject, which starts with a base distance / time assuming the last object is a hitcircle.
             double currVelocity = osuCurrObj.LazyJumpDistance / osuCurrObj.StrainTime;
@@ -152,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
 
-        protected override double CalculateInitialStrain(double time) => currentStrain * strainDecay(time - Previous[0].StartTime);
+        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) => currentStrain * strainDecay(time - current.Previous[0].StartTime);
 
         protected override double StrainValueAt(DifficultyHitObject current)
         {

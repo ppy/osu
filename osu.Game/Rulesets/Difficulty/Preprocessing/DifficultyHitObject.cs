@@ -1,6 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
@@ -36,6 +39,16 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         public readonly double EndTime;
 
         /// <summary>
+        /// A list of previous <see cref="DifficultyHitObject"/>s, indexed such that the most recent previous object is at index 0.
+        /// </summary>
+        public IReadOnlyList<DifficultyHitObject> Previous => (IReadOnlyList<DifficultyHitObject>)PreviousBacking ?? Array.Empty<DifficultyHitObject>();
+
+        /// <summary>
+        /// A linked node, linking to the previous <see cref="DifficultyHitObject"/>. This is set by <see cref="DifficultyCalculator"/>.
+        /// </summary>
+        internal ObjectLink<DifficultyHitObject> PreviousBacking;
+
+        /// <summary>
         /// Creates a new <see cref="DifficultyHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
@@ -48,6 +61,8 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
             DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
             StartTime = hitObject.StartTime / clockRate;
             EndTime = hitObject.GetEndTime() / clockRate;
+
+            PreviousBacking = new ObjectLink<DifficultyHitObject>(this, null);
         }
     }
 }
