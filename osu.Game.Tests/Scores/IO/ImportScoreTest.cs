@@ -9,11 +9,9 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Beatmaps;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -151,12 +149,8 @@ namespace osu.Game.Tests.Scores.IO
 
         public static async Task<ScoreInfo> LoadScoreIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
         {
-            var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
-
             // clone to avoid attaching the input score to realm.
             score = score.DeepClone();
-            score.BeatmapInfo ??= beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
-            score.Ruleset ??= new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             await scoreManager.Import(score, archive);

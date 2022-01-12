@@ -599,7 +599,8 @@ namespace osu.Game.Screens.Edit
             if (isNewBeatmap)
             {
                 // confirming exit without save means we should delete the new beatmap completely.
-                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+                if (playableBeatmap.BeatmapInfo.BeatmapSet != null)
+                    beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
 
                 // eagerly clear contents before restoring default beatmap to prevent value change callbacks from firing.
                 ClearInternal();

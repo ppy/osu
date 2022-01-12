@@ -98,6 +98,8 @@ namespace osu.Game.Tests.Beatmaps
                 userSkinInfo.Files.Clear();
                 userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+
                 beatmapInfo.BeatmapSet.Files.Clear();
                 beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
 

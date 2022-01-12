@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 var beatmap = new BeatmapInfo
                 {
-                    Ruleset = rulesets.GetRuleset(i % 4),
+                    Ruleset = rulesets.GetRuleset(i % 4) ?? throw new InvalidOperationException(),
                     OnlineID = beatmapId,
                     Length = length,
                     BPM = bpm,
