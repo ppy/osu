@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.LoadComplete();
 
             scoreSubscription = realmFactory.Context.All<ScoreInfo>()
-                                            .Filter($"{nameof(ScoreInfo.Beatmap)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
+                                            .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
                                             .QueryAsyncWithNotifications((_, changes, ___) =>
                                             {
                                                 if (changes == null)

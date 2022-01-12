@@ -49,7 +49,7 @@ namespace osu.Game.Scoring
         public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser realmUser)
         {
             Ruleset = ruleset;
-            Beatmap = beatmap;
+            BeatmapInfo = beatmap;
             RealmUser = realmUser;
         }
 
@@ -94,7 +94,7 @@ namespace osu.Game.Scoring
 
         public double? PP { get; set; }
 
-        public BeatmapInfo Beatmap { get; set; } = null!;
+        public BeatmapInfo BeatmapInfo { get; set; } = null!;
 
         public RulesetInfo Ruleset { get; set; } = null!;
 
@@ -129,7 +129,7 @@ namespace osu.Game.Scoring
         public int RankInt { get; set; }
 
         IRulesetInfo IScoreInfo.Ruleset => Ruleset;
-        IBeatmapInfo IScoreInfo.Beatmap => Beatmap;
+        IBeatmapInfo IScoreInfo.Beatmap => BeatmapInfo;
         IUser IScoreInfo.User => User;
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
@@ -139,13 +139,7 @@ namespace osu.Game.Scoring
 
         private Mod[]? mods;
 
-        public Guid BeatmapInfoID => Beatmap.ID;
-
-        public BeatmapInfo BeatmapInfo
-        {
-            get => Beatmap;
-            set => Beatmap = value;
-        }
+        public Guid BeatmapInfoID => BeatmapInfo.ID;
 
         public int UserID => RealmUser.OnlineID;
 

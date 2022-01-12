@@ -58,8 +58,8 @@ namespace osu.Game.Scoring
         protected override Task Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             // Ensure the beatmap is not detached.
-            if (!model.Beatmap.IsManaged)
-                model.Beatmap = realm.Find<BeatmapInfo>(model.Beatmap.ID);
+            if (!model.BeatmapInfo.IsManaged)
+                model.BeatmapInfo = realm.Find<BeatmapInfo>(model.BeatmapInfo.ID);
 
             if (!model.Ruleset.IsManaged)
                 model.Ruleset = realm.Find<RulesetInfo>(model.Ruleset.ShortName);

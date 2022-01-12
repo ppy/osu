@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps
         public BeatmapMetadata Metadata { get; set; } = new BeatmapMetadata();
 
         [IgnoreMap]
-        [Backlink(nameof(ScoreInfo.Beatmap))]
+        [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
         public BeatmapInfo(RulesetInfo ruleset, BeatmapDifficulty difficulty, BeatmapMetadata metadata)
