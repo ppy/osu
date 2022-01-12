@@ -186,14 +186,12 @@ namespace osu.Game.Scoring
         {
             get
             {
-                var rulesetInstance = Ruleset.CreateInstance();
-
                 Mod[] scoreMods = Array.Empty<Mod>();
 
                 if (mods != null)
                     scoreMods = mods;
                 else if (localAPIMods != null)
-                    scoreMods = APIMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+                    scoreMods = APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
 
                 return scoreMods;
             }
