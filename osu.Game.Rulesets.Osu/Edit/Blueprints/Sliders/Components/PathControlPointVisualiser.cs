@@ -283,6 +283,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 }
             }
 
+            // Snap the path to the current beat divisor before checking length validity.
+            slider.SnapTo(snapProvider);
+
             if (!slider.Path.HasValidLength)
             {
                 for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
@@ -290,6 +293,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 slider.Position = oldPosition;
                 slider.StartTime = oldStartTime;
+                // Snap the path length again to undo the invalid length.
+                slider.SnapTo(snapProvider);
                 return;
             }
 
