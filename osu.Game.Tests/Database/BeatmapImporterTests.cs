@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Database
     public class BeatmapImporterTests : RealmTest
     {
         [Test]
-        public void TestDetach()
+        public void TestDetachBeatmapSet()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
             {
@@ -71,7 +71,11 @@ namespace osu.Game.Tests.Database
                     Assert.NotZero(detachedBeatmapSet.Files.Select(f => f.File).Count());
                     Assert.NotNull(detachedBeatmapSet.Beatmaps.Count);
                     Assert.NotZero(detachedBeatmapSet.Beatmaps.Select(f => f.Difficulty).Count());
+                    Assert.NotNull(detachedBeatmapSet.Beatmaps.First().Path);
                     Assert.NotNull(detachedBeatmapSet.Metadata);
+
+                    // Check cyclic reference to beatmap set
+                    Assert.AreEqual(detachedBeatmapSet, detachedBeatmapSet.Beatmaps.First().BeatmapSet);
                 }
             });
         }
