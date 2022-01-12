@@ -230,6 +230,16 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorNudgeRight => new TranslatableString(getKey(@"editor_nudge_right"), @"Nudge selection right");
 
         /// <summary>
+        /// "Flip selection horizontally"
+        /// </summary>
+        public static LocalisableString EditorFlipHorizontally => new TranslatableString(getKey(@"editor_flip_horizontally"), @"Flip selection horizontally");
+
+        /// <summary>
+        /// "Flip selection vertically"
+        /// </summary>
+        public static LocalisableString EditorFlipVertically => new TranslatableString(getKey(@"editor_flip_vertically"), @"Flip selection vertically");
+
+        /// <summary>
         /// "Toggle skin editor"
         /// </summary>
         public static LocalisableString ToggleSkinEditor => new TranslatableString(getKey(@"toggle_skin_editor"), @"Toggle skin editor");

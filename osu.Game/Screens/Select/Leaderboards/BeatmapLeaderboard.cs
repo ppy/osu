@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -142,7 +143,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
 
                 scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+                            .ContinueWith(task => scoresCallback?.Invoke(task.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
             }
@@ -178,12 +179,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             req.Success += r =>
             {
                 scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
-                            .ContinueWith(ordered => Schedule(() =>
+                            .ContinueWith(task => Schedule(() =>
                             {
                                 if (cancellationToken.IsCancellationRequested)
                                     return;
 
-                                scoresCallback?.Invoke(ordered.Result);
+                                scoresCallback?.Invoke(task.GetResultSafely());
                                 TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
