@@ -19,43 +19,11 @@ namespace osu.Game.Database
 {
     public static class RealmObjectExtensions
     {
-        private static readonly IMapper write_mapper = new MapperConfiguration(c =>
+        private static readonly IMapper mapper = new MapperConfiguration(c =>
         {
             c.ShouldMapField = fi => false;
-            // If we want to limit this further, we can avoid mapping properties with no setter that are not IList<>.
-            // Takes a bit of effort to determine whether this is the case though, see https://stackoverflow.com/questions/951536/how-do-i-tell-whether-a-type-implements-ilist
-            c.ShouldMapProperty = pi => pi.SetMethod?.IsPublic == true;
 
-            c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
-            c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
-            c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
-            c.CreateMap<RulesetInfo, RulesetInfo>();
-            c.CreateMap<ScoreInfo, ScoreInfo>();
-            c.CreateMap<RealmUser, RealmUser>();
-            c.CreateMap<RealmFile, RealmFile>();
-            c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<BeatmapInfo, BeatmapInfo>().MaxDepth(2).AfterMap((s, d) =>
-            {
-                for (int i = 0; i < d.BeatmapSet?.Beatmaps.Count; i++)
-                {
-                    if (d.BeatmapSet.Beatmaps[i].Equals(d))
-                    {
-                        d.BeatmapSet.Beatmaps[i] = d;
-                        break;
-                    }
-                }
-            });
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>().MaxDepth(2).AfterMap((s, d) =>
-            {
-                foreach (var beatmap in d.Beatmaps)
-                    beatmap.BeatmapSet = d;
-            });
-            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
-        }).CreateMapper();
-
-        private static readonly IMapper read_mapper = new MapperConfiguration(c =>
-        {
-            c.ShouldMapField = fi => false;
+            // This is specifically to avoid mapping explicit interface implementations.
             // If we want to limit this further, we can avoid mapping properties with no setter that are not IList<>.
             // Takes a bit of effort to determine whether this is the case though, see https://stackoverflow.com/questions/951536/how-do-i-tell-whether-a-type-implements-ilist
             c.ShouldMapProperty = pi => pi.GetMethod?.IsPublic == true;
@@ -84,7 +52,6 @@ namespace osu.Game.Database
                 foreach (var beatmap in d.Beatmaps)
                     beatmap.BeatmapSet = d;
             });
-            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
         }).CreateMapper();
 
         /// <summary>
@@ -120,12 +87,12 @@ namespace osu.Game.Database
             if (!item.IsManaged)
                 return item;
 
-            return read_mapper.Map<T>(item);
+            return mapper.Map<T>(item);
         }
 
         public static void CopyChangesToRealm<T>(this T source, T destination) where T : RealmObjectBase
         {
-            write_mapper.Map(source, destination);
+            mapper.Map(source, destination);
         }
 
         public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
