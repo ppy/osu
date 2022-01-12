@@ -113,12 +113,18 @@ namespace osu.Game.Database
             {
                 var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
 
-                foreach (var s in pendingDeleteSets)
+                foreach (var beatmapSet in pendingDeleteSets)
                 {
-                    foreach (var b in s.Beatmaps)
-                        realm.Remove(b);
+                    foreach (var beatmap in beatmapSet.Beatmaps)
+                    {
+                        // Cascade delete related scores, else they will have a null beatmap against the model's spec.
+                        foreach (var score in beatmap.Scores)
+                            realm.Remove(score);
 
-                    realm.Remove(s);
+                        realm.Remove(beatmap);
+                    }
+
+                    realm.Remove(beatmapSet);
                 }
 
                 var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
