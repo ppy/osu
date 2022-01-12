@@ -216,7 +216,7 @@ namespace osu.Game.Skinning
                 {
                     try
                     {
-                        checkSkinIniMetadata(skin, realm);
+                        realm.Write(r => skin.Hash = ComputeHash(skin));
                     }
                     catch (Exception e)
                     {
