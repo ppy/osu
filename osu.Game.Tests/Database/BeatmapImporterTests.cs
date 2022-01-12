@@ -43,39 +43,35 @@ namespace osu.Game.Tests.Database
                 using (var importer = new BeatmapModelManager(realmFactory, storage))
                 using (new RulesetStore(realmFactory, storage))
                 {
-                    ILive<BeatmapSetInfo>? imported;
+                    ILive<BeatmapSetInfo>? beatmapSet;
 
                     using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
-                        imported = await importer.Import(reader);
+                        beatmapSet = await importer.Import(reader);
 
-                    Assert.NotNull(imported);
-                    Debug.Assert(imported != null);
+                    Assert.NotNull(beatmapSet);
+                    Debug.Assert(beatmapSet != null);
 
-                    BeatmapSetInfo? detached = null;
+                    BeatmapSetInfo? detachedBeatmapSet = null;
 
-                    imported.PerformRead(live =>
+                    beatmapSet.PerformRead(live =>
                     {
-                        var timer = new Stopwatch();
-                        timer.Start();
-                        detached = live.Detach();
-                        Logger.Log($"Detach took {timer.ElapsedMilliseconds} ms");
+                        detachedBeatmapSet = live.Detach();
 
-                        Logger.Log($"NamedFiles: {live.Files.Count} {detached.Files.Count}");
-                        Logger.Log($"Files: {live.Files.Select(f => f.File).Count()} {detached.Files.Select(f => f.File).Count()}");
-                        Logger.Log($"Difficulties: {live.Beatmaps.Count} {detached.Beatmaps.Count}");
-                        Logger.Log($"BeatmapDifficulties: {live.Beatmaps.Select(f => f.Difficulty).Count()} {detached.Beatmaps.Select(f => f.Difficulty).Count()}");
-                        Logger.Log($"Metadata: {live.Metadata} {detached.Metadata}");
+                        Assert.AreEqual(live.Files.Count, detachedBeatmapSet.Files.Count);
+                        Assert.AreEqual(live.Files.Select(f => f.File).Count(), detachedBeatmapSet.Files.Select(f => f.File).Count());
+                        Assert.AreEqual(live.Beatmaps.Count, detachedBeatmapSet.Beatmaps.Count);
+                        Assert.AreEqual(live.Beatmaps.Select(f => f.Difficulty).Count(), detachedBeatmapSet.Beatmaps.Select(f => f.Difficulty).Count());
+                        Assert.AreEqual(live.Metadata, detachedBeatmapSet.Metadata);
                     });
 
-                    Logger.Log("Testing detached-ness");
+                    Debug.Assert(detachedBeatmapSet != null);
 
-                    Debug.Assert(detached != null);
-
-                    Logger.Log($"NamedFiles: {detached.Files.Count}");
-                    Logger.Log($"Files: {detached.Files.Select(f => f.File).Count()}");
-                    Logger.Log($"Difficulties: {detached.Beatmaps.Count}");
-                    Logger.Log($"BeatmapDifficulties: {detached.Beatmaps.Select(f => f.Difficulty).Count()}");
-                    Logger.Log($"Metadata: {detached.Metadata}");
+                    // Check detached instances can all be accessed without throwing.
+                    Assert.NotNull(detachedBeatmapSet.Files.Count);
+                    Assert.NotZero(detachedBeatmapSet.Files.Select(f => f.File).Count());
+                    Assert.NotNull(detachedBeatmapSet.Beatmaps.Count);
+                    Assert.NotZero(detachedBeatmapSet.Beatmaps.Select(f => f.Difficulty).Count());
+                    Assert.NotNull(detachedBeatmapSet.Metadata);
                 }
             });
         }
