@@ -81,6 +81,48 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestUpdateDetachedBeatmapSet()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using (var importer = new BeatmapModelManager(realmFactory, storage))
+                using (new RulesetStore(realmFactory, storage))
+                {
+                    ILive<BeatmapSetInfo>? beatmapSet;
+
+                    using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
+                        beatmapSet = await importer.Import(reader);
+
+                    Assert.NotNull(beatmapSet);
+                    Debug.Assert(beatmapSet != null);
+
+                    BeatmapSetInfo? detachedBeatmapSet = null;
+
+                    beatmapSet.PerformRead(s => detachedBeatmapSet = s.Detach());
+
+                    Debug.Assert(detachedBeatmapSet != null);
+
+                    var newUser = new RealmUser { Username = "peppy", OnlineID = 2 };
+
+                    detachedBeatmapSet.Beatmaps.First().Metadata.Artist = "New Artist";
+                    detachedBeatmapSet.Beatmaps.First().Metadata.Author = newUser;
+
+                    Assert.AreNotEqual(detachedBeatmapSet.Status, BeatmapOnlineStatus.Ranked);
+                    detachedBeatmapSet.Status = BeatmapOnlineStatus.Ranked;
+
+                    beatmapSet.PerformWrite(s => detachedBeatmapSet.CopyChangesToRealm(s));
+
+                    beatmapSet.PerformRead(s =>
+                    {
+                        Assert.AreEqual(BeatmapOnlineStatus.Ranked, s.Status);
+                        Assert.AreEqual("New Artist", s.Beatmaps.First().Metadata.Artist);
+                        Assert.AreEqual(newUser, s.Beatmaps.First().Metadata.Author);
+                    });
+                }
+            });
+        }
+
+        [Test]
         public void TestImportBeatmapThenCleanup()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
