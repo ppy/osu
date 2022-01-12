@@ -7,12 +7,14 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -49,7 +51,7 @@ namespace osu.Game.Tests.Visual.Background
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
 
-            manager.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+            manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             Beatmap.SetDefault();
         }
@@ -322,7 +324,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundUndimmed() => background.CurrentColour == Color4.White;
 
-            public bool IsUserBlurApplied() => background.CurrentBlur == new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR);
+            public bool IsUserBlurApplied() => Precision.AlmostEquals(background.CurrentBlur, new Vector2((float)BlurLevel.Value * BackgroundScreenBeatmap.USER_BLUR_FACTOR), 0.1f);
 
             public bool IsUserBlurDisabled() => background.CurrentBlur == new Vector2(0);
 
@@ -330,9 +332,9 @@ namespace osu.Game.Tests.Visual.Background
 
             public bool IsBackgroundVisible() => background.CurrentAlpha == 1;
 
-            public bool IsBackgroundBlur() => background.CurrentBlur == new Vector2(BACKGROUND_BLUR);
+            public bool IsBackgroundBlur() => Precision.AlmostEquals(background.CurrentBlur, new Vector2(BACKGROUND_BLUR), 0.1f);
 
-            public bool CheckBackgroundBlur(Vector2 expected) => background.CurrentBlur == expected;
+            public bool CheckBackgroundBlur(Vector2 expected) => Precision.AlmostEquals(background.CurrentBlur, expected, 0.1f);
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced

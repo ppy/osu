@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             controlPoints.BindTo(HitObject.Path.ControlPoints);
 
             pathVersion.BindTo(HitObject.Path.Version);
-            pathVersion.BindValueChanged(_ => updatePath());
+            pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
 
             BodyPiece.UpdateFrom(HitObject);
         }
@@ -208,6 +208,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             // Move the control points from the insertion index onwards to make room for the insertion
             controlPoints.Insert(insertionIndex, pathControlPoint);
 
+            HitObject.SnapTo(composer);
+
             return pathControlPoint;
         }
 
@@ -227,7 +229,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 controlPoints.Remove(c);
             }
 
-            // If there are 0 or 1 remaining control points, the slider is in a degenerate (single point) form and should be deleted
+            // Snap the slider to the current beat divisor before checking length validity.
+            HitObject.SnapTo(composer);
+
+            // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
             {
                 placementHandler?.Delete(HitObject);
@@ -240,12 +245,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             foreach (var c in controlPoints)
                 c.Position -= first;
             HitObject.Position += first;
-        }
-
-        private void updatePath()
-        {
-            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
-            editorBeatmap?.Update(HitObject);
         }
 
         private void convertToStream()

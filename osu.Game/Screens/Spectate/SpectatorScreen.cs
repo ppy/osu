@@ -7,6 +7,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -57,9 +58,11 @@ namespace osu.Game.Screens.Spectate
         {
             base.LoadComplete();
 
-            userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(users => Schedule(() =>
+            userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(task => Schedule(() =>
             {
-                foreach (var u in users.Result)
+                var foundUsers = task.GetResultSafely();
+
+                foreach (var u in foundUsers)
                 {
                     if (u == null)
                         continue;

@@ -116,25 +116,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (RelativeScaleBeatLengths)
             {
-                IReadOnlyList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-                double maxDuration = 0;
+                baseBeatLength = Beatmap.GetMostCommonBeatLength();
 
-                for (int i = 0; i < timingPoints.Count; i++)
-                {
-                    if (timingPoints[i].Time > lastObjectTime)
-                        break;
-
-                    double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime;
-                    double duration = endTime - timingPoints[i].Time;
-
-                    if (duration > maxDuration)
-                    {
-                        maxDuration = duration;
-                        // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
-                        // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
-                        baseBeatLength = timingPoints[i].BeatLength / Beatmap.Difficulty.SliderMultiplier;
-                    }
-                }
+                // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
+                // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
+                baseBeatLength /= Beatmap.Difficulty.SliderMultiplier;
             }
 
             // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point

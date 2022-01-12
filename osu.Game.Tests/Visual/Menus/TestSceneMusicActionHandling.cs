@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -33,11 +34,11 @@ namespace osu.Game.Tests.Visual.Menus
             Queue<(IWorkingBeatmap working, TrackChangeDirection changeDirection)> trackChangeQueue = null;
 
             // ensure we have at least two beatmaps available to identify the direction the music controller navigated to.
-            AddRepeatStep("import beatmap", () => Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo()).Wait(), 5);
+            AddRepeatStep("import beatmap", () => Game.BeatmapManager.Import(TestResources.CreateTestBeatmapSetInfo()).WaitSafely(), 5);
 
             AddStep("import beatmap with track", () =>
             {
-                var setWithTrack = Game.BeatmapManager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).Result;
+                var setWithTrack = Game.BeatmapManager.Import(new ImportTask(TestResources.GetTestBeatmapForImport())).GetResultSafely();
                 Beatmap.Value = Game.BeatmapManager.GetWorkingBeatmap(setWithTrack.Value.Beatmaps.First());
             });
 

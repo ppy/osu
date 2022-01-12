@@ -7,7 +7,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ScrollingToolboxGroup : ToolboxGroup
+    public class ScrollingToolboxGroup : EditorToolboxGroup
     {
         protected readonly OsuScrollContainer Scroll;
 
