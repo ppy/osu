@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -51,7 +52,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
             });
 

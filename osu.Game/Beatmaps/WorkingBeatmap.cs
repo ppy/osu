@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
@@ -185,7 +186,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return loadBeatmapAsync().Result;
+                    return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)
                 {

@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Overlays;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ToolboxGroup : PlayerSettingsGroup
+    public class EditorToolboxGroup : SettingsToolboxGroup
     {
-        public ToolboxGroup(string title)
+        public EditorToolboxGroup(string title)
             : base(title)
         {
             RelativeSizeAxes = Axes.X;

@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             var beatmapSet = TestResources.CreateTestBeatmapSetInfo();
 
-            manager.Import(beatmapSet).Wait();
+            manager.Import(beatmapSet).WaitSafely();
         }
 
         public override void SetUpSteps()

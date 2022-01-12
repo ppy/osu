@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -112,7 +113,7 @@ namespace osu.Game.Scoring
         public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             GetTotalScoreAsync(score, mode, cancellationToken)
-                .ContinueWith(s => scheduler.Add(() => callback(s.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);
+                .ContinueWith(task => scheduler.Add(() => callback(task.GetResultSafely())), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         /// <summary>

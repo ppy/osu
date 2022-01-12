@@ -95,7 +95,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode, Is.Not.Null);
 
                 Assert.That(decodedAfterEncode.ScoreInfo.User.Username, Is.EqualTo(scoreInfo.User.Username));
-                Assert.That(decodedAfterEncode.ScoreInfo.BeatmapInfoID, Is.EqualTo(scoreInfo.BeatmapInfoID));
                 Assert.That(decodedAfterEncode.ScoreInfo.Ruleset, Is.EqualTo(scoreInfo.Ruleset));
                 Assert.That(decodedAfterEncode.ScoreInfo.TotalScore, Is.EqualTo(scoreInfo.TotalScore));
                 Assert.That(decodedAfterEncode.ScoreInfo.MaxCombo, Is.EqualTo(scoreInfo.MaxCombo));

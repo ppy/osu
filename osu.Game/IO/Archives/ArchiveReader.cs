@@ -32,7 +32,18 @@ namespace osu.Game.IO.Archives
 
         public abstract IEnumerable<string> Filenames { get; }
 
-        public virtual byte[] Get(string name) => GetAsync(name).Result;
+        public virtual byte[] Get(string name)
+        {
+            using (Stream input = GetStream(name))
+            {
+                if (input == null)
+                    return null;
+
+                byte[] buffer = new byte[input.Length];
+                input.Read(buffer);
+                return buffer;
+            }
+        }
 
         public async Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
         {

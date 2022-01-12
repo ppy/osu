@@ -85,11 +85,6 @@ namespace osu.Game.Localisation
         public static LocalisableString AlwaysShowKeyOverlay => new TranslatableString(getKey(@"key_overlay"), @"Always show key overlay");
 
         /// <summary>
-        /// "Positional hitsounds"
-        /// </summary>
-        public static LocalisableString PositionalHitsounds => new TranslatableString(getKey(@"positional_hitsounds"), @"Positional hitsounds");
-
-        /// <summary>
         /// "Always play first combo break sound"
         /// </summary>
         public static LocalisableString AlwaysPlayFirstComboBreak => new TranslatableString(getKey(@"always_play_first_combo_break"), @"Always play first combo break sound");
