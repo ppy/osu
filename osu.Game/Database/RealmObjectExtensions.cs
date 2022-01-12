@@ -19,6 +19,50 @@ namespace osu.Game.Database
 {
     public static class RealmObjectExtensions
     {
+        private static readonly IMapper write_mapper = new MapperConfiguration(c =>
+        {
+            c.ShouldMapField = fi => false;
+            c.ShouldMapProperty = pi => pi.SetMethod?.IsPublic == true;
+
+            c.CreateMap<BeatmapMetadata, BeatmapMetadata>()
+             .ForMember(s => s.Author, cc => cc.Ignore())
+             .AfterMap((s, d) =>
+             {
+                 copyChangesToRealm(s.Author, d.Author);
+             });
+            c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
+            c.CreateMap<RealmUser, RealmUser>();
+            c.CreateMap<RealmFile, RealmFile>();
+            c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            c.CreateMap<BeatmapInfo, BeatmapInfo>()
+             .ForMember(s => s.Ruleset, cc => cc.Ignore())
+             .ForMember(s => s.Metadata, cc => cc.Ignore())
+             .ForMember(s => s.Difficulty, cc => cc.Ignore())
+             .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
+             .AfterMap((s, d) =>
+             {
+                 d.Ruleset = d.Realm.Find<RulesetInfo>(s.Ruleset.ShortName);
+                 copyChangesToRealm(s.Difficulty, d.Difficulty);
+                 copyChangesToRealm(s.Metadata, d.Metadata);
+             });
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ForMember(s => s.Beatmaps, cc => cc.Ignore())
+             .AfterMap((s, d) =>
+             {
+                 foreach (var beatmap in s.Beatmaps)
+                 {
+                     var existing = d.Beatmaps.FirstOrDefault(b => b.ID == beatmap.ID);
+
+                     if (existing != null)
+                         copyChangesToRealm(beatmap, existing);
+                     else
+                         d.Beatmaps.Add(beatmap);
+                 }
+             });
+
+            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
+        }).CreateMapper();
+
         private static readonly IMapper mapper = new MapperConfiguration(c =>
         {
             c.ShouldMapField = fi => false;
@@ -52,6 +96,8 @@ namespace osu.Game.Database
                 foreach (var beatmap in d.Beatmaps)
                     beatmap.BeatmapSet = d;
             });
+
+            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
         }).CreateMapper();
 
         /// <summary>
@@ -90,10 +136,17 @@ namespace osu.Game.Database
             return mapper.Map<T>(item);
         }
 
-        public static void CopyChangesToRealm<T>(this T source, T destination) where T : RealmObjectBase
-        {
-            mapper.Map(source, destination);
-        }
+        /// <summary>
+        /// Copy changes in a detached beatmap back to realm.
+        /// This is a temporary method to handle existing flows only. It should not be used going forward if we can avoid it.
+        /// </summary>
+        /// <param name="source">The detached beatmap to copy from.</param>
+        /// <param name="destination">The live beatmap to copy to.</param>
+        public static void CopyChangesToRealm(this BeatmapSetInfo source, BeatmapSetInfo destination)
+            => copyChangesToRealm(source, destination);
+
+        private static void copyChangesToRealm<T>(T source, T destination) where T : RealmObjectBase
+            => write_mapper.Map(source, destination);
 
         public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
