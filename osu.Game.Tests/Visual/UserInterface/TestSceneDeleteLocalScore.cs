@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             imported?.PerformRead(s =>
             {
-                beatmapInfo = s.Beatmaps[0].Detach();
+                beatmapInfo = s.Beatmaps[0];
 
                 for (int i = 0; i < 50; i++)
                 {

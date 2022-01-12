@@ -682,9 +682,7 @@ namespace osu.Game.Screens.Select
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
 
-            // TODO: FUCK THE WORLD :D
-            if (beatmapSet.IsManaged)
-                beatmapSet = beatmapSet.Detach();
+            beatmapSet = beatmapSet.Detach();
 
             var set = new CarouselBeatmapSet(beatmapSet)
             {

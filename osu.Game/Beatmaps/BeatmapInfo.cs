@@ -188,7 +188,7 @@ namespace osu.Game.Beatmaps
 
         public int BeatmapVersion;
 
-        public BeatmapInfo Clone() => (BeatmapInfo)this.Detach().MemberwiseClone();
+        public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
 
         public override string ToString() => this.GetDisplayTitle();
 
