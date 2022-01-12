@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
         private TestUserListPanel evast;
 
         [Resolved]
-        private RulesetStore rulesetStore { get; set; }
+        private IRulesetStore rulesetStore { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>

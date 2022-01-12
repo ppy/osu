@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -25,9 +26,6 @@ namespace osu.Game.Tests.Beatmaps
 
         private BeatmapSetInfo importedSet;
 
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; }
-
         private TestBeatmapDifficultyCache difficultyCache;
 
         private IBindable<StarDifficulty?> starDifficultyBindable;
@@ -35,7 +33,7 @@ namespace osu.Game.Tests.Beatmaps
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu)
         {
-            importedSet = ImportBeatmapTest.LoadQuickOszIntoOsu(osu).Result;
+            importedSet = ImportBeatmapTest.LoadQuickOszIntoOsu(osu).GetResultSafely();
         }
 
         [SetUpSteps]

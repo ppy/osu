@@ -11,12 +11,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
 
@@ -170,6 +172,39 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("unset password", () => room.Password.Value = string.Empty);
             AddAssert("password icon hidden", () => Precision.AlmostEquals(0, drawableRoom.ChildrenOfType<DrawableRoom.PasswordProtectedIcon>().Single().Alpha));
+        }
+
+        [Test]
+        public void TestMultiplayerRooms()
+        {
+            AddStep("create rooms", () => Child = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(5),
+                Children = new[]
+                {
+                    new DrawableMatchRoom(new Room
+                    {
+                        Name = { Value = "A host-only room" },
+                        QueueMode = { Value = QueueMode.HostOnly },
+                        Type = { Value = MatchType.HeadToHead }
+                    }),
+                    new DrawableMatchRoom(new Room
+                    {
+                        Name = { Value = "An all-players, team-versus room" },
+                        QueueMode = { Value = QueueMode.AllPlayers },
+                        Type = { Value = MatchType.TeamVersus }
+                    }),
+                    new DrawableMatchRoom(new Room
+                    {
+                        Name = { Value = "A round-robin room" },
+                        QueueMode = { Value = QueueMode.AllPlayersRoundRobin },
+                        Type = { Value = MatchType.HeadToHead }
+                    }),
+                }
+            });
         }
 
         private DrawableRoom createLoungeRoom(Room room)

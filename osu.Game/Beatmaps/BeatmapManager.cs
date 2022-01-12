@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -91,7 +92,7 @@ namespace osu.Game.Beatmaps
                 }
             };
 
-            var imported = beatmapModelManager.Import(set).Result.Value;
+            var imported = beatmapModelManager.Import(set).GetResultSafely().Value;
 
             return GetWorkingBeatmap(imported.Beatmaps.First());
         }
@@ -288,9 +289,9 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IModelFileManager<in BeatmapSetInfo,in BeatmapSetFileInfo>
 
-        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents, string filename = null)
+        public void ReplaceFile(BeatmapSetInfo model, BeatmapSetFileInfo file, Stream contents)
         {
-            beatmapModelManager.ReplaceFile(model, file, contents, filename);
+            beatmapModelManager.ReplaceFile(model, file, contents);
         }
 
         public void DeleteFile(BeatmapSetInfo model, BeatmapSetFileInfo file)

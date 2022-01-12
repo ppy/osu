@@ -57,6 +57,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public static string WebsiteRootUrl
         {
+            get => websiteRootUrl;
             set => websiteRootUrl = value
                                     .Trim('/') // trim potential trailing slash/
                                     .Split('/').Last(); // only keep domain name, ignoring protocol.
@@ -134,7 +135,7 @@ namespace osu.Game.Online.Chat
                 case "http":
                 case "https":
                     // length > 3 since all these links need another argument to work
-                    if (args.Length > 3 && args[1].EndsWith(websiteRootUrl, StringComparison.OrdinalIgnoreCase))
+                    if (args.Length > 3 && args[1].EndsWith(WebsiteRootUrl, StringComparison.OrdinalIgnoreCase))
                     {
                         string mainArg = args[3];
 
@@ -262,7 +263,7 @@ namespace osu.Game.Online.Chat
             handleMatches(old_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '(', ')' });
 
             // handle wiki links
-            handleMatches(wiki_regex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
+            handleMatches(wiki_regex, "{1}", $"https://{WebsiteRootUrl}/wiki/{{1}}", result, startIndex);
 
             // handle bare links
             handleAdvanced(advanced_link_regex, result, startIndex);

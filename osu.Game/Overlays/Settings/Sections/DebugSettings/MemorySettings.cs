@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Game.Database;
 using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.Settings.Sections.DebugSettings
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkDebugConfigManager config, GameHost host)
+        private void load(FrameworkDebugConfigManager config, GameHost host, RealmContextFactory realmFactory)
         {
             Children = new Drawable[]
             {
@@ -23,6 +24,17 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                 {
                     Text = DebugSettingsStrings.ClearAllCaches,
                     Action = host.Collect
+                },
+                new SettingsButton
+                {
+                    Text = DebugSettingsStrings.CompactRealm,
+                    Action = () =>
+                    {
+                        // Blocking operations implicitly causes a Compact().
+                        using (realmFactory.BlockAllOperations())
+                        {
+                        }
+                    }
                 },
             };
         }

@@ -106,7 +106,10 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteSkinsButton.Enabled.Value = false;
-                        Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                        Task.Run(() =>
+                        {
+                            skins.Delete();
+                        }).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
                     }));
                 }
             });
