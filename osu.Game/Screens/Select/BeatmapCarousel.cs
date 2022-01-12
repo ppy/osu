@@ -158,7 +158,6 @@ namespace osu.Game.Screens.Select
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
         public BeatmapCarousel()
-
         {
             root = new CarouselRoot(this);
             InternalChild = new OsuContextMenuContainer
