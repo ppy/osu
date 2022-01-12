@@ -145,6 +145,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 modifiedBeatmap.HitObjects.Clear();
                 modifiedBeatmap.HitObjects.Add(new HitCircle { StartTime = 5000 });
 
+                Debug.Assert(modifiedBeatmap.BeatmapInfo.BeatmapSet != null);
+
                 manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet).WaitSafely();
             });
 
