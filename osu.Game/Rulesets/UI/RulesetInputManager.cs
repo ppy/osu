@@ -127,6 +127,17 @@ namespace osu.Game.Rulesets.UI
             return base.Handle(e);
         }
 
+        protected override bool HandleMouseTouchStateChange(TouchStateChangeEvent e)
+        {
+            if (mouseDisabled.Value)
+            {
+                // Only propagate positional data when mouse buttons are disabled.
+                e = new TouchStateChangeEvent(e.State, e.Input, e.Touch, false, e.LastPosition);
+            }
+
+            return base.HandleMouseTouchStateChange(e);
+        }
+
         #endregion
 
         #region Key Counter Attachment
