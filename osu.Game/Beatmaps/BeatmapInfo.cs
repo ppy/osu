@@ -11,6 +11,7 @@ using osu.Game.Database;
 using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using Realms;
 
 #nullable enable
@@ -35,6 +36,10 @@ namespace osu.Game.Beatmaps
         public BeatmapDifficulty Difficulty { get; set; } = new BeatmapDifficulty();
 
         public BeatmapMetadata Metadata { get; set; } = new BeatmapMetadata();
+
+        [IgnoreMap]
+        [Backlink(nameof(ScoreInfo.Beatmap))]
+        public IQueryable<ScoreInfo> Scores { get; } = null!;
 
         public BeatmapInfo(RulesetInfo ruleset, BeatmapDifficulty difficulty, BeatmapMetadata metadata)
         {
