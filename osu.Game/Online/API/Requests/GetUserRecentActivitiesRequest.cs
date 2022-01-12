@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
@@ -20,10 +19,11 @@ namespace osu.Game.Online.API.Requests
         protected override string Target => $"users/{userId}/recent_activity";
     }
 
-    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public enum RecentActivityType
     {
         Achievement,
+
+        // ReSharper disable once IdentifierTypo
         BeatmapPlaycount,
         BeatmapsetApprove,
         BeatmapsetDelete,
