@@ -84,7 +84,6 @@ namespace osu.Game.Beatmaps
                 if (working != null)
                     return working;
 
-                // TODO: FUCK THE WORLD :D
                 beatmapInfo = beatmapInfo.Detach();
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));

@@ -10,7 +10,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
@@ -162,7 +161,7 @@ namespace osu.Game.Tests.Scores.IO
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             await scoreManager.Import(score, archive);
 
-            return scoreManager.Query(_ => true).Detach();
+            return scoreManager.Query(_ => true);
         }
 
         internal class TestArchiveReader : ArchiveReader
