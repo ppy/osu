@@ -73,7 +73,7 @@ namespace osu.Game.Online.Rooms
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
-                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID),
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException(),
                 Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,

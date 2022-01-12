@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Select
                 });
 
                 // no difficulty means it can't have a status to show
-                if (beatmapInfo.DifficultyName == null)
+                if (string.IsNullOrEmpty(beatmapInfo.DifficultyName))
                     StatusPill.Hide();
 
                 addInfoLabels();
