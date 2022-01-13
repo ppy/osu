@@ -54,6 +54,12 @@ namespace osu.Game.Beatmaps
                 prepareLocalCache();
         }
 
+        public void Update(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
+        {
+            foreach (var b in beatmapSet.Beatmaps)
+                lookup(beatmapSet, b);
+        }
+
         public Task UpdateAsync(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
         {
             return Task.WhenAll(beatmapSet.Beatmaps.Select(b => UpdateAsync(beatmapSet, b, cancellationToken)).ToArray());
@@ -73,12 +79,16 @@ namespace osu.Game.Beatmaps
 
             var req = new GetBeatmapRequest(beatmapInfo);
 
-            req.Failure += fail;
-
             try
             {
                 // intentionally blocking to limit web request concurrency
                 api.Perform(req);
+
+                if (req.CompletionState == APIRequestCompletionState.Failed)
+                {
+                    logForModel(set, $"Online retrieval failed for {beatmapInfo}");
+                    beatmapInfo.OnlineID = -1;
+                }
 
                 var res = req.Response;
 
@@ -99,13 +109,8 @@ namespace osu.Game.Beatmaps
             }
             catch (Exception e)
             {
-                fail(e);
-            }
-
-            void fail(Exception e)
-            {
-                beatmapInfo.OnlineID = -1;
                 logForModel(set, $"Online retrieval failed for {beatmapInfo} ({e.Message})");
+                beatmapInfo.OnlineID = -1;
             }
         }
 
