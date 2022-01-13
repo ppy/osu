@@ -133,7 +133,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                // db.Context.RemoveRange(existingBeatmapSets);
+                db.Context.RemoveRange(existingBeatmapSets);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
                 transaction.Commit();
@@ -195,7 +195,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                // db.Context.RemoveRange(existingScores);
+                db.Context.RemoveRange(existingScores);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
                 transaction.Commit();
