@@ -486,7 +486,7 @@ namespace osu.Game.Screens.Select
             {
                 if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
                 {
-                    if (beatmap.BeatmapSetInfoID == beatmapInfoPrevious.BeatmapSetInfoID)
+                    if (beatmap.BeatmapSet?.ID == beatmapInfoPrevious.BeatmapSet?.ID)
                         sampleChangeDifficulty.Play();
                     else
                         sampleChangeBeatmap.Play();
