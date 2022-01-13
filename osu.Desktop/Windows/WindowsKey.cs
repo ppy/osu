@@ -4,6 +4,8 @@
 using System;
 using System.Runtime.InteropServices;
 
+// ReSharper disable IdentifierTypo
+
 namespace osu.Desktop.Windows
 {
     internal class WindowsKey
