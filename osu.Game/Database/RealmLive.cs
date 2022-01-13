@@ -61,15 +61,18 @@ namespace osu.Game.Database
         /// <param name="perform">The action to perform.</param>
         public TReturn PerformRead<TReturn>(Func<T, TReturn> perform)
         {
-            // TODO: this is weird and kinda wrong... unmanaged objects should be allowed?
-            // if (typeof(RealmObjectBase).IsAssignableFrom(typeof(TReturn)))
-            //     throw new InvalidOperationException(@$"Realm live objects should not exit the scope of {nameof(PerformRead)}.");
-
             if (!IsManaged)
                 return perform(data);
 
             using (var realm = realmFactory.CreateContext())
-                return perform(realm.Find<T>(ID));
+            {
+                var returnData = perform(realm.Find<T>(ID));
+
+                if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
+                    throw new InvalidOperationException(@$"Managed realm objects should not exit the scope of {nameof(PerformRead)}.");
+
+                return returnData;
+            }
         }
 
         /// <summary>
