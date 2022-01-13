@@ -263,6 +263,6 @@ namespace osu.Game.Skinning
             });
         }
 
-        public override bool IsAvailableLocally(SkinInfo model) => false;
+        public override bool IsAvailableLocally(SkinInfo model) => true; // skins do not have online download support yet.
     }
 }
