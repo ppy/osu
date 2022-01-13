@@ -46,6 +46,12 @@ namespace osu.Game.Scoring
         [MapTo("User")]
         public RealmUser RealmUser { get; set; } = new RealmUser();
 
+        [MapTo("Mods")]
+        public string ModsJson { get; set; } = string.Empty;
+
+        [MapTo("Statistics")]
+        public string StatisticsJson { get; set; } = string.Empty;
+
         public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser realmUser)
         {
             Ruleset = ruleset;
@@ -98,27 +104,6 @@ namespace osu.Game.Scoring
 
         public RulesetInfo Ruleset { get; set; } = null!;
 
-        private Dictionary<HitResult, int>? statistics;
-
-        [Ignored]
-        public Dictionary<HitResult, int> Statistics
-        {
-            get
-            {
-                if (statistics != null)
-                    return statistics;
-
-                if (!string.IsNullOrEmpty(StatisticsJson))
-                    statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson);
-
-                return statistics ??= new Dictionary<HitResult, int>();
-            }
-            set => statistics = value;
-        }
-
-        [MapTo("Statistics")]
-        public string StatisticsJson { get; set; } = null!;
-
         public ScoreRank Rank
         {
             get => (ScoreRank)RankInt;
@@ -134,10 +119,6 @@ namespace osu.Game.Scoring
         IEnumerable<INamedFileUsage> IHasNamedFiles.Files => Files;
 
         #region Properties required to make things work with existing usages
-
-        private APIMod[]? localAPIMods;
-
-        private Mod[]? mods;
 
         public Guid BeatmapInfoID => BeatmapInfo.ID;
 
@@ -177,31 +158,49 @@ namespace osu.Game.Scoring
         [Ignored]
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
 
-        // Used for database serialisation/deserialisation.
-        [MapTo("Mods")]
-        public string ModsJson { get; set; } = string.Empty;
+        private Dictionary<HitResult, int>? statistics;
+
+        [Ignored]
+        public Dictionary<HitResult, int> Statistics
+        {
+            get
+            {
+                if (statistics != null)
+                    return statistics;
+
+                if (!string.IsNullOrEmpty(StatisticsJson))
+                    statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(StatisticsJson);
+
+                return statistics ??= new Dictionary<HitResult, int>();
+            }
+            set => statistics = value;
+        }
+
+        private Mod[]? mods;
 
         [Ignored]
         public Mod[] Mods
         {
             get
             {
-                Mod[] scoreMods = Array.Empty<Mod>();
-
                 if (mods != null)
-                    scoreMods = mods;
-                else if (localAPIMods != null)
-                    scoreMods = APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
+                    return mods;
 
-                return scoreMods;
+                if (apiMods != null)
+                    return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
+
+                return Array.Empty<Mod>();
             }
             set
             {
-                localAPIMods = null;
+                apiMods = null;
                 mods = value;
-                ModsJson = JsonConvert.SerializeObject(APIMods);
+
+                updateModsJson();
             }
         }
+
+        private APIMod[]? apiMods;
 
         // Used for API serialisation/deserialisation.
         [Ignored]
@@ -209,27 +208,31 @@ namespace osu.Game.Scoring
         {
             get
             {
-                if (localAPIMods == null)
-                {
-                    // prioritise reading from realm backing
-                    if (!string.IsNullOrEmpty(ModsJson))
-                        localAPIMods = JsonConvert.DeserializeObject<APIMod[]>(ModsJson);
+                if (apiMods != null) return apiMods;
 
-                    // then check mods set via Mods property.
-                    if (mods != null)
-                        localAPIMods = mods.Select(m => new APIMod(m)).ToArray();
-                }
+                // prioritise reading from realm backing
+                if (!string.IsNullOrEmpty(ModsJson))
+                    apiMods = JsonConvert.DeserializeObject<APIMod[]>(ModsJson);
 
-                return localAPIMods ?? Array.Empty<APIMod>();
+                // then check mods set via Mods property.
+                if (mods != null)
+                    apiMods = mods.Select(m => new APIMod(m)).ToArray();
+
+                return apiMods ?? Array.Empty<APIMod>();
             }
             set
             {
-                localAPIMods = value;
+                apiMods = value;
+                mods = null;
 
                 // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
-                mods = null;
-                ModsJson = JsonConvert.SerializeObject(APIMods);
+                updateModsJson();
             }
+        }
+
+        private void updateModsJson()
+        {
+            ModsJson = JsonConvert.SerializeObject(APIMods);
         }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
