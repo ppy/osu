@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -55,7 +54,7 @@ namespace osu.Game.Scoring
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
-        protected override Task Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override void Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             // Ensure the beatmap is not detached.
             if (!model.BeatmapInfo.IsManaged)
@@ -66,8 +65,6 @@ namespace osu.Game.Scoring
 
             if (string.IsNullOrEmpty(model.StatisticsJson))
                 model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
-
-            return Task.CompletedTask;
         }
 
         public override bool IsAvailableLocally(ScoreInfo model)
