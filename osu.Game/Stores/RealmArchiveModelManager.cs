@@ -5,12 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Extensions;
-using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using Realms;
@@ -91,11 +88,6 @@ namespace osu.Game.Stores
             var namedUsage = new RealmNamedFileUsage(file, filename);
 
             item.Files.Add(namedUsage);
-        }
-
-        public override async Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return await base.Import(item, archive, lowPriority, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
