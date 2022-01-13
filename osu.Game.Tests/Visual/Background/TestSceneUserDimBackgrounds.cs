@@ -36,7 +36,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
+    public class TestSceneUserDimBackgrounds : ScreenTestScene
     {
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
@@ -57,14 +57,12 @@ namespace osu.Game.Tests.Visual.Background
             Beatmap.SetDefault();
         }
 
-        [SetUp]
-        public virtual void SetUp() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            var stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
-            Child = stack;
+            base.SetUpSteps();
 
-            stack.Push(songSelect = new DummySongSelect());
-        });
+            AddStep("push song select", () => Stack.Push(songSelect = new DummySongSelect()));
+        }
 
         /// <summary>
         /// User settings should always be ignored on song select screen.
