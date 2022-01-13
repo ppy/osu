@@ -274,5 +274,7 @@ namespace osu.Game.Scoring
         }
 
         #endregion
+
+        public override string ToString() => this.GetDisplayTitle();
     }
 }
