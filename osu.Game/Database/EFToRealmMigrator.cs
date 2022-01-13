@@ -35,7 +35,108 @@ namespace osu.Game.Database
                 migrateSettings(db);
                 migrateSkins(db);
 
+                migrateBeatmaps(db);
                 migrateScores(db);
+            }
+        }
+
+        private void migrateBeatmaps(DatabaseWriteUsage db)
+        {
+            // can be removed 20220730.
+            var existingBeatmapSets = db.Context.EFBeatmapSetInfo
+                                        .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
+                                        .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                        .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                        .Include(s => s.Files).ThenInclude(f => f.FileInfo)
+                                        .ToList();
+
+            // previous entries in EF are removed post migration.
+            if (!existingBeatmapSets.Any())
+                return;
+
+            using (var realm = realmContextFactory.CreateContext())
+            using (var transaction = realm.BeginWrite())
+            {
+                // only migrate data if the realm database is empty.
+                // note that this cannot be written as: `realm.All<BeatmapInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
+                if (!realm.All<BeatmapSetInfo>().Any(s => !s.Protected))
+                {
+                    foreach (var beatmapSet in existingBeatmapSets)
+                    {
+                        var realmBeatmapSet = new BeatmapSetInfo
+                        {
+                            OnlineID = beatmapSet.OnlineID ?? -1,
+                            DateAdded = beatmapSet.DateAdded,
+                            Status = beatmapSet.Status,
+                            DeletePending = beatmapSet.DeletePending,
+                            Hash = beatmapSet.Hash,
+                            Protected = beatmapSet.Protected,
+                        };
+
+                        migrateFiles(beatmapSet, realm, realmBeatmapSet);
+
+                        foreach (var beatmap in beatmapSet.Beatmaps)
+                        {
+                            var realmBeatmap = new BeatmapInfo
+                            {
+                                DifficultyName = beatmap.DifficultyName,
+                                Status = beatmap.Status,
+                                OnlineID = beatmap.OnlineID ?? -1,
+                                Length = beatmap.Length,
+                                BPM = beatmap.BPM,
+                                Hash = beatmap.Hash,
+                                StarRating = beatmap.StarRating,
+                                MD5Hash = beatmap.MD5Hash,
+                                Hidden = beatmap.Hidden,
+                                AudioLeadIn = beatmap.AudioLeadIn,
+                                StackLeniency = beatmap.StackLeniency,
+                                SpecialStyle = beatmap.SpecialStyle,
+                                LetterboxInBreaks = beatmap.LetterboxInBreaks,
+                                WidescreenStoryboard = beatmap.WidescreenStoryboard,
+                                EpilepsyWarning = beatmap.EpilepsyWarning,
+                                SamplesMatchPlaybackRate = beatmap.SamplesMatchPlaybackRate,
+                                DistanceSpacing = beatmap.DistanceSpacing,
+                                BeatDivisor = beatmap.BeatDivisor,
+                                GridSize = beatmap.GridSize,
+                                TimelineZoom = beatmap.TimelineZoom,
+                                Countdown = beatmap.Countdown,
+                                CountdownOffset = beatmap.CountdownOffset,
+                                MaxCombo = beatmap.MaxCombo,
+                                Bookmarks = beatmap.Bookmarks,
+                                Ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName),
+                                Difficulty = new BeatmapDifficulty(beatmap.BaseDifficulty),
+                                Metadata = new BeatmapMetadata
+                                {
+                                    Title = beatmap.Metadata.Title,
+                                    TitleUnicode = beatmap.Metadata.TitleUnicode,
+                                    Artist = beatmap.Metadata.Artist,
+                                    ArtistUnicode = beatmap.Metadata.ArtistUnicode,
+                                    Author = new RealmUser
+                                    {
+                                        OnlineID = beatmap.Metadata.Author.Id,
+                                        Username = beatmap.Metadata.Author.Username,
+                                    },
+                                    Source = beatmap.Metadata.Source,
+                                    Tags = beatmap.Metadata.Tags,
+                                    PreviewTime = beatmap.Metadata.PreviewTime,
+                                    AudioFile = beatmap.Metadata.AudioFile,
+                                    BackgroundFile = beatmap.Metadata.BackgroundFile,
+                                    AuthorString = beatmap.Metadata.AuthorString,
+                                },
+                                BeatmapSet = realmBeatmapSet,
+                            };
+
+                            realmBeatmapSet.Beatmaps.Add(realmBeatmap);
+                        }
+
+                        realm.Add(realmBeatmapSet);
+                    }
+                }
+
+                // db.Context.RemoveRange(existingBeatmapSets);
+                // Intentionally don't clean up the files, so they don't get purged by EF.
+
+                transaction.Commit();
             }
         }
 
@@ -94,7 +195,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                db.Context.RemoveRange(existingScores);
+                // db.Context.RemoveRange(existingScores);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
                 transaction.Commit();
