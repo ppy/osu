@@ -189,6 +189,10 @@ namespace osu.Game
                 : null;
 
             dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", efContextFactory));
+
+            dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
+            dependencies.CacheAs<IRulesetStore>(RulesetStore);
+
             if (efContextFactory != null)
                 new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig).Run();
 
@@ -218,9 +222,6 @@ namespace osu.Game
             dependencies.CacheAs(multiplayerClient = new OnlineMultiplayerClient(endpoints));
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
-
-            dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
-            dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realmFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
