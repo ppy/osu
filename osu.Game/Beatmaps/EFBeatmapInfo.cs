@@ -41,7 +41,7 @@ namespace osu.Game.Beatmaps
         public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
 
         [Required]
-        public EFBeatmapSetInfo BeatmapSet { get; set; }
+        public EFBeatmapSetInfo BeatmapSetInfo { get; set; }
 
         public EFBeatmapMetadata Metadata { get; set; }
 
@@ -85,9 +85,10 @@ namespace osu.Game.Beatmaps
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
-        public int RulesetID { get; set; }
+        [Column("RulesetID")]
+        public int RulesetInfoID { get; set; }
 
-        public EFRulesetInfo Ruleset { get; set; }
+        public EFRulesetInfo RulesetInfo { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
@@ -145,13 +146,13 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(IBeatmapInfo other) => other is EFBeatmapInfo b && Equals(b);
 
-        public bool AudioEquals(EFBeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                        BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                        (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
+        public bool AudioEquals(EFBeatmapInfo other) => other != null && BeatmapSetInfo != null && other.BeatmapSetInfo != null &&
+                                                        BeatmapSetInfo.Hash == other.BeatmapSetInfo.Hash &&
+                                                        (Metadata ?? BeatmapSetInfo.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSetInfo.Metadata).AudioFile;
 
-        public bool BackgroundEquals(EFBeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                             BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                             (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+        public bool BackgroundEquals(EFBeatmapInfo other) => other != null && BeatmapSetInfo != null && other.BeatmapSetInfo != null &&
+                                                             BeatmapSetInfo.Hash == other.BeatmapSetInfo.Hash &&
+                                                             (Metadata ?? BeatmapSetInfo.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSetInfo.Metadata).BackgroundFile;
 
         /// <summary>
         /// Returns a shallow-clone of this <see cref="EFBeatmapInfo"/>.
@@ -167,16 +168,16 @@ namespace osu.Game.Beatmaps
         #region Implementation of IBeatmapInfo
 
         [JsonIgnore]
-        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new EFBeatmapMetadata();
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSetInfo?.Metadata ?? new EFBeatmapMetadata();
 
         [JsonIgnore]
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
 
         [JsonIgnore]
-        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
+        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSetInfo;
 
         [JsonIgnore]
-        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+        IRulesetInfo IBeatmapInfo.Ruleset => RulesetInfo;
 
         #endregion
     }
