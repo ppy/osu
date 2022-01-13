@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Menu
             if (!resuming)
             {
                 // generally this can never be null
-                // an exception is running ruleset tests, where the osu! ruleset may not be prsent (causing importing the intro to fail).
+                // an exception is running ruleset tests, where the osu! ruleset may not be present (causing importing the intro to fail).
                 if (initialBeatmap != null)
                     beatmap.Value = initialBeatmap;
                 Track = beatmap.Value.Track;
