@@ -393,9 +393,6 @@ namespace osu.Game.Stores
                             LogForModel(item, @"Found existing but failed re-use check.");
 
                             existing.DeletePending = true;
-
-                            // todo: actually delete? i don't think this is required...
-                            // ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
 
                         PreImport(item, realm);
