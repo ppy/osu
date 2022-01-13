@@ -47,8 +47,9 @@ namespace osu.Game.Database
         /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
         /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
+        /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
         /// </summary>
-        private const int schema_version = 12;
+        private const int schema_version = 13;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
