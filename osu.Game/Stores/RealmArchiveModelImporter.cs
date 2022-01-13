@@ -169,7 +169,7 @@ namespace osu.Game.Stores
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First()}!"
+                    ? $"Imported {imported.First().GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PostImport != null)
