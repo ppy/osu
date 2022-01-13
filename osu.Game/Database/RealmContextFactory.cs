@@ -18,6 +18,7 @@ using osu.Game.Models;
 using osu.Game.Skinning;
 using osu.Game.Stores;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using Realms;
 
 #nullable enable
@@ -112,6 +113,11 @@ namespace osu.Game.Database
             using (var realm = CreateContext())
             using (var transaction = realm.BeginWrite())
             {
+                var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
+
+                foreach (var score in pendingDeleteScores)
+                    realm.Remove(score);
+
                 var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
 
                 foreach (var beatmapSet in pendingDeleteSets)
