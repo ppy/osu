@@ -501,8 +501,6 @@ namespace osu.Game
                 return;
             }
 
-            databasedScoreInfo = databasedScoreInfo.Detach();
-
             var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
 
             if (databasedScore.Replay == null)
