@@ -154,8 +154,7 @@ namespace osu.Game.Database
             return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
         }
 
-        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject
-        )
+        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLiveUnmanaged<T>(realmObject);
