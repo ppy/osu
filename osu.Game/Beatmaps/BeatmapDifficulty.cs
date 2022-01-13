@@ -37,12 +37,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Returns a shallow-clone of this <see cref="BeatmapDifficulty"/>.
         /// </summary>
-        public BeatmapDifficulty Clone()
-        {
-            var diff = (BeatmapDifficulty)MemberwiseClone();
-            CopyTo(diff);
-            return diff;
-        }
+        public virtual BeatmapDifficulty Clone() => new BeatmapDifficulty(this);
 
         public virtual void CopyTo(BeatmapDifficulty difficulty)
         {
