@@ -208,6 +208,8 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             #region Overrides of BeatmapDifficulty
 
+            public override BeatmapDifficulty Clone() => new TaikoMultiplierAppliedDifficulty(this);
+
             public override void CopyTo(BeatmapDifficulty other)
             {
                 base.CopyTo(other);
