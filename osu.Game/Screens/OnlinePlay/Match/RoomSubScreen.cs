@@ -21,6 +21,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -101,6 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             InternalChildren = new Drawable[]
             {
                 beatmapAvailabilityTracker,
+                new MultiplayerRoomSounds(),
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
