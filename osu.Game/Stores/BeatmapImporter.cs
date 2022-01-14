@@ -71,7 +71,7 @@ namespace osu.Game.Stores
 
             bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
-            onlineLookupQueue?.Update(beatmapSet, cancellationToken);
+            onlineLookupQueue?.Update(beatmapSet);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
