@@ -88,6 +88,7 @@ namespace osu.Game.Beatmaps
                 {
                     logForModel(set, $"Online retrieval failed for {beatmapInfo}");
                     beatmapInfo.OnlineID = -1;
+                    return;
                 }
 
                 var res = req.Response;
