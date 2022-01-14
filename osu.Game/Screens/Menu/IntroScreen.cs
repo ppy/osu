@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Menu
                         if (s.Beatmaps.Count == 0)
                             return;
 
-                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0].ToLive(realmContextFactory));
+                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0]);
                     });
                 }
             }
