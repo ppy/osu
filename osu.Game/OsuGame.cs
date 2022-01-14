@@ -820,7 +820,17 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
-            chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
+            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
+            // Multiplayer modes need to increase poll rate temporarily.
+            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
+
+            void updateChatPollRate()
+            {
+                channelManager.HighPollRate.Value =
+                    chatOverlay.State.Value == Visibility.Visible
+                    || API.Activity.Value is UserActivity.InLobby
+                    || API.Activity.Value is UserActivity.InMultiplayerGame;
+            }
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
