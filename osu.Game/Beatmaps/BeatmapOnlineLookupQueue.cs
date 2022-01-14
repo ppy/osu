@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
                 prepareLocalCache();
         }
 
-        public void Update(BeatmapSetInfo beatmapSet, CancellationToken cancellationToken)
+        public void Update(BeatmapSetInfo beatmapSet)
         {
             foreach (var b in beatmapSet.Beatmaps)
                 lookup(beatmapSet, b);
