@@ -48,6 +48,7 @@ namespace osu.Game.Database
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
                                         .Include(s => s.Files).ThenInclude(f => f.FileInfo)
+                                        .Include(s => s.Metadata)
                                         .ToList();
 
             // previous entries in EF are removed post migration.
@@ -105,24 +106,7 @@ namespace osu.Game.Database
                                 Bookmarks = beatmap.Bookmarks,
                                 Ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName),
                                 Difficulty = new BeatmapDifficulty(beatmap.BaseDifficulty),
-                                Metadata = new BeatmapMetadata
-                                {
-                                    Title = beatmap.Metadata.Title,
-                                    TitleUnicode = beatmap.Metadata.TitleUnicode,
-                                    Artist = beatmap.Metadata.Artist,
-                                    ArtistUnicode = beatmap.Metadata.ArtistUnicode,
-                                    Author = new RealmUser
-                                    {
-                                        OnlineID = beatmap.Metadata.Author.Id,
-                                        Username = beatmap.Metadata.Author.Username,
-                                    },
-                                    Source = beatmap.Metadata.Source,
-                                    Tags = beatmap.Metadata.Tags,
-                                    PreviewTime = beatmap.Metadata.PreviewTime,
-                                    AudioFile = beatmap.Metadata.AudioFile,
-                                    BackgroundFile = beatmap.Metadata.BackgroundFile,
-                                    AuthorString = beatmap.Metadata.AuthorString,
-                                },
+                                Metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata),
                                 BeatmapSet = realmBeatmapSet,
                             };
 
@@ -138,6 +122,30 @@ namespace osu.Game.Database
 
                 transaction.Commit();
             }
+        }
+
+        private BeatmapMetadata getBestMetadata(EFBeatmapMetadata? beatmapMetadata, EFBeatmapMetadata? beatmapSetMetadata)
+        {
+            var metadata = beatmapMetadata ?? beatmapSetMetadata ?? new EFBeatmapMetadata();
+
+            return new BeatmapMetadata
+            {
+                Title = metadata.Title,
+                TitleUnicode = metadata.TitleUnicode,
+                Artist = metadata.Artist,
+                ArtistUnicode = metadata.ArtistUnicode,
+                Author = new RealmUser
+                {
+                    OnlineID = metadata.Author.Id,
+                    Username = metadata.Author.Username,
+                },
+                Source = metadata.Source,
+                Tags = metadata.Tags,
+                PreviewTime = metadata.PreviewTime,
+                AudioFile = metadata.AudioFile,
+                BackgroundFile = metadata.BackgroundFile,
+                AuthorString = metadata.AuthorString,
+            };
         }
 
         private void migrateScores(DatabaseWriteUsage db)
