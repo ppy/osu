@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
         }
 
         [SetUp]
