@@ -429,7 +429,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             for (int i = 0; i < 20; i++)
             {
-                // index + 1 because we are using OnlineID which should never be zero.
                 var set = TestResources.CreateTestBeatmapSetInfo();
 
                 // only need to set the first as they are a shared reference.
