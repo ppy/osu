@@ -17,6 +17,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Midi;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -35,6 +37,8 @@ using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -447,6 +451,23 @@ namespace osu.Game
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
+
+        /// <summary>
+        /// Creates an input settings subsection for an <see cref="InputHandler"/>.
+        /// </summary>
+        /// <remarks>Should be overriden per-platform to provide settings for platform-specific handlers.</remarks>
+        public virtual SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case MidiHandler _:
+                    return new InputSection.HandlerSection(handler);
+
+                // return null for handlers that shouldn't have settings.
+                default:
+                    return null;
+            }
+        }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
