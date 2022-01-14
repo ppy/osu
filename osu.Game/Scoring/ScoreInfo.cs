@@ -131,7 +131,7 @@ namespace osu.Game.Scoring
 
         public ScoreInfo DeepClone()
         {
-            var clone = (ScoreInfo)MemberwiseClone();
+            var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
 
