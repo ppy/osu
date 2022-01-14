@@ -20,8 +20,15 @@ using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
+using osu.Framework.Input.Handlers;
+using osu.Framework.Input.Handlers.Joystick;
+using osu.Framework.Input.Handlers.Mouse;
+using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Threading;
 using osu.Game.IO;
+using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Overlays.Settings.Sections.Input;
 
 namespace osu.Desktop
 {
@@ -154,6 +161,24 @@ namespace osu.Desktop
             desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
+        }
+
+        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case ITabletHandler th:
+                    return new TabletSettings(th);
+
+                case MouseHandler mh:
+                    return new MouseSettings(mh);
+
+                case JoystickHandler _:
+                    return new InputSection.HandlerSection(handler);
+
+                default:
+                    return base.CreateSettingsSubsectionFor(handler);
+            }
         }
 
         private readonly List<string> importableFiles = new List<string>();
