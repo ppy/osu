@@ -134,14 +134,6 @@ namespace osu.Game.Overlays
         /// </summary>
         public bool TrackLoaded => CurrentTrack.TrackLoaded;
 
-        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(() =>
-        {
-            beatmapSets.Remove(set);
-            beatmapSets.Add(set);
-        });
-
-        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
-
         private ScheduledDelegate seekDelegate;
 
         public void SeekTo(double position)
