@@ -9,7 +9,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public class ControlPointVisualisation : PointVisualisation
+    public class ControlPointVisualisation : PointVisualisation, IControlPointVisualisationRedundant
     {
         protected readonly ControlPoint Point;
 
@@ -26,5 +26,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             Colour = Point.GetRepresentingColour(colours);
         }
+
+        public bool IsRedundant(ControlPoint other) => other.GetType() == Point.GetType();
     }
 }
