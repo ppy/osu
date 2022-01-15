@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                                 // to guarantee an accurate representation.
                                 //
                                 // note that the case where control point (type) is added or removed from a non-displayed group is not handled correctly.
-                                // this is an edge case which shouldn't affect the user too badly. we may flatted control point groups in the future
+                                // this is an edge case which shouldn't affect the user too badly. we may flatten control point groups in the future
                                 // which would allow this to be handled better.
                                 Clear();
                                 foreach (var g in controlPointGroups)
