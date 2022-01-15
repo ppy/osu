@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -21,25 +20,21 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        private const float default_flashlight_size = 180;
+        public override bool DefaultComboDependency => true;
+
+        //private const float default_flashlight_size = 180;
+        public override float DefaultRadius => 180;
 
         private const double default_follow_delay = 120;
 
         private OsuFlashlight flashlight;
 
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight();
+        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             if (drawable is DrawableSlider s)
                 s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
-        }
-
-        public override void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            base.ApplyToDrawableRuleset(drawableRuleset);
-
-            flashlight.FollowDelay = FollowDelay.Value;
         }
 
         [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
@@ -54,9 +49,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             public double FollowDelay { private get; set; }
 
-            public OsuFlashlight()
+            //public float InitialRadius { private get; set; }
+            public bool ChangeRadius { private get; set; }
+
+            public OsuFlashlight(bool isRadiusBasedOnCombo, float initialRadius, double followDelay)
+                : base(isRadiusBasedOnCombo, initialRadius)
             {
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FollowDelay = followDelay;
+
+                FlashlightSize = new Vector2(0, GetRadiusFor(0));
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
@@ -78,17 +79,20 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             private float getSizeFor(int combo)
             {
-                if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
+                if (ChangeRadius)
+                {
+                    if (combo > 200)
+                        return InitialRadius * 0.8f;
+                    else if (combo > 100)
+                        return InitialRadius * 0.9f;
+                }
+
+                return InitialRadius;
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetRadiusFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

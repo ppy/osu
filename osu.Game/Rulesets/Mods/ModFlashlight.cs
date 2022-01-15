@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
 using osu.Game.Rulesets.Objects;
@@ -32,8 +33,26 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
 
+        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
+        public Bindable<bool> ChangeRadius { get; private set; }
+
+        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
+        public BindableNumber<float> InitialRadius { get; private set; }
+
+        public abstract float DefaultRadius { get; }
+
+        public abstract bool DefaultComboDependency { get; }
+
         internal ModFlashlight()
         {
+            InitialRadius = new BindableFloat
+            {
+                MinValue = 90f,
+                MaxValue = 250f,
+                Precision = 5f,
+            };
+
+            ChangeRadius = new BindableBool(DefaultComboDependency);
         }
     }
 
@@ -93,6 +112,16 @@ namespace osu.Game.Rulesets.Mods
 
             public List<BreakPeriod> Breaks;
 
+            public readonly bool IsRadiusBasedOnCombo;
+
+            public readonly float InitialRadius;
+
+            protected Flashlight(bool isRadiusBasedOnCombo, float initialRadius)
+            {
+                IsRadiusBasedOnCombo = isRadiusBasedOnCombo;
+                InitialRadius = initialRadius;
+            }
+
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaderManager)
             {
@@ -123,6 +152,19 @@ namespace osu.Game.Rulesets.Mods
             protected abstract void OnComboChange(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
+
+            protected float GetRadiusFor(int combo)
+            {
+                if (IsRadiusBasedOnCombo)
+                {
+                    if (combo > 200)
+                        return InitialRadius * 0.8f;
+                    else if (combo > 100)
+                        return InitialRadius * 0.9f;
+                }
+
+                return InitialRadius;
+            }
 
             private Vector2 flashlightPosition;
 
