@@ -7,6 +7,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
     public interface IControlPointVisualisationRedundant
     {
-        bool IsRedundant(ControlPoint other);
+        /// <summary>
+        /// For display purposes, check whether the proposed point is made redundant by this visualisation.
+        /// </summary>
+        bool IsVisuallyRedundant(ControlPoint other);
     }
 }

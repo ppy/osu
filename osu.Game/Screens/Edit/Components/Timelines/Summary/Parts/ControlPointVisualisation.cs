@@ -27,6 +27,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             Colour = Point.GetRepresentingColour(colours);
         }
 
-        public bool IsRedundant(ControlPoint other) => other.GetType() == Point.GetType();
+        public bool IsVisuallyRedundant(ControlPoint other) => other.GetType() == Point.GetType();
     }
 }

@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                             // as an optimisation, don't add a visualisation if there are already groups with the same types in close proximity.
                             // for newly added control points (ie. lazer editor first where group is added empty) we always skip for simplicity.
                             // that is fine, because cases where this is causing a performance issue are mostly where external tools were used to create an insane number of points.
-                            if (Children.Any(g => Math.Abs(g.Group.Time - group.Time) < 1000 && g.IsRedundant(group)))
+                            if (Children.Any(g => Math.Abs(g.Group.Time - group.Time) < 1000 && g.IsVisuallyRedundant(group)))
                                 continue;
 
                             Add(new GroupVisualisation(group));
