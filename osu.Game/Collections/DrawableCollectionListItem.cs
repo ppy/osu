@@ -80,7 +80,7 @@ namespace osu.Game.Collections
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Children = new Drawable[]
                 {

@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
 using osuTK;
 
 namespace osu.Game.Screens.Edit
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Edit
         protected FillFlowContainer Flow { get; private set; }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours)
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
