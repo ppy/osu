@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -37,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private Drawable chroma;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, MatchIPCInfo ipc, Storage storage)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc)
         {
             this.ipc = ipc;
 

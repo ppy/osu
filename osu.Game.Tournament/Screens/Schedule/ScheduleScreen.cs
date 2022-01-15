@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -25,7 +24,7 @@ namespace osu.Game.Tournament.Screens.Schedule
         private LadderInfo ladder;
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, Storage storage)
+        private void load(LadderInfo ladder)
         {
             this.ladder = ladder;
 

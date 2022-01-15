@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             beatLength.BindValueChanged(beatLength =>
             {
