@@ -5,7 +5,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 {
-    public interface IControlPointVisualisationRedundant
+    public interface IControlPointVisualisation
     {
         /// <summary>
         /// For display purposes, check whether the proposed point is made redundant by this visualisation.
