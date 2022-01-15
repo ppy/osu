@@ -7,8 +7,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Database;
+using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -67,11 +69,37 @@ namespace osu.Game.Online.Chat
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
+        private readonly IBindable<bool> isIdle = new BindableBool();
+
         public ChannelManager()
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
+        }
 
-            HighPollRate.BindValueChanged(enabled => TimeBetweenPolls.Value = enabled.NewValue ? 1000 : 6000, true);
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(IdleTracker idleTracker)
+        {
+            HighPollRate.BindValueChanged(updatePollRate);
+            isIdle.BindValueChanged(updatePollRate, true);
+
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
+        }
+
+        private void updatePollRate(ValueChangedEvent<bool> valueChangedEvent)
+        {
+            // Polling will eventually be replaced with websocket, but let's avoid doing these background operations as much as possible for now.
+            // The only loss will be delayed PM/message highlight notifications.
+            int millisecondsBetweenPolls = HighPollRate.Value ? 1000 : 60000;
+
+            if (isIdle.Value)
+                millisecondsBetweenPolls *= 10;
+
+            if (TimeBetweenPolls.Value != millisecondsBetweenPolls)
+            {
+                TimeBetweenPolls.Value = millisecondsBetweenPolls;
+                Logger.Log($"Chat is now polling every {TimeBetweenPolls.Value} ms");
+            }
         }
 
         /// <summary>
@@ -335,7 +363,7 @@ namespace osu.Game.Online.Chat
         /// right now it caps out at 50 messages and therefore only returns one channel's worth of content.
         /// </summary>
         /// <param name="channel">The channel </param>
-        private void fetchInitalMessages(Channel channel)
+        private void fetchInitialMessages(Channel channel)
         {
             if (channel.Id <= 0 || channel.MessagesLoaded) return;
 
@@ -441,7 +469,7 @@ namespace osu.Game.Online.Chat
             else
             {
                 if (fetchInitialMessages)
-                    fetchInitalMessages(channel);
+                    this.fetchInitialMessages(channel);
             }
 
             CurrentChannel.Value ??= channel;
@@ -509,11 +537,12 @@ namespace osu.Game.Online.Chat
                 else if (lastClosedChannel.Type == ChannelType.PM)
                 {
                     // Try to get user in order to open PM chat
-                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(u =>
+                    users.GetUserAsync((int)lastClosedChannel.Id).ContinueWith(task =>
                     {
-                        if (u.Result == null) return;
+                        var user = task.GetResultSafely();
 
-                        Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(u.Result)));
+                        if (user != null)
+                            Schedule(() => CurrentChannel.Value = JoinChannel(new Channel(user)));
                     });
                 }
 

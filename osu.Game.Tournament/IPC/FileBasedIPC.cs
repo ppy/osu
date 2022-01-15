@@ -28,7 +28,7 @@ namespace osu.Game.Tournament.IPC
         protected IAPIProvider API { get; private set; }
 
         [Resolved]
-        protected RulesetStore Rulesets { get; private set; }
+        protected IRulesetStore Rulesets { get; private set; }
 
         [Resolved]
         private GameHost host { get; set; }

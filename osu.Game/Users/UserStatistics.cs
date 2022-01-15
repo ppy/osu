@@ -27,6 +27,9 @@ namespace osu.Game.Users
             public int Progress;
         }
 
+        [JsonProperty(@"is_ranked")]
+        public bool IsRanked;
+
         [JsonProperty(@"global_rank")]
         public int? GlobalRank;
 

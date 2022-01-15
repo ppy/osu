@@ -8,21 +8,28 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Stores;
+using Realms;
+
+#nullable enable
 
 namespace osu.Game.Skinning
 {
-    public class SkinModelManager : ArchiveModelManager<SkinInfo, SkinFileInfo>
+    public class SkinModelManager : RealmArchiveModelManager<SkinInfo>
     {
+        private const string skin_info_file = "skininfo.json";
+
         private readonly IStorageResourceProvider skinResources;
 
-        public SkinModelManager(Storage storage, DatabaseContextFactory contextFactory, SkinStore skinStore, GameHost host, IStorageResourceProvider skinResources)
-            : base(storage, contextFactory, skinStore, host)
+        public SkinModelManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IStorageResourceProvider skinResources)
+            : base(storage, contextFactory)
         {
             this.skinResources = skinResources;
 
@@ -42,18 +49,55 @@ namespace osu.Game.Skinning
 
         protected override bool HasCustomHashFunction => true;
 
-        protected override string ComputeHash(SkinInfo item)
+        protected override Task Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        {
+            var skinInfoFile = model.Files.SingleOrDefault(f => f.Filename == skin_info_file);
+
+            if (skinInfoFile != null)
+            {
+                try
+                {
+                    using (var existingStream = Files.Storage.GetStream(skinInfoFile.File.GetStoragePath()))
+                    using (var reader = new StreamReader(existingStream))
+                    {
+                        var deserialisedSkinInfo = JsonConvert.DeserializeObject<SkinInfo>(reader.ReadToEnd());
+
+                        if (deserialisedSkinInfo != null)
+                        {
+                            // for now we only care about the instantiation info.
+                            // eventually we probably want to transfer everything across.
+                            model.InstantiationInfo = deserialisedSkinInfo.InstantiationInfo;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    LogForModel(model, $"Error during {skin_info_file} parsing, falling back to default", e);
+
+                    // Not sure if we should still run the import in the case of failure here, but let's do so for now.
+                    model.InstantiationInfo = string.Empty;
+                }
+            }
+
+            // Always rewrite instantiation info (even after parsing in from the skin json) for sanity.
+            model.InstantiationInfo = createInstance(model).GetType().GetInvariantInstantiationInfo();
+
+            checkSkinIniMetadata(model, realm);
+
+            return Task.CompletedTask;
+        }
+
+        private void checkSkinIniMetadata(SkinInfo item, Realm realm)
         {
             var instance = createInstance(item);
 
             // This function can be run on fresh import or save. The logic here ensures a skin.ini file is in a good state for both operations.
-
             // `Skin` will parse the skin.ini and populate `Skin.Configuration` during construction above.
             string skinIniSourcedName = instance.Configuration.SkinInfo.Name;
             string skinIniSourcedCreator = instance.Configuration.SkinInfo.Creator;
             string archiveName = item.Name.Replace(@".osk", string.Empty, StringComparison.OrdinalIgnoreCase);
 
-            bool isImport = item.ID == 0;
+            bool isImport = !item.IsManaged;
 
             if (isImport)
             {
@@ -71,12 +115,10 @@ namespace osu.Game.Skinning
             // Regardless of whether this is an import or not, let's write the skin.ini if non-existing or non-matching.
             // This is (weirdly) done inside ComputeHash to avoid adding a new method to handle this case. After switching to realm it can be moved into another place.
             if (skinIniSourcedName != item.Name)
-                updateSkinIniMetadata(item);
-
-            return base.ComputeHash(item);
+                updateSkinIniMetadata(item, realm);
         }
 
-        private void updateSkinIniMetadata(SkinInfo item)
+        private void updateSkinIniMetadata(SkinInfo item, Realm realm)
         {
             string nameLine = @$"Name: {item.Name}";
             string authorLine = @$"Author: {item.Creator}";
@@ -95,38 +137,46 @@ namespace osu.Game.Skinning
             {
                 // In the case a skin doesn't have a skin.ini yet, let's create one.
                 writeNewSkinIni();
-                return;
             }
-
-            using (Stream stream = new MemoryStream())
+            else
             {
-                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                using (Stream stream = new MemoryStream())
                 {
-                    using (var existingStream = Files.Storage.GetStream(existingFile.FileInfo.GetStoragePath()))
-                    using (var sr = new StreamReader(existingStream))
+                    using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                     {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
+                        using (var existingStream = Files.Storage.GetStream(existingFile.File.GetStoragePath()))
+                        using (var sr = new StreamReader(existingStream))
+                        {
+                            string? line;
+                            while ((line = sr.ReadLine()) != null)
+                                sw.WriteLine(line);
+                        }
+
+                        sw.WriteLine();
+
+                        foreach (string line in newLines)
                             sw.WriteLine(line);
                     }
 
-                    sw.WriteLine();
+                    ReplaceFile(existingFile, stream, realm);
 
-                    foreach (string line in newLines)
-                        sw.WriteLine(line);
-                }
+                    // can be removed 20220502.
+                    if (!ensureIniWasUpdated(item))
+                    {
+                        Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
 
-                ReplaceFile(item, existingFile, stream);
+                        var existingIni = item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase));
+                        if (existingIni != null)
+                            item.Files.Remove(existingIni);
 
-                // can be removed 20220502.
-                if (!ensureIniWasUpdated(item))
-                {
-                    Logger.Log($"Skin {item}'s skin.ini had issues and has been removed. Please report this and provide the problematic skin.", LoggingTarget.Database, LogLevel.Important);
-
-                    DeleteFile(item, item.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase)));
-                    writeNewSkinIni();
+                        writeNewSkinIni();
+                    }
                 }
             }
+
+            // The hash is already populated at this point in import.
+            // As we have changed files, it needs to be recomputed.
+            item.Hash = ComputeHash(item);
 
             void writeNewSkinIni()
             {
@@ -138,8 +188,10 @@ namespace osu.Game.Skinning
                             sw.WriteLine(line);
                     }
 
-                    AddFile(item, stream, @"skin.ini");
+                    AddFile(item, stream, @"skin.ini", realm);
                 }
+
+                item.Hash = ComputeHash(item);
             }
         }
 
@@ -154,36 +206,61 @@ namespace osu.Game.Skinning
             return instance.Configuration.SkinInfo.Name == item.Name;
         }
 
-        protected override Task Populate(SkinInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
-        {
-            var instance = createInstance(model);
-
-            model.InstantiationInfo ??= instance.GetType().GetInvariantInstantiationInfo();
-
-            model.Name = instance.Configuration.SkinInfo.Name;
-            model.Creator = instance.Configuration.SkinInfo.Creator;
-
-            return Task.CompletedTask;
-        }
-
         private void populateMissingHashes()
         {
-            var skinsWithoutHashes = ModelStore.ConsumableItems.Where(i => i.Hash == null).ToArray();
-
-            foreach (SkinInfo skin in skinsWithoutHashes)
+            using (var realm = ContextFactory.CreateContext())
             {
-                try
+                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
+
+                foreach (SkinInfo skin in skinsWithoutHashes)
                 {
-                    Update(skin);
-                }
-                catch (Exception e)
-                {
-                    Delete(skin);
-                    Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
+                    try
+                    {
+                        realm.Write(r => skin.Hash = ComputeHash(skin));
+                    }
+                    catch (Exception e)
+                    {
+                        Delete(skin);
+                        Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
+                    }
                 }
             }
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
+
+        public void Save(Skin skin)
+        {
+            skin.SkinInfo.PerformWrite(s =>
+            {
+                // Serialise out the SkinInfo itself.
+                string skinInfoJson = JsonConvert.SerializeObject(s, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
+                {
+                    AddFile(s, streamContent, skin_info_file, s.Realm);
+                }
+
+                // Then serialise each of the drawable component groups into respective files.
+                foreach (var drawableInfo in skin.DrawableComponentInfo)
+                {
+                    string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
+                    using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+                    {
+                        string filename = @$"{drawableInfo.Key}.json";
+
+                        var oldFile = s.Files.FirstOrDefault(f => f.Filename == filename);
+
+                        if (oldFile != null)
+                            ReplaceFile(oldFile, streamContent, s.Realm);
+                        else
+                            AddFile(s, streamContent, filename, s.Realm);
+                    }
+                }
+
+                s.Hash = ComputeHash(s);
+            });
+        }
     }
 }

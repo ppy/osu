@@ -809,7 +809,7 @@ namespace osu.Game.Tests.Database
             // TODO: reimplement when we have score support in realm.
             // return ImportScoreTest.LoadScoreIntoOsu(osu, new ScoreInfo
             // {
-            //     OnlineScoreID = 2,
+            //     OnlineID = 2,
             //     Beatmap = beatmap,
             //     BeatmapInfoID = beatmap.ID
             // }, new ImportScoreTest.TestArchiveReader());

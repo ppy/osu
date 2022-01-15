@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Input;
-using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Components;
 using osu.Game.Screens.OnlinePlay.Match;
@@ -28,9 +27,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         public override string Title { get; }
 
         public override string ShortTitle => "playlist";
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
@@ -92,12 +88,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                 new Drawable[] { new OverlinedPlaylistHeader(), },
                                 new Drawable[]
                                 {
-                                    new DrawableRoomPlaylistWithResults
+                                    new DrawableRoomPlaylist
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Items = { BindTarget = Room.Playlist },
                                         SelectedItem = { BindTarget = SelectedItem },
-                                        RequestShowResults = item =>
+                                        AllowSelection = true,
+                                        AllowShowingResults = true,
+                                        RequestResults = item =>
                                         {
                                             Debug.Assert(RoomId.Value != null);
                                             ParentScreen?.Push(new PlaylistsResultsScreen(null, RoomId.Value.Value, item, false));

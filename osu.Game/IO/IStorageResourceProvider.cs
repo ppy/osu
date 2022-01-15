@@ -4,6 +4,7 @@
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Database;
 
 namespace osu.Game.IO
 {
@@ -23,6 +24,11 @@ namespace osu.Game.IO
         /// Access game-wide resources.
         /// </summary>
         IResourceStore<byte[]> Resources { get; }
+
+        /// <summary>
+        /// Access realm.
+        /// </summary>
+        RealmContextFactory RealmContextFactory { get; }
 
         /// <summary>
         /// Create a texture loader store based on an underlying data store.

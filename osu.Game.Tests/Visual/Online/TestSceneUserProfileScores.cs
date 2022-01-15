@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         public TestSceneUserProfileScores()
         {
-            var firstScore = new APIScoreInfo
+            var firstScore = new APIScore
             {
                 PP = 1047.21,
                 Rank = ScoreRank.SH,
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.9813
             };
 
-            var secondScore = new APIScoreInfo
+            var secondScore = new APIScore
             {
                 PP = 134.32,
                 Rank = ScoreRank.A,
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.998546
             };
 
-            var thirdScore = new APIScoreInfo
+            var thirdScore = new APIScore
             {
                 PP = 96.83,
                 Rank = ScoreRank.S,
@@ -81,7 +81,7 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.9726
             };
 
-            var noPPScore = new APIScoreInfo
+            var noPPScore = new APIScore
             {
                 Rank = ScoreRank.B,
                 Beatmap = new APIBeatmap

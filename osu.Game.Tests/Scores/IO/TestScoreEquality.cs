@@ -45,24 +45,6 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public void TestNonMatchingByHash()
-        {
-            ScoreInfo score1 = new ScoreInfo { Hash = "a" };
-            ScoreInfo score2 = new ScoreInfo { Hash = "b" };
-
-            Assert.That(score1, Is.Not.EqualTo(score2));
-        }
-
-        [Test]
-        public void TestMatchingByHash()
-        {
-            ScoreInfo score1 = new ScoreInfo { Hash = "a" };
-            ScoreInfo score2 = new ScoreInfo { Hash = "a" };
-
-            Assert.That(score1, Is.EqualTo(score2));
-        }
-
-        [Test]
         public void TestNonMatchingByNull()
         {
             ScoreInfo score = new ScoreInfo();

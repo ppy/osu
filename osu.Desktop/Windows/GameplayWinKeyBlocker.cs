@@ -14,6 +14,7 @@ namespace osu.Desktop.Windows
     {
         private Bindable<bool> disableWinKey;
         private IBindable<bool> localUserPlaying;
+        private IBindable<bool> isActive;
 
         [Resolved]
         private GameHost host { get; set; }
@@ -24,13 +25,16 @@ namespace osu.Desktop.Windows
             localUserPlaying = localUserInfo.IsPlaying.GetBoundCopy();
             localUserPlaying.BindValueChanged(_ => updateBlocking());
 
+            isActive = host.IsActive.GetBoundCopy();
+            isActive.BindValueChanged(_ => updateBlocking());
+
             disableWinKey = config.GetBindable<bool>(OsuSetting.GameplayDisableWinKey);
             disableWinKey.BindValueChanged(_ => updateBlocking(), true);
         }
 
         private void updateBlocking()
         {
-            bool shouldDisable = disableWinKey.Value && localUserPlaying.Value;
+            bool shouldDisable = isActive.Value && disableWinKey.Value && localUserPlaying.Value;
 
             if (shouldDisable)
                 host.InputThread.Scheduler.Add(WindowsKey.Disable);

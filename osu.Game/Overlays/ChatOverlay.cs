@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
         public LocalisableString Title => ChatStrings.HeaderTitle;
         public LocalisableString Description => ChatStrings.HeaderDescription;
 
-        private const float textbox_height = 60;
+        private const float text_box_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
         [Resolved]
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays
 
         private LoadingSpinner loading;
 
-        private FocusedTextBox textbox;
+        private FocusedTextBox textBox;
 
         private const int transition_length = 500;
 
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Padding = new MarginPadding
                                             {
-                                                Bottom = textbox_height
+                                                Bottom = text_box_height
                                             },
                                         },
                                         new Container
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             RelativeSizeAxes = Axes.X,
-                                            Height = textbox_height,
+                                            Height = text_box_height,
                                             Padding = new MarginPadding
                                             {
                                                 Top = padding * 2,
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays
                                             },
                                             Children = new Drawable[]
                                             {
-                                                textbox = new FocusedTextBox
+                                                textBox = new FocusedTextBox
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Height = 1,
@@ -197,7 +197,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            textbox.OnCommit += postMessage;
+            textBox.OnCommit += postMessage;
 
             ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
@@ -208,12 +208,12 @@ namespace osu.Game.Overlays
 
                 if (state.NewValue == Visibility.Visible)
                 {
-                    textbox.HoldFocus = false;
+                    textBox.HoldFocus = false;
                     if (1f - ChatHeight.Value < channel_selection_min_height)
                         this.TransformBindableTo(ChatHeight, 1f - channel_selection_min_height, 800, Easing.OutQuint);
                 }
                 else
-                    textbox.HoldFocus = true;
+                    textBox.HoldFocus = true;
             };
 
             ChannelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
@@ -237,10 +237,7 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
-                channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-
-                foreach (Channel channel in channelManager.JoinedChannels)
-                    ChannelTabControl.AddChannel(channel);
+                channelManager.JoinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
 
                 channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
                 availableChannelsChanged(null, null);
@@ -256,7 +253,7 @@ namespace osu.Game.Overlays
         {
             if (e.NewValue == null)
             {
-                textbox.Current.Disabled = true;
+                textBox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
                 ChannelSelectionOverlay.Show();
                 return;
@@ -265,7 +262,7 @@ namespace osu.Game.Overlays
             if (e.NewValue is ChannelSelectorTabItem.ChannelSelectorTabChannel)
                 return;
 
-            textbox.Current.Disabled = e.NewValue.ReadOnly;
+            textBox.Current.Disabled = e.NewValue.ReadOnly;
 
             if (ChannelTabControl.Current.Value != e.NewValue)
                 Scheduler.Add(() => ChannelTabControl.Current.Value = e.NewValue);
@@ -405,7 +402,7 @@ namespace osu.Game.Overlays
         protected override void OnFocus(FocusEvent e)
         {
             // this is necessary as textbox is masked away and therefore can't get focus :(
-            textbox.TakeFocus();
+            textBox.TakeFocus();
             base.OnFocus(e);
         }
 
@@ -414,7 +411,7 @@ namespace osu.Game.Overlays
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
 
-            textbox.HoldFocus = true;
+            textBox.HoldFocus = true;
 
             base.PopIn();
         }
@@ -426,7 +423,7 @@ namespace osu.Game.Overlays
 
             ChannelSelectionOverlay.Hide();
 
-            textbox.HoldFocus = false;
+            textBox.HoldFocus = false;
             base.PopOut();
         }
 
@@ -436,12 +433,19 @@ namespace osu.Game.Overlays
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (Channel channel in args.NewItems.Cast<Channel>())
-                        ChannelTabControl.AddChannel(channel);
+                    {
+                        if (channel.Type != ChannelType.Multiplayer)
+                            ChannelTabControl.AddChannel(channel);
+                    }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     foreach (Channel channel in args.OldItems.Cast<Channel>())
                     {
+                        if (!ChannelTabControl.Items.Contains(channel))
+                            continue;
+
                         ChannelTabControl.RemoveChannel(channel);
 
                         var loaded = loadedChannels.Find(c => c.Channel == channel);
@@ -477,9 +481,9 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void postMessage(TextBox textbox, bool newText)
+        private void postMessage(TextBox textBox, bool newText)
         {
-            string text = textbox.Text.Trim();
+            string text = textBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(text))
                 return;
@@ -489,7 +493,7 @@ namespace osu.Game.Overlays
             else
                 channelManager.PostMessage(text);
 
-            textbox.Text = string.Empty;
+            textBox.Text = string.Empty;
         }
 
         private class TabsArea : Container

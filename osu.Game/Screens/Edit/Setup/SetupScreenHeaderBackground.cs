@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Setup
                     {
                         new Box
                         {
-                            Colour = colours.GreySeafoamDarker,
+                            Colour = colours.GreySeaFoamDarker,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 24))

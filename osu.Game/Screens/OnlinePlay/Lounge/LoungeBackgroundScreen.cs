@@ -3,7 +3,6 @@
 
 #nullable enable
 
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Game.Online.Rooms;
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
         public LoungeBackgroundScreen()
         {
             SelectedRoom.BindValueChanged(onSelectedRoomChanged);
-            playlist.BindCollectionChanged((_, __) => PlaylistItem = playlist.FirstOrDefault());
+            playlist.BindCollectionChanged((_, __) => PlaylistItem = playlist.GetCurrentItem());
         }
 
         private void onSelectedRoomChanged(ValueChangedEvent<Room> room)

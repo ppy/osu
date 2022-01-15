@@ -251,7 +251,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationMuteButton()
         {
-            addVolumeSteps("mute button", () => volumeOverlay.IsMuted.Value = true, () => !volumeOverlay.IsMuted.Value);
+            addVolumeSteps("mute button", () =>
+            {
+                // Importantly, in the case the volume is muted but the user has a volume level set, it should be retained.
+                audioManager.VolumeTrack.Value = 0.5f;
+                volumeOverlay.IsMuted.Value = true;
+            }, () => !volumeOverlay.IsMuted.Value && audioManager.VolumeTrack.Value == 0.5f);
         }
 
         /// <remarks>

@@ -17,8 +17,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// </summary>
     public class TestMultiplayerRoomManager : MultiplayerRoomManager
     {
-        public bool RoomJoined { get; private set; }
-
         private readonly TestRoomRequestsHandler requestsHandler;
 
         public TestMultiplayerRoomManager(TestRoomRequestsHandler requestsHandler)
@@ -29,28 +27,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public IReadOnlyList<Room> ServerSideRooms => requestsHandler.ServerSideRooms;
 
         public override void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
-        {
-            base.CreateRoom(room, r =>
-            {
-                onSuccess?.Invoke(r);
-                RoomJoined = true;
-            }, onError);
-        }
+            => base.CreateRoom(room, r => onSuccess?.Invoke(r), onError);
 
         public override void JoinRoom(Room room, string password = null, Action<Room> onSuccess = null, Action<string> onError = null)
-        {
-            base.JoinRoom(room, password, r =>
-            {
-                onSuccess?.Invoke(r);
-                RoomJoined = true;
-            }, onError);
-        }
-
-        public override void PartRoom()
-        {
-            base.PartRoom();
-            RoomJoined = false;
-        }
+            => base.JoinRoom(room, password, r => onSuccess?.Invoke(r), onError);
 
         /// <summary>
         /// Adds a room to a local "server-side" list that's returned when a <see cref="GetRoomsRequest"/> is fired.

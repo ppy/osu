@@ -16,7 +16,6 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
-using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Details;
 using osuTK;
 using osuTK.Graphics;
@@ -37,9 +36,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private IAPIProvider api { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
 
         private IBeatmapInfo beatmapInfo;
 

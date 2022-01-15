@@ -29,7 +29,11 @@ namespace osu.Game.Tests.Visual
         {
             base.Content.AddRange(new Drawable[]
             {
-                Stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                Stack = new OsuScreenStack
+                {
+                    Name = nameof(ScreenTestScene),
+                    RelativeSizeAxes = Axes.Both
+                },
                 content = new Container { RelativeSizeAxes = Axes.Both },
                 DialogOverlay = new DialogOverlay()
             });

@@ -70,7 +70,9 @@ namespace osu.Desktop
                     if (!string.IsNullOrEmpty(stableInstallPath) && checkExists(stableInstallPath))
                         return stableInstallPath;
                 }
-                catch { }
+                catch
+                {
+                }
             }
 
             stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
@@ -113,7 +115,7 @@ namespace osu.Desktop
             base.LoadComplete();
 
             if (!noVersionOverlay)
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
 
             LoadComponentAsync(new DiscordRichPresence(), Add);
 

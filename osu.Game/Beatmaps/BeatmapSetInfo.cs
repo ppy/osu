@@ -18,6 +18,8 @@ namespace osu.Game.Beatmaps
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         private int? onlineID;
 
         [Column("OnlineBeatmapSetID")]

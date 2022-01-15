@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -120,16 +120,21 @@ namespace osu.Game.Online.Chat
 
         private void checkForMentions(Channel channel, Message message)
         {
-            if (!notifyOnUsername.Value || !checkContainsUsername(message.Content, localUser.Value.Username)) return;
+            if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
 
             notifications.Post(new MentionNotification(message.Sender.Username, channel));
         }
 
         /// <summary>
-        /// Checks if <paramref name="message"/> contains <paramref name="username"/>.
+        /// Checks if <paramref name="message"/> mentions <paramref name="username"/>.
         /// This will match against the case where underscores are used instead of spaces (which is how osu-stable handles usernames with spaces).
         /// </summary>
-        private static bool checkContainsUsername(string message, string username) => message.Contains(username, StringComparison.OrdinalIgnoreCase) || message.Contains(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase);
+        public static bool CheckContainsUsername(string message, string username)
+        {
+            string fullName = Regex.Escape(username);
+            string underscoreName = Regex.Escape(username.Replace(' ', '_'));
+            return Regex.IsMatch(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
+        }
 
         public class PrivateMessageNotification : OpenChannelNotification
         {
@@ -165,7 +170,7 @@ namespace osu.Game.Online.Chat
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
             {
-                IconBackgound.Colour = colours.PurpleDark;
+                IconBackground.Colour = colours.PurpleDark;
 
                 Activated = delegate
                 {

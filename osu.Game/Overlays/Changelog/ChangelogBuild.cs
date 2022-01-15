@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Changelog
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OverlayColourProvider colourProvider)
+        private void load()
         {
             foreach (var categoryEntries in Build.ChangelogEntries.GroupBy(b => b.Category).OrderBy(c => c.Key))
             {

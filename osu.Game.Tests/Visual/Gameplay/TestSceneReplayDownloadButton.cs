@@ -9,6 +9,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
@@ -135,7 +136,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
 
-            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)).Result);
+            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)).GetResultSafely());
 
             AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
 
@@ -164,7 +165,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private ScoreInfo getScoreInfo(bool replayAvailable)
         {
-            return new APIScoreInfo
+            return new APIScore
             {
                 OnlineID = 2553163309,
                 RulesetID = 0,

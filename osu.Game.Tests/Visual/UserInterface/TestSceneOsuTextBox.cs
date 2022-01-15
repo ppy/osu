@@ -62,6 +62,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private void clearTextboxes(IEnumerable<OsuTextBox> textBoxes) => AddStep("clear textbox", () => textBoxes.ForEach(textBox => textBox.Text = null));
-        private void expectedValue(IEnumerable<OsuTextBox> textBoxes, string value) => AddAssert("expected textbox value", () => textBoxes.All(textbox => textbox.Text == value));
+        private void expectedValue(IEnumerable<OsuTextBox> textBoxes, string value) => AddAssert("expected textbox value", () => textBoxes.All(textBox => textBox.Text == value));
     }
 }

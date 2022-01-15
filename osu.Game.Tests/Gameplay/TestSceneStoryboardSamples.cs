@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Audio;
@@ -15,6 +17,8 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -33,6 +37,9 @@ namespace osu.Game.Tests.Gameplay
     [HeadlessTest]
     public class TestSceneStoryboardSamples : OsuTestScene, IStorageResourceProvider
     {
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [Test]
         public void TestRetrieveTopLevelSample()
         {
@@ -164,10 +171,43 @@ namespace osu.Game.Tests.Gameplay
                     ((IApplicableToRate)testedMod).ApplyToRate(sampleInfo.StartTime)));
         }
 
+        [Test]
+        public void TestSamplePlaybackWithBeatmapHitsoundsOff()
+        {
+            GameplayClockContainer gameplayContainer = null;
+            TestDrawableStoryboardSample sample = null;
+
+            AddStep("disable beatmap hitsounds", () => config.SetValue(OsuSetting.BeatmapHitsounds, false));
+
+            AddStep("setup storyboard sample", () =>
+            {
+                Beatmap.Value = new TestCustomSkinWorkingBeatmap(new OsuRuleset().RulesetInfo, this);
+
+                var beatmapSkinSourceContainer = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+
+                Add(gameplayContainer = new MasterGameplayClockContainer(Beatmap.Value, 0)
+                {
+                    Child = beatmapSkinSourceContainer
+                });
+
+                beatmapSkinSourceContainer.Add(sample = new TestDrawableStoryboardSample(new StoryboardSampleInfo("test-sample", 1, 1))
+                {
+                    Clock = gameplayContainer.GameplayClock
+                });
+            });
+
+            AddStep("start", () => gameplayContainer.Start());
+
+            AddUntilStep("sample played", () => sample.IsPlayed);
+            AddUntilStep("sample has lifetime end", () => sample.LifetimeEnd < double.MaxValue);
+
+            AddStep("restore default", () => config.GetBindable<bool>(OsuSetting.BeatmapHitsounds).SetDefault());
+        }
+
         private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, IStorageResourceProvider resources)
-                : base(DefaultLegacySkin.Info, new TestResourceStore(resourceName), resources, "skin.ini")
+                : base(DefaultLegacySkin.CreateInfo(), new TestResourceStore(resourceName), resources, "skin.ini")
             {
             }
         }
@@ -183,7 +223,8 @@ namespace osu.Game.Tests.Gameplay
 
             public byte[] Get(string name) => name == resourceName ? TestResources.GetStore().Get("Resources/Samples/test-sample.mp3") : null;
 
-            public Task<byte[]> GetAsync(string name) => name == resourceName ? TestResources.GetStore().GetAsync("Resources/Samples/test-sample.mp3") : null;
+            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
+                => name == resourceName ? TestResources.GetStore().GetAsync("Resources/Samples/test-sample.mp3", cancellationToken) : null;
 
             public Stream GetStream(string name) => name == resourceName ? TestResources.GetStore().GetStream("Resources/Samples/test-sample.mp3") : null;
 
@@ -220,6 +261,7 @@ namespace osu.Game.Tests.Gameplay
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
+        public RealmContextFactory RealmContextFactory => null;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion

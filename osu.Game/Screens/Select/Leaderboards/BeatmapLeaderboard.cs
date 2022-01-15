@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -65,9 +66,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         private ScoreManager scoreManager { get; set; }
 
         [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
@@ -118,7 +116,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var cancellationToken = loadCancellationSource.Token;
 
-            if (BeatmapInfo == null)
+            var fetchBeatmapInfo = BeatmapInfo;
+
+            if (fetchBeatmapInfo == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
                 return null;
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 var scores = scoreManager
-                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == BeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
+                    .QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.ID == ruleset.Value.ID);
 
                 if (filterMods && !mods.Value.Any())
                 {
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
 
                 scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                            .ContinueWith(ordered => scoresCallback?.Invoke(ordered.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
+                            .ContinueWith(task => scoresCallback?.Invoke(task.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
 
                 return null;
             }
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (BeatmapInfo.OnlineID == null || BeatmapInfo?.Status <= BeatmapOnlineStatus.Pending)
+            if (fetchBeatmapInfo.OnlineID == null || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
                 PlaceholderState = PlaceholderState.Unavailable;
                 return null;
@@ -174,18 +174,18 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(BeatmapInfo, ruleset.Value ?? BeatmapInfo.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(fetchBeatmapInfo, ruleset.Value ?? fetchBeatmapInfo.Ruleset, Scope, requestMods);
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, BeatmapInfo)).ToArray(), cancellationToken)
-                            .ContinueWith(ordered => Schedule(() =>
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
+                            .ContinueWith(task => Schedule(() =>
                             {
                                 if (cancellationToken.IsCancellationRequested)
                                     return;
 
-                                scoresCallback?.Invoke(ordered.Result);
-                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, BeatmapInfo);
+                                scoresCallback?.Invoke(task.GetResultSafely());
+                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
 

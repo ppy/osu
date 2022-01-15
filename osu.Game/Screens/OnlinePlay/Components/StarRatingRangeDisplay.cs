@@ -80,7 +80,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         private void updateRange(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var orderedDifficulties = Playlist.Select(p => p.Beatmap.Value).OrderBy(b => b.StarRating).ToArray();
+            var orderedDifficulties = Playlist.Where(p => p.Beatmap.Value != null).Select(p => p.Beatmap.Value).OrderBy(b => b.StarRating).ToArray();
 
             StarDifficulty minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
             StarDifficulty maxDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[^1].StarRating : 0, 0);

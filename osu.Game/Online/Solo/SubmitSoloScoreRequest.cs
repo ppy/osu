@@ -12,17 +12,17 @@ namespace osu.Game.Online.Solo
 {
     public class SubmitSoloScoreRequest : APIRequest<MultiplayerScore>
     {
+        public readonly SubmittableScore Score;
+
         private readonly long scoreId;
 
         private readonly int beatmapId;
-
-        private readonly SubmittableScore score;
 
         public SubmitSoloScoreRequest(int beatmapId, long scoreId, ScoreInfo scoreInfo)
         {
             this.beatmapId = beatmapId;
             this.scoreId = scoreId;
-            score = new SubmittableScore(scoreInfo);
+            Score = new SubmittableScore(scoreInfo);
         }
 
         protected override WebRequest CreateWebRequest()
@@ -31,8 +31,9 @@ namespace osu.Game.Online.Solo
 
             req.ContentType = "application/json";
             req.Method = HttpMethod.Put;
+            req.Timeout = 30000;
 
-            req.AddRaw(JsonConvert.SerializeObject(score, new JsonSerializerSettings
+            req.AddRaw(JsonConvert.SerializeObject(Score, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));

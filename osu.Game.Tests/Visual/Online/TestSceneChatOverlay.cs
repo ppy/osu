@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -46,9 +45,6 @@ namespace osu.Game.Tests.Visual.Online
 
         [CanBeNull]
         private Func<Channel, List<Message>> onGetMessages;
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         public TestSceneChatOverlay()
         {
@@ -395,6 +391,25 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Open chat with user", () => channelManager.PostCommand("chat some body"));
             AddAssert("PM channel is selected", () =>
                 channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
+        }
+
+        [Test]
+        public void TestMultiplayerChannelIsNotShown()
+        {
+            Channel multiplayerChannel = null;
+
+            AddStep("join multiplayer channel", () => channelManager.JoinChannel(multiplayerChannel = new Channel(new APIUser())
+            {
+                Name = "#mp_1",
+                Type = ChannelType.Multiplayer,
+            }));
+
+            AddAssert("channel joined", () => channelManager.JoinedChannels.Contains(multiplayerChannel));
+            AddAssert("channel not present in overlay", () => !chatOverlay.TabMap.ContainsKey(multiplayerChannel));
+            AddAssert("multiplayer channel is not current", () => channelManager.CurrentChannel.Value != multiplayerChannel);
+
+            AddStep("leave channel", () => channelManager.LeaveChannel(multiplayerChannel));
+            AddAssert("channel left", () => !channelManager.JoinedChannels.Contains(multiplayerChannel));
         }
 
         private void pressChannelHotkey(int number)

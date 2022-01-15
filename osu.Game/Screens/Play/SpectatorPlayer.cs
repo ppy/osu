@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         private void userSentFrames(int userId, FrameDataBundle bundle)
         {
-            if (userId != score.ScoreInfo.User.Id)
+            if (userId != score.ScoreInfo.User.OnlineID)
                 return;
 
             if (!LoadedBeatmapSuccessfully)

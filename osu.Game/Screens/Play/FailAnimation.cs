@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -18,6 +19,7 @@ using osu.Framework.Utils;
 using osu.Game.Audio.Effects;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -34,6 +36,7 @@ namespace osu.Game.Screens.Play
 
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableDouble trackFreq = new BindableDouble(1);
+        private readonly BindableDouble volumeAdjustment = new BindableDouble(0.5);
 
         private Container filters;
 
@@ -57,6 +60,12 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.Both,
         };
+
+        /// <summary>
+        /// The player screen background, used to adjust appearance on failing.
+        /// </summary>
+        [CanBeNull]
+        public BackgroundScreen Background { private get; set; }
 
         public FailAnimation(DrawableRuleset drawableRuleset)
         {
@@ -117,6 +126,7 @@ namespace osu.Game.Screens.Play
             failSample.Play();
 
             track.AddAdjustment(AdjustableProperty.Frequency, trackFreq);
+            track.AddAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             applyToPlayfield(drawableRuleset.Playfield);
             drawableRuleset.Playfield.HitObjectContainer.FadeOut(duration / 2);
@@ -136,12 +146,17 @@ namespace osu.Game.Screens.Play
             Content.ScaleTo(0.85f, duration, Easing.OutQuart);
             Content.RotateTo(1, duration, Easing.OutQuart);
             Content.FadeColour(Color4.Gray, duration);
+
+            // Will be restored by `ApplyToBackground` logic in `SongSelect`.
+            Background?.FadeColour(OsuColour.Gray(0.3f), 60);
         }
 
         public void RemoveFilters(bool resetTrackFrequency = true)
         {
             if (resetTrackFrequency)
                 track?.RemoveAdjustment(AdjustableProperty.Frequency, trackFreq);
+
+            track?.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
             if (filters.Parent == null)
                 return;

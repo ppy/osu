@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                 },
             });
 
-            visiblityAssert(true);
+            visibilityAssert(true);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
                 },
             });
 
-            visiblityAssert(true);
+            visibilityAssert(true);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
                 },
             });
 
-            visiblityAssert(true);
+            visibilityAssert(true);
         }
 
         [Test]
@@ -73,10 +73,10 @@ namespace osu.Game.Tests.Visual.Online
                 },
             });
 
-            visiblityAssert(false);
+            visibilityAssert(false);
         }
 
-        private void visiblityAssert(bool shown)
+        private void visibilityAssert(bool shown)
         {
             AddAssert($"is container {(shown ? "visible" : "hidden")}", () => container.Alpha == (shown ? 1 : 0));
         }

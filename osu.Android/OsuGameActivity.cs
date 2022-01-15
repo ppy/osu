@@ -17,7 +17,7 @@ using osu.Game.Database;
 
 namespace osu.Android
 {
-    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = false, LaunchMode = LaunchMode.SingleInstance, Exported = true)]
+    [Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser)]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osz", DataHost = "*", DataMimeType = "*/*")]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osk", DataHost = "*", DataMimeType = "*/*")]
     [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault }, DataScheme = "content", DataPathPattern = ".*\\\\.osr", DataHost = "*", DataMimeType = "*/*")]
@@ -47,11 +47,6 @@ namespace osu.Android
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            // The default current directory on android is '/'.
-            // On some devices '/' maps to the app data directory. On others it maps to the root of the internal storage.
-            // In order to have a consistent current directory on all devices the full path of the app data directory is set as the current directory.
-            System.Environment.CurrentDirectory = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-
             base.OnCreate(savedInstanceState);
 
             // OnNewIntent() only fires for an activity if it's *re-launched* while it's on top of the activity stack.

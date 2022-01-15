@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             const string not_found_prefix = "beatmaps not found:";
 
-            string errorMesage = null;
+            string errorMessage = null;
 
             AddStep("setup", () =>
             {
@@ -96,9 +96,9 @@ namespace osu.Game.Tests.Visual.Playlists
                 SelectedRoom.Value.Name.Value = "Test Room";
                 SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = beatmap } });
 
-                errorMesage = $"{not_found_prefix} {beatmap.OnlineID}";
+                errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
 
-                RoomManager.CreateRequested = _ => errorMesage;
+                RoomManager.CreateRequested = _ => errorMessage;
             });
 
             AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
 
             AddAssert("error displayed", () => settings.ErrorText.IsPresent);
-            AddAssert("error has custom text", () => settings.ErrorText.Text != errorMesage);
+            AddAssert("error has custom text", () => settings.ErrorText.Text != errorMessage);
             AddAssert("playlist item marked invalid", () => !SelectedRoom.Value.Playlist[0].Valid.Value);
         }
 

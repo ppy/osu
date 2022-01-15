@@ -50,6 +50,8 @@ namespace osu.Game.Models
 
         public bool Equals(RealmRuleset? other) => other != null && OnlineID == other.OnlineID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
 
+        public bool Equals(IRulesetInfo? other) => other is RealmRuleset b && Equals(b);
+
         public override string ToString() => Name;
 
         public RealmRuleset Clone() => new RealmRuleset

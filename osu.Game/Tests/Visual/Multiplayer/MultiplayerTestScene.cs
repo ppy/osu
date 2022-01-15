@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
-        public bool RoomJoined => RoomManager.RoomJoined;
+        public bool RoomJoined => Client.RoomJoined;
 
         private readonly bool joinRoom;
 

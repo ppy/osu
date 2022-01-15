@@ -11,7 +11,7 @@
 
 A free-to-win rhythm game. Rhythm is just a *click* away!
 
-The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Currently known by and released under the codename "*lazer*". As in sharper than cutting-edge.
+The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Currently known by and released under the release codename "*lazer*". As in sharper than cutting-edge.
 
 ## Status
 
@@ -31,7 +31,7 @@ If you are looking to install or test osu! without setting up a development envi
 
 **Latest build:**
 
-| [Windows 8.1+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 10+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
+| [Windows 8.1+ (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe) | [macOS 10.15+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [Linux (x64)](https://github.com/ppy/osu/releases/latest/download/osu.AppImage) | [iOS 10+](https://osu.ppy.sh/home/testflight) | [Android 5+](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 
 - The iOS testflight link may fill up (Apple has a hard limit of 10,000 users). We reset it occasionally when this happens. Please do not ask about this. Check back regularly for link resets or follow [peppy](https://twitter.com/ppy) on twitter for announcements of link resets.
@@ -48,7 +48,7 @@ You can see some examples of custom rulesets by visiting the [custom ruleset dir
 
 Please make sure you have the following prerequisites:
 
-- A desktop platform with the [.NET 5.0 SDK](https://dotnet.microsoft.com/download) or higher installed.
+- A desktop platform with the [.NET 5.0 SDK](https://dotnet.microsoft.com/download) installed.
 - When developing with mobile, [Xamarin](https://docs.microsoft.com/en-us/xamarin/) is required, which is shipped together with Visual Studio or [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/).
 - When working with the codebase, we recommend using an IDE with intelligent code completion and syntax highlighting, such as [Visual Studio 2019+](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
 - When running on Linux, please have a system-wide FFmpeg installation available to support video decoding.

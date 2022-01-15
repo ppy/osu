@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider colourProvider, OsuColour colours)
         {
-            Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? colours.GreySeafoamDarker;
+            Background.Colour = Arrow.Colour = colourProvider?.Background4 ?? colours.GreySeaFoamDarker;
         }
 
         protected override Drawable CreateArrow() => Empty();

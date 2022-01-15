@@ -14,7 +14,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int? Position;
 
         [JsonProperty(@"score")]
-        public APIScoreInfo Score;
+        public APIScore Score;
 
         public ScoreInfo CreateScoreInfo(RulesetStore rulesets, BeatmapInfo beatmap = null)
         {

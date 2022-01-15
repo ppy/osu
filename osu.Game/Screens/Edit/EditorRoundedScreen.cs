@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Edit
@@ -13,9 +12,6 @@ namespace osu.Game.Screens.Edit
     public class EditorRoundedScreen : EditorScreen
     {
         public const int HORIZONTAL_PADDING = 100;
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         private Container roundedContent;
 

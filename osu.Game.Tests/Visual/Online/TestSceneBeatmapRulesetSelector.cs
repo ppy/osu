@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         [Test]
         public void TestMultipleRulesetsBeatmapSet()

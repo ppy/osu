@@ -111,7 +111,7 @@ namespace osu.Game.Graphics.Containers
             if (clock == null)
                 return;
 
-            double currentTrackTime = clock.CurrentTime;
+            double currentTrackTime = clock.CurrentTime + EarlyActivationMilliseconds;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -132,12 +132,10 @@ namespace osu.Game.Graphics.Containers
             {
                 // this may be the case where the beat syncing clock has been paused.
                 // we still want to show an idle animation, so use this container's time instead.
-                currentTrackTime = Clock.CurrentTime;
+                currentTrackTime = Clock.CurrentTime + EarlyActivationMilliseconds;
                 timingPoint = TimingControlPoint.DEFAULT;
                 effectPoint = EffectControlPoint.DEFAULT;
             }
-
-            currentTrackTime += EarlyActivationMilliseconds;
 
             double beatLength = timingPoint.BeatLength / Divisor;
 

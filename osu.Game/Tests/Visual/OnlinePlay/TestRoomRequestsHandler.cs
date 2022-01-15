@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
@@ -87,15 +85,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetRoomRequest getRoomRequest:
                     getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
-                    return true;
-
-                case GetBeatmapSetRequest getBeatmapSetRequest:
-                    var onlineReq = new GetBeatmapSetRequest(getBeatmapSetRequest.ID, getBeatmapSetRequest.Type);
-                    onlineReq.Success += res => getBeatmapSetRequest.TriggerSuccess(res);
-                    onlineReq.Failure += e => getBeatmapSetRequest.TriggerFailure(e);
-
-                    // Get the online API from the game's dependencies.
-                    game.Dependencies.Get<IAPIProvider>().Queue(onlineReq);
                     return true;
 
                 case CreateRoomScoreRequest createRoomScoreRequest:

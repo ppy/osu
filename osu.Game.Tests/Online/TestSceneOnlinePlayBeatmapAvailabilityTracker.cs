@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Online
         public void TestTrackerRespectsSoftDeleting()
         {
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
-            AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).Wait());
+            AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).WaitSafely());
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
 
             AddStep("delete beatmap", () => beatmaps.Delete(beatmaps.QueryBeatmapSet(b => b.OnlineID == testBeatmapSet.OnlineID)));
@@ -114,18 +114,23 @@ namespace osu.Game.Tests.Online
         public void TestTrackerRespectsChecksum()
         {
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddStep("import beatmap", () => beatmaps.Import(testBeatmapFile).WaitSafely());
+            addAvailabilityCheckStep("initially locally available", BeatmapAvailability.LocallyAvailable);
 
             AddStep("import altered beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetTestBeatmapForImport(true)).Wait();
+                beatmaps.Import(TestResources.GetTestBeatmapForImport(true)).WaitSafely();
             });
-            addAvailabilityCheckStep("state still not downloaded", BeatmapAvailability.NotDownloaded);
+            addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
             AddStep("recreate tracker", () => Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
             {
                 SelectedItem = { BindTarget = selectedItem }
             });
             addAvailabilityCheckStep("state not downloaded as well", BeatmapAvailability.NotDownloaded);
+
+            AddStep("reimport original beatmap", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
+            addAvailabilityCheckStep("locally available after re-import", BeatmapAvailability.LocallyAvailable);
         }
 
         private void addAvailabilityCheckStep(string description, Func<BeatmapAvailability> expected)

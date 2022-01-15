@@ -45,9 +45,9 @@ namespace osu.Game.Tests.Database
             {
                 var rulesets = new RealmRulesetStore(realmFactory, storage);
 
-                Assert.IsTrue((rulesets.AvailableRulesets.First() as RealmRuleset)?.IsManaged == false);
-                Assert.IsTrue((rulesets.GetRuleset(0) as RealmRuleset)?.IsManaged == false);
-                Assert.IsTrue((rulesets.GetRuleset("mania") as RealmRuleset)?.IsManaged == false);
+                Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
+                Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
+                Assert.IsFalse(rulesets.GetRuleset("mania")?.IsManaged);
             });
         }
     }

@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 beatmapSetInfo.Beatmaps.Add(beatmap);
             }
 
-            manager.Import(beatmapSetInfo).Wait();
+            manager.Import(beatmapSetInfo).WaitSafely();
         }
 
         public override void SetUpSteps()
@@ -179,7 +179,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             public new BeatmapCarousel Carousel => base.Carousel;
 
             public TestMultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
-                : base(room, beatmap, ruleset)
+                : base(room, null, beatmap, ruleset)
             {
             }
         }

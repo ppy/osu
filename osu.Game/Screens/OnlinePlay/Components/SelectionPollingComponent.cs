@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading.Tasks;
-using osu.Framework.Allocation;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -12,9 +11,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
     /// </summary>
     public class SelectionPollingComponent : RoomPollingComponent
     {
-        [Resolved]
-        private IRoomManager roomManager { get; set; }
-
         private readonly Room room;
 
         public SelectionPollingComponent(Room room)

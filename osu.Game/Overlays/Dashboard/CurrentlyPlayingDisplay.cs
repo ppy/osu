@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
@@ -44,9 +45,6 @@ namespace osu.Game.Overlays.Dashboard
         }
 
         [Resolved]
-        private IAPIProvider api { get; set; }
-
-        [Resolved]
         private UserLookupCache users { get; set; }
 
         protected override void LoadComplete()
@@ -64,17 +62,19 @@ namespace osu.Game.Overlays.Dashboard
                 case NotifyCollectionChangedAction.Add:
                     foreach (int id in e.NewItems.OfType<int>().ToArray())
                     {
-                        users.GetUserAsync(id).ContinueWith(u =>
+                        users.GetUserAsync(id).ContinueWith(task =>
                         {
-                            if (u.Result == null) return;
+                            var user = task.GetResultSafely();
+
+                            if (user == null) return;
 
                             Schedule(() =>
                             {
                                 // user may no longer be playing.
-                                if (!playingUsers.Contains(u.Result.Id))
+                                if (!playingUsers.Contains(user.Id))
                                     return;
 
-                                userFlow.Add(createUserPanel(u.Result));
+                                userFlow.Add(createUserPanel(user));
                             });
                         });
                     }

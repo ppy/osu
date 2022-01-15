@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(RulesetConfigCache),
+            typeof(IRulesetConfigCache),
             typeof(OsuColour),
             typeof(IBindable<WorkingBeatmap>),
             typeof(Bindable<WorkingBeatmap>),
@@ -82,9 +82,6 @@ namespace osu.Game.Tests.Visual.Navigation
 
         [Resolved]
         private OsuGameBase gameBase { get; set; }
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         [Test]
         public void TestNullRulesetHandled()

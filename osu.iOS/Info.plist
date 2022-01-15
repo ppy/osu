@@ -33,6 +33,8 @@
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>We don&apos;t really use the camera.</string>
 	<key>NSMicrophoneUsageDescription</key>

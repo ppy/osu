@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Tests.Resources;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -20,10 +20,8 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestScoreWithTimeStatistics()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents()
-            };
+            var score = TestResources.CreateTestScoreInfo();
+            score.HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents();
 
             loadPanel(score);
         }
@@ -31,10 +29,8 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestScoreWithPositionStatistics()
         {
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                HitEvents = createPositionDistributedHitEvents()
-            };
+            var score = TestResources.CreateTestScoreInfo();
+            score.HitEvents = createPositionDistributedHitEvents();
 
             loadPanel(score);
         }
@@ -42,7 +38,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestScoreWithoutStatistics()
         {
-            loadPanel(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+            loadPanel(TestResources.CreateTestScoreInfo());
         }
 
         [Test]

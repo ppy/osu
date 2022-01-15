@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -79,14 +80,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
-                            .ContinueWith(ordered => Schedule(() =>
+                            .ContinueWith(task => Schedule(() =>
                             {
                                 if (loadCancellationSource.IsCancellationRequested)
                                     return;
 
-                                var topScore = ordered.Result.First();
+                                var scores = task.GetResultSafely();
 
-                                scoreTable.DisplayScores(ordered.Result, apiBeatmap.Status.GrantsPerformancePoints());
+                                var topScore = scores.First();
+
+                                scoreTable.DisplayScores(scores, apiBeatmap.Status.GrantsPerformancePoints());
                                 scoreTable.Show();
 
                                 var userScore = value.UserScore;
@@ -94,7 +97,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
-                                if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
+                                if (userScoreInfo != null && userScoreInfo.OnlineID != topScore.OnlineID)
                                     topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             });

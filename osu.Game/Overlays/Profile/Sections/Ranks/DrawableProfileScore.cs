@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private const float performance_background_shear = 0.45f;
 
-        protected readonly APIScoreInfo Score;
+        protected readonly APIScore Score;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public DrawableProfileScore(APIScoreInfo score)
+        public DrawableProfileScore(APIScore score)
         {
             Score = score;
 

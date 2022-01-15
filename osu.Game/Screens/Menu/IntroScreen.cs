@@ -9,6 +9,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -17,7 +18,6 @@ using osu.Game.Configuration;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
             // prevent user from changing beatmap while the intro is still runnning.
             beatmap = Beatmap.BeginLease(false);
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Menu
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
+                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
                     import.PerformWrite(b =>
                     {

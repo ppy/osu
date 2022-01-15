@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
@@ -24,17 +25,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
+        private readonly long? itemToEdit;
+
         private LoadingLayer loadingLayer;
 
         /// <summary>
         /// Construct a new instance of multiplayer song select.
         /// </summary>
         /// <param name="room">The room.</param>
+        /// <param name="itemToEdit">The item to be edited. May be null, in which case a new item will be added to the playlist.</param>
         /// <param name="beatmap">An optional initial beatmap selection to perform.</param>
         /// <param name="ruleset">An optional initial ruleset selection to perform.</param>
-        public MultiplayerMatchSongSelect(Room room, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
+        public MultiplayerMatchSongSelect(Room room, long? itemToEdit = null, WorkingBeatmap beatmap = null, RulesetInfo ruleset = null)
             : base(room)
         {
+            this.itemToEdit = itemToEdit;
+
             if (beatmap != null || ruleset != null)
             {
                 Schedule(() =>
@@ -59,14 +65,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 loadingLayer.Show();
 
-                client.AddPlaylistItem(new MultiplayerPlaylistItem
+                var multiplayerItem = new MultiplayerPlaylistItem
                 {
+                    ID = itemToEdit ?? 0,
                     BeatmapID = item.BeatmapID,
                     BeatmapChecksum = item.Beatmap.Value.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
                     AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
-                }).ContinueWith(t =>
+                };
+
+                Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
+
+                task.ContinueWith(t =>
                 {
                     Schedule(() =>
                     {

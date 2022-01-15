@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 
@@ -17,6 +18,6 @@ namespace osu.Game.Scoring
         protected override ArchiveDownloadRequest<IScoreInfo> CreateDownloadRequest(IScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
 
         public override ArchiveDownloadRequest<IScoreInfo> GetExistingDownload(IScoreInfo model)
-            => CurrentDownloads.Find(r => r.Model.OnlineID == model.OnlineID);
+            => CurrentDownloads.Find(r => r.Model.MatchesOnlineID(model));
     }
 }

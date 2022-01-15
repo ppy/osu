@@ -24,13 +24,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
 
         public TestSceneHitExplosion()
         {
-            int runcount = 0;
+            int runCount = 0;
 
             AddRepeatStep("explode", () =>
             {
-                runcount++;
+                runCount++;
 
-                if (runcount % 15 > 12)
+                if (runCount % 15 > 12)
                     return;
 
                 int poolIndex = 0;
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                 {
                     c.Add(hitExplosionPools[poolIndex].Get(e =>
                     {
-                        e.Apply(new JudgementResult(new HitObject(), runcount % 6 == 0 ? new HoldNoteTickJudgement() : new ManiaJudgement()));
+                        e.Apply(new JudgementResult(new HitObject(), runCount % 6 == 0 ? new HoldNoteTickJudgement() : new ManiaJudgement()));
 
                         e.Anchor = Anchor.Centre;
                         e.Origin = Anchor.Centre;

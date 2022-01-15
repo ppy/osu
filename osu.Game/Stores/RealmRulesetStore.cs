@@ -18,7 +18,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Stores
 {
-    public class RealmRulesetStore : IDisposable
+    public class RealmRulesetStore : IRulesetStore, IDisposable
     {
         private readonly RealmContextFactory realmFactory;
 
@@ -29,9 +29,9 @@ namespace osu.Game.Stores
         /// <summary>
         /// All available rulesets.
         /// </summary>
-        public IEnumerable<IRulesetInfo> AvailableRulesets => availableRulesets;
+        public IEnumerable<RealmRuleset> AvailableRulesets => availableRulesets;
 
-        private readonly List<IRulesetInfo> availableRulesets = new List<IRulesetInfo>();
+        private readonly List<RealmRuleset> availableRulesets = new List<RealmRuleset>();
 
         public RealmRulesetStore(RealmContextFactory realmFactory, Storage? storage = null)
         {
@@ -64,14 +64,14 @@ namespace osu.Game.Stores
         /// </summary>
         /// <param name="id">The ruleset's internal ID.</param>
         /// <returns>A ruleset, if available, else null.</returns>
-        public IRulesetInfo? GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.OnlineID == id);
+        public RealmRuleset? GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.OnlineID == id);
 
         /// <summary>
         /// Retrieve a ruleset using a known short name.
         /// </summary>
         /// <param name="shortName">The ruleset's short name.</param>
         /// <returns>A ruleset, if available, else null.</returns>
-        public IRulesetInfo? GetRuleset(string shortName) => AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName);
+        public RealmRuleset? GetRuleset(string shortName) => AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName);
 
         private Assembly? resolveRulesetDependencyAssembly(object? sender, ResolveEventArgs args)
         {
@@ -258,5 +258,13 @@ namespace osu.Game.Stores
         {
             AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetDependencyAssembly;
         }
+
+        #region Implementation of IRulesetStore
+
+        IRulesetInfo? IRulesetStore.GetRuleset(int id) => GetRuleset(id);
+        IRulesetInfo? IRulesetStore.GetRuleset(string shortName) => GetRuleset(shortName);
+        IEnumerable<IRulesetInfo> IRulesetStore.AvailableRulesets => AvailableRulesets;
+
+        #endregion
     }
 }

@@ -15,38 +15,17 @@ using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// Provides access to the multiple resources offered by a beatmap model (textures, skins, playable beatmaps etc.)
+    /// </summary>
     public interface IWorkingBeatmap
     {
         IBeatmapInfo BeatmapInfo { get; }
-
-        IBeatmapSetInfo BeatmapSetInfo { get; }
-
-        IBeatmapMetadataInfo Metadata { get; }
 
         /// <summary>
         /// Whether the Beatmap has finished loading.
         ///</summary>
         public bool BeatmapLoaded { get; }
-
-        /// <summary>
-        /// Whether the Background has finished loading.
-        ///</summary>
-        public bool BackgroundLoaded { get; }
-
-        /// <summary>
-        /// Whether the Waveform has finished loading.
-        ///</summary>
-        public bool WaveformLoaded { get; }
-
-        /// <summary>
-        /// Whether the Storyboard has finished loading.
-        ///</summary>
-        public bool StoryboardLoaded { get; }
-
-        /// <summary>
-        /// Whether the Skin has finished loading.
-        ///</summary>
-        public bool SkinLoaded { get; }
 
         /// <summary>
         /// Whether the Track has finished loading.

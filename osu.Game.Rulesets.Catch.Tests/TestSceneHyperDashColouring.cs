@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private Drawable setupSkinHierarchy(Drawable child, ISkin skin)
         {
-            var legacySkinProvider = new SkinProvidingContainer(skins.GetSkin(DefaultLegacySkin.Info));
+            var legacySkinProvider = new SkinProvidingContainer(skins.GetSkin(DefaultLegacySkin.CreateInfo()));
             var testSkinProvider = new SkinProvidingContainer(skin);
             var legacySkinTransformer = new SkinProvidingContainer(new CatchLegacySkinTransformer(testSkinProvider));
 

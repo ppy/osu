@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Menus
         private TestToolbar toolbar;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         [SetUp]
         public void SetUp() => Schedule(() =>
