@@ -81,7 +81,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, LadderEditorScreen ladderEditor)
+        private void load(LadderEditorScreen ladderEditor)
         {
             this.ladderEditor = ladderEditor;
 

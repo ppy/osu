@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             DelayedFetchResultsScreen screen = null;
 
-            var tcs = new TaskCompletionSource();
+            var tcs = new TaskCompletionSource<bool>();
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task)));
 
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddAssert("no fetch yet", () => !screen.FetchCompleted);
 
-            AddStep("allow fetch", () => tcs.SetResult());
+            AddStep("allow fetch", () => tcs.SetResult(true));
 
             AddUntilStep("wait for fetch", () => screen.FetchCompleted);
             AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);

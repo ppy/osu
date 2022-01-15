@@ -317,7 +317,7 @@ namespace osu.Game.Overlays.Comments
         private class NoCommentsPlaceholder : CompositeDrawable
         {
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 Height = 80;
                 RelativeSizeAxes = Axes.X;
