@@ -47,9 +47,9 @@ namespace osu.Game.Tests.Visual.Online
 
             var allScores = new APIScoresCollection
             {
-                Scores = new List<APIScoreInfo>
+                Scores = new List<APIScore>
                 {
-                    new APIScoreInfo
+                    new APIScore
                     {
                         User = new APIUser
                         {
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234567890,
                         Accuracy = 1,
                     },
-                    new APIScoreInfo
+                    new APIScore
                     {
                         User = new APIUser
                         {
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234789,
                         Accuracy = 0.9997,
                     },
-                    new APIScoreInfo
+                    new APIScore
                     {
                         User = new APIUser
                         {
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 12345678,
                         Accuracy = 0.9854,
                     },
-                    new APIScoreInfo
+                    new APIScore
                     {
                         User = new APIUser
                         {
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Online
                         TotalScore = 1234567,
                         Accuracy = 0.8765,
                     },
-                    new APIScoreInfo
+                    new APIScore
                     {
                         User = new APIUser
                         {
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var myBestScore = new APIScoreWithPosition
             {
-                Score = new APIScoreInfo
+                Score = new APIScore
                 {
                     User = new APIUser
                     {
@@ -189,7 +189,7 @@ namespace osu.Game.Tests.Visual.Online
 
             var myBestScoreWithNullPosition = new APIScoreWithPosition
             {
-                Score = new APIScoreInfo
+                Score = new APIScore
                 {
                     User = new APIUser
                     {
@@ -212,9 +212,9 @@ namespace osu.Game.Tests.Visual.Online
 
             var oneScore = new APIScoresCollection
             {
-                Scores = new List<APIScoreInfo>
+                Scores = new List<APIScore>
                 {
-                    new APIScoreInfo
+                    new APIScore
                     {
                         User = new APIUser
                         {

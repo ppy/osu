@@ -11,7 +11,11 @@ namespace osu.Game.Skinning
     {
         public int ID { get; set; }
 
+        public bool IsManaged => ID > 0;
+
         public int SkinInfoID { get; set; }
+
+        public EFSkinInfo SkinInfo { get; set; }
 
         public int FileInfoID { get; set; }
 

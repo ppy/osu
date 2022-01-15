@@ -10,7 +10,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -104,7 +103,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {

@@ -78,9 +78,26 @@ namespace osu.Game.Online.Multiplayer
         Task StartMatch();
 
         /// <summary>
+        /// Aborts an ongoing gameplay load.
+        /// </summary>
+        Task AbortGameplay();
+
+        /// <summary>
         /// Adds an item to the playlist.
         /// </summary>
         /// <param name="item">The item to add.</param>
         Task AddPlaylistItem(MultiplayerPlaylistItem item);
+
+        /// <summary>
+        /// Edits an existing playlist item with new values.
+        /// </summary>
+        /// <param name="item">The item to edit, containing new properties. Must have an ID.</param>
+        Task EditPlaylistItem(MultiplayerPlaylistItem item);
+
+        /// <summary>
+        /// Removes an item from the playlist.
+        /// </summary>
+        /// <param name="playlistItemId">The item to remove.</param>
+        Task RemovePlaylistItem(long playlistItemId);
     }
 }

@@ -5,7 +5,9 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using Humanizer;
+using Humanizer.Localisation;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,6 +16,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -68,6 +72,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
+
+            [Resolved]
+            private IAPIProvider api { get; set; }
 
             private readonly Room room;
 
@@ -134,19 +141,6 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                             Child = DurationField = new DurationDropdown
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                Items = new[]
-                                                                {
-                                                                    TimeSpan.FromMinutes(30),
-                                                                    TimeSpan.FromHours(1),
-                                                                    TimeSpan.FromHours(2),
-                                                                    TimeSpan.FromHours(4),
-                                                                    TimeSpan.FromHours(8),
-                                                                    TimeSpan.FromHours(12),
-                                                                    //TimeSpan.FromHours(16),
-                                                                    TimeSpan.FromHours(24),
-                                                                    TimeSpan.FromDays(3),
-                                                                    TimeSpan.FromDays(7)
-                                                                }
                                                             }
                                                         },
                                                         new Section("Allowed attempts (across all playlist items)")
@@ -205,7 +199,10 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 {
                                                                     new Drawable[]
                                                                     {
-                                                                        playlist = new DrawableRoomPlaylist(true, false) { RelativeSizeAxes = Axes.Both }
+                                                                        playlist = new PlaylistsRoomSettingsPlaylist
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                        }
                                                                     },
                                                                     new Drawable[]
                                                                     {
@@ -300,8 +297,38 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 MaxAttempts.BindValueChanged(count => MaxAttemptsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue ?? TimeSpan.FromMinutes(30), true);
 
+                api.LocalUser.BindValueChanged(populateDurations, true);
+
                 playlist.Items.BindTo(Playlist);
                 Playlist.BindCollectionChanged(onPlaylistChanged, true);
+            }
+
+            private void populateDurations(ValueChangedEvent<APIUser> user)
+            {
+                DurationField.Items = new[]
+                {
+                    TimeSpan.FromMinutes(30),
+                    TimeSpan.FromHours(1),
+                    TimeSpan.FromHours(2),
+                    TimeSpan.FromHours(4),
+                    TimeSpan.FromHours(8),
+                    TimeSpan.FromHours(12),
+                    TimeSpan.FromHours(24),
+                    TimeSpan.FromDays(3),
+                    TimeSpan.FromDays(7),
+                    TimeSpan.FromDays(14),
+                };
+
+                // TODO: show these in the interface at all times.
+                if (user.NewValue.IsSupporter)
+                {
+                    // roughly correct (see https://github.com/Humanizr/Humanizer/blob/18167e56c082449cc4fe805b8429e3127a7b7f93/readme.md?plain=1#L427)
+                    // if we want this to be more accurate we might consider sending an actual end time, not a time span. probably not required though.
+                    const int days_in_month = 31;
+
+                    DurationField.AddDropdownItem(TimeSpan.FromDays(days_in_month));
+                    DurationField.AddDropdownItem(TimeSpan.FromDays(days_in_month * 3));
+                }
             }
 
             protected override void Update()
@@ -402,7 +429,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 Menu.MaxHeight = 100;
             }
 
-            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize();
+            protected override LocalisableString GenerateItemText(TimeSpan item) => item.Humanize(maxUnit: TimeUnit.Month);
         }
     }
 }

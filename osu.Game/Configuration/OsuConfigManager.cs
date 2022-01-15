@@ -17,6 +17,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Skinning;
 
 namespace osu.Game.Configuration
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Configuration
         {
             // UI/selection defaults
             SetDefault(OsuSetting.Ruleset, string.Empty);
-            SetDefault(OsuSetting.Skin, 0, -1, int.MaxValue);
+            SetDefault(OsuSetting.Skin, SkinInfo.DEFAULT_SKIN.ToString());
 
             SetDefault(OsuSetting.BeatmapDetailTab, PlayBeatmapDetailArea.TabType.Details);
             SetDefault(OsuSetting.BeatmapDetailModsFilter, false);
@@ -97,6 +98,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuParallax, true);
 
             // Gameplay
+            SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
+            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
             SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
@@ -108,7 +111,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
-            SetDefault(OsuSetting.PositionalHitSounds, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -174,9 +176,11 @@ namespace osu.Game.Configuration
 
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20210413)
+            if (combined < 20220103)
             {
-                SetValue(OsuSetting.EditorWaveformOpacity, 0.25f);
+                var positionalHitsoundsEnabled = GetBindable<bool>(OsuSetting.PositionalHitsounds);
+                if (!positionalHitsoundsEnabled.Value)
+                    SetValue(OsuSetting.PositionalHitsoundsLevel, 0);
             }
         }
 
@@ -210,9 +214,12 @@ namespace osu.Game.Configuration
                         value: scalingMode.GetLocalisableDescription()
                     )
                 ),
-                new TrackedSetting<int>(OsuSetting.Skin, skin =>
+                new TrackedSetting<string>(OsuSetting.Skin, skin =>
                 {
-                    string skinName = LookupSkinName(skin) ?? string.Empty;
+                    string skinName = string.Empty;
+
+                    if (Guid.TryParse(skin, out var id))
+                        skinName = LookupSkinName(id) ?? string.Empty;
 
                     return new SettingDescription(
                         rawValue: skinName,
@@ -233,7 +240,7 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<int, string> LookupSkinName { private get; set; }
+        public Func<Guid, string> LookupSkinName { private get; set; }
 
         public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; }
     }
@@ -252,7 +259,8 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
-        PositionalHitSounds,
+        PositionalHitsounds,
+        PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,

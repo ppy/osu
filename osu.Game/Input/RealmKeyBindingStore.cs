@@ -81,20 +81,37 @@ namespace osu.Game.Input
             // compare counts in database vs defaults for each action type.
             foreach (var defaultsForAction in defaults.GroupBy(k => k.Action))
             {
-                // avoid performing redundant queries when the database is empty and needs to be re-filled.
-                int existingCount = existingBindings.Count(k => k.RulesetName == rulesetName && k.Variant == variant && k.ActionInt == (int)defaultsForAction.Key);
+                IEnumerable<RealmKeyBinding> existing = existingBindings.Where(k =>
+                    k.RulesetName == rulesetName
+                    && k.Variant == variant
+                    && k.ActionInt == (int)defaultsForAction.Key);
 
-                if (defaultsForAction.Count() <= existingCount)
-                    continue;
+                int defaultsCount = defaultsForAction.Count();
+                int existingCount = existing.Count();
 
-                // insert any defaults which are missing.
-                realm.Add(defaultsForAction.Skip(existingCount).Select(k => new RealmKeyBinding
+                if (defaultsCount > existingCount)
                 {
-                    KeyCombinationString = k.KeyCombination.ToString(),
-                    ActionInt = (int)k.Action,
-                    RulesetName = rulesetName,
-                    Variant = variant
-                }));
+                    // insert any defaults which are missing.
+                    realm.Add(defaultsForAction.Skip(existingCount).Select(k => new RealmKeyBinding
+                    {
+                        KeyCombinationString = k.KeyCombination.ToString(),
+                        ActionInt = (int)k.Action,
+                        RulesetName = rulesetName,
+                        Variant = variant
+                    }));
+                }
+                else if (defaultsCount < existingCount)
+                {
+                    // generally this shouldn't happen, but if the user has more key bindings for an action than we expect,
+                    // remove the last entries until the count matches for sanity.
+                    foreach (var k in existing.TakeLast(existingCount - defaultsCount).ToArray())
+                    {
+                        realm.Remove(k);
+
+                        // Remove from the local flattened/cached list so future lookups don't query now deleted rows.
+                        existingBindings.Remove(k);
+                    }
+                }
             }
         }
 
