@@ -3,7 +3,10 @@
 
 using System;
 using Foundation;
+using osu.Framework.Input.Handlers;
+using osu.Framework.iOS.Input;
 using osu.Game;
+using osu.Game.Overlays.Settings;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using Xamarin.Essentials;
@@ -17,6 +20,18 @@ namespace osu.iOS
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
+
+        public override SettingsSubsection CreateSettingsSubsectionFor(InputHandler handler)
+        {
+            switch (handler)
+            {
+                case IOSMouseHandler _:
+                    return new IOSMouseSettings();
+
+                default:
+                    return base.CreateSettingsSubsectionFor(handler);
+            }
+        }
 
         private class IOSBatteryInfo : BatteryInfo
         {

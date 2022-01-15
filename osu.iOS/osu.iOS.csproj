@@ -23,6 +23,7 @@
   <ItemGroup>
     <Compile Include="Application.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="IOSMouseSettings.cs" />
     <Compile Include="OsuGameIOS.cs" />
   </ItemGroup>
   <ItemGroup>
