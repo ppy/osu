@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays.AccountCreation;
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(IAPIProvider api)
         {
             apiState.BindTo(api.State);
             apiState.BindValueChanged(apiStateChanged, true);

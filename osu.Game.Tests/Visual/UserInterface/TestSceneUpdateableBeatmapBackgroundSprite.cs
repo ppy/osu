@@ -14,7 +14,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 
@@ -28,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private IAPIProvider api;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
+        private void load(OsuGameBase osu, IAPIProvider api)
         {
             this.api = api;
 

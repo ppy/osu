@@ -19,7 +19,6 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -85,7 +84,7 @@ namespace osu.Game.Screens.Menu
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skinManager, Framework.Game game, RealmContextFactory realmContextFactory)
+        private void load(OsuConfigManager config, Framework.Game game, RealmContextFactory realmContextFactory)
         {
             // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
