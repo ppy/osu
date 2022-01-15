@@ -24,8 +24,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             userJoinedSample = audio.Samples.Get(@"Multiplayer/player-joined");
             userLeftSample = audio.Samples.Get(@"Multiplayer/player-left");
             userKickedSample = audio.Samples.Get(@"Multiplayer/player-kicked");
+        }
 
-            Host.ValueChanged += hostChanged;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Host.BindValueChanged(hostChanged);
         }
 
         protected override void UserJoined(MultiplayerRoomUser user)
@@ -55,13 +60,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (value.OldValue == null) return;
 
             hostChangedSample?.Play();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            Host.ValueChanged -= hostChanged;
         }
     }
 }
