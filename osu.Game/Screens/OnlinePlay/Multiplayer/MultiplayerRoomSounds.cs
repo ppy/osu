@@ -28,13 +28,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             Host.ValueChanged += hostChanged;
         }
 
-        private void hostChanged(ValueChangedEvent<APIUser> value)
-        {
-            if (value.OldValue == null) return;
-
-            hostChangedSample?.Play();
-        }
-
         protected override void UserJoined(MultiplayerRoomUser user)
         {
             base.UserJoined(user);
@@ -54,6 +47,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.UserKicked(user);
 
             userKickedSample?.Play();
+        }
+
+        private void hostChanged(ValueChangedEvent<APIUser> value)
+        {
+            // only play sound when the host changes from an already-existing host.
+            if (value.OldValue == null) return;
+
+            hostChangedSample?.Play();
         }
 
         protected override void Dispose(bool isDisposing)
