@@ -61,9 +61,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         /// <summary>
         /// For display purposes, check whether the proposed group is made redundant by this visualisation group.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool IsRedundant(ControlPointGroup other) =>
-            other.ControlPoints.Any(c => InternalChildren.OfType<IControlPointVisualisationRedundant>().Any(c2 => c2.IsRedundant(c)));
+        public bool IsVisuallyRedundant(ControlPointGroup other) =>
+            other.ControlPoints.Any(c => InternalChildren.OfType<IControlPointVisualisationRedundant>().Any(c2 => c2.IsVisuallyRedundant(c)));
     }
 }
