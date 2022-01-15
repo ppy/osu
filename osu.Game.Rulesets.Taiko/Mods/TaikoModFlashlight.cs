@@ -16,9 +16,12 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        private const float default_flashlight_size = 250;
+        public override bool DefaultComboDependency => true;
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield);
+        //private const float default_flashlight_size = 250;
+        public override float DefaultRadius => 250;
+
+        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value);
 
         private TaikoPlayfield playfield;
 
@@ -33,7 +36,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
             private readonly TaikoPlayfield taikoPlayfield;
 
-            public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
+            public TaikoFlashlight(TaikoPlayfield taikoPlayfield, bool isRadiusBasedOnCombo, float initialRadius)
+                : base(isRadiusBasedOnCombo, initialRadius)
             {
                 this.taikoPlayfield = taikoPlayfield;
                 FlashlightSize = getSizeFor(0);
@@ -43,15 +47,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             private Vector2 getSizeFor(int combo)
             {
-                float size = default_flashlight_size;
-
-                if (combo > 200)
-                    size *= 0.8f;
-                else if (combo > 100)
-                    size *= 0.9f;
-
                 // Preserve flashlight size through the playfield's aspect adjustment.
-                return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                // return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                return new Vector2(0, GetRadiusFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)

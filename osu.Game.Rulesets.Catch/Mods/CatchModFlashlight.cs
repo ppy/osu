@@ -15,9 +15,10 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        private const float default_flashlight_size = 350;
+        public override bool DefaultComboDependency => true;
+        public override float DefaultRadius => 350;
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield);
+        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value);
 
         private CatchPlayfield playfield;
 
@@ -31,10 +32,10 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             private readonly CatchPlayfield playfield;
 
-            public CatchFlashlight(CatchPlayfield playfield)
+            public CatchFlashlight(CatchPlayfield playfield, bool isRadiusBasedOnCombo, float initialRadius) : base(isRadiusBasedOnCombo, initialRadius)
             {
                 this.playfield = playfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FlashlightSize = new Vector2(0, GetRadiusFor(0));
             }
 
             protected override void Update()
@@ -44,19 +45,9 @@ namespace osu.Game.Rulesets.Catch.Mods
                 FlashlightPosition = playfield.CatcherArea.ToSpaceOfOtherDrawable(playfield.Catcher.DrawPosition, this);
             }
 
-            private float getSizeFor(int combo)
-            {
-                if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
-            }
-
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetRadiusFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
