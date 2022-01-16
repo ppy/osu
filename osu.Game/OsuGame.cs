@@ -745,6 +745,9 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -804,9 +807,6 @@ namespace osu.Game
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
-
-            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
-                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
 
             loadComponentSingleFile(new LoginOverlay
             {
