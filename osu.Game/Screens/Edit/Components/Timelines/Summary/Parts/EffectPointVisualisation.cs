@@ -70,6 +70,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         }
 
         // kiai sections display duration, so are required to be visualised.
-        public bool IsVisuallyRedundant(ControlPoint other) => (other as EffectControlPoint)?.KiaiMode == effect.KiaiMode;
+        public bool IsVisuallyRedundant(ControlPoint other) => other is EffectControlPoint otherEffect && effect.KiaiMode == otherEffect.KiaiMode;
     }
 }
