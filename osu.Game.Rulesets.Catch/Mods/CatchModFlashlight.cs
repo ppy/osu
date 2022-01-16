@@ -32,7 +32,8 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             private readonly CatchPlayfield playfield;
 
-            public CatchFlashlight(CatchPlayfield playfield, bool isRadiusBasedOnCombo, float initialRadius) : base(isRadiusBasedOnCombo, initialRadius)
+            public CatchFlashlight(CatchPlayfield playfield, bool isRadiusBasedOnCombo, float initialRadius)
+                : base(isRadiusBasedOnCombo, initialRadius)
             {
                 this.playfield = playfield;
                 FlashlightSize = new Vector2(0, GetRadiusFor(0));
