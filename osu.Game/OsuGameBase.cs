@@ -100,8 +100,6 @@ namespace osu.Game
 
         protected ScoreManager ScoreManager { get; private set; }
 
-        protected ReplayGainStore ReplayGainStore { get; private set; }
-
         protected ScoreModelDownloader ScoreDownloader { get; private set; }
 
         protected SkinManager SkinManager { get; private set; }
@@ -233,11 +231,9 @@ namespace osu.Game
 
             dependencies.Cache(fileStore = new FileStore(contextFactory, Storage));
 
-            dependencies.Cache(ReplayGainStore = new ReplayGainStore(contextFactory, Audio, Storage));
-
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, contextFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true, ReplayGainStore));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));

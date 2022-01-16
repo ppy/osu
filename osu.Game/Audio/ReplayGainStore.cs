@@ -15,8 +15,6 @@ namespace osu.Game.Audio
 {
     public class ReplayGainStore : MutableDatabaseBackedStore<ReplayGainInfo>
     {
-        /*private const string storage_directory = "replayGain";
-        private readonly Storage replayGainStorage;*/
         private ReplayGainInfo curr;
         private AudioMixer audioMixer;
         public ReplayGainStore(IDatabaseContextFactory factory, AudioManager audioManager, Storage storage = null) :

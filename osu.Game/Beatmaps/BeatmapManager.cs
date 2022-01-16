@@ -33,19 +33,20 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, BeatmapSetFileInfo>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
+        public ReplayGainManager ReplayGainManager { get;}
 
         private readonly BeatmapModelManager beatmapModelManager;
 
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue onlineBeatmapLookupQueue;
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false, ReplayGainStore replayGainStore = null)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost host = null, WorkingBeatmap defaultBeatmap = null, bool performOnlineLookups = false)
         {
             var userResources = new FileStore(contextFactory, storage).Store;
-
+            ReplayGainStore replayGainStore = new ReplayGainStore(contextFactory, audioManager, storage);
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
-
-            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host, replayGainStore, BeatmapTrackStore);
+            ReplayGainManager = new ReplayGainManager(replayGainStore, BeatmapTrackStore);
+            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host, ReplayGainManager);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             workingBeatmapCache.BeatmapManager = beatmapModelManager;
@@ -63,8 +64,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host, ReplayGainStore replayGainStore, ITrackStore trackstore) =>
-            new BeatmapModelManager(storage, contextFactory, rulesets, host, replayGainStore, trackstore);
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host, ReplayGainManager replayGainManager) =>
+            new BeatmapModelManager(storage, contextFactory, rulesets, host, replayGainManager);
 
         protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host) =>
             new BeatmapModelManager(storage, contextFactory, rulesets, host);

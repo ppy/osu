@@ -13,15 +13,13 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Audio
 {
-    public class AudioTest
+    public class ReplayGainManager
     {
         public const float CURR_REPLAYGAIN_VER = 0.1f;
-        private string filePath = "";
         private ITrackStore trackStore;
-        private FileCallbacks fileCallbacks;
         private ReplayGainStore replayGainStore;
 
-        public AudioTest(ReplayGainStore replayGainStore, ITrackStore trackStore)
+        public ReplayGainManager(ReplayGainStore replayGainStore, ITrackStore trackStore)
         {
             this.trackStore = trackStore;
             this.replayGainStore = replayGainStore;
@@ -32,20 +30,6 @@ namespace osu.Game.Audio
             ReplayGainInfo replayGainInfo = replayGainStore.ConsumableItems.Where(s => s.ID == ID).FirstOrDefault();
 
             return replayGainInfo;
-        }
-
-        public void changeTrack(BeatmapInfo info, BeatmapSetInfo setInfo)
-        {
-            try
-            {
-                filePath = setInfo.GetPathForFile(info?.Metadata?.AudioFile);
-                string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"osu", @"files");
-                filePath = Path.Combine(folderPath, filePath);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
         }
 
         public Task saveReplayGainInfo(ReplayGainInfo replayGainInfo, BeatmapInfo beatmap)
@@ -78,62 +62,10 @@ namespace osu.Game.Audio
             replayGainStore.AddFx(gainParameters);
         }
 
-        public void getAudioFileStream(ITrackStore storeParameter)
-        {
-            trackStore = storeParameter;
-            if(trackStore != null && File.Exists(filePath))
-            {
-                try
-                {
-                    Stream fileData = trackStore.GetStream(filePath);
-                    fileData.Seek(0, SeekOrigin.Begin);
-                    fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(fileData));
-                    int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode | BassFlags.Float, fileCallbacks.Callbacks, fileCallbacks.Handle);
-                    Bass.ChannelGetInfo(decodeStream, out ChannelInfo info);
-                    long length = Bass.ChannelGetLength(decodeStream);
-                    int samplesPerPoint = (int)(info.Frequency * 0.001f * info.Channels);
-                    int bytesPerPoint = samplesPerPoint * TrackBass.BYTES_PER_SAMPLE;
-                    int bytesPerIteration = bytesPerPoint * 100000;
-                    float[] sampleBuffer = new float[bytesPerIteration / TrackBass.BYTES_PER_SAMPLE];
-                    length = Bass.ChannelGetData(decodeStream, sampleBuffer, bytesPerIteration);
-                    
-                    if (decodeStream == 0 || length < 0)
-                    {
-                        string error = Bass.LastError.ToString();
-                    }
-                    else
-                    {
-                        testGetData(sampleBuffer);
-                    }
-                    fileData.Close();
-                }
-                catch(Exception e)
-                {
-                    Debug.WriteLine(e);
-                    return;
-                }
-
-                //replayGainInfo = generateReplayGainInfo(11, 11, 0);
-                //saveReplayGainInfo();
-            }
-        }
-
-        public ReplayGainInfo generateReplayGainInfo(float trackGain, float peakAmplitude, float version)
-        {
-            ReplayGainInfo replayGain = new ReplayGainInfo
-            {
-                TrackGain = trackGain,
-                PeakAmplitude = peakAmplitude,
-                Version = version,
-                DeletePending = false,
-            };
-            return replayGain;
-        }
-
         public ReplayGainInfo generateReplayGainInfo(BeatmapInfo info, BeatmapSetInfo setInfo)
         {
             ReplayGainInfo replayGain = new ReplayGainInfo();
-
+            string filePath = "";
             try
             {
                 filePath = setInfo.GetPathForFile(info?.Metadata?.AudioFile);
@@ -150,11 +82,6 @@ namespace osu.Game.Audio
             replayGain.TrackGain = (float)replayGainImplementation.Gain;
             replayGain.Version = CURR_REPLAYGAIN_VER;
             return replayGain;
-        }
-
-        private bool testGetData(float[] data)
-        {
-            return true;
         }
 
         internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo bSetInfo)

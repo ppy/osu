@@ -27,9 +27,7 @@ namespace osu.Game.Overlays
     {
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-        private AudioTest aTest;
-        [Resolved]
-        private ReplayGainStore replayGainStore { get; set; }
+
         public IBindableList<BeatmapSetInfo> BeatmapSets
         {
             get
@@ -71,7 +69,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            aTest = new AudioTest(replayGainStore, beatmaps.BeatmapTrackStore);
             beatmaps.ItemUpdated += beatmapUpdated;
             beatmaps.ItemRemoved += beatmapRemoved;
 
@@ -328,18 +325,18 @@ namespace osu.Game.Overlays
                 {
                     if (current.BeatmapInfo.ReplayGainInfoID != 0 && current.BeatmapInfo.ReplayGainInfo == null)
                     {
-                        current.BeatmapInfo.ReplayGainInfo = aTest.GetInfo(current.BeatmapInfo.ReplayGainInfoID);
+                        current.BeatmapInfo.ReplayGainInfo = beatmaps.ReplayGainManager.GetInfo(current.BeatmapInfo.ReplayGainInfoID);
                     }
 
                     if(current.BeatmapInfo.ReplayGainInfo != null)
-                        aTest.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
+                        beatmaps.ReplayGainManager.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
                 }
 
                 changeTrack();
             }
             else
             {
-                if (current.BeatmapInfo.ReplayGainInfo == null || current.BeatmapInfo.ReplayGainInfo.Version < AudioTest.CURR_REPLAYGAIN_VER)
+                if (current.BeatmapInfo.ReplayGainInfo == null || current.BeatmapInfo.ReplayGainInfo.Version < ReplayGainManager.CURR_REPLAYGAIN_VER)
                 {
                     current.BeatmapInfo.ReplayGainInfo = lastWorking.BeatmapInfo.ReplayGainInfo;
                     current.BeatmapInfo.ReplayGainInfoID = lastWorking.BeatmapInfo.ReplayGainInfoID;

@@ -60,15 +60,15 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        private AudioTest aTest;
+        private ReplayGainManager replayGainManager;
         private readonly BeatmapStore beatmaps;
         private readonly RulesetStore rulesets;
 
-        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null, ReplayGainStore replayGainStore = null, ITrackStore trackStore = null)
+        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null, ReplayGainManager replayGainManager = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
-            aTest = new AudioTest(replayGainStore, trackStore);
+            this.replayGainManager = replayGainManager;
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
@@ -94,11 +94,11 @@ namespace osu.Game.Beatmaps
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
-                if (aTest != null && b.ReplayGainInfo == null)
+                if (replayGainManager != null && b.ReplayGainInfo == null)
                 {
-                    ReplayGainInfo info = aTest.generateReplayGainInfo(b, beatmapSet);
-                    await aTest.saveReplayGainInfo(info, b).ConfigureAwait(false);
-                    beatmapSet = aTest.PopulateSet(b, beatmapSet);
+                    ReplayGainInfo info = replayGainManager.generateReplayGainInfo(b, beatmapSet);
+                    await replayGainManager.saveReplayGainInfo(info, b).ConfigureAwait(false);
+                    beatmapSet = replayGainManager.PopulateSet(b, beatmapSet);
                 }
             }
 
