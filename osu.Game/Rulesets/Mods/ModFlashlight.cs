@@ -45,10 +45,10 @@ namespace osu.Game.Rulesets.Mods
 
         internal ModFlashlight()
         {
-            InitialRadius = new BindableFloat
+            InitialRadius = new BindableFloat(DefaultRadius)
             {
-                MinValue = 90f,
-                MaxValue = 250f,
+                MinValue = DefaultRadius * .5f,
+                MaxValue = DefaultRadius * 1.5f,
                 Precision = 5f,
             };
 
