@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             yield return new PerformanceDisplayAttribute("Difficulty", Difficulty);
             yield return new PerformanceDisplayAttribute("Accuracy", Accuracy);
-            yield return new PerformanceDisplayAttribute("Scaled Score", ScaledScore);
         }
     }
 }

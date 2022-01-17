@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Difficulty
 
         /// <summary>
         /// Return a <see cref="PerformanceDisplayAttribute"/> for each attribute so that a performance breakdown can be displayed.
+        /// Some attributes may be omitted if they are not meant for display.
         /// </summary>
         /// <returns></returns>
         public virtual IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
