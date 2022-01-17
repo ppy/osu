@@ -64,7 +64,7 @@ namespace osu.Game.Stores
                 // ensure we aren't trying to add a new ruleset to the database
                 // this can happen in tests, mostly
                 if (!b.Ruleset.IsManaged)
-                    b.Ruleset = realm.Find<RulesetInfo>(b.Ruleset.ShortName);
+                    b.Ruleset = realm.Find<RulesetInfo>(b.Ruleset.ShortName) ?? throw new ArgumentNullException(nameof(b.Ruleset));
             }
 
             validateOnlineIds(beatmapSet, realm);
