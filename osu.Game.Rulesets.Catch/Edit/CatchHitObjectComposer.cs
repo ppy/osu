@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Catch.Edit
 
         private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
 
+        protected override bool SupportsDistanceSpacing => false;
+
         private InputManager inputManager;
 
         public CatchHitObjectComposer(CatchRuleset ruleset)

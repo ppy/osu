@@ -14,6 +14,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -55,6 +57,26 @@ namespace osu.Game.Rulesets.Edit
 
         [Resolved]
         protected IBeatSnapProvider BeatSnapProvider { get; private set; }
+
+        /// <summary>
+        /// Whether this composer supports a "distance spacing" multiplier for distance snap grids.
+        /// </summary>
+        /// <remarks>
+        /// Setting this to <see langword="true"/> displays a "distance spacing" slider and allows this composer to configure the value of <see cref="BeatmapInfo.DistanceSpacing"/>.
+        /// </remarks>
+        protected abstract bool SupportsDistanceSpacing { get; }
+
+        private readonly BindableFloat distanceSpacing = new BindableFloat
+        {
+            Default = 1.0f,
+            MinValue = 0.1f,
+            MaxValue = 6.0f,
+            Precision = 0.01f,
+        };
+
+        public override IBindable<float> DistanceSpacingMultiplier => distanceSpacing;
+
+        private SnappingToolboxContainer snappingToolboxContainer;
 
         protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
@@ -117,6 +139,8 @@ namespace osu.Game.Rulesets.Edit
                 },
                 new LeftToolboxFlow
                 {
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("toolbox (1-9)")
@@ -132,10 +156,40 @@ namespace osu.Game.Rulesets.Edit
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(0, 5),
                             },
-                        }
+                        },
                     }
                 },
             };
+
+            distanceSpacing.Value = (float)EditorBeatmap.BeatmapInfo.DistanceSpacing;
+
+            if (SupportsDistanceSpacing)
+            {
+                ExpandableSlider<float, SizeSlider> distanceSpacingSlider;
+
+                AddInternal(snappingToolboxContainer = new SnappingToolboxContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Child = new EditorToolboxGroup("snapping")
+                    {
+                        Child = distanceSpacingSlider = new ExpandableSlider<float, SizeSlider>
+                        {
+                            Current = { BindTarget = distanceSpacing },
+                            KeyboardStep = 0.01f,
+                        }
+                    }
+                });
+
+                distanceSpacing.BindValueChanged(v =>
+                {
+                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
+                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
+                    EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
+                }, true);
+            }
+            else
+                distanceSpacing.Disabled = true;
 
             toolboxCollection.Items = CompositionTools
                                       .Prepend(new SelectTool())
@@ -211,8 +265,17 @@ namespace osu.Game.Rulesets.Edit
 
         #region Tool selection logic
 
+        private bool distanceSpacingScrollActive;
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (SupportsDistanceSpacing && e.AltPressed && e.Key == Key.D && !e.Repeat)
+            {
+                snappingToolboxContainer.Expanded.Value = true;
+                distanceSpacingScrollActive = true;
+                return true;
+            }
+
             if (e.ControlPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
@@ -240,6 +303,28 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            if (distanceSpacingScrollActive && (e.Key == Key.AltLeft || e.Key == Key.AltRight || e.Key == Key.D))
+            {
+                snappingToolboxContainer.Expanded.Value = false;
+                distanceSpacingScrollActive = false;
+            }
+
+            base.OnKeyUp(e);
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            if (distanceSpacingScrollActive)
+            {
+                distanceSpacing.Value += e.ScrollDelta.Y * (e.ShiftPressed || e.IsPrecise ? 0.01f : 0.1f);
+                return true;
+            }
+
+            return base.OnScroll(e);
         }
 
         private bool checkLeftToggleFromKey(Key key, out int index)
@@ -383,7 +468,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override float GetBeatSnapDistanceAt(HitObject referenceObject)
         {
-            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
+            return (float)(100 * referenceObject.DifficultyControlPoint.SliderVelocity * EditorBeatmap.Difficulty.SliderMultiplier * distanceSpacing.Value / BeatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(HitObject referenceObject, double duration)
@@ -428,6 +513,18 @@ namespace osu.Game.Rulesets.Edit
             {
                 RelativeSizeAxes = Axes.Y;
                 Padding = new MarginPadding { Right = 10 };
+
+                FillFlow.Spacing = new Vector2(10);
+            }
+        }
+
+        private class SnappingToolboxContainer : ExpandingContainer
+        {
+            public SnappingToolboxContainer()
+                : base(130, 250)
+            {
+                RelativeSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Left = 10 };
 
                 FillFlow.Spacing = new Vector2(10);
             }
