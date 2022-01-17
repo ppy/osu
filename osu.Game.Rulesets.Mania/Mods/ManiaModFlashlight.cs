@@ -55,5 +55,3 @@ namespace osu.Game.Rulesets.Mania.Mods
         }
     }
 }
-
-

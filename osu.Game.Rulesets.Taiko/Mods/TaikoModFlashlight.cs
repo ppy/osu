@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             private Vector2 getSizeFor(int combo)
             {
                 // Preserve flashlight size through the playfield's aspect adjustment.
-                // return new Vector2(0, size * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
                 return new Vector2(0, GetRadiusFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 

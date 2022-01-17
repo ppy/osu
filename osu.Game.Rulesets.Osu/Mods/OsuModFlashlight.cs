@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private const double default_follow_delay = 120;
 
+
+
         private OsuFlashlight flashlight;
 
         public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value);
@@ -75,19 +77,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     Math.Min(Math.Abs(Clock.ElapsedFrameTime), FollowDelay), position, destination, 0, FollowDelay, Easing.Out);
 
                 return base.OnMouseMove(e);
-            }
-
-            private float getSizeFor(int combo)
-            {
-                if (ChangeRadius)
-                {
-                    if (combo > 200)
-                        return InitialRadius * 0.8f;
-                    else if (combo > 100)
-                        return InitialRadius * 0.9f;
-                }
-
-                return InitialRadius;
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
