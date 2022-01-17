@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -30,36 +31,247 @@ namespace osu.Game.Tests.Visual.Online
         private TestScoresContainer scoresContainer;
 
         [SetUpSteps]
-        public void SetUpSteps()
+        public void SetUp() => Schedule(() =>
         {
-            AddStep("Create container", () =>
+            Child = new Container
             {
-                Child = new Container
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.Both,
+                Width = 0.8f,
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Width = 0.8f,
-                    Children = new Drawable[]
+                    new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                        },
-                        scoresContainer = new TestScoresContainer
-                        {
-                            Beatmap = { Value = CreateAPIBeatmap() }
-                        }
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    scoresContainer = new TestScoresContainer
+                    {
+                        Beatmap = { Value = CreateAPIBeatmap() }
                     }
-                };
+                }
+            };
+        });
+
+        [Test]
+        public void TestNoUserBest()
+        {
+            AddStep("Scores with no user best", () =>
+            {
+                var allScores = createScores();
+
+                allScores.UserScore = null;
+
+                scoresContainer.Scores = allScores;
             });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("no user best displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
+
+            AddStep("Load null scores", () => scoresContainer.Scores = null);
+
+            AddUntilStep("wait for scores not displayed", () => !scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("no best score displayed", () => !scoresContainer.ChildrenOfType<DrawableTopScore>().Any());
+
+            AddStep("Load only one score", () =>
+            {
+                var allScores = createScores();
+
+                allScores.Scores.RemoveRange(1, allScores.Scores.Count - 1);
+
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores not displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Count() == 1);
+            AddAssert("no best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
         }
 
         [Test]
-        public void TestDisplay()
+        public void TestUserBest()
         {
-            foreach (var s in allScores.Scores)
+            AddStep("Load scores with personal best", () =>
+            {
+                var allScores = createScores();
+                allScores.UserScore = createUserBest();
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 2);
+
+            AddStep("Load scores with personal best (null position)", () =>
+            {
+                var allScores = createScores();
+                var userBest = createUserBest();
+                userBest.Position = null;
+                allScores.UserScore = userBest;
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 2);
+
+            AddStep("Load scores with personal best (first place)", () =>
+            {
+                var allScores = createScores();
+                allScores.UserScore = new APIScoreWithPosition
+                {
+                    Score = allScores.Scores.First(),
+                    Position = 1,
+                };
+                scoresContainer.Scores = allScores;
+            });
+
+            AddUntilStep("wait for scores displayed", () => scoresContainer.ChildrenOfType<ScoreTableRowBackground>().Any());
+            AddAssert("best score displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
+
+            AddStep("Scores with no user best", () =>
+            {
+                var allScores = createScores();
+
+                allScores.UserScore = null;
+
+                scoresContainer.Scores = allScores;
+            });
+
+            AddAssert("best score not displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
+        }
+
+        private int onlineID = 1;
+
+        private APIScoresCollection createScores()
+        {
+            var scores = new APIScoresCollection
+            {
+                Scores = new List<APIScore>
+                {
+                    new APIScore
+                    {
+                        Date = DateTimeOffset.Now,
+                        OnlineID = onlineID++,
+                        User = new APIUser
+                        {
+                            Id = 6602580,
+                            Username = @"waaiiru",
+                            Country = new Country
+                            {
+                                FullName = @"Spain",
+                                FlagName = @"ES",
+                            },
+                        },
+                        Mods = new[]
+                        {
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
+                            new APIMod { Acronym = new OsuModHardRock().Acronym },
+                        },
+                        Rank = ScoreRank.XH,
+                        PP = 200,
+                        MaxCombo = 1234,
+                        TotalScore = 1234567890,
+                        Accuracy = 1,
+                    },
+                    new APIScore
+                    {
+                        Date = DateTimeOffset.Now,
+                        OnlineID = onlineID++,
+                        User = new APIUser
+                        {
+                            Id = 4608074,
+                            Username = @"Skycries",
+                            Country = new Country
+                            {
+                                FullName = @"Brazil",
+                                FlagName = @"BR",
+                            },
+                        },
+                        Mods = new[]
+                        {
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                            new APIMod { Acronym = new OsuModFlashlight().Acronym },
+                        },
+                        Rank = ScoreRank.S,
+                        PP = 190,
+                        MaxCombo = 1234,
+                        TotalScore = 1234789,
+                        Accuracy = 0.9997,
+                    },
+                    new APIScore
+                    {
+                        Date = DateTimeOffset.Now,
+                        OnlineID = onlineID++,
+                        User = new APIUser
+                        {
+                            Id = 1014222,
+                            Username = @"eLy",
+                            Country = new Country
+                            {
+                                FullName = @"Japan",
+                                FlagName = @"JP",
+                            },
+                        },
+                        Mods = new[]
+                        {
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                            new APIMod { Acronym = new OsuModHidden().Acronym },
+                        },
+                        Rank = ScoreRank.B,
+                        PP = 180,
+                        MaxCombo = 1234,
+                        TotalScore = 12345678,
+                        Accuracy = 0.9854,
+                    },
+                    new APIScore
+                    {
+                        Date = DateTimeOffset.Now,
+                        OnlineID = onlineID++,
+                        User = new APIUser
+                        {
+                            Id = 1541390,
+                            Username = @"Toukai",
+                            Country = new Country
+                            {
+                                FullName = @"Canada",
+                                FlagName = @"CA",
+                            },
+                        },
+                        Mods = new[]
+                        {
+                            new APIMod { Acronym = new OsuModDoubleTime().Acronym },
+                        },
+                        Rank = ScoreRank.C,
+                        PP = 170,
+                        MaxCombo = 1234,
+                        TotalScore = 1234567,
+                        Accuracy = 0.8765,
+                    },
+                    new APIScore
+                    {
+                        Date = DateTimeOffset.Now,
+                        OnlineID = onlineID++,
+                        User = new APIUser
+                        {
+                            Id = 7151382,
+                            Username = @"Mayuri Hana",
+                            Country = new Country
+                            {
+                                FullName = @"Thailand",
+                                FlagName = @"TH",
+                            },
+                        },
+                        Rank = ScoreRank.D,
+                        PP = 160,
+                        MaxCombo = 1234,
+                        TotalScore = 123456,
+                        Accuracy = 0.6543,
+                    },
+                }
+            };
+
+            foreach (var s in scores.Scores)
             {
                 s.Statistics = new Dictionary<string, int>
                 {
@@ -70,155 +282,15 @@ namespace osu.Game.Tests.Visual.Online
                 };
             }
 
-            AddStep("Load all scores", () =>
-            {
-                allScores.UserScore = null;
-                scoresContainer.Scores = allScores;
-            });
-            AddStep("Load null scores", () => scoresContainer.Scores = null);
-            AddStep("Load only one score", () => scoresContainer.Scores = oneScore);
-            AddStep("Load scores with my best", () =>
-            {
-                allScores.UserScore = myBestScore;
-                scoresContainer.Scores = allScores;
-            });
-
-            AddStep("Load scores with null my best position", () =>
-            {
-                allScores.UserScore = myBestScoreWithNullPosition;
-                scoresContainer.Scores = allScores;
-            });
+            return scores;
         }
 
-        private readonly APIScoresCollection allScores = new APIScoresCollection
-        {
-            Scores = new List<APIScore>
-            {
-                new APIScore
-                {
-                    Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = 6602580,
-                        Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
-                    },
-                    Mods = new[]
-                    {
-                        new APIMod { Acronym = new OsuModDoubleTime().Acronym },
-                        new APIMod { Acronym = new OsuModHidden().Acronym },
-                        new APIMod { Acronym = new OsuModFlashlight().Acronym },
-                        new APIMod { Acronym = new OsuModHardRock().Acronym },
-                    },
-                    Rank = ScoreRank.XH,
-                    PP = 200,
-                    MaxCombo = 1234,
-                    TotalScore = 1234567890,
-                    Accuracy = 1,
-                },
-                new APIScore
-                {
-                    Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = 4608074,
-                        Username = @"Skycries",
-                        Country = new Country
-                        {
-                            FullName = @"Brazil",
-                            FlagName = @"BR",
-                        },
-                    },
-                    Mods = new[]
-                    {
-                        new APIMod { Acronym = new OsuModDoubleTime().Acronym },
-                        new APIMod { Acronym = new OsuModHidden().Acronym },
-                        new APIMod { Acronym = new OsuModFlashlight().Acronym },
-                    },
-                    Rank = ScoreRank.S,
-                    PP = 190,
-                    MaxCombo = 1234,
-                    TotalScore = 1234789,
-                    Accuracy = 0.9997,
-                },
-                new APIScore
-                {
-                    Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = 1014222,
-                        Username = @"eLy",
-                        Country = new Country
-                        {
-                            FullName = @"Japan",
-                            FlagName = @"JP",
-                        },
-                    },
-                    Mods = new[]
-                    {
-                        new APIMod { Acronym = new OsuModDoubleTime().Acronym },
-                        new APIMod { Acronym = new OsuModHidden().Acronym },
-                    },
-                    Rank = ScoreRank.B,
-                    PP = 180,
-                    MaxCombo = 1234,
-                    TotalScore = 12345678,
-                    Accuracy = 0.9854,
-                },
-                new APIScore
-                {
-                    Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = 1541390,
-                        Username = @"Toukai",
-                        Country = new Country
-                        {
-                            FullName = @"Canada",
-                            FlagName = @"CA",
-                        },
-                    },
-                    Mods = new[]
-                    {
-                        new APIMod { Acronym = new OsuModDoubleTime().Acronym },
-                    },
-                    Rank = ScoreRank.C,
-                    PP = 170,
-                    MaxCombo = 1234,
-                    TotalScore = 1234567,
-                    Accuracy = 0.8765,
-                },
-                new APIScore
-                {
-                    Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = 7151382,
-                        Username = @"Mayuri Hana",
-                        Country = new Country
-                        {
-                            FullName = @"Thailand",
-                            FlagName = @"TH",
-                        },
-                    },
-                    Rank = ScoreRank.D,
-                    PP = 160,
-                    MaxCombo = 1234,
-                    TotalScore = 123456,
-                    Accuracy = 0.6543,
-                },
-            }
-        };
-
-        private readonly APIScoreWithPosition myBestScore = new APIScoreWithPosition
+        private APIScoreWithPosition createUserBest() => new APIScoreWithPosition
         {
             Score = new APIScore
             {
                 Date = DateTimeOffset.Now,
+                OnlineID = onlineID++,
                 User = new APIUser
                 {
                     Id = 7151382,
@@ -236,63 +308,6 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.6543,
             },
             Position = 1337,
-        };
-
-        private readonly APIScoreWithPosition myBestScoreWithNullPosition = new APIScoreWithPosition
-        {
-            Score = new APIScore
-            {
-                Date = DateTimeOffset.Now,
-                User = new APIUser
-                {
-                    Id = 7151382,
-                    Username = @"Mayuri Hana",
-                    Country = new Country
-                    {
-                        FullName = @"Thailand",
-                        FlagName = @"TH",
-                    },
-                },
-                Rank = ScoreRank.D,
-                PP = 160,
-                MaxCombo = 1234,
-                TotalScore = 123456,
-                Accuracy = 0.6543,
-            },
-            Position = null,
-        };
-
-        private readonly APIScoresCollection oneScore = new APIScoresCollection
-        {
-            Scores = new List<APIScore>
-            {
-                new APIScore
-                {
-                    Date = DateTimeOffset.Now,
-                    User = new APIUser
-                    {
-                        Id = 6602580,
-                        Username = @"waaiiru",
-                        Country = new Country
-                        {
-                            FullName = @"Spain",
-                            FlagName = @"ES",
-                        },
-                    },
-                    Mods = new[]
-                    {
-                        new APIMod { Acronym = new OsuModDoubleTime().Acronym },
-                        new APIMod { Acronym = new OsuModHidden().Acronym },
-                        new APIMod { Acronym = new OsuModFlashlight().Acronym },
-                        new APIMod { Acronym = new OsuModHardRock().Acronym },
-                    },
-                    Rank = ScoreRank.XH,
-                    PP = 200,
-                    MaxCombo = 1234,
-                    TotalScore = 1234567890,
-                    Accuracy = 1,
-                }
-            }
         };
 
         private class TestScoresContainer : ScoresContainer
