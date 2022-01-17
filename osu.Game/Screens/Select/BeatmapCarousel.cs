@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Select
             newRoot.AddChildren(beatmapSets.Select(createCarouselSet).Where(g => g != null));
 
             root = newRoot;
-            if (selectedBeatmapSet != null && (!selectedBeatmapSet.BeatmapSet.IsManaged || !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet)))
+            if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
                 selectedBeatmapSet = null;
 
             Scroll.Clear(false);
