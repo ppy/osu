@@ -132,9 +132,10 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
-            // TODO: ??
-            // if (score.Beatmap == null)
-            //     return score.TotalScore;
+            // TODO: This is required for playlist aggregate scores. They should likely not be getting here in the first place.
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (score.BeatmapInfo == null)
+                return score.TotalScore;
 
             int beatmapMaxCombo;
             double accuracy = score.Accuracy;
