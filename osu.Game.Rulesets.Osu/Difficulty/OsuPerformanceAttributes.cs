@@ -33,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             yield return new PerformanceDisplayAttribute("Speed", Speed);
             yield return new PerformanceDisplayAttribute("Accuracy", Accuracy);
             yield return new PerformanceDisplayAttribute("Flashlight Bonus", Flashlight);
-            yield return new PerformanceDisplayAttribute("Effective Miss Count", EffectiveMissCount);
         }
     }
 }
