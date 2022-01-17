@@ -159,11 +159,8 @@ namespace osu.Game.Scoring
                     beatmapMaxCombo = score.BeatmapInfo.MaxCombo.Value;
                 else
                 {
-                    if (!score.BeatmapInfo.IsManaged || difficulties == null)
-                    {
-                        // We don't have enough information (max combo) to compute the score, so use the provided score.
+                    if (difficulties == null)
                         return score.TotalScore;
-                    }
 
                     // We can compute the max combo locally after the async beatmap difficulty computation.
                     var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
