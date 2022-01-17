@@ -51,7 +51,12 @@ namespace osu.Game.Beatmaps
         [UsedImplicitly]
         public BeatmapInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
         {
-            Ruleset = new RulesetInfo();
+            Ruleset = new RulesetInfo
+            {
+                OnlineID = 0,
+                ShortName = @"osu",
+                Name = @"null placeholder ruleset"
+            };
             Difficulty = new BeatmapDifficulty();
             Metadata = new BeatmapMetadata();
         }
@@ -149,20 +154,17 @@ namespace osu.Game.Beatmaps
 
         #region Compatibility properties
 
-        private int rulesetID;
-
         [Ignored]
         [IgnoreMap]
         public int RulesetID
         {
-            // ReSharper disable once ConstantConditionalAccessQualifier
-            get => Ruleset?.OnlineID ?? rulesetID;
+            get => Ruleset.OnlineID;
             set
             {
-                if (Ruleset != null)
-                    throw new InvalidOperationException($"Cannot set a {nameof(RulesetID)} when {nameof(Ruleset)} is non-null");
+                if (!string.IsNullOrEmpty(Ruleset.InstantiationInfo))
+                    throw new InvalidOperationException($"Cannot set a {nameof(RulesetID)} when {nameof(Ruleset)} is already set to an actual ruleset.");
 
-                rulesetID = value;
+                Ruleset.OnlineID = value;
             }
         }
 
