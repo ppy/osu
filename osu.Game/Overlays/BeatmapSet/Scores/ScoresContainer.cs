@@ -65,6 +65,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 scoreTable.ClearScores();
                 scoreTable.Hide();
 
+                loading.Hide();
+                loading.FinishTransforms();
+
                 if (value?.Scores.Any() != true)
                     return;
 
@@ -258,9 +261,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
-
-                loading.Hide();
-                loading.FinishTransforms();
                 return;
             }
 
@@ -272,9 +272,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
             {
-                loading.Hide();
-                loading.FinishTransforms();
-
                 Scores = scores;
 
                 if (!scores.Scores.Any())
