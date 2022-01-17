@@ -32,19 +32,33 @@ namespace osu.Game.Scoring
         [PrimaryKey]
         public Guid ID { get; set; } = Guid.NewGuid();
 
+        public BeatmapInfo BeatmapInfo { get; set; }
+
+        public RulesetInfo Ruleset { get; set; }
+
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
         public string Hash { get; set; } = string.Empty;
 
         public bool DeletePending { get; set; }
 
-        public bool Equals(ScoreInfo other) => other.ID == ID;
+        public long TotalScore { get; set; }
+
+        public int MaxCombo { get; set; }
+
+        public double Accuracy { get; set; }
+
+        public bool HasReplay { get; set; }
+
+        public DateTimeOffset Date { get; set; }
+
+        public double? PP { get; set; }
 
         [Indexed]
         public long OnlineID { get; set; } = -1;
 
         [MapTo("User")]
-        public RealmUser RealmUser { get; set; } = new RealmUser();
+        public RealmUser RealmUser { get; set; }
 
         [MapTo("Mods")]
         public string ModsJson { get; set; } = string.Empty;
@@ -62,6 +76,9 @@ namespace osu.Game.Scoring
         [UsedImplicitly]
         public ScoreInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
         {
+            Ruleset = new RulesetInfo();
+            RealmUser = new RealmUser();
+            BeatmapInfo = new BeatmapInfo();
         }
 
         // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
@@ -87,22 +104,6 @@ namespace osu.Game.Scoring
                 };
             }
         }
-
-        public long TotalScore { get; set; }
-
-        public int MaxCombo { get; set; }
-
-        public double Accuracy { get; set; }
-
-        public bool HasReplay { get; set; }
-
-        public DateTimeOffset Date { get; set; }
-
-        public double? PP { get; set; }
-
-        public BeatmapInfo BeatmapInfo { get; set; } = null!;
-
-        public RulesetInfo Ruleset { get; set; } = null!;
 
         public ScoreRank Rank
         {
@@ -274,6 +275,8 @@ namespace osu.Game.Scoring
         }
 
         #endregion
+
+        public bool Equals(ScoreInfo other) => other.ID == ID;
 
         public override string ToString() => this.GetDisplayTitle();
     }

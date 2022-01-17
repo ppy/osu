@@ -31,11 +31,11 @@ namespace osu.Game.Beatmaps
 
         public string DifficultyName { get; set; } = string.Empty;
 
-        public RulesetInfo Ruleset { get; set; } = null!;
+        public RulesetInfo Ruleset { get; set; }
 
-        public BeatmapDifficulty Difficulty { get; set; } = new BeatmapDifficulty();
+        public BeatmapDifficulty Difficulty { get; set; }
 
-        public BeatmapMetadata Metadata { get; set; } = new BeatmapMetadata();
+        public BeatmapMetadata Metadata { get; set; }
 
         [IgnoreMap]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
@@ -51,6 +51,9 @@ namespace osu.Game.Beatmaps
         [UsedImplicitly]
         public BeatmapInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
         {
+            Ruleset = new RulesetInfo();
+            Difficulty = new BeatmapDifficulty();
+            Metadata = new BeatmapMetadata();
         }
 
         public BeatmapSetInfo? BeatmapSet { get; set; }
