@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         protected override void PopIn()
         {
+            // Don't display the tooltip if "Total" is the only item
             if (lastAttributes.GetAttributesForDisplay().Count() > 1)
                 this.FadeIn(200, Easing.OutQuint);
         }
