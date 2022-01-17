@@ -7,12 +7,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class PerformanceStatistic : StatisticDisplay
+    public class PerformanceStatistic : StatisticDisplay, IHasCustomTooltip<PerformanceAttributes>
     {
         private readonly ScoreInfo score;
 
@@ -21,6 +23,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         private RollingCounter<int> counter;
+
+        private PerformanceAttributes attributes;
 
         public PerformanceStatistic(ScoreInfo score)
             : base("PP")
@@ -31,21 +35,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         [BackgroundDependencyLoader]
         private void load(ScorePerformanceCache performanceCache)
         {
-            if (score.PP.HasValue)
-            {
-                setPerformanceValue(score.PP.Value);
-            }
-            else
-            {
-                performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())), cancellationTokenSource.Token);
-            }
+            performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
+                            .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())), cancellationTokenSource.Token);
         }
 
-        private void setPerformanceValue(double? pp)
+        private void setPerformanceValue(PerformanceAttributes pp)
         {
-            if (pp.HasValue)
-                performance.Value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
+            if (pp != null)
+            {
+                attributes = pp;
+                performance.Value = (int)Math.Round(pp.Total, MidpointRounding.AwayFromZero);
+            }
         }
 
         public override void Appear()
@@ -65,5 +65,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre
         };
+
+        public ITooltip<PerformanceAttributes> GetCustomTooltip() => new PerformanceStatisticTooltip();
+
+        public PerformanceAttributes TooltipContent => attributes;
     }
 }
