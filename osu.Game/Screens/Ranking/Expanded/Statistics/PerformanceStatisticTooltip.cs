@@ -2,22 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 using System;
 using System.Globalization;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Difficulty;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
     public class PerformanceStatisticTooltip : VisibilityContainer, ITooltip<PerformanceAttributes>
     {
         private readonly Box background;
-        private Colour4 textColor;
+        private Colour4 totalColour;
+        private Colour4 textColour;
 
         protected override Container<Drawable> Content { get; }
 
@@ -46,10 +51,16 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray3;
-            textColor = colours.BlueLighter;
+            totalColour = colours.Blue;
+            textColour = colours.BlueLighter;
         }
 
-        protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+        protected override void PopIn()
+        {
+            if (lastAttributes.GetAttributesForDisplay().Count() > 1)
+                this.FadeIn(200, Easing.OutQuint);
+        }
+
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
         private PerformanceAttributes lastAttributes;
@@ -64,42 +75,71 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             UpdateDisplay(attributes);
         }
 
+        private Drawable createAttributeItem(PerformanceDisplayAttribute attribute, double attributeSum)
+        {
+            bool isTotal = attribute.PropertyName == nameof(PerformanceAttributes.Total);
+            return new GridContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.Absolute, 110),
+                    new Dimension(GridSizeMode.Absolute, 140),
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                            Text = attribute.DisplayName,
+                            Colour = isTotal ? totalColour : textColour
+                        },
+                        new Bar
+                        {
+                            Alpha = isTotal ? 0 : 1,
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            Width = 130,
+                            Height = 5,
+                            BackgroundColour = Color4.White.Opacity(0.5f),
+                            Length = (float)(attribute.Value / attributeSum),
+                            Margin = new MarginPadding { Left = 5, Right = 5 }
+                        },
+                        new OsuSpriteText
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                            Text = ((int)Math.Round(attribute.Value, MidpointRounding.AwayFromZero)).ToString(CultureInfo.CurrentCulture),
+                            Colour = isTotal ? totalColour : textColour
+                        }
+                    }
+                }
+            };
+        }
+
         protected virtual void UpdateDisplay(PerformanceAttributes attributes)
         {
             Content.Clear();
 
-            foreach (PerformanceDisplayAttribute attr in attributes.GetAttributesForDisplay())
+            var displayAttributes = attributes.GetAttributesForDisplay();
+
+            double attributeSum = displayAttributes
+                                  .Where(attr => attr.PropertyName != nameof(PerformanceAttributes.Total))
+                                  .Sum(attr => attr.Value);
+
+            foreach (PerformanceDisplayAttribute attr in displayAttributes)
             {
-                Content.Add(new GridContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.Absolute, 140),
-                        new Dimension(GridSizeMode.AutoSize)
-                    },
-                    RowDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize)
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                                Text = attr.DisplayName,
-                                Colour = textColor
-                            },
-                            new OsuSpriteText
-                            {
-                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                                Text = ((int)Math.Round(attr.Value, MidpointRounding.AwayFromZero)).ToString(CultureInfo.CurrentCulture)
-                            }
-                        }
-                    }
-                });
+                Content.Add(createAttributeItem(attr, attributeSum));
             }
         }
 
