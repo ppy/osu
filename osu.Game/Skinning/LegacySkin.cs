@@ -474,13 +474,18 @@ namespace osu.Game.Skinning
         {
             foreach (string name in getFallbackNames(componentName))
             {
+                // some component names (especially user-controlled ones, like `HitX` in mania)
+                // may contain `@2x` scale specifications.
+                // stable happens to check for that and strip them, so do the same to match stable behaviour.
+                string lookupName = name.Replace(@"@2x", string.Empty);
+
                 float ratio = 2;
-                var texture = Textures?.Get($"{name}@2x", wrapModeS, wrapModeT);
+                var texture = Textures?.Get(@$"{lookupName}@2x", wrapModeS, wrapModeT);
 
                 if (texture == null)
                 {
                     ratio = 1;
-                    texture = Textures?.Get(name, wrapModeS, wrapModeT);
+                    texture = Textures?.Get(lookupName, wrapModeS, wrapModeT);
                 }
 
                 if (texture == null)
