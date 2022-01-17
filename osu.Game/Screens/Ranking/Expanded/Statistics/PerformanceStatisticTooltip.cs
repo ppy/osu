@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 using System;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +17,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     public class PerformanceStatisticTooltip : VisibilityContainer, ITooltip<PerformanceAttributes>
     {
         private readonly Box background;
+        private Colour4 textColor;
 
         protected override Container<Drawable> Content { get; }
 
@@ -44,6 +46,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray3;
+            textColor = colours.BlueLighter;
         }
 
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
@@ -67,10 +70,35 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             foreach (PerformanceDisplayAttribute attr in attributes.GetAttributesForDisplay())
             {
-                Content.Add(new OsuSpriteText
+                Content.Add(new GridContainer
                 {
-                    Font = OsuFont.GetFont(weight: FontWeight.Regular),
-                    Text = $"{attr.DisplayName}: {(int)Math.Round(attr.Value, MidpointRounding.AwayFromZero)}"
+                    AutoSizeAxes = Axes.Both,
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Absolute, 140),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                                Text = attr.DisplayName,
+                                Colour = textColor
+                            },
+                            new OsuSpriteText
+                            {
+                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                Text = ((int)Math.Round(attr.Value, MidpointRounding.AwayFromZero)).ToString(CultureInfo.CurrentCulture)
+                            }
+                        }
+                    }
                 });
             }
         }
