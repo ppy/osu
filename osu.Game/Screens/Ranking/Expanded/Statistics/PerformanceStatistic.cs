@@ -24,8 +24,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private RollingCounter<int> counter;
 
-        private PerformanceAttributes attributes;
-
         public PerformanceStatistic(ScoreInfo score)
             : base("PP")
         {
@@ -43,7 +41,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         {
             if (pp != null)
             {
-                attributes = pp;
+                TooltipContent = pp;
                 performance.Value = (int)Math.Round(pp.Total, MidpointRounding.AwayFromZero);
             }
         }
@@ -68,6 +66,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         public ITooltip<PerformanceAttributes> GetCustomTooltip() => new PerformanceStatisticTooltip();
 
-        public PerformanceAttributes TooltipContent => attributes;
+        public PerformanceAttributes TooltipContent { get; private set; }
     }
 }
