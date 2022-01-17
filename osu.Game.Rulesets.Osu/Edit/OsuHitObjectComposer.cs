@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>
     {
+        protected override bool SupportsDistanceSpacing => true;
+
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {

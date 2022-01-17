@@ -70,6 +70,15 @@ namespace osu.Game.Graphics.UserInterface
             set => slider.Current = value;
         }
 
+        /// <summary>
+        /// A custom step value for each key press which actuates a change on this control.
+        /// </summary>
+        public float KeyboardStep
+        {
+            get => slider.KeyboardStep;
+            set => slider.KeyboardStep = value;
+        }
+
         public BindableBool Expanded { get; } = new BindableBool();
 
         public override bool HandlePositionalInput => true;
