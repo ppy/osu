@@ -8,6 +8,11 @@ namespace osu.Game.Rulesets.Difficulty
     public class PerformanceDisplayAttribute
     {
         /// <summary>
+        /// Name of the attribute property in <see cref="PerformanceAttributes"/>.
+        /// </summary>
+        public string PropertyName { get; }
+
+        /// <summary>
         /// A custom display name for the attribute.
         /// </summary>
         public string DisplayName { get; }
@@ -17,8 +22,9 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         public double Value { get; }
 
-        public PerformanceDisplayAttribute(string displayName, double value)
+        public PerformanceDisplayAttribute(string propertyName, string displayName, double value)
         {
+            PropertyName = propertyName;
             DisplayName = displayName;
             Value = value;
         }

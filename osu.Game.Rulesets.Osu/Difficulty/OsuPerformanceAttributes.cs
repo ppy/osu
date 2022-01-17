@@ -29,10 +29,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             foreach (var attribute in base.GetAttributesForDisplay())
                 yield return attribute;
 
-            yield return new PerformanceDisplayAttribute("Aim", Aim);
-            yield return new PerformanceDisplayAttribute("Speed", Speed);
-            yield return new PerformanceDisplayAttribute("Accuracy", Accuracy);
-            yield return new PerformanceDisplayAttribute("Flashlight Bonus", Flashlight);
+            yield return new PerformanceDisplayAttribute(nameof(Aim), "Aim", Aim);
+            yield return new PerformanceDisplayAttribute(nameof(Speed), "Speed", Speed);
+            yield return new PerformanceDisplayAttribute(nameof(Accuracy), "Accuracy", Accuracy);
+            yield return new PerformanceDisplayAttribute(nameof(Flashlight), "Flashlight Bonus", Flashlight);
         }
     }
 }
