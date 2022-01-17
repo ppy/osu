@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Online
                 scoresContainer.Scores = allScores;
             });
 
-            AddAssert("best score not displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
+            AddUntilStep("best score not displayed", () => scoresContainer.ChildrenOfType<DrawableTopScore>().Count() == 1);
         }
 
         private int onlineID = 1;
