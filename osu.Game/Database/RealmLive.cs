@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Development;
 using Realms;
 
@@ -22,7 +23,9 @@ namespace osu.Game.Database
         /// <summary>
         /// The original live data used to create this instance.
         /// </summary>
-        private readonly T data;
+        private T data;
+
+        private bool dataIsFromUpdateThread;
 
         private readonly RealmContextFactory realmFactory;
 
@@ -37,6 +40,7 @@ namespace osu.Game.Database
             this.realmFactory = realmFactory;
 
             ID = data.ID;
+            dataIsFromUpdateThread = ThreadSafety.IsUpdateThread;
         }
 
         /// <summary>
@@ -47,6 +51,13 @@ namespace osu.Game.Database
         {
             if (!IsManaged)
             {
+                perform(data);
+                return;
+            }
+
+            if (ThreadSafety.IsUpdateThread)
+            {
+                ensureDataIsFromUpdateThread();
                 perform(data);
                 return;
             }
@@ -63,6 +74,12 @@ namespace osu.Game.Database
         {
             if (!IsManaged)
                 return perform(data);
+
+            if (ThreadSafety.IsUpdateThread)
+            {
+                ensureDataIsFromUpdateThread();
+                return perform(data);
+            }
 
             using (var realm = realmFactory.CreateContext())
             {
@@ -102,8 +119,21 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                return realmFactory.Context.Find<T>(ID);
+                ensureDataIsFromUpdateThread();
+
+                return data;
             }
+        }
+
+        private void ensureDataIsFromUpdateThread()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (dataIsFromUpdateThread)
+                return;
+
+            dataIsFromUpdateThread = true;
+            data = realmFactory.Context.Find<T>(ID);
         }
 
         public bool Equals(ILive<T>? other) => ID == other?.ID;
