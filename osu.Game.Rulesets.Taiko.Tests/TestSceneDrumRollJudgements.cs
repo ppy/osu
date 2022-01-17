@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         protected override bool Autoplay => false;
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap<TaikoHitObject>()
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap<TaikoHitObject>
         {
             BeatmapInfo = { Ruleset = new TaikoRuleset().RulesetInfo },
             HitObjects =
