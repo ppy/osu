@@ -154,6 +154,8 @@ namespace osu.Game
 
         private MainMenu menuScreen;
 
+        private VersionManager versionManager;
+
         [CanBeNull]
         private IntroScreen introScreen;
 
@@ -743,6 +745,9 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -1126,10 +1131,16 @@ namespace osu.Game
             {
                 case IntroScreen intro:
                     introScreen = intro;
+                    versionManager?.Show();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
+                    versionManager?.Show();
+                    break;
+
+                default:
+                    versionManager?.Hide();
                     break;
             }
 
