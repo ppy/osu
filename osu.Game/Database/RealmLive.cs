@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Development;
 using Realms;
 
@@ -22,7 +23,9 @@ namespace osu.Game.Database
         /// <summary>
         /// The original live data used to create this instance.
         /// </summary>
-        private readonly T data;
+        private T data;
+
+        private bool dataIsFromUpdateThread;
 
         private readonly RealmAccess realm;
 
@@ -37,6 +40,7 @@ namespace osu.Game.Database
             this.realm = realm;
 
             ID = data.ID;
+            dataIsFromUpdateThread = ThreadSafety.IsUpdateThread;
         }
 
         /// <summary>
@@ -51,7 +55,17 @@ namespace osu.Game.Database
                 return;
             }
 
-            realm.Run(r => perform(retrieveFromID(r, ID)));
+            realm.Run(r =>
+            {
+                if (ThreadSafety.IsUpdateThread)
+                {
+                    ensureDataIsFromUpdateThread();
+                    perform(data);
+                    return;
+                }
+
+                perform(retrieveFromID(r, ID));
+            });
         }
 
         /// <summary>
@@ -62,6 +76,12 @@ namespace osu.Game.Database
         {
             if (!IsManaged)
                 return perform(data);
+
+            if (ThreadSafety.IsUpdateThread)
+            {
+                ensureDataIsFromUpdateThread();
+                return perform(data);
+            }
 
             return realm.Run(r =>
             {
@@ -101,8 +121,20 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                return realm.Realm.Find<T>(ID);
+                ensureDataIsFromUpdateThread();
+                return data;
             }
+        }
+
+        private void ensureDataIsFromUpdateThread()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (dataIsFromUpdateThread)
+                return;
+
+            dataIsFromUpdateThread = true;
+            data = retrieveFromID(realm.Realm, ID);
         }
 
         private T retrieveFromID(Realm realm, Guid id)
