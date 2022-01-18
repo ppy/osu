@@ -38,6 +38,10 @@ namespace osu.Game.Database
                 migrateBeatmaps(ef);
                 migrateScores(ef);
             }
+
+            // Delete the database permanently.
+            // Will cause future startups to not attempt migration.
+            efContextFactory.ResetDatabase();
         }
 
         private void migrateBeatmaps(DatabaseWriteUsage ef)
