@@ -193,6 +193,7 @@ namespace osu.Game
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
+            // A non-null context factory means there's still content to migrate.
             if (efContextFactory != null)
                 new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig).Run();
 
