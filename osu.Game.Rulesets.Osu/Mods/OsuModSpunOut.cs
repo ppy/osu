@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "自动转盘";
         public override string Acronym => "SO";
-        public override IconUsage? Icon => OsuIcon.ModSpunout;
+        public override IconUsage? Icon => OsuIcon.ModSpunOut;
         public override ModType Type => ModType.Automation;
         public override string Description => @"转盘会自动完成";
         public override double ScoreMultiplier => 0.9;

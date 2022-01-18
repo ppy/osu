@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -22,6 +23,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Music;
+using osu.Game.Screens.LLin;
+using osu.Game.Screens.Menu;
+using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
 
@@ -46,6 +50,7 @@ namespace osu.Game.Overlays
         private IconButton playButton;
         private IconButton nextButton;
         private IconButton playlistButton;
+        private IconButton llinButton;
 
         private SpriteText title, artist;
 
@@ -73,7 +78,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config)
+        private void load(MConfigManager config, OsuGame game, NotificationOverlay notifications)
         {
             optUI = config.GetBindable<bool>(MSetting.OptUI);
             Children = new Drawable[]
@@ -128,6 +133,18 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Children = new Drawable[]
                                     {
+                                        llinButton = new IconButton
+                                        {
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.CentreLeft,
+                                            Position = new Vector2(bottom_black_area_height / 2, 0),
+                                            Icon = FontAwesome.Solid.Play,
+                                            TooltipText = "打开LLin",
+                                            Action = () => game.PerformFromScreen(s =>
+                                            {
+                                                s.Push(new LLinScreen());
+                                            }, new[] { typeof(PlaySongSelect), typeof(MainMenu) })
+                                        },
                                         new FillFlowContainer<IconButton>
                                         {
                                             AutoSizeAxes = Axes.Both,
@@ -353,6 +370,7 @@ namespace osu.Game.Overlays
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
+            llinButton.Enabled.Value = !disabled;
         }
 
         protected override void Dispose(bool isDisposing)

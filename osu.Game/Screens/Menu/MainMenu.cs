@@ -21,7 +21,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Import;
-using osu.Game.Screens.LLin;
 using osuTK;
 using osuTK.Graphics;
 
@@ -73,7 +72,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(ReleaseNoteDialog releaseNoteDialog, MfMenuOverlay mfoverlay, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, RankingsOverlay rankings, OsuConfigManager config, SessionStatics statics, MConfigManager mConfig)
+        private void load(ReleaseNoteDialog releaseNoteDialog, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -106,7 +105,6 @@ namespace osu.Game.Screens.Menu
                                 Beatmap.SetDefault();
                                 this.Push(new EditorLoader());
                             },
-                            OnMvisButton = onMvis,
                             OnImportButton = onImport,
                             OnReleaseNoteButton = releaseNoteDialog.Show,
                             OnSolo = loadSoloSongSelect,
@@ -143,7 +141,6 @@ namespace osu.Game.Screens.Menu
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
             buttons.OnBeatmapListing = () => beatmapListing?.ToggleVisibility();
-            buttons.OnMfMenuButton = () => mfoverlay?.ToggleVisibility();
 
             LoadComponentAsync(background = new BackgroundScreenDefault(config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground
                                                                         || config.Get<Configuration.IntroSequence>(OsuSetting.IntroSequence) != Configuration.IntroSequence.SkippedIntro));
@@ -168,8 +165,6 @@ namespace osu.Game.Screens.Menu
         }
 
         private void loadSoloSongSelect() => this.Push(consumeSongSelect());
-
-        private void onMvis() => this.Push(new LLinScreen());
 
         private void onImport() => this.Push(new FileImportScreen());
 

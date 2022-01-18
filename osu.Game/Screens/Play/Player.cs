@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -225,8 +226,6 @@ namespace osu.Game.Screens.Play
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
-            if (ruleset.RulesetInfo.ID != null)
-                Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.ID.Value;
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
@@ -487,6 +486,9 @@ namespace osu.Game.Screens.Play
 
                 var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
+
+                if (ruleset == null)
+                    throw new RulesetLoadException("Instantiation failure");
 
                 try
                 {
@@ -772,7 +774,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
-                this.Push(CreateResults(prepareScoreForDisplayTask.Result));
+                this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
             Scheduler.Add(resultsDisplayDelegate);
@@ -1039,18 +1041,24 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
+            // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
+            var importableScore = score.ScoreInfo.DeepClone();
+
             // For the time being, online ID responses are not really useful for anything.
             // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
             //
             // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
             // conflicts across various systems (ie. solo and multiplayer).
-            long? onlineScoreId = score.ScoreInfo.OnlineID;
-            score.ScoreInfo.OnlineID = -1;
+            importableScore.OnlineID = -1;
 
-            await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
+            var imported = await scoreManager.Import(importableScore, replayReader).ConfigureAwait(false);
 
-            // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
-            score.ScoreInfo.OnlineID = onlineScoreId;
+            imported.PerformRead(s =>
+            {
+                // because of the clone above, it's required that we copy back the post-import hash/ID to use for availability matching.
+                score.ScoreInfo.Hash = s.Hash;
+                score.ScoreInfo.ID = s.ID;
+            });
         }
 
         /// <summary>

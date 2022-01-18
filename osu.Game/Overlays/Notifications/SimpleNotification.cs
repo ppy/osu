@@ -42,13 +42,13 @@ namespace osu.Game.Overlays.Notifications
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
-        protected Box IconBackgound;
+        protected Box IconBackground;
 
         public SimpleNotification()
         {
             IconContent.AddRange(new Drawable[]
             {
-                IconBackgound = new Box
+                IconBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.4f)

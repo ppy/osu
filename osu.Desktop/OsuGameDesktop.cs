@@ -12,13 +12,11 @@ using System.Threading.Tasks;
 using Microsoft.Win32;
 using osu.Desktop.DBus;
 using osu.Desktop.Security;
-using osu.Desktop.Overlays;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Framework;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Desktop.Windows;
 using osu.Framework.Allocation;
@@ -27,19 +25,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.IO;
+using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
-        private readonly bool noVersionOverlay;
-        private VersionManager versionManager;
         private DBusManagerContainer dBusManagerContainer;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-            noVersionOverlay = args?.Any(a => a == "--no-version-overlay") ?? false;
         }
 
         public override StableStorage GetStorageForStableInstall()
@@ -122,9 +118,6 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            if (!noVersionOverlay)
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
-
             LoadComponentAsync(new DiscordRichPresence(), Add);
 
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
@@ -161,24 +154,14 @@ namespace osu.Desktop
             switch (newScreen)
             {
                 case IntroScreen introScreen:
-                    versionManager?.Show();
-
                     if (!(lastScreen is Disclaimer) && allowWindowFade.Value)
                         TransformWindowOpacity(0, introScreen.FadeOutTime - 1);
 
                     break;
 
-                case MainMenu _:
-                    versionManager?.Show();
-                    break;
-
                 case Disclaimer _:
                     if (!(lastScreen is IntroScreen) && allowWindowFade.Value)
                         TransformWindowOpacity(1, 300);
-                    break;
-
-                default:
-                    versionManager?.Hide();
                     break;
             }
         }

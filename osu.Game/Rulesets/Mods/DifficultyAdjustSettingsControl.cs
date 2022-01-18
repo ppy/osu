@@ -76,9 +76,6 @@ namespace osu.Game.Rulesets.Mods
 
             var difficulty = beatmap.Value.BeatmapInfo.BaseDifficulty;
 
-            if (difficulty == null)
-                return;
-
             // generally should always be implemented, else the slider will have a zero default.
             if (difficultyBindable.ReadCurrentFromDifficulty == null)
                 return;

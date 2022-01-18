@@ -527,7 +527,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackgound.Colour = colours.RedDark;
+                IconBackground.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
@@ -579,7 +579,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, NotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackgound.Colour = colours.RedDark;
+                IconBackground.Colour = colours.RedDark;
 
                 Activated = delegate
                 {

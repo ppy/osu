@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             else if (texture.Width < low_width || texture.Height < low_height)
                 yield return new IssueTemplateLowResolution(this).Create(texture.Width, texture.Height);
 
-            string storagePath = context.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(backgroundFile);
+            string storagePath = context.Beatmap.BeatmapInfo.BeatmapSet?.GetPathForFile(backgroundFile);
 
             using (Stream stream = context.WorkingBeatmap.GetStream(storagePath))
             {

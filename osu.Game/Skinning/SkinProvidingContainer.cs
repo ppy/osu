@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowTextureLookup(string componentName) => true;
 
-        protected virtual bool AllowSampleLookup(ISampleInfo componentName) => true;
+        protected virtual bool AllowSampleLookup(ISampleInfo sampleInfo) => true;
 
         protected virtual bool AllowConfigurationLookup => true;
 

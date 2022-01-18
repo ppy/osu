@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Game.Configuration;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
@@ -82,7 +83,7 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new TestSceneScreenNavigation.TestPlaySongSelect());
             AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
 
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadOszIntoOsu(Game, virtualTrack: true).WaitSafely());
             AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
             AddStep("press enter", () => InputManager.Key(Key.Enter));
 

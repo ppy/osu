@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         public override IEnumerable<BeatmapStatistic> GetStatistics()
         {
             int hits = HitObjects.Count(s => s is Hit);
-            int drumrolls = HitObjects.Count(s => s is DrumRoll);
+            int drumRolls = HitObjects.Count(s => s is DrumRoll);
             int swells = HitObjects.Count(s => s is Swell);
 
             return new[]
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     Name = @"滑条数量",
                     CreateIcon = () => new BeatmapStatisticIcon(BeatmapStatisticsIconType.Sliders),
-                    Content = drumrolls.ToString(),
+                    Content = drumRolls.ToString(),
                 },
                 new BeatmapStatistic
                 {

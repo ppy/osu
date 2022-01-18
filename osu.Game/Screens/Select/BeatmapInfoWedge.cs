@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Select
             private void load(OsuColour colours, LocalisationManager localisation, BeatmapDifficultyCache difficultyCache)
             {
                 var beatmapInfo = working.BeatmapInfo;
-                var metadata = beatmapInfo.Metadata ?? working.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+                var metadata = beatmapInfo.Metadata;
 
                 RelativeSizeAxes = Axes.Both;
 
@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Select
                 });
 
                 // no difficulty means it can't have a status to show
-                if (beatmapInfo.DifficultyName == null)
+                if (string.IsNullOrEmpty(beatmapInfo.DifficultyName))
                     StatusPill.Hide();
 
                 addInfoLabels();

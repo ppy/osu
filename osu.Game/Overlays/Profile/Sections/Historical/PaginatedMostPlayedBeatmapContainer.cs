@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override int GetCount(APIUser user) => user.BeatmapPlaycountsCount;
+        protected override int GetCount(APIUser user) => user.BeatmapPlayCountsCount;
 
         protected override APIRequest<List<APIUserMostPlayedBeatmap>> CreateRequest() =>
             new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++, ItemsPerPage);

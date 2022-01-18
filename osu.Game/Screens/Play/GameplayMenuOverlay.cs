@@ -144,30 +144,20 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
-                new FillFlowContainer<PlayerSettingsGroup>
+                visualSettings = new VisualSettings
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 20),
                     Margin = new MarginPadding(25),
-                    Children = new PlayerSettingsGroup[]
-                    {
-                        visualSettings = new VisualSettings
-                        {
-                            IgnoreOptUI = false,
-                        },
-                    }
-                },
+                    AllowAutoDisplay = false
+                }
             };
 
             State.ValueChanged += s => InternalButtons.Deselect();
 
             updateRetryCount();
 
-            optui.ValueChanged += _ => updateVisibilities();
-            updateVisibilities();
+            optui.BindValueChanged(_ => updateVisibilities(), true);
         }
 
         private void updateVisibilities()

@@ -62,6 +62,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     Padding = new MarginPadding(10),
                     Children = new Drawable[]
                     {
+                        idText = new OsuSpriteText
+                        {
+                            Margin = new MarginPadding { Horizontal = 15, Top = 15 },
+                            Font = OsuFont.GetFont(size: 20),
+                            Colour = Color4.Black
+                        },
                         new TrackTimeIndicator(),
                         buttonFillFlow = new FillFlowContainer
                         {
@@ -72,14 +78,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                             AutoSizeEasing = Easing.OutQuint,
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
-                        },
+                        }
                     }
-                },
-                idText = new OsuSpriteText
-                {
-                    Margin = new MarginPadding { Horizontal = 15, Top = 15 },
-                    Font = OsuFont.GetFont(size: 20),
-                    Colour = Color4.Black
                 }
             };
         }
@@ -129,8 +129,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                     Origin = Anchor.TopRight,
                     Current = config.GetBindable<double>(LyricSettings.LyricOffset),
                     LabelText = CloudMusicStrings.GlobalOffsetMain,
-                    RelativeSizeAxes = Axes.None,
-                    Width = 200 + 25,
+                    RelativeSizeAxes = Axes.X,
                     Padding = new MarginPadding { Right = 10 },
                     Colour = Color4.Black
                 },
@@ -138,7 +137,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Width = 225,
+                    RelativeSizeAxes = Axes.X,
                     PlaceholderText = "按网易云ID搜索歌词"
                 }
             });

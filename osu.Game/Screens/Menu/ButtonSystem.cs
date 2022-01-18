@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -48,9 +47,7 @@ namespace osu.Game.Screens.Menu
         public Action OnPlaylists;
 
         public Action OnBeatmapListing;
-        public Action OnMvisButton;
         public Action OnImportButton;
-        public Action OnMfMenuButton;
         public Action OnReleaseNoteButton;
 
         public const float BUTTON_WIDTH = 140f;
@@ -137,10 +134,8 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, LocalisationManager strings, MConfigManager config)
+        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, MConfigManager config)
         {
-            buttonsCustom.Add(new Button(@"关于Mf-osu", @"button-generic-select", FontAwesome.Solid.Gift, new Color4(0, 86, 73, 255), () => OnMfMenuButton?.Invoke(), WEDGE_WIDTH));
-            buttonsCustom.Add(new Button(@"LLin", @"button-solo-select", FontAwesome.Solid.Play, new Color4(0, 86, 73, 255), () => OnMvisButton?.Invoke()));
             buttonsCustom.Add(new Button(@"文件导入", @"button-solo-select", FontAwesome.Solid.File, new Color4(0, 86, 73, 255), () => OnImportButton?.Invoke()));
             buttonsCustom.Add(new Button(@"有关后续更新", @"button-solo-select", FontAwesome.Solid.StickyNote, new Color4(0, 86, 73, 255), () => OnReleaseNoteButton?.Invoke()));
             buttonsCustom.ForEach(b => b.VisibleState = ButtonSystemState.Custom);
