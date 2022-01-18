@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -52,6 +53,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
+        private IBindable<float> distanceSpacingMultiplier;
+
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;
 
@@ -82,6 +85,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.LoadComplete();
 
             beatDivisor.BindValueChanged(_ => updateSpacing(), true);
+
+            distanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
+            distanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
         }
 
         private void updateSpacing()
