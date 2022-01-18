@@ -294,10 +294,6 @@ namespace osu.Game.Tests.Visual
             if (MusicController?.TrackLoaded == true)
                 MusicController.Stop();
 
-            // TODO: what should we do here, if anything? should we use an in-memory realm in this instance?
-            // if (contextFactory?.IsValueCreated == true)
-            //     contextFactory.Value.ResetDatabase();
-
             RecycleLocalStorage(true);
         }
 

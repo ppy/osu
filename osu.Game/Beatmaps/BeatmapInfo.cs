@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using AutoMapper;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
@@ -37,7 +36,6 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; }
 
-        [IgnoreMap]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
@@ -155,7 +153,6 @@ namespace osu.Game.Beatmaps
         #region Compatibility properties
 
         [Ignored]
-        [IgnoreMap]
         public int RulesetID
         {
             get => Ruleset.OnlineID;
@@ -169,7 +166,6 @@ namespace osu.Game.Beatmaps
         }
 
         [Ignored]
-        [IgnoreMap]
         public BeatmapDifficulty BaseDifficulty
         {
             get => Difficulty;
