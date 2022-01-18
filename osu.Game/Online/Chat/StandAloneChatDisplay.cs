@@ -25,7 +25,7 @@ namespace osu.Game.Online.Chat
 
         protected readonly ChatTextBox TextBox;
 
-        protected ChannelManager ChannelManager;
+        private ChannelManager channelManager;
 
         private StandAloneDrawableChannel drawableChannel;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Online.Chat
         [BackgroundDependencyLoader(true)]
         private void load(ChannelManager manager)
         {
-            ChannelManager ??= manager;
+            channelManager ??= manager;
         }
 
         protected virtual StandAloneDrawableChannel CreateDrawableChannel(Channel channel) =>
@@ -94,9 +94,9 @@ namespace osu.Game.Online.Chat
                 return;
 
             if (text[0] == '/')
-                ChannelManager?.PostCommand(text.Substring(1), Channel.Value);
+                channelManager?.PostCommand(text.Substring(1), Channel.Value);
             else
-                ChannelManager?.PostMessage(text, target: Channel.Value);
+                channelManager?.PostMessage(text, target: Channel.Value);
 
             TextBox.Text = string.Empty;
         }

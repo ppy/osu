@@ -90,13 +90,16 @@ namespace osu.Game.Online.Chat
         {
             // Polling will eventually be replaced with websocket, but let's avoid doing these background operations as much as possible for now.
             // The only loss will be delayed PM/message highlight notifications.
+            int millisecondsBetweenPolls = HighPollRate.Value ? 1000 : 60000;
 
-            if (HighPollRate.Value)
-                TimeBetweenPolls.Value = 1000;
-            else if (!isIdle.Value)
-                TimeBetweenPolls.Value = 60000;
-            else
-                TimeBetweenPolls.Value = 600000;
+            if (isIdle.Value)
+                millisecondsBetweenPolls *= 10;
+
+            if (TimeBetweenPolls.Value != millisecondsBetweenPolls)
+            {
+                TimeBetweenPolls.Value = millisecondsBetweenPolls;
+                Logger.Log($"Chat is now polling every {TimeBetweenPolls.Value} ms");
+            }
         }
 
         /// <summary>

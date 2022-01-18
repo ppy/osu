@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Menu
             private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load()
             {
                 InternalChildren = new Drawable[]
                 {

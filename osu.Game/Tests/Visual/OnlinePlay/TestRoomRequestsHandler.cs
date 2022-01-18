@@ -70,6 +70,29 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
                 }
 
+                case GetRoomLeaderboardRequest roomLeaderboardRequest:
+                    roomLeaderboardRequest.TriggerSuccess(new APILeaderboard
+                    {
+                        Leaderboard = new List<APIUserScoreAggregate>
+                        {
+                            new APIUserScoreAggregate
+                            {
+                                TotalScore = 1000000,
+                                TotalAttempts = 5,
+                                CompletedBeatmaps = 2,
+                                User = new APIUser { Username = "best user" }
+                            },
+                            new APIUserScoreAggregate
+                            {
+                                TotalScore = 50,
+                                TotalAttempts = 1,
+                                CompletedBeatmaps = 1,
+                                User = new APIUser { Username = "worst user" }
+                            }
+                        }
+                    });
+                    return true;
+
                 case PartRoomRequest partRoomRequest:
                     partRoomRequest.TriggerSuccess();
                     return true;

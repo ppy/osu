@@ -533,9 +533,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected double CalculateSamplePlaybackBalance(double position)
         {
             float balanceAdjustAmount = positionalHitsoundsLevel.Value * 2;
-            double returnedvalue = balanceAdjustAmount * (position - 0.5f);
+            double returnedValue = balanceAdjustAmount * (position - 0.5f);
 
-            return returnedvalue;
+            return returnedValue;
         }
 
         /// <summary>

@@ -12,7 +12,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osuTK;
@@ -218,7 +217,7 @@ namespace osu.Game.Tournament.Screens.Editors
                     }
 
                     [BackgroundDependencyLoader]
-                    private void load(RulesetStore rulesets)
+                    private void load()
                     {
                         beatmapId.Value = Model.ID;
                         beatmapId.BindValueChanged(id =>

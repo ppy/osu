@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -24,7 +23,7 @@ namespace osu.Game.Screens.Edit.Verify
         protected override string HeaderText => "Visibility";
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colours, VerifyScreen verify)
+        private void load(VerifyScreen verify)
         {
             hiddenIssueTypes = verify.HiddenIssueTypes.GetBoundCopy();
 

@@ -210,13 +210,13 @@ namespace osu.Game.Skinning
         {
             using (var realm = ContextFactory.CreateContext())
             {
-                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => string.IsNullOrEmpty(i.Hash)).ToArray();
+                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
 
                 foreach (SkinInfo skin in skinsWithoutHashes)
                 {
                     try
                     {
-                        Update(skin);
+                        realm.Write(r => skin.Hash = ComputeHash(skin));
                     }
                     catch (Exception e)
                     {
