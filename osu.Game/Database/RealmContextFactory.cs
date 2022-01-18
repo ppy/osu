@@ -366,17 +366,17 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
-
-            Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
-
             try
             {
                 contextCreationLock.Wait();
 
                 lock (contextLock)
                 {
+                    if (!ThreadSafety.IsUpdateThread && context != null)
+                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
+                    Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
+
                     context?.Dispose();
                     context = null;
                 }
