@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -84,6 +85,11 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             float fraction = (float)(attribute.Value / perfectAttribute.Value);
             if (float.IsNaN(fraction))
                 fraction = 0;
+            string text = fraction.ToLocalisableString("0%").ToString();
+
+            if (isTotal)
+                text = (int)Math.Round(attribute.Value, MidpointRounding.AwayFromZero) + "/" + (int)Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero);
+
             return new GridContainer
             {
                 AutoSizeAxes = Axes.Both,
@@ -111,12 +117,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                         },
                         new Bar
                         {
-                            Alpha = isTotal ? 0 : 1,
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Width = 130,
                             Height = 5,
                             BackgroundColour = Color4.White.Opacity(0.5f),
+                            Colour = isTotal ? titleColor : textColour,
                             Length = fraction,
                             Margin = new MarginPadding { Left = 5, Right = 5 }
                         },
@@ -125,7 +131,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                            Text = fraction.ToLocalisableString("0%"),
+                            Text = text,
                             Colour = isTotal ? titleColor : textColour
                         }
                     }
