@@ -451,13 +451,13 @@ namespace osu.Game
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> valueChangedEvent)
         {
-            if (!ThreadSafety.IsUpdateThread)
+            if (IsLoaded && !ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException("Global beatmap bindable must be changed from update thread.");
         }
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
-            if (!ThreadSafety.IsUpdateThread)
+            if (IsLoaded && !ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException("Global ruleset bindable must be changed from update thread.");
 
             if (r.NewValue?.Available != true)
