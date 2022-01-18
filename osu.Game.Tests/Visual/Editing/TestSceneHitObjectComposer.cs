@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
@@ -21,6 +22,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -84,6 +86,28 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
             AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
             AddAssert("Tool changed", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is HitCircleCompositionTool);
+        }
+
+        [Test]
+        public void TestDistanceSpacingHotkeys()
+        {
+            float originalSpacing = 0;
+
+            AddStep("retrieve original spacing", () => originalSpacing = (float)editorBeatmap.BeatmapInfo.DistanceSpacing);
+
+            AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
+            AddStep("hold D", () => InputManager.PressKey(Key.D));
+
+            AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
+            AddAssert("distance spacing increased by 0.5", () => Precision.AlmostEquals(editorBeatmap.BeatmapInfo.DistanceSpacing, originalSpacing + 0.5f));
+
+            AddStep("hold shift", () => InputManager.PressKey(Key.LShift));
+            AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
+            AddAssert("distance spacing increased by 0.05", () => Precision.AlmostEquals(editorBeatmap.BeatmapInfo.DistanceSpacing, originalSpacing + 0.55f));
+
+            AddStep("release shift", () => InputManager.ReleaseKey(Key.LShift));
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
+            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
         }
 
         public class EditorBeatmapContainer : Container
