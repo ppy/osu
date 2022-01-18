@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using AutoMapper;
+using AutoMapper.Internal;
 using osu.Framework.Development;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -60,7 +62,14 @@ namespace osu.Game.Database
                  }
              });
 
-            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
+            c.Internal().ForAllMaps((typeMap, expression) =>
+            {
+                expression.ForAllMembers(m =>
+                {
+                    if (m.DestinationMember.Has<IgnoredAttribute>() || m.DestinationMember.Has<BacklinkAttribute>() || m.DestinationMember.Has<IgnoreDataMemberAttribute>())
+                        m.Ignore();
+                });
+            });
         }).CreateMapper();
 
         private static readonly IMapper mapper = new MapperConfiguration(c =>
@@ -80,24 +89,35 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<BeatmapInfo, BeatmapInfo>().MaxDepth(2).AfterMap((s, d) =>
-            {
-                for (int i = 0; i < d.BeatmapSet?.Beatmaps.Count; i++)
-                {
-                    if (d.BeatmapSet.Beatmaps[i].Equals(d))
-                    {
-                        d.BeatmapSet.Beatmaps[i] = d;
-                        break;
-                    }
-                }
-            });
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>().MaxDepth(2).AfterMap((s, d) =>
-            {
-                foreach (var beatmap in d.Beatmaps)
-                    beatmap.BeatmapSet = d;
-            });
+            c.CreateMap<BeatmapInfo, BeatmapInfo>()
+             .MaxDepth(2)
+             .AfterMap((s, d) =>
+             {
+                 for (int i = 0; i < d.BeatmapSet?.Beatmaps.Count; i++)
+                 {
+                     if (d.BeatmapSet.Beatmaps[i].Equals(d))
+                     {
+                         d.BeatmapSet.Beatmaps[i] = d;
+                         break;
+                     }
+                 }
+             });
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .MaxDepth(2)
+             .AfterMap((s, d) =>
+             {
+                 foreach (var beatmap in d.Beatmaps)
+                     beatmap.BeatmapSet = d;
+             });
 
-            c.AddGlobalIgnore(nameof(RealmObjectBase.ObjectSchema));
+            c.Internal().ForAllMaps((typeMap, expression) =>
+            {
+                expression.ForAllMembers(m =>
+                {
+                    if (m.DestinationMember.Has<IgnoredAttribute>() || m.DestinationMember.Has<BacklinkAttribute>() || m.DestinationMember.Has<IgnoreDataMemberAttribute>())
+                        m.Ignore();
+                });
+            });
         }).CreateMapper();
 
         /// <summary>
