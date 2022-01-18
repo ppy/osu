@@ -191,6 +191,9 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override Beatmap<TaikoHitObject> CreateBeatmap() => new TaikoBeatmap();
 
+        // Important to note that this is subclassing a realm object.
+        // Realm doesn't allow this, but for now this can work since we aren't (in theory?) persisting this to the database.
+        // It is only used during beatmap conversion and processing.
         internal class TaikoMultiplierAppliedDifficulty : BeatmapDifficulty
         {
             public TaikoMultiplierAppliedDifficulty(IBeatmapDifficultyInfo difficulty)
@@ -204,6 +207,8 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             }
 
             #region Overrides of BeatmapDifficulty
+
+            public override BeatmapDifficulty Clone() => new TaikoMultiplierAppliedDifficulty(this);
 
             public override void CopyTo(BeatmapDifficulty other)
             {

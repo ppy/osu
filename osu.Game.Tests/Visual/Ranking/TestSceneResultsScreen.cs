@@ -13,8 +13,10 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -23,6 +25,7 @@ using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
+using Realms;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -32,13 +35,22 @@ namespace osu.Game.Tests.Visual.Ranking
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private RealmContextFactory realmContextFactory { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
-            if (beatmapInfo != null)
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            using (var realm = realmContextFactory.CreateContext())
+            {
+                var beatmapInfo = realm.All<BeatmapInfo>()
+                                       .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
+                                       .FirstOrDefault();
+
+                if (beatmapInfo != null)
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            }
         }
 
         [Test]

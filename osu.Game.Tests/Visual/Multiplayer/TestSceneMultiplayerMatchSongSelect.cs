@@ -44,6 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
 
             beatmaps = new List<BeatmapInfo>();
 
@@ -58,7 +59,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 OnlineID = 10,
                 Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                Metadata = metadata,
                 DateAdded = DateTimeOffset.UtcNow
             };
 
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 var beatmap = new BeatmapInfo
                 {
-                    Ruleset = rulesets.GetRuleset(i % 4),
+                    Ruleset = rulesets.GetRuleset(i % 4) ?? throw new InvalidOperationException(),
                     OnlineID = beatmapId,
                     Length = length,
                     BPM = bpm,
