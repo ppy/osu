@@ -76,6 +76,14 @@ namespace osu.Game.Database
         {
             applyCommonConfiguration(c);
 
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .MaxDepth(2)
+             .AfterMap((s, d) =>
+             {
+                 foreach (var beatmap in d.Beatmaps)
+                     beatmap.BeatmapSet = d;
+             });
+
             // This can be further optimised to reduce cyclic retrievals, similar to the optimised set mapper below.
             // Only hasn't been done yet as we detach at the point of BeatmapInfo less often.
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
@@ -99,6 +107,15 @@ namespace osu.Game.Database
         private static readonly IMapper beatmap_set_mapper = new MapperConfiguration(c =>
         {
             applyCommonConfiguration(c);
+
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .MaxDepth(2)
+             .ForMember(b => b.Files, cc => cc.Ignore())
+             .AfterMap((s, d) =>
+             {
+                 foreach (var beatmap in d.Beatmaps)
+                     beatmap.BeatmapSet = d;
+             });
 
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
              .MaxDepth(1)
@@ -131,13 +148,6 @@ namespace osu.Game.Database
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
-             .MaxDepth(2)
-             .AfterMap((s, d) =>
-             {
-                 foreach (var beatmap in d.Beatmaps)
-                     beatmap.BeatmapSet = d;
-             });
         }
 
         /// <summary>
