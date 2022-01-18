@@ -47,6 +47,7 @@ namespace osu.Game.Beatmaps
 
         #region Compatibility properties
 
+        [Ignored]
         public string AuthorString
         {
             get => Author.Username;
