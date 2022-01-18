@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Localisation;
@@ -85,7 +84,7 @@ namespace osu.Game.Scoring
         // Eventually we should either persist enough information to realm to not require the API lookups, or perform the API lookups locally.
         private APIUser? user;
 
-        [IgnoreMap]
+        [Ignored]
         public APIUser User
         {
             get => user ??= new APIUser
@@ -187,10 +186,7 @@ namespace osu.Game.Scoring
                 if (mods != null)
                     return mods;
 
-                if (apiMods != null)
-                    return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
-
-                return Array.Empty<Mod>();
+                return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
             }
             set
             {
@@ -217,7 +213,7 @@ namespace osu.Game.Scoring
 
                 // then check mods set via Mods property.
                 if (mods != null)
-                    apiMods = mods.Select(m => new APIMod(m)).ToArray();
+                    apiMods ??= mods.Select(m => new APIMod(m)).ToArray();
 
                 return apiMods ?? Array.Empty<APIMod>();
             }
