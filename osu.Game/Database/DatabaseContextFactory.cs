@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 
@@ -147,6 +148,7 @@ namespace osu.Game.Database
 
         public void CreateBackup(string filename)
         {
+            Logger.Log($"Creating full EF database backup at {filename}", LoggingTarget.Database);
             using (var source = storage.GetStream(DATABASE_NAME))
             using (var destination = storage.GetStream(filename, FileAccess.Write, FileMode.CreateNew))
                 source.CopyTo(destination);
