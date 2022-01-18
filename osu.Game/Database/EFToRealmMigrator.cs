@@ -75,6 +75,9 @@ namespace osu.Game.Database
                 if (!realm.All<BeatmapSetInfo>().Any(s => !s.Protected))
                 {
                     Logger.Log($"Migrating {existingBeatmapSets.Count} beatmaps", LoggingTarget.Database);
+                    string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                    realmContextFactory.CreateBackup($"client.{migration}.realm");
+                    efContextFactory.CreateBackup($"client.{migration}.db");
 
                     foreach (var beatmapSet in existingBeatmapSets)
                     {
@@ -131,7 +134,6 @@ namespace osu.Game.Database
                     }
                 }
 
-                efContextFactory.CreateBackup($"client.before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.db");
                 ef.Context.RemoveRange(existingBeatmapSets);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
@@ -187,6 +189,9 @@ namespace osu.Game.Database
                 if (!realm.All<ScoreInfo>().Any())
                 {
                     Logger.Log($"Migrating {existingScores.Count} scores", LoggingTarget.Database);
+                    string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                    realmContextFactory.CreateBackup($"client.{migration}.realm");
+                    efContextFactory.CreateBackup($"client.{migration}.db");
 
                     foreach (var score in existingScores)
                     {
@@ -222,7 +227,6 @@ namespace osu.Game.Database
                     }
                 }
 
-                efContextFactory.CreateBackup($"client.before_scores_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.db");
                 db.Context.RemoveRange(existingScores);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 

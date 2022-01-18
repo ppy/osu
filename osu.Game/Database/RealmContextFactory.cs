@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -352,6 +353,16 @@ namespace osu.Game.Database
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
+
+        public void CreateBackup(string filename)
+        {
+            using (BlockAllOperations())
+            {
+                using (var source = storage.GetStream(Filename))
+                using (var destination = storage.GetStream(filename, FileAccess.Write, FileMode.CreateNew))
+                    source.CopyTo(destination);
+            }
+        }
 
         /// <summary>
         /// Flush any active contexts and block any further writes.
