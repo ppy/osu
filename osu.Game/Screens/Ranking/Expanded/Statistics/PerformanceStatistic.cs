@@ -140,8 +140,14 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         public class PerformanceBreakdown
         {
+            /// <summary>
+            /// Actual gameplay performance.
+            /// </summary>
             public PerformanceAttributes Performance { get; set; }
 
+            /// <summary>
+            /// Performance of a perfect play for comparison.
+            /// </summary>
             public PerformanceAttributes PerfectPerformance { get; set; }
         }
     }
