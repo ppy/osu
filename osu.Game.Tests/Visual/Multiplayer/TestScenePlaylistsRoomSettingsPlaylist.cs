@@ -12,7 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                     Metadata = new BeatmapMetadata
                                     {
                                         Artist = "Artist",
-                                        Author = new APIUser { Username = "Creator name here" },
+                                        Author = new RealmUser { Username = "Creator name here" },
                                         Title = "Long title used to check background colour",
                                     },
                                     BeatmapSet = new BeatmapSetInfo()

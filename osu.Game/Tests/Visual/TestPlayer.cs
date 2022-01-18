@@ -94,6 +94,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (!LoadedBeatmapSuccessfully)
+                return;
+
             ScoreProcessor.NewJudgement += r => Results.Add(r);
         }
     }

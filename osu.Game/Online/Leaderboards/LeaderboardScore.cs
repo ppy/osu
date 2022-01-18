@@ -46,7 +46,7 @@ namespace osu.Game.Online.Leaderboards
         protected Container RankContainer { get; private set; }
 
         private readonly int? rank;
-        private readonly bool allowHighlight;
+        private readonly bool isOnlineScope;
 
         private Box background;
         private Container content;
@@ -70,12 +70,12 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private Storage storage { get; set; }
 
-        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
             Score = score;
 
             this.rank = rank;
-            this.allowHighlight = allowHighlight;
+            this.isOnlineScope = isOnlineScope;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -113,7 +113,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.OnlineID == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
+                                    Colour = user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -401,7 +401,7 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Files.Count > 0)
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
 
-                if (Score.ID != 0)
+                if (!isOnlineScope)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();

@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var beatmap = beatmaps.QueryBeatmapSet(b => b.OnlineID == 241526);
 
-                if (beatmap != null) beatmaps.Delete(beatmap);
+                if (beatmap != null) beatmaps.Delete(beatmap.Value);
             });
         }
 
