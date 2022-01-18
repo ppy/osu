@@ -18,6 +18,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.OnlinePlay.Components;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
@@ -70,6 +71,8 @@ namespace osu.Game.Tests.Visual.Playlists
             });
 
             AddUntilStep("Progress details are hidden", () => match.ChildrenOfType<RoomLocalUserInfo>().FirstOrDefault()?.Parent.Alpha == 0);
+
+            AddUntilStep("Leaderboard shows two aggregate scores", () => match.ChildrenOfType<MatchLeaderboardScore>().Count(s => s.ScoreText.Text != "0") == 2);
 
             AddStep("start match", () => match.ChildrenOfType<PlaylistsReadyButton>().First().TriggerClick());
             AddUntilStep("player loader loaded", () => Stack.CurrentScreen is PlayerLoader);
