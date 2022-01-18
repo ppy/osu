@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
@@ -54,13 +53,12 @@ namespace osu.Game.Database
         private void migrateBeatmaps(DatabaseWriteUsage ef)
         {
             // can be removed 20220730.
-            List<EFBeatmapSetInfo> existingBeatmapSets = ef.Context.EFBeatmapSetInfo
-                                                           .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
-                                                           .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                           .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                                           .Include(s => s.Files).ThenInclude(f => f.FileInfo)
-                                                           .Include(s => s.Metadata)
-                                                           .ToList();
+            var existingBeatmapSets = ef.Context.EFBeatmapSetInfo
+                                        .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
+                                        .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                        .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                        .Include(s => s.Files).ThenInclude(f => f.FileInfo)
+                                        .Include(s => s.Metadata);
 
             Logger.Log("Beginning beatmaps migration to realm", LoggingTarget.Database);
 
@@ -71,9 +69,11 @@ namespace osu.Game.Database
                 return;
             }
 
+            int count = existingBeatmapSets.Count();
+
             using (var realm = realmContextFactory.CreateContext())
             {
-                Logger.Log($"Found {existingBeatmapSets.Count} beatmaps in EF", LoggingTarget.Database);
+                Logger.Log($"Found {count} beatmaps in EF", LoggingTarget.Database);
                 string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
                 efContextFactory.CreateBackup($"client.{migration}.db");
 
@@ -147,7 +147,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                Logger.Log($"Successfully migrated {existingBeatmapSets.Count} beatmaps to realm", LoggingTarget.Database);
+                Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
                 ef.Context.RemoveRange(existingBeatmapSets);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
             }
@@ -180,12 +180,11 @@ namespace osu.Game.Database
         private void migrateScores(DatabaseWriteUsage db)
         {
             // can be removed 20220730.
-            List<EFScoreInfo> existingScores = db.Context.ScoreInfo
-                                                 .Include(s => s.Ruleset)
-                                                 .Include(s => s.BeatmapInfo)
-                                                 .Include(s => s.Files)
-                                                 .ThenInclude(f => f.FileInfo)
-                                                 .ToList();
+            var existingScores = db.Context.ScoreInfo
+                                   .Include(s => s.Ruleset)
+                                   .Include(s => s.BeatmapInfo)
+                                   .Include(s => s.Files)
+                                   .ThenInclude(f => f.FileInfo);
 
             Logger.Log("Beginning scores migration to realm", LoggingTarget.Database);
 
@@ -196,9 +195,11 @@ namespace osu.Game.Database
                 return;
             }
 
+            int count = existingScores.Count();
+
             using (var realm = realmContextFactory.CreateContext())
             {
-                Logger.Log($"Found {existingScores.Count} scores in EF", LoggingTarget.Database);
+                Logger.Log($"Found {count} scores in EF", LoggingTarget.Database);
                 string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
                 efContextFactory.CreateBackup($"client.{migration}.db");
 
@@ -251,7 +252,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                Logger.Log($"Successfully migrated {existingScores.Count} scores to realm", LoggingTarget.Database);
+                Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
                 db.Context.RemoveRange(existingScores);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
             }
