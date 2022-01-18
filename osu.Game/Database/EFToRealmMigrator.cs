@@ -30,20 +30,20 @@ namespace osu.Game.Database
 
         public void Run()
         {
-            using (var db = efContextFactory.GetForWrite())
+            using (var ef = efContextFactory.GetForWrite())
             {
-                migrateSettings(db);
-                migrateSkins(db);
+                migrateSettings(ef);
+                migrateSkins(ef);
 
-                migrateBeatmaps(db);
-                migrateScores(db);
+                migrateBeatmaps(ef);
+                migrateScores(ef);
             }
         }
 
-        private void migrateBeatmaps(DatabaseWriteUsage db)
+        private void migrateBeatmaps(DatabaseWriteUsage ef)
         {
             // can be removed 20220730.
-            var existingBeatmapSets = db.Context.EFBeatmapSetInfo
+            var existingBeatmapSets = ef.Context.EFBeatmapSetInfo
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
@@ -117,7 +117,7 @@ namespace osu.Game.Database
                     }
                 }
 
-                db.Context.RemoveRange(existingBeatmapSets);
+                ef.Context.RemoveRange(existingBeatmapSets);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
                 transaction.Commit();
