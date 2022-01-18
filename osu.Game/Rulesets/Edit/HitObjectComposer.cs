@@ -563,6 +563,8 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPositionSnapProvider
 
+        public abstract IBindable<float> DistanceSpacingMultiplier { get; }
+
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 
         public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>

@@ -4,6 +4,7 @@
 using System;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -185,6 +186,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
                 new SnapResult(screenSpacePosition, null);
 
             public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
+
+            public IBindable<float> DistanceSpacingMultiplier { get; } = new BindableFloat(1);
 
             public float GetBeatSnapDistanceAt(HitObject referenceObject) => (float)beat_length;
 

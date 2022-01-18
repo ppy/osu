@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -8,6 +10,12 @@ namespace osu.Game.Rulesets.Edit
 {
     public interface IPositionSnapProvider
     {
+        /// <summary>
+        /// The spacing multiplier applied to beat snap distances.
+        /// </summary>
+        /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
+        IBindable<float> DistanceSpacingMultiplier { get; }
+
         /// <summary>
         /// Given a position, find a valid time and position snap.
         /// </summary>
