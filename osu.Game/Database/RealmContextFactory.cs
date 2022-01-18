@@ -105,8 +105,20 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
-            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
-            cleanupPendingDeletions();
+            try
+            {
+                // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
+                cleanupPendingDeletions();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+
+                CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                storage.Delete(Filename);
+
+                cleanupPendingDeletions();
+            }
         }
 
         private void cleanupPendingDeletions()
@@ -396,14 +408,23 @@ namespace osu.Game.Database
                 const int sleep_length = 200;
                 int timeout = 5000;
 
-                // see https://github.com/realm/realm-dotnet/discussions/2657
-                while (!Compact())
+                try
                 {
-                    Thread.Sleep(sleep_length);
-                    timeout -= sleep_length;
+                    // see https://github.com/realm/realm-dotnet/discussions/2657
+                    while (!Compact())
+                    {
+                        Thread.Sleep(sleep_length);
+                        timeout -= sleep_length;
 
-                    if (timeout < 0)
-                        throw new TimeoutException(@"Took too long to acquire lock");
+                        if (timeout < 0)
+                            throw new TimeoutException(@"Took too long to acquire lock");
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Compact may fail if the realm is in a bad state.
+                    // We still want to continue with the blocking operation, though.
+                    Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
             }
             catch
