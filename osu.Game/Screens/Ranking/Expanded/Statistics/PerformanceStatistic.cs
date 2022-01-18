@@ -2,19 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class PerformanceStatistic : StatisticDisplay, IHasCustomTooltip<PerformanceAttributes>
+    public class PerformanceStatistic : StatisticDisplay, IHasCustomTooltip<PerformanceStatistic.PerformanceBreakdown>
     {
         private readonly ScoreInfo score;
 
@@ -24,6 +29,15 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private RollingCounter<int> counter;
 
+        [Resolved]
+        private ScorePerformanceCache performanceCache { get; set; }
+
+        [Resolved]
+        private BeatmapDifficultyCache difficultyCache { get; set; }
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         public PerformanceStatistic(ScoreInfo score)
             : base("PP")
         {
@@ -31,18 +45,74 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load(ScorePerformanceCache performanceCache)
+        private void load()
         {
-            performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                            .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())), cancellationTokenSource.Token);
+            Task.WhenAll(
+                // actual performance
+                performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token),
+                // performance for a perfect play
+                getPerfectPerformance(score)
+            ).ContinueWith(attr =>
+            {
+                PerformanceAttributes[] result = attr.GetResultSafely();
+                setPerformanceValue(new PerformanceBreakdown { Performance = result[0], PerfectPerformance = result[1] });
+            });
         }
 
-        private void setPerformanceValue(PerformanceAttributes pp)
+        private async Task<PerformanceAttributes> getPerfectPerformance(ScoreInfo originalScore)
         {
-            if (pp != null)
+            ScoreInfo perfectScore = await getPerfectScore(originalScore).ConfigureAwait(false);
+            return await performanceCache.CalculatePerformanceAsync(perfectScore, cancellationTokenSource.Token).ConfigureAwait(false);
+        }
+
+        private Task<ScoreInfo> getPerfectScore(ScoreInfo originalScore)
+        {
+            return Task.Factory.StartNew(() =>
             {
-                TooltipContent = pp;
-                performance.Value = (int)Math.Round(pp.Total, MidpointRounding.AwayFromZero);
+                var beatmap = beatmapManager.GetWorkingBeatmap(originalScore.BeatmapInfo).GetPlayableBeatmap(originalScore.Ruleset, originalScore.Mods);
+                ScoreInfo perfectPlay = originalScore.DeepClone();
+                perfectPlay.Accuracy = 1;
+                perfectPlay.Passed = true;
+
+                // create statistics assuming all hit objects have perfect hit result
+                var statistics = beatmap.HitObjects
+                                        .Select(ho => ho.CreateJudgement().MaxResult)
+                                        .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
+                                        .ToDictionary(pair => pair.hitResult, pair => pair.count);
+                perfectPlay.Statistics = statistics;
+
+                // calculate max combo
+                var difficulty = difficultyCache.GetDifficultyAsync(
+                    beatmap.BeatmapInfo,
+                    originalScore.Ruleset,
+                    originalScore.Mods,
+                    cancellationTokenSource.Token
+                ).GetResultSafely();
+                perfectPlay.MaxCombo = difficulty?.MaxCombo ?? originalScore.MaxCombo;
+
+                // calculate total score
+                ScoreProcessor scoreProcessor = originalScore.Ruleset.CreateInstance().CreateScoreProcessor();
+                perfectPlay.TotalScore = (long)scoreProcessor.GetImmediateScore(ScoringMode.Standardised, perfectPlay.MaxCombo, statistics);
+
+                // compute rank achieved
+                // default to SS, then adjust the rank with mods
+                perfectPlay.Rank = ScoreRank.X;
+
+                foreach (IApplicableToScoreProcessor mod in perfectPlay.Mods.OfType<IApplicableToScoreProcessor>())
+                {
+                    perfectPlay.Rank = mod.AdjustRank(perfectPlay.Rank, 1);
+                }
+
+                return perfectPlay;
+            }, cancellationTokenSource.Token);
+        }
+
+        private void setPerformanceValue(PerformanceBreakdown breakdown)
+        {
+            if (breakdown != null)
+            {
+                TooltipContent = breakdown;
+                performance.Value = (int)Math.Round(breakdown.Performance.Total, MidpointRounding.AwayFromZero);
             }
         }
 
@@ -64,8 +134,15 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             Origin = Anchor.TopCentre
         };
 
-        public ITooltip<PerformanceAttributes> GetCustomTooltip() => new PerformanceStatisticTooltip();
+        public ITooltip<PerformanceBreakdown> GetCustomTooltip() => new PerformanceStatisticTooltip();
 
-        public PerformanceAttributes TooltipContent { get; private set; }
+        public PerformanceBreakdown TooltipContent { get; private set; }
+
+        public class PerformanceBreakdown
+        {
+            public PerformanceAttributes Performance { get; set; }
+
+            public PerformanceAttributes PerfectPerformance { get; set; }
+        }
     }
 }
