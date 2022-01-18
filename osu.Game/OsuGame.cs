@@ -154,6 +154,8 @@ namespace osu.Game
 
         private MainMenu menuScreen;
 
+        private VersionManager versionManager;
+
         [CanBeNull]
         private IntroScreen introScreen;
 
@@ -743,6 +745,9 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -820,7 +825,17 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
-            chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
+            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
+            // Multiplayer modes need to increase poll rate temporarily.
+            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
+
+            void updateChatPollRate()
+            {
+                channelManager.HighPollRate.Value =
+                    chatOverlay.State.Value == Visibility.Visible
+                    || API.Activity.Value is UserActivity.InLobby
+                    || API.Activity.Value is UserActivity.InMultiplayerGame;
+            }
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
@@ -1116,10 +1131,16 @@ namespace osu.Game
             {
                 case IntroScreen intro:
                     introScreen = intro;
+                    versionManager?.Show();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
+                    versionManager?.Show();
+                    break;
+
+                default:
+                    versionManager?.Hide();
                     break;
             }
 
