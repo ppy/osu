@@ -358,6 +358,7 @@ namespace osu.Game.Database
         {
             using (BlockAllOperations())
             {
+                Logger.Log($"Creating full realm database backup at {filename}", LoggingTarget.Database);
                 using (var source = storage.GetStream(Filename))
                 using (var destination = storage.GetStream(filename, FileAccess.Write, FileMode.CreateNew))
                     source.CopyTo(destination);
