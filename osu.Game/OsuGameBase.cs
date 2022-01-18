@@ -327,6 +327,7 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+            Beatmap.BindValueChanged(onBeatmapChanged);
         }
 
         protected virtual void InitialiseFonts()
@@ -448,8 +449,17 @@ namespace osu.Game
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> valueChangedEvent)
+        {
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException("Global beatmap bindable must be changed from update thread.");
+        }
+
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException("Global ruleset bindable must be changed from update thread.");
+
             if (r.NewValue?.Available != true)
             {
                 // reject the change if the ruleset is not available.
