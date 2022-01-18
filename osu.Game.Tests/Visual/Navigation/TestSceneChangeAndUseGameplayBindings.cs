@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("close settings", () => Game.Settings.Hide());
 
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadQuickOszIntoOsu(Game).WaitSafely());
+            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
             PushAndConfirm(() => new PlaySongSelect());
 
             AddStep("enter gameplay", () => InputManager.Key(Key.Enter));

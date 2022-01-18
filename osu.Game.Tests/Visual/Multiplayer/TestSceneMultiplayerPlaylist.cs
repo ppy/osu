@@ -35,6 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
         }
 
         [SetUp]
@@ -55,7 +56,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
             });
 
@@ -169,7 +170,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void addItemStep(bool expired = false) => AddStep("add item", () => Client.AddPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem
         {
             Beatmap = { Value = importedBeatmap },
-            BeatmapID = importedBeatmap.OnlineID ?? -1,
+            BeatmapID = importedBeatmap.OnlineID,
             Expired = expired,
             PlayedAt = DateTimeOffset.Now
         })));
