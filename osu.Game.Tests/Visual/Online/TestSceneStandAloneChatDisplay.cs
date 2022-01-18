@@ -313,8 +313,8 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestStandAloneChatDisplay : StandAloneChatDisplay
         {
-            public TestStandAloneChatDisplay(bool textbox = false)
-                : base(textbox)
+            public TestStandAloneChatDisplay(bool textBox = false)
+                : base(textBox)
             {
             }
 

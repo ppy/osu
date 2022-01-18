@@ -12,10 +12,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
+using Realms;
 
 namespace osu.Game.Overlays
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays
     /// </summary>
     public class MusicController : CompositeDrawable
     {
+        private IDisposable beatmapSubscription;
+
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
@@ -65,18 +68,44 @@ namespace osu.Game.Overlays
         [NotNull]
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmaps.ItemUpdated += beatmapUpdated;
-            beatmaps.ItemRemoved += beatmapRemoved;
-
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets(IncludedDetails.Minimal, true).OrderBy(_ => RNG.Next()));
-
             // Todo: These binds really shouldn't be here, but are unlikely to cause any issues for now.
             // They are placed here for now since some tests rely on setting the beatmap _and_ their hierarchies inside their load(), which runs before the MusicController's load().
             beatmap.BindValueChanged(beatmapChanged, true);
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var availableBeatmaps = realmFactory.Context
+                                                .All<BeatmapSetInfo>()
+                                                .Where(s => !s.DeletePending);
+
+            // ensure we're ready before completing async load.
+            // probably not a good way of handling this (as there is a period we aren't watching for changes until the realm subscription finishes up.
+            foreach (var s in availableBeatmaps)
+                beatmapSets.Add(s);
+
+            beatmapSubscription = availableBeatmaps.QueryAsyncWithNotifications(beatmapsChanged);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        {
+            if (changes == null)
+                return;
+
+            foreach (int i in changes.InsertedIndices)
+                beatmapSets.Insert(i, sender[i].Detach());
+
+            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+                beatmapSets.RemoveAt(i);
         }
 
         /// <summary>
@@ -104,14 +133,6 @@ namespace osu.Game.Overlays
         /// Returns whether the beatmap track is loaded.
         /// </summary>
         public bool TrackLoaded => CurrentTrack.TrackLoaded;
-
-        private void beatmapUpdated(BeatmapSetInfo set) => Schedule(() =>
-        {
-            beatmapSets.Remove(set);
-            beatmapSets.Add(set);
-        });
-
-        private void beatmapRemoved(BeatmapSetInfo set) => Schedule(() => beatmapSets.RemoveAll(s => s.Equals(set)));
 
         private ScheduledDelegate seekDelegate;
 
@@ -259,11 +280,12 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => !i.Equals(current.BeatmapSetInfo)).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playableSet = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
 
-            if (playable != null)
+            if (playableBeatmap != null)
             {
-                changeBeatmap(beatmaps.GetWorkingBeatmap(playable.Beatmaps.First()));
+                changeBeatmap(beatmaps.GetWorkingBeatmap(playableBeatmap));
                 restartTrack();
                 return true;
             }
@@ -429,11 +451,7 @@ namespace osu.Game.Overlays
         {
             base.Dispose(isDisposing);
 
-            if (beatmaps != null)
-            {
-                beatmaps.ItemUpdated -= beatmapUpdated;
-                beatmaps.ItemRemoved -= beatmapRemoved;
-            }
+            beatmapSubscription?.Dispose();
         }
     }
 

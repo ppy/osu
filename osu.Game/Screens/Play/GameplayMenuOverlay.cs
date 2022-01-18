@@ -154,10 +154,7 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding(25),
                     Children = new PlayerSettingsGroup[]
                     {
-                        visualSettings = new VisualSettings
-                        {
-                            IgnoreOptUI = false,
-                        },
+                        visualSettings = new VisualSettings()
                     }
                 },
             };

@@ -115,7 +115,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                                         OnAdjust?.Invoke();
                                         timeTextBox.Text = Value.Time.ToString(CultureInfo.InvariantCulture);
                                     },
-                                    BackgroundColour = osuColour.GreySeafoamDarker
+                                    BackgroundColour = osuColour.Gray8
                                 },
                                 new OsuButton
                                 {

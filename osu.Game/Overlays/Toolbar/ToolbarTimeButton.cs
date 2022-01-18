@@ -3,7 +3,6 @@
 
 using System;
 using System.Globalization;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -26,8 +25,8 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapManager.ItemUpdated += _ => updateBeatmapTooltip();
-            beatmapManager.ItemRemoved += _ => updateBeatmapTooltip();
+            //beatmapManager.PostImport ItemUpdated += _ => updateBeatmapTooltip();
+            //beatmapManager.ItemRemoved += _ => updateBeatmapTooltip();
         }
 
         protected override void LoadComplete()
@@ -57,8 +56,8 @@ namespace osu.Game.Overlays.Toolbar
             this.Delay(500).Schedule(updateTime);
         }
 
-        private void updateBeatmapTooltip() =>
-            TooltipSub = $"你共有{beatmapManager.QueryBeatmaps(_ => true).ToList().Count}张谱面!";
+        private void updateBeatmapTooltip() => TooltipSub = "因为API更改，暂时无法显示谱面总数orz";
+        //    TooltipSub = $"你共有{beatmapManager.QueryBeatmaps(_ => true).ToList().Count}张谱面!";
 
         protected override bool OnClick(ClickEvent e)
         {

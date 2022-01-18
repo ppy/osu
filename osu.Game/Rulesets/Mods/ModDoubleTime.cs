@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "倍速";
         public override string Acronym => "DT";
-        public override IconUsage? Icon => OsuIcon.ModDoubletime;
+        public override IconUsage? Icon => OsuIcon.ModDoubleTime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "加速>>>>>>>>>>";
 

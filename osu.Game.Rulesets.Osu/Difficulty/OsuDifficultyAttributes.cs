@@ -70,8 +70,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             SliderFactor = values[ATTRIB_ID_SLIDER_FACTOR];
         }
 
-        // Used implicitly by Newtonsoft.Json to not serialize flashlight property in some cases.
+        #region Newtonsoft.Json implicit ShouldSerialize() methods
+
+        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
+        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
+        // unless the fields are also renamed.
+
         [UsedImplicitly]
         public bool ShouldSerializeFlashlightRating() => Mods.Any(m => m is ModFlashlight);
+
+        #endregion
     }
 }

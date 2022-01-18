@@ -459,6 +459,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestUnimplementedModOsuRuleset : OsuRuleset
         {
+            public override string ShortName => "unimplemented";
+
             public override IEnumerable<Mod> GetModsFor(ModType type)
             {
                 if (type == ModType.Conversion) return base.GetModsFor(type).Concat(new[] { new TestUnimplementedMod() });

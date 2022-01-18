@@ -1,16 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -19,10 +22,10 @@ namespace osu.Game.Screens.Select.Carousel
         private readonly BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private ScoreManager scores { get; set; }
+        private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
+        private RealmContextFactory realmFactory { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -36,26 +39,36 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader]
         private void load()
         {
-            scores.ItemUpdated += scoreChanged;
-            scores.ItemRemoved += scoreChanged;
-
             ruleset.ValueChanged += _ => fetchAndLoadTopScore();
 
             fetchAndLoadTopScore();
         }
 
-        private void scoreChanged(ScoreInfo score)
+        protected override void LoadComplete()
         {
-            if (score.BeatmapInfoID == beatmapInfo.ID)
-                fetchAndLoadTopScore();
+            base.LoadComplete();
+
+            scoreSubscription = realmFactory.Context.All<ScoreInfo>()
+                                            .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
+                                            .QueryAsyncWithNotifications((_, changes, ___) =>
+                                            {
+                                                if (changes == null)
+                                                    return;
+
+                                                fetchTopScoreRank();
+                                            });
         }
+
+        private IDisposable scoreSubscription;
 
         private ScheduledDelegate scheduledRankUpdate;
 
         private void fetchAndLoadTopScore()
         {
-            var rank = fetchTopScore()?.Rank;
-            scheduledRankUpdate = Schedule(() =>
+            // TODO: this lookup likely isn't required, we can use the results of the subscription directly.
+            var rank = fetchTopScoreRank();
+
+            scheduledRankUpdate = Scheduler.Add(() =>
             {
                 Rank = rank;
 
@@ -67,25 +80,28 @@ namespace osu.Game.Screens.Select.Carousel
         // We're present if a rank is set, or if there is a pending rank update (IsPresent = true is required for the scheduler to run).
         public override bool IsPresent => base.IsPresent && (Rank != null || scheduledRankUpdate?.Completed == false);
 
-        private ScoreInfo fetchTopScore()
+        private ScoreRank? fetchTopScoreRank()
         {
-            if (scores == null || beatmapInfo == null || ruleset?.Value == null || api?.LocalUser.Value == null)
+            if (realmFactory == null || beatmapInfo == null || ruleset?.Value == null || api?.LocalUser.Value == null)
                 return null;
 
-            return scores.QueryScores(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
-                         .OrderByDescending(s => s.TotalScore)
-                         .FirstOrDefault();
+            using (var realm = realmFactory.CreateContext())
+            {
+                return realm.All<ScoreInfo>()
+                            .AsEnumerable()
+                            // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
+                            .Where(s => s.UserID == api.LocalUser.Value.Id && s.BeatmapInfoID == beatmapInfo.ID && s.RulesetID == ruleset.Value.ID && !s.DeletePending)
+                            .OrderByDescending(s => s.TotalScore)
+                            .FirstOrDefault()
+                            ?.Rank;
+            }
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
 
-            if (scores != null)
-            {
-                scores.ItemUpdated -= scoreChanged;
-                scores.ItemRemoved -= scoreChanged;
-            }
+            scoreSubscription?.Dispose();
         }
     }
 }

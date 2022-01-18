@@ -107,8 +107,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                                 t.NewLine();
                                 t.AddText("如果你的数位板没被检测到, 请阅读 ");
                                 t.AddLink("此FAQ", LinkAction.External, RuntimeInfo.OS == RuntimeInfo.Platform.Windows
-                                    ? @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Windows-FAQ"
-                                    : @"https://github.com/OpenTabletDriver/OpenTabletDriver/wiki/Linux-FAQ");
+                                    ? @"https://opentabletdriver.net/Wiki/FAQ/Windows"
+                                    : @"https://opentabletdriver.net/Wiki/FAQ/Linux");
                                 t.AddText(" 以排查故障");
                             }
                         }),

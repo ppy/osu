@@ -16,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
+using FileInfo = System.IO.FileInfo;
 
 namespace osu.Game.Screens.Import
 {
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Import
                 {
                     new Box
                     {
-                        Colour = colours.GreySeafoamDark,
+                        Colour = colours.GreySeaFoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
                     fileSelector = new OsuFileSelector(storage.GetFullPath("."), validFileExtensions: game.HandledExtensions.ToArray())
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeafoamDarker,
+                                Colour = colours.GreySeaFoamDarker,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container

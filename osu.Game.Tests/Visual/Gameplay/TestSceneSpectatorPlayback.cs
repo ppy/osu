@@ -372,7 +372,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         internal class TestReplayRecorder : ReplayRecorder<TestAction>
         {
             public TestReplayRecorder()
-                : base(new Score { ScoreInfo = { BeatmapInfo = new BeatmapInfo() } })
+                : base(new Score
+                {
+                    ScoreInfo =
+                    {
+                        BeatmapInfo = new BeatmapInfo(),
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    }
+                })
             {
             }
 

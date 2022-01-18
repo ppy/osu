@@ -8,23 +8,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract class SelectionBoxDragHandle : SelectionBoxControl
     {
-        public Action<DragEvent> HandleDrag { get; set; }
-
         protected override bool OnDragStart(DragStartEvent e)
         {
             TriggerOperationStarted();
             return true;
         }
 
-        protected override void OnDrag(DragEvent e)
-        {
-            HandleDrag?.Invoke(e);
-            base.OnDrag(e);
-        }
-
         protected override void OnDragEnd(DragEndEvent e)
         {
-            TriggerOperatoinEnded();
+            TriggerOperationEnded();
 
             UpdateHoverState();
             base.OnDragEnd(e);

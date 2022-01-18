@@ -1,3 +1,4 @@
+using System;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic;
 using Mvis.Plugin.CloudMusicSupport.Sidebar.Screens;
 using osu.Framework.Allocation;
@@ -31,7 +32,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar
 
         private LyricPlugin plugin => (LyricPlugin)Plugin;
 
-        public int BeatmapSetId;
+        public Guid BeatmapSetId;
 
         private ScreenStack screenStack;
 

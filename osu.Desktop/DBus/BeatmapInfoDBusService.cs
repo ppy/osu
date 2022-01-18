@@ -116,7 +116,7 @@ namespace osu.Desktop.DBus
 
                 setProperty(nameof(properties.Version), value.BeatmapInfo.DifficultyName ?? "???");
                 setProperty(nameof(properties.Stars), value.BeatmapInfo.StarRating);
-                setProperty(nameof(properties.OnlineID), value.BeatmapInfo.OnlineID ?? -1);
+                setProperty(nameof(properties.OnlineID), value.BeatmapInfo.OnlineID);
                 setProperty(nameof(properties.BPM), value.BeatmapInfo.BPM);
                 setProperty(nameof(properties.CoverPath), resolveBeatmapCoverUrl(value));
             }

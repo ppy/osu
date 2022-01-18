@@ -209,7 +209,7 @@ namespace osu.Game.Collections
 
                             string checksum = sr.ReadString();
 
-                            var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum);
+                            var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum)?.Detach();
                             if (beatmap != null)
                                 collection.Beatmaps.Add(beatmap);
                         }

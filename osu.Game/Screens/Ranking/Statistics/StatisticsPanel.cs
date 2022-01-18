@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Placeholders;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -76,7 +74,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (newScore == null)
                 return;
 
-            if (newScore.HitEvents == null || newScore.HitEvents.Count == 0)
+            if (newScore.HitEvents.Count == 0)
             {
                 content.Add(new FillFlowContainer
                 {
@@ -104,7 +102,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
                 Task.Run(() =>
                 {
-                    playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods ?? Array.Empty<Mod>());
+                    playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
                 }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
                 {
                     var rows = new FillFlowContainer
@@ -142,7 +140,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     LoadComponentAsync(rows, d =>
                     {
-                        if (Score.Value != newScore)
+                        if (!Score.Value.Equals(newScore))
                             return;
 
                         spinner.Hide();
