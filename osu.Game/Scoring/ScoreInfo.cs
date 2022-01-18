@@ -186,10 +186,7 @@ namespace osu.Game.Scoring
                 if (mods != null)
                     return mods;
 
-                if (apiMods != null)
-                    return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
-
-                return Array.Empty<Mod>();
+                return APIMods.Select(m => m.ToMod(Ruleset.CreateInstance())).ToArray();
             }
             set
             {
@@ -216,7 +213,7 @@ namespace osu.Game.Scoring
 
                 // then check mods set via Mods property.
                 if (mods != null)
-                    apiMods = mods.Select(m => new APIMod(m)).ToArray();
+                    apiMods ??= mods.Select(m => new APIMod(m)).ToArray();
 
                 return apiMods ?? Array.Empty<APIMod>();
             }
