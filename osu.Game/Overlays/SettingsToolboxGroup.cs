@@ -155,11 +155,18 @@ namespace osu.Game.Overlays
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
         }
 
+        /// <summary>
+        /// 是否允许加载完毕时自动显示
+        /// </summary>
+        public bool AllowAutoDisplay = true;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            if (AllowAutoDisplay)
+                this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+
             updateExpanded();
         }
 

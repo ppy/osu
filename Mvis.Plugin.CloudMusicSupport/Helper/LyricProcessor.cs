@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading;
 using Markdig.Helpers;
@@ -241,7 +242,12 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
             req.Finished += () => onRequestFinish(req.ResponseObject, onFinish, onFail);
             req.Failed += e =>
             {
-                Logger.Error(e, "查询歌曲失败");
+                string message = "查询歌曲失败";
+
+                if (e is HttpRequestException)
+                    message += ", 未能送达http请求, 请检查当前网络以及代理";
+
+                Logger.Error(e, message);
                 onFail?.Invoke(e.ToString());
             };
             req.PerformAsync(cancellationTokenSource.Token);
@@ -302,7 +308,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             try
             {
-                string target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
+                string target = $"custom/lyrics/{working.BeatmapSetInfo.ID}.json";
 
                 string content = File.ReadAllText(storage.GetFullPath(target, true));
 
