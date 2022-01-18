@@ -53,7 +53,9 @@ namespace osu.Game.Online.Leaderboards
         private Drawable avatar;
         private Drawable scoreRank;
         private OsuSpriteText nameLabel;
-        private GlowingSpriteText scoreLabel;
+
+        public GlowingSpriteText ScoreText { get; private set; }
+
         private Container flagBadgeContainer;
         private FillFlowContainer<ModIcon> modsContainer;
 
@@ -198,7 +200,7 @@ namespace osu.Game.Online.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText
+                                        ScoreText = new GlowingSpriteText
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
@@ -240,7 +242,7 @@ namespace osu.Game.Online.Leaderboards
 
         public override void Show()
         {
-            foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
+            foreach (var d in new[] { avatar, nameLabel, ScoreText, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
                 d.FadeOut();
 
             Alpha = 0;
@@ -262,7 +264,7 @@ namespace osu.Game.Online.Leaderboards
 
                 using (BeginDelayedSequence(250))
                 {
-                    scoreLabel.FadeIn(200);
+                    ScoreText.FadeIn(200);
                     scoreRank.FadeIn(200);
 
                     using (BeginDelayedSequence(50))
