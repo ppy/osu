@@ -1,11 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -19,7 +18,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class PerformanceStatisticTooltip : VisibilityContainer, ITooltip<PerformanceAttributes>
+    using static PerformanceStatistic;
+
+    public class PerformanceStatisticTooltip : VisibilityContainer, ITooltip<PerformanceBreakdown>
     {
         private readonly Box background;
         private Colour4 totalColour;
@@ -59,27 +60,30 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         protected override void PopIn()
         {
             // Don't display the tooltip if "Total" is the only item
-            if (lastAttributes.GetAttributesForDisplay().Count() > 1)
+            if (currentPerformance.Performance.GetAttributesForDisplay().Count() > 1)
                 this.FadeIn(200, Easing.OutQuint);
         }
 
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
-        private PerformanceAttributes lastAttributes;
+        private PerformanceBreakdown currentPerformance;
 
-        public void SetContent(PerformanceAttributes attributes)
+        public void SetContent(PerformanceBreakdown performance)
         {
-            if (attributes == lastAttributes)
+            if (performance == currentPerformance)
                 return;
 
-            lastAttributes = attributes;
+            currentPerformance = performance;
 
-            UpdateDisplay(attributes);
+            UpdateDisplay(performance);
         }
 
-        private Drawable createAttributeItem(PerformanceDisplayAttribute attribute, double attributeSum)
+        private Drawable createAttributeItem(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
         {
             bool isTotal = attribute.PropertyName == nameof(PerformanceAttributes.Total);
+            float fraction = (float)(attribute.Value / perfectAttribute.Value);
+            if (float.IsNaN(fraction))
+                fraction = 0;
             return new GridContainer
             {
                 AutoSizeAxes = Axes.Both,
@@ -113,7 +117,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Width = 130,
                             Height = 5,
                             BackgroundColour = Color4.White.Opacity(0.5f),
-                            Length = (float)(attribute.Value / attributeSum),
+                            Length = fraction,
                             Margin = new MarginPadding { Left = 5, Right = 5 }
                         },
                         new OsuSpriteText
@@ -121,7 +125,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                            Text = ((int)Math.Round(attribute.Value, MidpointRounding.AwayFromZero)).ToString(CultureInfo.CurrentCulture),
+                            Text = fraction.ToLocalisableString("0%"),
                             Colour = isTotal ? totalColour : textColour
                         }
                     }
@@ -129,19 +133,17 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             };
         }
 
-        protected virtual void UpdateDisplay(PerformanceAttributes attributes)
+        protected virtual void UpdateDisplay(PerformanceBreakdown performance)
         {
             Content.Clear();
 
-            var displayAttributes = attributes.GetAttributesForDisplay();
+            var displayAttributes = performance.Performance.GetAttributesForDisplay();
 
-            double attributeSum = displayAttributes
-                                  .Where(attr => attr.PropertyName != nameof(PerformanceAttributes.Total))
-                                  .Sum(attr => attr.Value);
+            var perfectDisplayAttributes = performance.PerfectPerformance.GetAttributesForDisplay();
 
             foreach (PerformanceDisplayAttribute attr in displayAttributes)
             {
-                Content.Add(createAttributeItem(attr, attributeSum));
+                Content.Add(createAttributeItem(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName)));
             }
         }
 
