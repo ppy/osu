@@ -45,8 +45,8 @@ namespace osu.Game.Scoring.Legacy
                 sw.Write((byte)(score.ScoreInfo.Ruleset.OnlineID));
                 sw.Write(LATEST_VERSION);
                 sw.Write(score.ScoreInfo.BeatmapInfo.MD5Hash);
-                sw.Write(score.ScoreInfo.UserString);
-                sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.UserString}-{score.ScoreInfo.Date}").ComputeMD5Hash());
+                sw.Write(score.ScoreInfo.User.Username);
+                sw.Write(FormattableString.Invariant($"lazer-{score.ScoreInfo.User.Username}-{score.ScoreInfo.Date}").ComputeMD5Hash());
                 sw.Write((ushort)(score.ScoreInfo.GetCount300() ?? 0));
                 sw.Write((ushort)(score.ScoreInfo.GetCount100() ?? 0));
                 sw.Write((ushort)(score.ScoreInfo.GetCount50() ?? 0));

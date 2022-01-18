@@ -13,7 +13,7 @@ namespace osu.Game.Database
     {
         private readonly Storage storage;
 
-        private const string database_name = @"client.db";
+        public const string DATABASE_NAME = @"client.db";
 
         private ThreadLocal<OsuDbContext> threadContexts;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Database
             threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
         }
 
-        protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(database_name, storage))
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(DATABASE_NAME, storage))
         {
             Database = { AutoTransactionsEnabled = false }
         };
@@ -152,7 +152,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    storage.Delete(database_name);
+                    storage.Delete(DATABASE_NAME);
                 }
                 catch
                 {

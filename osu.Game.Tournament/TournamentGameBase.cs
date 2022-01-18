@@ -81,8 +81,9 @@ namespace osu.Game.Tournament
 
                 ladder ??= new LadderInfo();
 
-                ladder.Ruleset.Value = RulesetStore.GetRuleset(ladder.Ruleset.Value?.ShortName)
-                                       ?? RulesetStore.AvailableRulesets.First();
+                ladder.Ruleset.Value = ladder.Ruleset.Value != null
+                    ? RulesetStore.GetRuleset(ladder.Ruleset.Value.ShortName)
+                    : RulesetStore.AvailableRulesets.First();
 
                 bool addedInfo = false;
 

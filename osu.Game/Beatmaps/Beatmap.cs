@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
         }
 
         [JsonIgnore]
-        public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 

@@ -17,7 +17,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -45,6 +45,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
         }
 
         [Test]
@@ -153,17 +154,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            ILive<BeatmapSetInfo> imported = null;
 
-            AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).WaitSafely());
+            Debug.Assert(beatmap.BeatmapSet != null);
 
-            createPlaylistWithBeatmaps(beatmap);
+            AddStep("import beatmap", () => imported = manager.Import(beatmap.BeatmapSet).GetResultSafely());
+
+            createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
 
             assertDownloadButtonVisible(false);
 
-            AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single()));
+            AddStep("delete beatmap set", () => imported.PerformWrite(s => s.DeletePending = true));
             assertDownloadButtonVisible(true);
 
-            AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single()));
+            AddStep("undelete beatmap set", () => imported.PerformWrite(s => s.DeletePending = false));
             assertDownloadButtonVisible(false);
 
             void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
@@ -179,7 +183,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var byChecksum = CreateAPIBeatmap();
             byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
-            createPlaylistWithBeatmaps(byOnlineId, byChecksum);
+            createPlaylistWithBeatmaps(() => new[] { byOnlineId, byChecksum });
 
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadButton>().All(d => d.IsPresent));
         }
@@ -193,7 +197,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             beatmap.BeatmapSet.HasExplicitContent = true;
 
-            createPlaylistWithBeatmaps(beatmap);
+            createPlaylistWithBeatmaps(() => new[] { beatmap });
         }
 
         [Test]
@@ -305,7 +309,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                     Metadata = new BeatmapMetadata
                                     {
                                         Artist = "Artist",
-                                        Author = new APIUser { Username = "Creator name here" },
+                                        Author = new RealmUser { Username = "Creator name here" },
                                         Title = "Long title used to check background colour",
                                     },
                                     BeatmapSet = new BeatmapSetInfo()
@@ -325,7 +329,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylistWithBeatmaps(params IBeatmapInfo[] beatmaps)
+        private void createPlaylistWithBeatmaps(Func<IEnumerable<IBeatmapInfo>> beatmaps)
         {
             AddStep("create playlist", () =>
             {
@@ -338,7 +342,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 int index = 0;
 
-                foreach (var b in beatmaps)
+                foreach (var b in beatmaps())
                 {
                     playlist.Items.Add(new PlaylistItem
                     {
