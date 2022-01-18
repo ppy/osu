@@ -97,7 +97,6 @@ namespace osu.Game.Tests.Resources
                 OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 DateAdded = DateTimeOffset.UtcNow,
-                Metadata = metadata
             };
 
             foreach (var b in getBeatmaps(difficultyCount ?? RNG.Next(1, 20)))
@@ -131,8 +130,8 @@ namespace osu.Game.Tests.Resources
                         StarRating = diff,
                         Length = length,
                         BPM = bpm,
+                        Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
-                        RulesetID = rulesetInfo.ID ?? -1,
                         Metadata = metadata,
                         BaseDifficulty = new BeatmapDifficulty
                         {
@@ -166,7 +165,6 @@ namespace osu.Game.Tests.Resources
             },
             BeatmapInfo = beatmap,
             Ruleset = beatmap.Ruleset,
-            RulesetID = beatmap.Ruleset.ID ?? 0,
             Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
             TotalScore = 2845370,
             Accuracy = 0.95,

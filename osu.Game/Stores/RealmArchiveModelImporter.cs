@@ -169,7 +169,7 @@ namespace osu.Game.Stores
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First()}!"
+                    ? $"Imported {imported.First().GetDisplayString()}!"
                     : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PostImport != null)
@@ -318,7 +318,7 @@ namespace osu.Game.Stores
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual async Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             using (var realm = ContextFactory.CreateContext())
             {
@@ -352,7 +352,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return existing.ToLive(ContextFactory);
+                            return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -373,7 +373,7 @@ namespace osu.Game.Stores
                         item.Hash = ComputeHash(item);
 
                         // TODO: we may want to run this outside of the transaction.
-                        await Populate(item, archive, realm, cancellationToken).ConfigureAwait(false);
+                        Populate(item, archive, realm, cancellationToken);
 
                         if (!checkedExisting)
                             existing = CheckForExisting(item, realm);
@@ -387,15 +387,12 @@ namespace osu.Game.Stores
                                 existing.DeletePending = false;
                                 transaction.Commit();
 
-                                return existing.ToLive(ContextFactory);
+                                return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
 
                             existing.DeletePending = true;
-
-                            // todo: actually delete? i don't think this is required...
-                            // ModelStore.PurgeDeletable(s => s.ID == existing.ID);
                         }
 
                         PreImport(item, realm);
@@ -416,7 +413,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return item.ToLive(ContextFactory);
+                return Task.FromResult((ILive<TModel>?)item.ToLive(ContextFactory));
             }
         }
 
@@ -483,7 +480,7 @@ namespace osu.Game.Stores
         /// <param name="archive">The archive to use as a reference for population. May be null.</param>
         /// <param name="realm">The current realm context.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        protected abstract Task Populate(TModel model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default);
+        protected abstract void Populate(TModel model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Perform any final actions before the import to database executes.

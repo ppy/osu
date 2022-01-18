@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private RulesetStore rulesets;
 
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
-        private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
+        private readonly HashSet<Guid> eagerSelectedIDs = new HashSet<Guid>();
 
         private BeatmapInfo currentSelection => carousel.SelectedBeatmapInfo;
 
@@ -75,7 +76,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     AddStep("store selection", () => selection = carousel.SelectedBeatmapInfo);
                     if (isIterating)
-                        AddUntilStep("selection changed", () => !carousel.SelectedBeatmapInfo.Equals(selection));
+                        AddUntilStep("selection changed", () => !carousel.SelectedBeatmapInfo?.Equals(selection) == true);
                     else
                         AddUntilStep("selection not changed", () => carousel.SelectedBeatmapInfo.Equals(selection));
                 }
@@ -377,11 +378,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 var rulesetBeatmapSet = TestResources.CreateTestBeatmapSetInfo(1);
                 var taikoRuleset = rulesets.AvailableRulesets.ElementAt(1);
-                rulesetBeatmapSet.Beatmaps.ForEach(b =>
-                {
-                    b.Ruleset = taikoRuleset;
-                    b.RulesetID = 1;
-                });
+                rulesetBeatmapSet.Beatmaps.ForEach(b => b.Ruleset = taikoRuleset);
 
                 sets.Add(rulesetBeatmapSet);
             });
@@ -409,10 +406,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var set = TestResources.CreateTestBeatmapSetInfo();
 
                 if (i == 4)
-                    set.Metadata.Artist = zzz_string;
+                    set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
 
                 if (i == 16)
-                    set.Metadata.AuthorString = zzz_string;
+                    set.Beatmaps.ForEach(b => b.Metadata.AuthorString = zzz_string);
 
                 sets.Add(set);
             }
@@ -433,12 +430,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             for (int i = 0; i < 20; i++)
             {
                 var set = TestResources.CreateTestBeatmapSetInfo();
-                set.Metadata.Artist = "same artist";
-                set.Metadata.Title = "same title";
+
+                // only need to set the first as they are a shared reference.
+                var beatmap = set.Beatmaps.First();
+
+                beatmap.Metadata.Artist = "same artist";
+                beatmap.Metadata.Title = "same title";
+
                 sets.Add(set);
             }
 
-            int idOffset = sets.First().OnlineID ?? 0;
+            int idOffset = sets.First().OnlineID;
 
             loadBeatmaps(sets);
 
@@ -577,7 +579,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 for (int i = 0; i <= 2; i++)
                 {
                     testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
-                    testMixed.Beatmaps[i].RulesetID = i;
                 }
 
                 carousel.UpdateBeatmapSet(testMixed);
@@ -599,7 +600,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 testSingle.Beatmaps.ForEach(b =>
                 {
                     b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
-                    b.RulesetID = b.Ruleset.ID ?? 1;
                 });
 
                 carousel.UpdateBeatmapSet(testSingle);
@@ -674,7 +674,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("Restore different ruleset filter", () =>
                 {
                     carousel.Filter(new FilterCriteria { Ruleset = rulesets.GetRuleset(1) }, false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.OnlineID ?? -1);
+                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
                 });
 
                 AddAssert("selection changed", () => !carousel.SelectedBeatmapInfo.Equals(manySets.First().Beatmaps.First()));
@@ -697,10 +697,9 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 for (int i = 1; i <= 15; i++)
                 {
-                    set.Beatmaps.Add(new BeatmapInfo
+                    set.Beatmaps.Add(new BeatmapInfo(new OsuRuleset().RulesetInfo, new BeatmapDifficulty(), new BeatmapMetadata())
                     {
                         DifficultyName = $"Stars: {i}",
-                        Ruleset = new OsuRuleset().RulesetInfo,
                         StarRating = i,
                     });
                 }
@@ -872,8 +871,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 }
             }
-
-            protected override IEnumerable<BeatmapSetInfo> GetLoadableBeatmaps() => Enumerable.Empty<BeatmapSetInfo>();
         }
     }
 }
