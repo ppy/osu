@@ -166,13 +166,6 @@ namespace osu.Game.Beatmaps
         }
 
         [Ignored]
-        public BeatmapDifficulty BaseDifficulty
-        {
-            get => Difficulty;
-            set => Difficulty = value;
-        }
-
-        [Ignored]
         public string? Path => File?.Filename;
 
         [Ignored]
