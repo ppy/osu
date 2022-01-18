@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
 
-        protected RulesetInfo Ruleset;
+        public RulesetInfo Ruleset { get; protected set; }
 
         private readonly int? variant;
 
