@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -188,10 +189,17 @@ namespace osu.Game.Database
 
         private RealmConfiguration getConfiguration()
         {
+            // This is currently the only usage of temporary files at the osu! side.
+            // If we use the temporary folder in more situations in the future, this should be moved to a higher level (helper method or OsuGameBase).
+            string tempPathLocation = Path.Combine(Path.GetTempPath(), @"lazer");
+            if (!Directory.Exists(tempPathLocation))
+                Directory.CreateDirectory(tempPathLocation);
+
             return new RealmConfiguration(storage.GetFullPath(Filename, true))
             {
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
+                FallbackPipePath = tempPathLocation,
             };
         }
 
