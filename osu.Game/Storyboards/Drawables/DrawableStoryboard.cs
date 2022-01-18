@@ -10,8 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
-using osu.Game.IO;
+using osu.Game.Database;
 using osu.Game.Screens.Play;
+using osu.Game.Stores;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -76,12 +77,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken, GameHost host)
+        private void load(GameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmContextFactory realmContextFactory)
         {
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(new RealmFileStore(realmContextFactory, host.Storage).Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {
