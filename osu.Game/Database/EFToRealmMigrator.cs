@@ -34,16 +34,12 @@ namespace osu.Game.Database
         public void Run()
         {
             using (var ef = efContextFactory.GetForWrite())
+            {
                 migrateSettings(ef);
-
-            using (var ef = efContextFactory.GetForWrite())
                 migrateSkins(ef);
-
-            using (var ef = efContextFactory.GetForWrite())
                 migrateBeatmaps(ef);
-
-            using (var ef = efContextFactory.GetForWrite())
                 migrateScores(ef);
+            }
 
             // Delete the database permanently.
             // Will cause future startups to not attempt migration.
