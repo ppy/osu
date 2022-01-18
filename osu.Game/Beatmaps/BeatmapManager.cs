@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps
                 {
                     new BeatmapInfo
                     {
-                        BaseDifficulty = new BeatmapDifficulty(),
+                        Difficulty = new BeatmapDifficulty(),
                         Ruleset = ruleset,
                         Metadata = metadata,
                         WidescreenStoryboard = true,

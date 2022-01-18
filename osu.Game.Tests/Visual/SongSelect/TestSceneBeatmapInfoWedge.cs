@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Ruleset = ruleset,
                     StarRating = 6,
                     DifficultyName = $"{ruleset.ShortName}Version",
-                    BaseDifficulty = new BeatmapDifficulty()
+                    Difficulty = new BeatmapDifficulty()
                 },
                 HitObjects = objects
             };
