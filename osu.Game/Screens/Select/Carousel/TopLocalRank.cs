@@ -53,9 +53,9 @@ namespace osu.Game.Screens.Select.Carousel
                 scoreSubscription?.Dispose();
                 scoreSubscription = realmFactory.Context.All<ScoreInfo>()
                                                 .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                                                        + $"&& {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
-                                                        + $"&& {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                                                        + $"&& {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
+                                                        + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                                        + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
+                                                        + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
                                                 .OrderByDescending(s => s.TotalScore)
                                                 .QueryAsyncWithNotifications((items, changes, ___) =>
                                                 {
