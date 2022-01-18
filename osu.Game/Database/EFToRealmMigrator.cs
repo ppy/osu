@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Beatmaps;
@@ -31,13 +33,16 @@ namespace osu.Game.Database
         public void Run()
         {
             using (var ef = efContextFactory.GetForWrite())
-            {
                 migrateSettings(ef);
+
+            using (var ef = efContextFactory.GetForWrite())
                 migrateSkins(ef);
 
+            using (var ef = efContextFactory.GetForWrite())
                 migrateBeatmaps(ef);
+
+            using (var ef = efContextFactory.GetForWrite())
                 migrateScores(ef);
-            }
 
             // Delete the database permanently.
             // Will cause future startups to not attempt migration.
@@ -47,13 +52,13 @@ namespace osu.Game.Database
         private void migrateBeatmaps(DatabaseWriteUsage ef)
         {
             // can be removed 20220730.
-            var existingBeatmapSets = ef.Context.EFBeatmapSetInfo
-                                        .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
-                                        .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                        .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                        .Include(s => s.Files).ThenInclude(f => f.FileInfo)
-                                        .Include(s => s.Metadata)
-                                        .ToList();
+            List<EFBeatmapSetInfo> existingBeatmapSets = ef.Context.EFBeatmapSetInfo
+                                                           .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
+                                                           .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                           .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                                           .Include(s => s.Files).ThenInclude(f => f.FileInfo)
+                                                           .Include(s => s.Metadata)
+                                                           .ToList();
 
             // previous entries in EF are removed post migration.
             if (!existingBeatmapSets.Any())
@@ -121,6 +126,7 @@ namespace osu.Game.Database
                     }
                 }
 
+                efContextFactory.CreateBackup($"client.before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.db");
                 ef.Context.RemoveRange(existingBeatmapSets);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
@@ -207,6 +213,7 @@ namespace osu.Game.Database
                     }
                 }
 
+                efContextFactory.CreateBackup($"client.before_scores_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.db");
                 db.Context.RemoveRange(existingScores);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
 
