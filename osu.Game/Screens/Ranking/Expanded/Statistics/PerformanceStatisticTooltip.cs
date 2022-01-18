@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
     public class PerformanceStatisticTooltip : VisibilityContainer, ITooltip<PerformanceBreakdown>
     {
         private readonly Box background;
-        private Colour4 totalColour;
+        private Colour4 titleColor;
         private Colour4 textColour;
 
         protected override Container<Drawable> Content { get; }
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray3;
-            totalColour = colours.Blue;
+            titleColor = colours.Blue;
             textColour = colours.BlueLighter;
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
                             Text = attribute.DisplayName,
-                            Colour = isTotal ? totalColour : textColour
+                            Colour = isTotal ? titleColor : textColour
                         },
                         new Bar
                         {
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                             Text = fraction.ToLocalisableString("0%"),
-                            Colour = isTotal ? totalColour : textColour
+                            Colour = isTotal ? titleColor : textColour
                         }
                     }
                 }
