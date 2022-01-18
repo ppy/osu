@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Models;
@@ -64,6 +65,8 @@ namespace osu.Game.Database
             if (!existingBeatmapSets.Any())
                 return;
 
+            Logger.Log("Beginning beatmaps migration to realm", LoggingTarget.Database);
+
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
             {
@@ -71,6 +74,8 @@ namespace osu.Game.Database
                 // note that this cannot be written as: `realm.All<BeatmapInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (!realm.All<BeatmapSetInfo>().Any(s => !s.Protected))
                 {
+                    Logger.Log($"Migrating {existingBeatmapSets.Count} beatmaps", LoggingTarget.Database);
+
                     foreach (var beatmapSet in existingBeatmapSets)
                     {
                         var realmBeatmapSet = new BeatmapSetInfo
@@ -161,16 +166,18 @@ namespace osu.Game.Database
         private void migrateScores(DatabaseWriteUsage db)
         {
             // can be removed 20220730.
-            var existingScores = db.Context.ScoreInfo
-                                   .Include(s => s.Ruleset)
-                                   .Include(s => s.BeatmapInfo)
-                                   .Include(s => s.Files)
-                                   .ThenInclude(f => f.FileInfo)
-                                   .ToList();
+            List<EFScoreInfo> existingScores = db.Context.ScoreInfo
+                                                 .Include(s => s.Ruleset)
+                                                 .Include(s => s.BeatmapInfo)
+                                                 .Include(s => s.Files)
+                                                 .ThenInclude(f => f.FileInfo)
+                                                 .ToList();
 
             // previous entries in EF are removed post migration.
             if (!existingScores.Any())
                 return;
+
+            Logger.Log("Beginning scores migration to realm", LoggingTarget.Database);
 
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
@@ -179,6 +186,8 @@ namespace osu.Game.Database
                 // note that this cannot be written as: `realm.All<ScoreInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (!realm.All<ScoreInfo>().Any())
                 {
+                    Logger.Log($"Migrating {existingScores.Count} scores", LoggingTarget.Database);
+
                     foreach (var score in existingScores)
                     {
                         var realmScore = new ScoreInfo
@@ -254,6 +263,8 @@ namespace osu.Game.Database
                 // note that this cannot be written as: `realm.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (!realm.All<SkinInfo>().Any(s => !s.Protected))
                 {
+                    Logger.Log($"Migrating {existingSkins.Count} skins", LoggingTarget.Database);
+
                     foreach (var skin in existingSkins)
                     {
                         var realmSkin = new SkinInfo
@@ -297,11 +308,13 @@ namespace osu.Game.Database
         private void migrateSettings(DatabaseWriteUsage db)
         {
             // migrate ruleset settings. can be removed 20220315.
-            var existingSettings = db.Context.DatabasedSetting;
+            var existingSettings = db.Context.DatabasedSetting.ToList();
 
             // previous entries in EF are removed post migration.
             if (!existingSettings.Any())
                 return;
+
+            Logger.Log("Beginning settings migration to realm", LoggingTarget.Database);
 
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
@@ -309,6 +322,8 @@ namespace osu.Game.Database
                 // only migrate data if the realm database is empty.
                 if (!realm.All<RealmRulesetSetting>().Any())
                 {
+                    Logger.Log($"Migrating {existingSettings.Count} settings", LoggingTarget.Database);
+
                     foreach (var dkb in existingSettings)
                     {
                         if (dkb.RulesetID == null)
