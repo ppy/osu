@@ -30,7 +30,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ArtistUnicode = "check unicode too",
                 Title = "Title goes here",
                 TitleUnicode = "Title goes here",
-                AuthorString = "The Author",
+                Author = { Username = "The Author" },
                 Source = "unit tests",
                 Tags = "look for tags too",
             },

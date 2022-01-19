@@ -23,6 +23,8 @@ namespace osu.Game.Database
         private readonly RealmContextFactory realmContextFactory;
         private readonly OsuConfigManager config;
 
+        private bool hasTakenBackup;
+
         public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config)
         {
             this.efContextFactory = efContextFactory;
@@ -33,16 +35,12 @@ namespace osu.Game.Database
         public void Run()
         {
             using (var ef = efContextFactory.GetForWrite())
+            {
                 migrateSettings(ef);
-
-            using (var ef = efContextFactory.GetForWrite())
                 migrateSkins(ef);
-
-            using (var ef = efContextFactory.GetForWrite())
                 migrateBeatmaps(ef);
-
-            using (var ef = efContextFactory.GetForWrite())
                 migrateScores(ef);
+            }
 
             // Delete the database permanently.
             // Will cause future startups to not attempt migration.
@@ -74,19 +72,25 @@ namespace osu.Game.Database
             using (var realm = realmContextFactory.CreateContext())
             {
                 Logger.Log($"Found {count} beatmaps in EF", LoggingTarget.Database);
-                string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-                efContextFactory.CreateBackup($"client.{migration}.db");
+
+                if (!hasTakenBackup)
+                {
+                    string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                    efContextFactory.CreateBackup($"client.{migration}.db");
+                    realmContextFactory.CreateBackup($"client.{migration}.realm");
+
+                    hasTakenBackup = true;
+                }
 
                 // only migrate data if the realm database is empty.
-                // note that this cannot be written as: `realm.All<BeatmapInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
+                // note that this cannot be written as: `realm.All<BeatmapSetInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (realm.All<BeatmapSetInfo>().Any(s => !s.Protected))
                 {
                     Logger.Log("Skipping migration as realm already has beatmaps loaded", LoggingTarget.Database);
                 }
                 else
                 {
-                    realmContextFactory.CreateBackup($"client.{migration}.realm");
-
                     using (var transaction = realm.BeginWrite())
                     {
                         foreach (var beatmapSet in existingBeatmapSets)
@@ -144,10 +148,9 @@ namespace osu.Game.Database
                         }
 
                         transaction.Commit();
+                        Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
                     }
                 }
-
-                Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
             }
         }
 
@@ -171,7 +174,6 @@ namespace osu.Game.Database
                 PreviewTime = metadata.PreviewTime,
                 AudioFile = metadata.AudioFile,
                 BackgroundFile = metadata.BackgroundFile,
-                AuthorString = metadata.AuthorString,
             };
         }
 
@@ -198,19 +200,24 @@ namespace osu.Game.Database
             using (var realm = realmContextFactory.CreateContext())
             {
                 Logger.Log($"Found {count} scores in EF", LoggingTarget.Database);
-                string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-                efContextFactory.CreateBackup($"client.{migration}.db");
+
+                if (!hasTakenBackup)
+                {
+                    string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                    efContextFactory.CreateBackup($"client.{migration}.db");
+                    realmContextFactory.CreateBackup($"client.{migration}.realm");
+
+                    hasTakenBackup = true;
+                }
 
                 // only migrate data if the realm database is empty.
-                // note that this cannot be written as: `realm.All<ScoreInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (realm.All<ScoreInfo>().Any())
                 {
                     Logger.Log("Skipping migration as realm already has scores loaded", LoggingTarget.Database);
                 }
                 else
                 {
-                    realmContextFactory.CreateBackup($"client.{migration}.realm");
-
                     using (var transaction = realm.BeginWrite())
                     {
                         foreach (var score in existingScores)
@@ -247,10 +254,9 @@ namespace osu.Game.Database
                         }
 
                         transaction.Commit();
+                        Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
                     }
                 }
-
-                Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
             }
         }
 

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
+using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
@@ -146,11 +147,15 @@ namespace osu.Game.Database
             Database = { AutoTransactionsEnabled = false }
         };
 
-        public void CreateBackup(string filename)
+        public void CreateBackup(string backupFilename)
         {
-            Logger.Log($"Creating full EF database backup at {filename}", LoggingTarget.Database);
+            Logger.Log($"Creating full EF database backup at {backupFilename}", LoggingTarget.Database);
+
+            if (DebugUtils.IsDebugBuild)
+                Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
+
             using (var source = storage.GetStream(DATABASE_NAME))
-            using (var destination = storage.GetStream(filename, FileAccess.Write, FileMode.CreateNew))
+            using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                 source.CopyTo(destination);
         }
 
