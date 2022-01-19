@@ -234,7 +234,9 @@ namespace osu.Game.Scoring
 
         private void updateModsJson()
         {
-            ModsJson = JsonConvert.SerializeObject(APIMods);
+            ModsJson = APIMods.Length > 0
+                ? JsonConvert.SerializeObject(APIMods)
+                : string.Empty;
         }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
