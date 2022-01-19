@@ -159,7 +159,6 @@ namespace osu.Game.Screens.Select.Carousel
                                         new TopLocalRank(beatmapInfo)
                                         {
                                             Scale = new Vector2(0.8f),
-                                            Size = new Vector2(40, 20)
                                         },
                                         starCounter = new StarCounter
                                         {
