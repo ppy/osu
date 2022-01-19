@@ -34,7 +34,7 @@ namespace osu.Game.Database
 
         public void Run()
         {
-            using (var ef = efContextFactory.GetForWrite())
+            using (var ef = efContextFactory.Get())
             {
                 migrateSettings(ef);
                 migrateSkins(ef);
@@ -51,10 +51,10 @@ namespace osu.Game.Database
             efContextFactory.ResetDatabase();
         }
 
-        private void migrateBeatmaps(DatabaseWriteUsage ef)
+        private void migrateBeatmaps(OsuDbContext ef)
         {
             // can be removed 20220730.
-            var existingBeatmapSets = ef.Context.EFBeatmapSetInfo
+            var existingBeatmapSets = ef.EFBeatmapSetInfo
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
@@ -180,10 +180,10 @@ namespace osu.Game.Database
             };
         }
 
-        private void migrateScores(DatabaseWriteUsage db)
+        private void migrateScores(OsuDbContext db)
         {
             // can be removed 20220730.
-            var existingScores = db.Context.ScoreInfo
+            var existingScores = db.ScoreInfo
                                    .Include(s => s.Ruleset)
                                    .Include(s => s.BeatmapInfo)
                                    .Include(s => s.Files)
@@ -263,10 +263,10 @@ namespace osu.Game.Database
             }
         }
 
-        private void migrateSkins(DatabaseWriteUsage db)
+        private void migrateSkins(OsuDbContext db)
         {
             // can be removed 20220530.
-            var existingSkins = db.Context.SkinInfo
+            var existingSkins = db.SkinInfo
                                   .Include(s => s.Files)
                                   .ThenInclude(f => f.FileInfo)
                                   .ToList();
@@ -335,10 +335,10 @@ namespace osu.Game.Database
             }
         }
 
-        private void migrateSettings(DatabaseWriteUsage db)
+        private void migrateSettings(OsuDbContext db)
         {
             // migrate ruleset settings. can be removed 20220315.
-            var existingSettings = db.Context.DatabasedSetting.ToList();
+            var existingSettings = db.DatabasedSetting.ToList();
 
             // previous entries in EF are removed post migration.
             if (!existingSettings.Any())
