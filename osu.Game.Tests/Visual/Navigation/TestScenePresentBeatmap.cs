@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 var metadata = new BeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
+                    Author = { Username = "SomeAuthor" },
                     Title = $"import {i}"
                 };
 

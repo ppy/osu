@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Metadata = new BeatmapMetadata
                             {
                                 Artist = "SomeArtist",
-                                AuthorString = "SomeAuthor",
+                                Author = { Username = "SomeAuthor" },
                                 Title = "import"
                             },
                             BaseDifficulty = new BeatmapDifficulty(),
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.Navigation
                             Metadata = new BeatmapMetadata
                             {
                                 Artist = "SomeArtist",
-                                AuthorString = "SomeAuthor",
+                                Author = { Username = "SomeAuthor" },
                                 Title = "import"
                             },
                             BaseDifficulty = new BeatmapDifficulty(),

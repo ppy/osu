@@ -64,6 +64,7 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public RealmNamedFileUsage? File => BeatmapSet?.Files.FirstOrDefault(f => f.File.Hash == Hash);
 
+        [Ignored]
         public BeatmapOnlineStatus Status
         {
             get => (BeatmapOnlineStatus)StatusInt;

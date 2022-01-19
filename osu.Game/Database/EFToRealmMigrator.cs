@@ -177,7 +177,6 @@ namespace osu.Game.Database
                 PreviewTime = metadata.PreviewTime,
                 AudioFile = metadata.AudioFile,
                 BackgroundFile = metadata.BackgroundFile,
-                AuthorString = metadata.AuthorString,
             };
         }
 
