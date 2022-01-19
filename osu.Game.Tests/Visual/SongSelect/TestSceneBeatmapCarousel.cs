@@ -409,7 +409,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     set.Beatmaps.ForEach(b => b.Metadata.Artist = zzz_string);
 
                 if (i == 16)
-                    set.Beatmaps.ForEach(b => b.Metadata.AuthorString = zzz_string);
+                    set.Beatmaps.ForEach(b => b.Metadata.Author.Username = zzz_string);
 
                 sets.Add(set);
             }

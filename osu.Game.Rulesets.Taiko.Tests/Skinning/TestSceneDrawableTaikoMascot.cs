@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
                     {
                         Artist = "Unknown",
                         Title = "Sample Beatmap",
-                        AuthorString = "Craftplacer",
+                        Author = { Username = "Craftplacer" },
                     },
                     Ruleset = new TaikoRuleset().RulesetInfo
                 },

@@ -32,6 +32,7 @@ namespace osu.Game.Beatmaps
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
+        [Ignored]
         public BeatmapOnlineStatus Status
         {
             get => (BeatmapOnlineStatus)StatusInt;
