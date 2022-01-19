@@ -74,21 +74,10 @@ namespace osu.Game.Database
 
         private static readonly IMapper mapper = new MapperConfiguration(c =>
         {
-            c.ShouldMapField = fi => false;
+            applyCommonConfiguration(c);
 
-            // This is specifically to avoid mapping explicit interface implementations.
-            // If we want to limit this further, we can avoid mapping properties with no setter that are not IList<>.
-            // Takes a bit of effort to determine whether this is the case though, see https://stackoverflow.com/questions/951536/how-do-i-tell-whether-a-type-implements-ilist
-            c.ShouldMapProperty = pi => pi.GetMethod?.IsPublic == true;
-
-            c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
-            c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
-            c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
-            c.CreateMap<RulesetInfo, RulesetInfo>();
-            c.CreateMap<ScoreInfo, ScoreInfo>();
-            c.CreateMap<RealmUser, RealmUser>();
-            c.CreateMap<RealmFile, RealmFile>();
-            c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            // This can be further optimised to reduce cyclic retrievals, similar to the optimised set mapper below.
+            // Only hasn't been done yet as we detach at the point of BeatmapInfo less often.
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
              .MaxDepth(2)
              .AfterMap((s, d) =>
@@ -102,13 +91,29 @@ namespace osu.Game.Database
                      }
                  }
              });
-            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
-             .MaxDepth(2)
-             .AfterMap((s, d) =>
-             {
-                 foreach (var beatmap in d.Beatmaps)
-                     beatmap.BeatmapSet = d;
-             });
+        }).CreateMapper();
+
+        /// <summary>
+        /// A slightly optimised mapper that avoids double-fetches in cyclic reference.
+        /// </summary>
+        private static readonly IMapper beatmap_set_mapper = new MapperConfiguration(c =>
+        {
+            applyCommonConfiguration(c);
+
+            c.CreateMap<BeatmapInfo, BeatmapInfo>()
+             .MaxDepth(1)
+             // This is not required as it will be populated in the `AfterMap` call from the `BeatmapInfo`'s parent.
+             .ForMember(b => b.BeatmapSet, cc => cc.Ignore());
+        }).CreateMapper();
+
+        private static void applyCommonConfiguration(IMapperConfigurationExpression c)
+        {
+            c.ShouldMapField = fi => false;
+
+            // This is specifically to avoid mapping explicit interface implementations.
+            // If we want to limit this further, we can avoid mapping properties with no setter that are not IList<>.
+            // Takes a bit of effort to determine whether this is the case though, see https://stackoverflow.com/questions/951536/how-do-i-tell-whether-a-type-implements-ilist
+            c.ShouldMapProperty = pi => pi.GetMethod?.IsPublic == true;
 
             c.Internal().ForAllMaps((typeMap, expression) =>
             {
@@ -118,7 +123,23 @@ namespace osu.Game.Database
                         m.Ignore();
                 });
             });
-        }).CreateMapper();
+
+            c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
+            c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
+            c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
+            c.CreateMap<RulesetInfo, RulesetInfo>();
+            c.CreateMap<ScoreInfo, ScoreInfo>();
+            c.CreateMap<RealmUser, RealmUser>();
+            c.CreateMap<RealmFile, RealmFile>();
+            c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
+            c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .MaxDepth(2)
+             .AfterMap((s, d) =>
+             {
+                 foreach (var beatmap in d.Beatmaps)
+                     beatmap.BeatmapSet = d;
+             });
+        }
 
         /// <summary>
         /// Create a detached copy of the each item in the collection.
@@ -152,6 +173,9 @@ namespace osu.Game.Database
         {
             if (!item.IsManaged)
                 return item;
+
+            if (item is BeatmapSetInfo)
+                return beatmap_set_mapper.Map<T>(item);
 
             return mapper.Map<T>(item);
         }
