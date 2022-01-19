@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Models;
@@ -22,14 +24,16 @@ namespace osu.Game.Database
         private readonly DatabaseContextFactory efContextFactory;
         private readonly RealmContextFactory realmContextFactory;
         private readonly OsuConfigManager config;
+        private readonly Storage storage;
 
         private bool hasTakenBackup;
 
-        public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config)
+        public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config, Storage storage)
         {
             this.efContextFactory = efContextFactory;
             this.realmContextFactory = realmContextFactory;
             this.config = config;
+            this.storage = storage;
         }
 
         public void Run()
@@ -73,15 +77,7 @@ namespace osu.Game.Database
             {
                 Logger.Log($"Found {count} beatmaps in EF", LoggingTarget.Database);
 
-                if (!hasTakenBackup)
-                {
-                    string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-                    efContextFactory.CreateBackup($"client.{migration}.db");
-                    realmContextFactory.CreateBackup($"client.{migration}.realm");
-
-                    hasTakenBackup = true;
-                }
+                ensureBackup();
 
                 // only migrate data if the realm database is empty.
                 // note that this cannot be written as: `realm.All<BeatmapSetInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
@@ -201,15 +197,7 @@ namespace osu.Game.Database
             {
                 Logger.Log($"Found {count} scores in EF", LoggingTarget.Database);
 
-                if (!hasTakenBackup)
-                {
-                    string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-                    efContextFactory.CreateBackup($"client.{migration}.db");
-                    realmContextFactory.CreateBackup($"client.{migration}.realm");
-
-                    hasTakenBackup = true;
-                }
+                ensureBackup();
 
                 // only migrate data if the realm database is empty.
                 if (realm.All<ScoreInfo>().Any())
@@ -271,6 +259,8 @@ namespace osu.Game.Database
             // previous entries in EF are removed post migration.
             if (!existingSkins.Any())
                 return;
+
+            ensureBackup();
 
             var userSkinChoice = config.GetBindable<string>(OsuSetting.Skin);
             int.TryParse(userSkinChoice.Value, out int userSkinInt);
@@ -342,6 +332,7 @@ namespace osu.Game.Database
                 return;
 
             Logger.Log("Beginning settings migration to realm", LoggingTarget.Database);
+            ensureBackup();
 
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
@@ -377,5 +368,22 @@ namespace osu.Game.Database
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
+
+        private void ensureBackup()
+        {
+            if (!hasTakenBackup)
+            {
+                string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                efContextFactory.CreateBackup($"client.{migration}.db");
+                realmContextFactory.CreateBackup($"client.{migration}.realm");
+
+                using (var source = storage.GetStream("collection.db"))
+                using (var destination = storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                    source.CopyTo(destination);
+
+                hasTakenBackup = true;
+            }
+        }
     }
 }
