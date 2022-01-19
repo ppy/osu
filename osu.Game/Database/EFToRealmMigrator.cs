@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Models;
@@ -22,14 +24,16 @@ namespace osu.Game.Database
         private readonly DatabaseContextFactory efContextFactory;
         private readonly RealmContextFactory realmContextFactory;
         private readonly OsuConfigManager config;
+        private readonly Storage storage;
 
         private bool hasTakenBackup;
 
-        public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config)
+        public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config, Storage storage)
         {
             this.efContextFactory = efContextFactory;
             this.realmContextFactory = realmContextFactory;
             this.config = config;
+            this.storage = storage;
         }
 
         public void Run()
@@ -373,6 +377,10 @@ namespace osu.Game.Database
 
                 efContextFactory.CreateBackup($"client.{migration}.db");
                 realmContextFactory.CreateBackup($"client.{migration}.realm");
+
+                using (var source = storage.GetStream("collection.db"))
+                using (var destination = storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                    source.CopyTo(destination);
 
                 hasTakenBackup = true;
             }
