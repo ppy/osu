@@ -182,9 +182,10 @@ namespace osu.Game.Screens.Select
             RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
-            using (var realm = realmFactory.CreateContext())
+            if (!loadedTestBeatmaps)
             {
-                loadBeatmapSets(getBeatmapSets(realm));
+                using (var realm = realmFactory.CreateContext())
+                    loadBeatmapSets(getBeatmapSets(realm));
             }
         }
 
