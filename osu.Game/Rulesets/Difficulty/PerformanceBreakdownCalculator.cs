@@ -72,6 +72,8 @@ namespace osu.Game.Rulesets.Difficulty
 
                 // calculate total score
                 ScoreProcessor scoreProcessor = score.Ruleset.CreateInstance().CreateScoreProcessor();
+                scoreProcessor.HighestCombo.Value = perfectPlay.MaxCombo;
+                scoreProcessor.Mods.Value = perfectPlay.Mods;
                 perfectPlay.TotalScore = (long)scoreProcessor.GetImmediateScore(ScoringMode.Standardised, perfectPlay.MaxCombo, statistics);
 
                 // compute rank achieved
