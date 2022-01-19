@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Text = score.MaxCombo.ToLocalisableString(@"0\x"),
                     Font = OsuFont.GetFont(size: text_size),
-                    Colour = score.MaxCombo == score.BeatmapInfo?.MaxCombo ? highAccuracyColour : Color4.White
+                    Colour = score.MaxCombo == score.BeatmapInfo.MaxCombo ? highAccuracyColour : Color4.White
                 }
             };
 

@@ -14,8 +14,8 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     {
         private readonly APIUserScoreAggregate score;
 
-        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool allowHighlight = true)
-            : base(score.CreateScoreInfo(), rank, allowHighlight)
+        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool isOnlineScope = true)
+            : base(score.CreateScoreInfo(), rank, isOnlineScope)
         {
             this.score = score;
         }

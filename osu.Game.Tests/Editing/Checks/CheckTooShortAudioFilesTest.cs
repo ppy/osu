@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ManagedBass;
@@ -45,6 +46,8 @@ namespace osu.Game.Tests.Editing.Checks
         [Test]
         public void TestDifferentExtension()
         {
+            Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
+
             beatmap.BeatmapInfo.BeatmapSet.Files.Clear();
             beatmap.BeatmapInfo.BeatmapSet.Files.Add(CheckTestHelpers.CreateMockFile("jpg"));
 

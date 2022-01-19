@@ -20,12 +20,14 @@ namespace osu.Game.Input.Bindings
 
         public int? Variant { get; set; }
 
+        [Ignored]
         public KeyCombination KeyCombination
         {
             get => KeyCombinationString;
             set => KeyCombinationString = value.ToString();
         }
 
+        [Ignored]
         public object Action
         {
             get => ActionInt;
