@@ -94,10 +94,20 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    using (var transaction = realm.BeginWrite())
+                    var transaction = realm.BeginWrite();
+                    int written = 0;
+
+                    try
                     {
                         foreach (var beatmapSet in existingBeatmapSets)
                         {
+                            if (++written % 1000 == 0)
+                            {
+                                transaction.Commit();
+                                transaction = realm.BeginWrite();
+                                Logger.Log($"Migrated {written}/{count} beatmaps...", LoggingTarget.Database);
+                            }
+
                             var realmBeatmapSet = new BeatmapSetInfo
                             {
                                 OnlineID = beatmapSet.OnlineID ?? -1,
@@ -149,10 +159,13 @@ namespace osu.Game.Database
 
                             realm.Add(realmBeatmapSet);
                         }
-
-                        transaction.Commit();
-                        Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
                     }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+
+                    Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
                 }
             }
         }
@@ -221,10 +234,20 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    using (var transaction = realm.BeginWrite())
+                    var transaction = realm.BeginWrite();
+                    int written = 0;
+
+                    try
                     {
                         foreach (var score in existingScores)
                         {
+                            if (++written % 1000 == 0)
+                            {
+                                transaction.Commit();
+                                transaction = realm.BeginWrite();
+                                Logger.Log($"Migrated {written}/{count} scores...", LoggingTarget.Database);
+                            }
+
                             var realmScore = new ScoreInfo
                             {
                                 Hash = score.Hash,
@@ -255,10 +278,13 @@ namespace osu.Game.Database
 
                             realm.Add(realmScore);
                         }
-
-                        transaction.Commit();
-                        Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
                     }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+
+                    Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
                 }
             }
         }
