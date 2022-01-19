@@ -361,6 +361,17 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
+        public void CreateBackup(string backupFilename)
+        {
+            using (BlockAllOperations())
+            {
+                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
+                using (var source = storage.GetStream(Filename))
+                using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                    source.CopyTo(destination);
+            }
+        }
+
         /// <summary>
         /// Flush any active contexts and block any further writes.
         /// </summary>
@@ -374,17 +385,17 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
-
-            Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
-
             try
             {
                 contextCreationLock.Wait();
 
                 lock (contextLock)
                 {
+                    if (!ThreadSafety.IsUpdateThread && context != null)
+                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
+                    Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
+
                     context?.Dispose();
                     context = null;
                 }

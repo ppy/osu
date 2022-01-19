@@ -45,16 +45,6 @@ namespace osu.Game.Beatmaps
 
         IUser IBeatmapMetadataInfo.Author => Author;
 
-        #region Compatibility properties
-
-        public string AuthorString
-        {
-            get => Author.Username;
-            set => Author.Username = value;
-        }
-
-        #endregion
-
         public override string ToString() => this.GetDisplayTitle();
     }
 }
