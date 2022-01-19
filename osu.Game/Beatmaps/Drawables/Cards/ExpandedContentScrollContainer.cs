@@ -12,16 +12,12 @@ namespace osu.Game.Beatmaps.Drawables.Cards
     {
         public const float HEIGHT = 200;
 
-        public ExpandedContentScrollContainer()
-        {
-            ScrollbarVisible = false;
-        }
-
         protected override void Update()
         {
             base.Update();
 
             Height = Math.Min(Content.DrawHeight, HEIGHT);
+            ScrollbarVisible = allowScroll;
         }
 
         private bool allowScroll => !Precision.AlmostEquals(DrawSize, Content.DrawSize);
