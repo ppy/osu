@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Length = length,
                     BPM = bpm,
                     Metadata = metadata,
-                    BaseDifficulty = new BeatmapDifficulty()
+                    Difficulty = new BeatmapDifficulty()
                 };
 
                 beatmaps.Add(beatmap);

@@ -57,8 +57,9 @@ namespace osu.Game.Tests.Database
                     {
                         detachedBeatmapSet = live.Detach();
 
-                        Assert.AreEqual(live.Files.Count, detachedBeatmapSet.Files.Count);
-                        Assert.AreEqual(live.Files.Select(f => f.File).Count(), detachedBeatmapSet.Files.Select(f => f.File).Count());
+                        // files are omitted
+                        Assert.AreEqual(0, detachedBeatmapSet.Files.Count);
+
                         Assert.AreEqual(live.Beatmaps.Count, detachedBeatmapSet.Beatmaps.Count);
                         Assert.AreEqual(live.Beatmaps.Select(f => f.Difficulty).Count(), detachedBeatmapSet.Beatmaps.Select(f => f.Difficulty).Count());
                         Assert.AreEqual(live.Metadata, detachedBeatmapSet.Metadata);
@@ -67,11 +68,9 @@ namespace osu.Game.Tests.Database
                     Debug.Assert(detachedBeatmapSet != null);
 
                     // Check detached instances can all be accessed without throwing.
-                    Assert.NotNull(detachedBeatmapSet.Files.Count);
-                    Assert.NotZero(detachedBeatmapSet.Files.Select(f => f.File).Count());
+                    Assert.AreEqual(0, detachedBeatmapSet.Files.Count);
                     Assert.NotNull(detachedBeatmapSet.Beatmaps.Count);
                     Assert.NotZero(detachedBeatmapSet.Beatmaps.Select(f => f.Difficulty).Count());
-                    Assert.NotNull(detachedBeatmapSet.Beatmaps.First().Path);
                     Assert.NotNull(detachedBeatmapSet.Metadata);
 
                     // Check cyclic reference to beatmap set
@@ -96,9 +95,12 @@ namespace osu.Game.Tests.Database
                     Assert.NotNull(beatmapSet);
                     Debug.Assert(beatmapSet != null);
 
-                    BeatmapSetInfo? detachedBeatmapSet = null;
+                    // Detach at the BeatmapInfo point, similar to what GetWorkingBeatmap does.
+                    BeatmapInfo? detachedBeatmap = null;
 
-                    beatmapSet.PerformRead(s => detachedBeatmapSet = s.Detach());
+                    beatmapSet.PerformRead(s => detachedBeatmap = s.Beatmaps.First().Detach());
+
+                    BeatmapSetInfo? detachedBeatmapSet = detachedBeatmap?.BeatmapSet;
 
                     Debug.Assert(detachedBeatmapSet != null);
 

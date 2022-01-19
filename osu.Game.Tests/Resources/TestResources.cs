@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Resources
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
                         Metadata = metadata,
-                        BaseDifficulty = new BeatmapDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
                         }
