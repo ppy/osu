@@ -17,9 +17,8 @@ namespace osu.Game.Tests.NonVisual.Filtering
         private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
             Ruleset = new RulesetInfo { OnlineID = 0 },
-            RulesetID = 0,
             StarRating = 4.0d,
-            BaseDifficulty = new BeatmapDifficulty
+            Difficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5.0f,
                 DrainRate = 3.0f,
@@ -31,7 +30,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
                 ArtistUnicode = "check unicode too",
                 Title = "Title goes here",
                 TitleUnicode = "Title goes here",
-                AuthorString = "The Author",
+                Author = { Username = "The Author" },
                 Source = "unit tests",
                 Tags = "look for tags too",
             },

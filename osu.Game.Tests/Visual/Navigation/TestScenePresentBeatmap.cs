@@ -97,11 +97,10 @@ namespace osu.Game.Tests.Visual.Navigation
             BeatmapSetInfo imported = null;
             AddStep($"import beatmap {i}", () =>
             {
-                var difficulty = new BeatmapDifficulty();
                 var metadata = new BeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
+                    Author = { Username = "SomeAuthor" },
                     Title = $"import {i}"
                 };
 
@@ -109,25 +108,24 @@ namespace osu.Game.Tests.Visual.Navigation
                 {
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = i,
-                    Metadata = metadata,
                     Beatmaps =
                     {
                         new BeatmapInfo
                         {
                             OnlineID = i * 1024,
                             Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
                             OnlineID = i * 2048,
                             Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                     }
-                }).GetResultSafely().Value;
+                }).GetResultSafely()?.Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

@@ -409,18 +409,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
         {
-            IBeatmapSetInfo? set = roomManager.ServerSideRooms.SelectMany(r => r.Playlist)
-                                              .FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value.BeatmapSet
-                                   ?? beatmaps.QueryBeatmap(b => b.OnlineID == beatmapId)?.BeatmapSet;
+            IBeatmapInfo? beatmap = roomManager.ServerSideRooms.SelectMany(r => r.Playlist)
+                                               .FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value
+                                    ?? beatmaps.QueryBeatmap(b => b.OnlineID == beatmapId);
 
-            if (set == null)
+            if (beatmap == null)
                 throw new InvalidOperationException("Beatmap not found.");
 
             return Task.FromResult(new APIBeatmap
             {
-                BeatmapSet = new APIBeatmapSet { OnlineID = set.OnlineID },
+                BeatmapSet = new APIBeatmapSet { OnlineID = beatmap.BeatmapSet?.OnlineID ?? -1 },
                 OnlineID = beatmapId,
-                Checksum = set.Beatmaps.First(b => b.OnlineID == beatmapId).MD5Hash
+                Checksum = beatmap.MD5Hash
             });
         }
 
