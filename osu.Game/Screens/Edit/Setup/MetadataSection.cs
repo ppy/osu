@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;
             Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
 
-            Beatmap.Metadata.AuthorString = creatorTextBox.Current.Value;
+            Beatmap.Metadata.Author.Username = creatorTextBox.Current.Value;
             Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
