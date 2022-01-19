@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -290,6 +291,33 @@ namespace osu.Game.Tests.Visual.Online
             setRankAchievedFilter(Array.Empty<ScoreRank>());
             setPlayedFilter(SearchPlayed.Any);
             noPlaceholderShown();
+        }
+
+        [Test]
+        public void TestExpandedCardContentNotClipped()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show result with many difficulties", () =>
+            {
+                var beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
+                beatmapSet.Beatmaps = Enumerable.Repeat(beatmapSet.Beatmaps.First(), 100).ToArray();
+                fetchFor(beatmapSet);
+            });
+            assertAllCardsOfType<BeatmapCardNormal>(1);
+
+            AddStep("hover extra info row", () =>
+            {
+                var difficultyArea = this.ChildrenOfType<BeatmapCardExtraInfoRow>().Single();
+                InputManager.MoveMouseTo(difficultyArea);
+            });
+            AddUntilStep("wait for expanded", () => this.ChildrenOfType<BeatmapCardNormal>().Single().Expanded.Value);
+            AddAssert("expanded content not clipped", () =>
+            {
+                var cardContainer = this.ChildrenOfType<ReverseChildIDFillFlowContainer<BeatmapCard>>().Single().Parent;
+                var expandedContent = this.ChildrenOfType<ExpandedContentScrollContainer>().Single();
+                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer.ScreenSpaceDrawQuad.Contains(v));
+            });
         }
 
         private static int searchCount;
