@@ -24,6 +24,8 @@ namespace osu.Game.Database
         private readonly RealmContextFactory realmContextFactory;
         private readonly OsuConfigManager config;
 
+        private bool hasTakenBackup;
+
         public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config)
         {
             this.efContextFactory = efContextFactory;
@@ -70,8 +72,16 @@ namespace osu.Game.Database
             using (var realm = realmContextFactory.CreateContext())
             {
                 Logger.Log($"Found {existingBeatmapSets.Count} beatmaps in EF", LoggingTarget.Database);
-                string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-                efContextFactory.CreateBackup($"client.{migration}.db");
+
+                if (!hasTakenBackup)
+                {
+                    string migration = $"before_beatmap_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                    efContextFactory.CreateBackup($"client.{migration}.db");
+                    realmContextFactory.CreateBackup($"client.{migration}.realm");
+
+                    hasTakenBackup = true;
+                }
 
                 // only migrate data if the realm database is empty.
                 // note that this cannot be written as: `realm.All<BeatmapInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
@@ -81,8 +91,6 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    realmContextFactory.CreateBackup($"client.{migration}.realm");
-
                     using (var transaction = realm.BeginWrite())
                     {
                         foreach (var beatmapSet in existingBeatmapSets)
@@ -195,8 +203,16 @@ namespace osu.Game.Database
             using (var realm = realmContextFactory.CreateContext())
             {
                 Logger.Log($"Found {existingScores.Count} scores in EF", LoggingTarget.Database);
-                string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-                efContextFactory.CreateBackup($"client.{migration}.db");
+
+                if (!hasTakenBackup)
+                {
+                    string migration = $"before_score_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                    efContextFactory.CreateBackup($"client.{migration}.db");
+                    realmContextFactory.CreateBackup($"client.{migration}.realm");
+
+                    hasTakenBackup = true;
+                }
 
                 // only migrate data if the realm database is empty.
                 // note that this cannot be written as: `realm.All<ScoreInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
@@ -206,8 +222,6 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    realmContextFactory.CreateBackup($"client.{migration}.realm");
-
                     using (var transaction = realm.BeginWrite())
                     {
                         foreach (var score in existingScores)
