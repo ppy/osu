@@ -122,7 +122,10 @@ namespace osu.Game.Database
 
                             foreach (var beatmap in beatmapSet.Beatmaps)
                             {
-                                var realmBeatmap = new BeatmapInfo
+                                var ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
+                                var metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata);
+
+                                var realmBeatmap = new BeatmapInfo(ruleset, new BeatmapDifficulty(beatmap.BaseDifficulty), metadata)
                                 {
                                     DifficultyName = beatmap.DifficultyName,
                                     Status = beatmap.Status,
@@ -148,9 +151,6 @@ namespace osu.Game.Database
                                     CountdownOffset = beatmap.CountdownOffset,
                                     MaxCombo = beatmap.MaxCombo,
                                     Bookmarks = beatmap.Bookmarks,
-                                    Ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName),
-                                    Difficulty = new BeatmapDifficulty(beatmap.BaseDifficulty),
-                                    Metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata),
                                     BeatmapSet = realmBeatmapSet,
                                 };
 
@@ -180,7 +180,7 @@ namespace osu.Game.Database
                 TitleUnicode = metadata.TitleUnicode,
                 Artist = metadata.Artist,
                 ArtistUnicode = metadata.ArtistUnicode,
-                Author = new RealmUser
+                Author =
                 {
                     OnlineID = metadata.Author.Id,
                     Username = metadata.Author.Username,
@@ -248,7 +248,15 @@ namespace osu.Game.Database
                                 Logger.Log($"Migrated {written}/{count} scores...", LoggingTarget.Database);
                             }
 
-                            var realmScore = new ScoreInfo
+                            var beatmap = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
+                            var ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName);
+                            var user = new RealmUser
+                            {
+                                OnlineID = score.User.OnlineID,
+                                Username = score.User.Username
+                            };
+
+                            var realmScore = new ScoreInfo(beatmap, ruleset, user)
                             {
                                 Hash = score.Hash,
                                 DeletePending = score.DeletePending,
@@ -262,8 +270,8 @@ namespace osu.Game.Database
                                 HasReplay = ((IScoreInfo)score).HasReplay,
                                 Date = score.Date,
                                 PP = score.PP,
-                                BeatmapInfo = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash),
-                                Ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName),
+                                BeatmapInfo = beatmap,
+                                Ruleset = ruleset,
                                 Rank = score.Rank,
                                 HitEvents = score.HitEvents,
                                 Passed = score.Passed,
