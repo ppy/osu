@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
@@ -17,7 +16,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private FillFlowContainer<ParticipantPanel> panels;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             InternalChild = new OsuContextMenuContainer
             {
