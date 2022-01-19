@@ -193,6 +193,7 @@ namespace osu.Game
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
+            // A non-null context factory means there's still content to migrate.
             if (efContextFactory != null)
                 new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig).Run();
 
@@ -300,6 +301,7 @@ namespace osu.Game
             dependencies.CacheAs(MusicController);
 
             Ruleset.BindValueChanged(onRulesetChanged);
+            Beatmap.BindValueChanged(onBeatmapChanged);
         }
 
         protected virtual void InitialiseFonts()
@@ -420,8 +422,17 @@ namespace osu.Game
 
         protected override Storage CreateStorage(GameHost host, Storage defaultStorage) => new OsuStorage(host, defaultStorage);
 
+        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> valueChangedEvent)
+        {
+            if (IsLoaded && !ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException("Global beatmap bindable must be changed from update thread.");
+        }
+
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
         {
+            if (IsLoaded && !ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException("Global ruleset bindable must be changed from update thread.");
+
             Ruleset instance = null;
 
             try
