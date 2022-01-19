@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 HitObjects = new List<HitObject> { new Fruit() },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",

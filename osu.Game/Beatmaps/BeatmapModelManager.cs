@@ -58,7 +58,7 @@ namespace osu.Game.Beatmaps
             // Warning: The directionality here is important. Changes have to be copied *from* beatmapContent (which comes from editor and is being saved)
             // *to* the beatmapInfo (which is a database model and needs to receive values without the taiko slider velocity multiplier for correct operation).
             // CopyTo() will undo such adjustments, while CopyFrom() will not.
-            beatmapContent.Difficulty.CopyTo(beatmapInfo.BaseDifficulty);
+            beatmapContent.Difficulty.CopyTo(beatmapInfo.Difficulty);
 
             // All changes to metadata are made in the provided beatmapInfo, so this should be copied to the `IBeatmap` before encoding.
             beatmapContent.BeatmapInfo = beatmapInfo;
