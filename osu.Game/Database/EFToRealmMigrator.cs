@@ -42,6 +42,9 @@ namespace osu.Game.Database
                 migrateScores(ef);
             }
 
+            Logger.Log("Refreshing realm...", LoggingTarget.Database);
+            realmContextFactory.Refresh();
+
             // Delete the database permanently.
             // Will cause future startups to not attempt migration.
             Logger.Log("Migration successful, deleting EF database", LoggingTarget.Database);
