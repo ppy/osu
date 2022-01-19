@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Artist = "Some Artist",
                 Title = "Some Beatmap",
-                AuthorString = "Some Author"
+                Author = { Username = "Some Author" },
             };
 
             var beatmapSetInfo = new BeatmapSetInfo

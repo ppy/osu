@@ -104,6 +104,7 @@ namespace osu.Game.Scoring
             }
         }
 
+        [Ignored]
         public ScoreRank Rank
         {
             get => (ScoreRank)RankInt;
