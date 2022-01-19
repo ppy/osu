@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public static int GetColumnCountForNonConvert(BeatmapInfo beatmapInfo)
         {
-            double roundedCircleSize = Math.Round(beatmapInfo.BaseDifficulty.CircleSize);
+            double roundedCircleSize = Math.Round(beatmapInfo.Difficulty.CircleSize);
             return (int)Math.Max(1, roundedCircleSize);
         }
 

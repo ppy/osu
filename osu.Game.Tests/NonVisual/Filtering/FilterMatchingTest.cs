@@ -18,7 +18,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         {
             Ruleset = new RulesetInfo { OnlineID = 0 },
             StarRating = 4.0d,
-            BaseDifficulty = new BeatmapDifficulty
+            Difficulty = new BeatmapDifficulty
             {
                 ApproachRate = 5.0f,
                 DrainRate = 3.0f,
