@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 {
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
-                    BaseDifficulty = new BeatmapDifficulty()
+                    Difficulty = new BeatmapDifficulty()
                 }
             });
         }
