@@ -13,6 +13,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osuTK;
 using Realms;
 
 namespace osu.Game.Screens.Select.Carousel
@@ -32,12 +33,12 @@ namespace osu.Game.Screens.Select.Carousel
 
         private IDisposable scoreSubscription;
 
-        private bool rankUpdatePending;
-
         public TopLocalRank(BeatmapInfo beatmapInfo)
             : base(null)
         {
             this.beatmapInfo = beatmapInfo;
+
+            Size = new Vector2(40, 20);
         }
 
         protected override void LoadComplete()
@@ -46,10 +47,6 @@ namespace osu.Game.Screens.Select.Carousel
 
             ruleset.BindValueChanged(_ =>
             {
-                rankUpdatePending = true;
-                // Required since presence is changed via IsPresent override
-                Invalidate(Invalidation.Presence);
-
                 scoreSubscription?.Dispose();
                 scoreSubscription = realmFactory.Context.All<ScoreInfo>()
                                                 .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
@@ -59,16 +56,14 @@ namespace osu.Game.Screens.Select.Carousel
                                                 .OrderByDescending(s => s.TotalScore)
                                                 .QueryAsyncWithNotifications((items, changes, ___) =>
                                                 {
-                                                    if (changes == null)
-                                                        rankUpdatePending = false;
-
                                                     Rank = items.FirstOrDefault()?.Rank;
+                                                    // Required since presence is changed via IsPresent override
+                                                    Invalidate(Invalidation.Presence);
                                                 });
             }, true);
         }
 
-        // We're present if a rank is set, or if there is a pending rank update (IsPresent = true is required for the scheduler to run).
-        public override bool IsPresent => base.IsPresent && (Rank != null || rankUpdatePending);
+        public override bool IsPresent => base.IsPresent && Rank != null;
 
         protected override void Dispose(bool isDisposing)
         {
