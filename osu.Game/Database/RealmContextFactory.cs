@@ -21,6 +21,7 @@ using osu.Game.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
+using Realms.Exceptions;
 
 #nullable enable
 
@@ -427,7 +428,7 @@ namespace osu.Game.Database
                             throw new TimeoutException(@"Took too long to acquire lock");
                     }
                 }
-                catch (Exception e)
+                catch (RealmException e)
                 {
                     // Compact may fail if the realm is in a bad state.
                     // We still want to continue with the blocking operation, though.
