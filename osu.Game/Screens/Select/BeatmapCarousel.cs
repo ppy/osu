@@ -677,10 +677,10 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
+            beatmapSet = beatmapSet.Detach();
+
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
-
-            beatmapSet = beatmapSet.Detach();
 
             var set = new CarouselBeatmapSet(beatmapSet)
             {
