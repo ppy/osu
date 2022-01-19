@@ -64,6 +64,7 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public RealmNamedFileUsage? File => BeatmapSet?.Files.FirstOrDefault(f => f.File.Hash == Hash);
 
+        [Ignored]
         public BeatmapOnlineStatus Status
         {
             get => (BeatmapOnlineStatus)StatusInt;
@@ -166,6 +167,7 @@ namespace osu.Game.Beatmaps
         }
 
         [Ignored]
+        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
         public BeatmapDifficulty BaseDifficulty
         {
             get => Difficulty;

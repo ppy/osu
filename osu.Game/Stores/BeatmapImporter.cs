@@ -218,7 +218,7 @@ namespace osu.Game.Stores
                     }
 
                     var decodedInfo = decoded.BeatmapInfo;
-                    var decodedDifficulty = decodedInfo.BaseDifficulty;
+                    var decodedDifficulty = decodedInfo.Difficulty;
 
                     var ruleset = realm.All<RulesetInfo>().FirstOrDefault(r => r.OnlineID == decodedInfo.RulesetID);
 
