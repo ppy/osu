@@ -102,6 +102,7 @@ namespace osu.Game.Database
 
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
              .MaxDepth(1)
+             // This is not required as it will be populated in the `AfterMap` call from the `BeatmapInfo`'s parent.
              .ForMember(b => b.BeatmapSet, cc => cc.Ignore());
         }).CreateMapper();
 
