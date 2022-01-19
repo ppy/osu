@@ -361,13 +361,13 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
-        public void CreateBackup(string filename)
+        public void CreateBackup(string backupFilename)
         {
             using (BlockAllOperations())
             {
-                Logger.Log($"Creating full realm database backup at {filename}", LoggingTarget.Database);
+                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
                 using (var source = storage.GetStream(Filename))
-                using (var destination = storage.GetStream(filename, FileAccess.Write, FileMode.CreateNew))
+                using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
                     source.CopyTo(destination);
             }
         }
