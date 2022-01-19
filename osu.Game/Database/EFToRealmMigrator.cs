@@ -148,10 +148,10 @@ namespace osu.Game.Database
                         }
 
                         transaction.Commit();
+                        Logger.Log($"Successfully migrated {existingBeatmapSets.Count} beatmaps to realm", LoggingTarget.Database);
                     }
                 }
 
-                Logger.Log($"Successfully migrated {existingBeatmapSets.Count} beatmaps to realm", LoggingTarget.Database);
                 ef.Context.RemoveRange(existingBeatmapSets);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
             }
@@ -257,10 +257,10 @@ namespace osu.Game.Database
                         }
 
                         transaction.Commit();
+                        Logger.Log($"Successfully migrated {existingScores.Count} scores to realm", LoggingTarget.Database);
                     }
                 }
 
-                Logger.Log($"Successfully migrated {existingScores.Count} scores to realm", LoggingTarget.Database);
                 db.Context.RemoveRange(existingScores);
                 // Intentionally don't clean up the files, so they don't get purged by EF.
             }
