@@ -19,8 +19,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    using static PerformanceStatistic;
-
     public class PerformanceStatisticTooltip : VisibilityContainer, ITooltip<PerformanceBreakdown>
     {
         private readonly Box background;
