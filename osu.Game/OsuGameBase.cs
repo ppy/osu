@@ -195,7 +195,7 @@ namespace osu.Game
 
             // A non-null context factory means there's still content to migrate.
             if (efContextFactory != null)
-                new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig).Run();
+                new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig, Storage).Run();
 
             dependencies.CacheAs(Storage);
 
