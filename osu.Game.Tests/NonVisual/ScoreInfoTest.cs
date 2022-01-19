@@ -6,7 +6,6 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
