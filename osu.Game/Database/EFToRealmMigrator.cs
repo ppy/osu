@@ -84,7 +84,7 @@ namespace osu.Game.Database
                 }
 
                 // only migrate data if the realm database is empty.
-                // note that this cannot be written as: `realm.All<BeatmapInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
+                // note that this cannot be written as: `realm.All<BeatmapSetInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (realm.All<BeatmapSetInfo>().Any(s => !s.Protected))
                 {
                     Logger.Log("Skipping migration as realm already has beatmaps loaded", LoggingTarget.Database);
@@ -215,7 +215,6 @@ namespace osu.Game.Database
                 }
 
                 // only migrate data if the realm database is empty.
-                // note that this cannot be written as: `realm.All<ScoreInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                 if (realm.All<ScoreInfo>().Any())
                 {
                     Logger.Log("Skipping migration as realm already has scores loaded", LoggingTarget.Database);
