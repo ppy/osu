@@ -48,6 +48,7 @@ namespace osu.Game.Database
                  copyChangesToRealm(s.Metadata, d.Metadata);
              });
             c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ConstructUsing(_ => new BeatmapSetInfo(null))
              .ForMember(s => s.Beatmaps, cc => cc.Ignore())
              .AfterMap((s, d) =>
              {
@@ -77,6 +78,7 @@ namespace osu.Game.Database
             applyCommonConfiguration(c);
 
             c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ConstructUsing(_ => new BeatmapSetInfo(null))
              .MaxDepth(2)
              .AfterMap((s, d) =>
              {
@@ -109,6 +111,7 @@ namespace osu.Game.Database
             applyCommonConfiguration(c);
 
             c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ConstructUsing(_ => new BeatmapSetInfo(null))
              .MaxDepth(2)
              .ForMember(b => b.Files, cc => cc.Ignore())
              .AfterMap((s, d) =>
