@@ -56,19 +56,17 @@ namespace osu.Game.Overlays.News.Sidebar
             if (allPosts?.Any() != true)
                 return;
 
-            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => post.PublishedAt.Month);
+            var lookup = metadata.NewValue.NewsPosts.ToLookup(post => (post.PublishedAt.Month, post.PublishedAt.Year));
 
             var keys = lookup.Select(kvp => kvp.Key);
-            var sortedKeys = keys.OrderByDescending(k => k).ToList();
-
-            int year = metadata.NewValue.CurrentYear;
+            var sortedKeys = keys.OrderByDescending(k => k.Year).ThenByDescending(k => k.Month).ToList();
 
             for (int i = 0; i < sortedKeys.Count; i++)
             {
-                int month = sortedKeys[i];
-                var posts = lookup[month];
+                var key = sortedKeys[i];
+                var posts = lookup[key];
 
-                monthsFlow.Add(new MonthSection(month, year, posts)
+                monthsFlow.Add(new MonthSection(key.Month, key.Year, posts)
                 {
                     Expanded = { Value = i == 0 }
                 });
