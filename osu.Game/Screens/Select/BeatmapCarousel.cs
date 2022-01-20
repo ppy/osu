@@ -126,14 +126,8 @@ namespace osu.Game.Screens.Select
 
             applyActiveCriteria(false);
 
-            // Run on late scheduler want to ensure this runs after all pending UpdateBeatmapSet / RemoveBeatmapSet operations are run.
-            SchedulerAfterChildren.Add(() =>
-            {
-                BeatmapSetsChanged?.Invoke();
-                BeatmapSetsLoaded = true;
-
-                itemsCache.Invalidate();
-            });
+            if (loadedTestBeatmaps)
+                signalBeatmapsLoaded();
         }
 
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
@@ -181,6 +175,12 @@ namespace osu.Game.Screens.Select
 
             RightClickScrollingEnabled.ValueChanged += enabled => Scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
+
+            if (!loadedTestBeatmaps)
+            {
+                using (var realm = realmFactory.CreateContext())
+                    loadBeatmapSets(getBeatmapSets(realm));
+            }
         }
 
         [Resolved]
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            subscriptionSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).QueryAsyncWithNotifications(beatmapSetsChanged);
+            subscriptionSets = getBeatmapSets(realmFactory.Context).QueryAsyncWithNotifications(beatmapSetsChanged);
             subscriptionBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
 
             // Can't use main subscriptions because we can't lookup deleted indices.
@@ -220,8 +220,30 @@ namespace osu.Game.Screens.Select
 
             if (changes == null)
             {
-                // initial load
-                loadBeatmapSets(sender);
+                // During initial population, we must manually account for the fact that our original query was done on an async thread.
+                // Since then, there may have been imports or deletions.
+                // Here we manually catch up on any changes.
+                var populatedSets = new HashSet<Guid>();
+                foreach (var s in beatmapSets)
+                    populatedSets.Add(s.BeatmapSet.ID);
+
+                var realmSets = new HashSet<Guid>();
+                foreach (var s in sender)
+                    realmSets.Add(s.ID);
+
+                foreach (var s in realmSets)
+                {
+                    if (!populatedSets.Contains(s))
+                        UpdateBeatmapSet(realmFactory.Context.Find<BeatmapSetInfo>(s));
+                }
+
+                foreach (var s in populatedSets)
+                {
+                    if (!realmSets.Contains(s))
+                        RemoveBeatmapSet(realmFactory.Context.Find<BeatmapSetInfo>(s));
+                }
+
+                signalBeatmapsLoaded();
                 return;
             }
 
@@ -241,6 +263,8 @@ namespace osu.Game.Screens.Select
             foreach (int i in changes.InsertedIndices)
                 UpdateBeatmapSet(sender[i].BeatmapSet);
         }
+
+        private IRealmCollection<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
         {
@@ -518,6 +542,16 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private void signalBeatmapsLoaded()
+        {
+            Debug.Assert(BeatmapSetsLoaded == false);
+
+            BeatmapSetsChanged?.Invoke();
+            BeatmapSetsLoaded = true;
+
+            itemsCache.Invalidate();
+        }
+
         private float? scrollTarget;
 
         /// <summary>
@@ -679,6 +713,11 @@ namespace osu.Game.Screens.Select
         {
             beatmapSet = beatmapSet.Detach();
 
+            // This can be moved to the realm query if required using:
+            // .Filter("DeletePending == false && Protected == false && ANY Beatmaps.Hidden == false")
+            //
+            // As long as we are detaching though, it makes more sense to do it here as adding to the realm query has an overhead
+            // as seen at https://github.com/realm/realm-dotnet/discussions/2773#discussioncomment-2004275.
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
                 return null;
 
