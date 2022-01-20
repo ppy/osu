@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -50,7 +51,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private void setPerformanceValue(PerformanceBreakdown breakdown)
         {
-            if (breakdown != null)
+            // Don't display the tooltip if "Total" is the only item
+            if (breakdown != null && breakdown.Performance.GetAttributesForDisplay().Count() > 1)
             {
                 TooltipContent = breakdown;
                 performance.Value = (int)Math.Round(breakdown.Performance.Total, MidpointRounding.AwayFromZero);
