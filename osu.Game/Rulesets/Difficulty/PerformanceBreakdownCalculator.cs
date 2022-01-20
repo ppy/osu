@@ -39,20 +39,11 @@ namespace osu.Game.Rulesets.Difficulty
         }
 
         [ItemCanBeNull]
-        private async Task<PerformanceAttributes> getPerfectPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
-        {
-            ScoreInfo perfectScore = await getPerfectScore(score, cancellationToken).ConfigureAwait(false);
-            if (perfectScore == null)
-                return null;
-
-            return await performanceCache.CalculatePerformanceAsync(perfectScore, cancellationToken).ConfigureAwait(false);
-        }
-
-        [ItemCanBeNull]
-        private Task<ScoreInfo> getPerfectScore(ScoreInfo score, CancellationToken cancellationToken = default)
+        private Task<PerformanceAttributes> getPerfectPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
         {
             return Task.Run(async () =>
             {
+                Ruleset ruleset = score.Ruleset.CreateInstance();
                 IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(score.BeatmapInfo).GetPlayableBeatmap(score.Ruleset, score.Mods);
                 ScoreInfo perfectPlay = score.DeepClone();
                 perfectPlay.Accuracy = 1;
@@ -79,7 +70,7 @@ namespace osu.Game.Rulesets.Difficulty
                 perfectPlay.Statistics = statistics;
 
                 // calculate total score
-                ScoreProcessor scoreProcessor = score.Ruleset.CreateInstance().CreateScoreProcessor();
+                ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
                 scoreProcessor.HighestCombo.Value = perfectPlay.MaxCombo;
                 scoreProcessor.Mods.Value = perfectPlay.Mods;
                 perfectPlay.TotalScore = (long)scoreProcessor.GetImmediateScore(ScoringMode.Standardised, perfectPlay.MaxCombo, statistics);
@@ -93,7 +84,9 @@ namespace osu.Game.Rulesets.Difficulty
                     perfectPlay.Rank = mod.AdjustRank(perfectPlay.Rank, 1);
                 }
 
-                return perfectPlay;
+                // calculate performance for this perfect score
+                // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
+                return ruleset.CreatePerformanceCalculator(difficulty.Value.Attributes, perfectPlay)?.Calculate();
             }, cancellationToken);
         }
     }
