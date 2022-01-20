@@ -130,7 +130,7 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (dataIsFromUpdateThread)
+            if (dataIsFromUpdateThread && !data.Realm.IsClosed)
                 return;
 
             dataIsFromUpdateThread = true;
