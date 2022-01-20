@@ -36,6 +36,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; } = null!;
 
+        [JsonIgnore]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
