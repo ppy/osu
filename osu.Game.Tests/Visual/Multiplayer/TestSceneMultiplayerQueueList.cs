@@ -6,7 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -26,8 +26,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
-
         [Cached(typeof(UserLookupCache))]
         private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
@@ -41,7 +39,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void load(GameHost host, AudioManager audio)
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
         }
 
         public override void SetUpSteps()
@@ -50,22 +49,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("create playlist", () =>
             {
-                selectedItem.Value = null;
-
                 Child = playlist = new MultiplayerQueueList
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(500, 300),
-                    SelectedItem = { BindTarget = selectedItem },
                     Items = { BindTarget = Client.APIRoom!.Playlist }
                 };
             });
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
             });
 
@@ -111,12 +107,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             addPlaylistItem(() => API.LocalUser.Value.OnlineID);
 
-            AddStep("select item 0", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(0).Model);
             assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, true);
 
-            AddStep("select item 1", () => selectedItem.Value = playlist.ChildrenOfType<RearrangeableListItem<PlaylistItem>>().ElementAt(1).Model);
-            assertDeleteButtonVisibility(0, true);
+            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddUntilStep("wait for next item to be selected", () => Client.Room?.Settings.PlaylistItemId == 2);
+            AddUntilStep("wait for two items in playlist", () => playlist.ChildrenOfType<DrawableRoomPlaylistItem>().Count() == 2);
+
+            assertDeleteButtonVisibility(0, false);
             assertDeleteButtonVisibility(1, false);
         }
 
@@ -129,7 +127,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap },
-                    BeatmapID = importedBeatmap.OnlineID ?? -1,
+                    BeatmapID = importedBeatmap.OnlineID,
                 });
 
                 Client.AddUserPlaylistItem(userId(), item);
@@ -141,7 +139,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void assertDeleteButtonVisibility(int index, bool visible)
-            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible",
-                () => (playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAt(index).Alpha > 0) == visible);
+            => AddUntilStep($"delete button {index} {(visible ? "is" : "is not")} visible", () =>
+            {
+                var button = playlist.ChildrenOfType<DrawableRoomPlaylistItem.PlaylistRemoveButton>().ElementAtOrDefault(index);
+                return (button?.Alpha > 0) == visible;
+            });
     }
 }

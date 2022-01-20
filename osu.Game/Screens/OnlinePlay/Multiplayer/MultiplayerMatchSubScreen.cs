@@ -30,7 +30,6 @@ using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
 using osuTK;
@@ -242,7 +241,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void UpdateMods()
         {
-            if (SelectedItem.Value == null || client.LocalUser == null)
+            if (SelectedItem.Value == null || client.LocalUser == null || !this.IsCurrentScreen())
                 return;
 
             // update local mods based on room's reported status for the local user (omitting the base call implementation).
@@ -478,7 +477,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
-                    return new PlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
+                    return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));
             }
         }
 

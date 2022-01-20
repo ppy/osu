@@ -35,9 +35,9 @@ namespace osu.Game.Tests.Visual
             return dependencies;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 

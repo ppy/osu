@@ -25,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    string defaultStorageLocation = getDefaultLocationFor(nameof(TestDefaultDirectory));
+                    string defaultStorageLocation = getDefaultLocationFor(host);
 
                     var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
@@ -61,6 +61,7 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
                 }
             }
         }
@@ -94,6 +95,7 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
                 }
             }
         }
@@ -107,7 +109,7 @@ namespace osu.Game.Tests.NonVisual
             {
                 try
                 {
-                    string defaultStorageLocation = getDefaultLocationFor(nameof(TestMigration));
+                    string defaultStorageLocation = getDefaultLocationFor(host);
 
                     var osu = LoadOsuIntoHost(host);
                     var storage = osu.Dependencies.Get<Storage>();
@@ -160,6 +162,7 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
                 }
             }
         }
@@ -168,7 +171,7 @@ namespace osu.Game.Tests.NonVisual
         public void TestMigrationBetweenTwoTargets()
         {
             string customPath = prepareCustomPath();
-            string customPath2 = prepareCustomPath("-2");
+            string customPath2 = prepareCustomPath();
 
             using (var host = new CustomTestHeadlessGameHost())
             {
@@ -176,7 +179,7 @@ namespace osu.Game.Tests.NonVisual
                 {
                     var osu = LoadOsuIntoHost(host);
 
-                    const string database_filename = "client.db";
+                    const string database_filename = "client.realm";
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
@@ -185,7 +188,7 @@ namespace osu.Game.Tests.NonVisual
                     Assert.That(File.Exists(Path.Combine(customPath2, database_filename)));
 
                     // some files may have been left behind for whatever reason, but that's not what we're testing here.
-                    customPath = prepareCustomPath();
+                    cleanupPath(customPath);
 
                     Assert.DoesNotThrow(() => osu.Migrate(customPath));
                     Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
@@ -193,6 +196,8 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
+                    cleanupPath(customPath2);
                 }
             }
         }
@@ -214,6 +219,7 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
                 }
             }
         }
@@ -243,6 +249,7 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
                 }
             }
         }
@@ -272,13 +279,14 @@ namespace osu.Game.Tests.NonVisual
                 finally
                 {
                     host.Exit();
+                    cleanupPath(customPath);
                 }
             }
         }
 
-        private static string getDefaultLocationFor(string testTypeName)
+        private static string getDefaultLocationFor(CustomTestHeadlessGameHost host)
         {
-            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, testTypeName);
+            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, host.Name);
 
             if (Directory.Exists(path))
                 Directory.Delete(path, true);
@@ -286,14 +294,18 @@ namespace osu.Game.Tests.NonVisual
             return path;
         }
 
-        private string prepareCustomPath(string suffix = "")
+        private static string prepareCustomPath() => Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, $"custom-path-{Guid.NewGuid()}");
+
+        private static void cleanupPath(string path)
         {
-            string path = Path.Combine(TestRunHeadlessGameHost.TemporaryTestDirectory, $"custom-path{suffix}");
-
-            if (Directory.Exists(path))
-                Directory.Delete(path, true);
-
-            return path;
+            try
+            {
+                if (Directory.Exists(path))
+                    Directory.Delete(path, true);
+            }
+            catch
+            {
+            }
         }
 
         public class CustomTestHeadlessGameHost : CleanRunHeadlessGameHost
@@ -303,7 +315,7 @@ namespace osu.Game.Tests.NonVisual
             public CustomTestHeadlessGameHost([CallerMemberName] string callingMethodName = @"")
                 : base(callingMethodName: callingMethodName)
             {
-                string defaultStorageLocation = getDefaultLocationFor(callingMethodName);
+                string defaultStorageLocation = getDefaultLocationFor(this);
 
                 InitialStorage = new DesktopStorage(defaultStorageLocation, this);
                 InitialStorage.DeleteDirectory(string.Empty);

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -27,22 +28,25 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
     [ExcludeFromDynamicCompile]
     public abstract class OsuTestScene : TestScene
     {
-        protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        [Cached]
+        protected Bindable<WorkingBeatmap> Beatmap { get; } = new Bindable<WorkingBeatmap>();
 
-        protected Bindable<RulesetInfo> Ruleset;
+        [Cached]
+        protected Bindable<RulesetInfo> Ruleset { get; } = new Bindable<RulesetInfo>();
 
-        protected Bindable<IReadOnlyList<Mod>> SelectedMods;
+        [Cached]
+        protected Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected new OsuScreenDependencies Dependencies { get; private set; }
+        protected new DependencyContainer Dependencies { get; private set; }
 
         protected IResourceStore<byte[]> Resources;
 
@@ -71,9 +75,9 @@ namespace osu.Game.Tests.Visual
         /// <remarks>
         /// In interactive runs (ie. VisualTests) this will use the user's database if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
         /// </remarks>
-        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+        protected RealmContextFactory ContextFactory => contextFactory.Value;
 
-        private Lazy<DatabaseContextFactory> contextFactory;
+        private Lazy<RealmContextFactory> contextFactory;
 
         /// <summary>
         /// Whether a fresh storage should be initialised per test (method) run.
@@ -93,6 +97,16 @@ namespace osu.Game.Tests.Visual
         /// </remarks>
         protected Storage LocalStorage => localStorage.Value;
 
+        /// <summary>
+        /// A cache for ruleset configurations to be used in this test scene.
+        /// </summary>
+        /// <remarks>
+        /// This <see cref="IRulesetConfigCache"/> instance is provided to the children of this test scene via DI.
+        /// It is only exposed so that test scenes themselves can access the ruleset config cache in a safe manner
+        /// (<see cref="OsuTestScene"/>s cannot use DI themselves, as they will end up accessing the real cached instance from <see cref="OsuGameBase"/>).
+        /// </remarks>
+        protected IRulesetConfigCache RulesetConfigs { get; private set; }
+
         private Lazy<Storage> localStorage;
 
         private Storage headlessHostStorage;
@@ -105,32 +119,30 @@ namespace osu.Game.Tests.Visual
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
-            contextFactory = new Lazy<DatabaseContextFactory>(() =>
-            {
-                var factory = new DatabaseContextFactory(LocalStorage);
-
-                using (var usage = factory.Get())
-                    usage.Migrate();
-                return factory;
-            });
+            contextFactory = new Lazy<RealmContextFactory>(() => new RealmContextFactory(LocalStorage, "client"));
 
             RecycleLocalStorage(false);
 
             var baseDependencies = base.CreateChildDependencies(parent);
 
+            // to isolate ruleset configs in tests from the actual database and avoid state pollution problems,
+            // as well as problems due to the implementation details of the "real" implementation (the configs only being available at `LoadComplete()`),
+            // cache a test implementation of the ruleset config cache over the "real" one.
+            var isolatedBaseDependencies = new DependencyContainer(baseDependencies);
+            isolatedBaseDependencies.CacheAs(RulesetConfigs = new TestRulesetConfigCache());
+            baseDependencies = isolatedBaseDependencies;
+
             var providedRuleset = CreateRuleset();
             if (providedRuleset != null)
-                baseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
+                isolatedBaseDependencies = rulesetDependencies = new DrawableRulesetDependencies(providedRuleset, baseDependencies);
 
-            Dependencies = new OsuScreenDependencies(false, baseDependencies);
+            Dependencies = isolatedBaseDependencies;
 
-            Beatmap = Dependencies.Beatmap;
+            Beatmap.Default = parent.Get<Bindable<WorkingBeatmap>>().Default;
             Beatmap.SetDefault();
 
-            Ruleset = Dependencies.Ruleset;
-            Ruleset.SetDefault();
+            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? parent.Get<RulesetStore>().AvailableRulesets.First();
 
-            SelectedMods = Dependencies.Mods;
             SelectedMods.SetDefault();
 
             if (!UseOnlineAPI)
@@ -141,6 +153,23 @@ namespace osu.Game.Tests.Visual
             }
 
             return Dependencies;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            var parentBeatmap = Parent.Dependencies.Get<Bindable<WorkingBeatmap>>();
+            parentBeatmap.Value = Beatmap.Value;
+            Beatmap.BindTo(parentBeatmap);
+
+            var parentRuleset = Parent.Dependencies.Get<Bindable<RulesetInfo>>();
+            parentRuleset.Value = Ruleset.Value;
+            Ruleset.BindTo(parentRuleset);
+
+            var parentMods = Parent.Dependencies.Get<Bindable<IReadOnlyList<Mod>>>();
+            parentMods.Value = SelectedMods.Value;
+            SelectedMods.BindTo(parentMods);
         }
 
         protected override Container<Drawable> Content => content ?? base.Content;
@@ -267,12 +296,6 @@ namespace osu.Game.Tests.Visual
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
             new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
-        {
-            Ruleset.Value = CreateRuleset()?.RulesetInfo ?? rulesets.AvailableRulesets.First();
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -281,9 +304,6 @@ namespace osu.Game.Tests.Visual
 
             if (MusicController?.TrackLoaded == true)
                 MusicController.Stop();
-
-            if (contextFactory?.IsValueCreated == true)
-                contextFactory.Value.ResetDatabase();
 
             RecycleLocalStorage(true);
         }
@@ -352,7 +372,7 @@ namespace osu.Game.Tests.Visual
 
                 public Track Get(string name) => throw new NotImplementedException();
 
-                public Task<Track> GetAsync(string name) => throw new NotImplementedException();
+                public Task<Track> GetAsync(string name, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
                 public Stream GetStream(string name) => throw new NotImplementedException();
 

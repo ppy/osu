@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -46,9 +47,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            importedSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Result;
+            importedSet = BeatmapImportHelper.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
             importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
-            importedBeatmapId = importedBeatmap.OnlineID ?? -1;
+            importedBeatmapId = importedBeatmap.OnlineID;
         }
 
         [SetUp]

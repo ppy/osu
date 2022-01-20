@@ -78,19 +78,20 @@ namespace osu.Game.Input.Bindings
         {
             var defaults = DefaultKeyBindings.ToList();
 
-            if (ruleset != null && !ruleset.ID.HasValue)
-                // some tests instantiate a ruleset which is not present in the database.
-                // in these cases we still want key bindings to work, but matching to database instances would result in none being present,
-                // so let's populate the defaults directly.
+            List<RealmKeyBinding> newBindings = realmKeyBindings.Detach()
+                                                                // this ordering is important to ensure that we read entries from the database in the order
+                                                                // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                                                // have been eaten by the music controller due to query order.
+                                                                .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
+
+            // In the case no bindings were found in the database, presume this usage is for a non-databased ruleset.
+            // This actually should never be required and can be removed if it is ever deemed to cause a problem.
+            // See https://github.com/ppy/osu/issues/8805 for original reasoning, which is no longer valid as we use ShortName
+            // for lookups these days.
+            if (newBindings.Count == 0)
                 KeyBindings = defaults;
             else
-            {
-                KeyBindings = realmKeyBindings.Detach()
-                                              // this ordering is important to ensure that we read entries from the database in the order
-                                              // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
-                                              // have been eaten by the music controller due to query order.
-                                              .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
-            }
+                KeyBindings = newBindings;
         }
     }
 }

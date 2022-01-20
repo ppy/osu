@@ -34,20 +34,20 @@ namespace osu.Game.Tests.Mods
             var mod3 = new OsuModDoubleTime { SpeedChange = { Value = 1.26 } };
 
             var doubleConvertedMod1 = new APIMod(mod1).ToMod(ruleset);
-            var doulbeConvertedMod2 = new APIMod(mod2).ToMod(ruleset);
-            var doulbeConvertedMod3 = new APIMod(mod3).ToMod(ruleset);
+            var doubleConvertedMod2 = new APIMod(mod2).ToMod(ruleset);
+            var doubleConvertedMod3 = new APIMod(mod3).ToMod(ruleset);
 
             Assert.That(mod1, Is.Not.EqualTo(mod2));
-            Assert.That(doubleConvertedMod1, Is.Not.EqualTo(doulbeConvertedMod2));
+            Assert.That(doubleConvertedMod1, Is.Not.EqualTo(doubleConvertedMod2));
 
             Assert.That(mod2, Is.EqualTo(mod2));
-            Assert.That(doulbeConvertedMod2, Is.EqualTo(doulbeConvertedMod2));
+            Assert.That(doubleConvertedMod2, Is.EqualTo(doubleConvertedMod2));
 
             Assert.That(mod2, Is.EqualTo(mod3));
-            Assert.That(doulbeConvertedMod2, Is.EqualTo(doulbeConvertedMod3));
+            Assert.That(doubleConvertedMod2, Is.EqualTo(doubleConvertedMod3));
 
             Assert.That(mod3, Is.EqualTo(mod2));
-            Assert.That(doulbeConvertedMod3, Is.EqualTo(doulbeConvertedMod2));
+            Assert.That(doubleConvertedMod3, Is.EqualTo(doubleConvertedMod2));
         }
     }
 }

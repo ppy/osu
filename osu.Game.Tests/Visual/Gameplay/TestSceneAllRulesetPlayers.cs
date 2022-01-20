@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected OsuConfigManager Config { get; private set; }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
             Dependencies.Cache(Config = new OsuConfigManager(LocalStorage));
             Config.GetBindable<double>(OsuSetting.DimLevel).Value = 1.0;

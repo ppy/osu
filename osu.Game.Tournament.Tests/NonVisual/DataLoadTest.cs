@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestUnavailableRuleset()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUnavailableRuleset)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -35,9 +35,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
 
         public class TestTournament : TournamentGameBase
         {
-            [BackgroundDependencyLoader]
-            private void load()
+            protected override void LoadComplete()
             {
+                base.LoadComplete();
                 Ruleset.Value = new RulesetInfo(); // not available
             }
         }

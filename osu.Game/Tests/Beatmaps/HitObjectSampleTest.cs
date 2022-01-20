@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -77,7 +79,11 @@ namespace osu.Game.Tests.Beatmaps
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     // populate ruleset for beatmap converters that require it to be present.
-                    currentTestBeatmap.BeatmapInfo.Ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.RulesetID);
+                    var ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.RulesetID);
+
+                    Debug.Assert(ruleset != null);
+
+                    currentTestBeatmap.BeatmapInfo.Ruleset = ruleset;
                 });
             });
 
@@ -92,12 +98,10 @@ namespace osu.Game.Tests.Beatmaps
                 userSkinInfo.Files.Clear();
                 userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
+                Debug.Assert(beatmapInfo.BeatmapSet != null);
+
                 beatmapInfo.BeatmapSet.Files.Clear();
-                beatmapInfo.BeatmapSet.Files.Add(new BeatmapSetFileInfo
-                {
-                    Filename = beatmapFile,
-                    FileInfo = new IO.FileInfo { Hash = beatmapFile }
-                });
+                beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
@@ -166,7 +170,7 @@ namespace osu.Game.Tests.Beatmaps
                 return Array.Empty<byte>();
             }
 
-            public Task<byte[]> GetAsync(string name)
+            public Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
             {
                 markLookup(name);
                 return Task.FromResult(Array.Empty<byte>());

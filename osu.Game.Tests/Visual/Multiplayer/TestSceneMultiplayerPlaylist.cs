@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -34,6 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
         }
 
         [SetUp]
@@ -53,8 +55,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
                 importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
             });
 
@@ -121,7 +123,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("finish current item", () => Client.FinishCurrentItem());
 
             AddStep("leave room", () => RoomManager.PartRoom());
-            AddUntilStep("wait for room part", () => Client.Room == null);
+            AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddUntilStep("item 0 not in lists", () => !inHistoryList(0) && !inQueueList(0));
             AddUntilStep("item 1 not in lists", () => !inHistoryList(0) && !inQueueList(0));
@@ -132,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
         {
             AddStep("leave room", () => RoomManager.PartRoom());
-            AddUntilStep("wait for room part", () => Client.Room == null);
+            AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddStep("join room with items", () =>
             {
@@ -168,7 +170,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void addItemStep(bool expired = false) => AddStep("add item", () => Client.AddPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem
         {
             Beatmap = { Value = importedBeatmap },
-            BeatmapID = importedBeatmap.OnlineID ?? -1,
+            BeatmapID = importedBeatmap.OnlineID,
             Expired = expired,
             PlayedAt = DateTimeOffset.Now
         })));

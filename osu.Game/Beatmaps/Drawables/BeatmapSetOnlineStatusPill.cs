@@ -94,9 +94,9 @@ namespace osu.Game.Beatmaps.Drawables
             if (colourProvider != null)
                 statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colourProvider.Background1 : colourProvider.Background3;
             else
-                statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colours.GreySeafoamLight : Color4.Black;
+                statusText.Colour = status == BeatmapOnlineStatus.Graveyard ? colours.GreySeaFoamLight : Color4.Black;
 
-            background.Colour = OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeafoamLighter;
+            background.Colour = OsuColour.ForBeatmapSetOnlineStatus(Status) ?? colourProvider?.Light1 ?? colours.GreySeaFoamLighter;
         }
     }
 }
