@@ -38,7 +38,7 @@ namespace osu.Game.Database
 
         public void Run()
         {
-            using (var ef = efContextFactory.GetForWrite())
+            using (var ef = efContextFactory.Get())
             {
                 migrateSettings(ef);
                 migrateSkins(ef);
@@ -46,16 +46,19 @@ namespace osu.Game.Database
                 migrateScores(ef);
             }
 
+            Logger.Log("Refreshing realm...", LoggingTarget.Database);
+            realmContextFactory.Refresh();
+
             // Delete the database permanently.
             // Will cause future startups to not attempt migration.
             Logger.Log("Migration successful, deleting EF database", LoggingTarget.Database);
             efContextFactory.ResetDatabase();
         }
 
-        private void migrateBeatmaps(DatabaseWriteUsage ef)
+        private void migrateBeatmaps(OsuDbContext ef)
         {
             // can be removed 20220730.
-            var existingBeatmapSets = ef.Context.EFBeatmapSetInfo
+            var existingBeatmapSets = ef.EFBeatmapSetInfo
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.RulesetInfo)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
@@ -87,10 +90,20 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    using (var transaction = realm.BeginWrite())
+                    var transaction = realm.BeginWrite();
+                    int written = 0;
+
+                    try
                     {
                         foreach (var beatmapSet in existingBeatmapSets)
                         {
+                            if (++written % 1000 == 0)
+                            {
+                                transaction.Commit();
+                                transaction = realm.BeginWrite();
+                                Logger.Log($"Migrated {written}/{count} beatmaps...", LoggingTarget.Database);
+                            }
+
                             var realmBeatmapSet = new BeatmapSetInfo
                             {
                                 OnlineID = beatmapSet.OnlineID ?? -1,
@@ -105,7 +118,10 @@ namespace osu.Game.Database
 
                             foreach (var beatmap in beatmapSet.Beatmaps)
                             {
-                                var realmBeatmap = new BeatmapInfo
+                                var ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
+                                var metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata);
+
+                                var realmBeatmap = new BeatmapInfo(ruleset, new BeatmapDifficulty(beatmap.BaseDifficulty), metadata)
                                 {
                                     DifficultyName = beatmap.DifficultyName,
                                     Status = beatmap.Status,
@@ -131,9 +147,6 @@ namespace osu.Game.Database
                                     CountdownOffset = beatmap.CountdownOffset,
                                     MaxCombo = beatmap.MaxCombo,
                                     Bookmarks = beatmap.Bookmarks,
-                                    Ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName),
-                                    Difficulty = new BeatmapDifficulty(beatmap.BaseDifficulty),
-                                    Metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata),
                                     BeatmapSet = realmBeatmapSet,
                                 };
 
@@ -142,10 +155,13 @@ namespace osu.Game.Database
 
                             realm.Add(realmBeatmapSet);
                         }
-
-                        transaction.Commit();
-                        Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
                     }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+
+                    Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
                 }
             }
         }
@@ -160,7 +176,7 @@ namespace osu.Game.Database
                 TitleUnicode = metadata.TitleUnicode,
                 Artist = metadata.Artist,
                 ArtistUnicode = metadata.ArtistUnicode,
-                Author = new RealmUser
+                Author =
                 {
                     OnlineID = metadata.Author.Id,
                     Username = metadata.Author.Username,
@@ -173,10 +189,10 @@ namespace osu.Game.Database
             };
         }
 
-        private void migrateScores(DatabaseWriteUsage db)
+        private void migrateScores(OsuDbContext db)
         {
             // can be removed 20220730.
-            var existingScores = db.Context.ScoreInfo
+            var existingScores = db.ScoreInfo
                                    .Include(s => s.Ruleset)
                                    .Include(s => s.BeatmapInfo)
                                    .Include(s => s.Files)
@@ -206,26 +222,41 @@ namespace osu.Game.Database
                 }
                 else
                 {
-                    using (var transaction = realm.BeginWrite())
+                    var transaction = realm.BeginWrite();
+                    int written = 0;
+
+                    try
                     {
                         foreach (var score in existingScores)
                         {
-                            var realmScore = new ScoreInfo
+                            if (++written % 1000 == 0)
+                            {
+                                transaction.Commit();
+                                transaction = realm.BeginWrite();
+                                Logger.Log($"Migrated {written}/{count} scores...", LoggingTarget.Database);
+                            }
+
+                            var beatmap = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
+                            var ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName);
+                            var user = new RealmUser
+                            {
+                                OnlineID = score.User.OnlineID,
+                                Username = score.User.Username
+                            };
+
+                            var realmScore = new ScoreInfo(beatmap, ruleset, user)
                             {
                                 Hash = score.Hash,
                                 DeletePending = score.DeletePending,
                                 OnlineID = score.OnlineID ?? -1,
                                 ModsJson = score.ModsJson,
                                 StatisticsJson = score.StatisticsJson,
-                                User = score.User,
                                 TotalScore = score.TotalScore,
                                 MaxCombo = score.MaxCombo,
                                 Accuracy = score.Accuracy,
                                 HasReplay = ((IScoreInfo)score).HasReplay,
                                 Date = score.Date,
                                 PP = score.PP,
-                                BeatmapInfo = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash),
-                                Ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName),
                                 Rank = score.Rank,
                                 HitEvents = score.HitEvents,
                                 Passed = score.Passed,
@@ -240,18 +271,21 @@ namespace osu.Game.Database
 
                             realm.Add(realmScore);
                         }
-
-                        transaction.Commit();
-                        Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
                     }
+                    finally
+                    {
+                        transaction.Commit();
+                    }
+
+                    Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
                 }
             }
         }
 
-        private void migrateSkins(DatabaseWriteUsage db)
+        private void migrateSkins(OsuDbContext db)
         {
             // can be removed 20220530.
-            var existingSkins = db.Context.SkinInfo
+            var existingSkins = db.SkinInfo
                                   .Include(s => s.Files)
                                   .ThenInclude(f => f.FileInfo)
                                   .ToList();
@@ -322,10 +356,10 @@ namespace osu.Game.Database
             }
         }
 
-        private void migrateSettings(DatabaseWriteUsage db)
+        private void migrateSettings(OsuDbContext db)
         {
             // migrate ruleset settings. can be removed 20220315.
-            var existingSettings = db.Context.DatabasedSetting.ToList();
+            var existingSettings = db.DatabasedSetting.ToList();
 
             // previous entries in EF are removed post migration.
             if (!existingSettings.Any())
