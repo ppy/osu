@@ -126,14 +126,8 @@ namespace osu.Game.Screens.Select
 
             applyActiveCriteria(false);
 
-            // Run on late scheduler want to ensure this runs after all pending UpdateBeatmapSet / RemoveBeatmapSet operations are run.
-            SchedulerAfterChildren.Add(() =>
-            {
-                BeatmapSetsChanged?.Invoke();
-                BeatmapSetsLoaded = true;
-
-                itemsCache.Invalidate();
-            });
+            if (loadedTestBeatmaps)
+                signalBeatmapsLoaded();
         }
 
         private readonly List<CarouselItem> visibleItems = new List<CarouselItem>();
@@ -249,6 +243,7 @@ namespace osu.Game.Screens.Select
                         RemoveBeatmapSet(realmFactory.Context.Find<BeatmapSetInfo>(s));
                 }
 
+                signalBeatmapsLoaded();
                 return;
             }
 
@@ -545,6 +540,16 @@ namespace osu.Game.Screens.Select
                 if (alwaysResetScrollPosition || !Scroll.UserScrolling)
                     ScrollToSelected(true);
             }
+        }
+
+        private void signalBeatmapsLoaded()
+        {
+            Debug.Assert(BeatmapSetsLoaded == false);
+
+            BeatmapSetsChanged?.Invoke();
+            BeatmapSetsLoaded = true;
+
+            itemsCache.Invalidate();
         }
 
         private float? scrollTarget;
