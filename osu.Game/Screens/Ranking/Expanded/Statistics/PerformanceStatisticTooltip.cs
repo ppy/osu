@@ -56,12 +56,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             textColour = colours.BlueLighter;
         }
 
-        protected override void PopIn()
-        {
-            // Don't display the tooltip if "Total" is the only item
-            if (currentPerformance.Performance.GetAttributesForDisplay().Count() > 1)
-                this.FadeIn(200, Easing.OutQuint);
-        }
+        protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
 
         protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
 
