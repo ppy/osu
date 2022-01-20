@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select
 
         protected readonly CarouselScrollContainer Scroll;
 
-        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.BeatmapSetsByID.Values;
+        private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
         // todo: only used for testing, maybe remove.
         private bool loadedTestBeatmaps;
