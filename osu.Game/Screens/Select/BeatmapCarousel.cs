@@ -225,8 +225,9 @@ namespace osu.Game.Screens.Select
                 // Since then, there may have been imports or deletions.
                 // Here we manually catch up on any changes.
                 var realmSets = new HashSet<Guid>();
-                foreach (var s in sender)
-                    realmSets.Add(s.ID);
+
+                for (int i = 0; i < sender.Count; i++)
+                    realmSets.Add(sender[i].ID);
 
                 foreach (var id in realmSets)
                 {
