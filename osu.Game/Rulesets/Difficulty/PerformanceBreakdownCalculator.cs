@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -29,21 +28,30 @@ namespace osu.Game.Rulesets.Difficulty
         [ItemCanBeNull]
         public async Task<PerformanceBreakdown> CalculateAsync(ScoreInfo score, CancellationToken cancellationToken = default)
         {
-            PerformanceAttributes performance = await performanceCache.CalculatePerformanceAsync(score, cancellationToken).ConfigureAwait(false);
+            PerformanceAttributes[] performanceArray = await Task.WhenAll(
+                // compute actual performance
+                performanceCache.CalculatePerformanceAsync(score, cancellationToken),
+                // compute performance for perfect play
+                getPerfectPerformance(score, cancellationToken)
+            ).ConfigureAwait(false);
 
+            return new PerformanceBreakdown { Performance = performanceArray[0], PerfectPerformance = performanceArray[1] };
+        }
+
+        [ItemCanBeNull]
+        private async Task<PerformanceAttributes> getPerfectPerformance(ScoreInfo score, CancellationToken cancellationToken = default)
+        {
             ScoreInfo perfectScore = await getPerfectScore(score, cancellationToken).ConfigureAwait(false);
             if (perfectScore == null)
                 return null;
 
-            PerformanceAttributes perfectPerformance = await performanceCache.CalculatePerformanceAsync(perfectScore, cancellationToken).ConfigureAwait(false);
-
-            return new PerformanceBreakdown { Performance = performance, PerfectPerformance = perfectPerformance };
+            return await performanceCache.CalculatePerformanceAsync(perfectScore, cancellationToken).ConfigureAwait(false);
         }
 
         [ItemCanBeNull]
         private Task<ScoreInfo> getPerfectScore(ScoreInfo score, CancellationToken cancellationToken = default)
         {
-            return Task.Factory.StartNew(() =>
+            return Task.Run(async () =>
             {
                 IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(score.BeatmapInfo).GetPlayableBeatmap(score.Ruleset, score.Mods);
                 ScoreInfo perfectPlay = score.DeepClone();
@@ -51,12 +59,12 @@ namespace osu.Game.Rulesets.Difficulty
                 perfectPlay.Passed = true;
 
                 // calculate max combo
-                var difficulty = difficultyCache.GetDifficultyAsync(
+                var difficulty = await difficultyCache.GetDifficultyAsync(
                     beatmap.BeatmapInfo,
                     score.Ruleset,
                     score.Mods,
                     cancellationToken
-                ).GetResultSafely();
+                ).ConfigureAwait(false);
 
                 if (difficulty == null)
                     return null;
