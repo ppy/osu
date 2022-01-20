@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Hard Rock";
         public override string Acronym => "HR";
-        public override IconUsage? Icon => OsuIcon.ModHardrock;
+        public override IconUsage? Icon => OsuIcon.ModHardRock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };

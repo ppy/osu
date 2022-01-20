@@ -29,9 +29,10 @@ namespace osu.Game.Tests.Visual.Editing
             editorBeatmap = new EditorBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo));
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
             Beatmap.Disabled = true;
 

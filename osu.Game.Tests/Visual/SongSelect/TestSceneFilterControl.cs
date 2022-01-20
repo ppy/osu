@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -37,8 +38,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, Audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(ContextFactory);
 
-            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
+            beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             base.Content.AddRange(new Drawable[]
             {

@@ -141,7 +141,7 @@ namespace osu.Game.Beatmaps.Drawables.Cards.Buttons
         private void toggleLoading(bool loading)
         {
             Enabled.Value = !loading;
-            icon.FadeTo(loading ? 0 : 1, BeatmapCardBase.TRANSITION_DURATION, Easing.OutQuint);
+            icon.FadeTo(loading ? 0 : 1, BeatmapCard.TRANSITION_DURATION, Easing.OutQuint);
             loadingSpinner.State.Value = loading ? Visibility.Visible : Visibility.Hidden;
         }
     }

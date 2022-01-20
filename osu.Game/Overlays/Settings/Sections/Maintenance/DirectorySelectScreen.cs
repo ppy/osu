@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = colours.GreySeafoamDark
+                        Colour = colours.GreySeaFoamDark
                     },
                     new GridContainer
                     {

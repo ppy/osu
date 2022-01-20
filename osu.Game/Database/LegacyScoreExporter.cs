@@ -24,7 +24,7 @@ namespace osu.Game.Database
             if (file == null)
                 return;
 
-            using (var inputStream = UserFileStorage.GetStream(file.FileInfo.GetStoragePath()))
+            using (var inputStream = UserFileStorage.GetStream(file.File.GetStoragePath()))
                 inputStream.CopyTo(outputStream);
         }
     }

@@ -73,10 +73,10 @@ namespace osu.Desktop.Security
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours)
             {
                 Icon = FontAwesome.Solid.ShieldAlt;
-                IconBackgound.Colour = colours.YellowDark;
+                IconBackground.Colour = colours.YellowDark;
             }
         }
     }

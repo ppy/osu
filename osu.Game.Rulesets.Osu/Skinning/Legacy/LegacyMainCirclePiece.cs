@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -68,13 +69,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
             // the flow above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
-            Texture overlayTexture = getTextureWithFallback("overlay");
 
             InternalChildren = new[]
             {
-                hitCircleSprite = new KiaiFlashingSprite
+                hitCircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = baseTexture })
                 {
-                    Texture = baseTexture,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
@@ -82,9 +81,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = hitCircleOverlay = new KiaiFlashingSprite
+                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => getAnimationWithFallback(@"overlay", 1000 / 2d))
                     {
-                        Texture = overlayTexture,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
@@ -125,6 +123,21 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 }
 
                 return tex ?? skin.GetTexture($"hitcircle{name}");
+            }
+
+            Drawable getAnimationWithFallback(string name, double frameLength)
+            {
+                Drawable animation = null;
+
+                if (!string.IsNullOrEmpty(priorityLookup))
+                {
+                    animation = skin.GetAnimation($"{priorityLookup}{name}", true, true, frameLength: frameLength);
+
+                    if (!allowFallback)
+                        return animation;
+                }
+
+                return animation ?? skin.GetAnimation($"hitcircle{name}", true, true, frameLength: frameLength);
             }
         }
 

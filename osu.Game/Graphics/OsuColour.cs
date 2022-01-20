@@ -212,12 +212,12 @@ namespace osu.Game.Graphics
         public readonly Color4 GreySkyDark = Color4Extensions.FromHex(@"303d47");
         public readonly Color4 GreySkyDarker = Color4Extensions.FromHex(@"21272c");
 
-        public readonly Color4 Seafoam = Color4Extensions.FromHex(@"05ffa2");
-        public readonly Color4 GreySeafoamLighter = Color4Extensions.FromHex(@"9ebab1");
-        public readonly Color4 GreySeafoamLight = Color4Extensions.FromHex(@"4d7365");
-        public readonly Color4 GreySeafoam = Color4Extensions.FromHex(@"33413c");
-        public readonly Color4 GreySeafoamDark = Color4Extensions.FromHex(@"2c3532");
-        public readonly Color4 GreySeafoamDarker = Color4Extensions.FromHex(@"1e2422");
+        public readonly Color4 SeaFoam = Color4Extensions.FromHex(@"05ffa2");
+        public readonly Color4 GreySeaFoamLighter = Color4Extensions.FromHex(@"9ebab1");
+        public readonly Color4 GreySeaFoamLight = Color4Extensions.FromHex(@"4d7365");
+        public readonly Color4 GreySeaFoam = Color4Extensions.FromHex(@"33413c");
+        public readonly Color4 GreySeaFoamDark = Color4Extensions.FromHex(@"2c3532");
+        public readonly Color4 GreySeaFoamDarker = Color4Extensions.FromHex(@"1e2422");
 
         public readonly Color4 Cyan = Color4Extensions.FromHex(@"05f4fd");
         public readonly Color4 GreyCyanLighter = Color4Extensions.FromHex(@"77b1b3");

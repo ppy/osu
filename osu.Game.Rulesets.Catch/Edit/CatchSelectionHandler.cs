@@ -52,16 +52,25 @@ namespace osu.Game.Rulesets.Catch.Edit
             return true;
         }
 
-        public override bool HandleFlip(Direction direction)
+        public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
+            if (SelectedItems.Count == 0)
+                return false;
+
+            // This could be implemented in the future if there's a requirement for it.
+            if (direction == Direction.Vertical)
+                return false;
+
             var selectionRange = CatchHitObjectUtils.GetPositionRange(SelectedItems);
 
             bool changed = false;
+
             EditorBeatmap.PerformOnSelection(h =>
             {
                 if (h is CatchHitObject catchObject)
-                    changed |= handleFlip(selectionRange, catchObject);
+                    changed |= handleFlip(selectionRange, catchObject, flipOverOrigin);
             });
+
             return changed;
         }
 
@@ -116,7 +125,7 @@ namespace osu.Game.Rulesets.Catch.Edit
             return Math.Clamp(deltaX, lowerBound, upperBound);
         }
 
-        private bool handleFlip(PositionRange selectionRange, CatchHitObject hitObject)
+        private bool handleFlip(PositionRange selectionRange, CatchHitObject hitObject, bool flipOverOrigin)
         {
             switch (hitObject)
             {
@@ -124,7 +133,7 @@ namespace osu.Game.Rulesets.Catch.Edit
                     return false;
 
                 case JuiceStream juiceStream:
-                    juiceStream.OriginalX = selectionRange.GetFlippedPosition(juiceStream.OriginalX);
+                    juiceStream.OriginalX = getFlippedPosition(juiceStream.OriginalX);
 
                     foreach (var point in juiceStream.Path.ControlPoints)
                         point.Position *= new Vector2(-1, 1);
@@ -133,9 +142,11 @@ namespace osu.Game.Rulesets.Catch.Edit
                     return true;
 
                 default:
-                    hitObject.OriginalX = selectionRange.GetFlippedPosition(hitObject.OriginalX);
+                    hitObject.OriginalX = getFlippedPosition(hitObject.OriginalX);
                     return true;
             }
+
+            float getFlippedPosition(float original) => flipOverOrigin ? CatchPlayfield.WIDTH - original : selectionRange.GetFlippedPosition(original);
         }
     }
 }

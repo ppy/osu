@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         public Bindable<bool> Expanded = new Bindable<bool>();
 
-        private readonly Bindable<bool> expandedFromTextboxFocus = new Bindable<bool>();
+        private readonly Bindable<bool> expandedFromTextBoxFocus = new Bindable<bool>();
 
         private const float height = 100;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             Background.Alpha = 0.2f;
 
-            Textbox.FocusLost = () => expandedFromTextboxFocus.Value = false;
+            TextBox.FocusLost = () => expandedFromTextBoxFocus.Value = false;
         }
 
         protected override bool OnHover(HoverEvent e) => true; // use UI mouse cursor.
@@ -51,14 +51,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             {
                 // for now let's never hold focus. this avoid misdirected gameplay keys entering chat.
                 // note that this is done within this callback as it triggers an un-focus as well.
-                Textbox.HoldFocus = false;
+                TextBox.HoldFocus = false;
 
                 // only hold focus (after sending a message) during breaks
-                Textbox.ReleaseFocusOnCommit = playing.NewValue;
+                TextBox.ReleaseFocusOnCommit = playing.NewValue;
             }, true);
 
             Expanded.BindValueChanged(_ => updateExpandedState(), true);
-            expandedFromTextboxFocus.BindValueChanged(focus =>
+            expandedFromTextBoxFocus.BindValueChanged(focus =>
             {
                 if (focus.NewValue)
                     updateExpandedState();
@@ -76,25 +76,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (e.Action)
             {
                 case GlobalAction.Back:
-                    if (Textbox.HasFocus)
+                    if (TextBox.HasFocus)
                     {
-                        Schedule(() => Textbox.KillFocus());
+                        Schedule(() => TextBox.KillFocus());
                         return true;
                     }
 
                     break;
 
                 case GlobalAction.ToggleChatFocus:
-                    if (Textbox.HasFocus)
+                    if (TextBox.HasFocus)
                     {
-                        Schedule(() => Textbox.KillFocus());
+                        Schedule(() => TextBox.KillFocus());
                     }
                     else
                     {
-                        expandedFromTextboxFocus.Value = true;
+                        expandedFromTextBoxFocus.Value = true;
 
                         // schedule required to ensure the textbox has become present from above bindable update.
-                        Schedule(() => Textbox.TakeFocus());
+                        Schedule(() => TextBox.TakeFocus());
                     }
 
                     return true;
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void updateExpandedState()
         {
-            if (Expanded.Value || expandedFromTextboxFocus.Value)
+            if (Expanded.Value || expandedFromTextBoxFocus.Value)
             {
                 this.FadeIn(300, Easing.OutQuint);
                 this.ResizeHeightTo(height, 500, Easing.OutQuint);

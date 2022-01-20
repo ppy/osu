@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Tests;
 using osu.Game.Tournament.Configuration;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestDefaultDirectory()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestDefaultDirectory)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
                 try
                 {
@@ -36,9 +37,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestCustomDirectory()
         {
-            using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestCustomDirectory))) // don't use clean run as we are writing a config file.
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestCustomDirectory))) // don't use clean run as we are writing a config file.
             {
-                string osuDesktopStorage = PrepareBasePath(nameof(TestCustomDirectory));
+                string osuDesktopStorage = Path.Combine(host.UserStoragePaths.First(), nameof(TestCustomDirectory));
                 const string custom_tournament = "custom";
 
                 // need access before the game has constructed its own storage yet.
@@ -60,15 +61,6 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-
-                    try
-                    {
-                        if (Directory.Exists(osuDesktopStorage))
-                            Directory.Delete(osuDesktopStorage, true);
-                    }
-                    catch
-                    {
-                    }
                 }
             }
         }
@@ -76,9 +68,9 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestMigration()
         {
-            using (HeadlessGameHost host = new HeadlessGameHost(nameof(TestMigration))) // don't use clean run as we are writing test files for migration.
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestMigration))) // don't use clean run as we are writing test files for migration.
             {
-                string osuRoot = PrepareBasePath(nameof(TestMigration));
+                string osuRoot = Path.Combine(host.UserStoragePaths.First(), nameof(TestMigration));
                 string configFile = Path.Combine(osuRoot, "tournament.ini");
 
                 if (File.Exists(configFile))
@@ -146,28 +138,8 @@ namespace osu.Game.Tournament.Tests.NonVisual
                 finally
                 {
                     host.Exit();
-
-                    try
-                    {
-                        if (Directory.Exists(osuRoot))
-                            Directory.Delete(osuRoot, true);
-                    }
-                    catch
-                    {
-                    }
                 }
             }
-        }
-
-        public static string PrepareBasePath(string testInstance)
-        {
-            string basePath = Path.Combine(RuntimeInfo.StartupDirectory, "headless", testInstance);
-
-            // manually clean before starting in case there are left-over files at the test site.
-            if (Directory.Exists(basePath))
-                Directory.Delete(basePath, true);
-
-            return basePath;
         }
     }
 }

@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
                 InternalChild = new Box
                 {
-                    Colour = colours.GreySeafoamDarker,
+                    Colour = colours.GreySeaFoamDarker,
                     RelativeSizeAxes = Axes.Both,
                 };
             }

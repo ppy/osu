@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
@@ -23,6 +24,18 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddRepeatStep("increase combo", () => scoreProcessor.Combo.Value++, 10);
 
             AddStep("reset combo", () => scoreProcessor.Combo.Value = 0);
+        }
+
+        [Test]
+        public void TestLegacyComboCounterHiddenByRulesetImplementation()
+        {
+            AddToggleStep("toggle legacy hidden by ruleset", visible =>
+            {
+                foreach (var legacyCounter in this.ChildrenOfType<LegacyComboCounter>())
+                    legacyCounter.HiddenByRulesetImplementation = visible;
+            });
+
+            AddRepeatStep("increase combo", () => scoreProcessor.Combo.Value++, 10);
         }
     }
 }

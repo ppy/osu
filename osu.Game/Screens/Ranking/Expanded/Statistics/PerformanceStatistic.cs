@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Scoring;
@@ -37,7 +38,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             else
             {
                 performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
-                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.Result)), cancellationTokenSource.Token);
+                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())), cancellationTokenSource.Token);
             }
         }
 

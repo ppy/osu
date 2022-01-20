@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -20,30 +21,30 @@ namespace osu.Game.Tests.Visual.Navigation
         public void TestFromMainMenu()
         {
             var firstImport = importBeatmap(1);
-            var secondimport = importBeatmap(3);
+            var secondImport = importBeatmap(3);
 
             presentAndConfirm(firstImport);
             returnToMenu();
-            presentAndConfirm(secondimport);
+            presentAndConfirm(secondImport);
             returnToMenu();
             presentSecondDifficultyAndConfirm(firstImport, 1);
             returnToMenu();
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         [Test]
         public void TestFromMainMenuDifferentRuleset()
         {
             var firstImport = importBeatmap(1);
-            var secondimport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
+            var secondImport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
 
             presentAndConfirm(firstImport);
             returnToMenu();
-            presentAndConfirm(secondimport);
+            presentAndConfirm(secondImport);
             returnToMenu();
             presentSecondDifficultyAndConfirm(firstImport, 1);
             returnToMenu();
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         [Test]
@@ -52,17 +53,17 @@ namespace osu.Game.Tests.Visual.Navigation
             var firstImport = importBeatmap(1);
             presentAndConfirm(firstImport);
 
-            var secondimport = importBeatmap(3);
-            presentAndConfirm(secondimport);
+            var secondImport = importBeatmap(3);
+            presentAndConfirm(secondImport);
 
             // Test presenting same beatmap more than once
-            presentAndConfirm(secondimport);
+            presentAndConfirm(secondImport);
 
             presentSecondDifficultyAndConfirm(firstImport, 1);
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
 
             // Test presenting same beatmap more than once
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         [Test]
@@ -71,11 +72,11 @@ namespace osu.Game.Tests.Visual.Navigation
             var firstImport = importBeatmap(1);
             presentAndConfirm(firstImport);
 
-            var secondimport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
-            presentAndConfirm(secondimport);
+            var secondImport = importBeatmap(3, new ManiaRuleset().RulesetInfo);
+            presentAndConfirm(secondImport);
 
             presentSecondDifficultyAndConfirm(firstImport, 1);
-            presentSecondDifficultyAndConfirm(secondimport, 3);
+            presentSecondDifficultyAndConfirm(secondImport, 3);
         }
 
         private void returnToMenu()
@@ -96,11 +97,10 @@ namespace osu.Game.Tests.Visual.Navigation
             BeatmapSetInfo imported = null;
             AddStep($"import beatmap {i}", () =>
             {
-                var difficulty = new BeatmapDifficulty();
                 var metadata = new BeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
+                    Author = { Username = "SomeAuthor" },
                     Title = $"import {i}"
                 };
 
@@ -108,25 +108,24 @@ namespace osu.Game.Tests.Visual.Navigation
                 {
                     Hash = Guid.NewGuid().ToString(),
                     OnlineID = i,
-                    Metadata = metadata,
                     Beatmaps =
                     {
                         new BeatmapInfo
                         {
                             OnlineID = i * 1024,
                             Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
                             OnlineID = i * 2048,
                             Metadata = metadata,
-                            BaseDifficulty = difficulty,
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                     }
-                }).Result.Value;
+                }).GetResultSafely()?.Value;
             });
 
             AddAssert($"import {i} succeeded", () => imported != null);

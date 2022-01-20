@@ -170,7 +170,7 @@ namespace osu.Game.Online.Chat
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
             {
-                IconBackgound.Colour = colours.PurpleDark;
+                IconBackground.Colour = colours.PurpleDark;
 
                 Activated = delegate
                 {

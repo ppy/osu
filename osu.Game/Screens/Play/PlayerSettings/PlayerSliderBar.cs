@@ -15,12 +15,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         public OsuSliderBar<T> Bar => (OsuSliderBar<T>)Control;
 
-        protected override Drawable CreateControl() => new Sliderbar
+        protected override Drawable CreateControl() => new SliderBar
         {
             RelativeSizeAxes = Axes.X
         };
 
-        private class Sliderbar : OsuSliderBar<T>
+        private class SliderBar : OsuSliderBar<T>
         {
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

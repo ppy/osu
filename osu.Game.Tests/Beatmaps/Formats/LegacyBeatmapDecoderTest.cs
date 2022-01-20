@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(string.Empty, metadata.Source);
                 Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", metadata.Tags);
                 Assert.AreEqual(557821, beatmapInfo.OnlineID);
-                Assert.AreEqual(241526, beatmapInfo.BeatmapSet.OnlineID);
+                Assert.AreEqual(241526, beatmapInfo.BeatmapSet?.OnlineID);
             }
         }
 

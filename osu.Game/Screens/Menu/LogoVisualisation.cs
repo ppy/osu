@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// How much should each bar go down each millisecond (based on a full bar).
         /// </summary>
-        private const float decay_per_milisecond = 0.0024f;
+        private const float decay_per_millisecond = 0.0024f;
 
         /// <summary>
         /// Number of milliseconds between each amplitude update.
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Menu
         {
             base.Update();
 
-            float decayFactor = (float)Time.Elapsed * decay_per_milisecond;
+            float decayFactor = (float)Time.Elapsed * decay_per_millisecond;
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {

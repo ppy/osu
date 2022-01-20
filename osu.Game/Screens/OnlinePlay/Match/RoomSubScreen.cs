@@ -21,6 +21,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.OnlinePlay.Multiplayer;
 
 namespace osu.Game.Screens.OnlinePlay.Match
 {
@@ -101,6 +102,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             InternalChildren = new Drawable[]
             {
                 beatmapAvailabilityTracker,
+                new MultiplayerRoomSounds(),
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -300,6 +302,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             updateWorkingBeatmap();
             beginHandlingTrack();
             Scheduler.AddOnce(UpdateMods);
+            Scheduler.AddOnce(updateRuleset);
         }
 
         public override bool OnExiting(IScreen next)
@@ -353,8 +356,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                      .ToList();
 
             UpdateMods();
-
-            Ruleset.Value = rulesets.GetRuleset(selected.RulesetID);
+            updateRuleset();
 
             if (!selected.AllowedMods.Any())
             {
@@ -381,10 +383,18 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected virtual void UpdateMods()
         {
-            if (SelectedItem.Value == null)
+            if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
             Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
+        }
+
+        private void updateRuleset()
+        {
+            if (SelectedItem.Value == null || !this.IsCurrentScreen())
+                return;
+
+            Ruleset.Value = rulesets.GetRuleset(SelectedItem.Value.RulesetID);
         }
 
         private void beginHandlingTrack()

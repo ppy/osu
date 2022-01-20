@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
@@ -112,8 +113,20 @@ namespace osu.Game.Online.Rooms
             }
         }
 
+        #region Newtonsoft.Json implicit ShouldSerialize() methods
+
+        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
+        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
+        // unless the fields are also renamed.
+
+        [UsedImplicitly]
         public bool ShouldSerializeID() => false;
+
+        // ReSharper disable once IdentifierTypo
+        [UsedImplicitly]
         public bool ShouldSerializeapiBeatmap() => false;
+
+        #endregion
 
         public bool Equals(PlaylistItem other)
             => ID == other?.ID

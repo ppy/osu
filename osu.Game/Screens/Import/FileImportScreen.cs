@@ -9,7 +9,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -40,7 +39,7 @@ namespace osu.Game.Screens.Import
         private OsuColour colours { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(Storage storage)
+        private void load()
         {
             InternalChild = contentContainer = new Container
             {
@@ -54,7 +53,7 @@ namespace osu.Game.Screens.Import
                 {
                     new Box
                     {
-                        Colour = colours.GreySeafoamDark,
+                        Colour = colours.GreySeaFoamDark,
                         RelativeSizeAxes = Axes.Both,
                     },
                     fileSelector = new OsuFileSelector(validFileExtensions: game.HandledExtensions.ToArray())
@@ -72,7 +71,7 @@ namespace osu.Game.Screens.Import
                         {
                             new Box
                             {
-                                Colour = colours.GreySeafoamDarker,
+                                Colour = colours.GreySeaFoamDarker,
                                 RelativeSizeAxes = Axes.Both
                             },
                             new Container

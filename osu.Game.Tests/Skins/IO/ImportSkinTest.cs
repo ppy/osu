@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IO;
@@ -187,7 +188,7 @@ namespace osu.Game.Tests.Skins.IO
 
             var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
-            imported.Result.PerformRead(s =>
+            imported.GetResultSafely().PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
@@ -222,7 +223,7 @@ namespace osu.Game.Tests.Skins.IO
 
             var imported = skinManager.Import(new ImportTask(exportStream, "exported.osk"));
 
-            imported.Result.PerformRead(s =>
+            imported.GetResultSafely().PerformRead(s =>
             {
                 Assert.IsFalse(s.Protected);
                 Assert.AreNotEqual(originalSkinId, s.ID);
@@ -319,7 +320,7 @@ namespace osu.Game.Tests.Skins.IO
 
         private async Task runSkinTest(Func<OsuGameBase, Task> action, [CallerMemberName] string callingMethodName = @"")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: callingMethodName))
             {
                 try
                 {

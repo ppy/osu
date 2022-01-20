@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Double Time";
         public override string Acronym => "DT";
-        public override IconUsage? Icon => OsuIcon.ModDoubletime;
+        public override IconUsage? Icon => OsuIcon.ModDoubleTime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom...";
 

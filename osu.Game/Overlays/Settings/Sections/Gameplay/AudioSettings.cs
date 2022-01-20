@@ -14,20 +14,23 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         protected override LocalisableString Header => GameplaySettingsStrings.AudioHeader;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, OsuConfigManager osuConfig)
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new SettingsSlider<float>
                 {
-                    LabelText = GameplaySettingsStrings.PositionalHitsounds,
-                    Current = config.GetBindable<bool>(OsuSetting.PositionalHitSounds)
+                    LabelText = AudioSettingsStrings.PositionalLevel,
+                    Keywords = new[] { @"positional", @"balance" },
+                    Current = osuConfig.GetBindable<float>(OsuSetting.PositionalHitsoundsLevel),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
                 new SettingsCheckbox
                 {
                     LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
-                },
+                }
             };
         }
     }
