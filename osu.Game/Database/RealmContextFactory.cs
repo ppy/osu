@@ -61,10 +61,10 @@ namespace osu.Game.Database
 
         private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
-        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
+
         private Realm? context;
 
         public Realm Context
@@ -168,18 +168,6 @@ namespace osu.Game.Database
         /// </summary>
         /// <returns></returns>
         public bool Compact() => Realm.Compact(getConfiguration());
-
-        /// <summary>
-        /// Perform a blocking refresh on the main realm context.
-        /// </summary>
-        public void Refresh()
-        {
-            lock (contextLock)
-            {
-                if (context?.Refresh() == true)
-                    refreshes.Value++;
-            }
-        }
 
         public Realm CreateContext()
         {
