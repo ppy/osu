@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapInfo exampleBeatmapInfo => new BeatmapInfo
         {
             Ruleset = rulesets.AvailableRulesets.First(),
-            BaseDifficulty = new BeatmapDifficulty
+            Difficulty = new BeatmapDifficulty
             {
                 CircleSize = 7.2f,
                 DrainRate = 3,
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("set beatmap", () => advancedStats.BeatmapInfo = new BeatmapInfo
             {
                 Ruleset = rulesets.GetRuleset(3) ?? throw new InvalidOperationException(),
-                BaseDifficulty = new BeatmapDifficulty
+                Difficulty = new BeatmapDifficulty
                 {
                     CircleSize = 5,
                     DrainRate = 4.3f,

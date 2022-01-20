@@ -21,6 +21,7 @@ using osu.Game.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using Realms;
+using Realms.Exceptions;
 
 #nullable enable
 
@@ -60,10 +61,10 @@ namespace osu.Game.Database
 
         private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
-        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
+
         private Realm? context;
 
         public Realm Context
@@ -105,8 +106,20 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
-            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
-            cleanupPendingDeletions();
+            try
+            {
+                // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
+                cleanupPendingDeletions();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+
+                CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                storage.Delete(Filename);
+
+                cleanupPendingDeletions();
+            }
         }
 
         private void cleanupPendingDeletions()
@@ -155,18 +168,6 @@ namespace osu.Game.Database
         /// </summary>
         /// <returns></returns>
         public bool Compact() => Realm.Compact(getConfiguration());
-
-        /// <summary>
-        /// Perform a blocking refresh on the main realm context.
-        /// </summary>
-        public void Refresh()
-        {
-            lock (contextLock)
-            {
-                if (context?.Refresh() == true)
-                    refreshes.Value++;
-            }
-        }
 
         public Realm CreateContext()
         {
@@ -361,6 +362,17 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
+        public void CreateBackup(string backupFilename)
+        {
+            using (BlockAllOperations())
+            {
+                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
+                using (var source = storage.GetStream(Filename))
+                using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                    source.CopyTo(destination);
+            }
+        }
+
         /// <summary>
         /// Flush any active contexts and block any further writes.
         /// </summary>
@@ -374,17 +386,17 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
-
-            Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
-
             try
             {
                 contextCreationLock.Wait();
 
                 lock (contextLock)
                 {
+                    if (!ThreadSafety.IsUpdateThread && context != null)
+                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
+                    Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
+
                     context?.Dispose();
                     context = null;
                 }
@@ -392,14 +404,23 @@ namespace osu.Game.Database
                 const int sleep_length = 200;
                 int timeout = 5000;
 
-                // see https://github.com/realm/realm-dotnet/discussions/2657
-                while (!Compact())
+                try
                 {
-                    Thread.Sleep(sleep_length);
-                    timeout -= sleep_length;
+                    // see https://github.com/realm/realm-dotnet/discussions/2657
+                    while (!Compact())
+                    {
+                        Thread.Sleep(sleep_length);
+                        timeout -= sleep_length;
 
-                    if (timeout < 0)
-                        throw new TimeoutException(@"Took too long to acquire lock");
+                        if (timeout < 0)
+                            throw new TimeoutException(@"Took too long to acquire lock");
+                    }
+                }
+                catch (RealmException e)
+                {
+                    // Compact may fail if the realm is in a bad state.
+                    // We still want to continue with the blocking operation, though.
+                    Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
             }
             catch

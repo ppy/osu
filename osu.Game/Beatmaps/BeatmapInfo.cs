@@ -26,37 +26,36 @@ namespace osu.Game.Beatmaps
     public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
     {
         [PrimaryKey]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public Guid ID { get; set; }
 
         public string DifficultyName { get; set; } = string.Empty;
 
-        public RulesetInfo Ruleset { get; set; }
+        public RulesetInfo Ruleset { get; set; } = null!;
 
-        public BeatmapDifficulty Difficulty { get; set; }
+        public BeatmapDifficulty Difficulty { get; set; } = null!;
 
-        public BeatmapMetadata Metadata { get; set; }
+        public BeatmapMetadata Metadata { get; set; } = null!;
 
+        [JsonIgnore]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
-        public BeatmapInfo(RulesetInfo ruleset, BeatmapDifficulty difficulty, BeatmapMetadata metadata)
+        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null)
         {
-            Ruleset = ruleset;
-            Difficulty = difficulty;
-            Metadata = metadata;
-        }
-
-        [UsedImplicitly]
-        public BeatmapInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
-        {
-            Ruleset = new RulesetInfo
+            ID = Guid.NewGuid();
+            Ruleset = ruleset ?? new RulesetInfo
             {
                 OnlineID = 0,
                 ShortName = @"osu",
                 Name = @"null placeholder ruleset"
             };
-            Difficulty = new BeatmapDifficulty();
-            Metadata = new BeatmapMetadata();
+            Difficulty = difficulty ?? new BeatmapDifficulty();
+            Metadata = metadata ?? new BeatmapMetadata();
+        }
+
+        [UsedImplicitly]
+        private BeatmapInfo()
+        {
         }
 
         public BeatmapSetInfo? BeatmapSet { get; set; }
@@ -64,6 +63,7 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public RealmNamedFileUsage? File => BeatmapSet?.Files.FirstOrDefault(f => f.File.Hash == Hash);
 
+        [Ignored]
         public BeatmapOnlineStatus Status
         {
             get => (BeatmapOnlineStatus)StatusInt;
@@ -166,6 +166,7 @@ namespace osu.Game.Beatmaps
         }
 
         [Ignored]
+        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
         public BeatmapDifficulty BaseDifficulty
         {
             get => Difficulty;

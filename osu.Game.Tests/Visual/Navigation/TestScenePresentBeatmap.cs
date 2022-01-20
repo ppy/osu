@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 var metadata = new BeatmapMetadata
                 {
                     Artist = "SomeArtist",
-                    AuthorString = "SomeAuthor",
+                    Author = { Username = "SomeAuthor" },
                     Title = $"import {i}"
                 };
 
@@ -114,14 +114,14 @@ namespace osu.Game.Tests.Visual.Navigation
                         {
                             OnlineID = i * 1024,
                             Metadata = metadata,
-                            BaseDifficulty = new BeatmapDifficulty(),
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                         new BeatmapInfo
                         {
                             OnlineID = i * 2048,
                             Metadata = metadata,
-                            BaseDifficulty = new BeatmapDifficulty(),
+                            Difficulty = new BeatmapDifficulty(),
                             Ruleset = ruleset ?? new OsuRuleset().RulesetInfo
                         },
                     }

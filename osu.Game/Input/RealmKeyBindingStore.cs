@@ -92,13 +92,7 @@ namespace osu.Game.Input
                 if (defaultsCount > existingCount)
                 {
                     // insert any defaults which are missing.
-                    realm.Add(defaultsForAction.Skip(existingCount).Select(k => new RealmKeyBinding
-                    {
-                        KeyCombinationString = k.KeyCombination.ToString(),
-                        ActionInt = (int)k.Action,
-                        RulesetName = rulesetName,
-                        Variant = variant
-                    }));
+                    realm.Add(defaultsForAction.Skip(existingCount).Select(k => new RealmKeyBinding(k.Action, k.KeyCombination, rulesetName, variant)));
                 }
                 else if (defaultsCount < existingCount)
                 {
