@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Select
         {
             CarouselRoot newRoot = new CarouselRoot(this);
 
-            newRoot.AddChildren(beatmapSets.Select(createCarouselSet).Where(g => g != null));
+            newRoot.AddChildren(beatmapSets.Select(s => createCarouselSet(s.Detach())).Where(g => g != null));
 
             root = newRoot;
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             foreach (int i in changes.InsertedIndices)
-                RemoveBeatmapSet(sender[i]);
+                RemoveBeatmapSet(sender[i].Detach());
         }
 
         private void beatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -248,10 +248,10 @@ namespace osu.Game.Screens.Select
             }
 
             foreach (int i in changes.NewModifiedIndices)
-                UpdateBeatmapSet(sender[i]);
+                UpdateBeatmapSet(sender[i].Detach());
 
             foreach (int i in changes.InsertedIndices)
-                UpdateBeatmapSet(sender[i]);
+                UpdateBeatmapSet(sender[i].Detach());
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)
@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             foreach (int i in changes.InsertedIndices)
-                UpdateBeatmapSet(sender[i].BeatmapSet);
+                UpdateBeatmapSet(sender[i].BeatmapSet?.Detach());
         }
 
         private IRealmCollection<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
@@ -711,8 +711,6 @@ namespace osu.Game.Screens.Select
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
-            beatmapSet = beatmapSet.Detach();
-
             // This can be moved to the realm query if required using:
             // .Filter("DeletePending == false && Protected == false && ANY Beatmaps.Hidden == false")
             //
