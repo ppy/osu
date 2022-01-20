@@ -165,7 +165,7 @@ namespace osu.Game.Stores
 
         public bool Delete(TModel item)
         {
-            using (var realm = ContextFactory.CreateContext())
+            return ContextFactory.Run(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
@@ -175,12 +175,12 @@ namespace osu.Game.Stores
 
                 realm.Write(r => item.DeletePending = true);
                 return true;
-            }
+            });
         }
 
         public void Undelete(TModel item)
         {
-            using (var realm = ContextFactory.CreateContext())
+            ContextFactory.Run(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
@@ -189,7 +189,7 @@ namespace osu.Game.Stores
                     return;
 
                 realm.Write(r => item.DeletePending = false);
-            }
+            });
         }
 
         public abstract bool IsAvailableLocally(TModel model);
