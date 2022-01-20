@@ -169,6 +169,41 @@ namespace osu.Game.Database
         /// <returns></returns>
         public bool Compact() => Realm.Compact(getConfiguration());
 
+        /// <summary>
+        /// Run work on realm with a return value.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        /// <typeparam name="T">The return type.</typeparam>
+        public T Run<T>(Func<Realm, T> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                return action(Context);
+
+            using (var realm = CreateContext())
+                return action(realm);
+        }
+
+        /// <summary>
+        /// Run work on realm.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        public void Run(Action<Realm> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                action(Context);
+            else
+            {
+                using (var realm = CreateContext())
+                    action(realm);
+            }
+        }
+
         public Realm CreateContext()
         {
             if (isDisposed)
