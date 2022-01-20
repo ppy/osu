@@ -351,13 +351,6 @@ namespace osu.Game
             FrameStatistics.ValueChanged += e => fpsDisplayVisible.Value = e.NewValue != FrameStatisticsMode.None;
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            realmFactory.Refresh();
-        }
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
