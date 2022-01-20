@@ -714,7 +714,7 @@ namespace osu.Game.Screens.Select
             beatmapSet = beatmapSet.Detach();
 
             // This can be moved to the realm query if required using:
-            // .Filter("DeletePending == false && Protected == false && ALL Beatmaps.Hidden == false")
+            // .Filter("DeletePending == false && Protected == false && ANY Beatmaps.Hidden == false")
             //
             // As long as we are detaching though, it makes more sense to do it here as adding to the realm query has an overhead
             // as seen at https://github.com/realm/realm-dotnet/discussions/2773#discussioncomment-2004275.
