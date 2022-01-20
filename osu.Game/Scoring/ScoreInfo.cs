@@ -191,9 +191,8 @@ namespace osu.Game.Scoring
             }
             set
             {
-                apiMods = null;
+                clearAllMods();
                 mods = value;
-
                 updateModsJson();
             }
         }
@@ -220,17 +219,24 @@ namespace osu.Game.Scoring
             }
             set
             {
+                clearAllMods();
                 apiMods = value;
-                mods = null;
-
-                // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
                 updateModsJson();
             }
         }
 
+        private void clearAllMods()
+        {
+            ModsJson = string.Empty;
+            mods = null;
+            apiMods = null;
+        }
+
         private void updateModsJson()
         {
-            ModsJson = JsonConvert.SerializeObject(APIMods);
+            ModsJson = APIMods.Length > 0
+                ? JsonConvert.SerializeObject(APIMods)
+                : string.Empty;
         }
 
         public IEnumerable<HitResultDisplayStatistic> GetStatisticsForDisplay()
