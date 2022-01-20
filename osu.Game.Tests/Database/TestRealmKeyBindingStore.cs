@@ -63,23 +63,9 @@ namespace osu.Game.Tests.Database
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
             {
-                realm.Add(new RealmKeyBinding
-                {
-                    Action = GlobalAction.Back,
-                    KeyCombination = new KeyCombination(InputKey.A)
-                });
-
-                realm.Add(new RealmKeyBinding
-                {
-                    Action = GlobalAction.Back,
-                    KeyCombination = new KeyCombination(InputKey.S)
-                });
-
-                realm.Add(new RealmKeyBinding
-                {
-                    Action = GlobalAction.Back,
-                    KeyCombination = new KeyCombination(InputKey.D)
-                });
+                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
+                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
+                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
 
                 transaction.Commit();
             }
