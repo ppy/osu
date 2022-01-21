@@ -88,6 +88,8 @@ namespace osu.Game.Database
                             registerSubscription(action);
                     }
 
+                    Debug.Assert(context != null);
+
                     // creating a context will ensure our schema is up-to-date and migrated.
                     return context;
                 }
@@ -261,10 +263,13 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
+            // Get context outside of flag update to ensure beyond doubt this can't be cyclic.
+            var realm = Context;
+
             lock (contextLock)
             {
                 current_thread_subscriptions_allowed.Value = true;
-                subscriptionActions[action] = action(Context);
+                subscriptionActions[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
             }
         }
