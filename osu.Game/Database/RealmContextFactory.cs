@@ -204,6 +204,24 @@ namespace osu.Game.Database
             }
         }
 
+        /// <summary>
+        /// Write changes to realm.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management and transaction committing automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        public void Write(Action<Realm> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                Context.Write(action);
+            else
+            {
+                using (var realm = createContext())
+                    realm.Write(action);
+            }
+        }
+
         private Realm createContext()
         {
             if (isDisposed)
