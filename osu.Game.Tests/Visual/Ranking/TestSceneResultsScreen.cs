@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             base.LoadComplete();
 
-            using (var realm = realmContextFactory.CreateContext())
+            realmContextFactory.Run(realm =>
             {
                 var beatmapInfo = realm.All<BeatmapInfo>()
                                        .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
-            }
+            });
         }
 
         [Test]

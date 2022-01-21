@@ -103,10 +103,10 @@ namespace osu.Game.Beatmaps
 
         public void Update(BeatmapSetInfo item)
         {
-            ContextFactory.Run(realm =>
+            ContextFactory.Write(realm =>
             {
                 var existing = realm.Find<BeatmapSetInfo>(item.ID);
-                realm.Write(r => item.CopyChangesToRealm(existing));
+                item.CopyChangesToRealm(existing);
             });
         }
     }
