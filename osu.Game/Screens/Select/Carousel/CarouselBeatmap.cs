@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
-            if (match)
+            if (match && criteria.SearchTerms.Length > 0)
             {
                 string[] terms = BeatmapInfo.GetSearchableTerms();
 
