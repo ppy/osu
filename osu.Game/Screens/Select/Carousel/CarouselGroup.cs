@@ -3,7 +3,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
+
+#nullable enable
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -12,7 +13,7 @@ namespace osu.Game.Screens.Select.Carousel
     /// </summary>
     public class CarouselGroup : CarouselItem
     {
-        public override DrawableCarouselItem CreateDrawableRepresentation() => null;
+        public override DrawableCarouselItem? CreateDrawableRepresentation() => null;
 
         public IReadOnlyList<CarouselItem> Children => InternalChildren;
 
@@ -23,6 +24,10 @@ namespace osu.Game.Screens.Select.Carousel
         /// incremented whenever a child is added.
         /// </summary>
         private ulong currentChildID;
+
+        private Comparer<CarouselItem>? criteriaComparer;
+
+        private FilterCriteria? lastCriteria;
 
         public virtual void RemoveChild(CarouselItem i)
         {
@@ -54,7 +59,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        public CarouselGroup(List<CarouselItem> items = null)
+        public CarouselGroup(List<CarouselItem>? items = null)
         {
             if (items != null) InternalChildren = items;
 
@@ -76,11 +81,6 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             };
         }
-
-        private Comparer<CarouselItem> criteriaComparer;
-
-        [CanBeNull]
-        private FilterCriteria lastCriteria;
 
         public override void Filter(FilterCriteria criteria)
         {
