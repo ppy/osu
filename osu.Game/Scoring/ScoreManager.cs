@@ -51,8 +51,7 @@ namespace osu.Game.Scoring
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query)
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<ScoreInfo>().FirstOrDefault(query)?.Detach();
+            return contextFactory.Run(realm => realm.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
         }
 
         /// <summary>
@@ -255,16 +254,16 @@ namespace osu.Game.Scoring
 
         public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
         {
-            using (var context = contextFactory.CreateContext())
+            contextFactory.Run(realm =>
             {
-                var items = context.All<ScoreInfo>()
-                                   .Where(s => !s.DeletePending);
+                var items = realm.All<ScoreInfo>()
+                                 .Where(s => !s.DeletePending);
 
                 if (filter != null)
                     items = items.Where(filter);
 
                 scoreModelManager.Delete(items.ToList(), silent);
-            }
+            });
         }
 
         public void Delete(List<ScoreInfo> items, bool silent = false)

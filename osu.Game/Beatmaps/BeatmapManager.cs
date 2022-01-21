@@ -153,14 +153,16 @@ namespace osu.Game.Beatmaps
 
         public void RestoreAll()
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            contextFactory.Run(realm =>
             {
-                foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
-                    beatmap.Hidden = false;
+                using (var transaction = realm.BeginWrite())
+                {
+                    foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
+                        beatmap.Hidden = false;
 
-                transaction.Commit();
-            }
+                    transaction.Commit();
+                }
+            });
         }
 
         /// <summary>
@@ -169,8 +171,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+            return contextFactory.Run(realm => realm.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach());
         }
 
         /// <summary>
@@ -235,21 +236,20 @@ namespace osu.Game.Beatmaps
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
-            using (var context = contextFactory.CreateContext())
+            contextFactory.Run(realm =>
             {
-                var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                var items = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
                 if (filter != null)
                     items = items.Where(filter);
 
                 beatmapModelManager.Delete(items.ToList(), silent);
-            }
+            });
         }
 
         public void UndeleteAll()
         {
-            using (var context = contextFactory.CreateContext())
-                beatmapModelManager.Undelete(context.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList());
+            contextFactory.Run(realm => beatmapModelManager.Undelete(realm.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)

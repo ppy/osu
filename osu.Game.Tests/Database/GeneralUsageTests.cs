@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestConstructRealm()
         {
-            RunTestWithRealm((realmFactory, _) => { realmFactory.CreateContext().Refresh(); });
+            RunTestWithRealm((realmFactory, _) => { realmFactory.Run(realm => realm.Refresh()); });
         }
 
         [Test]
@@ -46,23 +46,21 @@ namespace osu.Game.Tests.Database
             {
                 bool callbackRan = false;
 
-                using (var context = realmFactory.CreateContext())
+                realmFactory.Run(realm =>
                 {
-                    var subscription = context.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    var subscription = realm.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
                     {
-                        using (realmFactory.CreateContext())
+                        realmFactory.Run(_ =>
                         {
                             callbackRan = true;
-                        }
+                        });
                     });
 
                     // Force the callback above to run.
-                    using (realmFactory.CreateContext())
-                    {
-                    }
+                    realmFactory.Run(r => r.Refresh());
 
                     subscription?.Dispose();
-                }
+                });
 
                 Assert.IsTrue(callbackRan);
             });
@@ -78,12 +76,12 @@ namespace osu.Game.Tests.Database
 
                 Task.Factory.StartNew(() =>
                 {
-                    using (realmFactory.CreateContext())
+                    realmFactory.Run(_ =>
                     {
                         hasThreadedUsage.Set();
 
                         stopThreadedUsage.Wait();
-                    }
+                    });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler);
 
                 hasThreadedUsage.Wait();

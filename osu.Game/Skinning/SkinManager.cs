@@ -87,17 +87,14 @@ namespace osu.Game.Skinning
             };
 
             // Ensure the default entries are present.
-            using (var context = contextFactory.CreateContext())
-            using (var transaction = context.BeginWrite())
+            contextFactory.Write(realm =>
             {
                 foreach (var skin in defaultSkins)
                 {
-                    if (context.Find<SkinInfo>(skin.SkinInfo.ID) == null)
-                        context.Add(skin.SkinInfo.Value);
+                    if (realm.Find<SkinInfo>(skin.SkinInfo.ID) == null)
+                        realm.Add(skin.SkinInfo.Value);
                 }
-
-                transaction.Commit();
-            }
+            });
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
 
@@ -292,10 +289,10 @@ namespace osu.Game.Skinning
 
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            using (var context = contextFactory.CreateContext())
+            contextFactory.Run(realm =>
             {
-                var items = context.All<SkinInfo>()
-                                   .Where(s => !s.Protected && !s.DeletePending);
+                var items = realm.All<SkinInfo>()
+                                 .Where(s => !s.Protected && !s.DeletePending);
                 if (filter != null)
                     items = items.Where(filter);
 
@@ -306,7 +303,7 @@ namespace osu.Game.Skinning
                     scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
 
                 skinModelManager.Delete(items.ToList(), silent);
-            }
+            });
         }
 
         #endregion

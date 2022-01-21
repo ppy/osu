@@ -56,21 +56,15 @@ namespace osu.Game.Rulesets.Configuration
                 pendingWrites.Clear();
             }
 
-            if (realmFactory == null)
-                return true;
-
-            using (var context = realmFactory.CreateContext())
+            realmFactory?.Write(realm =>
             {
-                context.Write(realm =>
+                foreach (var c in changed)
                 {
-                    foreach (var c in changed)
-                    {
-                        var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
+                    var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
 
-                        setting.Value = ConfigStore[c].ToString();
-                    }
-                });
-            }
+                    setting.Value = ConfigStore[c].ToString();
+                }
+            });
 
             return true;
         }

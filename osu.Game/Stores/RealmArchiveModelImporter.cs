@@ -320,7 +320,7 @@ namespace osu.Game.Stores
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
-            using (var realm = ContextFactory.CreateContext())
+            return ContextFactory.Run(realm =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -414,7 +414,7 @@ namespace osu.Game.Stores
                 }
 
                 return Task.FromResult((ILive<TModel>?)item.ToLive(ContextFactory));
-            }
+            });
         }
 
         private string computeHashFast(ArchiveReader reader)

@@ -178,8 +178,7 @@ namespace osu.Game.Screens.Select
 
             if (!loadedTestBeatmaps)
             {
-                using (var realm = realmFactory.CreateContext())
-                    loadBeatmapSets(getBeatmapSets(realm));
+                realmFactory.Run(realm => loadBeatmapSets(getBeatmapSets(realm)));
             }
         }
 

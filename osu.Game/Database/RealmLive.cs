@@ -51,8 +51,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            using (var realm = realmFactory.CreateContext())
-                perform(realm.Find<T>(ID));
+            realmFactory.Run(realm => perform(realm.Find<T>(ID)));
         }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace osu.Game.Database
             if (!IsManaged)
                 return perform(data);
 
-            using (var realm = realmFactory.CreateContext())
+            return realmFactory.Run(realm =>
             {
                 var returnData = perform(realm.Find<T>(ID));
 
@@ -72,7 +71,7 @@ namespace osu.Game.Database
                     throw new InvalidOperationException(@$"Managed realm objects should not exit the scope of {nameof(PerformRead)}.");
 
                 return returnData;
-            }
+            });
         }
 
         /// <summary>
