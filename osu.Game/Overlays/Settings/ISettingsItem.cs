@@ -14,5 +14,10 @@ namespace osu.Game.Overlays.Settings
         /// Invoked when the setting value has changed.
         /// </summary>
         event Action SettingChanged;
+
+        /// <summary>
+        /// Returns whether the UI control is currently in a dragged state.
+        /// </summary>
+        bool IsControlDragged { get; }
     }
 }

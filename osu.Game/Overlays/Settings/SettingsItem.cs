@@ -105,6 +105,8 @@ namespace osu.Game.Overlays.Settings
 
         public BindableBool Expanded { get; } = new BindableBool(true);
 
+        public bool IsControlDragged => Control.IsDragged;
+
         public event Action SettingChanged;
 
         public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
