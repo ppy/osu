@@ -12,6 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Database;
@@ -213,6 +214,37 @@ namespace osu.Game.Beatmaps
 
         #endregion
 
+        #region LLin Custom
+
+        public Action<int>? OnBeatmapAdded { get; set; }
+        public Action<int>? OnBeatmapHide { get; set; }
+
+        private void invokeBeatmapAdded(int count)
+        {
+            try
+            {
+                OnBeatmapAdded?.Invoke(count);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "调用OnBeatmapAdded时出现问题");
+            }
+        }
+
+        private void invokeBeatmapHide(int count)
+        {
+            try
+            {
+                OnBeatmapHide?.Invoke(count);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "调用OnBeatmapAdded时出现问题");
+            }
+        }
+
+        #endregion
+
         #region Implementation of IModelManager<BeatmapSetInfo>
 
         public bool IsAvailableLocally(BeatmapSetInfo model)
@@ -222,11 +254,13 @@ namespace osu.Game.Beatmaps
 
         public bool Delete(BeatmapSetInfo item)
         {
+            invokeBeatmapHide(1);
             return beatmapModelManager.Delete(item);
         }
 
         public void Delete(List<BeatmapSetInfo> items, bool silent = false)
         {
+            invokeBeatmapHide(items.Count);
             beatmapModelManager.Delete(items, silent);
         }
 
@@ -235,6 +269,8 @@ namespace osu.Game.Beatmaps
             using (var context = contextFactory.CreateContext())
             {
                 var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+
+                invokeBeatmapHide(items.Count());
 
                 if (filter != null)
                     items = items.Where(filter);
@@ -246,17 +282,24 @@ namespace osu.Game.Beatmaps
         public void UndeleteAll()
         {
             using (var context = contextFactory.CreateContext())
-                beatmapModelManager.Undelete(context.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList());
+            {
+                var items = context.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList();
+                beatmapModelManager.Undelete(items);
+
+                invokeBeatmapAdded(items.Count);
+            }
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
         {
             beatmapModelManager.Undelete(items, silent);
+            invokeBeatmapAdded(items.Count);
         }
 
         public void Undelete(BeatmapSetInfo item)
         {
             beatmapModelManager.Undelete(item);
+            invokeBeatmapAdded(1);
         }
 
         #endregion

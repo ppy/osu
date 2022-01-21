@@ -60,8 +60,6 @@ namespace osu.Game.Screens.Menu
 
         private OsuScreen nextScreen;
 
-        protected BeatmapSetInfo SetInfo;
-
         [Resolved]
         private AudioManager audio { get; set; }
 
