@@ -244,7 +244,6 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
 
-            subscriptionActions.Add(action, null);
             registerSubscription(action);
 
             return new InvokeOnDisposal(() =>
@@ -264,10 +263,8 @@ namespace osu.Game.Database
 
             lock (contextLock)
             {
-                Debug.Assert(context != null);
-
                 current_thread_subscriptions_allowed.Value = true;
-                subscriptionActions[action] = action(context);
+                subscriptionActions[action] = action(Context);
                 current_thread_subscriptions_allowed.Value = false;
             }
         }

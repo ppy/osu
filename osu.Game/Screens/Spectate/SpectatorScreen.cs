@@ -79,17 +79,17 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                realmSubscription = realmContextFactory.Context
-                                                       .All<BeatmapSetInfo>()
-                                                       .Where(s => !s.DeletePending)
-                                                       .QueryAsyncWithNotifications((items, changes, ___) =>
-                                                       {
-                                                           if (changes?.InsertedIndices == null)
-                                                               return;
+                realmSubscription = realmContextFactory.Register(realm =>
+                    realm.All<BeatmapSetInfo>()
+                         .Where(s => !s.DeletePending)
+                         .QueryAsyncWithNotifications((items, changes, ___) =>
+                         {
+                             if (changes?.InsertedIndices == null)
+                                 return;
 
-                                                           foreach (int c in changes.InsertedIndices)
-                                                               beatmapUpdated(items[c]);
-                                                       });
+                             foreach (int c in changes.InsertedIndices)
+                                 beatmapUpdated(items[c]);
+                         }));
 
                 foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);

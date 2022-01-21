@@ -44,9 +44,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 beatmapInfo = value;
                 Scores = null;
 
-                UpdateScores();
-                if (IsLoaded)
-                    refreshRealmSubscription();
+                if (IsOnlineScope)
+                    UpdateScores();
+                else
+                {
+                    if (IsLoaded)
+                        refreshRealmSubscription();
+                }
             }
         }
 
@@ -109,15 +113,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (beatmapInfo == null)
                 return;
 
-            scoreSubscription = realmFactory.Context.All<ScoreInfo>()
-                                            .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
-                                            .QueryAsyncWithNotifications((_, changes, ___) =>
-                                            {
-                                                if (changes == null)
-                                                    return;
-
-                                                RefreshScores();
-                                            });
+            scoreSubscription = realmFactory.Register(realm =>
+                realm.All<ScoreInfo>()
+                     .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
+                     .QueryAsyncWithNotifications((_, changes, ___) =>
+                     {
+                         if (!IsOnlineScope)
+                             RefreshScores();
+                     }));
         }
 
         protected override void Reset()

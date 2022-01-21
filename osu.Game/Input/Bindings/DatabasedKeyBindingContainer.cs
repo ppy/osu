@@ -23,7 +23,6 @@ namespace osu.Game.Input.Bindings
         private readonly int? variant;
 
         private IDisposable realmSubscription;
-        private IQueryable<RealmKeyBinding> realmKeyBindings;
 
         [Resolved]
         private RealmContextFactory realmFactory { get; set; }
@@ -47,22 +46,25 @@ namespace osu.Game.Input.Bindings
                 throw new InvalidOperationException($"{nameof(variant)} can not be null when a non-null {nameof(ruleset)} is provided.");
         }
 
+        private IQueryable<RealmKeyBinding> realmKeyBindings
+        {
+            get
+            {
+                string rulesetName = ruleset?.ShortName;
+                return realmFactory.Context.All<RealmKeyBinding>()
+                                   .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
+            }
+        }
+
         protected override void LoadComplete()
         {
-            string rulesetName = ruleset?.ShortName;
-
-            realmKeyBindings = realmFactory.Context.All<RealmKeyBinding>()
-                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
-
-            realmSubscription = realmKeyBindings
+            realmSubscription = realmFactory.Register(realm => realmKeyBindings
                 .QueryAsyncWithNotifications((sender, changes, error) =>
                 {
-                    // first subscription ignored as we are handling this in LoadComplete.
-                    if (changes == null)
-                        return;
-
+                    // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
+                    // but this is safest in case the subscription is restored after a context recycle.
                     ReloadMappings();
-                });
+                }));
 
             base.LoadComplete();
         }
