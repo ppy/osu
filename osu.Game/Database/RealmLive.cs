@@ -51,7 +51,21 @@ namespace osu.Game.Database
                 return;
             }
 
-            realmFactory.Run(realm => perform(realm.Find<T>(ID)));
+            realmFactory.Run(realm =>
+            {
+                var found = realm.Find<T>(ID);
+
+                if (found == null)
+                {
+                    // It may be that we access this from the update thread before a refresh has taken place.
+                    // To ensure that behaviour matches what we'd expect (the object *is* available), force
+                    // a refresh to bring in any off-thread changes immediately.
+                    realm.Refresh();
+                    found = realm.Find<T>(ID);
+                }
+
+                perform(found);
+            });
         }
 
         /// <summary>
