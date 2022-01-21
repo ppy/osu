@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
     /// </summary>
-    public class RealmContextFactory : IDisposable, IRealmFactory
+    public class RealmContextFactory : IDisposable
     {
         private readonly Storage storage;
 
