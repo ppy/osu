@@ -50,12 +50,9 @@ namespace osu.Game.Overlays.Music
             var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
 
             titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-
-            updateSelectionState(true);
             titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
 
             text.AddText(@"  "); // to separate the title from the artist.
-
             text.AddText(artist, sprite =>
             {
                 sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
@@ -65,24 +62,31 @@ namespace osu.Game.Overlays.Music
 
             SelectedSet.BindValueChanged(set =>
             {
-                if (set.OldValue?.Equals(Model) != true && set.NewValue?.Equals(Model) != true)
+                bool newSelected = set.NewValue?.Equals(Model) == true;
+
+                if (newSelected == selected)
                     return;
 
+                selected = newSelected;
                 updateSelectionState(false);
-            }, true);
+            });
+
+            updateSelectionState(true);
         }
+
+        private bool selected;
 
         private void updateSelectionState(bool instant)
         {
             foreach (Drawable s in titlePart.Drawables)
-                s.FadeColour(SelectedSet.Value?.Equals(Model) == true ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
+                s.FadeColour(selected ? colours.Yellow : Color4.White, instant ? 0 : FADE_DURATION);
         }
 
-        protected override Drawable CreateContent() => text = new OsuTextFlowContainer
+        protected override Drawable CreateContent() => new DelayedLoadWrapper(text = new OsuTextFlowContainer
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,
-        };
+        });
 
         protected override bool OnClick(ClickEvent e)
         {
