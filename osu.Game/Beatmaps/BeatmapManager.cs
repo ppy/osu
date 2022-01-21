@@ -171,7 +171,11 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            return contextFactory.Run(realm => realm.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach());
+            return contextFactory.Run(realm =>
+            {
+                realm.Refresh();
+                return realm.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+            });
         }
 
         /// <summary>
