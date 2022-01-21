@@ -87,12 +87,6 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            // ensure we're ready before completing async load.
-            // probably not a good way of handling this (as there is a period we aren't watching for changes until the realm subscription finishes up.
-            foreach (var s in availableBeatmaps)
-                beatmapSets.Add(s.Detach());
-
             beatmapSubscription = realmFactory.Register(realm => availableBeatmaps.QueryAsyncWithNotifications(beatmapsChanged));
         }
 
