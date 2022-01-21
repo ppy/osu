@@ -3,17 +3,22 @@
 
 using System;
 using System.Diagnostics;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Game.Screens.Play
 {
     public class SoloPlayer : SubmittingPlayer
     {
+        private LLinGameplayLeaderboard leaderboard;
+
         public SoloPlayer()
             : this(null)
         {
@@ -22,6 +27,16 @@ namespace osu.Game.Screens.Play
         protected SoloPlayer(PlayerConfiguration configuration = null)
             : base(configuration)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LoadComponentAsync(leaderboard = new LLinGameplayLeaderboard
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft
+            }, HUDOverlay.Add);
         }
 
         protected override APIRequest<APIScoreToken> CreateTokenRequest()

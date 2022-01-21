@@ -39,6 +39,7 @@ using System.Diagnostics;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
@@ -116,6 +117,10 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private MusicController music { get; set; }
+
+        //LLin
+        public Bindable<BeatmapLeaderboardScope> CurrentScope = new Bindable<BeatmapLeaderboardScope>();
+        public Bindable<bool> FilterMods = new Bindable<bool>();
 
         [BackgroundDependencyLoader(true)]
         private void load(MConfigManager config, AudioManager audio, DialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)

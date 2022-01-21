@@ -50,6 +50,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.H, GlobalAction.MvisForceLockOverlayChanges),
             new KeyBinding(InputKey.Period, GlobalAction.MvisSelectCollection),
             new KeyBinding(InputKey.Comma, GlobalAction.MvisTogglePluginPage),
+            new KeyBinding(InputKey.Tab, GlobalAction.LLinSwitchLeaderboardMode)
         };
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
@@ -347,5 +348,8 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipVertically))]
         EditorFlipVertically,
+
+        [Description("打开插件列表")]
+        LLinSwitchLeaderboardMode,
     }
 }

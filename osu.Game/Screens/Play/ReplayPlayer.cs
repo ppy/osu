@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
@@ -12,6 +14,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
@@ -32,6 +35,16 @@ namespace osu.Game.Screens.Play
             : base(configuration)
         {
             this.createScore = createScore;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            LoadComponentAsync(new LLinGameplayLeaderboard(Score.ScoreInfo.User)
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft
+            }, HUDOverlay.Add);
         }
 
         protected override void PrepareReplay()
