@@ -72,13 +72,13 @@ namespace osu.Game.Database
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException(@$"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException(@$"Use {nameof(createContext)} when performing realm operations from a non-update thread");
 
                 lock (contextLock)
                 {
                     if (context == null)
                     {
-                        context = CreateContext();
+                        context = createContext();
                         Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
                     }
 
@@ -124,7 +124,7 @@ namespace osu.Game.Database
 
         private void cleanupPendingDeletions()
         {
-            using (var realm = CreateContext())
+            using (var realm = createContext())
             using (var transaction = realm.BeginWrite())
             {
                 var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
@@ -182,7 +182,7 @@ namespace osu.Game.Database
             if (ThreadSafety.IsUpdateThread)
                 return action(Context);
 
-            using (var realm = CreateContext())
+            using (var realm = createContext())
                 return action(realm);
         }
 
@@ -199,12 +199,12 @@ namespace osu.Game.Database
                 action(Context);
             else
             {
-                using (var realm = CreateContext())
+                using (var realm = createContext())
                     action(realm);
             }
         }
 
-        public Realm CreateContext()
+        private Realm createContext()
         {
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
