@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         {
             new PerformanceBreakdownCalculator(beatmapManager, difficultyCache, performanceCache)
                 .CalculateAsync(score, cancellationTokenSource.Token)
-                .ContinueWith(t => setPerformanceValue(t.GetResultSafely()));
+                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
         }
 
         private void setPerformanceValue(PerformanceBreakdown breakdown)
