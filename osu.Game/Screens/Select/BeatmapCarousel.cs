@@ -934,7 +934,7 @@ namespace osu.Game.Screens.Select
             public override void AddChild(CarouselItem i)
             {
                 CarouselBeatmapSet set = (CarouselBeatmapSet)i;
-                BeatmapSetsByID[set.BeatmapSet.ID] = set;
+                BeatmapSetsByID.Add(set.BeatmapSet.ID, set);
 
                 base.AddChild(i);
             }
