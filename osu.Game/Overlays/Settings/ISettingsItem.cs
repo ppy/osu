@@ -2,12 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    public interface ISettingsItem : IDrawable, IDisposable
+    /// <summary>
+    /// A non-generic interface for <see cref="SettingsItem{T}"/>s.
+    /// </summary>
+    public interface ISettingsItem : IExpandable, IDisposable
     {
+        /// <summary>
+        /// Invoked when the setting value has changed.
+        /// </summary>
         event Action SettingChanged;
     }
 }
