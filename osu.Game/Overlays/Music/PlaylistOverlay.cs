@@ -34,13 +34,13 @@ namespace osu.Game.Overlays.Music
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private IDisposable beatmapSubscription;
 
-        private IQueryable<BeatmapSetInfo> availableBeatmaps => realmFactory.Context
-                                                                            .All<BeatmapSetInfo>()
-                                                                            .Where(s => !s.DeletePending);
+        private IQueryable<BeatmapSetInfo> availableBeatmaps => realm.Realm
+                                                                     .All<BeatmapSetInfo>()
+                                                                     .Where(s => !s.DeletePending);
 
         private FilterControl filter;
         private Playlist list;
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Music
 
             // tests might bind externally, in which case we don't want to involve realm.
             if (beatmapSets.Count == 0)
-                beatmapSubscription = realmFactory.RegisterForNotifications(realm => availableBeatmaps, beatmapsChanged);
+                beatmapSubscription = realm.RegisterForNotifications(realm => availableBeatmaps, beatmapsChanged);
 
             list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
