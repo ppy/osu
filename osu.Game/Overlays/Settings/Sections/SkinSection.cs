@@ -50,7 +50,12 @@ namespace osu.Game.Overlays.Settings.Sections
         private RealmContextFactory realmFactory { get; set; }
 
         private IDisposable realmSubscription;
-        private IQueryable<SkinInfo> realmSkins;
+
+        private IQueryable<SkinInfo> realmSkins =>
+            realmFactory.Context.All<SkinInfo>()
+                        .Where(s => !s.DeletePending)
+                        .OrderByDescending(s => s.Protected) // protected skins should be at the top.
+                        .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
@@ -78,20 +83,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSkins = realmFactory.Context.All<SkinInfo>()
-                                     .Where(s => !s.DeletePending)
-                                     .OrderByDescending(s => s.Protected) // protected skins should be at the top.
-                                     .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
-
-            realmSubscription = realmSkins
+            realmSubscription = realmFactory.Register(realm => realmSkins
                 .QueryAsyncWithNotifications((sender, changes, error) =>
                 {
-                    if (changes == null)
-                        return;
-
-                    // Eventually this should be handling the individual changes rather than refreshing the whole dropdown.
+                    // The first fire of this is a bit redundant due to the call below,
+                    // but this is safest in case the subscription is restored after a context recycle.
                     updateItems();
-                });
+                }));
 
             updateItems();
 

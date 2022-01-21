@@ -234,7 +234,7 @@ namespace osu.Game.Tests.Database
             {
                 int changesTriggered = 0;
 
-                realmFactory.Run(outerRealm =>
+                realmFactory.Register(outerRealm =>
                 {
                     outerRealm.All<BeatmapInfo>().QueryAsyncWithNotifications(gotChange);
                     ILive<BeatmapInfo>? liveBeatmap = null;
@@ -277,6 +277,8 @@ namespace osu.Game.Tests.Database
                             r.Remove(resolved);
                         });
                     });
+
+                    return null;
                 });
 
                 void gotChange(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)
