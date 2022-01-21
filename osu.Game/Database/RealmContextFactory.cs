@@ -367,9 +367,24 @@ namespace osu.Game.Database
             using (BlockAllOperations())
             {
                 Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
-                using (var source = storage.GetStream(Filename))
-                using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
-                    source.CopyTo(destination);
+
+                int attempts = 10;
+
+                while (attempts-- > 0)
+                {
+                    try
+                    {
+                        using (var source = storage.GetStream(Filename))
+                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                            source.CopyTo(destination);
+                        return;
+                    }
+                    catch (IOException)
+                    {
+                        // file may be locked during use.
+                        Thread.Sleep(500);
+                    }
+                }
             }
         }
 

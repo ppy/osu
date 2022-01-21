@@ -26,8 +26,6 @@ namespace osu.Game.Database
         private readonly OsuConfigManager config;
         private readonly Storage storage;
 
-        private bool hasTakenBackup;
-
         public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config, Storage storage)
         {
             this.efContextFactory = efContextFactory;
@@ -38,6 +36,8 @@ namespace osu.Game.Database
 
         public void Run()
         {
+            createBackup();
+
             using (var ef = efContextFactory.Get())
             {
                 migrateSettings(ef);
@@ -76,8 +76,6 @@ namespace osu.Game.Database
             using (var realm = realmContextFactory.CreateContext())
             {
                 Logger.Log($"Found {count} beatmaps in EF", LoggingTarget.Database);
-
-                ensureBackup();
 
                 // only migrate data if the realm database is empty.
                 // note that this cannot be written as: `realm.All<BeatmapSetInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
@@ -210,8 +208,6 @@ namespace osu.Game.Database
             {
                 Logger.Log($"Found {count} scores in EF", LoggingTarget.Database);
 
-                ensureBackup();
-
                 // only migrate data if the realm database is empty.
                 if (realm.All<ScoreInfo>().Any())
                 {
@@ -291,8 +287,6 @@ namespace osu.Game.Database
             if (!existingSkins.Any())
                 return;
 
-            ensureBackup();
-
             var userSkinChoice = config.GetBindable<string>(OsuSetting.Skin);
             int.TryParse(userSkinChoice.Value, out int userSkinInt);
 
@@ -363,7 +357,6 @@ namespace osu.Game.Database
                 return;
 
             Logger.Log("Beginning settings migration to realm", LoggingTarget.Database);
-            ensureBackup();
 
             using (var realm = realmContextFactory.CreateContext())
             using (var transaction = realm.BeginWrite())
@@ -400,21 +393,16 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
-        private void ensureBackup()
+        private void createBackup()
         {
-            if (!hasTakenBackup)
-            {
-                string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+            string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
-                efContextFactory.CreateBackup($"client.{migration}.db");
-                realmContextFactory.CreateBackup($"client.{migration}.realm");
+            efContextFactory.CreateBackup($"client.{migration}.db");
+            realmContextFactory.CreateBackup($"client.{migration}.realm");
 
-                using (var source = storage.GetStream("collection.db"))
-                using (var destination = storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
-                    source.CopyTo(destination);
-
-                hasTakenBackup = true;
-            }
+            using (var source = storage.GetStream("collection.db"))
+            using (var destination = storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                source.CopyTo(destination);
         }
     }
 }
