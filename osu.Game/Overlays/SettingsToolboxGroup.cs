@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
@@ -18,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class SettingsToolboxGroup : Container
+    public class SettingsToolboxGroup : Container, IExpandable
     {
         private const float transition_duration = 250;
         private const int container_width = 270;
@@ -34,30 +35,7 @@ namespace osu.Game.Overlays
         private readonly FillFlowContainer content;
         private readonly IconButton button;
 
-        private bool expanded = true;
-
-        public bool Expanded
-        {
-            get => expanded;
-            set
-            {
-                if (expanded == value) return;
-
-                expanded = value;
-
-                content.ClearTransforms();
-
-                if (expanded)
-                    content.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    content.AutoSizeAxes = Axes.None;
-                    content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-                }
-
-                updateExpanded();
-            }
-        }
+        public BindableBool Expanded { get; } = new BindableBool(true);
 
         private Color4 expandedColour;
 
@@ -67,7 +45,7 @@ namespace osu.Game.Overlays
         /// Create a new instance.
         /// </summary>
         /// <param name="title">The title to be displayed in the header of this group.</param>
-        protected SettingsToolboxGroup(string title)
+        public SettingsToolboxGroup(string title)
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
@@ -115,7 +93,7 @@ namespace osu.Game.Overlays
                                     Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.Solid.Bars,
                                     Scale = new Vector2(0.75f),
-                                    Action = () => Expanded = !Expanded,
+                                    Action = () => Expanded.Toggle(),
                                 },
                             }
                         },
@@ -155,23 +133,58 @@ namespace osu.Game.Overlays
                 headerText.FadeTo(headerText.DrawWidth < DrawWidth ? 1 : 0, 150, Easing.OutQuint);
         }
 
+        [Resolved(canBeNull: true)]
+        private IExpandingContainer expandingContainer { get; set; }
+
+        private bool expandedByContainer;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
-            updateExpanded();
+            expandingContainer?.Expanded.BindValueChanged(containerExpanded =>
+            {
+                if (containerExpanded.NewValue && !Expanded.Value)
+                {
+                    Expanded.Value = true;
+                    expandedByContainer = true;
+                }
+                else if (!containerExpanded.NewValue && expandedByContainer)
+                {
+                    Expanded.Value = false;
+                    expandedByContainer = false;
+                }
+
+                updateActiveState();
+            }, true);
+
+            Expanded.BindValueChanged(v =>
+            {
+                content.ClearTransforms();
+
+                if (v.NewValue)
+                    content.AutoSizeAxes = Axes.Y;
+                else
+                {
+                    content.AutoSizeAxes = Axes.None;
+                    content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                }
+
+                button.FadeColour(Expanded.Value ? expandedColour : Color4.White, 200, Easing.InOutQuint);
+            }, true);
+
+            this.Delay(600).Schedule(updateActiveState);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            this.FadeIn(fade_duration, Easing.OutQuint);
+            updateActiveState();
             return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            updateActiveState();
             base.OnHoverLost(e);
         }
 
@@ -181,7 +194,10 @@ namespace osu.Game.Overlays
             expandedColour = colours.Yellow;
         }
 
-        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
+        private void updateActiveState()
+        {
+            this.FadeTo(IsHovered || expandingContainer?.Expanded.Value == true ? 1 : inactive_alpha, fade_duration, Easing.OutQuint);
+        }
 
         protected override Container<Drawable> Content => content;
 
