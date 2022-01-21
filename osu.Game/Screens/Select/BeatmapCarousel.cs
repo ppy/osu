@@ -305,17 +305,20 @@ namespace osu.Game.Screens.Select
             {
                 root.AddChild(newSet);
 
-                // only reset scroll position if already near the scroll target.
-                // without this, during a large beatmap import it is impossible to navigate the carousel.
-                applyActiveCriteria(false, alwaysResetScrollPosition: false);
-
                 // check if we can/need to maintain our current selection.
                 if (previouslySelectedID != null)
                     select((CarouselItem)newSet.Beatmaps.FirstOrDefault(b => b.BeatmapInfo.ID == previouslySelectedID) ?? newSet);
             }
 
             itemsCache.Invalidate();
-            Schedule(() => BeatmapSetsChanged?.Invoke());
+
+            Schedule(() =>
+            {
+                if (!Scroll.UserScrolling)
+                    ScrollToSelected(true);
+
+                BeatmapSetsChanged?.Invoke();
+            });
         });
 
         /// <summary>
