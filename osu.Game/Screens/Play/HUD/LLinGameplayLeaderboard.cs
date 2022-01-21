@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly HintText hintText = new HintText
         {
-            Y = -20 + 5,
+            Y = -20 - 5,
             Alpha = 0,
             Margin = new MarginPadding { Left = 5 },
             Font = OsuFont.GetFont(size: 20)
