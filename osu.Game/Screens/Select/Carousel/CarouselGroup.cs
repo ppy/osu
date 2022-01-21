@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -36,7 +37,21 @@ namespace osu.Game.Screens.Select.Carousel
         {
             i.State.ValueChanged += state => ChildItemStateChanged(i, state.NewValue);
             i.ChildID = ++currentChildID;
-            InternalChildren.Add(i);
+
+            if (lastCriteria != null)
+            {
+                i.Filter(lastCriteria);
+
+                int index = InternalChildren.BinarySearch(i, criteriaComparer);
+                if (index < 0) index = ~index; // BinarySearch hacks multiple return values with 2's complement.
+
+                InternalChildren.Insert(index, i);
+            }
+            else
+            {
+                // criteria may be null for initial population. the filtering will be applied post-add.
+                InternalChildren.Add(i);
+            }
         }
 
         public CarouselGroup(List<CarouselItem> items = null)
@@ -62,14 +77,22 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        private Comparer<CarouselItem> criteriaComparer;
+
+        [CanBeNull]
+        private FilterCriteria lastCriteria;
+
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
 
             InternalChildren.ForEach(c => c.Filter(criteria));
+
             // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
-            var criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
+            criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
             InternalChildren = InternalChildren.OrderBy(c => c, criteriaComparer).ToList();
+
+            lastCriteria = criteria;
         }
 
         protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
