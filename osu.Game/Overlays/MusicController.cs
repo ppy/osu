@@ -30,8 +30,6 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
-
         /// <summary>
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
         /// </summary>
@@ -88,12 +86,12 @@ namespace osu.Game.Overlays
             {
                 beatmapSets.Clear();
                 foreach (var s in sender)
-                    beatmapSets.Add(s.Detach());
+                    beatmapSets.Add(s);
                 return;
             }
 
             foreach (int i in changes.InsertedIndices)
-                beatmapSets.Insert(i, sender[i].Detach());
+                beatmapSets.Insert(i, sender[i]);
 
             foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
                 beatmapSets.RemoveAt(i);
@@ -240,7 +238,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playable = BeatmapSets.TakeWhile(i => !i.Equals(current.BeatmapSetInfo)).LastOrDefault() ?? BeatmapSets.LastOrDefault();
+            var playable = beatmapSets.TakeWhile(i => !i.Equals(current.BeatmapSetInfo)).LastOrDefault() ?? beatmapSets.LastOrDefault();
 
             if (playable != null)
             {
@@ -271,7 +269,7 @@ namespace osu.Game.Overlays
 
             queuedDirection = TrackChangeDirection.Next;
 
-            var playableSet = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? BeatmapSets.FirstOrDefault();
+            var playableSet = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).ElementAtOrDefault(1) ?? beatmapSets.FirstOrDefault();
             var playableBeatmap = playableSet?.Beatmaps.FirstOrDefault();
 
             if (playableBeatmap != null)
@@ -322,8 +320,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     // figure out the best direction based on order in playlist.
-                    int last = BeatmapSets.TakeWhile(b => !b.Equals(current.BeatmapSetInfo)).Count();
-                    int next = newWorking == null ? -1 : BeatmapSets.TakeWhile(b => !b.Equals(newWorking.BeatmapSetInfo)).Count();
+                    int last = beatmapSets.TakeWhile(b => !b.Equals(current.BeatmapSetInfo)).Count();
+                    int next = newWorking == null ? -1 : beatmapSets.TakeWhile(b => !b.Equals(newWorking.BeatmapSetInfo)).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
