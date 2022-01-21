@@ -53,18 +53,7 @@ namespace osu.Game.Database
 
             realmFactory.Run(realm =>
             {
-                var found = realm.Find<T>(ID);
-
-                if (found == null)
-                {
-                    // It may be that we access this from the update thread before a refresh has taken place.
-                    // To ensure that behaviour matches what we'd expect (the object *is* available), force
-                    // a refresh to bring in any off-thread changes immediately.
-                    realm.Refresh();
-                    found = realm.Find<T>(ID);
-                }
-
-                perform(found);
+                perform(retrieveFromID(realm, ID));
             });
         }
 
@@ -79,7 +68,7 @@ namespace osu.Game.Database
 
             return realmFactory.Run(realm =>
             {
-                var returnData = perform(realm.Find<T>(ID));
+                var returnData = perform(retrieveFromID(realm, ID));
 
                 if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
                     throw new InvalidOperationException(@$"Managed realm objects should not exit the scope of {nameof(PerformRead)}.");
@@ -117,6 +106,22 @@ namespace osu.Game.Database
 
                 return realmFactory.Context.Find<T>(ID);
             }
+        }
+
+        private T retrieveFromID(Realm realm, Guid id)
+        {
+            var found = realm.Find<T>(ID);
+
+            if (found == null)
+            {
+                // It may be that we access this from the update thread before a refresh has taken place.
+                // To ensure that behaviour matches what we'd expect (the object *is* available), force
+                // a refresh to bring in any off-thread changes immediately.
+                realm.Refresh();
+                found = realm.Find<T>(ID);
+            }
+
+            return found;
         }
 
         public bool Equals(ILive<T>? other) => ID == other?.ID;
