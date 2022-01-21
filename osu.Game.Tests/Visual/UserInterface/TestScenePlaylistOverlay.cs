@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("drag to 5th", () =>
             {
                 var item = this.ChildrenOfType<PlaylistItem>().ElementAt(4);
-                InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.Centre);
+                InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.BottomLeft);
             });
 
             AddAssert("song 1 is 5th", () => beatmapSets[4].Equals(first));
