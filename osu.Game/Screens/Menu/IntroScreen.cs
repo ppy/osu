@@ -21,6 +21,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
+using Realms;
 
 namespace osu.Game.Screens.Menu
 {
@@ -93,57 +94,56 @@ namespace osu.Game.Screens.Menu
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
             seeya = audio.Samples.Get(SeeyaSampleName);
 
-            ILive<BeatmapSetInfo> setInfo = null;
-
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
-
-                if (sets.Count > 0)
+                realmContextFactory.Run(realm =>
                 {
-                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                    setInfo?.PerformRead(s =>
+                    var sets = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
+
+                    int setCount = sets.Count;
+
+                    if (sets.Any())
+                    {
+                        var found = sets[RNG.Next(0, setCount - 1)].Beatmaps.FirstOrDefault();
+
+                        if (found != null)
+                            initialBeatmap = beatmaps.GetWorkingBeatmap(found);
+                    }
+                });
+
+                // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
+                if (initialBeatmap == null)
+                {
+                    if (!loadThemedIntro())
+                    {
+                        // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
+                        // this could happen if a user has nuked their files store. for now, reimport to repair this.
+                        var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
+
+                        import?.PerformWrite(b => b.Protected = true);
+
+                        loadThemedIntro();
+                    }
+                }
+
+                bool loadThemedIntro()
+                {
+                    var setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+
+                    if (setInfo == null)
+                        return false;
+
+                    setInfo.PerformRead(s =>
                     {
                         if (s.Beatmaps.Count == 0)
                             return;
 
-                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0]);
+                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
                     });
+
+                    return UsingThemedIntro = initialBeatmap != null;
                 }
-            }
-
-            // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
-            if (setInfo == null)
-            {
-                if (!loadThemedIntro())
-                {
-                    // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
-                    // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
-
-                    import?.PerformWrite(b => b.Protected = true);
-
-                    loadThemedIntro();
-                }
-            }
-
-            bool loadThemedIntro()
-            {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
-
-                if (setInfo == null)
-                    return false;
-
-                setInfo.PerformRead(s =>
-                {
-                    if (s.Beatmaps.Count == 0)
-                        return;
-
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
-                });
-
-                return UsingThemedIntro = initialBeatmap != null;
             }
         }
 
