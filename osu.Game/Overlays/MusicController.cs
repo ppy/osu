@@ -30,16 +30,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets
-        {
-            get
-            {
-                if (LoadState < LoadState.Ready)
-                    throw new InvalidOperationException($"{nameof(BeatmapSets)} should not be accessed before the music controller is loaded.");
-
-                return beatmapSets;
-            }
-        }
+        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
 
         /// <summary>
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
