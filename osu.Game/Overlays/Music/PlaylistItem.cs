@@ -32,8 +32,6 @@ namespace osu.Game.Overlays.Music
             : base(item)
         {
             Padding = new MarginPadding { Left = 5 };
-
-            FilterTerms = item.Metadata.GetSearchableTerms();
         }
 
         [BackgroundDependencyLoader]
@@ -45,6 +43,25 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            var metadata = Model.Metadata;
+
+            var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+            var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
+
+            titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+
+            updateSelectionState(true);
+            titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
+
+            text.AddText(@"  "); // to separate the title from the artist.
+
+            text.AddText(artist, sprite =>
+            {
+                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
+                sprite.Colour = colours.Gray9;
+                sprite.Padding = new MarginPadding { Top = 1 };
+            });
 
             SelectedSet.BindValueChanged(set =>
             {
@@ -67,27 +84,6 @@ namespace osu.Game.Overlays.Music
             AutoSizeAxes = Axes.Y,
         };
 
-        protected override void LoadAsyncComplete()
-        {
-            base.LoadAsyncComplete();
-
-            var title = new RomanisableString(Model.Metadata.TitleUnicode, Model.Metadata.Title);
-            var artist = new RomanisableString(Model.Metadata.ArtistUnicode, Model.Metadata.Artist);
-
-            titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-            updateSelectionState(true);
-            titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
-
-            text.AddText(@"  "); // to separate the title from the artist.
-
-            text.AddText(artist, sprite =>
-            {
-                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
-                sprite.Colour = colours.Gray9;
-                sprite.Padding = new MarginPadding { Top = 1 };
-            });
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
             RequestSelection?.Invoke(Model);
@@ -109,7 +105,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public IEnumerable<string> FilterTerms { get; }
+        public IEnumerable<string> FilterTerms => Model.Metadata.GetSearchableTerms();
 
         private bool matchingFilter = true;
 
