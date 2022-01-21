@@ -88,6 +88,10 @@ namespace osu.Game.Database
             }
         }
 
+        internal static bool CurrentThreadSubscriptionsAllowed => current_thread_subscriptions_allowed.Value;
+
+        private static readonly ThreadLocal<bool> current_thread_subscriptions_allowed = new ThreadLocal<bool>();
+
         /// <summary>
         /// Construct a new instance of a realm context factory.
         /// </summary>
@@ -219,6 +223,30 @@ namespace osu.Game.Database
             {
                 using (var realm = createContext())
                     realm.Write(action);
+            }
+        }
+
+        /// <summary>
+        /// Run work on realm that will be run every time the update thread realm context gets recycled.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
+        public void Register(Action<Realm> action)
+        {
+            if (!ThreadSafety.IsUpdateThread && context != null)
+                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
+            if (ThreadSafety.IsUpdateThread)
+            {
+                current_thread_subscriptions_allowed.Value = true;
+                action(Context);
+                current_thread_subscriptions_allowed.Value = false;
+            }
+            else
+            {
+                current_thread_subscriptions_allowed.Value = true;
+                using (var realm = createContext())
+                    action(realm);
+                current_thread_subscriptions_allowed.Value = false;
             }
         }
 

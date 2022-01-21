@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using AutoMapper;
 using AutoMapper.Internal;
-using osu.Framework.Development;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
@@ -272,9 +271,8 @@ namespace osu.Game.Database
         public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
-            // Subscriptions can only work on the main thread.
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException("Cannot subscribe for realm notifications from a non-update thread.");
+            if (!RealmContextFactory.CurrentThreadSubscriptionsAllowed)
+                throw new InvalidOperationException($"Make sure to call {nameof(RealmContextFactory)}.{nameof(RealmContextFactory.Register)}");
 
             return collection.SubscribeForNotifications(callback);
         }
