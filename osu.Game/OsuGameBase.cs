@@ -161,6 +161,11 @@ namespace osu.Game
 
         private readonly BindableNumber<double> globalTrackVolumeAdjust = new BindableNumber<double>(global_track_volume_adjust);
 
+        /// <summary>
+        /// A legacy EF context factory if migration has not been performed to realm yet.
+        /// </summary>
+        protected DatabaseContextFactory EFContextFactory { get; private set; }
+
         public OsuGameBase()
         {
             UseDevelopmentServer = DebugUtils.IsDebugBuild;
@@ -184,18 +189,13 @@ namespace osu.Game
 
             Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
-            DatabaseContextFactory efContextFactory = Storage.Exists(DatabaseContextFactory.DATABASE_NAME)
-                ? new DatabaseContextFactory(Storage)
-                : null;
+            if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
+                dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", efContextFactory));
+            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", EFContextFactory));
 
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
-
-            // A non-null context factory means there's still content to migrate.
-            if (efContextFactory != null)
-                new EFToRealmMigrator(efContextFactory, realmFactory, LocalConfig, Storage).Run();
 
             dependencies.CacheAs(Storage);
 
