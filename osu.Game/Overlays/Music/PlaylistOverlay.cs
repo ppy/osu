@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,9 +11,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
+using Realms;
 
 namespace osu.Game.Overlays.Music
 {
@@ -29,6 +32,15 @@ namespace osu.Game.Overlays.Music
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
+
+        private IDisposable beatmapSubscription;
+
+        private IQueryable<BeatmapSetInfo> availableBeatmaps => realmFactory.Context
+                                                                            .All<BeatmapSetInfo>()
+                                                                            .Where(s => !s.DeletePending);
 
         private FilterControl filter;
         private Playlist list;
@@ -91,8 +103,29 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
+            // tests might bind externally, in which case we don't want to involve realm.
+            if (beatmapSets.Count == 0)
+                beatmapSubscription = realmFactory.RegisterForNotifications(realm => availableBeatmaps, beatmapsChanged);
+
             list.Items.BindTo(beatmapSets);
             beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        {
+            if (changes == null)
+            {
+                beatmapSets.Clear();
+                // must use AddRange to avoid RearrangeableList sort overhead per add op.
+                beatmapSets.AddRange(sender);
+                return;
+            }
+
+            foreach (int i in changes.InsertedIndices)
+                beatmapSets.Insert(i, sender[i]);
+
+            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+                beatmapSets.RemoveAt(i);
         }
 
         protected override void PopIn()
@@ -122,6 +155,12 @@ namespace osu.Game.Overlays.Music
 
             beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
             beatmap.Value.Track.Restart();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapSubscription?.Dispose();
         }
     }
 }
