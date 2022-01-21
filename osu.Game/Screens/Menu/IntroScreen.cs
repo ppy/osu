@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
 
                     int setCount = sets.Count;
 
-                    if (sets.Any())
+                    if (setCount > 0)
                     {
                         var found = sets[RNG.Next(0, setCount - 1)].Beatmaps.FirstOrDefault();
 
