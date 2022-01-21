@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Settings
 
         protected readonly FillFlowContainer FlowContent;
 
-        private SpriteText labelText;
+        private SpriteText label;
 
         private OsuTextFlowContainer warningText;
 
@@ -42,21 +42,34 @@ namespace osu.Game.Overlays.Settings
         [Resolved]
         private OsuColour colours { get; set; }
 
+        private LocalisableString labelText;
+
         public virtual LocalisableString LabelText
         {
-            get => labelText?.Text ?? string.Empty;
+            get => labelText;
             set
             {
-                if (labelText == null)
-                {
-                    // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    FlowContent.Insert(-1, labelText = new OsuSpriteText());
+                ensureLabelCreated();
 
-                    updateDisabled();
-                }
+                labelText = value;
+                updateLabelText();
+            }
+        }
 
-                labelText.Text = value;
-                updateLayout();
+        private LocalisableString? contractedLabelText;
+
+        /// <summary>
+        /// Text to be displayed in place of <see cref="LabelText"/> when this <see cref="SettingsItem{T}"/> is in a contracted state.
+        /// </summary>
+        public LocalisableString? ContractedLabelText
+        {
+            get => contractedLabelText;
+            set
+            {
+                ensureLabelCreated();
+
+                contractedLabelText = value;
+                updateLabelText();
             }
         }
 
@@ -90,6 +103,10 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
+        public BindableBool Expanded { get; } = new BindableBool(true);
+
+        public event Action SettingChanged;
+
         public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
 
         public IEnumerable<string> Keywords { get; set; }
@@ -100,8 +117,6 @@ namespace osu.Game.Overlays.Settings
         }
 
         public bool FilteringActive { get; set; }
-
-        public event Action SettingChanged;
 
         protected SettingsItem()
         {
@@ -151,23 +166,59 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 });
-                updateLayout();
             }
         }
 
-        private void updateLayout()
-        {
-            bool hasLabel = labelText != null && !string.IsNullOrEmpty(labelText.Text.ToString());
+        [Resolved(canBeNull: true)]
+        private IExpandingContainer expandingContainer { get; set; }
 
-            // if the settings item is providing a label, the default value indicator should be centred vertically to the left of the label.
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            expandingContainer?.Expanded.BindValueChanged(containerExpanded => Expanded.Value = containerExpanded.NewValue, true);
+
+            Expanded.BindValueChanged(v =>
+            {
+                updateLabelText();
+
+                Control.FadeTo(v.NewValue ? 1 : 0, 500, Easing.OutQuint);
+                Control.BypassAutoSizeAxes = v.NewValue ? Axes.None : Axes.Both;
+            }, true);
+
+            FinishTransforms(true);
+        }
+
+        private void ensureLabelCreated()
+        {
+            if (label != null)
+                return;
+
+            // construct lazily for cases where the label is not needed (may be provided by the Control).
+            FlowContent.Insert(-1, label = new OsuSpriteText());
+
+            updateDisabled();
+        }
+
+        private void updateLabelText()
+        {
+            if (label != null)
+            {
+                if (contractedLabelText is LocalisableString contractedText)
+                    label.Text = Expanded.Value ? labelText : contractedText;
+                else
+                    label.Text = labelText;
+            }
+
+            // if the settings item is providing a non-empty label, the default value indicator should be centred vertically to the left of the label.
             // otherwise, it should be centred vertically to the left of the main control of the settings item.
-            defaultValueIndicatorContainer.Height = hasLabel ? labelText.DrawHeight : Control.DrawHeight;
+            defaultValueIndicatorContainer.Height = !string.IsNullOrEmpty(label?.Text.ToString()) ? label.DrawHeight : Control.DrawHeight;
         }
 
         private void updateDisabled()
         {
-            if (labelText != null)
-                labelText.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
+            if (label != null)
+                label.Alpha = controlWithCurrent.Current.Disabled ? 0.3f : 1;
         }
     }
 }
