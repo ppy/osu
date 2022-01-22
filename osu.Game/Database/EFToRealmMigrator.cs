@@ -100,10 +100,6 @@ namespace osu.Game.Database
         {
             base.LoadComplete();
 
-            // needs to be run on the update thread because of realm BlockAllOperations.
-            // maybe we can work around this? not sure..
-            createBackup();
-
             Task.Factory.StartNew(() =>
             {
                 using (var ef = efContextFactory.Get())
@@ -470,17 +466,5 @@ namespace osu.Game.Database
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
-
-        private void createBackup()
-        {
-            string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-            efContextFactory.CreateBackup($"client.{migration}.db");
-            realmContextFactory.CreateBackup($"client.{migration}.realm");
-
-            using (var source = storage.GetStream("collection.db"))
-            using (var destination = storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
-                source.CopyTo(destination);
-        }
     }
 }

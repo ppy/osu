@@ -197,6 +197,21 @@ namespace osu.Game
             dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
+            // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
+            // after initial usages below. It can be moved once a direction is established for handling re-subscription.
+            // See https://github.com/ppy/osu/pull/16547 for more discussion.
+            if (EFContextFactory != null)
+            {
+                string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                EFContextFactory.CreateBackup($"client.{migration}.db");
+                realmFactory.CreateBackup($"client.{migration}.realm");
+
+                using (var source = Storage.GetStream("collection.db"))
+                using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                    source.CopyTo(destination);
+            }
+
             dependencies.CacheAs(Storage);
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
