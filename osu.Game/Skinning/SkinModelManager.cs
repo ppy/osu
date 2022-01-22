@@ -205,7 +205,7 @@ namespace osu.Game.Skinning
 
         private void populateMissingHashes()
         {
-            using (var realm = ContextFactory.CreateContext())
+            ContextFactory.Run(realm =>
             {
                 var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
 
@@ -221,7 +221,7 @@ namespace osu.Game.Skinning
                         Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
                     }
                 }
-            }
+            });
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);

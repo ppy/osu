@@ -165,8 +165,7 @@ namespace osu.Game.Stores
 
         public override bool IsAvailableLocally(BeatmapSetInfo model)
         {
-            using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID);
+            return ContextFactory.Run(realm => realm.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID));
         }
 
         public override string HumanisedModelName => "beatmap";
