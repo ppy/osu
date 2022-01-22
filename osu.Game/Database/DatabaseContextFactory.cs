@@ -1,9 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 
@@ -13,7 +15,7 @@ namespace osu.Game.Database
     {
         private readonly Storage storage;
 
-        private const string database_name = @"client.db";
+        public const string DATABASE_NAME = @"client.db";
 
         private ThreadLocal<OsuDbContext> threadContexts;
 
@@ -139,10 +141,19 @@ namespace osu.Game.Database
             threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
         }
 
-        protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(database_name, storage))
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(CreateDatabaseConnectionString(DATABASE_NAME, storage))
         {
             Database = { AutoTransactionsEnabled = false }
         };
+
+        public void CreateBackup(string backupFilename)
+        {
+            Logger.Log($"Creating full EF database backup at {backupFilename}", LoggingTarget.Database);
+
+            using (var source = storage.GetStream(DATABASE_NAME))
+            using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                source.CopyTo(destination);
+        }
 
         public void ResetDatabase()
         {
@@ -152,7 +163,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    storage.Delete(database_name);
+                    storage.Delete(DATABASE_NAME);
                 }
                 catch
                 {

@@ -46,14 +46,16 @@ namespace osu.Game.Online.Leaderboards
         protected Container RankContainer { get; private set; }
 
         private readonly int? rank;
-        private readonly bool allowHighlight;
+        private readonly bool isOnlineScope;
 
         private Box background;
         private Container content;
         private Drawable avatar;
         private Drawable scoreRank;
         private OsuSpriteText nameLabel;
-        private GlowingSpriteText scoreLabel;
+
+        public GlowingSpriteText ScoreText { get; private set; }
+
         private Container flagBadgeContainer;
         private FillFlowContainer<ModIcon> modsContainer;
 
@@ -68,12 +70,12 @@ namespace osu.Game.Online.Leaderboards
         [Resolved]
         private Storage storage { get; set; }
 
-        public LeaderboardScore(ScoreInfo score, int? rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
             Score = score;
 
             this.rank = rank;
-            this.allowHighlight = allowHighlight;
+            this.isOnlineScope = isOnlineScope;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -111,7 +113,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.OnlineID == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
+                                    Colour = user.OnlineID == api.LocalUser.Value.Id && isOnlineScope ? colour.Green : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -198,7 +200,7 @@ namespace osu.Game.Online.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText
+                                        ScoreText = new GlowingSpriteText
                                         {
                                             TextColour = Color4.White,
                                             GlowColour = Color4Extensions.FromHex(@"83ccfa"),
@@ -240,7 +242,7 @@ namespace osu.Game.Online.Leaderboards
 
         public override void Show()
         {
-            foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
+            foreach (var d in new[] { avatar, nameLabel, ScoreText, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
                 d.FadeOut();
 
             Alpha = 0;
@@ -262,7 +264,7 @@ namespace osu.Game.Online.Leaderboards
 
                 using (BeginDelayedSequence(250))
                 {
-                    scoreLabel.FadeIn(200);
+                    ScoreText.FadeIn(200);
                     scoreRank.FadeIn(200);
 
                     using (BeginDelayedSequence(50))
@@ -399,7 +401,7 @@ namespace osu.Game.Online.Leaderboards
                 if (Score.Files.Count > 0)
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
 
-                if (Score.ID != 0)
+                if (!isOnlineScope)
                     items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();

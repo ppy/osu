@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
                 difficulty = value;
 
                 if (beatmapInfo != null)
-                    beatmapInfo.BaseDifficulty = difficulty.Clone();
+                    beatmapInfo.Difficulty = difficulty.Clone();
             }
         }
 
@@ -41,8 +41,8 @@ namespace osu.Game.Beatmaps
             {
                 beatmapInfo = value;
 
-                if (beatmapInfo?.BaseDifficulty != null)
-                    Difficulty = beatmapInfo.BaseDifficulty.Clone();
+                if (beatmapInfo?.Difficulty != null)
+                    Difficulty = beatmapInfo.Difficulty.Clone();
             }
         }
 
@@ -54,15 +54,15 @@ namespace osu.Game.Beatmaps
                 {
                     Artist = @"Unknown",
                     Title = @"Unknown",
-                    AuthorString = @"Unknown Creator",
+                    Author = { Username = @"Unknown Creator" },
                 },
                 DifficultyName = @"Normal",
-                BaseDifficulty = Difficulty,
+                Difficulty = Difficulty,
             };
         }
 
         [JsonIgnore]
-        public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
         public ControlPointInfo ControlPointInfo { get; set; } = new ControlPointInfo();
 

@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -19,7 +18,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapClearScoresDialog(BeatmapInfo beatmapInfo, Action onCompletion)
         {
-            BodyText = $@"{beatmapInfo.Metadata?.Artist} - {beatmapInfo.Metadata?.Title}";
+            BodyText = beatmapInfo.GetDisplayTitle();
             Icon = FontAwesome.Solid.Eraser;
             HeaderText = @"Clearing all local scores. Are you sure?";
             Buttons = new PopupDialogButton[]
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Select
                     Text = @"Yes. Please.",
                     Action = () =>
                     {
-                        Task.Run(() => scoreManager.Delete(scoreManager.QueryScores(s => !s.DeletePending && s.BeatmapInfo.ID == beatmapInfo.ID).ToList()))
+                        Task.Run(() => scoreManager.Delete(s => !s.DeletePending && s.BeatmapInfo.ID == beatmapInfo.ID))
                             .ContinueWith(_ => onCompletion);
                     }
                 },

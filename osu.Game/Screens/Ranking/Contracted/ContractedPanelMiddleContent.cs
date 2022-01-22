@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Ranking.Contracted
                                         {
                                             Anchor = Anchor.TopCentre,
                                             Origin = Anchor.TopCentre,
-                                            Text = score.UserString,
+                                            Text = score.RealmUser.Username,
                                             Font = OsuFont.GetFont(size: 16, weight: FontWeight.SemiBold)
                                         },
                                         new FillFlowContainer

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -355,9 +356,6 @@ namespace osu.Game.Screens.Edit
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
 
-            // apply any set-level metadata changes.
-            beatmapManager.Update(editorBeatmap.BeatmapInfo.BeatmapSet);
-
             // save the loaded beatmap's data stream.
             beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
 
@@ -601,7 +599,8 @@ namespace osu.Game.Screens.Edit
             if (isNewBeatmap)
             {
                 // confirming exit without save means we should delete the new beatmap completely.
-                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+                if (playableBeatmap.BeatmapInfo.BeatmapSet != null)
+                    beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
 
                 // eagerly clear contents before restoring default beatmap to prevent value change callbacks from firing.
                 ClearInternal();
@@ -775,7 +774,9 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
-            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
+
+            Debug.Assert(beatmapSet != null);
 
             var difficultyItems = new List<MenuItem>();
 

@@ -42,17 +42,27 @@ namespace osu.Game.Tests.Visual
             Alpha = 0
         };
 
+        private TestBeatmapManager testBeatmapManager;
+        private WorkingBeatmap working;
+
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio, RulesetStore rulesets)
         {
             Add(logo);
 
-            var working = CreateWorkingBeatmap(Ruleset.Value);
-
-            Beatmap.Value = working;
+            working = CreateWorkingBeatmap(Ruleset.Value);
 
             if (IsolateSavingFromDatabase)
-                Dependencies.CacheAs<BeatmapManager>(new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default, working));
+                Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Beatmap.Value = working;
+            if (testBeatmapManager != null)
+                testBeatmapManager.TestBeatmap = working;
         }
 
         protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
@@ -114,17 +124,16 @@ namespace osu.Game.Tests.Visual
 
         private class TestBeatmapManager : BeatmapManager
         {
-            private readonly WorkingBeatmap testBeatmap;
+            public WorkingBeatmap TestBeatmap;
 
-            public TestBeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap, WorkingBeatmap testBeatmap)
+            public TestBeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap)
                 : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
-                this.testBeatmap = testBeatmap;
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
             {
-                return new TestBeatmapModelManager(storage, contextFactory, rulesets, api, host);
+                return new TestBeatmapModelManager(storage, contextFactory, rulesets, onlineLookupQueue);
             }
 
             protected override WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
@@ -143,13 +152,13 @@ namespace osu.Game.Tests.Visual
                 }
 
                 public override WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
-                    => testBeatmapManager.testBeatmap;
+                    => testBeatmapManager.TestBeatmap;
             }
 
             internal class TestBeatmapModelManager : BeatmapModelManager
             {
-                public TestBeatmapModelManager(Storage storage, IDatabaseContextFactory databaseContextFactory, RulesetStore rulesetStore, IAPIProvider apiProvider, GameHost gameHost)
-                    : base(storage, databaseContextFactory, rulesetStore, gameHost)
+                public TestBeatmapModelManager(Storage storage, RealmContextFactory databaseContextFactory, RulesetStore rulesetStore, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
+                    : base(databaseContextFactory, storage, beatmapOnlineLookupQueue)
                 {
                 }
 
