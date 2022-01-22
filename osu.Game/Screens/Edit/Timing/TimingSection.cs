@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Timing
     internal class TimingSection : Section<TimingControlPoint>
     {
         private SettingsSlider<double> bpmSlider;
-        private SettingsEnumDropdown<TimeSignatures> timeSignature;
+        private SettingsDropdown<TimeSignature> timeSignature;
         private BPMTextBox bpmTextEntry;
 
         [BackgroundDependencyLoader]
@@ -25,9 +25,14 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 bpmTextEntry = new BPMTextBox(),
                 bpmSlider = new BPMSlider(),
-                timeSignature = new SettingsEnumDropdown<TimeSignatures>
+                timeSignature = new SettingsDropdown<TimeSignature>
                 {
-                    LabelText = "Time Signature"
+                    LabelText = "Time Signature",
+                    Items = new[]
+                    {
+                        TimeSignature.SimpleTriple,
+                        TimeSignature.SimpleQuadruple
+                    }
                 },
             });
         }
