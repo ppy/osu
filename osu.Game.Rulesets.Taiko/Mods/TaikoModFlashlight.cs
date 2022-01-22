@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
@@ -16,10 +17,22 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        public override bool DefaultComboDependency => true;
+        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
+        public override BindableBool ChangeRadius { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
 
-        //private const float default_flashlight_size = 250;
-        public override float DefaultRadius => 250;
+        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
+        public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
+        {
+            MinValue = 0f,
+            MaxValue = 400f,
+            Default = 250f,
+            Value = 250f,
+            Precision = 5f
+        };
 
         public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value);
 

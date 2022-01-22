@@ -34,26 +34,10 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Restricted view area.";
 
         [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
-        public Bindable<bool> ChangeRadius { get; private set; }
+        public abstract BindableBool ChangeRadius { get; }
 
         [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
-        public BindableNumber<float> InitialRadius { get; private set; }
-
-        public abstract float DefaultRadius { get; }
-
-        public abstract bool DefaultComboDependency { get; }
-
-        internal ModFlashlight()
-        {
-            InitialRadius = new BindableFloat(DefaultRadius)
-            {
-                MinValue = DefaultRadius * .5f,
-                MaxValue = DefaultRadius * 1.5f,
-                Precision = 5f,
-            };
-
-            ChangeRadius = new BindableBool(DefaultComboDependency);
-        }
+        public abstract BindableNumber<float> InitialRadius { get; }
     }
 
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
