@@ -34,9 +34,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             string rulesetName = Ruleset?.ShortName;
 
-            List<RealmKeyBinding> bindings = null;
-
-            realmFactory.Run(realm => bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).Detach());
+            var bindings = realmFactory.Run(realm => realm.All<RealmKeyBinding>()
+                                                          .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
+                                                          .Detach());
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
