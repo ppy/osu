@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -108,6 +109,9 @@ namespace osu.Game.Database
                 // Will cause future startups to not attempt migration.
                 log("Migration successful, deleting EF database");
                 efContextFactory.ResetDatabase();
+
+                if (DebugUtils.IsDebugBuild)
+                    Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 FinishedMigrating = true;
