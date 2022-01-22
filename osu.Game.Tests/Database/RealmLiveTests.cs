@@ -47,6 +47,11 @@ namespace osu.Game.Tests.Database
                     liveBeatmap = beatmap.ToLive(realmFactory);
                 });
 
+                using (realmFactory.BlockAllOperations())
+                {
+                    // recycle realm before migrating
+                }
+
                 using (var migratedStorage = new TemporaryNativeStorage("realm-test-migration-target"))
                 {
                     migratedStorage.DeleteDirectory(string.Empty);
