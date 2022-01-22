@@ -69,28 +69,29 @@ namespace osu.Game.Database
 
         private Realm? context;
 
-        public Realm Context
+        public Realm Context => ensureUpdateContext();
+
+        private Realm ensureUpdateContext()
         {
-            get
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"Use {nameof(createContext)} when performing realm operations from a non-update thread");
+
+            lock (contextLock)
             {
-                if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException(@$"Use {nameof(createContext)} when performing realm operations from a non-update thread");
-
-                lock (contextLock)
+                if (context == null)
                 {
-                    if (context == null)
-                    {
-                        context = createContext();
-                        Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
+                    context = createContext();
+                    Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
 
-                        // Resubscribe any subscriptions
-                        foreach (var action in subscriptionActions.Keys)
-                            registerSubscription(action);
-                    }
-
-                    // creating a context will ensure our schema is up-to-date and migrated.
-                    return context;
+                    // Resubscribe any subscriptions
+                    foreach (var action in subscriptionActions.Keys)
+                        registerSubscription(action);
                 }
+
+                Debug.Assert(context != null);
+
+                // creating a context will ensure our schema is up-to-date and migrated.
+                return context;
             }
         }
 
@@ -261,10 +262,13 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
+            // Get context outside of flag update to ensure beyond doubt this can't be cyclic.
+            var realm = Context;
+
             lock (contextLock)
             {
                 current_thread_subscriptions_allowed.Value = true;
-                subscriptionActions[action] = action(Context);
+                subscriptionActions[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
             }
         }
@@ -501,6 +505,8 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            SynchronizationContext syncContext;
+
             try
             {
                 contextCreationLock.Wait();
@@ -509,6 +515,8 @@ namespace osu.Game.Database
                 {
                     if (!ThreadSafety.IsUpdateThread && context != null)
                         throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
+                    syncContext = SynchronizationContext.Current;
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
@@ -548,6 +556,9 @@ namespace osu.Game.Database
             {
                 factory.contextCreationLock.Release();
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+
+                // Post back to the update thread to revive any subscriptions.
+                syncContext?.Post(_ => ensureUpdateContext(), null);
             });
         }
 

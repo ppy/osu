@@ -33,10 +33,6 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                         using (realmFactory.BlockAllOperations())
                         {
                         }
-
-                        // retrieve context to revive realm subscriptions.
-                        // TODO: should we do this from OsuGame or RealmContextFactory or something? Answer: yes.
-                        var _ = realmFactory.Context;
                     }
                 },
             };
