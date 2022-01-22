@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 PlaylistItem playlistItem = new PlaylistItem
                 {
-                    BeatmapID = beatmapInfo.OnlineID ?? -1,
+                    BeatmapID = beatmapInfo.OnlineID,
                 };
 
                 Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem));
