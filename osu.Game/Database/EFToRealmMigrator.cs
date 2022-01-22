@@ -38,9 +38,6 @@ namespace osu.Game.Database
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
 
-        [Resolved]
-        private Storage storage { get; set; } = null!;
-
         private readonly OsuSpriteText currentOperationText;
 
         public EFToRealmMigrator()
