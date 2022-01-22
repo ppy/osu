@@ -92,8 +92,7 @@ namespace osu.Game.Stores
             int removedFiles = 0;
 
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
-            using (var realm = realmFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realmFactory.Write(realm =>
             {
                 // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
                 var files = realm.All<RealmFile>().ToList();
@@ -116,9 +115,7 @@ namespace osu.Game.Stores
                         Logger.Error(e, $@"Could not delete databased file {file.Hash}");
                     }
                 }
-
-                transaction.Commit();
-            }
+            });
 
             Logger.Log($@"Finished realm file store cleanup ({removedFiles} of {totalFiles} deleted)");
         }

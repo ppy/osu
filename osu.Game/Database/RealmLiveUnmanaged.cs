@@ -21,6 +21,9 @@ namespace osu.Game.Database
         /// <param name="data">The realm data.</param>
         public RealmLiveUnmanaged(T data)
         {
+            if (data.IsManaged)
+                throw new InvalidOperationException($"Cannot use {nameof(RealmLiveUnmanaged<T>)} with managed instances");
+
             Value = data;
         }
 

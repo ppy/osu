@@ -60,8 +60,8 @@ namespace osu.Game.Tests.Online
             testBeatmapInfo = getTestBeatmapInfo(testBeatmapFile);
             testBeatmapSet = testBeatmapInfo.BeatmapSet;
 
-            ContextFactory.Context.Write(r => r.RemoveAll<BeatmapSetInfo>());
-            ContextFactory.Context.Write(r => r.RemoveAll<BeatmapInfo>());
+            ContextFactory.Write(r => r.RemoveAll<BeatmapSetInfo>());
+            ContextFactory.Write(r => r.RemoveAll<BeatmapInfo>());
 
             selectedItem.Value = new PlaylistItem
             {

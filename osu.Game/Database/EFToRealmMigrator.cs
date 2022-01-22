@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -142,7 +141,7 @@ namespace osu.Game.Database
 
             int count = existingBeatmapSets.Count();
 
-            using (var realm = realmContextFactory.CreateContext())
+            realmContextFactory.Run(realm =>
             {
                 log($"Found {count} beatmaps in EF");
 
@@ -227,7 +226,7 @@ namespace osu.Game.Database
 
                     log($"Successfully migrated {count} beatmaps to realm");
                 }
-            }
+            });
         }
 
         private BeatmapMetadata getBestMetadata(EFBeatmapMetadata? beatmapMetadata, EFBeatmapMetadata? beatmapSetMetadata)
@@ -273,7 +272,7 @@ namespace osu.Game.Database
 
             int count = existingScores.Count();
 
-            using (var realm = realmContextFactory.CreateContext())
+            realmContextFactory.Run(realm =>
             {
                 log($"Found {count} scores in EF");
 
@@ -341,7 +340,7 @@ namespace osu.Game.Database
 
                     log($"Successfully migrated {count} scores to realm");
                 }
-            }
+            });
         }
 
         private void migrateSkins(OsuDbContext db)
@@ -370,37 +369,39 @@ namespace osu.Game.Database
                     break;
             }
 
-            using (var realm = realmContextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realmContextFactory.Run(realm =>
             {
-                // only migrate data if the realm database is empty.
-                // note that this cannot be written as: `realm.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
-                if (!realm.All<SkinInfo>().Any(s => !s.Protected))
+                using (var transaction = realm.BeginWrite())
                 {
-                    log($"Migrating {existingSkins.Count} skins");
-
-                    foreach (var skin in existingSkins)
+                    // only migrate data if the realm database is empty.
+                    // note that this cannot be written as: `realm.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
+                    if (!realm.All<SkinInfo>().Any(s => !s.Protected))
                     {
-                        var realmSkin = new SkinInfo
+                        log($"Migrating {existingSkins.Count} skins");
+
+                        foreach (var skin in existingSkins)
                         {
-                            Name = skin.Name,
-                            Creator = skin.Creator,
-                            Hash = skin.Hash,
-                            Protected = false,
-                            InstantiationInfo = skin.InstantiationInfo,
-                        };
+                            var realmSkin = new SkinInfo
+                            {
+                                Name = skin.Name,
+                                Creator = skin.Creator,
+                                Hash = skin.Hash,
+                                Protected = false,
+                                InstantiationInfo = skin.InstantiationInfo,
+                            };
 
-                        migrateFiles(skin, realm, realmSkin);
+                            migrateFiles(skin, realm, realmSkin);
 
-                        realm.Add(realmSkin);
+                            realm.Add(realmSkin);
 
-                        if (skin.ID == userSkinInt)
-                            userSkinChoice.Value = realmSkin.ID.ToString();
+                            if (skin.ID == userSkinInt)
+                                userSkinChoice.Value = realmSkin.ID.ToString();
+                        }
                     }
-                }
 
-                transaction.Commit();
-            }
+                    transaction.Commit();
+                }
+            });
         }
 
         private static void migrateFiles<T>(IHasFiles<T> fileSource, Realm realm, IHasRealmFiles realmObject) where T : INamedFileInfo
@@ -427,36 +428,38 @@ namespace osu.Game.Database
 
             log("Beginning settings migration to realm");
 
-            using (var realm = realmContextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realmContextFactory.Run(realm =>
             {
-                // only migrate data if the realm database is empty.
-                if (!realm.All<RealmRulesetSetting>().Any())
+                using (var transaction = realm.BeginWrite())
                 {
-                    log($"Migrating {existingSettings.Count} settings");
-
-                    foreach (var dkb in existingSettings)
+                    // only migrate data if the realm database is empty.
+                    if (!realm.All<RealmRulesetSetting>().Any())
                     {
-                        if (dkb.RulesetID == null)
-                            continue;
+                        log($"Migrating {existingSettings.Count} settings");
 
-                        string? shortName = getRulesetShortNameFromLegacyID(dkb.RulesetID.Value);
-
-                        if (string.IsNullOrEmpty(shortName))
-                            continue;
-
-                        realm.Add(new RealmRulesetSetting
+                        foreach (var dkb in existingSettings)
                         {
-                            Key = dkb.Key,
-                            Value = dkb.StringValue,
-                            RulesetName = shortName,
-                            Variant = dkb.Variant ?? 0,
-                        });
-                    }
-                }
+                            if (dkb.RulesetID == null)
+                                continue;
 
-                transaction.Commit();
-            }
+                            string? shortName = getRulesetShortNameFromLegacyID(dkb.RulesetID.Value);
+
+                            if (string.IsNullOrEmpty(shortName))
+                                continue;
+
+                            realm.Add(new RealmRulesetSetting
+                            {
+                                Key = dkb.Key,
+                                Value = dkb.StringValue,
+                                RulesetName = shortName,
+                                Variant = dkb.Variant ?? 0,
+                            });
+                        }
+                    }
+
+                    transaction.Commit();
+                }
+            });
         }
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>

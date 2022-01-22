@@ -98,17 +98,16 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query)
         {
-            using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapInfo>().FirstOrDefault(query)?.Detach();
+            return ContextFactory.Run(realm => realm.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
         }
 
         public void Update(BeatmapSetInfo item)
         {
-            using (var realm = ContextFactory.CreateContext())
+            ContextFactory.Write(realm =>
             {
                 var existing = realm.Find<BeatmapSetInfo>(item.ID);
-                realm.Write(r => item.CopyChangesToRealm(existing));
-            }
+                item.CopyChangesToRealm(existing);
+            });
         }
     }
 }
