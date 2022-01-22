@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                using (var realm = realmFactory.CreateContext())
+                realmFactory.Run(realm =>
                 {
                     var scores = realm.All<ScoreInfo>()
                                       .AsEnumerable()
@@ -171,9 +171,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                     scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
                                 .ContinueWith(ordered => scoresCallback?.Invoke(ordered.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
+                });
 
-                    return null;
-                }
+                return null;
             }
 
             if (api?.IsLoggedIn != true)
