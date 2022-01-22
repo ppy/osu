@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -54,7 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteBeatmapsButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
+                        Task.Run(() => beatmaps.Delete()).ContinueWith(t => Schedule(() => deleteBeatmapsButton.Enabled.Value = true));
                     }));
                 }
             });
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteScoresButton.Enabled.Value = false;
-                        Task.Run(() => scores.Delete(scores.GetAllUsableScores())).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
+                        Task.Run(() => scores.Delete()).ContinueWith(t => Schedule(() => deleteScoresButton.Enabled.Value = true));
                     }));
                 }
             });
@@ -106,10 +105,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     dialogOverlay?.Push(new MassDeleteConfirmationDialog(() =>
                     {
                         deleteSkinsButton.Enabled.Value = false;
-                        Task.Run(() =>
-                        {
-                            skins.Delete();
-                        }).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
+                        Task.Run(() => skins.Delete()).ContinueWith(t => Schedule(() => deleteSkinsButton.Enabled.Value = true));
                     }));
                 }
             });
@@ -147,11 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         restoreButton.Enabled.Value = false;
-                        Task.Run(() =>
-                        {
-                            foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
-                                beatmaps.Restore(b);
-                        }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
+                        Task.Run(beatmaps.RestoreAll).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
                     }
                 },
                 undeleteButton = new SettingsButton
@@ -160,7 +152,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         undeleteButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.Undelete(beatmaps.QueryBeatmapSets(b => b.DeletePending).ToList())).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
+                        Task.Run(beatmaps.UndeleteAll).ContinueWith(t => Schedule(() => undeleteButton.Enabled.Value = true));
                     }
                 },
             });

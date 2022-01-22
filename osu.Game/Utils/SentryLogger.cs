@@ -16,6 +16,7 @@ namespace osu.Game.Utils
     {
         private SentryClient sentry;
         private Scope sentryScope;
+        private Exception lastException;
 
         public SentryLogger(OsuGame game)
         {
@@ -30,30 +31,27 @@ namespace osu.Game.Utils
             sentry = new SentryClient(options);
             sentryScope = new Scope(options);
 
-            Exception lastException = null;
+            Logger.NewEntry += processLogEntry;
+        }
 
-            Logger.NewEntry += entry =>
+        private void processLogEntry(LogEntry entry)
+        {
+            if (entry.Level < LogLevel.Verbose) return;
+
+            var exception = entry.Exception;
+
+            if (exception != null)
             {
-                if (entry.Level < LogLevel.Verbose) return;
+                if (!shouldSubmitException(exception)) return;
 
-                var exception = entry.Exception;
+                // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
+                if (lastException != null && lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal)) return;
 
-                if (exception != null)
-                {
-                    if (!shouldSubmitException(exception))
-                        return;
-
-                    // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
-                    if (lastException != null &&
-                        lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace, StringComparison.Ordinal))
-                        return;
-
-                    lastException = exception;
-                    sentry.CaptureEvent(new SentryEvent(exception) { Message = entry.Message }, sentryScope);
-                }
-                else
-                    sentryScope.AddBreadcrumb(DateTimeOffset.Now, entry.Message, entry.Target.ToString(), "navigation");
-            };
+                lastException = exception;
+                sentry.CaptureEvent(new SentryEvent(exception) { Message = entry.Message }, sentryScope);
+            }
+            else
+                sentryScope.AddBreadcrumb(DateTimeOffset.Now, entry.Message, entry.Target.ToString(), "navigation");
         }
 
         private bool shouldSubmitException(Exception exception)
@@ -92,15 +90,9 @@ namespace osu.Game.Utils
             GC.SuppressFinalize(this);
         }
 
-        private bool isDisposed;
-
         protected virtual void Dispose(bool isDisposing)
         {
-            if (isDisposed)
-                return;
-
-            isDisposed = true;
-            sentry?.Dispose();
+            Logger.NewEntry -= processLogEntry;
             sentry = null;
             sentryScope = null;
         }

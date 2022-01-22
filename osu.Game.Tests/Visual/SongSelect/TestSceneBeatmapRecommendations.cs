@@ -113,6 +113,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             // Switch to catch
             presentAndConfirm(() => catchSet, 1);
 
+            AddAssert("game-wide ruleset changed", () => Game.Ruleset.Value.Equals(catchSet.Beatmaps.First().Ruleset));
+
             // Present mixed difficulty set, expect current ruleset to be selected
             presentAndConfirm(() => mixedSet, 2);
         }
@@ -182,7 +184,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmap.DifficultyName = $"SR{i + 1}";
             }
 
-            return Game.BeatmapManager.Import(beatmapSet).GetResultSafely().Value;
+            return Game.BeatmapManager.Import(beatmapSet).GetResultSafely()?.Value;
         }
 
         private bool ensureAllBeatmapSetsImported(IEnumerable<BeatmapSetInfo> beatmapSets) => beatmapSets.All(set => set != null);
