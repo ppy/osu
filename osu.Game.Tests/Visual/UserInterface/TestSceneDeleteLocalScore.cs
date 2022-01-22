@@ -122,11 +122,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            using (var realm = realmFactory.CreateContext())
+            realmFactory.Run(realm =>
             {
                 // Due to soft deletions, we can re-use deleted scores between test runs
                 scoreManager.Undelete(realm.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
-            }
+            });
 
             leaderboard.Scores = null;
             leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables

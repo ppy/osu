@@ -30,7 +30,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
     /// </summary>
-    public class RealmContextFactory : IDisposable, IRealmFactory
+    public class RealmContextFactory : IDisposable
     {
         private readonly Storage storage;
 
@@ -72,13 +72,13 @@ namespace osu.Game.Database
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException(@$"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException(@$"Use {nameof(Run)}/{nameof(Write)} when performing realm operations from a non-update thread");
 
                 lock (contextLock)
                 {
                     if (context == null)
                     {
-                        context = CreateContext();
+                        context = createContext();
                         Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
                     }
 
@@ -124,7 +124,7 @@ namespace osu.Game.Database
 
         private void cleanupPendingDeletions()
         {
-            using (var realm = CreateContext())
+            using (var realm = createContext())
             using (var transaction = realm.BeginWrite())
             {
                 var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
@@ -169,7 +169,60 @@ namespace osu.Game.Database
         /// <returns></returns>
         public bool Compact() => Realm.Compact(getConfiguration());
 
-        public Realm CreateContext()
+        /// <summary>
+        /// Run work on realm with a return value.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        /// <typeparam name="T">The return type.</typeparam>
+        public T Run<T>(Func<Realm, T> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                return action(Context);
+
+            using (var realm = createContext())
+                return action(realm);
+        }
+
+        /// <summary>
+        /// Run work on realm.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        public void Run(Action<Realm> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                action(Context);
+            else
+            {
+                using (var realm = createContext())
+                    action(realm);
+            }
+        }
+
+        /// <summary>
+        /// Write changes to realm.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management and transaction committing automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        public void Write(Action<Realm> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                Context.Write(action);
+            else
+            {
+                using (var realm = createContext())
+                    realm.Write(action);
+            }
+        }
+
+        private Realm createContext()
         {
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));

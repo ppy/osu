@@ -119,15 +119,17 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
         public void Hide(BeatmapInfo beatmapInfo)
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            contextFactory.Run(realm =>
             {
-                if (!beatmapInfo.IsManaged)
-                    beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+                using (var transaction = realm.BeginWrite())
+                {
+                    if (!beatmapInfo.IsManaged)
+                        beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
 
-                beatmapInfo.Hidden = true;
-                transaction.Commit();
-            }
+                    beatmapInfo.Hidden = true;
+                    transaction.Commit();
+                }
+            });
         }
 
         /// <summary>
@@ -136,27 +138,31 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmapInfo)
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            contextFactory.Run(realm =>
             {
-                if (!beatmapInfo.IsManaged)
-                    beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+                using (var transaction = realm.BeginWrite())
+                {
+                    if (!beatmapInfo.IsManaged)
+                        beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
 
-                beatmapInfo.Hidden = false;
-                transaction.Commit();
-            }
+                    beatmapInfo.Hidden = false;
+                    transaction.Commit();
+                }
+            });
         }
 
         public void RestoreAll()
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            contextFactory.Run(realm =>
             {
-                foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
-                    beatmap.Hidden = false;
+                using (var transaction = realm.BeginWrite())
+                {
+                    foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
+                        beatmap.Hidden = false;
 
-                transaction.Commit();
-            }
+                    transaction.Commit();
+                }
+            });
         }
 
         /// <summary>
@@ -165,8 +171,11 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+            return contextFactory.Run(realm =>
+            {
+                realm.Refresh();
+                return realm.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+            });
         }
 
         /// <summary>
@@ -176,8 +185,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
+            return contextFactory.Run(realm => realm.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(contextFactory));
         }
 
         #region Delegation to BeatmapModelManager (methods which previously existed locally).
@@ -232,21 +240,20 @@ namespace osu.Game.Beatmaps
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
-            using (var context = contextFactory.CreateContext())
+            contextFactory.Run(realm =>
             {
-                var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                var items = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
                 if (filter != null)
                     items = items.Where(filter);
 
                 beatmapModelManager.Delete(items.ToList(), silent);
-            }
+            });
         }
 
         public void UndeleteAll()
         {
-            using (var context = contextFactory.CreateContext())
-                beatmapModelManager.Undelete(context.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList());
+            contextFactory.Run(realm => beatmapModelManager.Undelete(realm.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
@@ -305,13 +312,13 @@ namespace osu.Game.Beatmaps
             // If we seem to be missing files, now is a good time to re-fetch.
             if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
             {
-                using (var realm = contextFactory.CreateContext())
+                contextFactory.Run(realm =>
                 {
                     var refetch = realm.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
 
                     if (refetch != null)
                         importedBeatmap = refetch;
-                }
+                });
             }
 
             return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);

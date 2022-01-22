@@ -87,17 +87,14 @@ namespace osu.Game.Skinning
             };
 
             // Ensure the default entries are present.
-            using (var context = contextFactory.CreateContext())
-            using (var transaction = context.BeginWrite())
+            contextFactory.Write(realm =>
             {
                 foreach (var skin in defaultSkins)
                 {
-                    if (context.Find<SkinInfo>(skin.SkinInfo.ID) == null)
-                        context.Add(skin.SkinInfo.Value);
+                    if (realm.Find<SkinInfo>(skin.SkinInfo.ID) == null)
+                        realm.Add(skin.SkinInfo.Value);
                 }
-
-                transaction.Commit();
-            }
+            });
 
             CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
 
@@ -113,10 +110,10 @@ namespace osu.Game.Skinning
 
         public void SelectRandomSkin()
         {
-            using (var context = contextFactory.CreateContext())
+            contextFactory.Run(realm =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = context.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+                var randomChoices = realm.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
                 if (randomChoices.Length == 0)
                 {
@@ -127,7 +124,7 @@ namespace osu.Game.Skinning
                 var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
 
                 CurrentSkinInfo.Value = chosen.ToLive(contextFactory);
-            }
+            });
         }
 
         /// <summary>
@@ -182,8 +179,7 @@ namespace osu.Game.Skinning
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ILive<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<SkinInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
+            return contextFactory.Run(realm => realm.All<SkinInfo>().FirstOrDefault(query)?.ToLive(contextFactory));
         }
 
         public event Action SourceChanged;
@@ -293,10 +289,10 @@ namespace osu.Game.Skinning
 
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            using (var context = contextFactory.CreateContext())
+            contextFactory.Run(realm =>
             {
-                var items = context.All<SkinInfo>()
-                                   .Where(s => !s.Protected && !s.DeletePending);
+                var items = realm.All<SkinInfo>()
+                                 .Where(s => !s.Protected && !s.DeletePending);
                 if (filter != null)
                     items = items.Where(filter);
 
@@ -307,7 +303,7 @@ namespace osu.Game.Skinning
                     scheduler.Add(() => CurrentSkinInfo.Value = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged());
 
                 skinModelManager.Delete(items.ToList(), silent);
-            }
+            });
         }
 
         #endregion
