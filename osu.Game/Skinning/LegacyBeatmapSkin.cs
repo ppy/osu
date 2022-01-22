@@ -77,6 +77,6 @@ namespace osu.Game.Skinning
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmapInfo) =>
-            new SkinInfo { Name = beatmapInfo.ToString(), Creator = beatmapInfo.Metadata?.Author.Username ?? string.Empty };
+            new SkinInfo { Name = beatmapInfo.ToString(), Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty };
     }
 }

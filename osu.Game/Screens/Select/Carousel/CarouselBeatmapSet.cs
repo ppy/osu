@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             beatmapSet.Beatmaps
                       .Where(b => !b.Hidden)
+                      .OrderBy(b => b.RulesetID)
+                      .ThenBy(b => b.StarRating)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
         }
@@ -48,7 +50,7 @@ namespace osu.Game.Screens.Select.Carousel
             if (LastSelected == null || LastSelected.Filtered.Value)
             {
                 if (GetRecommendedBeatmap?.Invoke(Children.OfType<CarouselBeatmap>().Where(b => !b.Filtered.Value).Select(b => b.BeatmapInfo)) is BeatmapInfo recommended)
-                    return Children.OfType<CarouselBeatmap>().First(b => b.BeatmapInfo == recommended);
+                    return Children.OfType<CarouselBeatmap>().First(b => b.BeatmapInfo.Equals(recommended));
             }
 
             return base.GetNextToSelect();

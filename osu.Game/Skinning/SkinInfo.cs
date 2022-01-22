@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Testing;
@@ -26,16 +27,16 @@ namespace osu.Game.Skinning
 
         [PrimaryKey]
         [JsonProperty]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public Guid ID { get; set; }
 
         [JsonProperty]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = null!;
 
         [JsonProperty]
-        public string Creator { get; set; } = string.Empty;
+        public string Creator { get; set; } = null!;
 
         [JsonProperty]
-        public string InstantiationInfo { get; set; } = string.Empty;
+        public string InstantiationInfo { get; set; } = null!;
 
         public string Hash { get; set; } = string.Empty;
 
@@ -54,6 +55,19 @@ namespace osu.Game.Skinning
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
         public bool DeletePending { get; set; }
+
+        public SkinInfo(string? name = null, string? creator = null, string? instantiationInfo = null)
+        {
+            Name = name ?? string.Empty;
+            Creator = creator ?? string.Empty;
+            InstantiationInfo = instantiationInfo ?? string.Empty;
+            ID = Guid.NewGuid();
+        }
+
+        [UsedImplicitly] // Realm
+        private SkinInfo()
+        {
+        }
 
         public bool Equals(SkinInfo? other)
         {
