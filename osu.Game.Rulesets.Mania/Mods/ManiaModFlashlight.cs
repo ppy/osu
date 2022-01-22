@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -16,8 +17,22 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
-        public override bool DefaultComboDependency => false;
-        public override float DefaultRadius => 180;
+        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
+        public override BindableBool ChangeRadius { get; } = new BindableBool
+        {
+            Default = false,
+            Value = false
+        };
+
+        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
+        public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
+        {
+            MinValue = 0f,
+            MaxValue = 230f,
+            Default = 50f,
+            Value = 50f,
+            Precision = 5f
+        };
 
         public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value);
 

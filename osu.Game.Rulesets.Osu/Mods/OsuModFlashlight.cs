@@ -20,14 +20,32 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        public override bool DefaultComboDependency => true;
-
-        //private const float default_flashlight_size = 180;
-        public override float DefaultRadius => 180;
-
         private const double default_follow_delay = 120;
 
+        [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
+        public BindableNumber<double> FollowDelay { get; } = new BindableDouble(default_follow_delay)
+        {
+            MinValue = default_follow_delay,
+            MaxValue = default_follow_delay * 10,
+            Precision = default_follow_delay,
+        };
 
+        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
+        public override BindableBool ChangeRadius { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
+        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
+        public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
+        {
+            MinValue = 90f,
+            MaxValue = 360f,
+            Default = 180f,
+            Value = 180f,
+            Precision = 5f
+        };
 
         private OsuFlashlight flashlight;
 
@@ -38,14 +56,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (drawable is DrawableSlider s)
                 s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
         }
-
-        [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
-        public BindableNumber<double> FollowDelay { get; } = new BindableDouble(default_follow_delay)
-        {
-            MinValue = default_follow_delay,
-            MaxValue = default_follow_delay * 10,
-            Precision = default_follow_delay,
-        };
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
