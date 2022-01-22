@@ -29,8 +29,10 @@ namespace osu.Game.Benchmarks
 
             realmFactory = new RealmContextFactory(storage, "client");
 
-            using (var context = realmFactory.CreateContext())
-                context.Write(c => c.Add(TestResources.CreateTestBeatmapSetInfo(rulesets: new[] { new OsuRuleset().RulesetInfo })));
+            realmFactory.Run(realm =>
+            {
+                realm.Write(c => c.Add(TestResources.CreateTestBeatmapSetInfo(rulesets: new[] { new OsuRuleset().RulesetInfo })));
+            });
 
             updateThread = new UpdateThread(() => { }, null);
             updateThread.Start();
@@ -39,15 +41,15 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkDirectPropertyRead()
         {
-            using (var context = realmFactory.CreateContext())
+            realmFactory.Run(realm =>
             {
-                var beatmapSet = context.All<BeatmapSetInfo>().First();
+                var beatmapSet = realm.All<BeatmapSetInfo>().First();
 
                 for (int i = 0; i < ReadsPerFetch; i++)
                 {
                     string _ = beatmapSet.Beatmaps.First().Hash;
                 }
-            }
+            });
         }
 
         [Benchmark]
@@ -78,15 +80,15 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkRealmLivePropertyRead()
         {
-            using (var context = realmFactory.CreateContext())
+            realmFactory.Run(realm =>
             {
-                var beatmapSet = context.All<BeatmapSetInfo>().First().ToLive(realmFactory);
+                var beatmapSet = realm.All<BeatmapSetInfo>().First().ToLive(realmFactory);
 
                 for (int i = 0; i < ReadsPerFetch; i++)
                 {
                     string _ = beatmapSet.PerformRead(b => b.Beatmaps.First().Hash);
                 }
-            }
+            });
         }
 
         [Benchmark]
@@ -117,15 +119,15 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkDetachedPropertyRead()
         {
-            using (var context = realmFactory.CreateContext())
+            realmFactory.Run(realm =>
             {
-                var beatmapSet = context.All<BeatmapSetInfo>().First().Detach();
+                var beatmapSet = realm.All<BeatmapSetInfo>().First().Detach();
 
                 for (int i = 0; i < ReadsPerFetch; i++)
                 {
                     string _ = beatmapSet.Beatmaps.First().Hash;
                 }
-            }
+            });
         }
 
         [GlobalCleanup]
