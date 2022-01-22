@@ -72,7 +72,7 @@ namespace osu.Game.Database
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException(@$"Use {nameof(createContext)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException(@$"Use {nameof(Run)}/{nameof(Write)} when performing realm operations from a non-update thread");
 
                 lock (contextLock)
                 {
