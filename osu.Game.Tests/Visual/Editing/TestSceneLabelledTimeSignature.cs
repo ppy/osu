@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("set current to 3/4", () => timeSignature.Current.Value = TimeSignature.SimpleTriple);
 
             AddAssert("current is 3/4", () => timeSignature.Current.Value.Equals(TimeSignature.SimpleTriple));
-            AddAssert("numerator is 5", () => numeratorTextBox.Current.Value == "3");
+            AddAssert("numerator is 3", () => numeratorTextBox.Current.Value == "3");
         }
 
         [Test]
