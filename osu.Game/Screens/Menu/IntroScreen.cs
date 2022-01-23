@@ -99,51 +99,51 @@ namespace osu.Game.Screens.Menu
             {
                 realmContextFactory.Run(realm =>
                 {
-                    var sets = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
+                    var usableBeatmapSets = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
 
-                    int setCount = sets.Count;
+                    int setCount = usableBeatmapSets.Count;
 
                     if (setCount > 0)
                     {
-                        var found = sets[RNG.Next(0, setCount - 1)].Beatmaps.FirstOrDefault();
+                        var found = usableBeatmapSets[RNG.Next(0, setCount - 1)].Beatmaps.FirstOrDefault();
 
                         if (found != null)
                             initialBeatmap = beatmaps.GetWorkingBeatmap(found);
                     }
                 });
+            }
 
-                // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
-                if (initialBeatmap == null)
+            // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
+            if (initialBeatmap == null)
+            {
+                if (!loadThemedIntro())
                 {
-                    if (!loadThemedIntro())
-                    {
-                        // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
-                        // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                        var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
+                    // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
+                    // this could happen if a user has nuked their files store. for now, reimport to repair this.
+                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
 
-                        import?.PerformWrite(b => b.Protected = true);
+                    import?.PerformWrite(b => b.Protected = true);
 
-                        loadThemedIntro();
-                    }
+                    loadThemedIntro();
                 }
+            }
 
-                bool loadThemedIntro()
+            bool loadThemedIntro()
+            {
+                var setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+
+                if (setInfo == null)
+                    return false;
+
+                setInfo.PerformRead(s =>
                 {
-                    var setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+                    if (s.Beatmaps.Count == 0)
+                        return;
 
-                    if (setInfo == null)
-                        return false;
+                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
+                });
 
-                    setInfo.PerformRead(s =>
-                    {
-                        if (s.Beatmaps.Count == 0)
-                            return;
-
-                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
-                    });
-
-                    return UsingThemedIntro = initialBeatmap != null;
-                }
+                return UsingThemedIntro = initialBeatmap != null;
             }
         }
 
