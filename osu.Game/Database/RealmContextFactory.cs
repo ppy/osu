@@ -84,7 +84,7 @@ namespace osu.Game.Database
                     Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
 
                     // Resubscribe any subscriptions
-                    foreach (var action in subscriptionActions.Keys)
+                    foreach (var action in customSubscriptionActions.Keys)
                         registerSubscription(action);
                 }
 
@@ -233,7 +233,22 @@ namespace osu.Game.Database
             }
         }
 
-        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> subscriptionActions = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
+        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> customSubscriptionActions = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
+
+        private readonly Dictionary<Func<Realm, IDisposable?>, Action> realmSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
+
+        public IDisposable Register<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> onChanged)
+            where T : RealmObjectBase
+        {
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
+
+            realmSubscriptionsResetMap.Add(action, () => onChanged(new EmptyRealmSet<T>(), null, null));
+
+            return Register(action);
+
+            IDisposable? action(Realm realm) => query(realm).QueryAsyncWithNotifications(onChanged);
+        }
 
         /// <summary>
         /// Run work on realm that will be run every time the update thread realm context gets recycled.
@@ -253,10 +268,11 @@ namespace osu.Game.Database
             {
                 lock (contextLock)
                 {
-                    if (subscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                    if (customSubscriptionActions.TryGetValue(action, out var unsubscriptionAction))
                     {
                         unsubscriptionAction?.Dispose();
-                        subscriptionActions.Remove(action);
+                        customSubscriptionActions.Remove(action);
+                        realmSubscriptionsResetMap.Remove(action);
                     }
                 }
             });
@@ -274,7 +290,7 @@ namespace osu.Game.Database
                 Debug.Assert(!customSubscriptionActions.TryGetValue(action, out var found) || found == null);
 
                 current_thread_subscriptions_allowed.Value = true;
-                subscriptionActions[action] = action(realm);
+                customSubscriptionActions[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
             }
         }
@@ -285,10 +301,13 @@ namespace osu.Game.Database
         /// </summary>
         private void unregisterAllSubscriptions()
         {
-            foreach (var action in subscriptionActions)
+            foreach (var action in realmSubscriptionsResetMap.Values)
+                action();
+
+            foreach (var action in customSubscriptionActions)
             {
                 action.Value?.Dispose();
-                subscriptionActions[action.Key] = null;
+                customSubscriptionActions[action.Key] = null;
             }
         }
 

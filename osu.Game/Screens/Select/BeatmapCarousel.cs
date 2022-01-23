@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            subscriptionSets = realmFactory.Register(realm => getBeatmapSets(realm).QueryAsyncWithNotifications(beatmapSetsChanged));
+            subscriptionSets = realmFactory.Register(getBeatmapSets, beatmapSetsChanged);
             subscriptionBeatmaps = realmFactory.Register(realm => realm.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged));
 
             // Can't use main subscriptions because we can't lookup deleted indices.
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private IRealmCollection<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
+        private IQueryable<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) =>
             removeBeatmapSet(beatmapSet.ID);
