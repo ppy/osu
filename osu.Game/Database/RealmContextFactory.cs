@@ -247,6 +247,8 @@ namespace osu.Game.Database
 
             registerSubscription(action);
 
+            // This token is returned to the consumer only.
+            // It will cause the registration to be permanently removed.
             return new InvokeOnDisposal(() =>
             {
                 lock (contextLock)
@@ -269,9 +271,24 @@ namespace osu.Game.Database
 
             lock (contextLock)
             {
+                Debug.Assert(!customSubscriptionActions.TryGetValue(action, out var found) || found == null);
+
                 current_thread_subscriptions_allowed.Value = true;
                 subscriptionActions[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
+            }
+        }
+
+        /// <summary>
+        /// Unregister all subscriptions when the realm context is to be recycled.
+        /// Subscriptions will still remain and will be re-subscribed when the realm context returns.
+        /// </summary>
+        private void unregisterAllSubscriptions()
+        {
+            foreach (var action in subscriptionActions)
+            {
+                action.Value?.Dispose();
+                subscriptionActions[action.Key] = null;
             }
         }
 
@@ -519,6 +536,7 @@ namespace osu.Game.Database
                         throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
                     syncContext = SynchronizationContext.Current;
+                    unregisterAllSubscriptions();
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
