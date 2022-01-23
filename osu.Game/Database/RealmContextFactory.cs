@@ -260,19 +260,29 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
 
+            var syncContext = SynchronizationContext.Current;
+
             registerSubscription(action);
 
             // This token is returned to the consumer only.
             // It will cause the registration to be permanently removed.
             return new InvokeOnDisposal(() =>
             {
-                lock (contextLock)
+                if (ThreadSafety.IsUpdateThread)
+                    unsubscribe();
+                else
+                    syncContext.Post(_ => unsubscribe(), null);
+
+                void unsubscribe()
                 {
-                    if (customSubscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                    lock (contextLock)
                     {
-                        unsubscriptionAction?.Dispose();
-                        customSubscriptionActions.Remove(action);
-                        realmSubscriptionsResetMap.Remove(action);
+                        if (customSubscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                        {
+                            unsubscriptionAction?.Dispose();
+                            customSubscriptionActions.Remove(action);
+                            realmSubscriptionsResetMap.Remove(action);
+                        }
                     }
                 }
             });
