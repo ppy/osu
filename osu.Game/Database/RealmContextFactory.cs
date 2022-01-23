@@ -292,7 +292,9 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            // Get context outside of flag update to ensure beyond doubt this can't be cyclic.
+            // Retrieve context outside of flag update to ensure that the context is constructed,
+            // as attempting to access it inside the subscription if it's not constructed would lead to
+            // cyclic invocations of the subscription callback.
             var realm = Context;
 
             lock (contextLock)
