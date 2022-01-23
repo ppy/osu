@@ -27,8 +27,8 @@ namespace osu.Game.Beatmaps.Timing
             Numerator = numerator;
         }
 
-        public static TimeSignature SimpleTriple => new TimeSignature(3);
-        public static TimeSignature SimpleQuadruple => new TimeSignature(4);
+        public static TimeSignature SimpleTriple { get; } = new TimeSignature(3);
+        public static TimeSignature SimpleQuadruple { get; } = new TimeSignature(4);
 
         public override string ToString() => $"{Numerator}/4";
 
