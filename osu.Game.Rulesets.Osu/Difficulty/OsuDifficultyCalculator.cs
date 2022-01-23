@@ -63,8 +63,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double drainRate = beatmap.Difficulty.DrainRate;
 
             int maxCombo = beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
-            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
+            // Add the ticks + tail of the slider
+            // 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
+            // an additional 1 is subtracted if only nested objects are judged because the hit result of the entire slider would not contribute to combo
+            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1 - (s.OnlyJudgeNestedObjects ? 1 : 0));
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
