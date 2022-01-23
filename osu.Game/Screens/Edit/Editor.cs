@@ -822,10 +822,13 @@ namespace osu.Game.Screens.Edit
             var rulesetItems = new List<MenuItem>();
 
             foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.OnlineID))
-                rulesetItems.Add(new EditorMenuItem(ruleset.Name));
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => createNewDifficulty(ruleset)));
 
             return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
         }
+
+        private void createNewDifficulty(RulesetInfo rulesetInfo)
+            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo.BeatmapSet, rulesetInfo, GetState());
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
@@ -850,7 +853,7 @@ namespace osu.Game.Screens.Edit
             return new EditorMenuItem("Change difficulty") { Items = difficultyItems };
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, GetState(nextBeatmap));
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap));
 
         private void cancelExit()
         {

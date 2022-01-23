@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -78,7 +79,13 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void ScheduleDifficultySwitch(BeatmapInfo nextBeatmap, EditorState editorState)
+        public void ScheduleSwitchToNewDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo, EditorState editorState)
+            => scheduleDifficultySwitch(() => beatmapManager.CreateNewBlankDifficulty(beatmapSetInfo, rulesetInfo), editorState);
+
+        public void ScheduleSwitchToExistingDifficulty(BeatmapInfo beatmapInfo, EditorState editorState)
+            => scheduleDifficultySwitch(() => beatmapManager.GetWorkingBeatmap(beatmapInfo), editorState);
+
+        private void scheduleDifficultySwitch(Func<WorkingBeatmap> nextBeatmap, EditorState editorState)
         {
             scheduledDifficultySwitch?.Cancel();
             ValidForResume = true;
@@ -87,7 +94,7 @@ namespace osu.Game.Screens.Edit
 
             scheduledDifficultySwitch = Schedule(() =>
             {
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(nextBeatmap);
+                Beatmap.Value = nextBeatmap.Invoke();
                 state = editorState;
 
                 // This screen is a weird exception to the rule that nothing after song select changes the global beatmap.

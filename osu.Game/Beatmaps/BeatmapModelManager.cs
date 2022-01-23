@@ -49,7 +49,6 @@ namespace osu.Game.Beatmaps
         public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
         {
             var setInfo = beatmapInfo.BeatmapSet;
-
             Debug.Assert(setInfo != null);
 
             // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
@@ -85,6 +84,24 @@ namespace osu.Game.Beatmaps
             WorkingBeatmapCache?.Invalidate(beatmapInfo);
         }
 
+        /// <summary>
+        /// Add a new difficulty to the beatmap set represented by the provided <see cref="BeatmapSetInfo"/>.
+        /// </summary>
+        public BeatmapInfo AddDifficultyToBeatmapSet(BeatmapSetInfo beatmapSetInfo, Beatmap beatmap)
+        {
+            return Realm.Run(realm =>
+            {
+                var beatmapInfo = beatmap.BeatmapInfo;
+
+                beatmapSetInfo.Beatmaps.Add(beatmapInfo);
+                beatmapInfo.BeatmapSet = beatmapSetInfo;
+
+                Save(beatmapInfo, beatmap);
+
+                return beatmapInfo.Detach();
+            });
+        }
+
         private static string getFilename(BeatmapInfo beatmapInfo)
         {
             var metadata = beatmapInfo.Metadata;
@@ -103,9 +120,9 @@ namespace osu.Game.Beatmaps
 
         public void Update(BeatmapSetInfo item)
         {
-            Realm.Write(realm =>
+            Realm.Write(r =>
             {
-                var existing = realm.Find<BeatmapSetInfo>(item.ID);
+                var existing = r.Find<BeatmapSetInfo>(item.ID);
                 item.CopyChangesToRealm(existing);
             });
         }
