@@ -55,13 +55,12 @@ namespace osu.Game.Input.Bindings
 
         protected override void LoadComplete()
         {
-            realmSubscription = realmFactory.Register(realm => queryRealmKeyBindings()
-                .QueryAsyncWithNotifications((sender, changes, error) =>
-                {
-                    // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
-                    // but this is safest in case the subscription is restored after a context recycle.
-                    ReloadMappings();
-                }));
+            realmSubscription = realmFactory.Register(realm => queryRealmKeyBindings(), (sender, changes, error) =>
+            {
+                // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
+                // but this is safest in case the subscription is restored after a context recycle.
+                ReloadMappings();
+            });
 
             base.LoadComplete();
         }

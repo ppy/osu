@@ -49,18 +49,18 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 scoreSubscription?.Dispose();
                 scoreSubscription = realmFactory.Register(realm =>
-                    realm.All<ScoreInfo>()
-                         .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                                 + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
-                                 + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
-                         .OrderByDescending(s => s.TotalScore)
-                         .QueryAsyncWithNotifications((items, changes, ___) =>
-                         {
-                             Rank = items.FirstOrDefault()?.Rank;
-                             // Required since presence is changed via IsPresent override
-                             Invalidate(Invalidation.Presence);
-                         }));
+                        realm.All<ScoreInfo>()
+                             .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                     + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                     + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
+                                     + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
+                             .OrderByDescending(s => s.TotalScore),
+                    (items, changes, ___) =>
+                    {
+                        Rank = items.FirstOrDefault()?.Rank;
+                        // Required since presence is changed via IsPresent override
+                        Invalidate(Invalidation.Presence);
+                    });
             }, true);
         }
 
