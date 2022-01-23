@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Mods
 
         [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
         public abstract BindableNumber<float> InitialRadius { get; }
+
+        protected abstract BindableNumber<float> ModeMultiplier { get; }
     }
 
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
@@ -100,10 +102,13 @@ namespace osu.Game.Rulesets.Mods
 
             public readonly float InitialRadius;
 
-            protected Flashlight(bool isRadiusBasedOnCombo, float initialRadius)
+            public readonly float ModeMultiplier;
+
+            protected Flashlight(bool isRadiusBasedOnCombo, float initialRadius, float modeMultiplier)
             {
                 IsRadiusBasedOnCombo = isRadiusBasedOnCombo;
                 InitialRadius = initialRadius;
+                ModeMultiplier = modeMultiplier;
             }
 
             [BackgroundDependencyLoader]
@@ -142,12 +147,12 @@ namespace osu.Game.Rulesets.Mods
                 if (IsRadiusBasedOnCombo)
                 {
                     if (combo > 200)
-                        return InitialRadius * 0.8f;
+                        return InitialRadius * 0.8f * ModeMultiplier;
                     else if (combo > 100)
-                        return InitialRadius * 0.9f;
+                        return InitialRadius * 0.9f * ModeMultiplier;
                 }
 
-                return InitialRadius;
+                return InitialRadius * ModeMultiplier;
             }
 
             private Vector2 flashlightPosition;

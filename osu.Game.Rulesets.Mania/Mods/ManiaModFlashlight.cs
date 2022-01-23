@@ -28,20 +28,26 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
         {
             MinValue = 0f,
-            MaxValue = 230f,
-            Default = 50f,
-            Value = 50f,
-            Precision = 5f
+            MaxValue = 4.5f,
+            Default = 1f,
+            Value = 1f,
+            Precision = 0.1f
         };
 
-        public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value);
+        protected override BindableNumber<float> ModeMultiplier { get; } = new BindableNumber<float>
+        {
+            Default = 50,
+            Value = 50,
+        };
+
+        public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value, ModeMultiplier.Value);
 
         private class ManiaFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
 
-            public ManiaFlashlight(bool isRadiusBasedOnCombo, float initialRadius)
-                : base(isRadiusBasedOnCombo, initialRadius)
+            public ManiaFlashlight(bool isRadiusBasedOnCombo, float initialRadius, float modeMultiplier)
+                : base(isRadiusBasedOnCombo, initialRadius, modeMultiplier)
             {
                 FlashlightSize = new Vector2(DrawWidth, GetRadiusFor(0));
 
