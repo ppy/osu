@@ -114,13 +114,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return;
 
             scoreSubscription = realmFactory.Register(realm =>
-                realm.All<ScoreInfo>()
-                     .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
-                     .QueryAsyncWithNotifications((_, changes, ___) =>
-                     {
-                         if (!IsOnlineScope)
-                             RefreshScores();
-                     }));
+                    realm.All<ScoreInfo>()
+                         .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
+                (_, changes, ___) =>
+                {
+                    if (!IsOnlineScope)
+                        RefreshScores();
+                });
         }
 
         protected override void Reset()
