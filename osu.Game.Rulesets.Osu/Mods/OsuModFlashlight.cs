@@ -40,16 +40,22 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
         public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
         {
-            MinValue = 90f,
-            MaxValue = 360f,
-            Default = 180f,
-            Value = 180f,
-            Precision = 5f
+            MinValue = 0.5f,
+            MaxValue = 2f,
+            Default = 1f,
+            Value = 1f,
+            Precision = 0.1f
+        };
+
+        protected override BindableNumber<float> ModeMultiplier { get; } = new BindableNumber<float>
+        {
+            Default = 180,
+            Value = 180,
         };
 
         private OsuFlashlight flashlight;
 
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value);
+        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value, ModeMultiplier.Value);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -64,8 +70,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             //public float InitialRadius { private get; set; }
             public bool ChangeRadius { private get; set; }
 
-            public OsuFlashlight(bool isRadiusBasedOnCombo, float initialRadius, double followDelay)
-                : base(isRadiusBasedOnCombo, initialRadius)
+            public OsuFlashlight(bool isRadiusBasedOnCombo, float initialRadius, double followDelay, float modeMultiplier)
+                : base(isRadiusBasedOnCombo, initialRadius, modeMultiplier)
             {
                 FollowDelay = followDelay;
 
