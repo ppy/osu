@@ -57,8 +57,12 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Margin = new MarginPadding(10),
-                            Text = "/4",
+                            Margin = new MarginPadding
+                            {
+                                Left = 5,
+                                Right = CONTENT_PADDING_HORIZONTAL
+                            },
+                            Text = "/ 4",
                             Font = OsuFont.Default.With(size: 20)
                         }
                     }
