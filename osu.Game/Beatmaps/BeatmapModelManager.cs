@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps
                 string targetFilename = getFilename(beatmapInfo);
 
                 // ensure that two difficulties from the set don't point at the same beatmap file.
-                if (setInfo.Beatmaps.Any(b => string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
+                if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
                     throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
 
                 if (existingFileInfo != null)
