@@ -78,6 +78,9 @@ namespace osu.Game.Screens.Edit
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [Resolved]
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -806,11 +809,22 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
+            fileMenuItems.Add(createDifficultyCreationMenu());
             fileMenuItems.Add(createDifficultySwitchMenu());
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
+        }
+
+        private EditorMenuItem createDifficultyCreationMenu()
+        {
+            var rulesetItems = new List<MenuItem>();
+
+            foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.OnlineID))
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name));
+
+            return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
         }
 
         private EditorMenuItem createDifficultySwitchMenu()
