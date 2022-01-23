@@ -88,7 +88,7 @@ namespace osu.Game.Beatmaps
         private static string getFilename(BeatmapInfo beatmapInfo)
         {
             var metadata = beatmapInfo.Metadata;
-            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
         }
 
         /// <summary>
