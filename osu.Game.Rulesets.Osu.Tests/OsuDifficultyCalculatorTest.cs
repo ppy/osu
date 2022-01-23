@@ -15,15 +15,20 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(6.6972307565739273d, "diffcalc-test")]
-        [TestCase(1.4484754139145539d, "zero-length-sliders")]
-        public void Test(double expected, string name)
-            => base.Test(expected, name);
+        [TestCase(6.6972307565739273d, 206, "diffcalc-test")]
+        [TestCase(1.4484754139145539d, 45, "zero-length-sliders")]
+        public void Test(double expectedStarRating, int expectedMaxCombo, string name)
+            => base.Test(expectedStarRating, expectedMaxCombo, name);
 
-        [TestCase(8.9382559208689809d, "diffcalc-test")]
-        [TestCase(1.7548875851757628d, "zero-length-sliders")]
-        public void TestClockRateAdjusted(double expected, string name)
-            => Test(expected, name, new OsuModDoubleTime());
+        [TestCase(8.9382559208689809d, 206, "diffcalc-test")]
+        [TestCase(1.7548875851757628d, 45, "zero-length-sliders")]
+        public void TestClockRateAdjusted(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name, new OsuModDoubleTime());
+
+        [TestCase(6.6972307218715166d, 239, "diffcalc-test")]
+        [TestCase(1.4484754139145537d, 54, "zero-length-sliders")]
+        public void TestClassicMod(double expectedStarRating, int expectedMaxCombo, string name)
+            => Test(expectedStarRating, expectedMaxCombo, name, new OsuModClassic());
 
         protected override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset().RulesetInfo, beatmap);
 
