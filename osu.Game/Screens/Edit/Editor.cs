@@ -378,12 +378,16 @@ namespace osu.Game.Screens.Edit
             Clipboard.Content.Value = state.ClipboardContent;
         });
 
-        protected void Save()
+        /// <summary>
+        /// Saves the currently edited beatmap.
+        /// </summary>
+        /// <returns>Whether the save was successful.</returns>
+        protected bool Save()
         {
             if (!canSave)
             {
                 notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
-                return;
+                return false;
             }
 
             try
@@ -395,12 +399,13 @@ namespace osu.Game.Screens.Edit
             {
                 // can fail e.g. due to duplicated difficulty names.
                 Logger.Error(ex, ex.Message);
-                return;
+                return false;
             }
 
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
             updateLastSavedHash();
+            return true;
         }
 
         protected override void Update()
@@ -809,7 +814,7 @@ namespace osu.Game.Screens.Edit
         {
             var fileMenuItems = new List<MenuItem>
             {
-                new EditorMenuItem("Save", MenuItemType.Standard, Save)
+                new EditorMenuItem("Save", MenuItemType.Standard, () => Save())
             };
 
             if (RuntimeInfo.IsDesktop)

@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual
 
             public new void Redo() => base.Redo();
 
-            public new void Save() => base.Save();
+            public new bool Save() => base.Save();
 
             public new void Cut() => base.Cut();
 
