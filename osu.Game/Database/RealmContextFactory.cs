@@ -249,11 +249,13 @@ namespace osu.Game.Database
 
             return new InvokeOnDisposal(() =>
             {
-                // TODO: this likely needs to be run on the update thread.
-                if (subscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                lock (contextLock)
                 {
-                    unsubscriptionAction?.Dispose();
-                    subscriptionActions.Remove(action);
+                    if (subscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                    {
+                        unsubscriptionAction?.Dispose();
+                        subscriptionActions.Remove(action);
+                    }
                 }
             });
         }
