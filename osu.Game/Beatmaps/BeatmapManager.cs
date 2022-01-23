@@ -129,6 +129,8 @@ namespace osu.Game.Beatmaps
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
             var createdBeatmapInfo = beatmapModelManager.AddDifficultyToBeatmapSet(beatmapSetInfo, newBeatmap);
+
+            workingBeatmapCache.Invalidate(createdBeatmapInfo.BeatmapSet);
             return GetWorkingBeatmap(createdBeatmapInfo);
         }
 
