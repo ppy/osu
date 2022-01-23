@@ -90,5 +90,45 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("track length changed", () => Beatmap.Value.Track.Length > 60000);
         }
+
+        [Test]
+        public void TestCreateNewDifficulty()
+        {
+            string firstDifficultyName = Guid.NewGuid().ToString();
+            string secondDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == firstDifficultyName);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+
+                return beatmap != null
+                       && beatmap.DifficultyName == firstDifficultyName
+                       && set != null
+                       && set.PerformRead(s => s.Beatmaps.Single().ID == beatmap.ID);
+            });
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddUntilStep("wait for created", () =>
+            {
+                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != firstDifficultyName;
+            });
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == secondDifficultyName);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+
+                return beatmap != null
+                       && beatmap.DifficultyName == secondDifficultyName
+                       && set != null
+                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName));
+            });
+        }
     }
 }
