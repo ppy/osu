@@ -109,6 +109,7 @@ namespace osu.Game.Tests.Visual.Editing
                        && set != null
                        && set.PerformRead(s => s.Beatmaps.Single().ID == beatmap.ID);
             });
+            AddAssert("can save again", () => Editor.Save());
 
             AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
             AddUntilStep("wait for created", () =>
