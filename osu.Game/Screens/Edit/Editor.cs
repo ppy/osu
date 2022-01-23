@@ -386,12 +386,20 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
+            try
+            {
+                // save the loaded beatmap's data stream.
+                beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
+            }
+            catch (Exception ex)
+            {
+                // can fail e.g. due to duplicated difficulty names.
+                Logger.Error(ex, ex.Message);
+                return;
+            }
+
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
-
-            // save the loaded beatmap's data stream.
-            beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
-
             updateLastSavedHash();
         }
 

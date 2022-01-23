@@ -71,6 +71,12 @@ namespace osu.Game.Beatmaps
 
                 // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
                 var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                string targetFilename = getFilename(beatmapInfo);
+
+                // ensure that two difficulties from the set don't point at the same beatmap file.
+                if (setInfo.Beatmaps.Any(b => string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
+
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
