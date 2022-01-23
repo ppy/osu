@@ -112,7 +112,7 @@ namespace osu.Game.Beatmaps
         /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
         /// and represented by the returned <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public WorkingBeatmap CreateNewBlankDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo)
+        public virtual WorkingBeatmap CreateNewBlankDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo)
         {
             // fetch one of the existing difficulties to copy timing points and metadata from,
             // so that the user doesn't have to fill all of that out again.
