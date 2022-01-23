@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
@@ -62,11 +63,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(beatmap.Difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
             double drainRate = beatmap.Difficulty.DrainRate;
 
-            int maxCombo = beatmap.HitObjects.Count;
-            // Add the ticks + tail of the slider
-            // 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
-            // an additional 1 is subtracted if only nested objects are judged because the hit result of the entire slider would not contribute to combo
-            maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1 - (s.OnlyJudgeNestedObjects ? 1 : 0));
+            int maxCombo = 0;
+
+            void countCombo(HitObject ho)
+            {
+                if (ho.CreateJudgement().MaxResult.AffectsCombo())
+                    maxCombo++;
+            }
+
+            foreach (HitObject ho in beatmap.HitObjects)
+            {
+                countCombo(ho);
+                foreach (HitObject nested in ho.NestedHitObjects)
+                    countCombo(nested);
+            }
 
             int hitCirclesCount = beatmap.HitObjects.Count(h => h is HitCircle);
             int sliderCount = beatmap.HitObjects.Count(h => h is Slider);
