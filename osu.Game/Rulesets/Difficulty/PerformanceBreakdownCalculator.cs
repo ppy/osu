@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -64,7 +66,7 @@ namespace osu.Game.Rulesets.Difficulty
 
                 // create statistics assuming all hit objects have perfect hit result
                 var statistics = beatmap.HitObjects
-                                        .Select(ho => ho.CreateJudgement().MaxResult)
+                                        .SelectMany(getPerfectHitResults)
                                         .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
                                         .ToDictionary(pair => pair.hitResult, pair => pair.count);
                 perfectPlay.Statistics = statistics;
@@ -88,6 +90,14 @@ namespace osu.Game.Rulesets.Difficulty
                 // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
                 return ruleset.CreatePerformanceCalculator(difficulty.Value.Attributes, perfectPlay)?.Calculate();
             }, cancellationToken);
+        }
+
+        private IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
+        {
+            foreach (HitObject nested in hitObject.NestedHitObjects)
+                yield return nested.CreateJudgement().MaxResult;
+
+            yield return hitObject.CreateJudgement().MaxResult;
         }
     }
 }
