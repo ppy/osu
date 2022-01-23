@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                     MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                    Zoom = getZoomLevelForVisibleMilliseconds(6000);
                 }
             }, true);
         }
