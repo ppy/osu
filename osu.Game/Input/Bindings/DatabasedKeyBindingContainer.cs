@@ -46,19 +46,16 @@ namespace osu.Game.Input.Bindings
                 throw new InvalidOperationException($"{nameof(variant)} can not be null when a non-null {nameof(ruleset)} is provided.");
         }
 
-        private IQueryable<RealmKeyBinding> realmKeyBindings
+        private IQueryable<RealmKeyBinding> queryRealmKeyBindings()
         {
-            get
-            {
-                string rulesetName = ruleset?.ShortName;
-                return realmFactory.Context.All<RealmKeyBinding>()
-                                   .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
-            }
+            string rulesetName = ruleset?.ShortName;
+            return realmFactory.Context.All<RealmKeyBinding>()
+                               .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
         }
 
         protected override void LoadComplete()
         {
-            realmSubscription = realmFactory.Register(realm => realmKeyBindings
+            realmSubscription = realmFactory.Register(realm => queryRealmKeyBindings()
                 .QueryAsyncWithNotifications((sender, changes, error) =>
                 {
                     // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
@@ -80,11 +77,11 @@ namespace osu.Game.Input.Bindings
         {
             var defaults = DefaultKeyBindings.ToList();
 
-            List<RealmKeyBinding> newBindings = realmKeyBindings.Detach()
-                                                                // this ordering is important to ensure that we read entries from the database in the order
-                                                                // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
-                                                                // have been eaten by the music controller due to query order.
-                                                                .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
+            List<RealmKeyBinding> newBindings = queryRealmKeyBindings().Detach()
+                                                                       // this ordering is important to ensure that we read entries from the database in the order
+                                                                       // enforced by DefaultKeyBindings. allow for song select to handle actions that may otherwise
+                                                                       // have been eaten by the music controller due to query order.
+                                                                       .OrderBy(b => defaults.FindIndex(d => (int)d.Action == b.ActionInt)).ToList();
 
             // In the case no bindings were found in the database, presume this usage is for a non-databased ruleset.
             // This actually should never be required and can be removed if it is ever deemed to cause a problem.
