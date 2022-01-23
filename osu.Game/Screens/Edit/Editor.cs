@@ -822,12 +822,12 @@ namespace osu.Game.Screens.Edit
             var rulesetItems = new List<MenuItem>();
 
             foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.OnlineID))
-                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => createNewDifficulty(ruleset)));
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => CreateNewDifficulty(ruleset)));
 
             return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
         }
 
-        private void createNewDifficulty(RulesetInfo rulesetInfo)
+        protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
             => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo.BeatmapSet, rulesetInfo, GetState());
 
         private EditorMenuItem createDifficultySwitchMenu()
