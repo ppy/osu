@@ -61,6 +61,7 @@ namespace osu.Game.Tests.Editing
             BeatDivisor.Value = 1;
 
             composer.EditorBeatmap.Difficulty.SliderMultiplier = 1;
+            composer.EditorBeatmap.BeatmapInfo.DistanceSpacing = 1;
             composer.EditorBeatmap.ControlPointInfo.Clear();
             composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });

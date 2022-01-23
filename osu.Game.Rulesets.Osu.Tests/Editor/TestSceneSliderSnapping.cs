@@ -3,12 +3,15 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
@@ -61,8 +64,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             }));
             AddStep("set beat divisor to 1/1", () =>
             {
-                var beatDivisor = (BindableBeatDivisor)Editor.Dependencies.Get(typeof(BindableBeatDivisor));
+                var beatDivisor = Editor.Dependencies.Get<BindableBeatDivisor>();
                 beatDivisor.Value = 1;
+            });
+            AddStep("set distance spacing to 1", () =>
+            {
+                var distanceSpacing = (BindableFloat)Editor.ChildrenOfType<HitObjectComposer>().Single().DistanceSpacingMultiplier;
+                distanceSpacing.Value = 1;
             });
         }
 
