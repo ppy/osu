@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -80,7 +81,20 @@ namespace osu.Game.Screens.Edit
         }
 
         public void ScheduleSwitchToNewDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo, EditorState editorState)
-            => scheduleDifficultySwitch(() => beatmapManager.CreateNewBlankDifficulty(beatmapSetInfo, rulesetInfo), editorState);
+            => scheduleDifficultySwitch(() =>
+            {
+                try
+                {
+                    return beatmapManager.CreateNewBlankDifficulty(beatmapSetInfo, rulesetInfo);
+                }
+                catch (Exception ex)
+                {
+                    // if the beatmap creation fails (e.g. due to duplicated difficulty names),
+                    // bring the user back to the previous beatmap as a best-effort.
+                    Logger.Error(ex, ex.Message);
+                    return Beatmap.Value;
+                }
+            }, editorState);
 
         public void ScheduleSwitchToExistingDifficulty(BeatmapInfo beatmapInfo, EditorState editorState)
             => scheduleDifficultySwitch(() => beatmapManager.GetWorkingBeatmap(beatmapInfo), editorState);
