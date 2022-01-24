@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -22,8 +24,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform) };
 
-        private const int wiggle_duration = 90; // (ms) Higher = fewer wiggles
-        private const int wiggle_strength = 10; // Higher = stronger wiggles
+        [SettingSource("Wiggle strength", "something")]
+        public BindableDouble WiggleStrength { get; } = new BindableDouble(10)
+        {
+            MinValue = 1f,
+            MaxValue = 15f,
+            Precision = .5f
+        };
+
+        [SettingSource("Wiggle duration", "milliseconds per wiggle")]
+        public BindableInt WiggleDuration { get; } = new BindableInt(90)
+        {
+            MinValue = 40,
+            MaxValue = 300,
+            Precision = 5
+        };
 
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => drawableOnApplyCustomUpdateState(hitObject, state);
 
@@ -42,18 +57,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             Random objRand = new Random((int)osuObject.StartTime);
 
             // Wiggle all objects during TimePreempt
-            int amountWiggles = (int)osuObject.TimePreempt / wiggle_duration;
+            int amountWiggles = (int)osuObject.TimePreempt / WiggleDuration.Value;
 
             void wiggle()
             {
                 float nextAngle = (float)(objRand.NextDouble() * 2 * Math.PI);
-                float nextDist = (float)(objRand.NextDouble() * wiggle_strength);
-                drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), wiggle_duration);
+                float nextDist = (float)(objRand.NextDouble() * WiggleStrength.Value);
+                drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), WiggleDuration.Value);
             }
 
             for (int i = 0; i < amountWiggles; i++)
             {
-                using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * wiggle_duration))
+                using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * WiggleDuration.Value))
                     wiggle();
             }
 
@@ -61,11 +76,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(osuObject is IHasDuration endTime))
                 return;
 
-            amountWiggles = (int)(endTime.Duration / wiggle_duration);
+            amountWiggles = (int)(endTime.Duration / WiggleDuration.Value);
 
             for (int i = 0; i < amountWiggles; i++)
             {
-                using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * wiggle_duration))
+                using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * WiggleDuration.Value))
                     wiggle();
             }
         }
