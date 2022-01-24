@@ -25,11 +25,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform) };
 
         [SettingSource("Strength")]
-        public BindableDouble WiggleStrength { get; } = new BindableDouble(10)
+        public BindableDouble WiggleStrength { get; } = new BindableDouble(1)
         {
-            MinValue = 1f,
-            MaxValue = 15f,
-            Precision = .5f
+            MinValue = .1f,
+            MaxValue = 2f,
+            Precision = .1f
         };
 
         [SettingSource("Duration", "Milliseconds per wiggle")]
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             void wiggle()
             {
                 float nextAngle = (float)(objRand.NextDouble() * 2 * Math.PI);
-                float nextDist = (float)(objRand.NextDouble() * WiggleStrength.Value);
+                float nextDist = (float)(objRand.NextDouble() * WiggleStrength.Value * 7);
                 drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), WiggleDuration.Value);
             }
 
