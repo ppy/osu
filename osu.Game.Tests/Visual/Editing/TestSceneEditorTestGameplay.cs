@@ -5,10 +5,12 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
@@ -37,13 +39,14 @@ namespace osu.Game.Tests.Visual.Editing
 
         public override void SetUpSteps()
         {
-            AddStep("import test beatmap", () => importedBeatmapSet = ImportBeatmapTest.LoadOszIntoOsu(game).Result);
+            AddStep("import test beatmap", () => importedBeatmapSet = BeatmapImportHelper.LoadOszIntoOsu(game).GetResultSafely());
             base.SetUpSteps();
         }
 
         protected override void LoadEditor()
         {
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First(b => b.RulesetID == 0));
+            SelectedMods.Value = new[] { new ModCinema() };
             base.LoadEditor();
         }
 
@@ -67,6 +70,7 @@ namespace osu.Game.Tests.Visual.Editing
                 var background = this.ChildrenOfType<BackgroundScreenBeatmap>().Single();
                 return background.Colour == Color4.DarkGray && background.BlurAmount.Value == 0;
             });
+            AddAssert("no mods selected", () => SelectedMods.Value.Count == 0);
         }
 
         [Test]

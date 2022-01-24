@@ -52,15 +52,37 @@ namespace osu.Game.Tests.Database
             Assert.That(queryCount(GlobalAction.Select), Is.EqualTo(2));
         }
 
+        [Test]
+        public void TestDefaultsPopulationRemovesExcess()
+        {
+            Assert.That(queryCount(), Is.EqualTo(0));
+
+            KeyBindingContainer testContainer = new TestKeyBindingContainer();
+
+            // Add some excess bindings for an action which only supports 1.
+            realmContextFactory.Write(realm =>
+            {
+                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
+                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
+                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
+            });
+
+            Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(3));
+
+            keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
+
+            Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(1));
+        }
+
         private int queryCount(GlobalAction? match = null)
         {
-            using (var realm = realmContextFactory.CreateContext())
+            return realmContextFactory.Run(realm =>
             {
                 var results = realm.All<RealmKeyBinding>();
                 if (match.HasValue)
                     results = results.Where(k => k.ActionInt == (int)match.Value);
                 return results.Count();
-            }
+            });
         }
 
         [Test]
@@ -70,26 +92,26 @@ namespace osu.Game.Tests.Database
 
             keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
 
-            using (var primaryRealm = realmContextFactory.CreateContext())
+            realmContextFactory.Run(outerRealm =>
             {
-                var backBinding = primaryRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
+                var backBinding = outerRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
 
                 Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
 
                 var tsr = ThreadSafeReference.Create(backBinding);
 
-                using (var threadedContext = realmContextFactory.CreateContext())
+                realmContextFactory.Run(innerRealm =>
                 {
-                    var binding = threadedContext.ResolveReference(tsr);
-                    threadedContext.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
-                }
+                    var binding = innerRealm.ResolveReference(tsr);
+                    innerRealm.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
+                });
 
                 Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
 
                 // check still correct after re-query.
-                backBinding = primaryRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
+                backBinding = outerRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
                 Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
-            }
+            });
         }
 
         [TearDown]

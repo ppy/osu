@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play.HUD
             public Action HoverLost;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, Framework.Game game)
+            private void load(OsuColour colours)
             {
                 Size = new Vector2(60);
 

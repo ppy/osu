@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -24,28 +25,34 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
+        private readonly RealmContextFactory contextFactory;
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
         private readonly OsuConfigManager configManager;
         private readonly ScoreModelManager scoreModelManager;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, Scheduler scheduler,
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmContextFactory contextFactory, Scheduler scheduler,
                             IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
         {
+            this.contextFactory = contextFactory;
             this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
 
-            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory, importHost);
+            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory);
         }
 
         public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
 
-        public List<ScoreInfo> GetAllUsableScores() => scoreModelManager.GetAllUsableScores();
-
-        public IEnumerable<ScoreInfo> QueryScores(Expression<Func<ScoreInfo, bool>> query) => scoreModelManager.QueryScores(query);
-
-        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => scoreModelManager.Query(query);
+        /// <summary>
+        /// Perform a lookup query on available <see cref="ScoreInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query)
+        {
+            return contextFactory.Run(realm => realm.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
+        }
 
         /// <summary>
         /// Orders an array of <see cref="ScoreInfo"/>s by total score.
@@ -71,7 +78,7 @@ namespace osu.Game.Scoring
 
             return scores.Select((score, index) => (score, totalScore: totalScores[index]))
                          .OrderByDescending(g => g.totalScore)
-                         .ThenBy(g => g.score.OnlineScoreID)
+                         .ThenBy(g => g.score.OnlineID)
                          .Select(g => g.score)
                          .ToArray();
         }
@@ -112,7 +119,7 @@ namespace osu.Game.Scoring
         public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             GetTotalScoreAsync(score, mode, cancellationToken)
-                .ContinueWith(s => scheduler.Add(() => callback(s.Result)), TaskContinuationOptions.OnlyOnRanToCompletion);
+                .ContinueWith(task => scheduler.Add(() => callback(task.GetResultSafely())), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         /// <summary>
@@ -124,7 +131,8 @@ namespace osu.Game.Scoring
         /// <returns>The total score.</returns>
         public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
-            if (score.BeatmapInfo == null)
+            // TODO: This is required for playlist aggregate scores. They should likely not be getting here in the first place.
+            if (string.IsNullOrEmpty(score.BeatmapInfo.Hash))
                 return score.TotalScore;
 
             int beatmapMaxCombo;
@@ -149,11 +157,8 @@ namespace osu.Game.Scoring
                     beatmapMaxCombo = score.BeatmapInfo.MaxCombo.Value;
                 else
                 {
-                    if (score.BeatmapInfo.ID == 0 || difficulties == null)
-                    {
-                        // We don't have enough information (max combo) to compute the score, so use the provided score.
+                    if (difficulties == null)
                         return score.TotalScore;
-                    }
 
                     // We can compute the max combo locally after the async beatmap difficulty computation.
                     var difficulty = await difficulties().GetDifficultyAsync(score.BeatmapInfo, score.Ruleset, score.Mods, cancellationToken).ConfigureAwait(false);
@@ -242,26 +247,23 @@ namespace osu.Game.Scoring
 
         #region Implementation of IModelManager<ScoreInfo>
 
-        public event Action<ScoreInfo> ItemUpdated
-        {
-            add => scoreModelManager.ItemUpdated += value;
-            remove => scoreModelManager.ItemUpdated -= value;
-        }
-
-        public event Action<ScoreInfo> ItemRemoved
-        {
-            add => scoreModelManager.ItemRemoved += value;
-            remove => scoreModelManager.ItemRemoved -= value;
-        }
-
-        public void Update(ScoreInfo item)
-        {
-            scoreModelManager.Update(item);
-        }
-
         public bool Delete(ScoreInfo item)
         {
             return scoreModelManager.Delete(item);
+        }
+
+        public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
+        {
+            contextFactory.Run(realm =>
+            {
+                var items = realm.All<ScoreInfo>()
+                                 .Where(s => !s.DeletePending);
+
+                if (filter != null)
+                    items = items.Where(filter);
+
+                scoreModelManager.Delete(items.ToList(), silent);
+            });
         }
 
         public void Delete(List<ScoreInfo> items, bool silent = false)

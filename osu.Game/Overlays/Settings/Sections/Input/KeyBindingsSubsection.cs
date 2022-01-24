@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
 
-        protected RulesetInfo Ruleset;
+        public RulesetInfo Ruleset { get; protected set; }
 
         private readonly int? variant;
 
@@ -34,10 +34,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             string rulesetName = Ruleset?.ShortName;
 
-            List<RealmKeyBinding> bindings;
-
-            using (var realm = realmFactory.CreateContext())
-                bindings = realm.All<RealmKeyBinding>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).Detach();
+            var bindings = realmFactory.Run(realm => realm.All<RealmKeyBinding>()
+                                                          .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
+                                                          .Detach());
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {

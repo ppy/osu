@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour osuColour)
         {
-            Background.Colour = overlayColourProvider?.Dark6 ?? osuColour.GreySeafoamDarker;
+            Background.Colour = overlayColourProvider?.Dark6 ?? osuColour.GreySeaFoamDarker;
         }
 
         protected override TextBox CreateHexCodeTextBox() => new OsuTextBox();

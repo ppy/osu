@@ -49,8 +49,7 @@ namespace osu.Game.Tests.Visual.Editing
         public void TestCreateNewBeatmap()
         {
             AddStep("save beatmap", () => Editor.Save());
-            AddAssert("new beatmap persisted", () => EditorBeatmap.BeatmapInfo.ID > 0);
-            AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == false);
+            AddAssert("new beatmap in database", () => beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID)?.Value.DeletePending == false);
         }
 
         [Test]
@@ -66,7 +65,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddUntilStep("wait for exit", () => !Editor.IsCurrentScreen());
-            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.ID)?.DeletePending == true);
+            AddAssert("new beatmap not persisted", () => beatmapManager.QueryBeatmapSet(s => s.ID == editorBeatmap.BeatmapInfo.BeatmapSet.ID)?.Value.DeletePending == true);
         }
 
         [Test]

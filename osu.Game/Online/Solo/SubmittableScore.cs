@@ -10,13 +10,12 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Online.Solo
 {
     /// <summary>
     /// A class specifically for sending scores to the API during score submission.
-    /// This is used instead of <see cref="APIScoreInfo"/> due to marginally different serialisation naming requirements.
+    /// This is used instead of <see cref="APIScore"/> due to marginally different serialisation naming requirements.
     /// </summary>
     [Serializable]
     public class SubmittableScore

@@ -24,15 +24,20 @@ namespace osu.Game.Overlays.News.Sidebar
 {
     public class MonthSection : CompositeDrawable
     {
+        public int Year { get; private set; }
+        public int Month { get; private set; }
+        public readonly BindableBool Expanded = new BindableBool();
+
         private const int animation_duration = 250;
         private Sample sampleOpen;
         private Sample sampleClose;
 
-        public readonly BindableBool Expanded = new BindableBool();
-
         public MonthSection(int month, int year, IEnumerable<APINewsPost> posts)
         {
             Debug.Assert(posts.All(p => p.PublishedAt.Month == month && p.PublishedAt.Year == year));
+
+            Year = year;
+            Month = month;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

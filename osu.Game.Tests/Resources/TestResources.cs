@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
@@ -12,8 +13,12 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Resources
 {
@@ -84,7 +89,7 @@ namespace osu.Game.Tests.Resources
                 // Create random metadata, then we can check if sorting works based on these
                 Artist = "Some Artist " + RNG.Next(0, 9),
                 Title = $"Some Song (set id {setId}) {Guid.NewGuid()}",
-                AuthorString = "Some Guy " + RNG.Next(0, 9),
+                Author = { Username = "Some Guy " + RNG.Next(0, 9) },
             };
 
             var beatmapSet = new BeatmapSetInfo
@@ -92,7 +97,6 @@ namespace osu.Game.Tests.Resources
                 OnlineID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 DateAdded = DateTimeOffset.UtcNow,
-                Metadata = metadata
             };
 
             foreach (var b in getBeatmaps(difficultyCount ?? RNG.Next(1, 20)))
@@ -126,16 +130,73 @@ namespace osu.Game.Tests.Resources
                         StarRating = diff,
                         Length = length,
                         BPM = bpm,
+                        Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
-                        RulesetID = rulesetInfo.ID ?? -1,
                         Metadata = metadata,
-                        BaseDifficulty = new BeatmapDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = diff,
                         }
                     };
                 }
             }
+        }
+
+        /// <summary>
+        /// Create a test score model.
+        /// </summary>
+        /// <param name="ruleset">The ruleset for which the score was set against.</param>
+        /// <returns></returns>
+        public static ScoreInfo CreateTestScoreInfo(RulesetInfo ruleset = null) =>
+            CreateTestScoreInfo(CreateTestBeatmapSetInfo(1, new[] { ruleset ?? new OsuRuleset().RulesetInfo }).Beatmaps.First());
+
+        /// <summary>
+        /// Create a test score model.
+        /// </summary>
+        /// <param name="beatmap">The beatmap for which the score was set against.</param>
+        /// <returns></returns>
+        public static ScoreInfo CreateTestScoreInfo(BeatmapInfo beatmap) => new ScoreInfo
+        {
+            User = new APIUser
+            {
+                Id = 2,
+                Username = "peppy",
+                CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+            },
+            BeatmapInfo = beatmap,
+            Ruleset = beatmap.Ruleset,
+            Mods = new Mod[] { new TestModHardRock(), new TestModDoubleTime() },
+            TotalScore = 2845370,
+            Accuracy = 0.95,
+            MaxCombo = 999,
+            Position = 1,
+            Rank = ScoreRank.S,
+            Date = DateTimeOffset.Now,
+            Statistics = new Dictionary<HitResult, int>
+            {
+                [HitResult.Miss] = 1,
+                [HitResult.Meh] = 50,
+                [HitResult.Ok] = 100,
+                [HitResult.Good] = 200,
+                [HitResult.Great] = 300,
+                [HitResult.Perfect] = 320,
+                [HitResult.SmallTickHit] = 50,
+                [HitResult.SmallTickMiss] = 25,
+                [HitResult.LargeTickHit] = 100,
+                [HitResult.LargeTickMiss] = 50,
+                [HitResult.SmallBonus] = 10,
+                [HitResult.SmallBonus] = 50
+            },
+        };
+
+        private class TestModHardRock : ModHardRock
+        {
+            public override double ScoreMultiplier => 1;
+        }
+
+        private class TestModDoubleTime : ModDoubleTime
+        {
+            public override double ScoreMultiplier => 1;
         }
     }
 }

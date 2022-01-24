@@ -13,6 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
@@ -80,7 +81,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load()
         {
-            Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            Config = Dependencies.Get<IRulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
             {
@@ -98,14 +99,11 @@ namespace osu.Game.Rulesets.Edit
 
             dependencies.CacheAs(Playfield);
 
-            const float toolbar_width = 200;
-
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
                     Name = "Content",
-                    Padding = new MarginPadding { Left = toolbar_width },
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -117,20 +115,15 @@ namespace osu.Game.Rulesets.Edit
                                               .WithChild(BlueprintContainer = CreateBlueprintContainer())
                     }
                 },
-                new FillFlowContainer
+                new LeftToolboxFlow
                 {
-                    Name = "Sidebar",
-                    RelativeSizeAxes = Axes.Y,
-                    Width = toolbar_width,
-                    Padding = new MarginPadding { Right = 10 },
-                    Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        new ToolboxGroup("toolbox (1-9)")
+                        new EditorToolboxGroup("toolbox (1-9)")
                         {
                             Child = toolboxCollection = new EditorRadioButtonCollection { RelativeSizeAxes = Axes.X }
                         },
-                        new ToolboxGroup("toggles (Q~P)")
+                        new EditorToolboxGroup("toggles (Q~P)")
                         {
                             Child = togglesCollection = new FillFlowContainer
                             {
@@ -427,6 +420,18 @@ namespace osu.Game.Rulesets.Edit
         }
 
         #endregion
+
+        private class LeftToolboxFlow : ExpandingButtonContainer
+        {
+            public LeftToolboxFlow()
+                : base(80, 200)
+            {
+                RelativeSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Right = 10 };
+
+                FillFlow.Spacing = new Vector2(10);
+            }
+        }
     }
 
     /// <summary>

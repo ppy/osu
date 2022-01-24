@@ -22,14 +22,17 @@ using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Playlists
 {
     public class TestScenePlaylistsResultsScreen : ScreenTestScene
     {
         private const int scores_per_result = 10;
+        private const int real_user_position = 200;
 
         private TestResultsScreen resultsScreen;
+
         private int currentScoreId;
         private bool requestComplete;
         private int totalCount;
@@ -37,10 +40,14 @@ namespace osu.Game.Tests.Visual.Playlists
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            currentScoreId = 0;
+            currentScoreId = 1;
             requestComplete = false;
             totalCount = 0;
             bindHandler();
+
+            // beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
+            // else the tests that rely on ordering will fall over.
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
         });
 
         [Test]
@@ -50,13 +57,17 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = currentScoreId++;
+
                 bindHandler(userScore: userScore);
             });
 
             createResults(() => userScore);
 
-            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
+            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
+            AddAssert($"score panel position is {real_user_position}",
+                () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).ScorePosition.Value == real_user_position);
         }
 
         [Test]
@@ -74,14 +85,16 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = currentScoreId++;
+
                 bindHandler(true, userScore);
             });
 
             createResults(() => userScore);
 
             AddAssert("more than 1 panel displayed", () => this.ChildrenOfType<ScorePanel>().Count() > 1);
-            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineScoreID == userScore.OnlineScoreID).State == PanelState.Expanded);
+            AddAssert("user score selected", () => this.ChildrenOfType<ScorePanel>().Single(p => p.Score.OnlineID == userScore.OnlineID).State == PanelState.Expanded);
         }
 
         [Test]
@@ -123,7 +136,9 @@ namespace osu.Game.Tests.Visual.Playlists
 
             AddStep("bind user score info handler", () =>
             {
-                userScore = new TestScoreInfo(new OsuRuleset().RulesetInfo) { OnlineScoreID = currentScoreId++ };
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.OnlineID = currentScoreId++;
+
                 bindHandler(userScore: userScore);
             });
 
@@ -157,12 +172,13 @@ namespace osu.Game.Tests.Visual.Playlists
                 }));
             });
 
+            AddUntilStep("wait for screen to load", () => resultsScreen.IsLoaded);
             waitForDisplay();
         }
 
         private void waitForDisplay()
         {
-            AddUntilStep("wait for load to complete", () =>
+            AddUntilStep("wait for scores loaded", () =>
                 requestComplete
                 && resultsScreen.ScorePanelList.GetScorePanels().Count() == totalCount
                 && resultsScreen.ScorePanelList.AllPanelsVisible);
@@ -230,12 +246,12 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             var multiplayerUserScore = new MultiplayerScore
             {
-                ID = (int)(userScore.OnlineScoreID ?? currentScoreId++),
+                ID = (int)(userScore.OnlineID > 0 ? userScore.OnlineID : currentScoreId++),
                 Accuracy = userScore.Accuracy,
                 EndedAt = userScore.Date,
                 Passed = userScore.Passed,
                 Rank = userScore.Rank,
-                Position = 200,
+                Position = real_user_position,
                 MaxCombo = userScore.MaxCombo,
                 TotalScore = userScore.TotalScore,
                 User = userScore.User,

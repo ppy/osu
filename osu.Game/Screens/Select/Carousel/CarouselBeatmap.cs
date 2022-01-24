@@ -28,8 +28,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool match =
                 criteria.Ruleset == null ||
-                BeatmapInfo.RulesetID == criteria.Ruleset.ID ||
-                (BeatmapInfo.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
+                BeatmapInfo.RulesetID == criteria.Ruleset.OnlineID ||
+                (BeatmapInfo.RulesetID == 0 && criteria.Ruleset.OnlineID > 0 && criteria.AllowConvertedBeatmaps);
 
             if (BeatmapInfo.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
@@ -39,10 +39,10 @@ namespace osu.Game.Screens.Select.Carousel
             }
 
             match &= !criteria.StarDifficulty.HasFilter || criteria.StarDifficulty.IsInRange(BeatmapInfo.StarRating);
-            match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(BeatmapInfo.BaseDifficulty.ApproachRate);
-            match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(BeatmapInfo.BaseDifficulty.DrainRate);
-            match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(BeatmapInfo.BaseDifficulty.CircleSize);
-            match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(BeatmapInfo.BaseDifficulty.OverallDifficulty);
+            match &= !criteria.ApproachRate.HasFilter || criteria.ApproachRate.IsInRange(BeatmapInfo.Difficulty.ApproachRate);
+            match &= !criteria.DrainRate.HasFilter || criteria.DrainRate.IsInRange(BeatmapInfo.Difficulty.DrainRate);
+            match &= !criteria.CircleSize.HasFilter || criteria.CircleSize.IsInRange(BeatmapInfo.Difficulty.CircleSize);
+            match &= !criteria.OverallDifficulty.HasFilter || criteria.OverallDifficulty.IsInRange(BeatmapInfo.Difficulty.OverallDifficulty);
             match &= !criteria.Length.HasFilter || criteria.Length.IsInRange(BeatmapInfo.Length);
             match &= !criteria.BPM.HasFilter || criteria.BPM.IsInRange(BeatmapInfo.BPM);
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(BeatmapInfo.StarRating);
 
-            if (match)
+            if (match && criteria.SearchTerms.Length > 0)
             {
                 string[] terms = BeatmapInfo.GetSearchableTerms();
 

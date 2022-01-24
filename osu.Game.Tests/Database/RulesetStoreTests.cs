@@ -3,8 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Game.Models;
-using osu.Game.Stores;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Database
 {
@@ -15,10 +14,10 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmFactory, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realmFactory, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
-                Assert.AreEqual(4, realmFactory.Context.All<RealmRuleset>().Count());
+                Assert.AreEqual(4, realmFactory.Context.All<RulesetInfo>().Count());
             });
         }
 
@@ -27,14 +26,14 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmFactory, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realmFactory, storage);
-                var rulesets2 = new RealmRulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realmFactory, storage);
+                var rulesets2 = new RulesetStore(realmFactory, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
 
                 Assert.AreEqual(rulesets.AvailableRulesets.First(), rulesets2.AvailableRulesets.First());
-                Assert.AreEqual(4, realmFactory.Context.All<RealmRuleset>().Count());
+                Assert.AreEqual(4, realmFactory.Context.All<RulesetInfo>().Count());
             });
         }
 
@@ -43,11 +42,11 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmFactory, storage) =>
             {
-                var rulesets = new RealmRulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realmFactory, storage);
 
-                Assert.IsTrue((rulesets.AvailableRulesets.First() as RealmRuleset)?.IsManaged == false);
-                Assert.IsTrue((rulesets.GetRuleset(0) as RealmRuleset)?.IsManaged == false);
-                Assert.IsTrue((rulesets.GetRuleset("mania") as RealmRuleset)?.IsManaged == false);
+                Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
+                Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
+                Assert.IsFalse(rulesets.GetRuleset("mania")?.IsManaged);
             });
         }
     }

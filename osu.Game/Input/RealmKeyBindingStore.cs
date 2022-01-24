@@ -34,7 +34,7 @@ namespace osu.Game.Input
         {
             List<string> combinations = new List<string>();
 
-            using (var context = realmFactory.CreateContext())
+            realmFactory.Run(context =>
             {
                 foreach (var action in context.All<RealmKeyBinding>().Where(b => string.IsNullOrEmpty(b.RulesetName) && (GlobalAction)b.ActionInt == globalAction))
                 {
@@ -44,7 +44,7 @@ namespace osu.Game.Input
                     if (str.Length > 0)
                         combinations.Add(str);
                 }
-            }
+            });
 
             return combinations;
         }
@@ -56,24 +56,26 @@ namespace osu.Game.Input
         /// <param name="rulesets">The rulesets to populate defaults from.</param>
         public void Register(KeyBindingContainer container, IEnumerable<RulesetInfo> rulesets)
         {
-            using (var realm = realmFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realmFactory.Run(realm =>
             {
-                // intentionally flattened to a list rather than querying against the IQueryable, as nullable fields being queried against aren't indexed.
-                // this is much faster as a result.
-                var existingBindings = realm.All<RealmKeyBinding>().ToList();
-
-                insertDefaults(realm, existingBindings, container.DefaultKeyBindings);
-
-                foreach (var ruleset in rulesets)
+                using (var transaction = realm.BeginWrite())
                 {
-                    var instance = ruleset.CreateInstance();
-                    foreach (int variant in instance.AvailableVariants)
-                        insertDefaults(realm, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
-                }
+                    // intentionally flattened to a list rather than querying against the IQueryable, as nullable fields being queried against aren't indexed.
+                    // this is much faster as a result.
+                    var existingBindings = realm.All<RealmKeyBinding>().ToList();
 
-                transaction.Commit();
-            }
+                    insertDefaults(realm, existingBindings, container.DefaultKeyBindings);
+
+                    foreach (var ruleset in rulesets)
+                    {
+                        var instance = ruleset.CreateInstance();
+                        foreach (int variant in instance.AvailableVariants)
+                            insertDefaults(realm, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
+                    }
+
+                    transaction.Commit();
+                }
+            });
         }
 
         private void insertDefaults(Realm realm, List<RealmKeyBinding> existingBindings, IEnumerable<IKeyBinding> defaults, string? rulesetName = null, int? variant = null)
@@ -81,20 +83,31 @@ namespace osu.Game.Input
             // compare counts in database vs defaults for each action type.
             foreach (var defaultsForAction in defaults.GroupBy(k => k.Action))
             {
-                // avoid performing redundant queries when the database is empty and needs to be re-filled.
-                int existingCount = existingBindings.Count(k => k.RulesetName == rulesetName && k.Variant == variant && k.ActionInt == (int)defaultsForAction.Key);
+                IEnumerable<RealmKeyBinding> existing = existingBindings.Where(k =>
+                    k.RulesetName == rulesetName
+                    && k.Variant == variant
+                    && k.ActionInt == (int)defaultsForAction.Key);
 
-                if (defaultsForAction.Count() <= existingCount)
-                    continue;
+                int defaultsCount = defaultsForAction.Count();
+                int existingCount = existing.Count();
 
-                // insert any defaults which are missing.
-                realm.Add(defaultsForAction.Skip(existingCount).Select(k => new RealmKeyBinding
+                if (defaultsCount > existingCount)
                 {
-                    KeyCombinationString = k.KeyCombination.ToString(),
-                    ActionInt = (int)k.Action,
-                    RulesetName = rulesetName,
-                    Variant = variant
-                }));
+                    // insert any defaults which are missing.
+                    realm.Add(defaultsForAction.Skip(existingCount).Select(k => new RealmKeyBinding(k.Action, k.KeyCombination, rulesetName, variant)));
+                }
+                else if (defaultsCount < existingCount)
+                {
+                    // generally this shouldn't happen, but if the user has more key bindings for an action than we expect,
+                    // remove the last entries until the count matches for sanity.
+                    foreach (var k in existing.TakeLast(existingCount - defaultsCount).ToArray())
+                    {
+                        realm.Remove(k);
+
+                        // Remove from the local flattened/cached list so future lookups don't query now deleted rows.
+                        existingBindings.Remove(k);
+                    }
+                }
             }
         }
 

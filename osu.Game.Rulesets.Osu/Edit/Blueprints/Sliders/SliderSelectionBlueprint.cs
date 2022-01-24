@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -81,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             controlPoints.BindTo(HitObject.Path.ControlPoints);
 
             pathVersion.BindTo(HitObject.Path.Version);
-            pathVersion.BindValueChanged(_ => updatePath());
+            pathVersion.BindValueChanged(_ => editorBeatmap?.Update(HitObject));
 
             BodyPiece.UpdateFrom(HitObject);
         }
@@ -140,7 +139,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case MouseButton.Left:
                     if (e.ControlPressed && IsSelected)
                     {
-                        placementControlPointIndex = addControlPoint(e.MousePosition);
+                        changeHandler?.BeginChange();
+                        placementControlPoint = addControlPoint(e.MousePosition);
+                        ControlPointVisualiser?.SetSelectionTo(placementControlPoint);
                         return true; // Stop input from being handled and modifying the selection
                     }
 
@@ -150,31 +151,22 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return false;
         }
 
-        private int? placementControlPointIndex;
+        [CanBeNull]
+        private PathControlPoint placementControlPoint;
 
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            if (placementControlPointIndex != null)
-            {
-                changeHandler?.BeginChange();
-                return true;
-            }
-
-            return false;
-        }
+        protected override bool OnDragStart(DragStartEvent e) => placementControlPoint != null;
 
         protected override void OnDrag(DragEvent e)
         {
-            Debug.Assert(placementControlPointIndex != null);
-
-            HitObject.Path.ControlPoints[placementControlPointIndex.Value].Position = e.MousePosition - HitObject.Position;
+            if (placementControlPoint != null)
+                placementControlPoint.Position = e.MousePosition - HitObject.Position;
         }
 
-        protected override void OnDragEnd(DragEndEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (placementControlPointIndex != null)
+            if (placementControlPoint != null)
             {
-                placementControlPointIndex = null;
+                placementControlPoint = null;
                 changeHandler?.EndChange();
             }
         }
@@ -193,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return false;
         }
 
-        private int addControlPoint(Vector2 position)
+        private PathControlPoint addControlPoint(Vector2 position)
         {
             position -= HitObject.Position;
 
@@ -211,10 +203,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 }
             }
 
-            // Move the control points from the insertion index onwards to make room for the insertion
-            controlPoints.Insert(insertionIndex, new PathControlPoint { Position = position });
+            var pathControlPoint = new PathControlPoint { Position = position };
 
-            return insertionIndex;
+            // Move the control points from the insertion index onwards to make room for the insertion
+            controlPoints.Insert(insertionIndex, pathControlPoint);
+
+            HitObject.SnapTo(composer);
+
+            return pathControlPoint;
         }
 
         private void removeControlPoints(List<PathControlPoint> toRemove)
@@ -233,7 +229,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 controlPoints.Remove(c);
             }
 
-            // If there are 0 or 1 remaining control points, the slider is in a degenerate (single point) form and should be deleted
+            // Snap the slider to the current beat divisor before checking length validity.
+            HitObject.SnapTo(composer);
+
+            // If there are 0 or 1 remaining control points, or the slider has an invalid length, it is in a degenerate form and should be deleted
             if (controlPoints.Count <= 1 || !HitObject.Path.HasValidLength)
             {
                 placementHandler?.Delete(HitObject);
@@ -246,12 +245,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             foreach (var c in controlPoints)
                 c.Position -= first;
             HitObject.Position += first;
-        }
-
-        private void updatePath()
-        {
-            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
-            editorBeatmap?.Update(HitObject);
         }
 
         private void convertToStream()

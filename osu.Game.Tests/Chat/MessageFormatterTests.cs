@@ -9,6 +9,21 @@ namespace osu.Game.Tests.Chat
     [TestFixture]
     public class MessageFormatterTests
     {
+        private string originalWebsiteRootUrl;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            originalWebsiteRootUrl = MessageFormatter.WebsiteRootUrl;
+            MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            MessageFormatter.WebsiteRootUrl = originalWebsiteRootUrl;
+        }
+
         [Test]
         public void TestBareLink()
         {
@@ -32,8 +47,6 @@ namespace osu.Game.Tests.Chat
         [TestCase(LinkAction.External, "https://dev.ppy.sh/beatmapsets/discussions/123", "https://dev.ppy.sh/beatmapsets/discussions/123")]
         public void TestBeatmapLinks(LinkAction expectedAction, string expectedArg, string link)
         {
-            MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
-
             Message result = MessageFormatter.FormatMessage(new Message { Content = link });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
@@ -47,7 +60,10 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestMultipleComplexLinks()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a http://test.io/link#fragment. (see https://twitter.com). Also, This string should not be altered. http://example.com/" });
+            Message result = MessageFormatter.FormatMessage(new Message
+            {
+                Content = "This is a http://test.io/link#fragment. (see https://twitter.com). Also, This string should not be altered. http://example.com/"
+            });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(3, result.Links.Count);
@@ -104,7 +120,7 @@ namespace osu.Game.Tests.Chat
 
             Assert.AreEqual("This is a Wiki Link.", result.DisplayContent);
             Assert.AreEqual(1, result.Links.Count);
-            Assert.AreEqual("https://osu.ppy.sh/wiki/Wiki Link", result.Links[0].Url);
+            Assert.AreEqual("https://dev.ppy.sh/wiki/Wiki Link", result.Links[0].Url);
             Assert.AreEqual(10, result.Links[0].Index);
             Assert.AreEqual(9, result.Links[0].Length);
         }
@@ -117,15 +133,15 @@ namespace osu.Game.Tests.Chat
             Assert.AreEqual("This is a Wiki Link Wiki:LinkWiki.Link.", result.DisplayContent);
             Assert.AreEqual(3, result.Links.Count);
 
-            Assert.AreEqual("https://osu.ppy.sh/wiki/Wiki Link", result.Links[0].Url);
+            Assert.AreEqual("https://dev.ppy.sh/wiki/Wiki Link", result.Links[0].Url);
             Assert.AreEqual(10, result.Links[0].Index);
             Assert.AreEqual(9, result.Links[0].Length);
 
-            Assert.AreEqual("https://osu.ppy.sh/wiki/Wiki:Link", result.Links[1].Url);
+            Assert.AreEqual("https://dev.ppy.sh/wiki/Wiki:Link", result.Links[1].Url);
             Assert.AreEqual(20, result.Links[1].Index);
             Assert.AreEqual(9, result.Links[1].Length);
 
-            Assert.AreEqual("https://osu.ppy.sh/wiki/Wiki.Link", result.Links[2].Url);
+            Assert.AreEqual("https://dev.ppy.sh/wiki/Wiki.Link", result.Links[2].Url);
             Assert.AreEqual(29, result.Links[2].Index);
             Assert.AreEqual(9, result.Links[2].Length);
         }
@@ -445,12 +461,15 @@ namespace osu.Game.Tests.Chat
         [Test]
         public void TestLinkComplex()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a [http://www.simple-test.com simple test] with some [traps] and [[wiki links]]. Don't forget to visit https://osu.ppy.sh (now!)[http://google.com]\uD83D\uDE12" });
+            Message result = MessageFormatter.FormatMessage(new Message
+            {
+                Content = "This is a [http://www.simple-test.com simple test] with some [traps] and [[wiki links]]. Don't forget to visit https://osu.ppy.sh (now!)[http://google.com]\uD83D\uDE12"
+            });
 
             Assert.AreEqual("This is a simple test with some [traps] and wiki links. Don't forget to visit https://osu.ppy.sh now!\0\0\0", result.DisplayContent);
             Assert.AreEqual(5, result.Links.Count);
 
-            Link f = result.Links.Find(l => l.Url == "https://osu.ppy.sh/wiki/wiki links");
+            Link f = result.Links.Find(l => l.Url == "https://dev.ppy.sh/wiki/wiki links");
             Assert.That(f, Is.Not.Null);
             Assert.AreEqual(44, f.Index);
             Assert.AreEqual(10, f.Length);
@@ -514,8 +533,6 @@ namespace osu.Game.Tests.Chat
         [TestCase("https://dev.ppy.sh/home/changelog/lazer/2021.1012", "lazer/2021.1012")]
         public void TestChangelogLinks(string link, string expectedArg)
         {
-            MessageFormatter.WebsiteRootUrl = "dev.ppy.sh";
-
             LinkDetails result = MessageFormatter.GetLinkDetails(link);
 
             Assert.AreEqual(LinkAction.OpenChangelog, result.Action);

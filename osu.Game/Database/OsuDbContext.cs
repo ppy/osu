@@ -19,14 +19,14 @@ namespace osu.Game.Database
 {
     public class OsuDbContext : DbContext
     {
-        public DbSet<BeatmapInfo> BeatmapInfo { get; set; }
-        public DbSet<BeatmapDifficulty> BeatmapDifficulty { get; set; }
-        public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
-        public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
+        public DbSet<EFBeatmapInfo> EFBeatmapInfo { get; set; }
+        public DbSet<EFBeatmapDifficulty> BeatmapDifficulty { get; set; }
+        public DbSet<EFBeatmapMetadata> BeatmapMetadata { get; set; }
+        public DbSet<EFBeatmapSetInfo> EFBeatmapSetInfo { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
-        public DbSet<RulesetInfo> RulesetInfo { get; set; }
-        public DbSet<SkinInfo> SkinInfo { get; set; }
-        public DbSet<ScoreInfo> ScoreInfo { get; set; }
+        public DbSet<EFRulesetInfo> RulesetInfo { get; set; }
+        public DbSet<EFSkinInfo> SkinInfo { get; set; }
+        public DbSet<EFScoreInfo> ScoreInfo { get; set; }
 
         // migrated to realm
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
@@ -125,28 +125,29 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
+            modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
+            modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.MD5Hash);
+            modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.Hash);
 
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
+            modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.Hash).IsUnique();
-            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<EFSkinInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<EFSkinInfo>().HasMany(s => s.Files).WithOne(f => f.SkinInfo);
 
             modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
 
-            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
-            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
+            modelBuilder.Entity<EFRulesetInfo>().HasIndex(b => b.Available);
+            modelBuilder.Entity<EFRulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
-            modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+            modelBuilder.Entity<EFBeatmapInfo>().HasOne(b => b.BaseDifficulty);
 
-            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
+            modelBuilder.Entity<EFScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory

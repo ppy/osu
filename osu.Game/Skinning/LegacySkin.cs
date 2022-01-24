@@ -51,7 +51,7 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, resources.Files), resources, "skin.ini")
+            : this(skin, new LegacyDatabasedSkinResourceStore(skin, resources.Files), resources, "skin.ini")
         {
         }
 
@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
-            : this(skin, storage, resources, storage?.GetStream(configurationFilename))
+            : this(skin, storage, resources, string.IsNullOrEmpty(configurationFilename) ? null : storage?.GetStream(configurationFilename))
         {
         }
 
@@ -474,13 +474,18 @@ namespace osu.Game.Skinning
         {
             foreach (string name in getFallbackNames(componentName))
             {
+                // some component names (especially user-controlled ones, like `HitX` in mania)
+                // may contain `@2x` scale specifications.
+                // stable happens to check for that and strip them, so do the same to match stable behaviour.
+                string lookupName = name.Replace(@"@2x", string.Empty);
+
                 float ratio = 2;
-                var texture = Textures?.Get($"{name}@2x", wrapModeS, wrapModeT);
+                var texture = Textures?.Get(@$"{lookupName}@2x", wrapModeS, wrapModeT);
 
                 if (texture == null)
                 {
                     ratio = 1;
-                    texture = Textures?.Get(name, wrapModeS, wrapModeT);
+                    texture = Textures?.Get(lookupName, wrapModeS, wrapModeT);
                 }
 
                 if (texture == null)

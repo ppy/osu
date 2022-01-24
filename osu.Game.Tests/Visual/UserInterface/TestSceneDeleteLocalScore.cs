@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -15,10 +17,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Resources;
@@ -40,6 +44,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapInfo beatmapInfo;
 
+        [Resolved]
+        private RealmContextFactory realmFactory { get; set; }
+
         [Cached]
         private readonly DialogOverlay dialogOverlay;
 
@@ -58,13 +65,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Scope = BeatmapLeaderboardScope.Local,
                         BeatmapInfo = new BeatmapInfo
                         {
-                            ID = 1,
+                            ID = Guid.NewGuid(),
                             Metadata = new BeatmapMetadata
                             {
-                                ID = 1,
                                 Title = "TestSong",
                                 Artist = "TestArtist",
-                                Author = new APIUser
+                                Author = new RealmUser
                                 {
                                     Username = "TestAuthor"
                                 },
@@ -83,26 +89,32 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
+            Dependencies.Cache(ContextFactory);
 
-            beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).Result.Value.Beatmaps[0];
+            var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
-            for (int i = 0; i < 50; i++)
+            imported?.PerformRead(s =>
             {
-                var score = new ScoreInfo
-                {
-                    OnlineScoreID = i,
-                    BeatmapInfo = beatmapInfo,
-                    BeatmapInfoID = beatmapInfo.ID,
-                    Accuracy = RNG.NextDouble(),
-                    TotalScore = RNG.Next(1, 1000000),
-                    MaxCombo = RNG.Next(1, 1000),
-                    Rank = ScoreRank.XH,
-                    User = new APIUser { Username = "TestUser" },
-                };
+                beatmapInfo = s.Beatmaps[0];
 
-                importedScores.Add(scoreManager.Import(score).Result.Value);
-            }
+                for (int i = 0; i < 50; i++)
+                {
+                    var score = new ScoreInfo
+                    {
+                        OnlineID = i,
+                        BeatmapInfo = beatmapInfo,
+                        Accuracy = RNG.NextDouble(),
+                        TotalScore = RNG.Next(1, 1000000),
+                        MaxCombo = RNG.Next(1, 1000),
+                        Rank = ScoreRank.XH,
+                        User = new APIUser { Username = "TestUser" },
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    };
+
+                    importedScores.Add(scoreManager.Import(score).GetResultSafely().Value);
+                }
+            });
 
             return dependencies;
         }
@@ -110,8 +122,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            // Due to soft deletions, we can re-use deleted scores between test runs
-            scoreManager.Undelete(scoreManager.QueryScores(s => s.DeletePending).ToList());
+            realmFactory.Run(realm =>
+            {
+                // Due to soft deletions, we can re-use deleted scores between test runs
+                scoreManager.Undelete(realm.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
+            });
 
             leaderboard.Scores = null;
             leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
@@ -163,7 +178,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scoreBeingDeleted.OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
         }
 
         [Test]
@@ -171,7 +186,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("delete top score", () => scoreManager.Delete(importedScores[0]));
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
-            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != importedScores[0].OnlineScoreID));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != importedScores[0].OnlineID));
         }
     }
 }

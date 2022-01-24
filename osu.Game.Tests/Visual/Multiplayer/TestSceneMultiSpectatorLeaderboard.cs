@@ -50,6 +50,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
+            AddUntilStep("wait for user population", () => leaderboard.ChildrenOfType<GameplayLeaderboardScore>().Count() == 2);
 
             AddStep("add clock sources", () =>
             {

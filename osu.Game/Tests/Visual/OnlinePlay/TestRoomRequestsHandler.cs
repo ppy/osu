@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Scoring;
@@ -25,9 +23,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         private readonly List<Room> serverSideRooms = new List<Room>();
 
-        private int currentRoomId;
-        private int currentPlaylistItemId;
-        private int currentScoreId;
+        private int currentRoomId = 1;
+        private int currentPlaylistItemId = 1;
+        private int currentScoreId = 1;
 
         /// <summary>
         /// Handles an API request, while also updating the local state to match
@@ -72,6 +70,29 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
                 }
 
+                case GetRoomLeaderboardRequest roomLeaderboardRequest:
+                    roomLeaderboardRequest.TriggerSuccess(new APILeaderboard
+                    {
+                        Leaderboard = new List<APIUserScoreAggregate>
+                        {
+                            new APIUserScoreAggregate
+                            {
+                                TotalScore = 1000000,
+                                TotalAttempts = 5,
+                                CompletedBeatmaps = 2,
+                                User = new APIUser { Username = "best user" }
+                            },
+                            new APIUserScoreAggregate
+                            {
+                                TotalScore = 50,
+                                TotalAttempts = 1,
+                                CompletedBeatmaps = 1,
+                                User = new APIUser { Username = "worst user" }
+                            }
+                        }
+                    });
+                    return true;
+
                 case PartRoomRequest partRoomRequest:
                     partRoomRequest.TriggerSuccess();
                     return true;
@@ -87,15 +108,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetRoomRequest getRoomRequest:
                     getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
-                    return true;
-
-                case GetBeatmapSetRequest getBeatmapSetRequest:
-                    var onlineReq = new GetBeatmapSetRequest(getBeatmapSetRequest.ID, getBeatmapSetRequest.Type);
-                    onlineReq.Success += res => getBeatmapSetRequest.TriggerSuccess(res);
-                    onlineReq.Failure += e => getBeatmapSetRequest.TriggerFailure(e);
-
-                    // Get the online API from the game's dependencies.
-                    game.Dependencies.Get<IAPIProvider>().Queue(onlineReq);
                     return true;
 
                 case CreateRoomScoreRequest createRoomScoreRequest:

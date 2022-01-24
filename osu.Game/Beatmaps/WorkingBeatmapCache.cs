@@ -15,6 +15,7 @@ using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -29,8 +30,6 @@ namespace osu.Game.Beatmaps
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public readonly WorkingBeatmap DefaultBeatmap;
-
-        public BeatmapModelManager BeatmapManager { private get; set; }
 
         private readonly AudioManager audioManager;
         private readonly IResourceStore<byte[]> resources;
@@ -75,13 +74,6 @@ namespace osu.Game.Beatmaps
 
         public virtual WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo)
         {
-            // if there are no files, presume the full beatmap info has not yet been fetched from the database.
-            if (beatmapInfo?.BeatmapSet?.Files.Count == 0)
-            {
-                int lookupId = beatmapInfo.ID;
-                beatmapInfo = BeatmapManager.QueryBeatmap(b => b.ID == lookupId);
-            }
-
             if (beatmapInfo?.BeatmapSet == null)
                 return DefaultBeatmap;
 
@@ -92,12 +84,12 @@ namespace osu.Game.Beatmaps
                 if (working != null)
                     return working;
 
-                beatmapInfo.Metadata ??= beatmapInfo.BeatmapSet.Metadata;
+                beatmapInfo = beatmapInfo.Detach();
 
                 workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
 
                 // best effort; may be higher than expected.
-                GlobalStatistics.Get<int>(nameof(Beatmaps), $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
+                GlobalStatistics.Get<int>("Beatmaps", $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
 
                 return working;
             }
@@ -108,6 +100,7 @@ namespace osu.Game.Beatmaps
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);
@@ -142,8 +135,6 @@ namespace osu.Game.Beatmaps
                     return null;
                 }
             }
-
-            protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
             protected override Texture GetBackground()
             {
@@ -197,6 +188,9 @@ namespace osu.Game.Beatmaps
             protected override Storyboard GetStoryboard()
             {
                 Storyboard storyboard;
+
+                if (BeatmapInfo.Path == null)
+                    return new Storyboard();
 
                 try
                 {

@@ -69,13 +69,11 @@ namespace osu.Game.Online.Rooms
 
             var scoreInfo = new ScoreInfo
             {
-                OnlineScoreID = ID,
+                OnlineID = ID,
                 TotalScore = TotalScore,
                 MaxCombo = MaxCombo,
                 BeatmapInfo = beatmap,
-                BeatmapInfoID = playlistItem.BeatmapID,
-                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID),
-                RulesetID = playlistItem.RulesetID,
+                Ruleset = rulesets.GetRuleset(playlistItem.RulesetID) ?? throw new InvalidOperationException(),
                 Statistics = Statistics,
                 User = User,
                 Accuracy = Accuracy,

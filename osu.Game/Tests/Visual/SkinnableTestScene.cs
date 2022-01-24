@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.IO;
 using osu.Game.Rulesets;
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, SkinManager skinManager)
+        private void load()
         {
             var dllStore = new DllResourceStore(DynamicCompilationOriginal.GetType().Assembly);
 
@@ -95,7 +96,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new OsuSpriteText
                     {
-                        Text = skin?.SkinInfo?.Name ?? "none",
+                        Text = skin?.SkinInfo?.Value.Name ?? "none",
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
@@ -158,6 +159,7 @@ namespace osu.Game.Tests.Visual
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
+        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
 
         #endregion
 

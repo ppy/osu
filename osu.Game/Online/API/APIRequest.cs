@@ -38,7 +38,12 @@ namespace osu.Game.Online.API
         protected override void PostProcess()
         {
             base.PostProcess();
-            Response = ((OsuJsonWebRequest<T>)WebRequest)?.ResponseObject;
+
+            if (WebRequest != null)
+            {
+                Response = ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
+                Logger.Log($"{GetType()} finished with response size of {WebRequest.ResponseStream.Length:#,0} bytes", LoggingTarget.Network);
+            }
         }
 
         internal void TriggerSuccess(T result)

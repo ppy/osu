@@ -468,12 +468,14 @@ namespace osu.Game.Screens.Play
 
         private int restartCount;
 
+        private const double volume_requirement = 0.05;
+
         private void showMuteWarningIfNeeded()
         {
             if (!muteWarningShownOnce.Value)
             {
                 // Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= volume_requirement || audioManager.VolumeTrack.Value <= volume_requirement)
                 {
                     notificationOverlay?.Post(new MutedNotification());
                     muteWarningShownOnce.Value = true;
@@ -487,22 +489,26 @@ namespace osu.Game.Screens.Play
 
             public MutedNotification()
             {
-                Text = "Your music volume is set to 0%! Click here to restore it.";
+                Text = "Your game volume is too low to hear anything! Click here to restore it.";
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
-                IconBackgound.Colour = colours.RedDark;
+                IconBackground.Colour = colours.RedDark;
 
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
 
                     volumeOverlay.IsMuted.Value = false;
-                    audioManager.Volume.SetDefault();
-                    audioManager.VolumeTrack.SetDefault();
+
+                    // Check values before resetting, as the user may have only had mute enabled, in which case we might not need to adjust volumes.
+                    if (audioManager.Volume.Value <= volume_requirement)
+                        audioManager.Volume.SetDefault();
+                    if (audioManager.VolumeTrack.Value <= volume_requirement)
+                        audioManager.VolumeTrack.SetDefault();
 
                     return true;
                 };
@@ -542,7 +548,7 @@ namespace osu.Game.Screens.Play
             private void load(OsuColour colours, NotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
-                IconBackgound.Colour = colours.RedDark;
+                IconBackground.Colour = colours.RedDark;
 
                 Activated = delegate
                 {

@@ -120,14 +120,14 @@ namespace osu.Game.Rulesets.Difficulty
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<DifficultyAttributes> CalculateAll()
+        public IEnumerable<DifficultyAttributes> CalculateAll(CancellationToken cancellationToken = default)
         {
             foreach (var combination in CreateDifficultyAdjustmentModCombinations())
             {
                 if (combination is MultiMod multi)
-                    yield return Calculate(multi.Mods);
+                    yield return Calculate(multi.Mods, cancellationToken);
                 else
-                    yield return Calculate(combination.Yield());
+                    yield return Calculate(combination.Yield(), cancellationToken);
             }
         }
 
@@ -145,7 +145,11 @@ namespace osu.Game.Rulesets.Difficulty
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+            // Only pass through the cancellation token if it's non-default.
+            // This allows for the default timeout to be applied for playable beatmap construction.
+            Beatmap = cancellationToken == default
+                ? beatmap.GetPlayableBeatmap(ruleset, playableMods)
+                : beatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
 
             var track = new TrackVirtual(10000);
             playableMods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));

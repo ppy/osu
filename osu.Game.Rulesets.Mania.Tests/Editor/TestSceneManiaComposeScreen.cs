@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Screens.Edit;
@@ -30,10 +31,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             AddStep("setup compose screen", () =>
             {
-                var editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 }))
+                var editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition { Columns = 4 })
                 {
                     BeatmapInfo = { Ruleset = new ManiaRuleset().RulesetInfo },
-                };
+                });
 
                 Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
 
@@ -55,13 +56,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         [Test]
         public void TestDefaultSkin()
         {
-            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = SkinInfo.Default);
+            AddStep("set default skin", () => skins.CurrentSkinInfo.Value = DefaultSkin.CreateInfo().ToLiveUnmanaged());
         }
 
         [Test]
         public void TestLegacySkin()
         {
-            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.Info);
+            AddStep("set legacy skin", () => skins.CurrentSkinInfo.Value = DefaultLegacySkin.CreateInfo().ToLiveUnmanaged());
         }
     }
 }

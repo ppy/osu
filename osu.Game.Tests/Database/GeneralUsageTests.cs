@@ -5,6 +5,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 
 #nullable enable
 
@@ -19,7 +21,7 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestConstructRealm()
         {
-            RunTestWithRealm((realmFactory, _) => { realmFactory.CreateContext().Refresh(); });
+            RunTestWithRealm((realmFactory, _) => { realmFactory.Run(realm => realm.Refresh()); });
         }
 
         [Test]
@@ -33,6 +35,37 @@ namespace osu.Game.Tests.Database
             });
         }
 
+        /// <summary>
+        /// Test to ensure that a `CreateContext` call nested inside a subscription doesn't cause any deadlocks
+        /// due to context fetching semaphores.
+        /// </summary>
+        [Test]
+        public void TestNestedContextCreationWithSubscription()
+        {
+            RunTestWithRealm((realmFactory, _) =>
+            {
+                bool callbackRan = false;
+
+                realmFactory.Run(realm =>
+                {
+                    var subscription = realm.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    {
+                        realmFactory.Run(_ =>
+                        {
+                            callbackRan = true;
+                        });
+                    });
+
+                    // Force the callback above to run.
+                    realmFactory.Run(r => r.Refresh());
+
+                    subscription?.Dispose();
+                });
+
+                Assert.IsTrue(callbackRan);
+            });
+        }
+
         [Test]
         public void TestBlockOperationsWithContention()
         {
@@ -43,12 +76,12 @@ namespace osu.Game.Tests.Database
 
                 Task.Factory.StartNew(() =>
                 {
-                    using (realmFactory.CreateContext())
+                    realmFactory.Run(_ =>
                     {
                         hasThreadedUsage.Set();
 
                         stopThreadedUsage.Wait();
-                    }
+                    });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler);
 
                 hasThreadedUsage.Wait();

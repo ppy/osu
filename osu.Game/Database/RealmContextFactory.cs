@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -12,10 +13,15 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
 using osu.Game.Configuration;
+using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
+using osu.Game.Skinning;
 using osu.Game.Stores;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using Realms;
+using Realms.Exceptions;
 
 #nullable enable
 
@@ -24,7 +30,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
     /// </summary>
-    public class RealmContextFactory : IDisposable, IRealmFactory
+    public class RealmContextFactory : IDisposable
     {
         private readonly Storage storage;
 
@@ -44,18 +50,21 @@ namespace osu.Game.Database
         /// 10   2021-11-22    Use ShortName instead of RulesetID for ruleset settings.
         /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
+        /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
         /// </summary>
-        private const int schema_version = 12;
+        private const int schema_version = 13;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
         /// </summary>
         private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
 
-        private static readonly GlobalStatistic<int> refreshes = GlobalStatistics.Get<int>(@"Realm", @"Dirty Refreshes");
+        private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
+
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
+
         private Realm? context;
 
         public Realm Context
@@ -63,13 +72,13 @@ namespace osu.Game.Database
             get
             {
                 if (!ThreadSafety.IsUpdateThread)
-                    throw new InvalidOperationException(@$"Use {nameof(CreateContext)} when performing realm operations from a non-update thread");
+                    throw new InvalidOperationException(@$"Use {nameof(Run)}/{nameof(Write)} when performing realm operations from a non-update thread");
 
                 lock (contextLock)
                 {
                     if (context == null)
                     {
-                        context = CreateContext();
+                        context = createContext();
                         Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
                     }
 
@@ -97,28 +106,54 @@ namespace osu.Game.Database
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
 
-            // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
-            cleanupPendingDeletions();
+            try
+            {
+                // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
+                cleanupPendingDeletions();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
 
-            // Data migration is handled separately from schema migrations.
-            // This is required as the user may be initialising realm for the first time ever, which would result in no schema migrations running.
-            migrateDataFromEF();
+                CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                storage.Delete(Filename);
+
+                cleanupPendingDeletions();
+            }
         }
 
         private void cleanupPendingDeletions()
         {
-            using (var realm = CreateContext())
+            using (var realm = createContext())
             using (var transaction = realm.BeginWrite())
             {
-                var pendingDeleteSets = realm.All<RealmBeatmapSet>().Where(s => s.DeletePending);
+                var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
 
-                foreach (var s in pendingDeleteSets)
+                foreach (var score in pendingDeleteScores)
+                    realm.Remove(score);
+
+                var pendingDeleteSets = realm.All<BeatmapSetInfo>().Where(s => s.DeletePending);
+
+                foreach (var beatmapSet in pendingDeleteSets)
                 {
-                    foreach (var b in s.Beatmaps)
-                        realm.Remove(b);
+                    foreach (var beatmap in beatmapSet.Beatmaps)
+                    {
+                        // Cascade delete related scores, else they will have a null beatmap against the model's spec.
+                        foreach (var score in beatmap.Scores)
+                            realm.Remove(score);
 
-                    realm.Remove(s);
+                        realm.Remove(beatmap.Metadata);
+
+                        realm.Remove(beatmap);
+                    }
+
+                    realm.Remove(beatmapSet);
                 }
+
+                var pendingDeleteSkins = realm.All<SkinInfo>().Where(s => s.DeletePending);
+
+                foreach (var s in pendingDeleteSkins)
+                    realm.Remove(s);
 
                 transaction.Commit();
             }
@@ -135,25 +170,79 @@ namespace osu.Game.Database
         public bool Compact() => Realm.Compact(getConfiguration());
 
         /// <summary>
-        /// Perform a blocking refresh on the main realm context.
+        /// Run work on realm with a return value.
         /// </summary>
-        public void Refresh()
+        /// <remarks>
+        /// Handles correct context management automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        /// <typeparam name="T">The return type.</typeparam>
+        public T Run<T>(Func<Realm, T> action)
         {
-            lock (contextLock)
+            if (ThreadSafety.IsUpdateThread)
+                return action(Context);
+
+            using (var realm = createContext())
+                return action(realm);
+        }
+
+        /// <summary>
+        /// Run work on realm.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        public void Run(Action<Realm> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                action(Context);
+            else
             {
-                if (context?.Refresh() == true)
-                    refreshes.Value++;
+                using (var realm = createContext())
+                    action(realm);
             }
         }
 
-        public Realm CreateContext()
+        /// <summary>
+        /// Write changes to realm.
+        /// </summary>
+        /// <remarks>
+        /// Handles correct context management and transaction committing automatically.
+        /// </remarks>
+        /// <param name="action">The work to run.</param>
+        public void Write(Action<Realm> action)
+        {
+            if (ThreadSafety.IsUpdateThread)
+                Context.Write(action);
+            else
+            {
+                using (var realm = createContext())
+                    realm.Write(action);
+            }
+        }
+
+        private Realm createContext()
         {
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
+            bool tookSemaphoreLock = false;
+
             try
             {
-                contextCreationLock.Wait();
+                if (!currentThreadCanCreateContexts.Value)
+                {
+                    contextCreationLock.Wait();
+                    currentThreadCanCreateContexts.Value = true;
+                    tookSemaphoreLock = true;
+                }
+                else
+                {
+                    // the semaphore is used to handle blocking of all context creation during certain periods.
+                    // once the semaphore has been taken by this code section, it is safe to create further contexts on the same thread.
+                    // this can happen if a realm subscription is active and triggers a callback which has user code that calls `CreateContext`.
+                }
 
                 contexts_created.Value++;
 
@@ -161,64 +250,28 @@ namespace osu.Game.Database
             }
             finally
             {
-                contextCreationLock.Release();
+                if (tookSemaphoreLock)
+                {
+                    contextCreationLock.Release();
+                    currentThreadCanCreateContexts.Value = false;
+                }
             }
         }
 
         private RealmConfiguration getConfiguration()
         {
+            // This is currently the only usage of temporary files at the osu! side.
+            // If we use the temporary folder in more situations in the future, this should be moved to a higher level (helper method or OsuGameBase).
+            string tempPathLocation = Path.Combine(Path.GetTempPath(), @"lazer");
+            if (!Directory.Exists(tempPathLocation))
+                Directory.CreateDirectory(tempPathLocation);
+
             return new RealmConfiguration(storage.GetFullPath(Filename, true))
             {
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
+                FallbackPipePath = tempPathLocation,
             };
-        }
-
-        private void migrateDataFromEF()
-        {
-            if (efContextFactory == null)
-                return;
-
-            using (var db = efContextFactory.GetForWrite())
-            {
-                // migrate ruleset settings. can be removed 20220315.
-                var existingSettings = db.Context.DatabasedSetting;
-
-                // previous entries in EF are removed post migration.
-                if (!existingSettings.Any())
-                    return;
-
-                using (var realm = CreateContext())
-                using (var transaction = realm.BeginWrite())
-                {
-                    // only migrate data if the realm database is empty.
-                    if (!realm.All<RealmRulesetSetting>().Any())
-                    {
-                        foreach (var dkb in existingSettings)
-                        {
-                            if (dkb.RulesetID == null)
-                                continue;
-
-                            string? shortName = getRulesetShortNameFromLegacyID(dkb.RulesetID.Value);
-
-                            if (string.IsNullOrEmpty(shortName))
-                                continue;
-
-                            realm.Add(new RealmRulesetSetting
-                            {
-                                Key = dkb.Key,
-                                Value = dkb.StringValue,
-                                RulesetName = shortName,
-                                Variant = dkb.Variant ?? 0,
-                            });
-                        }
-                    }
-
-                    db.Context.RemoveRange(existingSettings);
-
-                    transaction.Commit();
-                }
-            }
         }
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)
@@ -232,9 +285,9 @@ namespace osu.Game.Database
             switch (targetVersion)
             {
                 case 7:
-                    convertOnlineIDs<RealmBeatmap>();
-                    convertOnlineIDs<RealmBeatmapSet>();
-                    convertOnlineIDs<RealmRuleset>();
+                    convertOnlineIDs<BeatmapInfo>();
+                    convertOnlineIDs<BeatmapSetInfo>();
+                    convertOnlineIDs<RulesetInfo>();
 
                     void convertOnlineIDs<T>() where T : RealmObject
                     {
@@ -279,14 +332,14 @@ namespace osu.Game.Database
 
                 case 9:
                     // Pretty pointless to do this as beatmaps aren't really loaded via realm yet, but oh well.
-                    string metadataClassName = getMappedOrOriginalName(typeof(RealmBeatmapMetadata));
+                    string metadataClassName = getMappedOrOriginalName(typeof(BeatmapMetadata));
 
                     // May be coming from a version before `RealmBeatmapMetadata` existed.
                     if (!migration.OldRealm.Schema.TryFindObjectSchema(metadataClassName, out _))
                         return;
 
                     var oldMetadata = migration.OldRealm.DynamicApi.All(metadataClassName);
-                    var newMetadata = migration.NewRealm.All<RealmBeatmapMetadata>();
+                    var newMetadata = migration.NewRealm.All<BeatmapMetadata>();
 
                     int metadataCount = newMetadata.Count();
 
@@ -362,6 +415,32 @@ namespace osu.Game.Database
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory?.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
 
+        public void CreateBackup(string backupFilename)
+        {
+            using (BlockAllOperations())
+            {
+                Logger.Log($"Creating full realm database backup at {backupFilename}", LoggingTarget.Database);
+
+                int attempts = 10;
+
+                while (attempts-- > 0)
+                {
+                    try
+                    {
+                        using (var source = storage.GetStream(Filename))
+                        using (var destination = storage.GetStream(backupFilename, FileAccess.Write, FileMode.CreateNew))
+                            source.CopyTo(destination);
+                        return;
+                    }
+                    catch (IOException)
+                    {
+                        // file may be locked during use.
+                        Thread.Sleep(500);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Flush any active contexts and block any further writes.
         /// </summary>
@@ -375,17 +454,17 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
-
-            Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
-
             try
             {
                 contextCreationLock.Wait();
 
                 lock (contextLock)
                 {
+                    if (!ThreadSafety.IsUpdateThread && context != null)
+                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+
+                    Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
+
                     context?.Dispose();
                     context = null;
                 }
@@ -393,14 +472,23 @@ namespace osu.Game.Database
                 const int sleep_length = 200;
                 int timeout = 5000;
 
-                // see https://github.com/realm/realm-dotnet/discussions/2657
-                while (!Compact())
+                try
                 {
-                    Thread.Sleep(sleep_length);
-                    timeout -= sleep_length;
+                    // see https://github.com/realm/realm-dotnet/discussions/2657
+                    while (!Compact())
+                    {
+                        Thread.Sleep(sleep_length);
+                        timeout -= sleep_length;
 
-                    if (timeout < 0)
-                        throw new TimeoutException(@"Took too long to acquire lock");
+                        if (timeout < 0)
+                            throw new TimeoutException(@"Took too long to acquire lock");
+                    }
+                }
+                catch (RealmException e)
+                {
+                    // Compact may fail if the realm is in a bad state.
+                    // We still want to continue with the blocking operation, though.
+                    Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
             }
             catch

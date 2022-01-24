@@ -9,8 +9,11 @@ using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.Models;
+using osu.Game.Rulesets;
 
 #nullable enable
 
@@ -27,15 +30,16 @@ namespace osu.Game.Tests.Database
             storage.DeleteDirectory(string.Empty);
         }
 
-        protected void RunTestWithRealm(Action<RealmContextFactory, Storage> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealm(Action<RealmContextFactory, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(() =>
                 {
-                    var testStorage = storage.GetStorageForDirectory(caller);
+                    // ReSharper disable once AccessToDisposedClosure
+                    var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
                         testAction(realmFactory, testStorage);
@@ -52,13 +56,13 @@ namespace osu.Game.Tests.Database
 
         protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(caller))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
                 host.Run(new RealmTestGame(async () =>
                 {
                     var testStorage = storage.GetStorageForDirectory(caller);
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, caller))
+                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
                         await testAction(realmFactory, testStorage);
@@ -72,24 +76,24 @@ namespace osu.Game.Tests.Database
             }
         }
 
-        protected static RealmBeatmapSet CreateBeatmapSet(RealmRuleset ruleset)
+        protected static BeatmapSetInfo CreateBeatmapSet(RulesetInfo ruleset)
         {
             RealmFile createRealmFile() => new RealmFile { Hash = Guid.NewGuid().ToString().ComputeSHA2Hash() };
 
-            var metadata = new RealmBeatmapMetadata
+            var metadata = new BeatmapMetadata
             {
                 Title = "My Love",
                 Artist = "Kuba Oms"
             };
 
-            var beatmapSet = new RealmBeatmapSet
+            var beatmapSet = new BeatmapSetInfo
             {
                 Beatmaps =
                 {
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Easy", },
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Normal", },
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Hard", },
-                    new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), metadata) { DifficultyName = "Insane", }
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Easy", },
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Normal", },
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Hard", },
+                    new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata) { DifficultyName = "Insane", }
                 },
                 Files =
                 {
@@ -109,8 +113,8 @@ namespace osu.Game.Tests.Database
             return beatmapSet;
         }
 
-        protected static RealmRuleset CreateRuleset() =>
-            new RealmRuleset(0, "osu!", "osu", true);
+        protected static RulesetInfo CreateRuleset() =>
+            new RulesetInfo(0, "osu!", "osu", true);
 
         private class RealmTestGame : Framework.Game
         {

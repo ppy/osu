@@ -4,6 +4,7 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -85,11 +86,17 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddAssert("is one object", () => EditorBeatmap.HitObjects.Count == 1);
 
+            Slider slider = null;
+            AddStep("retrieve slider", () => slider = (Slider)EditorBeatmap.HitObjects.Single());
             AddAssert("path matches", () =>
             {
-                var path = ((Slider)EditorBeatmap.HitObjects.Single()).Path;
+                var path = slider.Path;
                 return path.ControlPoints.Count == 2 && path.ControlPoints.SequenceEqual(addedObject.Path.ControlPoints);
             });
+
+            // see `HitObject.control_point_leniency`.
+            AddAssert("sample control point has correct time", () => Precision.AlmostEquals(slider.SampleControlPoint.Time, slider.GetEndTime(), 1));
+            AddAssert("difficulty control point has correct time", () => slider.DifficultyControlPoint.Time == slider.StartTime);
         }
 
         [Test]
