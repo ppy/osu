@@ -264,14 +264,12 @@ namespace osu.Game.Database
         /// </remarks>
         /// <param name="query">The <see cref="IQueryable{T}"/> to observe for changes.</param>
         /// <typeparam name="T">Type of the elements in the list.</typeparam>
-        /// <seealso cref="IRealmCollection{T}.SubscribeForNotifications"/>
         /// <param name="callback">The callback to be invoked with the updated <see cref="IRealmCollection{T}"/>.</param>
         /// <returns>
         /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
         /// To stop receiving notifications, call <see cref="IDisposable.Dispose"/>.
-        ///
-        /// May be null in the case the provided collection is not managed.
         /// </returns>
+        /// <seealso cref="IRealmCollection{T}.SubscribeForNotifications"/>
         public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
