@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         public override float DefaultFlashlightSize => 250;
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ComboBasedSize.Value, SizeMultiplier.Value, DefaultFlashlightSize);
+        protected override Flashlight CreateFlashlight() => new TaikoFlashlight(this, playfield);
 
         private TaikoPlayfield playfield;
 
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
             private readonly TaikoPlayfield taikoPlayfield;
 
-            public TaikoFlashlight(TaikoPlayfield taikoPlayfield, bool isRadiusBasedOnCombo, float initialRadius, float defaultFlashlightSize)
-                : base(isRadiusBasedOnCombo, initialRadius, defaultFlashlightSize)
+            public TaikoFlashlight(TaikoModFlashlight modFlashlight, TaikoPlayfield taikoPlayfield)
+                : base(modFlashlight)
             {
                 this.taikoPlayfield = taikoPlayfield;
                 FlashlightSize = getSizeFor(0);
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             private Vector2 getSizeFor(int combo)
             {
                 // Preserve flashlight size through the playfield's aspect adjustment.
-                return new Vector2(0, GetRadiusFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
+                return new Vector2(0, GetSizeFor(combo) * taikoPlayfield.DrawHeight / TaikoPlayfield.DEFAULT_HEIGHT);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)

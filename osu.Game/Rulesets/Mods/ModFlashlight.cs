@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
-        public abstract Flashlight CreateFlashlight();
+        protected abstract Flashlight CreateFlashlight();
 
         public abstract class Flashlight : Drawable
         {
@@ -102,17 +102,15 @@ namespace osu.Game.Rulesets.Mods
 
             public List<BreakPeriod> Breaks;
 
-            public readonly bool IsRadiusBasedOnCombo;
+            private readonly float defaultFlashlightSize;
+            private readonly float sizeMultiplier;
+            private readonly bool comboBasedSize;
 
-            public readonly float InitialRadius;
-
-            public readonly float DefaultFlashlightSize;
-
-            protected Flashlight(bool isRadiusBasedOnCombo, float initialRadius, float defaultFlashlightSize)
+            protected Flashlight(ModFlashlight modFlashlight)
             {
-                IsRadiusBasedOnCombo = isRadiusBasedOnCombo;
-                InitialRadius = initialRadius;
-                DefaultFlashlightSize = defaultFlashlightSize;
+                defaultFlashlightSize = modFlashlight.DefaultFlashlightSize;
+                sizeMultiplier = modFlashlight.SizeMultiplier.Value;
+                comboBasedSize = modFlashlight.ComboBasedSize.Value;
             }
 
             [BackgroundDependencyLoader]
@@ -146,17 +144,19 @@ namespace osu.Game.Rulesets.Mods
 
             protected abstract string FragmentShader { get; }
 
-            protected float GetRadiusFor(int combo)
+            protected float GetSizeFor(int combo)
             {
-                if (IsRadiusBasedOnCombo)
+                float size = defaultFlashlightSize * sizeMultiplier;
+
+                if (comboBasedSize)
                 {
                     if (combo > 200)
-                        return InitialRadius * 0.8f * DefaultFlashlightSize;
+                        size *= 0.8f;
                     else if (combo > 100)
-                        return InitialRadius * 0.9f * DefaultFlashlightSize;
+                        size *= 0.9f;
                 }
 
-                return InitialRadius * DefaultFlashlightSize;
+                return size;
             }
 
             private Vector2 flashlightPosition;

@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private OsuFlashlight flashlight;
 
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ComboBasedSize.Value, SizeMultiplier.Value, FollowDelay.Value, DefaultFlashlightSize);
+        protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -61,17 +61,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
-            public double FollowDelay { private get; set; }
+            private readonly double followDelay;
 
-            //public float InitialRadius { private get; set; }
-            public bool ChangeRadius { private get; set; }
-
-            public OsuFlashlight(bool isRadiusBasedOnCombo, float initialRadius, double followDelay, float defaultFlashlightSize)
-                : base(isRadiusBasedOnCombo, initialRadius, defaultFlashlightSize)
+            public OsuFlashlight(OsuModFlashlight modFlashlight)
+                : base(modFlashlight)
             {
-                FollowDelay = followDelay;
+                followDelay = modFlashlight.FollowDelay.Value;
 
-                FlashlightSize = new Vector2(0, GetRadiusFor(0));
+                FlashlightSize = new Vector2(0, GetSizeFor(0));
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
@@ -86,14 +83,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var destination = e.MousePosition;
 
                 FlashlightPosition = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(Clock.ElapsedFrameTime), FollowDelay), position, destination, 0, FollowDelay, Easing.Out);
+                    Math.Min(Math.Abs(Clock.ElapsedFrameTime), followDelay), position, destination, 0, followDelay, Easing.Out);
 
                 return base.OnMouseMove(e);
             }
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetRadiusFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
