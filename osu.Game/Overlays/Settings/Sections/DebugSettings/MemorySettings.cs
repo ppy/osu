@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -17,6 +19,9 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         [BackgroundDependencyLoader]
         private void load(GameHost host, RealmContextFactory realmFactory)
         {
+            SettingsButton blockAction;
+            SettingsButton unblockAction;
+
             Children = new Drawable[]
             {
                 new SettingsButton
@@ -35,6 +40,43 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                         }
                     }
                 },
+                blockAction = new SettingsButton
+                {
+                    Text = "Block realm",
+                },
+                unblockAction = new SettingsButton
+                {
+                    Text = "Unblock realm",
+                },
+            };
+
+            blockAction.Action = () =>
+            {
+                var blocking = realmFactory.BlockAllOperations();
+                blockAction.Enabled.Value = false;
+
+                // As a safety measure, unblock after 10 seconds.
+                // This is to handle the case where a dev may block, but then something on the update thread
+                // accesses realm and blocks for eternity.
+                Task.Factory.StartNew(() =>
+                {
+                    Thread.Sleep(10000);
+                    unblock();
+                });
+
+                unblockAction.Action = unblock;
+
+                void unblock()
+                {
+                    blocking?.Dispose();
+                    blocking = null;
+
+                    Scheduler.Add(() =>
+                    {
+                        blockAction.Enabled.Value = true;
+                        unblockAction.Action = null;
+                    });
+                }
             };
         }
     }
