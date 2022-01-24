@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Default
             if (!effectPoint.KiaiMode)
                 return;
 
-            if (beatIndex % (int)timingPoint.TimeSignature != 0)
+            if (beatIndex % timingPoint.TimeSignature.Numerator != 0)
                 return;
 
             double duration = timingPoint.BeatLength * 2;

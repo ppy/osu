@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Database
             {
                 bool callbackRan = false;
 
-                realmFactory.Run(realm =>
+                realmFactory.RegisterCustomSubscription(realm =>
                 {
                     var subscription = realm.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
                     {
@@ -60,6 +60,7 @@ namespace osu.Game.Tests.Database
                     realmFactory.Run(r => r.Refresh());
 
                     subscription?.Dispose();
+                    return null;
                 });
 
                 Assert.IsTrue(callbackRan);

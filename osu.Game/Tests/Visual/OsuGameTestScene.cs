@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -72,8 +73,11 @@ namespace osu.Game.Tests.Visual
         [TearDownSteps]
         public void TearDownSteps()
         {
-            AddStep("exit game", () => Game.Exit());
-            AddUntilStep("wait for game exit", () => Game.Parent == null);
+            if (DebugUtils.IsNUnitRunning)
+            {
+                AddStep("exit game", () => Game.Exit());
+                AddUntilStep("wait for game exit", () => Game.Parent == null);
+            }
         }
 
         protected void CreateGame()
