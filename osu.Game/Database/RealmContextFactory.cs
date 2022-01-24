@@ -63,8 +63,22 @@ namespace osu.Game.Database
 
         private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
-        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> customSubscriptionActions = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
+        /// <summary>
+        /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
+        /// will unregister the subscription from realm.
+        ///
+        /// Put another way, the key is an action which registers the subscription with realm. The returned <see cref="IDisposable"/> from the action is stored as the value and only
+        /// used internally.
+        ///
+        /// Entries in this dictionary are only removed when a consumer signals that the subscription should be permanently ceased (via their own <see cref="IDisposable"/>).
+        /// </summary>
+        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> customSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
 
+        /// <summary>
+        /// Holds a map of functions registered via <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
+        /// fires a change set event with an empty collection. This is used to inform subscribers when a realm context goes away, and ensure they don't use invalidated
+        /// managed realm objects from a previous firing.
+        /// </summary>
         private readonly Dictionary<Func<Realm, IDisposable?>, Action> realmSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
 
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
@@ -88,7 +102,7 @@ namespace osu.Game.Database
                     Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
 
                     // Resubscribe any subscriptions
-                    foreach (var action in customSubscriptionActions.Keys)
+                    foreach (var action in customSubscriptionsResetMap.Keys)
                         registerSubscription(action);
                 }
 
@@ -245,11 +259,12 @@ namespace osu.Game.Database
 
             lock (contextLock)
             {
+                Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(onChanged);
+
+                // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
                 realmSubscriptionsResetMap.Add(action, () => onChanged(new EmptyRealmSet<T>(), null, null));
                 return RegisterCustomSubscription(action);
             }
-
-            IDisposable? action(Realm realm) => query(realm).QueryAsyncWithNotifications(onChanged);
         }
 
         /// <summary>
@@ -266,8 +281,8 @@ namespace osu.Game.Database
 
             registerSubscription(action);
 
-            // This token is returned to the consumer only.
-            // It will cause the registration to be permanently removed.
+            // This token is returned to the consumer.
+            // When disposed, it will cause the registration to be permanently ceased (unsubscribed with realm and unregistered by this class).
             return new InvokeOnDisposal(() =>
             {
                 if (ThreadSafety.IsUpdateThread)
@@ -279,10 +294,10 @@ namespace osu.Game.Database
                 {
                     lock (contextLock)
                     {
-                        if (customSubscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                        if (customSubscriptionsResetMap.TryGetValue(action, out var unsubscriptionAction))
                         {
                             unsubscriptionAction?.Dispose();
-                            customSubscriptionActions.Remove(action);
+                            customSubscriptionsResetMap.Remove(action);
                             realmSubscriptionsResetMap.Remove(action);
                         }
                     }
@@ -301,10 +316,10 @@ namespace osu.Game.Database
 
             lock (contextLock)
             {
-                Debug.Assert(!customSubscriptionActions.TryGetValue(action, out var found) || found == null);
+                Debug.Assert(!customSubscriptionsResetMap.TryGetValue(action, out var found) || found == null);
 
                 current_thread_subscriptions_allowed.Value = true;
-                customSubscriptionActions[action] = action(realm);
+                customSubscriptionsResetMap[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
             }
         }
@@ -318,10 +333,10 @@ namespace osu.Game.Database
             foreach (var action in realmSubscriptionsResetMap.Values)
                 action();
 
-            foreach (var action in customSubscriptionActions)
+            foreach (var action in customSubscriptionsResetMap)
             {
                 action.Value?.Dispose();
-                customSubscriptionActions[action.Key] = null;
+                customSubscriptionsResetMap[action.Key] = null;
             }
         }
 
