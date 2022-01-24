@@ -243,9 +243,11 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
 
-            realmSubscriptionsResetMap.Add(action, () => onChanged(new EmptyRealmSet<T>(), null, null));
-
-            return Register(action);
+            lock (contextLock)
+            {
+                realmSubscriptionsResetMap.Add(action, () => onChanged(new EmptyRealmSet<T>(), null, null));
+                return Register(action);
+            }
 
             IDisposable? action(Realm realm) => query(realm).QueryAsyncWithNotifications(onChanged);
         }
