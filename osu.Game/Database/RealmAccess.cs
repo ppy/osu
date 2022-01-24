@@ -83,6 +83,8 @@ namespace osu.Game.Database
 
         private static readonly GlobalStatistic<int> realm_instances_created = GlobalStatistics.Get<int>(@"Realm", @"Instances (Created)");
 
+        private static readonly GlobalStatistic<int> total_subscriptions = GlobalStatistics.Get<int>(@"Realm", @"Subscriptions");
+
         private readonly object realmLock = new object();
 
         private Realm? updateRealm;
@@ -289,6 +291,8 @@ namespace osu.Game.Database
 
             var syncContext = SynchronizationContext.Current;
 
+            total_subscriptions.Value++;
+
             registerSubscription(action);
 
             // This token is returned to the consumer.
@@ -309,6 +313,7 @@ namespace osu.Game.Database
                             unsubscriptionAction?.Dispose();
                             customSubscriptionsResetMap.Remove(action);
                             notificationsResetMap.Remove(action);
+                            total_subscriptions.Value--;
                         }
                     }
                 }
