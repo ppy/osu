@@ -94,7 +94,7 @@ namespace osu.Game.Overlays
             foreach (var s in queryRealmBeatmapSets())
                 beatmapSets.Add(s.Detach());
 
-            beatmapSubscription = realmFactory.Register(realm => queryRealmBeatmapSets(), beatmapsChanged);
+            beatmapSubscription = realmFactory.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)

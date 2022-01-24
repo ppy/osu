@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (beatmapInfo == null)
                 return;
 
-            scoreSubscription = realmFactory.Register(realm =>
+            scoreSubscription = realmFactory.RegisterForNotifications(realm =>
                     realm.All<ScoreInfo>()
                          .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
                 (_, changes, ___) =>

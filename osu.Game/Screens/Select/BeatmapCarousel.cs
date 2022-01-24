@@ -190,13 +190,13 @@ namespace osu.Game.Screens.Select
         {
             base.LoadComplete();
 
-            subscriptionSets = realmFactory.Register(getBeatmapSets, beatmapSetsChanged);
-            subscriptionBeatmaps = realmFactory.Register(realm => realm.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
+            subscriptionSets = realmFactory.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
+            subscriptionBeatmaps = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
 
             // Can't use main subscriptions because we can't lookup deleted indices.
             // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-            subscriptionDeletedSets = realmFactory.Register(realm => realm.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
-            subscriptionHiddenBeatmaps = realmFactory.Register(realm => realm.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
+            subscriptionDeletedSets = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
+            subscriptionHiddenBeatmaps = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
         private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)

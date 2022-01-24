@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Database
             {
                 realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
 
-                var registration = realmFactory.Register(realm => realm.All<BeatmapSetInfo>(), onChanged);
+                var registration = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapSetInfo>(), onChanged);
 
                 testEventsArriving(true);
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Database
 
                 realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
 
-                var subscription = realmFactory.Register(realm =>
+                var subscription = realmFactory.RegisterCustomSubscription(realm =>
                 {
                     beatmapSetInfo = realm.All<BeatmapSetInfo>().First();
 
