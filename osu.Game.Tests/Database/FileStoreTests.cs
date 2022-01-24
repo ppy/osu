@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmAccess.Context;
+                var realm = realmAccess.Realm;
                 var files = new RealmFileStore(realmAccess, storage);
 
                 var testData = new MemoryStream(new byte[] { 0, 1, 2, 3 });
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmAccess.Context;
+                var realm = realmAccess.Realm;
                 var files = new RealmFileStore(realmAccess, storage);
 
                 var testData = new MemoryStream(new byte[] { 0, 1, 2, 3 });
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmAccess.Context;
+                var realm = realmAccess.Realm;
                 var files = new RealmFileStore(realmAccess, storage);
 
                 var file = realm.Write(() => files.Add(new MemoryStream(new byte[] { 0, 1, 2, 3 }), realm));
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realmAccess, storage) =>
             {
-                var realm = realmAccess.Context;
+                var realm = realmAccess.Realm;
                 var files = new RealmFileStore(realmAccess, storage);
 
                 var file = realm.Write(() => files.Add(new MemoryStream(new byte[] { 0, 1, 2, 3 }), realm));

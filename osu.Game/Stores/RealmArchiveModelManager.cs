@@ -45,7 +45,7 @@ namespace osu.Game.Stores
             // This method should be removed as soon as all the surrounding pieces support non-detached operations.
             if (!item.IsManaged)
             {
-                var managed = Access.Context.Find<TModel>(item.ID);
+                var managed = Access.Realm.Find<TModel>(item.ID);
                 managed.Realm.Write(() => operation(managed));
 
                 item.Files.Clear();
