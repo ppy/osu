@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform) };
 
-        [SettingSource("Wiggle strength", "something")]
+        [SettingSource("Strength")]
         public BindableDouble WiggleStrength { get; } = new BindableDouble(10)
         {
             MinValue = 1f,
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = .5f
         };
 
-        [SettingSource("Wiggle duration", "milliseconds per wiggle")]
+        [SettingSource("Duration", "Milliseconds per wiggle")]
         public BindableInt WiggleDuration { get; } = new BindableInt(90)
         {
             MinValue = 40,
