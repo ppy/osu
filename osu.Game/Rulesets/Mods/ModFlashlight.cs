@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
 
-        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
-        public abstract BindableBool ChangeRadius { get; }
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public abstract BindableNumber<float> SizeMultiplier { get; }
 
-        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
-        public abstract BindableNumber<float> InitialRadius { get; }
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public abstract BindableBool ComboBasedSize { get; }
     }
 
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
