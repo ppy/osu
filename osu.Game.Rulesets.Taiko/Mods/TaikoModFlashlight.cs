@@ -34,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Precision = 0.1f
         };
 
-        protected override float ModeMultiplier => 250;
+        protected virtual float DefaultFlashlightSize => 250;
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, ModeMultiplier);
+        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, DefaultFlashlightSize);
 
         private TaikoPlayfield playfield;
 
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
             private readonly TaikoPlayfield taikoPlayfield;
 
-            public TaikoFlashlight(TaikoPlayfield taikoPlayfield, bool isRadiusBasedOnCombo, float initialRadius, float modeMultiplier)
-                : base(isRadiusBasedOnCombo, initialRadius, modeMultiplier)
+            public TaikoFlashlight(TaikoPlayfield taikoPlayfield, bool isRadiusBasedOnCombo, float initialRadius, float defaultFlashlightSize)
+                : base(isRadiusBasedOnCombo, initialRadius, defaultFlashlightSize)
             {
                 this.taikoPlayfield = taikoPlayfield;
                 FlashlightSize = getSizeFor(0);

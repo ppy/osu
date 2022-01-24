@@ -47,11 +47,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.1f
         };
 
-        protected override float ModeMultiplier => 180;
+        protected virtual float DefaultFlashlightSize => 180;
 
         private OsuFlashlight flashlight;
 
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value, ModeMultiplier);
+        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value, DefaultFlashlightSize);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             //public float InitialRadius { private get; set; }
             public bool ChangeRadius { private get; set; }
 
-            public OsuFlashlight(bool isRadiusBasedOnCombo, float initialRadius, double followDelay, float modeMultiplier)
-                : base(isRadiusBasedOnCombo, initialRadius, modeMultiplier)
+            public OsuFlashlight(bool isRadiusBasedOnCombo, float initialRadius, double followDelay, float defaultFlashlightSize)
+                : base(isRadiusBasedOnCombo, initialRadius, defaultFlashlightSize)
             {
                 FollowDelay = followDelay;
 
