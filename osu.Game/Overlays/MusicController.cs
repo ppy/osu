@@ -71,14 +71,15 @@ namespace osu.Game.Overlays
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
-        private IQueryable<BeatmapSetInfo> availableBeatmaps => realmFactory.Context
-                                                                            .All<BeatmapSetInfo>()
-                                                                            .Where(s => !s.DeletePending);
+        private IQueryable<BeatmapSetInfo> queryRealmBeatmapSets() =>
+            realmFactory.Context
+                        .All<BeatmapSetInfo>()
+                        .Where(s => !s.DeletePending);
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmapSubscription = realmFactory.Register(realm => availableBeatmaps.QueryAsyncWithNotifications(beatmapsChanged));
+            beatmapSubscription = realmFactory.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)

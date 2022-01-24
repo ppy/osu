@@ -272,7 +272,7 @@ namespace osu.Game.Database
             where T : RealmObjectBase
         {
             if (!RealmContextFactory.CurrentThreadSubscriptionsAllowed)
-                throw new InvalidOperationException($"Make sure to call {nameof(RealmContextFactory)}.{nameof(RealmContextFactory.Register)}");
+                throw new InvalidOperationException($"Make sure to call {nameof(RealmContextFactory)}.{nameof(RealmContextFactory.RegisterForNotifications)}");
 
             return collection.SubscribeForNotifications(callback);
         }

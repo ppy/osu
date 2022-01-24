@@ -63,6 +63,24 @@ namespace osu.Game.Database
 
         private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
+        /// <summary>
+        /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
+        /// will unregister the subscription from realm.
+        ///
+        /// Put another way, the key is an action which registers the subscription with realm. The returned <see cref="IDisposable"/> from the action is stored as the value and only
+        /// used internally.
+        ///
+        /// Entries in this dictionary are only removed when a consumer signals that the subscription should be permanently ceased (via their own <see cref="IDisposable"/>).
+        /// </summary>
+        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> customSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
+
+        /// <summary>
+        /// Holds a map of functions registered via <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
+        /// fires a change set event with an empty collection. This is used to inform subscribers when a realm context goes away, and ensure they don't use invalidated
+        /// managed realm objects from a previous firing.
+        /// </summary>
+        private readonly Dictionary<Func<Realm, IDisposable?>, Action> notificationsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
+
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
@@ -84,7 +102,7 @@ namespace osu.Game.Database
                     Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
 
                     // Resubscribe any subscriptions
-                    foreach (var action in subscriptionActions.Keys)
+                    foreach (var action in customSubscriptionsResetMap.Keys)
                         registerSubscription(action);
                 }
 
@@ -233,27 +251,75 @@ namespace osu.Game.Database
             }
         }
 
-        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> subscriptionActions = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
+        /// <summary>
+        /// Subscribe to a realm collection and begin watching for asynchronous changes.
+        /// </summary>
+        /// <remarks>
+        /// This adds osu! specific thread and managed state safety checks on top of <see cref="IRealmCollection{T}.SubscribeForNotifications"/>.
+        ///
+        /// In addition to the documented realm behaviour, we have the additional requirement of handling subscriptions over potential context loss.
+        /// When this happens, callback events will be automatically fired:
+        /// - On context loss, a callback with an empty collection and <c>null</c> <see cref="ChangeSet"/> will be invoked.
+        /// - On context revival, a standard initial realm callback will arrive, with <c>null</c> <see cref="ChangeSet"/> and an up-to-date collection.
+        /// </remarks>
+        /// <param name="query">The <see cref="IQueryable{T}"/> to observe for changes.</param>
+        /// <typeparam name="T">Type of the elements in the list.</typeparam>
+        /// <param name="callback">The callback to be invoked with the updated <see cref="IRealmCollection{T}"/>.</param>
+        /// <returns>
+        /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
+        /// To stop receiving notifications, call <see cref="IDisposable.Dispose"/>.
+        /// </returns>
+        /// <seealso cref="IRealmCollection{T}.SubscribeForNotifications"/>
+        public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> callback)
+            where T : RealmObjectBase
+        {
+            if (!ThreadSafety.IsUpdateThread)
+                throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
+
+            lock (contextLock)
+            {
+                Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
+
+                // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                return RegisterCustomSubscription(action);
+            }
+        }
 
         /// <summary>
         /// Run work on realm that will be run every time the update thread realm context gets recycled.
         /// </summary>
         /// <param name="action">The work to run. Return value should be an <see cref="IDisposable"/> from QueryAsyncWithNotifications, or an <see cref="InvokeOnDisposal"/> to clean up any bindings.</param>
         /// <returns>An <see cref="IDisposable"/> which should be disposed to unsubscribe any inner subscription.</returns>
-        public IDisposable Register(Func<Realm, IDisposable?> action)
+        public IDisposable RegisterCustomSubscription(Func<Realm, IDisposable?> action)
         {
             if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
+                throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
+
+            var syncContext = SynchronizationContext.Current;
 
             registerSubscription(action);
 
+            // This token is returned to the consumer.
+            // When disposed, it will cause the registration to be permanently ceased (unsubscribed with realm and unregistered by this class).
             return new InvokeOnDisposal(() =>
             {
-                // TODO: this likely needs to be run on the update thread.
-                if (subscriptionActions.TryGetValue(action, out var unsubscriptionAction))
+                if (ThreadSafety.IsUpdateThread)
+                    unsubscribe();
+                else
+                    syncContext.Post(_ => unsubscribe(), null);
+
+                void unsubscribe()
                 {
-                    unsubscriptionAction?.Dispose();
-                    subscriptionActions.Remove(action);
+                    lock (contextLock)
+                    {
+                        if (customSubscriptionsResetMap.TryGetValue(action, out var unsubscriptionAction))
+                        {
+                            unsubscriptionAction?.Dispose();
+                            customSubscriptionsResetMap.Remove(action);
+                            notificationsResetMap.Remove(action);
+                        }
+                    }
                 }
             });
         }
@@ -262,14 +328,37 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            // Get context outside of flag update to ensure beyond doubt this can't be cyclic.
-            var realm = Context;
-
             lock (contextLock)
             {
+                // Retrieve context outside of flag update to ensure that the context is constructed,
+                // as attempting to access it inside the subscription if it's not constructed would lead to
+                // cyclic invocations of the subscription callback.
+                var realm = Context;
+
+                Debug.Assert(!customSubscriptionsResetMap.TryGetValue(action, out var found) || found == null);
+
                 current_thread_subscriptions_allowed.Value = true;
-                subscriptionActions[action] = action(realm);
+                customSubscriptionsResetMap[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
+            }
+        }
+
+        /// <summary>
+        /// Unregister all subscriptions when the realm context is to be recycled.
+        /// Subscriptions will still remain and will be re-subscribed when the realm context returns.
+        /// </summary>
+        private void unregisterAllSubscriptions()
+        {
+            lock (contextLock)
+            {
+                foreach (var action in notificationsResetMap.Values)
+                    action();
+
+                foreach (var action in customSubscriptionsResetMap)
+                {
+                    action.Value?.Dispose();
+                    customSubscriptionsResetMap[action.Key] = null;
+                }
             }
         }
 
@@ -505,7 +594,7 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            SynchronizationContext syncContext;
+            SynchronizationContext? syncContext = null;
 
             try
             {
@@ -513,10 +602,21 @@ namespace osu.Game.Database
 
                 lock (contextLock)
                 {
-                    if (!ThreadSafety.IsUpdateThread && context != null)
-                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+                    if (context == null)
+                    {
+                        // null context means the update thread has not yet retrieved its context.
+                        // we don't need to worry about reviving the update context in this case, so don't bother with the SynchronizationContext.
+                        Debug.Assert(!ThreadSafety.IsUpdateThread);
+                    }
+                    else
+                    {
+                        if (!ThreadSafety.IsUpdateThread)
+                            throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
-                    syncContext = SynchronizationContext.Current;
+                        syncContext = SynchronizationContext.Current;
+                    }
+
+                    unregisterAllSubscriptions();
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
