@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.1f
         };
 
-        protected override float ModeMultiplier => 350;
+        protected virtual float DefaultFlashlightSize => 350;
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, ModeMultiplier);
+        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, DefaultFlashlightSize);
 
         private CatchPlayfield playfield;
 
@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             private readonly CatchPlayfield playfield;
 
-            public CatchFlashlight(CatchPlayfield playfield, bool isRadiusBasedOnCombo, float initialRadius, float modeMultiplier)
-                : base(isRadiusBasedOnCombo, initialRadius, modeMultiplier)
+            public CatchFlashlight(CatchPlayfield playfield, bool isRadiusBasedOnCombo, float initialRadius, float defaultFlashlightSize)
+                : base(isRadiusBasedOnCombo, initialRadius, defaultFlashlightSize)
             {
                 this.playfield = playfield;
                 FlashlightSize = new Vector2(0, GetRadiusFor(0));

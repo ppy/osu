@@ -34,16 +34,16 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 0.1f
         };
 
-        protected override float ModeMultiplier => 50;
+        protected virtual float DefaultFlashlightSize => 50;
 
-        public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value, ModeMultiplier);
+        public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value, DefaultFlashlightSize);
 
         private class ManiaFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
 
-            public ManiaFlashlight(bool isRadiusBasedOnCombo, float initialRadius, float modeMultiplier)
-                : base(isRadiusBasedOnCombo, initialRadius, modeMultiplier)
+            public ManiaFlashlight(bool isRadiusBasedOnCombo, float initialRadius, float defaultFlashlightSize)
+                : base(isRadiusBasedOnCombo, initialRadius, defaultFlashlightSize)
             {
                 FlashlightSize = new Vector2(DrawWidth, GetRadiusFor(0));
 
