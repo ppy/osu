@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
         {
-            MinValue = 0.1f,
-            MaxValue = 4.5f,
+            MinValue = 0.5f,
+            MaxValue = 3f,
             Default = 1f,
             Value = 1f,
             Precision = 0.1f
