@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                int beatsPerBar = (int)timingPoint.TimeSignature;
+                int beatsPerBar = timingPoint.TimeSignature.Numerator;
                 int segmentLength = beatsPerBar * Divisor * bars_per_segment;
 
                 if (!IsBeatSyncedWithTrack)
@@ -102,14 +102,14 @@ namespace osu.Game.Rulesets.Mods
                     playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
             }
 
-            private void playBeatFor(int beatIndex, TimeSignatures signature)
+            private void playBeatFor(int beatIndex, TimeSignature signature)
             {
                 if (beatIndex == 0)
                     finishSample?.Play();
 
-                switch (signature)
+                switch (signature.Numerator)
                 {
-                    case TimeSignatures.SimpleTriple:
+                    case 3:
                         switch (beatIndex % 6)
                         {
                             case 0:
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Mods
 
                         break;
 
-                    case TimeSignatures.SimpleQuadruple:
+                    case 4:
                         switch (beatIndex % 4)
                         {
                             case 0:
