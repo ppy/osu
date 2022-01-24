@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select.Carousel
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select.Carousel
             ruleset.BindValueChanged(_ =>
             {
                 scoreSubscription?.Dispose();
-                scoreSubscription = realmFactory.RegisterForNotifications(realm =>
+                scoreSubscription = realm.RegisterForNotifications(realm =>
                         realm.All<ScoreInfo>()
                              .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                      + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"

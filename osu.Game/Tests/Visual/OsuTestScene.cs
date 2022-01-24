@@ -75,9 +75,9 @@ namespace osu.Game.Tests.Visual
         /// <remarks>
         /// In interactive runs (ie. VisualTests) this will use the user's database if <see cref="UseFreshStoragePerRun"/> is not set to <c>true</c>.
         /// </remarks>
-        protected RealmContextFactory ContextFactory => contextFactory.Value;
+        protected RealmAccess Access => contextFactory.Value;
 
-        private Lazy<RealmContextFactory> contextFactory;
+        private Lazy<RealmAccess> contextFactory;
 
         /// <summary>
         /// Whether a fresh storage should be initialised per test (method) run.
@@ -119,7 +119,7 @@ namespace osu.Game.Tests.Visual
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
-            contextFactory = new Lazy<RealmContextFactory>(() => new RealmContextFactory(LocalStorage, "client"));
+            contextFactory = new Lazy<RealmAccess>(() => new RealmAccess(LocalStorage, "client"));
 
             RecycleLocalStorage(false);
 

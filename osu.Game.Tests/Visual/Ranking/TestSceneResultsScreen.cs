@@ -36,13 +36,13 @@ namespace osu.Game.Tests.Visual.Ranking
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            realmContextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var beatmapInfo = realm.All<BeatmapInfo>()
                                        .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)

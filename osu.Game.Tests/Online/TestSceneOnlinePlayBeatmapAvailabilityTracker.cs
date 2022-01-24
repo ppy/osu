@@ -45,8 +45,8 @@ namespace osu.Game.Tests.Online
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Access));
+            Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Access, rulesets, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API, host));
         }
 
@@ -60,8 +60,8 @@ namespace osu.Game.Tests.Online
             testBeatmapInfo = getTestBeatmapInfo(testBeatmapFile);
             testBeatmapSet = testBeatmapInfo.BeatmapSet;
 
-            ContextFactory.Write(r => r.RemoveAll<BeatmapSetInfo>());
-            ContextFactory.Write(r => r.RemoveAll<BeatmapInfo>());
+            Access.Write(r => r.RemoveAll<BeatmapSetInfo>());
+            Access.Write(r => r.RemoveAll<BeatmapInfo>());
 
             selectedItem.Value = new PlaylistItem
             {
@@ -166,22 +166,22 @@ namespace osu.Game.Tests.Online
 
             public Task<ILive<BeatmapSetInfo>> CurrentImportTask { get; private set; }
 
-            public TestBeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
-                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
+            public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+                : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
             {
-                return new TestBeatmapModelManager(this, storage, contextFactory, rulesets, onlineLookupQueue);
+                return new TestBeatmapModelManager(this, storage, realm, rulesets, onlineLookupQueue);
             }
 
             internal class TestBeatmapModelManager : BeatmapModelManager
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmContextFactory databaseContextFactory, RulesetStore rulesetStore, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseContextFactory, storage, beatmapOnlineLookupQueue)
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, RulesetStore rulesetStore, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
+                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }

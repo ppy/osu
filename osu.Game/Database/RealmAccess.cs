@@ -32,7 +32,7 @@ namespace osu.Game.Database
     /// <summary>
     /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
     /// </summary>
-    public class RealmContextFactory : IDisposable
+    public class RealmAccess : IDisposable
     {
         private readonly Storage storage;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Database
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
         /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
-        public RealmContextFactory(Storage storage, string filename, IDatabaseContextFactory? efContextFactory = null)
+        public RealmAccess(Storage storage, string filename, IDatabaseContextFactory? efContextFactory = null)
         {
             this.storage = storage;
             this.efContextFactory = efContextFactory;
@@ -365,7 +365,7 @@ namespace osu.Game.Database
         private Realm createContext()
         {
             if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmContextFactory));
+                throw new ObjectDisposedException(nameof(RealmAccess));
 
             bool tookSemaphoreLock = false;
 
@@ -592,7 +592,7 @@ namespace osu.Game.Database
         public IDisposable BlockAllOperations()
         {
             if (isDisposed)
-                throw new ObjectDisposedException(nameof(RealmContextFactory));
+                throw new ObjectDisposedException(nameof(RealmAccess));
 
             SynchronizationContext? syncContext = null;
 
@@ -652,7 +652,7 @@ namespace osu.Game.Database
                 throw;
             }
 
-            return new InvokeOnDisposal<RealmContextFactory>(this, factory =>
+            return new InvokeOnDisposal<RealmAccess>(this, factory =>
             {
                 factory.contextCreationLock.Release();
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);

@@ -25,7 +25,7 @@ namespace osu.Game.Input.Bindings
         private IDisposable realmSubscription;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         public override IEnumerable<IKeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings(variant ?? 0);
 
@@ -49,13 +49,13 @@ namespace osu.Game.Input.Bindings
         private IQueryable<RealmKeyBinding> queryRealmKeyBindings()
         {
             string rulesetName = ruleset?.ShortName;
-            return realmFactory.Context.All<RealmKeyBinding>()
-                               .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
+            return realm.Realm.All<RealmKeyBinding>()
+                        .Where(b => b.RulesetName == rulesetName && b.Variant == variant);
         }
 
         protected override void LoadComplete()
         {
-            realmSubscription = realmFactory.RegisterForNotifications(realm => queryRealmKeyBindings(), (sender, changes, error) =>
+            realmSubscription = realm.RegisterForNotifications(realm => queryRealmKeyBindings(), (sender, changes, error) =>
             {
                 // The first fire of this is a bit redundant as this is being called in base.LoadComplete,
                 // but this is safest in case the subscription is restored after a context recycle.

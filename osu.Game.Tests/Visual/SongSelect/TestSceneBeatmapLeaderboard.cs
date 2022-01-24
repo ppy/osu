@@ -42,10 +42,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
-            Dependencies.Cache(ContextFactory);
+            dependencies.Cache(rulesetStore = new RulesetStore(Access));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Access, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Access, Scheduler));
+            Dependencies.Cache(Access);
 
             return dependencies;
         }

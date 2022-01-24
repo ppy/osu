@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             working = CreateWorkingBeatmap(Ruleset.Value);
 
             if (IsolateSavingFromDatabase)
-                Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+                Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Access, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
         protected override void LoadComplete()
@@ -126,14 +126,14 @@ namespace osu.Game.Tests.Visual
         {
             public WorkingBeatmap TestBeatmap;
 
-            public TestBeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap)
-                : base(storage, contextFactory, rulesets, api, audioManager, resources, host, defaultBeatmap)
+            public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host, WorkingBeatmap defaultBeatmap)
+                : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
             {
-                return new TestBeatmapModelManager(storage, contextFactory, rulesets, onlineLookupQueue);
+                return new TestBeatmapModelManager(storage, realm, rulesets, onlineLookupQueue);
             }
 
             protected override WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap defaultBeatmap, GameHost host)
@@ -157,8 +157,8 @@ namespace osu.Game.Tests.Visual
 
             internal class TestBeatmapModelManager : BeatmapModelManager
             {
-                public TestBeatmapModelManager(Storage storage, RealmContextFactory databaseContextFactory, RulesetStore rulesetStore, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseContextFactory, storage, beatmapOnlineLookupQueue)
+                public TestBeatmapModelManager(Storage storage, RealmAccess databaseAccess, RulesetStore rulesetStore, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
+                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
                 {
                 }
 

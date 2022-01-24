@@ -24,10 +24,10 @@ namespace osu.Game.Stores
     {
         private readonly RealmFileStore realmFileStore;
 
-        protected RealmArchiveModelManager(Storage storage, RealmContextFactory contextFactory)
-            : base(storage, contextFactory)
+        protected RealmArchiveModelManager(Storage storage, RealmAccess realm)
+            : base(storage, realm)
         {
-            realmFileStore = new RealmFileStore(contextFactory, storage);
+            realmFileStore = new RealmFileStore(realm, storage);
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
@@ -45,7 +45,7 @@ namespace osu.Game.Stores
             // This method should be removed as soon as all the surrounding pieces support non-detached operations.
             if (!item.IsManaged)
             {
-                var managed = ContextFactory.Context.Find<TModel>(item.ID);
+                var managed = Access.Context.Find<TModel>(item.ID);
                 managed.Realm.Write(() => operation(managed));
 
                 item.Files.Clear();
@@ -165,7 +165,7 @@ namespace osu.Game.Stores
 
         public bool Delete(TModel item)
         {
-            return ContextFactory.Run(realm =>
+            return Access.Run(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
@@ -180,7 +180,7 @@ namespace osu.Game.Stores
 
         public void Undelete(TModel item)
         {
-            ContextFactory.Run(realm =>
+            Access.Run(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);

@@ -179,24 +179,24 @@ namespace osu.Game.Screens.Select
 
             if (!loadedTestBeatmaps)
             {
-                realmFactory.Run(realm => loadBeatmapSets(getBeatmapSets(realm)));
+                realm.Run(realm => loadBeatmapSets(getBeatmapSets(realm)));
             }
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            subscriptionSets = realmFactory.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
-            subscriptionBeatmaps = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
+            subscriptionSets = realm.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
+            subscriptionBeatmaps = realm.RegisterForNotifications(realm => realm.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
 
             // Can't use main subscriptions because we can't lookup deleted indices.
             // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-            subscriptionDeletedSets = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
-            subscriptionHiddenBeatmaps = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
+            subscriptionDeletedSets = realm.RegisterForNotifications(realm => realm.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
+            subscriptionHiddenBeatmaps = realm.RegisterForNotifications(realm => realm.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
         private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Select
                 foreach (var id in realmSets)
                 {
                     if (!root.BeatmapSetsByID.ContainsKey(id))
-                        UpdateBeatmapSet(realmFactory.Context.Find<BeatmapSetInfo>(id).Detach());
+                        UpdateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id).Detach());
                 }
 
                 foreach (var id in root.BeatmapSetsByID.Keys)

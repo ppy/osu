@@ -35,7 +35,7 @@ namespace osu.Game.Database
         private DatabaseContextFactory efContextFactory { get; set; } = null!;
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; } = null!;
+        private RealmAccess realm { get; set; } = null!;
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
@@ -101,7 +101,7 @@ namespace osu.Game.Database
             {
                 using (var ef = efContextFactory.Get())
                 {
-                    realmContextFactory.Write(realm =>
+                    realm.Write(realm =>
                     {
                         // Before beginning, ensure realm is in an empty state.
                         // Migrations which are half-completed could lead to issues if the user tries a second time.
@@ -158,7 +158,7 @@ namespace osu.Game.Database
 
             int count = existingBeatmapSets.Count();
 
-            realmContextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 log($"Found {count} beatmaps in EF");
 
@@ -280,7 +280,7 @@ namespace osu.Game.Database
 
             int count = existingScores.Count();
 
-            realmContextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 log($"Found {count} scores in EF");
 
@@ -369,7 +369,7 @@ namespace osu.Game.Database
                     break;
             }
 
-            realmContextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 using (var transaction = realm.BeginWrite())
                 {
@@ -428,7 +428,7 @@ namespace osu.Game.Database
 
             log("Beginning settings migration to realm");
 
-            realmContextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 using (var transaction = realm.BeginWrite())
                 {
