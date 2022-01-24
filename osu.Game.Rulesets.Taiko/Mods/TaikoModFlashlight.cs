@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Value = true
         };
 
-        protected virtual float DefaultFlashlightSize => 250;
+        public override float DefaultFlashlightSize => 250;
 
         public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ComboBasedSize.Value, SizeMultiplier.Value, DefaultFlashlightSize);
 

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             Value = false
         };
 
-        protected virtual float DefaultFlashlightSize => 50;
+        public override float DefaultFlashlightSize => 50;
 
         public override Flashlight CreateFlashlight() => new ManiaFlashlight(ComboBasedSize.Value, SizeMultiplier.Value, DefaultFlashlightSize);
 

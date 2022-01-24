@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Mods
             Value = true
         };
 
-        protected virtual float DefaultFlashlightSize => 350;
+        public override float DefaultFlashlightSize => 350;
 
         public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ComboBasedSize.Value, SizeMultiplier.Value, DefaultFlashlightSize);
 
