@@ -30,15 +30,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
-        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
-        public override BindableBool ChangeRadius { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
-
-        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
-        public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
         {
             MinValue = 0.5f,
             MaxValue = 2f,
@@ -47,11 +40,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.1f
         };
 
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public override BindableBool ComboBasedSize { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
         protected virtual float DefaultFlashlightSize => 180;
 
         private OsuFlashlight flashlight;
 
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value, DefaultFlashlightSize);
+        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ComboBasedSize.Value, SizeMultiplier.Value, FollowDelay.Value, DefaultFlashlightSize);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {

@@ -16,15 +16,8 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        [SettingSource("Change radius based on combo", "Decrease the flashlight radius as combo increases.")]
-        public override BindableBool ChangeRadius { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
-
-        [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
-        public override BindableNumber<float> InitialRadius { get; } = new BindableNumber<float>
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
         {
             MinValue = 0.4f,
             MaxValue = 1.7f,
@@ -33,9 +26,16 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.1f
         };
 
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public override BindableBool ComboBasedSize { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
         protected virtual float DefaultFlashlightSize => 350;
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, DefaultFlashlightSize);
+        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ComboBasedSize.Value, SizeMultiplier.Value, DefaultFlashlightSize);
 
         private CatchPlayfield playfield;
 
