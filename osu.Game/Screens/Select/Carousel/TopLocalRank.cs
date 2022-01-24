@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select.Carousel
             ruleset.BindValueChanged(_ =>
             {
                 scoreSubscription?.Dispose();
-                scoreSubscription = realmFactory.Register(realm =>
+                scoreSubscription = realmFactory.RegisterForNotifications(realm =>
                         realm.All<ScoreInfo>()
                              .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
                                      + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"

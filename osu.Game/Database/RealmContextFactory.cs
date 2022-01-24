@@ -63,6 +63,10 @@ namespace osu.Game.Database
 
         private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
 
+        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> customSubscriptionActions = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
+
+        private readonly Dictionary<Func<Realm, IDisposable?>, Action> realmSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
+
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
         private readonly object contextLock = new object();
@@ -233,20 +237,16 @@ namespace osu.Game.Database
             }
         }
 
-        private readonly Dictionary<Func<Realm, IDisposable?>, IDisposable?> customSubscriptionActions = new Dictionary<Func<Realm, IDisposable?>, IDisposable?>();
-
-        private readonly Dictionary<Func<Realm, IDisposable?>, Action> realmSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
-
-        public IDisposable Register<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> onChanged)
+        public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> onChanged)
             where T : RealmObjectBase
         {
             if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
+                throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
 
             lock (contextLock)
             {
                 realmSubscriptionsResetMap.Add(action, () => onChanged(new EmptyRealmSet<T>(), null, null));
-                return Register(action);
+                return RegisterCustomSubscription(action);
             }
 
             IDisposable? action(Realm realm) => query(realm).QueryAsyncWithNotifications(onChanged);
@@ -257,10 +257,10 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="action">The work to run. Return value should be an <see cref="IDisposable"/> from QueryAsyncWithNotifications, or an <see cref="InvokeOnDisposal"/> to clean up any bindings.</param>
         /// <returns>An <see cref="IDisposable"/> which should be disposed to unsubscribe any inner subscription.</returns>
-        public IDisposable Register(Func<Realm, IDisposable?> action)
+        public IDisposable RegisterCustomSubscription(Func<Realm, IDisposable?> action)
         {
             if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(Register)} must be called from the update thread.");
+                throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
 
             var syncContext = SynchronizationContext.Current;
 
