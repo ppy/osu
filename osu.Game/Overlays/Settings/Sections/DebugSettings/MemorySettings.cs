@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Localisation;
@@ -52,30 +54,38 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 
             blockAction.Action = () =>
             {
-                var blocking = realmFactory.BlockAllOperations();
-                blockAction.Enabled.Value = false;
-
-                // As a safety measure, unblock after 10 seconds.
-                // This is to handle the case where a dev may block, but then something on the update thread
-                // accesses realm and blocks for eternity.
-                Task.Factory.StartNew(() =>
+                try
                 {
-                    Thread.Sleep(10000);
-                    unblock();
-                });
+                    var token = realmFactory.BlockAllOperations();
 
-                unblockAction.Action = unblock;
+                    blockAction.Enabled.Value = false;
 
-                void unblock()
-                {
-                    blocking?.Dispose();
-                    blocking = null;
-
-                    Scheduler.Add(() =>
+                    // As a safety measure, unblock after 10 seconds.
+                    // This is to handle the case where a dev may block, but then something on the update thread
+                    // accesses realm and blocks for eternity.
+                    Task.Factory.StartNew(() =>
                     {
-                        blockAction.Enabled.Value = true;
-                        unblockAction.Action = null;
+                        Thread.Sleep(10000);
+                        unblock();
                     });
+
+                    unblockAction.Action = unblock;
+
+                    void unblock()
+                    {
+                        token?.Dispose();
+                        token = null;
+
+                        Scheduler.Add(() =>
+                        {
+                            blockAction.Enabled.Value = true;
+                            unblockAction.Action = null;
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Blocking realm failed");
                 }
             };
         }
