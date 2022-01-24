@@ -330,13 +330,16 @@ namespace osu.Game.Database
         /// </summary>
         private void unregisterAllSubscriptions()
         {
-            foreach (var action in realmSubscriptionsResetMap.Values)
-                action();
-
-            foreach (var action in customSubscriptionsResetMap)
+            lock (contextLock)
             {
-                action.Value?.Dispose();
-                customSubscriptionsResetMap[action.Key] = null;
+                foreach (var action in realmSubscriptionsResetMap.Values)
+                    action();
+
+                foreach (var action in customSubscriptionsResetMap)
+                {
+                    action.Value?.Dispose();
+                    customSubscriptionsResetMap[action.Key] = null;
+                }
             }
         }
 
