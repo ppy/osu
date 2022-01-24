@@ -33,13 +33,9 @@ namespace osu.Game.Rulesets.Catch.Mods
             Precision = 0.1f
         };
 
-        protected override BindableNumber<float> ModeMultiplier { get; } = new BindableNumber<float>
-        {
-            Default = 350,
-            Value = 350,
-        };
+        protected override float ModeMultiplier => 350;
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, ModeMultiplier.Value);
+        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, ModeMultiplier);
 
         private CatchPlayfield playfield;
 

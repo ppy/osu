@@ -34,13 +34,9 @@ namespace osu.Game.Rulesets.Mania.Mods
             Precision = 0.1f
         };
 
-        protected override BindableNumber<float> ModeMultiplier { get; } = new BindableNumber<float>
-        {
-            Default = 50,
-            Value = 50,
-        };
+        protected override float ModeMultiplier => 50;
 
-        public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value, ModeMultiplier.Value);
+        public override Flashlight CreateFlashlight() => new ManiaFlashlight(ChangeRadius.Value, InitialRadius.Value, ModeMultiplier);
 
         private class ManiaFlashlight : Flashlight
         {
