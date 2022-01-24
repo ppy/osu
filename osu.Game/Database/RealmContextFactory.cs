@@ -309,13 +309,13 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            // Retrieve context outside of flag update to ensure that the context is constructed,
-            // as attempting to access it inside the subscription if it's not constructed would lead to
-            // cyclic invocations of the subscription callback.
-            var realm = Context;
-
             lock (contextLock)
             {
+                // Retrieve context outside of flag update to ensure that the context is constructed,
+                // as attempting to access it inside the subscription if it's not constructed would lead to
+                // cyclic invocations of the subscription callback.
+                var realm = Context;
+
                 Debug.Assert(!customSubscriptionsResetMap.TryGetValue(action, out var found) || found == null);
 
                 current_thread_subscriptions_allowed.Value = true;
