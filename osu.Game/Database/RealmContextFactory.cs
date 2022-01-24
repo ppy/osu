@@ -251,7 +251,28 @@ namespace osu.Game.Database
             }
         }
 
-        public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> onChanged)
+        /// <summary>
+        /// Subscribe to a realm collection and begin watching for asynchronous changes.
+        /// </summary>
+        /// <remarks>
+        /// This adds osu! specific thread and managed state safety checks on top of <see cref="IRealmCollection{T}.SubscribeForNotifications"/>.
+        ///
+        /// In addition to the documented realm behaviour, we have the additional requirement of handling subscriptions over potential context loss.
+        /// When this happens, callback events will be automatically fired:
+        /// - On context loss, a callback with an empty collection and <c>null</c> <see cref="ChangeSet"/> will be invoked.
+        /// - On context revival, a standard initial realm callback will arrive, with <c>null</c> <see cref="ChangeSet"/> and an up-to-date collection.
+        /// </remarks>
+        /// <param name="query">The <see cref="IQueryable{T}"/> to observe for changes.</param>
+        /// <typeparam name="T">Type of the elements in the list.</typeparam>
+        /// <seealso cref="IRealmCollection{T}.SubscribeForNotifications"/>
+        /// <param name="callback">The callback to be invoked with the updated <see cref="IRealmCollection{T}"/>.</param>
+        /// <returns>
+        /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
+        /// To stop receiving notifications, call <see cref="IDisposable.Dispose"/>.
+        ///
+        /// May be null in the case the provided collection is not managed.
+        /// </returns>
+        public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
             if (!ThreadSafety.IsUpdateThread)
@@ -259,10 +280,10 @@ namespace osu.Game.Database
 
             lock (contextLock)
             {
-                Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(onChanged);
+                Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
 
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                realmSubscriptionsResetMap.Add(action, () => onChanged(new EmptyRealmSet<T>(), null, null));
+                realmSubscriptionsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
                 return RegisterCustomSubscription(action);
             }
         }
