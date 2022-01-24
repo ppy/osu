@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
         {
-            MinValue = 0.1f,
-            MaxValue = 1.66f,
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
             Default = 1f,
             Value = 1f,
             Precision = 0.1f

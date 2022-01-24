@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Catch.Mods
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
         public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
         {
-            MinValue = 0.4f,
-            MaxValue = 1.7f,
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
             Default = 1f,
             Value = 1f,
             Precision = 0.1f
