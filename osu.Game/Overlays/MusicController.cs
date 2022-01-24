@@ -80,26 +80,32 @@ namespace osu.Game.Overlays
             mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
         }
 
+        private IQueryable<BeatmapSetInfo> queryRealmBeatmapSets() =>
+            realmFactory.Context
+                        .All<BeatmapSetInfo>()
+                        .Where(s => !s.DeletePending);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var availableBeatmaps = realmFactory.Context
-                                                .All<BeatmapSetInfo>()
-                                                .Where(s => !s.DeletePending);
-
             // ensure we're ready before completing async load.
             // probably not a good way of handling this (as there is a period we aren't watching for changes until the realm subscription finishes up.
-            foreach (var s in availableBeatmaps)
-                beatmapSets.Add(s);
+            foreach (var s in queryRealmBeatmapSets())
+                beatmapSets.Add(s.Detach());
 
-            beatmapSubscription = availableBeatmaps.QueryAsyncWithNotifications(beatmapsChanged);
+            beatmapSubscription = realmFactory.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
         {
             if (changes == null)
+            {
+                beatmapSets.Clear();
+                foreach (var s in sender)
+                    beatmapSets.Add(s.Detach());
                 return;
+            }
 
             foreach (int i in changes.InsertedIndices)
                 beatmapSets.Insert(i, sender[i].Detach());
