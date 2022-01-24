@@ -9,10 +9,12 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -93,7 +95,11 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestDeserialiseSubmittableScoreWithEmptyMods()
         {
-            var score = new SubmittableScore(new ScoreInfo());
+            var score = new SubmittableScore(new ScoreInfo
+            {
+                User = new APIUser(),
+                Ruleset = new OsuRuleset().RulesetInfo,
+            });
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
@@ -105,7 +111,9 @@ namespace osu.Game.Tests.Online
         {
             var score = new SubmittableScore(new ScoreInfo
             {
-                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
+                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } },
+                User = new APIUser(),
+                Ruleset = new OsuRuleset().RulesetInfo,
             });
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));

@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.AccountCreation
         private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChildren = new Drawable[]
             {

@@ -36,7 +36,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Background
 {
     [TestFixture]
-    public class TestSceneUserDimBackgrounds : OsuManualInputManagerTestScene
+    public class TestSceneUserDimBackgrounds : ScreenTestScene
     {
         private DummySongSelect songSelect;
         private TestPlayerLoader playerLoader;
@@ -50,20 +50,19 @@ namespace osu.Game.Tests.Visual.Background
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
+            Dependencies.Cache(ContextFactory);
 
             manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
             Beatmap.SetDefault();
         }
 
-        [SetUp]
-        public virtual void SetUp() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            var stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
-            Child = stack;
+            base.SetUpSteps();
 
-            stack.Push(songSelect = new DummySongSelect());
-        });
+            AddStep("push song select", () => Stack.Push(songSelect = new DummySongSelect()));
+        }
 
         /// <summary>
         /// User settings should always be ignored on song select screen.
@@ -388,6 +387,9 @@ namespace osu.Game.Tests.Visual.Background
             {
                 while (BlockLoad && !token.IsCancellationRequested)
                     Thread.Sleep(1);
+
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);

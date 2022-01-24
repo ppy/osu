@@ -10,6 +10,7 @@ using osuTK.Graphics;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Users;
@@ -61,6 +62,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
                         Id = 6602580,
@@ -79,6 +81,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
                         Id = 4608074,
@@ -97,6 +100,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
                     {
                         Id = 1541390,

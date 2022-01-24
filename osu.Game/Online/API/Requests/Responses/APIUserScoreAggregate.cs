@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Newtonsoft.Json;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -42,7 +44,8 @@ namespace osu.Game.Online.API.Requests.Responses
                 PP = PP,
                 TotalScore = TotalScore,
                 User = User,
-                Position = Position
+                Position = Position,
+                Mods = Array.Empty<Mod>()
             };
     }
 }

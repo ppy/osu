@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = $"{(beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet.Metadata).Author.Username}",
+                                            Text = $"{beatmapInfo.Metadata.Author.Username}",
                                             Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
@@ -159,7 +159,6 @@ namespace osu.Game.Screens.Select.Carousel
                                         new TopLocalRank(beatmapInfo)
                                         {
                                             Scale = new Vector2(0.8f),
-                                            Size = new Vector2(40, 20)
                                         },
                                         starCounter = new StarCounter
                                         {
@@ -238,8 +237,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmapInfo)));
 
-                if (beatmapInfo.OnlineID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID.Value)));
+                if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));
 
                 if (collectionManager != null)
                 {
