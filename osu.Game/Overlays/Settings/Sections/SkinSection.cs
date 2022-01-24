@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private IDisposable realmSubscription;
 
-        private IQueryable<SkinInfo> realmSkins =>
+        private IQueryable<SkinInfo> queryRealmSkins() =>
             realmFactory.Context.All<SkinInfo>()
                         .Where(s => !s.DeletePending)
                         .OrderByDescending(s => s.Protected) // protected skins should be at the top.
@@ -83,13 +83,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSubscription = realmFactory.Register(realm => realmSkins
-                .QueryAsyncWithNotifications((sender, changes, error) =>
-                {
-                    // The first fire of this is a bit redundant due to the call below,
-                    // but this is safest in case the subscription is restored after a context recycle.
-                    updateItems();
-                }));
+            realmSubscription = realmFactory.RegisterForNotifications(realm => queryRealmSkins(), (sender, changes, error) =>
+            {
+                // The first fire of this is a bit redundant due to the call below,
+                // but this is safest in case the subscription is restored after a context recycle.
+                updateItems();
+            });
 
             updateItems();
 
@@ -129,9 +128,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateItems()
         {
-            int protectedCount = realmSkins.Count(s => s.Protected);
+            int protectedCount = queryRealmSkins().Count(s => s.Protected);
 
-            skinItems = realmSkins.ToLive(realmFactory);
+            skinItems = queryRealmSkins().ToLive(realmFactory);
 
             skinItems.Insert(protectedCount, random_skin_info);
 

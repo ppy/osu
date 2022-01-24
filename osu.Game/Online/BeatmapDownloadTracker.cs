@@ -42,7 +42,7 @@ namespace osu.Game.Online
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineID = TrackedItem.OnlineID };
 
-            realmSubscription = realmContextFactory.Register(realm => realm.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID && !s.DeletePending).QueryAsyncWithNotifications((items, changes, ___) =>
+            realmSubscription = realmContextFactory.RegisterForNotifications(realm => realm.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID && !s.DeletePending), (items, changes, ___) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));
@@ -54,7 +54,7 @@ namespace osu.Game.Online
                         attachDownload(Downloader.GetExistingDownload(beatmapSetInfo));
                     });
                 }
-            }));
+            });
         }
 
         private void downloadBegan(ArchiveDownloadRequest<IBeatmapSetInfo> request) => Schedule(() =>

@@ -239,7 +239,7 @@ namespace osu.Game.Tests.Database
             {
                 int changesTriggered = 0;
 
-                realmFactory.Register(outerRealm =>
+                realmFactory.RegisterCustomSubscription(outerRealm =>
                 {
                     outerRealm.All<BeatmapInfo>().QueryAsyncWithNotifications(gotChange);
                     ILive<BeatmapInfo>? liveBeatmap = null;

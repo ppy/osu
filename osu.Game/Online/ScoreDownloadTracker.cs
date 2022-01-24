@@ -47,7 +47,7 @@ namespace osu.Game.Online
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
 
-            realmSubscription = realmContextFactory.Register(realm => realm.All<ScoreInfo>().Where(s => ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID) || s.Hash == TrackedItem.Hash) && !s.DeletePending).QueryAsyncWithNotifications((items, changes, ___) =>
+            realmSubscription = realmContextFactory.RegisterForNotifications(realm => realm.All<ScoreInfo>().Where(s => ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID) || s.Hash == TrackedItem.Hash) && !s.DeletePending), (items, changes, ___) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));
@@ -59,7 +59,7 @@ namespace osu.Game.Online
                         attachDownload(Downloader.GetExistingDownload(scoreInfo));
                     });
                 }
-            }));
+            });
         }
 
         private void downloadBegan(ArchiveDownloadRequest<IScoreInfo> request) => Schedule(() =>

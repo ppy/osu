@@ -1,55 +1,140 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Allocation;
+using osu.Framework.Development;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 using Realms;
 
 #nullable enable
 
 namespace osu.Game.Database
 {
-    internal class EFToRealmMigrator
+    internal class EFToRealmMigrator : CompositeDrawable
     {
-        private readonly DatabaseContextFactory efContextFactory;
-        private readonly RealmContextFactory realmContextFactory;
-        private readonly OsuConfigManager config;
-        private readonly Storage storage;
+        public Task<bool> MigrationCompleted => migrationCompleted.Task;
 
-        public EFToRealmMigrator(DatabaseContextFactory efContextFactory, RealmContextFactory realmContextFactory, OsuConfigManager config, Storage storage)
+        private readonly TaskCompletionSource<bool> migrationCompleted = new TaskCompletionSource<bool>();
+
+        [Resolved]
+        private DatabaseContextFactory efContextFactory { get; set; } = null!;
+
+        [Resolved]
+        private RealmContextFactory realmContextFactory { get; set; } = null!;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        private readonly OsuSpriteText currentOperationText;
+
+        public EFToRealmMigrator()
         {
-            this.efContextFactory = efContextFactory;
-            this.realmContextFactory = realmContextFactory;
-            this.config = config;
-            this.storage = storage;
+            RelativeSizeAxes = Axes.Both;
+
+            InternalChildren = new Drawable[]
+            {
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "Database migration in progress",
+                            Font = OsuFont.Default.With(size: 40)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "This could take a few minutes depending on the speed of your disk(s).",
+                            Font = OsuFont.Default.With(size: 30)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "Please keep the window open until this completes!",
+                            Font = OsuFont.Default.With(size: 30)
+                        },
+                        new LoadingSpinner(true)
+                        {
+                            State = { Value = Visibility.Visible }
+                        },
+                        currentOperationText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.Default.With(size: 30)
+                        },
+                    }
+                },
+            };
         }
 
-        public void Run()
+        protected override void LoadComplete()
         {
-            createBackup();
+            base.LoadComplete();
 
-            using (var ef = efContextFactory.Get())
+            Task.Factory.StartNew(() =>
             {
-                migrateSettings(ef);
-                migrateSkins(ef);
-                migrateBeatmaps(ef);
-                migrateScores(ef);
-            }
+                using (var ef = efContextFactory.Get())
+                {
+                    realmContextFactory.Write(realm =>
+                    {
+                        // Before beginning, ensure realm is in an empty state.
+                        // Migrations which are half-completed could lead to issues if the user tries a second time.
+                        // Note that we only do this for beatmaps and scores since the other migrations are yonks old.
+                        realm.RemoveAll<BeatmapSetInfo>();
+                        realm.RemoveAll<BeatmapInfo>();
+                        realm.RemoveAll<BeatmapMetadata>();
+                        realm.RemoveAll<ScoreInfo>();
+                    });
 
-            // Delete the database permanently.
-            // Will cause future startups to not attempt migration.
-            Logger.Log("Migration successful, deleting EF database", LoggingTarget.Database);
-            efContextFactory.ResetDatabase();
+                    migrateSettings(ef);
+                    migrateSkins(ef);
+                    migrateBeatmaps(ef);
+                    migrateScores(ef);
+                }
+
+                // Delete the database permanently.
+                // Will cause future startups to not attempt migration.
+                log("Migration successful, deleting EF database");
+                efContextFactory.ResetDatabase();
+
+                if (DebugUtils.IsDebugBuild)
+                    Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
+            }, TaskCreationOptions.LongRunning).ContinueWith(t =>
+            {
+                migrationCompleted.SetResult(true);
+            });
+        }
+
+        private void log(string message)
+        {
+            Logger.Log(message, LoggingTarget.Database);
+            Scheduler.AddOnce(m => currentOperationText.Text = m, message);
         }
 
         private void migrateBeatmaps(OsuDbContext ef)
@@ -62,12 +147,12 @@ namespace osu.Game.Database
                                         .Include(s => s.Files).ThenInclude(f => f.FileInfo)
                                         .Include(s => s.Metadata);
 
-            Logger.Log("Beginning beatmaps migration to realm", LoggingTarget.Database);
+            log("Beginning beatmaps migration to realm");
 
             // previous entries in EF are removed post migration.
             if (!existingBeatmapSets.Any())
             {
-                Logger.Log("No beatmaps found to migrate", LoggingTarget.Database);
+                log("No beatmaps found to migrate");
                 return;
             }
 
@@ -75,89 +160,80 @@ namespace osu.Game.Database
 
             realmContextFactory.Run(realm =>
             {
-                Logger.Log($"Found {count} beatmaps in EF", LoggingTarget.Database);
+                log($"Found {count} beatmaps in EF");
 
-                // only migrate data if the realm database is empty.
-                // note that this cannot be written as: `realm.All<BeatmapSetInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
-                if (realm.All<BeatmapSetInfo>().Any(s => !s.Protected))
-                {
-                    Logger.Log("Skipping migration as realm already has beatmaps loaded", LoggingTarget.Database);
-                }
-                else
-                {
-                    var transaction = realm.BeginWrite();
-                    int written = 0;
+                var transaction = realm.BeginWrite();
+                int written = 0;
 
-                    try
+                try
+                {
+                    foreach (var beatmapSet in existingBeatmapSets)
                     {
-                        foreach (var beatmapSet in existingBeatmapSets)
+                        if (++written % 1000 == 0)
                         {
-                            if (++written % 1000 == 0)
-                            {
-                                transaction.Commit();
-                                transaction = realm.BeginWrite();
-                                Logger.Log($"Migrated {written}/{count} beatmaps...", LoggingTarget.Database);
-                            }
+                            transaction.Commit();
+                            transaction = realm.BeginWrite();
+                            log($"Migrated {written}/{count} beatmaps...");
+                        }
 
-                            var realmBeatmapSet = new BeatmapSetInfo
+                        var realmBeatmapSet = new BeatmapSetInfo
+                        {
+                            OnlineID = beatmapSet.OnlineID ?? -1,
+                            DateAdded = beatmapSet.DateAdded,
+                            Status = beatmapSet.Status,
+                            DeletePending = beatmapSet.DeletePending,
+                            Hash = beatmapSet.Hash,
+                            Protected = beatmapSet.Protected,
+                        };
+
+                        migrateFiles(beatmapSet, realm, realmBeatmapSet);
+
+                        foreach (var beatmap in beatmapSet.Beatmaps)
+                        {
+                            var ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
+                            var metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata);
+
+                            var realmBeatmap = new BeatmapInfo(ruleset, new BeatmapDifficulty(beatmap.BaseDifficulty), metadata)
                             {
-                                OnlineID = beatmapSet.OnlineID ?? -1,
-                                DateAdded = beatmapSet.DateAdded,
-                                Status = beatmapSet.Status,
-                                DeletePending = beatmapSet.DeletePending,
-                                Hash = beatmapSet.Hash,
-                                Protected = beatmapSet.Protected,
+                                DifficultyName = beatmap.DifficultyName,
+                                Status = beatmap.Status,
+                                OnlineID = beatmap.OnlineID ?? -1,
+                                Length = beatmap.Length,
+                                BPM = beatmap.BPM,
+                                Hash = beatmap.Hash,
+                                StarRating = beatmap.StarRating,
+                                MD5Hash = beatmap.MD5Hash,
+                                Hidden = beatmap.Hidden,
+                                AudioLeadIn = beatmap.AudioLeadIn,
+                                StackLeniency = beatmap.StackLeniency,
+                                SpecialStyle = beatmap.SpecialStyle,
+                                LetterboxInBreaks = beatmap.LetterboxInBreaks,
+                                WidescreenStoryboard = beatmap.WidescreenStoryboard,
+                                EpilepsyWarning = beatmap.EpilepsyWarning,
+                                SamplesMatchPlaybackRate = beatmap.SamplesMatchPlaybackRate,
+                                DistanceSpacing = beatmap.DistanceSpacing,
+                                BeatDivisor = beatmap.BeatDivisor,
+                                GridSize = beatmap.GridSize,
+                                TimelineZoom = beatmap.TimelineZoom,
+                                Countdown = beatmap.Countdown,
+                                CountdownOffset = beatmap.CountdownOffset,
+                                MaxCombo = beatmap.MaxCombo,
+                                Bookmarks = beatmap.Bookmarks,
+                                BeatmapSet = realmBeatmapSet,
                             };
 
-                            migrateFiles(beatmapSet, realm, realmBeatmapSet);
-
-                            foreach (var beatmap in beatmapSet.Beatmaps)
-                            {
-                                var ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
-                                var metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata);
-
-                                var realmBeatmap = new BeatmapInfo(ruleset, new BeatmapDifficulty(beatmap.BaseDifficulty), metadata)
-                                {
-                                    DifficultyName = beatmap.DifficultyName,
-                                    Status = beatmap.Status,
-                                    OnlineID = beatmap.OnlineID ?? -1,
-                                    Length = beatmap.Length,
-                                    BPM = beatmap.BPM,
-                                    Hash = beatmap.Hash,
-                                    StarRating = beatmap.StarRating,
-                                    MD5Hash = beatmap.MD5Hash,
-                                    Hidden = beatmap.Hidden,
-                                    AudioLeadIn = beatmap.AudioLeadIn,
-                                    StackLeniency = beatmap.StackLeniency,
-                                    SpecialStyle = beatmap.SpecialStyle,
-                                    LetterboxInBreaks = beatmap.LetterboxInBreaks,
-                                    WidescreenStoryboard = beatmap.WidescreenStoryboard,
-                                    EpilepsyWarning = beatmap.EpilepsyWarning,
-                                    SamplesMatchPlaybackRate = beatmap.SamplesMatchPlaybackRate,
-                                    DistanceSpacing = beatmap.DistanceSpacing,
-                                    BeatDivisor = beatmap.BeatDivisor,
-                                    GridSize = beatmap.GridSize,
-                                    TimelineZoom = beatmap.TimelineZoom,
-                                    Countdown = beatmap.Countdown,
-                                    CountdownOffset = beatmap.CountdownOffset,
-                                    MaxCombo = beatmap.MaxCombo,
-                                    Bookmarks = beatmap.Bookmarks,
-                                    BeatmapSet = realmBeatmapSet,
-                                };
-
-                                realmBeatmapSet.Beatmaps.Add(realmBeatmap);
-                            }
-
-                            realm.Add(realmBeatmapSet);
+                            realmBeatmapSet.Beatmaps.Add(realmBeatmap);
                         }
-                    }
-                    finally
-                    {
-                        transaction.Commit();
-                    }
 
-                    Logger.Log($"Successfully migrated {count} beatmaps to realm", LoggingTarget.Database);
+                        realm.Add(realmBeatmapSet);
+                    }
                 }
+                finally
+                {
+                    transaction.Commit();
+                }
+
+                log($"Successfully migrated {count} beatmaps to realm");
             });
         }
 
@@ -193,12 +269,12 @@ namespace osu.Game.Database
                                    .Include(s => s.Files)
                                    .ThenInclude(f => f.FileInfo);
 
-            Logger.Log("Beginning scores migration to realm", LoggingTarget.Database);
+            log("Beginning scores migration to realm");
 
             // previous entries in EF are removed post migration.
             if (!existingScores.Any())
             {
-                Logger.Log("No scores found to migrate", LoggingTarget.Database);
+                log("No scores found to migrate");
                 return;
             }
 
@@ -206,72 +282,64 @@ namespace osu.Game.Database
 
             realmContextFactory.Run(realm =>
             {
-                Logger.Log($"Found {count} scores in EF", LoggingTarget.Database);
+                log($"Found {count} scores in EF");
 
-                // only migrate data if the realm database is empty.
-                if (realm.All<ScoreInfo>().Any())
-                {
-                    Logger.Log("Skipping migration as realm already has scores loaded", LoggingTarget.Database);
-                }
-                else
-                {
-                    var transaction = realm.BeginWrite();
-                    int written = 0;
+                var transaction = realm.BeginWrite();
+                int written = 0;
 
-                    try
+                try
+                {
+                    foreach (var score in existingScores)
                     {
-                        foreach (var score in existingScores)
+                        if (++written % 1000 == 0)
                         {
-                            if (++written % 1000 == 0)
-                            {
-                                transaction.Commit();
-                                transaction = realm.BeginWrite();
-                                Logger.Log($"Migrated {written}/{count} scores...", LoggingTarget.Database);
-                            }
-
-                            var beatmap = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
-                            var ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName);
-                            var user = new RealmUser
-                            {
-                                OnlineID = score.User.OnlineID,
-                                Username = score.User.Username
-                            };
-
-                            var realmScore = new ScoreInfo(beatmap, ruleset, user)
-                            {
-                                Hash = score.Hash,
-                                DeletePending = score.DeletePending,
-                                OnlineID = score.OnlineID ?? -1,
-                                ModsJson = score.ModsJson,
-                                StatisticsJson = score.StatisticsJson,
-                                TotalScore = score.TotalScore,
-                                MaxCombo = score.MaxCombo,
-                                Accuracy = score.Accuracy,
-                                HasReplay = ((IScoreInfo)score).HasReplay,
-                                Date = score.Date,
-                                PP = score.PP,
-                                Rank = score.Rank,
-                                HitEvents = score.HitEvents,
-                                Passed = score.Passed,
-                                Combo = score.Combo,
-                                Position = score.Position,
-                                Statistics = score.Statistics,
-                                Mods = score.Mods,
-                                APIMods = score.APIMods,
-                            };
-
-                            migrateFiles(score, realm, realmScore);
-
-                            realm.Add(realmScore);
+                            transaction.Commit();
+                            transaction = realm.BeginWrite();
+                            log($"Migrated {written}/{count} scores...");
                         }
-                    }
-                    finally
-                    {
-                        transaction.Commit();
-                    }
 
-                    Logger.Log($"Successfully migrated {count} scores to realm", LoggingTarget.Database);
+                        var beatmap = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
+                        var ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName);
+                        var user = new RealmUser
+                        {
+                            OnlineID = score.User.OnlineID,
+                            Username = score.User.Username
+                        };
+
+                        var realmScore = new ScoreInfo(beatmap, ruleset, user)
+                        {
+                            Hash = score.Hash,
+                            DeletePending = score.DeletePending,
+                            OnlineID = score.OnlineID ?? -1,
+                            ModsJson = score.ModsJson,
+                            StatisticsJson = score.StatisticsJson,
+                            TotalScore = score.TotalScore,
+                            MaxCombo = score.MaxCombo,
+                            Accuracy = score.Accuracy,
+                            HasReplay = ((IScoreInfo)score).HasReplay,
+                            Date = score.Date,
+                            PP = score.PP,
+                            Rank = score.Rank,
+                            HitEvents = score.HitEvents,
+                            Passed = score.Passed,
+                            Combo = score.Combo,
+                            Position = score.Position,
+                            Statistics = score.Statistics,
+                            Mods = score.Mods,
+                            APIMods = score.APIMods,
+                        };
+
+                        migrateFiles(score, realm, realmScore);
+
+                        realm.Add(realmScore);
+                    }
                 }
+                finally
+                {
+                    transaction.Commit();
+                }
+
+                log($"Successfully migrated {count} scores to realm");
             });
         }
 
@@ -309,7 +377,7 @@ namespace osu.Game.Database
                     // note that this cannot be written as: `realm.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
                     if (!realm.All<SkinInfo>().Any(s => !s.Protected))
                     {
-                        Logger.Log($"Migrating {existingSkins.Count} skins", LoggingTarget.Database);
+                        log($"Migrating {existingSkins.Count} skins");
 
                         foreach (var skin in existingSkins)
                         {
@@ -358,7 +426,7 @@ namespace osu.Game.Database
             if (!existingSettings.Any())
                 return;
 
-            Logger.Log("Beginning settings migration to realm", LoggingTarget.Database);
+            log("Beginning settings migration to realm");
 
             realmContextFactory.Run(realm =>
             {
@@ -367,7 +435,7 @@ namespace osu.Game.Database
                     // only migrate data if the realm database is empty.
                     if (!realm.All<RealmRulesetSetting>().Any())
                     {
-                        Logger.Log($"Migrating {existingSettings.Count} settings", LoggingTarget.Database);
+                        log($"Migrating {existingSettings.Count} settings");
 
                         foreach (var dkb in existingSettings)
                         {
@@ -396,17 +464,5 @@ namespace osu.Game.Database
 
         private string? getRulesetShortNameFromLegacyID(long rulesetId) =>
             efContextFactory.Get().RulesetInfo.FirstOrDefault(r => r.ID == rulesetId)?.ShortName;
-
-        private void createBackup()
-        {
-            string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
-
-            efContextFactory.CreateBackup($"client.{migration}.db");
-            realmContextFactory.CreateBackup($"client.{migration}.realm");
-
-            using (var source = storage.GetStream("collection.db"))
-            using (var destination = storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
-                source.CopyTo(destination);
-        }
     }
 }
