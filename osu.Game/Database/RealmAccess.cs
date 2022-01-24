@@ -59,9 +59,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
         /// </summary>
-        private readonly SemaphoreSlim contextCreationLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim realmCreationLock = new SemaphoreSlim(1);
 
-        private readonly ThreadLocal<bool> currentThreadCanCreateContexts = new ThreadLocal<bool>();
+        private readonly ThreadLocal<bool> currentThreadCanCreateRealmInstances = new ThreadLocal<bool>();
 
         /// <summary>
         /// Holds a map of functions registered via <see cref="RegisterCustomSubscription"/> and <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
@@ -81,35 +81,35 @@ namespace osu.Game.Database
         /// </summary>
         private readonly Dictionary<Func<Realm, IDisposable?>, Action> notificationsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
 
-        private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
+        private static readonly GlobalStatistic<int> realm_instances_created = GlobalStatistics.Get<int>(@"Realm", @"Instances (Created)");
 
-        private readonly object contextLock = new object();
+        private readonly object realmLock = new object();
 
-        private Realm? context;
+        private Realm? updateRealm;
 
-        public Realm Context => ensureUpdateContext();
+        public Realm Realm => ensureUpdateRealm();
 
-        private Realm ensureUpdateContext()
+        private Realm ensureUpdateRealm()
         {
             if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"Use {nameof(createContext)} when performing realm operations from a non-update thread");
+                throw new InvalidOperationException(@$"Use {nameof(getRealmInstance)} when performing realm operations from a non-update thread");
 
-            lock (contextLock)
+            lock (realmLock)
             {
-                if (context == null)
+                if (updateRealm == null)
                 {
-                    context = createContext();
-                    Logger.Log(@$"Opened realm ""{context.Config.DatabasePath}"" at version {context.Config.SchemaVersion}");
+                    updateRealm = getRealmInstance();
+
+                    Logger.Log(@$"Opened realm ""{updateRealm.Config.DatabasePath}"" at version {updateRealm.Config.SchemaVersion}");
 
                     // Resubscribe any subscriptions
                     foreach (var action in customSubscriptionsResetMap.Keys)
                         registerSubscription(action);
                 }
 
-                Debug.Assert(context != null);
+                Debug.Assert(updateRealm != null);
 
-                // creating a context will ensure our schema is up-to-date and migrated.
-                return context;
+                return updateRealm;
             }
         }
 
@@ -118,7 +118,7 @@ namespace osu.Game.Database
         private static readonly ThreadLocal<bool> current_thread_subscriptions_allowed = new ThreadLocal<bool>();
 
         /// <summary>
-        /// Construct a new instance of a realm context factory.
+        /// Construct a new instance.
         /// </summary>
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
@@ -137,7 +137,7 @@ namespace osu.Game.Database
 
             try
             {
-                // This method triggers the first `CreateContext` call, which will implicitly run realm migrations and bring the schema up-to-date.
+                // This method triggers the first `getRealmInstance` call, which will implicitly run realm migrations and bring the schema up-to-date.
                 cleanupPendingDeletions();
             }
             catch (Exception e)
@@ -153,7 +153,7 @@ namespace osu.Game.Database
 
         private void cleanupPendingDeletions()
         {
-            using (var realm = createContext())
+            using (var realm = getRealmInstance())
             using (var transaction = realm.BeginWrite())
             {
                 var pendingDeleteScores = realm.All<ScoreInfo>().Where(s => s.DeletePending);
@@ -201,34 +201,28 @@ namespace osu.Game.Database
         /// <summary>
         /// Run work on realm with a return value.
         /// </summary>
-        /// <remarks>
-        /// Handles correct context management automatically.
-        /// </remarks>
         /// <param name="action">The work to run.</param>
         /// <typeparam name="T">The return type.</typeparam>
         public T Run<T>(Func<Realm, T> action)
         {
             if (ThreadSafety.IsUpdateThread)
-                return action(Context);
+                return action(Realm);
 
-            using (var realm = createContext())
+            using (var realm = getRealmInstance())
                 return action(realm);
         }
 
         /// <summary>
         /// Run work on realm.
         /// </summary>
-        /// <remarks>
-        /// Handles correct context management automatically.
-        /// </remarks>
         /// <param name="action">The work to run.</param>
         public void Run(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
-                action(Context);
+                action(Realm);
             else
             {
-                using (var realm = createContext())
+                using (var realm = getRealmInstance())
                     action(realm);
             }
         }
@@ -236,17 +230,14 @@ namespace osu.Game.Database
         /// <summary>
         /// Write changes to realm.
         /// </summary>
-        /// <remarks>
-        /// Handles correct context management and transaction committing automatically.
-        /// </remarks>
         /// <param name="action">The work to run.</param>
         public void Write(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
-                Context.Write(action);
+                Realm.Write(action);
             else
             {
-                using (var realm = createContext())
+                using (var realm = getRealmInstance())
                     realm.Write(action);
             }
         }
@@ -257,10 +248,10 @@ namespace osu.Game.Database
         /// <remarks>
         /// This adds osu! specific thread and managed state safety checks on top of <see cref="IRealmCollection{T}.SubscribeForNotifications"/>.
         ///
-        /// In addition to the documented realm behaviour, we have the additional requirement of handling subscriptions over potential context loss.
+        /// In addition to the documented realm behaviour, we have the additional requirement of handling subscriptions over potential realm instance recycle.
         /// When this happens, callback events will be automatically fired:
-        /// - On context loss, a callback with an empty collection and <c>null</c> <see cref="ChangeSet"/> will be invoked.
-        /// - On context revival, a standard initial realm callback will arrive, with <c>null</c> <see cref="ChangeSet"/> and an up-to-date collection.
+        /// - On recycle start, a callback with an empty collection and <c>null</c> <see cref="ChangeSet"/> will be invoked.
+        /// - On recycle end, a standard initial realm callback will arrive, with <c>null</c> <see cref="ChangeSet"/> and an up-to-date collection.
         /// </remarks>
         /// <param name="query">The <see cref="IQueryable{T}"/> to observe for changes.</param>
         /// <typeparam name="T">Type of the elements in the list.</typeparam>
@@ -276,7 +267,7 @@ namespace osu.Game.Database
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
 
-            lock (contextLock)
+            lock (realmLock)
             {
                 Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
 
@@ -287,7 +278,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Run work on realm that will be run every time the update thread realm context gets recycled.
+        /// Run work on realm that will be run every time the update thread realm instance gets recycled.
         /// </summary>
         /// <param name="action">The work to run. Return value should be an <see cref="IDisposable"/> from QueryAsyncWithNotifications, or an <see cref="InvokeOnDisposal"/> to clean up any bindings.</param>
         /// <returns>An <see cref="IDisposable"/> which should be disposed to unsubscribe any inner subscription.</returns>
@@ -311,7 +302,7 @@ namespace osu.Game.Database
 
                 void unsubscribe()
                 {
-                    lock (contextLock)
+                    lock (realmLock)
                     {
                         if (customSubscriptionsResetMap.TryGetValue(action, out var unsubscriptionAction))
                         {
@@ -328,12 +319,12 @@ namespace osu.Game.Database
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            lock (contextLock)
+            lock (realmLock)
             {
-                // Retrieve context outside of flag update to ensure that the context is constructed,
+                // Retrieve realm instance outside of flag update to ensure that the instance is retrieved,
                 // as attempting to access it inside the subscription if it's not constructed would lead to
                 // cyclic invocations of the subscription callback.
-                var realm = Context;
+                var realm = Realm;
 
                 Debug.Assert(!customSubscriptionsResetMap.TryGetValue(action, out var found) || found == null);
 
@@ -344,12 +335,12 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Unregister all subscriptions when the realm context is to be recycled.
-        /// Subscriptions will still remain and will be re-subscribed when the realm context returns.
+        /// Unregister all subscriptions when the realm instance is to be recycled.
+        /// Subscriptions will still remain and will be re-subscribed when the realm instance returns.
         /// </summary>
         private void unregisterAllSubscriptions()
         {
-            lock (contextLock)
+            lock (realmLock)
             {
                 foreach (var action in notificationsResetMap.Values)
                     action();
@@ -362,7 +353,7 @@ namespace osu.Game.Database
             }
         }
 
-        private Realm createContext()
+        private Realm getRealmInstance()
         {
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmAccess));
@@ -371,20 +362,20 @@ namespace osu.Game.Database
 
             try
             {
-                if (!currentThreadCanCreateContexts.Value)
+                if (!currentThreadCanCreateRealmInstances.Value)
                 {
-                    contextCreationLock.Wait();
-                    currentThreadCanCreateContexts.Value = true;
+                    realmCreationLock.Wait();
+                    currentThreadCanCreateRealmInstances.Value = true;
                     tookSemaphoreLock = true;
                 }
                 else
                 {
-                    // the semaphore is used to handle blocking of all context creation during certain periods.
-                    // once the semaphore has been taken by this code section, it is safe to create further contexts on the same thread.
-                    // this can happen if a realm subscription is active and triggers a callback which has user code that calls `CreateContext`.
+                    // the semaphore is used to handle blocking of all realm retrieval during certain periods.
+                    // once the semaphore has been taken by this code section, it is safe to retrieve further realm instances on the same thread.
+                    // this can happen if a realm subscription is active and triggers a callback which has user code that calls `Run`.
                 }
 
-                contexts_created.Value++;
+                realm_instances_created.Value++;
 
                 return Realm.GetInstance(getConfiguration());
             }
@@ -392,8 +383,8 @@ namespace osu.Game.Database
             {
                 if (tookSemaphoreLock)
                 {
-                    contextCreationLock.Release();
-                    currentThreadCanCreateContexts.Value = false;
+                    realmCreationLock.Release();
+                    currentThreadCanCreateRealmInstances.Value = false;
                 }
             }
         }
@@ -582,7 +573,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Flush any active contexts and block any further writes.
+        /// Flush any active realm instances and block any further writes.
         /// </summary>
         /// <remarks>
         /// This should be used in places we need to ensure no ongoing reads/writes are occurring with realm.
@@ -598,14 +589,14 @@ namespace osu.Game.Database
 
             try
             {
-                contextCreationLock.Wait();
+                realmCreationLock.Wait();
 
-                lock (contextLock)
+                lock (realmLock)
                 {
-                    if (context == null)
+                    if (updateRealm == null)
                     {
-                        // null context means the update thread has not yet retrieved its context.
-                        // we don't need to worry about reviving the update context in this case, so don't bother with the SynchronizationContext.
+                        // null realm means the update thread has not yet retrieved its instance.
+                        // we don't need to worry about reviving the update instance in this case, so don't bother with the SynchronizationContext.
                         Debug.Assert(!ThreadSafety.IsUpdateThread);
                     }
                     else
@@ -620,8 +611,8 @@ namespace osu.Game.Database
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
-                    context?.Dispose();
-                    context = null;
+                    updateRealm?.Dispose();
+                    updateRealm = null;
                 }
 
                 const int sleep_length = 200;
@@ -648,17 +639,17 @@ namespace osu.Game.Database
             }
             catch
             {
-                contextCreationLock.Release();
+                realmCreationLock.Release();
                 throw;
             }
 
             return new InvokeOnDisposal<RealmAccess>(this, factory =>
             {
-                factory.contextCreationLock.Release();
+                factory.realmCreationLock.Release();
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
 
                 // Post back to the update thread to revive any subscriptions.
-                syncContext?.Post(_ => ensureUpdateContext(), null);
+                syncContext?.Post(_ => ensureUpdateRealm(), null);
             });
         }
 
@@ -669,16 +660,16 @@ namespace osu.Game.Database
 
         public void Dispose()
         {
-            lock (contextLock)
+            lock (realmLock)
             {
-                context?.Dispose();
+                updateRealm?.Dispose();
             }
 
             if (!isDisposed)
             {
                 // intentionally block context creation indefinitely. this ensures that nothing can start consuming a new context after disposal.
-                contextCreationLock.Wait();
-                contextCreationLock.Dispose();
+                realmCreationLock.Wait();
+                realmCreationLock.Dispose();
 
                 isDisposed = true;
             }

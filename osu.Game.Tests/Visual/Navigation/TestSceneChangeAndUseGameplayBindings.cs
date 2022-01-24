@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Navigation
                                                        .ChildrenOfType<KeyBindingPanel>().SingleOrDefault();
 
         private RealmKeyBinding firstOsuRulesetKeyBindings => Game.Dependencies
-                                                                  .Get<RealmAccess>().Context
+                                                                  .Get<RealmAccess>().Realm
                                                                   .All<RealmKeyBinding>()
                                                                   .AsEnumerable()
                                                                   .First(k => k.RulesetName == "osu" && k.ActionInt == 0);
