@@ -595,8 +595,8 @@ namespace osu.Game.Database
                 {
                     if (updateRealm == null)
                     {
-                        // null realm means the update thread has not yet retrieved its instance.
-                        // we don't need to worry about reviving the update instance in this case, so don't bother with the SynchronizationContext.
+                        // null context means the update thread has not yet retrieved its context.
+                        // we don't need to worry about reviving the update context in this case, so don't bother with the SynchronizationContext.
                         Debug.Assert(!ThreadSafety.IsUpdateThread);
                     }
                     else
@@ -639,18 +639,19 @@ namespace osu.Game.Database
             }
             catch
             {
-                realmCreationLock.Release();
+                restoreOperation();
                 throw;
             }
 
-            return new InvokeOnDisposal<RealmAccess>(this, factory =>
-            {
-                factory.realmCreationLock.Release();
-                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+            return new InvokeOnDisposal(restoreOperation);
 
+            void restoreOperation()
+            {
+                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+                realmCreationLock.Release();
                 // Post back to the update thread to revive any subscriptions.
                 syncContext?.Post(_ => ensureUpdateRealm(), null);
-            });
+            }
         }
 
         // https://github.com/realm/realm-dotnet/blob/32f4ebcc88b3e80a3b254412665340cd9f3bd6b5/Realm/Realm/Extensions/ReflectionExtensions.cs#L46
