@@ -594,7 +594,7 @@ namespace osu.Game.Database
             if (isDisposed)
                 throw new ObjectDisposedException(nameof(RealmContextFactory));
 
-            SynchronizationContext syncContext;
+            SynchronizationContext? syncContext = null;
 
             try
             {
@@ -602,10 +602,20 @@ namespace osu.Game.Database
 
                 lock (contextLock)
                 {
-                    if (!ThreadSafety.IsUpdateThread && context != null)
-                        throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
+                    if (context == null)
+                    {
+                        // null context means the update thread has not yet retrieved its context.
+                        // we don't need to worry about reviving the update context in this case, so don't bother with the SynchronizationContext.
+                        Debug.Assert(!ThreadSafety.IsUpdateThread);
+                    }
+                    else
+                    {
+                        if (!ThreadSafety.IsUpdateThread)
+                            throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
-                    syncContext = SynchronizationContext.Current;
+                        syncContext = SynchronizationContext.Current;
+                    }
+
                     unregisterAllSubscriptions();
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
