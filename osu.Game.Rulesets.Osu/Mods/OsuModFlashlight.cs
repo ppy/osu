@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = true
         };
 
-        protected virtual float DefaultFlashlightSize => 180;
+        public override float DefaultFlashlightSize => 180;
 
         private OsuFlashlight flashlight;
 

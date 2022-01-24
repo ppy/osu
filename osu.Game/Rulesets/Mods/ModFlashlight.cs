@@ -38,6 +38,12 @@ namespace osu.Game.Rulesets.Mods
 
         [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
         public abstract BindableBool ComboBasedSize { get; }
+
+        /// <summary>
+        /// The default size of the flashlight in ruleset-appropriate dimensions.
+        /// <see cref="SizeMultiplier"/> and <see cref="ComboBasedSize"/> will apply their adjustments on top of this size.
+        /// </summary>
+        public abstract float DefaultFlashlightSize { get; }
     }
 
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
