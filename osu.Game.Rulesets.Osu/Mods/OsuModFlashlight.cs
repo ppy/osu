@@ -47,15 +47,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.1f
         };
 
-        protected override BindableNumber<float> ModeMultiplier { get; } = new BindableNumber<float>
-        {
-            Default = 180,
-            Value = 180,
-        };
+        protected override float ModeMultiplier => 180;
 
         private OsuFlashlight flashlight;
 
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value, ModeMultiplier.Value);
+        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(ChangeRadius.Value, InitialRadius.Value, FollowDelay.Value, ModeMultiplier);
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {

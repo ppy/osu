@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Initial radius", "Initial radius of the flashlight area.")]
         public abstract BindableNumber<float> InitialRadius { get; }
 
-        protected abstract BindableNumber<float> ModeMultiplier { get; }
+        protected abstract float ModeMultiplier { get; }
     }
 
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor

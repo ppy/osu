@@ -34,13 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Precision = 0.1f
         };
 
-        protected override BindableNumber<float> ModeMultiplier { get; } = new BindableNumber<float>
-        {
-            Default = 250,
-            Value = 250,
-        };
+        protected override float ModeMultiplier => 250;
 
-        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, ModeMultiplier.Value);
+        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield, ChangeRadius.Value, InitialRadius.Value, ModeMultiplier);
 
         private TaikoPlayfield playfield;
 
