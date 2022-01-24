@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -155,7 +156,7 @@ namespace osu.Game.Tests.Collections.IO
             }
 
             // Name matches the automatically chosen name from `CleanRunHeadlessGameHost` above, so we end up using the same storage location.
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName))
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(firstRunName, null))
             {
                 try
                 {
