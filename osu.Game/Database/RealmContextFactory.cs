@@ -79,7 +79,7 @@ namespace osu.Game.Database
         /// fires a change set event with an empty collection. This is used to inform subscribers when a realm context goes away, and ensure they don't use invalidated
         /// managed realm objects from a previous firing.
         /// </summary>
-        private readonly Dictionary<Func<Realm, IDisposable?>, Action> realmSubscriptionsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
+        private readonly Dictionary<Func<Realm, IDisposable?>, Action> notificationsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
 
         private static readonly GlobalStatistic<int> contexts_created = GlobalStatistics.Get<int>(@"Realm", @"Contexts (Created)");
 
@@ -283,7 +283,7 @@ namespace osu.Game.Database
                 Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
 
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
-                realmSubscriptionsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
+                notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
                 return RegisterCustomSubscription(action);
             }
         }
@@ -319,7 +319,7 @@ namespace osu.Game.Database
                         {
                             unsubscriptionAction?.Dispose();
                             customSubscriptionsResetMap.Remove(action);
-                            realmSubscriptionsResetMap.Remove(action);
+                            notificationsResetMap.Remove(action);
                         }
                     }
                 }
@@ -353,7 +353,7 @@ namespace osu.Game.Database
         {
             lock (contextLock)
             {
-                foreach (var action in realmSubscriptionsResetMap.Values)
+                foreach (var action in notificationsResetMap.Values)
                     action();
 
                 foreach (var action in customSubscriptionsResetMap)
