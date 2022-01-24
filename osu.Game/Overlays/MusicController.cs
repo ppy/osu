@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -81,9 +81,9 @@ namespace osu.Game.Overlays
         }
 
         private IQueryable<BeatmapSetInfo> queryRealmBeatmapSets() =>
-            realmFactory.Context
-                        .All<BeatmapSetInfo>()
-                        .Where(s => !s.DeletePending);
+            realm.Realm
+                 .All<BeatmapSetInfo>()
+                 .Where(s => !s.DeletePending);
 
         protected override void LoadComplete()
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays
             foreach (var s in queryRealmBeatmapSets())
                 beatmapSets.Add(s.Detach());
 
-            beatmapSubscription = realmFactory.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)

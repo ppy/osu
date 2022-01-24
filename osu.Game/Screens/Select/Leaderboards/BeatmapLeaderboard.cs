@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private BeatmapInfo beatmapInfo;
 
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (beatmapInfo == null)
                 return;
 
-            scoreSubscription = realmFactory.RegisterForNotifications(realm =>
+            scoreSubscription = realm.RegisterForNotifications(realm =>
                     realm.All<ScoreInfo>()
                          .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
                 (_, changes, ___) =>
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                realmFactory.Run(realm =>
+                realm.Run(realm =>
                 {
                     var scores = realm.All<ScoreInfo>()
                                       .AsEnumerable()

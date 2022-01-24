@@ -16,12 +16,12 @@ namespace osu.Game.Input
 {
     public class RealmKeyBindingStore
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
         private readonly ReadableKeyCombinationProvider keyCombinationProvider;
 
-        public RealmKeyBindingStore(RealmContextFactory realmFactory, ReadableKeyCombinationProvider keyCombinationProvider)
+        public RealmKeyBindingStore(RealmAccess realm, ReadableKeyCombinationProvider keyCombinationProvider)
         {
-            this.realmFactory = realmFactory;
+            this.realm = realm;
             this.keyCombinationProvider = keyCombinationProvider;
         }
 
@@ -34,7 +34,7 @@ namespace osu.Game.Input
         {
             List<string> combinations = new List<string>();
 
-            realmFactory.Run(context =>
+            realm.Run(context =>
             {
                 foreach (var action in context.All<RealmKeyBinding>().Where(b => string.IsNullOrEmpty(b.RulesetName) && (GlobalAction)b.ActionInt == globalAction))
                 {
@@ -56,7 +56,7 @@ namespace osu.Game.Input
         /// <param name="rulesets">The rulesets to populate defaults from.</param>
         public void Register(KeyBindingContainer container, IEnumerable<RulesetInfo> rulesets)
         {
-            realmFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 using (var transaction = realm.BeginWrite())
                 {

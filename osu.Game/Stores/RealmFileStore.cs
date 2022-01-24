@@ -24,15 +24,15 @@ namespace osu.Game.Stores
     [ExcludeFromDynamicCompile]
     public class RealmFileStore
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
 
         public readonly IResourceStore<byte[]> Store;
 
         public readonly Storage Storage;
 
-        public RealmFileStore(RealmContextFactory realmFactory, Storage storage)
+        public RealmFileStore(RealmAccess realm, Storage storage)
         {
-            this.realmFactory = realmFactory;
+            this.realm = realm;
 
             Storage = storage.GetStorageForDirectory(@"files");
             Store = new StorageBackedResourceStore(Storage);
@@ -92,7 +92,7 @@ namespace osu.Game.Stores
             int removedFiles = 0;
 
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
-            realmFactory.Write(realm =>
+            realm.Write(realm =>
             {
                 // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
                 var files = realm.All<RealmFile>().ToList();

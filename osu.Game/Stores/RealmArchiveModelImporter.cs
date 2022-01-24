@@ -59,7 +59,7 @@ namespace osu.Game.Stores
 
         protected readonly RealmFileStore Files;
 
-        protected readonly RealmContextFactory ContextFactory;
+        protected readonly RealmAccess Access;
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.
@@ -71,11 +71,11 @@ namespace osu.Game.Stores
         /// </summary>
         public Action<Notification>? PostNotification { protected get; set; }
 
-        protected RealmArchiveModelImporter(Storage storage, RealmContextFactory contextFactory)
+        protected RealmArchiveModelImporter(Storage storage, RealmAccess realm)
         {
-            ContextFactory = contextFactory;
+            Access = realm;
 
-            Files = new RealmFileStore(contextFactory, storage);
+            Files = new RealmFileStore(realm, storage);
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace osu.Game.Stores
         /// <param name="cancellationToken">An optional cancellation token.</param>
         public virtual Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
-            return ContextFactory.Run(realm =>
+            return Access.Run(realm =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -352,7 +352,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
+                            return Task.FromResult((ILive<TModel>?)existing.ToLive(Access));
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -387,7 +387,7 @@ namespace osu.Game.Stores
                                 existing.DeletePending = false;
                                 transaction.Commit();
 
-                                return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
+                                return Task.FromResult((ILive<TModel>?)existing.ToLive(Access));
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -413,7 +413,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return Task.FromResult((ILive<TModel>?)item.ToLive(ContextFactory));
+                return Task.FromResult((ILive<TModel>?)item.ToLive(Access));
             });
         }
 

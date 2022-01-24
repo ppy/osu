@@ -16,7 +16,7 @@ namespace osu.Game.Benchmarks
     public class BenchmarkRealmReads : BenchmarkTest
     {
         private TemporaryNativeStorage storage;
-        private RealmContextFactory realmFactory;
+        private RealmAccess realm;
         private UpdateThread updateThread;
 
         [Params(1, 100, 1000)]
@@ -27,9 +27,9 @@ namespace osu.Game.Benchmarks
             storage = new TemporaryNativeStorage("realm-benchmark");
             storage.DeleteDirectory(string.Empty);
 
-            realmFactory = new RealmContextFactory(storage, "client");
+            realm = new RealmAccess(storage, "client");
 
-            realmFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 realm.Write(c => c.Add(TestResources.CreateTestBeatmapSetInfo(rulesets: new[] { new OsuRuleset().RulesetInfo })));
             });
@@ -41,7 +41,7 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkDirectPropertyRead()
         {
-            realmFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var beatmapSet = realm.All<BeatmapSetInfo>().First();
 
@@ -61,7 +61,7 @@ namespace osu.Game.Benchmarks
             {
                 try
                 {
-                    var beatmapSet = realmFactory.Context.All<BeatmapSetInfo>().First();
+                    var beatmapSet = realm.Realm.All<BeatmapSetInfo>().First();
 
                     for (int i = 0; i < ReadsPerFetch; i++)
                     {
@@ -80,9 +80,9 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkRealmLivePropertyRead()
         {
-            realmFactory.Run(realm =>
+            realm.Run(r =>
             {
-                var beatmapSet = realm.All<BeatmapSetInfo>().First().ToLive(realmFactory);
+                var beatmapSet = r.All<BeatmapSetInfo>().First().ToLive(realm);
 
                 for (int i = 0; i < ReadsPerFetch; i++)
                 {
@@ -100,7 +100,7 @@ namespace osu.Game.Benchmarks
             {
                 try
                 {
-                    var beatmapSet = realmFactory.Context.All<BeatmapSetInfo>().First().ToLive(realmFactory);
+                    var beatmapSet = realm.Realm.All<BeatmapSetInfo>().First().ToLive(realm);
 
                     for (int i = 0; i < ReadsPerFetch; i++)
                     {
@@ -119,7 +119,7 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkDetachedPropertyRead()
         {
-            realmFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var beatmapSet = realm.All<BeatmapSetInfo>().First().Detach();
 
@@ -133,7 +133,7 @@ namespace osu.Game.Benchmarks
         [GlobalCleanup]
         public void Cleanup()
         {
-            realmFactory?.Dispose();
+            realm?.Dispose();
             storage?.Dispose();
             updateThread?.Exit();
         }

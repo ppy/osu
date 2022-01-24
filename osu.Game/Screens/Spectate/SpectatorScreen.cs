@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Spectate
         }
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private IDisposable realmSubscription;
 
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                realmSubscription = realmContextFactory.RegisterForNotifications(
+                realmSubscription = realm.RegisterForNotifications(
                     realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
                 foreach ((int id, var _) in userMap)

@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
         };
 
         private readonly SkinModelManager skinModelManager;
-        private readonly RealmContextFactory contextFactory;
+        private readonly RealmAccess realm;
 
         private readonly IResourceStore<byte[]> userFiles;
 
@@ -68,9 +68,9 @@ namespace osu.Game.Skinning
         /// </summary>
         public Skin DefaultLegacySkin { get; }
 
-        public SkinManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
         {
-            this.contextFactory = contextFactory;
+            this.realm = realm;
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
@@ -78,7 +78,7 @@ namespace osu.Game.Skinning
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
-            skinModelManager = new SkinModelManager(storage, contextFactory, host, this);
+            skinModelManager = new SkinModelManager(storage, realm, host, this);
 
             var defaultSkins = new[]
             {
@@ -87,7 +87,7 @@ namespace osu.Game.Skinning
             };
 
             // Ensure the default entries are present.
-            contextFactory.Write(realm =>
+            realm.Write(realm =>
             {
                 foreach (var skin in defaultSkins)
                 {
@@ -110,10 +110,10 @@ namespace osu.Game.Skinning
 
         public void SelectRandomSkin()
         {
-            contextFactory.Run(realm =>
+            realm.Run(r =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = realm.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+                var randomChoices = r.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
                 if (randomChoices.Length == 0)
                 {
@@ -123,7 +123,7 @@ namespace osu.Game.Skinning
 
                 var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
 
-                CurrentSkinInfo.Value = chosen.ToLive(contextFactory);
+                CurrentSkinInfo.Value = chosen.ToLive(realm);
             });
         }
 
@@ -179,7 +179,7 @@ namespace osu.Game.Skinning
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ILive<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
         {
-            return contextFactory.Run(realm => realm.All<SkinInfo>().FirstOrDefault(query)?.ToLive(contextFactory));
+            return realm.Run(r => r.All<SkinInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
 
         public event Action SourceChanged;
@@ -234,7 +234,7 @@ namespace osu.Game.Skinning
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<byte[]> IStorageResourceProvider.Files => userFiles;
-        RealmContextFactory IStorageResourceProvider.RealmContextFactory => contextFactory;
+        RealmAccess IStorageResourceProvider.RealmAccess => realm;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
@@ -289,7 +289,7 @@ namespace osu.Game.Skinning
 
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            contextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var items = realm.All<SkinInfo>()
                                  .Where(s => !s.Protected && !s.DeletePending);

@@ -149,7 +149,7 @@ namespace osu.Game
 
         private MultiplayerClient multiplayerClient;
 
-        private RealmContextFactory realmFactory;
+        private RealmAccess realm;
 
         protected override Container<Drawable> Content => content;
 
@@ -192,9 +192,9 @@ namespace osu.Game
             if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
                 dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", EFContextFactory));
+            dependencies.Cache(realm = new RealmAccess(Storage, "client", EFContextFactory));
 
-            dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
+            dependencies.Cache(RulesetStore = new RulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
@@ -205,7 +205,7 @@ namespace osu.Game
                 string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
                 EFContextFactory.CreateBackup($"client.{migration}.db");
-                realmFactory.CreateBackup($"client.{migration}.realm");
+                realm.CreateBackup($"client.{migration}.realm");
 
                 using (var source = Storage.GetStream("collection.db"))
                 using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
@@ -225,7 +225,7 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, realmFactory, Host, Resources, Audio, Scheduler));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
@@ -240,8 +240,8 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realmFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realmFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
@@ -259,7 +259,7 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
+            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -303,7 +303,7 @@ namespace osu.Game
 
             base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
 
-            KeyBindingStore = new RealmKeyBindingStore(realmFactory, keyCombinationProvider);
+            KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
@@ -405,7 +405,7 @@ namespace osu.Game
 
                 Scheduler.Add(() =>
                 {
-                    realmBlocker = realmFactory.BlockAllOperations();
+                    realmBlocker = realm.BlockAllOperations();
 
                     readyToRun.Set();
                 }, false);
@@ -483,7 +483,7 @@ namespace osu.Game
             BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
 
-            realmFactory?.Dispose();
+            realm?.Dispose();
         }
     }
 }

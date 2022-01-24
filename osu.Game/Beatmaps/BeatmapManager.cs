@@ -41,11 +41,11 @@ namespace osu.Game.Beatmaps
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
 
-        private readonly RealmContextFactory contextFactory;
+        private readonly RealmAccess realm;
 
-        public BeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
         {
-            this.contextFactory = contextFactory;
+            this.realm = realm;
 
             if (performOnlineLookups)
             {
@@ -55,11 +55,11 @@ namespace osu.Game.Beatmaps
                 onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
             }
 
-            var userResources = new RealmFileStore(contextFactory, storage).Store;
+            var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, onlineBeatmapLookupQueue);
+            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
@@ -70,8 +70,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapModelManager(contextFactory, storage, onlineLookupQueue);
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
+            new BeatmapModelManager(realm, storage, onlineLookupQueue);
 
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
@@ -119,7 +119,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
         public void Hide(BeatmapInfo beatmapInfo)
         {
-            contextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 using (var transaction = realm.BeginWrite())
                 {
@@ -138,7 +138,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmapInfo)
         {
-            contextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 using (var transaction = realm.BeginWrite())
                 {
@@ -153,7 +153,7 @@ namespace osu.Game.Beatmaps
 
         public void RestoreAll()
         {
-            contextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 using (var transaction = realm.BeginWrite())
                 {
@@ -171,7 +171,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            return contextFactory.Run(realm =>
+            return realm.Run(realm =>
             {
                 realm.Refresh();
                 return realm.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
@@ -185,7 +185,7 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            return contextFactory.Run(realm => realm.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(contextFactory));
+            return realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
 
         #region Delegation to BeatmapModelManager (methods which previously existed locally).
@@ -240,7 +240,7 @@ namespace osu.Game.Beatmaps
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
-            contextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var items = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
@@ -253,7 +253,7 @@ namespace osu.Game.Beatmaps
 
         public void UndeleteAll()
         {
-            contextFactory.Run(realm => beatmapModelManager.Undelete(realm.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
+            realm.Run(realm => beatmapModelManager.Undelete(realm.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
@@ -312,7 +312,7 @@ namespace osu.Game.Beatmaps
             // If we seem to be missing files, now is a good time to re-fetch.
             if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
             {
-                contextFactory.Run(realm =>
+                realm.Run(realm =>
                 {
                     var refetch = realm.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
 

@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [Cached]
         private readonly DialogOverlay dialogOverlay;
@@ -87,10 +87,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
-            Dependencies.Cache(ContextFactory);
+            dependencies.Cache(rulesetStore = new RulesetStore(Access));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Access, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Access, Scheduler));
+            Dependencies.Cache(Access);
 
             var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            realmFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 // Due to soft deletions, we can re-use deleted scores between test runs
                 scoreManager.Undelete(realm.All<ScoreInfo>().Where(s => s.DeletePending).ToList());

@@ -38,9 +38,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RulesetStore(Access));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Access, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Access);
 
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 

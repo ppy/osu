@@ -44,8 +44,8 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        protected BeatmapImporter(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
-            : base(storage, contextFactory)
+        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+            : base(storage, realm)
         {
             this.onlineLookupQueue = onlineLookupQueue;
         }
@@ -165,7 +165,7 @@ namespace osu.Game.Stores
 
         public override bool IsAvailableLocally(BeatmapSetInfo model)
         {
-            return ContextFactory.Run(realm => realm.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID));
+            return Access.Run(realm => realm.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID));
         }
 
         public override string HumanisedModelName => "beatmap";

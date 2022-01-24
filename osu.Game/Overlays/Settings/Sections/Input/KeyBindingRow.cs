@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -386,7 +386,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateStoreFromButton(KeyButton button)
         {
-            realmFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var binding = realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
                 realm.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);

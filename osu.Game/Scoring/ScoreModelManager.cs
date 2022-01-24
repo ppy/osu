@@ -29,8 +29,8 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmContextFactory contextFactory)
-            : base(storage, contextFactory)
+        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+            : base(storage, realm)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
@@ -74,7 +74,7 @@ namespace osu.Game.Scoring
 
         public override bool IsAvailableLocally(ScoreInfo model)
         {
-            return ContextFactory.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+            return Access.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
         }
     }
 }

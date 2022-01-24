@@ -25,21 +25,21 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
-        private readonly RealmContextFactory contextFactory;
+        private readonly RealmAccess realm;
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
         private readonly OsuConfigManager configManager;
         private readonly ScoreModelManager scoreModelManager;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmContextFactory contextFactory, Scheduler scheduler,
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
                             IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
         {
-            this.contextFactory = contextFactory;
+            this.realm = realm;
             this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
 
-            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory);
+            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, realm);
         }
 
         public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
@@ -51,7 +51,7 @@ namespace osu.Game.Scoring
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query)
         {
-            return contextFactory.Run(realm => realm.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
+            return realm.Run(realm => realm.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
         }
 
         /// <summary>
@@ -254,7 +254,7 @@ namespace osu.Game.Scoring
 
         public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
         {
-            contextFactory.Run(realm =>
+            realm.Run(realm =>
             {
                 var items = realm.All<ScoreInfo>()
                                  .Where(s => !s.DeletePending);
