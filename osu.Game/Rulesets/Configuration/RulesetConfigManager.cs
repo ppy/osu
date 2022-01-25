@@ -56,11 +56,11 @@ namespace osu.Game.Rulesets.Configuration
                 pendingWrites.Clear();
             }
 
-            realm?.Write(realm =>
+            realm?.Write(r =>
             {
                 foreach (var c in changed)
                 {
-                    var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
+                    var setting = r.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
 
                     setting.Value = ConfigStore[c].ToString();
                 }

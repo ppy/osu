@@ -92,10 +92,10 @@ namespace osu.Game.Stores
             int removedFiles = 0;
 
             // can potentially be run asynchronously, although we will need to consider operation order for disk deletion vs realm removal.
-            realm.Write(realm =>
+            realm.Write(r =>
             {
                 // TODO: consider using a realm native query to avoid iterating all files (https://github.com/realm/realm-dotnet/issues/2659#issuecomment-927823707)
-                var files = realm.All<RealmFile>().ToList();
+                var files = r.All<RealmFile>().ToList();
 
                 foreach (var file in files)
                 {
@@ -108,7 +108,7 @@ namespace osu.Game.Stores
                     {
                         removedFiles++;
                         Storage.Delete(file.GetStoragePath());
-                        realm.Remove(file);
+                        r.Remove(file);
                     }
                     catch (Exception e)
                     {

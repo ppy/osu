@@ -101,15 +101,15 @@ namespace osu.Game.Database
             {
                 using (var ef = efContextFactory.Get())
                 {
-                    realm.Write(realm =>
+                    realm.Write(r =>
                     {
                         // Before beginning, ensure realm is in an empty state.
                         // Migrations which are half-completed could lead to issues if the user tries a second time.
                         // Note that we only do this for beatmaps and scores since the other migrations are yonks old.
-                        realm.RemoveAll<BeatmapSetInfo>();
-                        realm.RemoveAll<BeatmapInfo>();
-                        realm.RemoveAll<BeatmapMetadata>();
-                        realm.RemoveAll<ScoreInfo>();
+                        r.RemoveAll<BeatmapSetInfo>();
+                        r.RemoveAll<BeatmapInfo>();
+                        r.RemoveAll<BeatmapMetadata>();
+                        r.RemoveAll<ScoreInfo>();
                     });
 
                     migrateSettings(ef);
