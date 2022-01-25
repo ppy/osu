@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -39,11 +40,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("make new beatmap unique", () => EditorBeatmap.Metadata.Title = Guid.NewGuid().ToString());
         }
 
-        protected override void LoadEditor()
-        {
-            Beatmap.Value = new DummyWorkingBeatmap(Audio, null);
-            base.LoadEditor();
-        }
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) => new DummyWorkingBeatmap(Audio, null);
 
         [Test]
         public void TestCreateNewBeatmap()
