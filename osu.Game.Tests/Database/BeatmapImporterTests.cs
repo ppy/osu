@@ -601,6 +601,38 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestImportThenReimportAfterMissingFiles()
+        {
+            RunTestWithRealmAsync(async (realmFactory, storage) =>
+            {
+                using var importer = new BeatmapModelManager(realmFactory, storage);
+                using var store = new RulesetStore(realmFactory, storage);
+
+                var imported = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                deleteBeatmapSet(imported, realmFactory.Context);
+
+                Assert.IsTrue(imported.DeletePending);
+
+                // intentionally nuke all files
+                storage.DeleteDirectory("files");
+
+                Assert.That(imported.Files.All(f => !storage.GetStorageForDirectory("files").Exists(f.File.GetStoragePath())));
+
+                var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
+
+                // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
+                Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+                Assert.IsFalse(imported.DeletePending);
+                Assert.IsFalse(importedSecondTime.DeletePending);
+
+                // check that the files now exist, even though they were deleted above.
+                Assert.That(importedSecondTime.Files.All(f => storage.GetStorageForDirectory("files").Exists(f.File.GetStoragePath())));
+            });
+        }
+
+        [Test]
         public void TestImportThenDeleteThenImportNonOptimisedPath()
         {
             RunTestWithRealmAsync(async (realmFactory, storage) =>
