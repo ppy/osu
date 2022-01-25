@@ -55,7 +55,7 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { PortableInstallation = true }))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
             {
                 host.ExceptionThrown += handleException;
 
