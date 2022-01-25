@@ -205,7 +205,7 @@ namespace osu.Game.Skinning
 
         private void populateMissingHashes()
         {
-            Access.Run(realm =>
+            Realm.Run(realm =>
             {
                 var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
 

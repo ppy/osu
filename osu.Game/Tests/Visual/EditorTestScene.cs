@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             working = CreateWorkingBeatmap(Ruleset.Value);
 
             if (IsolateSavingFromDatabase)
-                Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Access, rulesets, null, audio, Resources, host, Beatmap.Default));
+                Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
         }
 
         protected override void LoadComplete()

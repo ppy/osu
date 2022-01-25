@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSubscription = realm.RegisterForNotifications(realm => queryRealmSkins(), (sender, changes, error) =>
+            realmSubscription = realm.RegisterForNotifications(r => queryRealmSkins(), (sender, changes, error) =>
             {
                 // The first fire of this is a bit redundant due to the call below,
                 // but this is safest in case the subscription is restored after a context recycle.

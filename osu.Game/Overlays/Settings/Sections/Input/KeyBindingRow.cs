@@ -386,10 +386,10 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private void updateStoreFromButton(KeyButton button)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                var binding = realm.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
-                realm.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
+                var binding = r.Find<RealmKeyBinding>(((IHasGuidPrimaryKey)button.KeyBinding).ID);
+                r.Write(() => binding.KeyCombinationString = button.KeyBinding.KeyCombinationString);
             });
         }
 

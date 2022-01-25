@@ -45,7 +45,7 @@ namespace osu.Game.Stores
             // This method should be removed as soon as all the surrounding pieces support non-detached operations.
             if (!item.IsManaged)
             {
-                var managed = Access.Realm.Find<TModel>(item.ID);
+                var managed = Realm.Realm.Find<TModel>(item.ID);
                 managed.Realm.Write(() => operation(managed));
 
                 item.Files.Clear();
@@ -165,7 +165,7 @@ namespace osu.Game.Stores
 
         public bool Delete(TModel item)
         {
-            return Access.Run(realm =>
+            return Realm.Run(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
@@ -180,7 +180,7 @@ namespace osu.Game.Stores
 
         public void Undelete(TModel item)
         {
-            Access.Run(realm =>
+            Realm.Run(realm =>
             {
                 if (!item.IsManaged)
                     item = realm.Find<TModel>(item.ID);
