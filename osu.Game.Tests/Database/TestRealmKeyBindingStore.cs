@@ -60,11 +60,11 @@ namespace osu.Game.Tests.Database
             KeyBindingContainer testContainer = new TestKeyBindingContainer();
 
             // Add some excess bindings for an action which only supports 1.
-            realm.Write(realm =>
+            realm.Write(r =>
             {
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
             });
 
             Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(3));

@@ -48,13 +48,13 @@ namespace osu.Game.Screens.Select.Carousel
             ruleset.BindValueChanged(_ =>
             {
                 scoreSubscription?.Dispose();
-                scoreSubscription = realm.RegisterForNotifications(realm =>
-                        realm.All<ScoreInfo>()
-                             .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
-                                     + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
-                                     + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
-                                     + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
-                             .OrderByDescending(s => s.TotalScore),
+                scoreSubscription = realm.RegisterForNotifications(r =>
+                        r.All<ScoreInfo>()
+                         .Filter($"{nameof(ScoreInfo.User)}.{nameof(RealmUser.OnlineID)} == $0"
+                                 + $" && {nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $1"
+                                 + $" && {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $2"
+                                 + $" && {nameof(ScoreInfo.DeletePending)} == false", api.LocalUser.Value.Id, beatmapInfo.ID, ruleset.Value.ShortName)
+                         .OrderByDescending(s => s.TotalScore),
                     (items, changes, ___) =>
                     {
                         Rank = items.FirstOrDefault()?.Rank;

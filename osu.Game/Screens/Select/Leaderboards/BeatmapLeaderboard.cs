@@ -113,9 +113,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (beatmapInfo == null)
                 return;
 
-            scoreSubscription = realm.RegisterForNotifications(realm =>
-                    realm.All<ScoreInfo>()
-                         .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
+            scoreSubscription = realm.RegisterForNotifications(r =>
+                    r.All<ScoreInfo>()
+                     .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
                 (_, changes, ___) =>
                 {
                     if (!IsOnlineScope)

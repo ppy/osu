@@ -87,12 +87,12 @@ namespace osu.Game.Skinning
             };
 
             // Ensure the default entries are present.
-            realm.Write(realm =>
+            realm.Write(r =>
             {
                 foreach (var skin in defaultSkins)
                 {
-                    if (realm.Find<SkinInfo>(skin.SkinInfo.ID) == null)
-                        realm.Add(skin.SkinInfo.Value);
+                    if (r.Find<SkinInfo>(skin.SkinInfo.ID) == null)
+                        r.Add(skin.SkinInfo.Value);
                 }
             });
 

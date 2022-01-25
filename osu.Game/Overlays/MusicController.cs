@@ -79,7 +79,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmapSubscription = realm.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(r => queryRealmBeatmapSets(), beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
