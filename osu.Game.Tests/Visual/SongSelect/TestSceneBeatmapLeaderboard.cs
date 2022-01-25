@@ -42,10 +42,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
-            Dependencies.Cache(ContextFactory);
+            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, Scheduler));
+            Dependencies.Cache(Realm);
 
             return dependencies;
         }
@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Load new scores via manager", () =>
             {
                 foreach (var score in generateSampleScores(beatmapInfo()))
-                    scoreManager.Import(score).WaitSafely();
+                    scoreManager.Import(score);
             });
         }
 

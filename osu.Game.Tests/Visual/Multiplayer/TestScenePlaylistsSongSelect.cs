@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -34,13 +33,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
             var beatmapSet = TestResources.CreateTestBeatmapSetInfo();
 
-            manager.Import(beatmapSet).WaitSafely();
+            manager.Import(beatmapSet);
         }
 
         public override void SetUpSteps()

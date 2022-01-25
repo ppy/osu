@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Beatmaps
         public IResourceStore<byte[]> Files => userSkinResourceStore;
         public new IResourceStore<byte[]> Resources => base.Resources;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
-        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
+        RealmAccess IStorageResourceProvider.RealmAccess => null;
 
         #endregion
 

@@ -30,13 +30,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         }
 
         [BackgroundDependencyLoader]
-        private void load(RealmContextFactory realmFactory)
+        private void load(RealmAccess realm)
         {
             string rulesetName = Ruleset?.ShortName;
 
-            var bindings = realmFactory.Run(realm => realm.All<RealmKeyBinding>()
-                                                          .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
-                                                          .Detach());
+            var bindings = realm.Run(r => r.All<RealmKeyBinding>()
+                                           .Where(b => b.RulesetName == rulesetName && b.Variant == variant)
+                                           .Detach());
 
             foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {

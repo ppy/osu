@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
 
@@ -15,7 +14,7 @@ namespace osu.Game.Screens.Edit.Timing
     internal class TimingSection : Section<TimingControlPoint>
     {
         private SettingsSlider<double> bpmSlider;
-        private SettingsEnumDropdown<TimeSignatures> timeSignature;
+        private LabelledTimeSignature timeSignature;
         private BPMTextBox bpmTextEntry;
 
         [BackgroundDependencyLoader]
@@ -25,10 +24,10 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 bpmTextEntry = new BPMTextBox(),
                 bpmSlider = new BPMSlider(),
-                timeSignature = new SettingsEnumDropdown<TimeSignatures>
+                timeSignature = new LabelledTimeSignature
                 {
-                    LabelText = "Time Signature"
-                },
+                    Label = "Time Signature"
+                }
             });
         }
 
