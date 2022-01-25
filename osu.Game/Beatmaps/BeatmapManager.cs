@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -105,7 +104,7 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapModelManager.Import(beatmapSet).GetResultSafely();
+            var imported = beatmapModelManager.Import(beatmapSet);
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
@@ -295,7 +294,7 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<BeatmapSetInfo>?> Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public ILive<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
