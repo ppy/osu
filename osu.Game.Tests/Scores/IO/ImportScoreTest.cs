@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -25,7 +24,7 @@ namespace osu.Game.Tests.Scores.IO
     public class ImportScoreTest : ImportTest
     {
         [Test]
-        public async Task TestBasicImport()
+        public void TestBasicImport()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
@@ -49,7 +48,7 @@ namespace osu.Game.Tests.Scores.IO
                         BeatmapInfo = beatmap.Beatmaps.First()
                     };
 
-                    var imported = await LoadScoreIntoOsu(osu, toImport);
+                    var imported = LoadScoreIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Rank, imported.Rank);
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
@@ -67,7 +66,7 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public async Task TestImportMods()
+        public void TestImportMods()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
@@ -85,7 +84,7 @@ namespace osu.Game.Tests.Scores.IO
                         Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
                     };
 
-                    var imported = await LoadScoreIntoOsu(osu, toImport);
+                    var imported = LoadScoreIntoOsu(osu, toImport);
 
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModHardRock));
                     Assert.IsTrue(imported.Mods.Any(m => m is OsuModDoubleTime));
@@ -98,7 +97,7 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public async Task TestImportStatistics()
+        public void TestImportStatistics()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
@@ -120,7 +119,7 @@ namespace osu.Game.Tests.Scores.IO
                         }
                     };
 
-                    var imported = await LoadScoreIntoOsu(osu, toImport);
+                    var imported = LoadScoreIntoOsu(osu, toImport);
 
                     Assert.AreEqual(toImport.Statistics[HitResult.Perfect], imported.Statistics[HitResult.Perfect]);
                     Assert.AreEqual(toImport.Statistics[HitResult.Miss], imported.Statistics[HitResult.Miss]);
@@ -133,7 +132,7 @@ namespace osu.Game.Tests.Scores.IO
         }
 
         [Test]
-        public async Task TestOnlineScoreIsAvailableLocally()
+        public void TestOnlineScoreIsAvailableLocally()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost())
             {
@@ -143,7 +142,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var beatmap = BeatmapImportHelper.LoadOszIntoOsu(osu, TestResources.GetQuickTestBeatmapForImport()).GetResultSafely();
 
-                    await LoadScoreIntoOsu(osu, new ScoreInfo
+                    LoadScoreIntoOsu(osu, new ScoreInfo
                     {
                         User = new APIUser { Username = "Test user" },
                         BeatmapInfo = beatmap.Beatmaps.First(),
@@ -168,13 +167,14 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
-        public static async Task<ScoreInfo> LoadScoreIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
+        public static ScoreInfo LoadScoreIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
         {
             // clone to avoid attaching the input score to realm.
             score = score.DeepClone();
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
-            await scoreManager.Import(score, archive);
+
+            scoreManager.Import(score, archive);
 
             return scoreManager.Query(_ => true);
         }
