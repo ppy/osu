@@ -30,7 +30,7 @@ using Realms.Exceptions;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// A factory which provides both the main (update thread bound) realm context and creates contexts for async usage.
+    /// A factory which provides safe access to the realm storage backend.
     /// </summary>
     public class RealmAccess : IDisposable
     {
@@ -57,9 +57,9 @@ namespace osu.Game.Database
         private const int schema_version = 13;
 
         /// <summary>
-        /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking context creation during blocking periods.
+        /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
         /// </summary>
-        private readonly SemaphoreSlim realmCreationLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim realmRetrievalLock = new SemaphoreSlim(1);
 
         private readonly ThreadLocal<bool> currentThreadCanCreateRealmInstances = new ThreadLocal<bool>();
 
@@ -76,7 +76,7 @@ namespace osu.Game.Database
 
         /// <summary>
         /// Holds a map of functions registered via <see cref="RegisterForNotifications{T}"/> and a coinciding action which when triggered,
-        /// fires a change set event with an empty collection. This is used to inform subscribers when a realm context goes away, and ensure they don't use invalidated
+        /// fires a change set event with an empty collection. This is used to inform subscribers when the main realm instance gets recycled, and ensure they don't use invalidated
         /// managed realm objects from a previous firing.
         /// </summary>
         private readonly Dictionary<Func<Realm, IDisposable?>, Action> notificationsResetMap = new Dictionary<Func<Realm, IDisposable?>, Action>();
@@ -364,7 +364,7 @@ namespace osu.Game.Database
             {
                 if (!currentThreadCanCreateRealmInstances.Value)
                 {
-                    realmCreationLock.Wait();
+                    realmRetrievalLock.Wait();
                     currentThreadCanCreateRealmInstances.Value = true;
                     tookSemaphoreLock = true;
                 }
@@ -383,7 +383,7 @@ namespace osu.Game.Database
             {
                 if (tookSemaphoreLock)
                 {
-                    realmCreationLock.Release();
+                    realmRetrievalLock.Release();
                     currentThreadCanCreateRealmInstances.Value = false;
                 }
             }
@@ -589,7 +589,7 @@ namespace osu.Game.Database
 
             try
             {
-                realmCreationLock.Wait();
+                realmRetrievalLock.Wait();
 
                 lock (realmLock)
                 {
@@ -639,13 +639,13 @@ namespace osu.Game.Database
             }
             catch
             {
-                realmCreationLock.Release();
+                realmRetrievalLock.Release();
                 throw;
             }
 
             return new InvokeOnDisposal<RealmAccess>(this, factory =>
             {
-                factory.realmCreationLock.Release();
+                factory.realmRetrievalLock.Release();
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
 
                 // Post back to the update thread to revive any subscriptions.
@@ -667,9 +667,9 @@ namespace osu.Game.Database
 
             if (!isDisposed)
             {
-                // intentionally block context creation indefinitely. this ensures that nothing can start consuming a new context after disposal.
-                realmCreationLock.Wait();
-                realmCreationLock.Dispose();
+                // intentionally block realm retrieval indefinitely. this ensures that nothing can start consuming a new instance after disposal.
+                realmRetrievalLock.Wait();
+                realmRetrievalLock.Dispose();
 
                 isDisposed = true;
             }
