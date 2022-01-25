@@ -208,8 +208,13 @@ namespace osu.Game
                 realm.CreateBackup($"client.{migration}.realm");
 
                 using (var source = Storage.GetStream("collection.db"))
-                using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
-                    source.CopyTo(destination);
+                {
+                    if (source != null)
+                    {
+                        using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                            source.CopyTo(destination);
+                    }
+                }
             }
 
             dependencies.CacheAs(Storage);
