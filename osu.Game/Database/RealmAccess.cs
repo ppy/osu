@@ -334,25 +334,6 @@ namespace osu.Game.Database
             }
         }
 
-        /// <summary>
-        /// Unregister all subscriptions when the realm instance is to be recycled.
-        /// Subscriptions will still remain and will be re-subscribed when the realm instance returns.
-        /// </summary>
-        private void unregisterAllSubscriptions()
-        {
-            lock (realmLock)
-            {
-                foreach (var action in notificationsResetMap.Values)
-                    action();
-
-                foreach (var action in customSubscriptionsResetMap)
-                {
-                    action.Value?.Dispose();
-                    customSubscriptionsResetMap[action.Key] = null;
-                }
-            }
-        }
-
         private Realm getRealmInstance()
         {
             if (isDisposed)
@@ -605,15 +586,32 @@ namespace osu.Game.Database
                             throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
                         syncContext = SynchronizationContext.Current;
-                    }
 
-                    unregisterAllSubscriptions();
+                        // Before disposing the update context, clean up all subscriptions.
+                        // Note that in the case of realm notification subscriptions, this is not really required (they will be cleaned up by disposal).
+                        // In the case of custom subscriptions, we want them to fire before the update realm is disposed in case they do any follow-up work.
+                        foreach (var action in customSubscriptionsResetMap)
+                        {
+                            action.Value?.Dispose();
+                            customSubscriptionsResetMap[action.Key] = null;
+                        }
+                    }
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
                     updateRealm?.Dispose();
                     updateRealm = null;
                 }
+
+                // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
+                // and must be posted to the synchronization context.
+                // This is because realm may fire event callbacks between the `unregisterAllSubscriptions` and `updateRealm.Dispose`
+                // calls above.
+                syncContext?.Post(_ =>
+                {
+                    foreach (var action in notificationsResetMap.Values)
+                        action();
+                }, null);
 
                 const int sleep_length = 200;
                 int timeout = 5000;
