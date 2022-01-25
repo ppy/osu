@@ -1024,11 +1024,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual async Task ImportScore(Score score)
+        protected virtual Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return;
+                return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;
 
@@ -1048,7 +1048,7 @@ namespace osu.Game.Screens.Play
             // conflicts across various systems (ie. solo and multiplayer).
             importableScore.OnlineID = -1;
 
-            var imported = await scoreManager.Import(importableScore, replayReader).ConfigureAwait(false);
+            var imported = scoreManager.Import(importableScore, replayReader);
 
             imported.PerformRead(s =>
             {
@@ -1056,6 +1056,8 @@ namespace osu.Game.Screens.Play
                 score.ScoreInfo.Hash = s.Hash;
                 score.ScoreInfo.ID = s.ID;
             });
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -308,7 +308,7 @@ namespace osu.Game.Scoring
             return scoreModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<ScoreInfo>> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public ILive<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
