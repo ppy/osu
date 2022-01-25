@@ -639,18 +639,19 @@ namespace osu.Game.Database
             }
             catch
             {
-                realmRetrievalLock.Release();
+                restoreOperation();
                 throw;
             }
 
-            return new InvokeOnDisposal<RealmAccess>(this, factory =>
-            {
-                factory.realmRetrievalLock.Release();
-                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+            return new InvokeOnDisposal(restoreOperation);
 
+            void restoreOperation()
+            {
+                Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
+                realmRetrievalLock.Release();
                 // Post back to the update thread to revive any subscriptions.
                 syncContext?.Post(_ => ensureUpdateRealm(), null);
-            });
+            }
         }
 
         // https://github.com/realm/realm-dotnet/blob/32f4ebcc88b3e80a3b254412665340cd9f3bd6b5/Realm/Realm/Extensions/ReflectionExtensions.cs#L46
