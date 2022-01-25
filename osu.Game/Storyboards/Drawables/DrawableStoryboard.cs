@@ -77,12 +77,12 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmContextFactory realmContextFactory)
+        private void load(GameplayClock clock, CancellationToken? cancellationToken, GameHost host, RealmAccess realm)
         {
             if (clock != null)
                 Clock = clock;
 
-            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(new RealmFileStore(realmContextFactory, host.Storage).Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(host.CreateTextureLoaderStore(new RealmFileStore(realm, host.Storage).Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
             {

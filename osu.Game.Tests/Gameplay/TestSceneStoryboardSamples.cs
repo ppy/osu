@@ -261,7 +261,7 @@ namespace osu.Game.Tests.Gameplay
         public AudioManager AudioManager => Audio;
         public IResourceStore<byte[]> Files => null;
         public new IResourceStore<byte[]> Resources => base.Resources;
-        public RealmContextFactory RealmContextFactory => null;
+        public RealmAccess RealmAccess => null;
         public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => null;
 
         #endregion

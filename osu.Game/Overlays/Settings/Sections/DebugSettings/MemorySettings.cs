@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
         protected override LocalisableString Header => DebugSettingsStrings.MemoryHeader;
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, RealmContextFactory realmFactory)
+        private void load(GameHost host, RealmAccess realm)
         {
             SettingsButton blockAction;
             SettingsButton unblockAction;
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
                     Action = () =>
                     {
                         // Blocking operations implicitly causes a Compact().
-                        using (realmFactory.BlockAllOperations())
+                        using (realm.BlockAllOperations())
                         {
                         }
                     }
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
             {
                 try
                 {
-                    var token = realmFactory.BlockAllOperations();
+                    var token = realm.BlockAllOperations();
 
                     blockAction.Enabled.Value = false;
 

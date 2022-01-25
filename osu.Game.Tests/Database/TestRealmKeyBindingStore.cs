@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Database
 
         private RealmKeyBindingStore keyBindingStore;
 
-        private RealmContextFactory realmContextFactory;
+        private RealmAccess realm;
 
         [SetUp]
         public void SetUp()
@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Database
 
             storage = new NativeStorage(directory.FullName);
 
-            realmContextFactory = new RealmContextFactory(storage, "test");
-            keyBindingStore = new RealmKeyBindingStore(realmContextFactory, new ReadableKeyCombinationProvider());
+            realm = new RealmAccess(storage, "test");
+            keyBindingStore = new RealmKeyBindingStore(realm, new ReadableKeyCombinationProvider());
         }
 
         [Test]
@@ -60,11 +60,11 @@ namespace osu.Game.Tests.Database
             KeyBindingContainer testContainer = new TestKeyBindingContainer();
 
             // Add some excess bindings for an action which only supports 1.
-            realmContextFactory.Write(realm =>
+            realm.Write(r =>
             {
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
             });
 
             Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(3));
@@ -76,9 +76,9 @@ namespace osu.Game.Tests.Database
 
         private int queryCount(GlobalAction? match = null)
         {
-            return realmContextFactory.Run(realm =>
+            return realm.Run(r =>
             {
-                var results = realm.All<RealmKeyBinding>();
+                var results = r.All<RealmKeyBinding>();
                 if (match.HasValue)
                     results = results.Where(k => k.ActionInt == (int)match.Value);
                 return results.Count();
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Database
 
             keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
 
-            realmContextFactory.Run(outerRealm =>
+            realm.Run(outerRealm =>
             {
                 var backBinding = outerRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
 
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Database
 
                 var tsr = ThreadSafeReference.Create(backBinding);
 
-                realmContextFactory.Run(innerRealm =>
+                realm.Run(innerRealm =>
                 {
                     var binding = innerRealm.ResolveReference(tsr);
                     innerRealm.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Database
         [TearDown]
         public void TearDown()
         {
-            realmContextFactory.Dispose();
+            realm.Dispose();
             storage.DeleteDirectory(string.Empty);
         }
 
