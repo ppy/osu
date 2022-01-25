@@ -3,12 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,7 +17,6 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
@@ -47,8 +43,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Replay replay;
 
-        private readonly IBindableList<int> users = new BindableList<int>();
-
         private TestReplayRecorder recorder;
 
         private ManualClock manualClock;
@@ -56,9 +50,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         private OsuSpriteText latencyDisplay;
 
         private TestFramedReplayInputHandler replayHandler;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         [Resolved]
         private SpectatorClient spectatorClient { get; set; }
@@ -77,35 +68,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 manualClock = new ManualClock();
 
                 spectatorClient.OnNewFrames += onNewFrames;
-
-                users.BindTo(spectatorClient.PlayingUsers);
-                users.BindCollectionChanged((obj, args) =>
-                {
-                    switch (args.Action)
-                    {
-                        case NotifyCollectionChangedAction.Add:
-                            Debug.Assert(args.NewItems != null);
-
-                            foreach (int user in args.NewItems)
-                            {
-                                if (user == api.LocalUser.Value.Id)
-                                    spectatorClient.WatchUser(user);
-                            }
-
-                            break;
-
-                        case NotifyCollectionChangedAction.Remove:
-                            Debug.Assert(args.OldItems != null);
-
-                            foreach (int user in args.OldItems)
-                            {
-                                if (user == api.LocalUser.Value.Id)
-                                    spectatorClient.StopWatchingUser(user);
-                            }
-
-                            break;
-                    }
-                }, true);
 
                 Children = new Drawable[]
                 {
