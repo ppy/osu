@@ -24,11 +24,11 @@ namespace osu.Game.Tests.Database
             IEnumerable<BeatmapSetInfo>? resolvedItems = null;
             ChangeSet? lastChanges = null;
 
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
 
-                var registration = realmFactory.RegisterForNotifications(realm => realm.All<BeatmapSetInfo>(), onChanged);
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
 
                 testEventsArriving(true);
 
@@ -37,10 +37,10 @@ namespace osu.Game.Tests.Database
                 resolvedItems = null;
                 lastChanges = null;
 
-                using (realmFactory.BlockAllOperations())
+                using (realm.BlockAllOperations())
                     Assert.That(resolvedItems, Is.Empty);
 
-                realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
 
                 testEventsArriving(true);
 
@@ -50,34 +50,34 @@ namespace osu.Game.Tests.Database
 
                 registration.Dispose();
 
-                realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
 
                 testEventsArriving(false);
 
                 // And make sure even after another context loss we don't get firings.
-                using (realmFactory.BlockAllOperations())
+                using (realm.BlockAllOperations())
                     Assert.That(resolvedItems, Is.Null);
 
-                realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
 
                 testEventsArriving(false);
 
                 void testEventsArriving(bool shouldArrive)
                 {
-                    realmFactory.Run(realm => realm.Refresh());
+                    realm.Run(r => r.Refresh());
 
                     if (shouldArrive)
                         Assert.That(resolvedItems, Has.One.Items);
                     else
                         Assert.That(resolvedItems, Is.Null);
 
-                    realmFactory.Write(realm =>
+                    realm.Write(r =>
                     {
-                        realm.RemoveAll<BeatmapSetInfo>();
-                        realm.RemoveAll<RulesetInfo>();
+                        r.RemoveAll<BeatmapSetInfo>();
+                        r.RemoveAll<RulesetInfo>();
                     });
 
-                    realmFactory.Run(realm => realm.Refresh());
+                    realm.Run(r => r.Refresh());
 
                     if (shouldArrive)
                         Assert.That(lastChanges?.DeletedIndices, Has.One.Items);
@@ -98,39 +98,39 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestCustomRegisterWithContextLoss()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
                 BeatmapSetInfo? beatmapSetInfo = null;
 
-                realmFactory.Write(realm => realm.Add(TestResources.CreateTestBeatmapSetInfo()));
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
 
-                var subscription = realmFactory.RegisterCustomSubscription(realm =>
+                var subscription = realm.RegisterCustomSubscription(r =>
                 {
-                    beatmapSetInfo = realm.All<BeatmapSetInfo>().First();
+                    beatmapSetInfo = r.All<BeatmapSetInfo>().First();
 
                     return new InvokeOnDisposal(() => beatmapSetInfo = null);
                 });
 
                 Assert.That(beatmapSetInfo, Is.Not.Null);
 
-                using (realmFactory.BlockAllOperations())
+                using (realm.BlockAllOperations())
                 {
                     // custom disposal action fired when context lost.
                     Assert.That(beatmapSetInfo, Is.Null);
                 }
 
                 // re-registration after context restore.
-                realmFactory.Run(realm => realm.Refresh());
+                realm.Run(r => r.Refresh());
                 Assert.That(beatmapSetInfo, Is.Not.Null);
 
                 subscription.Dispose();
 
                 Assert.That(beatmapSetInfo, Is.Null);
 
-                using (realmFactory.BlockAllOperations())
+                using (realm.BlockAllOperations())
                     Assert.That(beatmapSetInfo, Is.Null);
 
-                realmFactory.Run(realm => realm.Refresh());
+                realm.Run(r => r.Refresh());
                 Assert.That(beatmapSetInfo, Is.Null);
             });
         }

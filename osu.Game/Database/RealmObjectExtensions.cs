@@ -216,16 +216,16 @@ namespace osu.Game.Database
             return new RealmLiveUnmanaged<T>(realmObject);
         }
 
-        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmContextFactory realmContextFactory)
+        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l, realmContextFactory)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLive<T>(l, realm)).Cast<ILive<T>>().ToList();
         }
 
-        public static ILive<T> ToLive<T>(this T realmObject, RealmContextFactory realmContextFactory)
+        public static ILive<T> ToLive<T>(this T realmObject, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return new RealmLive<T>(realmObject, realmContextFactory);
+            return new RealmLive<T>(realmObject, realm);
         }
 
         /// <summary>
@@ -271,8 +271,8 @@ namespace osu.Game.Database
         public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
-            if (!RealmContextFactory.CurrentThreadSubscriptionsAllowed)
-                throw new InvalidOperationException($"Make sure to call {nameof(RealmContextFactory)}.{nameof(RealmContextFactory.RegisterForNotifications)}");
+            if (!RealmAccess.CurrentThreadSubscriptionsAllowed)
+                throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
             return collection.SubscribeForNotifications(callback);
         }

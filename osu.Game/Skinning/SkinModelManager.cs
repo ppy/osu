@@ -27,8 +27,8 @@ namespace osu.Game.Skinning
 
         private readonly IStorageResourceProvider skinResources;
 
-        public SkinModelManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IStorageResourceProvider skinResources)
-            : base(storage, contextFactory)
+        public SkinModelManager(Storage storage, RealmAccess realm, GameHost host, IStorageResourceProvider skinResources)
+            : base(storage, realm)
         {
             this.skinResources = skinResources;
 
@@ -205,7 +205,7 @@ namespace osu.Game.Skinning
 
         private void populateMissingHashes()
         {
-            ContextFactory.Run(realm =>
+            Realm.Run(realm =>
             {
                 var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
 
