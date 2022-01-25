@@ -76,9 +76,9 @@ namespace osu.Game.Tests.Database
 
         private int queryCount(GlobalAction? match = null)
         {
-            return realm.Run(realm =>
+            return realm.Run(r =>
             {
-                var results = realm.All<RealmKeyBinding>();
+                var results = r.All<RealmKeyBinding>();
                 if (match.HasValue)
                     results = results.Where(k => k.ActionInt == (int)match.Value);
                 return results.Count();

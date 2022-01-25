@@ -56,21 +56,21 @@ namespace osu.Game.Input
         /// <param name="rulesets">The rulesets to populate defaults from.</param>
         public void Register(KeyBindingContainer container, IEnumerable<RulesetInfo> rulesets)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                using (var transaction = realm.BeginWrite())
+                using (var transaction = r.BeginWrite())
                 {
                     // intentionally flattened to a list rather than querying against the IQueryable, as nullable fields being queried against aren't indexed.
                     // this is much faster as a result.
-                    var existingBindings = realm.All<RealmKeyBinding>().ToList();
+                    var existingBindings = r.All<RealmKeyBinding>().ToList();
 
-                    insertDefaults(realm, existingBindings, container.DefaultKeyBindings);
+                    insertDefaults(r, existingBindings, container.DefaultKeyBindings);
 
                     foreach (var ruleset in rulesets)
                     {
                         var instance = ruleset.CreateInstance();
                         foreach (int variant in instance.AvailableVariants)
-                            insertDefaults(realm, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
+                            insertDefaults(r, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
                     }
 
                     transaction.Commit();

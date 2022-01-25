@@ -119,12 +119,12 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
         public void Hide(BeatmapInfo beatmapInfo)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                using (var transaction = realm.BeginWrite())
+                using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
 
                     beatmapInfo.Hidden = true;
                     transaction.Commit();
@@ -138,12 +138,12 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmapInfo)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                using (var transaction = realm.BeginWrite())
+                using (var transaction = r.BeginWrite())
                 {
                     if (!beatmapInfo.IsManaged)
-                        beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
 
                     beatmapInfo.Hidden = false;
                     transaction.Commit();
@@ -153,11 +153,11 @@ namespace osu.Game.Beatmaps
 
         public void RestoreAll()
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                using (var transaction = realm.BeginWrite())
+                using (var transaction = r.BeginWrite())
                 {
-                    foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
+                    foreach (var beatmap in r.All<BeatmapInfo>().Where(b => b.Hidden))
                         beatmap.Hidden = false;
 
                     transaction.Commit();
@@ -171,10 +171,10 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            return realm.Run(realm =>
+            return realm.Run(r =>
             {
-                realm.Refresh();
-                return realm.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+                r.Refresh();
+                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
             });
         }
 
@@ -240,9 +240,9 @@ namespace osu.Game.Beatmaps
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                var items = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
                 if (filter != null)
                     items = items.Where(filter);
@@ -253,7 +253,7 @@ namespace osu.Game.Beatmaps
 
         public void UndeleteAll()
         {
-            realm.Run(realm => beatmapModelManager.Undelete(realm.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
+            realm.Run(r => beatmapModelManager.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
@@ -312,9 +312,9 @@ namespace osu.Game.Beatmaps
             // If we seem to be missing files, now is a good time to re-fetch.
             if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
             {
-                realm.Run(realm =>
+                realm.Run(r =>
                 {
-                    var refetch = realm.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
+                    var refetch = r.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
 
                     if (refetch != null)
                         importedBeatmap = refetch;
