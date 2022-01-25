@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
@@ -184,7 +183,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 beatmap.DifficultyName = $"SR{i + 1}";
             }
 
-            return Game.BeatmapManager.Import(beatmapSet).GetResultSafely()?.Value;
+            return Game.BeatmapManager.Import(beatmapSet)?.Value;
         }
 
         private bool ensureAllBeatmapSetsImported(IEnumerable<BeatmapSetInfo> beatmapSets) => beatmapSets.All(set => set != null);
