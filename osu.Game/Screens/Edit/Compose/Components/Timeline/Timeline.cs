@@ -216,9 +216,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnScroll(e);
         }
 
-        protected override void OnZoomChange()
+        protected override void OnZoomChanged()
         {
-            base.OnZoomChange();
+            base.OnZoomChanged();
             timelineZoomScale.Value = Zoom / defaultTimelineZoom;
         }
 
