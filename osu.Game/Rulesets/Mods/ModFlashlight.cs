@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.OpenGL.Vertices;
 using osu.Game.Rulesets.Objects;
@@ -32,9 +33,17 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
 
-        internal ModFlashlight()
-        {
-        }
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public abstract BindableNumber<float> SizeMultiplier { get; }
+
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public abstract BindableBool ComboBasedSize { get; }
+
+        /// <summary>
+        /// The default size of the flashlight in ruleset-appropriate dimensions.
+        /// <see cref="SizeMultiplier"/> and <see cref="ComboBasedSize"/> will apply their adjustments on top of this size.
+        /// </summary>
+        public abstract float DefaultFlashlightSize { get; }
     }
 
     public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToDrawableRuleset<T>, IApplicableToScoreProcessor
@@ -79,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
             flashlight.Breaks = drawableRuleset.Beatmap.Breaks;
         }
 
-        public abstract Flashlight CreateFlashlight();
+        protected abstract Flashlight CreateFlashlight();
 
         public abstract class Flashlight : Drawable
         {
@@ -92,6 +101,17 @@ namespace osu.Game.Rulesets.Mods
             public override bool RemoveCompletedTransforms => false;
 
             public List<BreakPeriod> Breaks;
+
+            private readonly float defaultFlashlightSize;
+            private readonly float sizeMultiplier;
+            private readonly bool comboBasedSize;
+
+            protected Flashlight(ModFlashlight modFlashlight)
+            {
+                defaultFlashlightSize = modFlashlight.DefaultFlashlightSize;
+                sizeMultiplier = modFlashlight.SizeMultiplier.Value;
+                comboBasedSize = modFlashlight.ComboBasedSize.Value;
+            }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaderManager)
@@ -123,6 +143,21 @@ namespace osu.Game.Rulesets.Mods
             protected abstract void OnComboChange(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
+
+            protected float GetSizeFor(int combo)
+            {
+                float size = defaultFlashlightSize * sizeMultiplier;
+
+                if (comboBasedSize)
+                {
+                    if (combo > 200)
+                        size *= 0.8f;
+                    else if (combo > 100)
+                        size *= 0.9f;
+                }
+
+                return size;
+            }
 
             private Vector2 flashlightPosition;
 

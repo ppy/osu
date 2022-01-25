@@ -59,7 +59,7 @@ namespace osu.Game.Stores
 
         protected readonly RealmFileStore Files;
 
-        protected readonly RealmContextFactory ContextFactory;
+        protected readonly RealmAccess Realm;
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.
@@ -71,11 +71,11 @@ namespace osu.Game.Stores
         /// </summary>
         public Action<Notification>? PostNotification { protected get; set; }
 
-        protected RealmArchiveModelImporter(Storage storage, RealmContextFactory contextFactory)
+        protected RealmArchiveModelImporter(Storage storage, RealmAccess realm)
         {
-            ContextFactory = contextFactory;
+            Realm = realm;
 
-            Files = new RealmFileStore(contextFactory, storage);
+            Files = new RealmFileStore(realm, storage);
         }
 
         /// <summary>
@@ -250,8 +250,10 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(async () => await Import(model, archive, lowPriority, cancellationToken).ConfigureAwait(false),
-                cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap();
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+                cancellationToken,
+                TaskCreationOptions.HideScheduler,
+                lowPriority ? import_scheduler_low_priority : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
@@ -318,9 +320,9 @@ namespace osu.Game.Stores
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual ILive<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
-            return ContextFactory.Run(realm =>
+            return Realm.Run(realm =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -342,7 +344,8 @@ namespace osu.Game.Stores
                         // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                         // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                         if (CanSkipImport(existing, item) &&
-                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                            checkAllFilesExist(existing))
                         {
                             LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
@@ -352,7 +355,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
+                            return existing.ToLive(Realm);
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -387,7 +390,7 @@ namespace osu.Game.Stores
                                 existing.DeletePending = false;
                                 transaction.Commit();
 
-                                return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
+                                return existing.ToLive(Realm);
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -413,7 +416,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return Task.FromResult((ILive<TModel>?)item.ToLive(ContextFactory));
+                return (ILive<TModel>?)item.ToLive(Realm);
             });
         }
 
@@ -459,7 +462,6 @@ namespace osu.Game.Stores
             if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
-            // import files to manager
             foreach (string file in reader.Filenames)
                 yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
         }
@@ -519,7 +521,11 @@ namespace osu.Game.Stores
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all File IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
+            checkAllFilesExist(existing);
+
+        private bool checkAllFilesExist(TModel model) =>
+            model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.

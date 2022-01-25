@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private RulesetStore rulesets { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private BeatmapInfo beatmapInfo;
 
@@ -44,9 +44,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 beatmapInfo = value;
                 Scores = null;
 
-                UpdateScores();
-                if (IsLoaded)
-                    refreshRealmSubscription();
+                if (IsOnlineScope)
+                    UpdateScores();
+                else
+                {
+                    if (IsLoaded)
+                        refreshRealmSubscription();
+                }
             }
         }
 
@@ -109,15 +113,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (beatmapInfo == null)
                 return;
 
-            scoreSubscription = realmFactory.Context.All<ScoreInfo>()
-                                            .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID)
-                                            .QueryAsyncWithNotifications((_, changes, ___) =>
-                                            {
-                                                if (changes == null)
-                                                    return;
-
-                                                RefreshScores();
-                                            });
+            scoreSubscription = realm.RegisterForNotifications(r =>
+                    r.All<ScoreInfo>()
+                     .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
+                (_, changes, ___) =>
+                {
+                    if (!IsOnlineScope)
+                        RefreshScores();
+                });
         }
 
         protected override void Reset()
@@ -147,12 +150,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                realmFactory.Run(realm =>
+                realm.Run(r =>
                 {
-                    var scores = realm.All<ScoreInfo>()
-                                      .AsEnumerable()
-                                      // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
-                                      .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
+                    var scores = r.All<ScoreInfo>()
+                                  .AsEnumerable()
+                                  // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
+                                  .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
 
                     if (filterMods && !mods.Value.Any())
                     {
