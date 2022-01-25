@@ -43,26 +43,14 @@ namespace osu.Game.Tests.Visual
         };
 
         private TestBeatmapManager testBeatmapManager;
-        private WorkingBeatmap working;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio, RulesetStore rulesets)
         {
             Add(logo);
 
-            working = CreateWorkingBeatmap(Ruleset.Value);
-
             if (IsolateSavingFromDatabase)
                 Dependencies.CacheAs<BeatmapManager>(testBeatmapManager = new TestBeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Beatmap.Value = working;
-            if (testBeatmapManager != null)
-                testBeatmapManager.TestBeatmap = working;
         }
 
         protected virtual bool EditorComponentsReady => Editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true
@@ -78,6 +66,11 @@ namespace osu.Game.Tests.Visual
 
         protected virtual void LoadEditor()
         {
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
+
+            if (testBeatmapManager != null)
+                testBeatmapManager.TestBeatmap = Beatmap.Value;
+
             LoadScreen(editorLoader = new TestEditorLoader());
         }
 
