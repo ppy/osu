@@ -122,10 +122,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
                 // Due to soft deletions, we can re-use deleted scores between test runs
-                scoreManager.Undelete(realm.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
+                scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
             });
 
             leaderboard.Scores = null;

@@ -158,11 +158,11 @@ namespace osu.Game.Database
 
             int count = existingBeatmapSets.Count();
 
-            realm.Run(realm =>
+            realm.Run(r =>
             {
                 log($"Found {count} beatmaps in EF");
 
-                var transaction = realm.BeginWrite();
+                var transaction = r.BeginWrite();
                 int written = 0;
 
                 try
@@ -172,7 +172,7 @@ namespace osu.Game.Database
                         if (++written % 1000 == 0)
                         {
                             transaction.Commit();
-                            transaction = realm.BeginWrite();
+                            transaction = r.BeginWrite();
                             log($"Migrated {written}/{count} beatmaps...");
                         }
 
@@ -186,11 +186,11 @@ namespace osu.Game.Database
                             Protected = beatmapSet.Protected,
                         };
 
-                        migrateFiles(beatmapSet, realm, realmBeatmapSet);
+                        migrateFiles(beatmapSet, r, realmBeatmapSet);
 
                         foreach (var beatmap in beatmapSet.Beatmaps)
                         {
-                            var ruleset = realm.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
+                            var ruleset = r.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
                             var metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata);
 
                             var realmBeatmap = new BeatmapInfo(ruleset, new BeatmapDifficulty(beatmap.BaseDifficulty), metadata)
@@ -225,7 +225,7 @@ namespace osu.Game.Database
                             realmBeatmapSet.Beatmaps.Add(realmBeatmap);
                         }
 
-                        realm.Add(realmBeatmapSet);
+                        r.Add(realmBeatmapSet);
                     }
                 }
                 finally
@@ -280,11 +280,11 @@ namespace osu.Game.Database
 
             int count = existingScores.Count();
 
-            realm.Run(realm =>
+            realm.Run(r =>
             {
                 log($"Found {count} scores in EF");
 
-                var transaction = realm.BeginWrite();
+                var transaction = r.BeginWrite();
                 int written = 0;
 
                 try
@@ -294,12 +294,12 @@ namespace osu.Game.Database
                         if (++written % 1000 == 0)
                         {
                             transaction.Commit();
-                            transaction = realm.BeginWrite();
+                            transaction = r.BeginWrite();
                             log($"Migrated {written}/{count} scores...");
                         }
 
-                        var beatmap = realm.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
-                        var ruleset = realm.Find<RulesetInfo>(score.Ruleset.ShortName);
+                        var beatmap = r.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
+                        var ruleset = r.Find<RulesetInfo>(score.Ruleset.ShortName);
                         var user = new RealmUser
                         {
                             OnlineID = score.User.OnlineID,
@@ -329,9 +329,9 @@ namespace osu.Game.Database
                             APIMods = score.APIMods,
                         };
 
-                        migrateFiles(score, realm, realmScore);
+                        migrateFiles(score, r, realmScore);
 
-                        realm.Add(realmScore);
+                        r.Add(realmScore);
                     }
                 }
                 finally
@@ -369,13 +369,13 @@ namespace osu.Game.Database
                     break;
             }
 
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                using (var transaction = realm.BeginWrite())
+                using (var transaction = r.BeginWrite())
                 {
                     // only migrate data if the realm database is empty.
-                    // note that this cannot be written as: `realm.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
-                    if (!realm.All<SkinInfo>().Any(s => !s.Protected))
+                    // note that this cannot be written as: `r.All<SkinInfo>().All(s => s.Protected)`, because realm does not support `.All()`.
+                    if (!r.All<SkinInfo>().Any(s => !s.Protected))
                     {
                         log($"Migrating {existingSkins.Count} skins");
 
@@ -390,9 +390,9 @@ namespace osu.Game.Database
                                 InstantiationInfo = skin.InstantiationInfo,
                             };
 
-                            migrateFiles(skin, realm, realmSkin);
+                            migrateFiles(skin, r, realmSkin);
 
-                            realm.Add(realmSkin);
+                            r.Add(realmSkin);
 
                             if (skin.ID == userSkinInt)
                                 userSkinChoice.Value = realmSkin.ID.ToString();
@@ -428,12 +428,12 @@ namespace osu.Game.Database
 
             log("Beginning settings migration to realm");
 
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                using (var transaction = realm.BeginWrite())
+                using (var transaction = r.BeginWrite())
                 {
                     // only migrate data if the realm database is empty.
-                    if (!realm.All<RealmRulesetSetting>().Any())
+                    if (!r.All<RealmRulesetSetting>().Any())
                     {
                         log($"Migrating {existingSettings.Count} settings");
 
@@ -447,7 +447,7 @@ namespace osu.Game.Database
                             if (string.IsNullOrEmpty(shortName))
                                 continue;
 
-                            realm.Add(new RealmRulesetSetting
+                            r.Add(new RealmRulesetSetting
                             {
                                 Key = dkb.Key,
                                 Value = dkb.StringValue,

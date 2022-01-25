@@ -289,10 +289,10 @@ namespace osu.Game.Skinning
 
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                var items = realm.All<SkinInfo>()
-                                 .Where(s => !s.Protected && !s.DeletePending);
+                var items = r.All<SkinInfo>()
+                             .Where(s => !s.Protected && !s.DeletePending);
                 if (filter != null)
                     items = items.Where(filter);
 

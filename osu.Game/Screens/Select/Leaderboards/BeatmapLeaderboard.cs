@@ -150,12 +150,12 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                realm.Run(realm =>
+                realm.Run(r =>
                 {
-                    var scores = realm.All<ScoreInfo>()
-                                      .AsEnumerable()
-                                      // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
-                                      .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
+                    var scores = r.All<ScoreInfo>()
+                                  .AsEnumerable()
+                                  // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
+                                  .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
 
                     if (filterMods && !mods.Value.Any())
                     {
