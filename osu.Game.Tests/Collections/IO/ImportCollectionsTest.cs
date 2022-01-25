@@ -6,7 +6,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;

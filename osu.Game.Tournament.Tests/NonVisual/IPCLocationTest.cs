@@ -4,7 +4,6 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
