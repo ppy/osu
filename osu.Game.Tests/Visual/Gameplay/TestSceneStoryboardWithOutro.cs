@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddStep("set storyboard duration to 0.6s", () => currentStoryboardDuration = 600);
             });
 
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
         }
