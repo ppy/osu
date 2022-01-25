@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
-        private readonly IBindableList<int> playingUsers = new BindableList<int>();
+        private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private FillFlowContainer<PlayingUserPanel> userFlow;
 
@@ -51,18 +51,20 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            playingUsers.BindTo(spectatorClient.PlayingUsers);
-            playingUsers.BindCollectionChanged(onUsersChanged, true);
+            playingUserStates.BindTo(spectatorClient.PlayingUserStates);
+            playingUserStates.BindCollectionChanged(onUsersChanged, true);
         }
 
-        private void onUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        private void onUsersChanged(object sender, NotifyDictionaryChangedEventArgs<int, SpectatorState> e) => Schedule(() =>
         {
             switch (e.Action)
             {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (int id in e.NewItems.OfType<int>().ToArray())
+                case NotifyDictionaryChangedAction.Add:
+                    Debug.Assert(e.NewItems != null);
+
+                    foreach ((int userId, _) in e.NewItems)
                     {
-                        users.GetUserAsync(id).ContinueWith(task =>
+                        users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             var user = task.GetResultSafely();
 
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays.Dashboard
                             Schedule(() =>
                             {
                                 // user may no longer be playing.
-                                if (!playingUsers.Contains(user.Id))
+                                if (!playingUserStates.ContainsKey(user.Id))
                                     return;
 
                                 userFlow.Add(createUserPanel(user));
@@ -81,13 +83,11 @@ namespace osu.Game.Overlays.Dashboard
 
                     break;
 
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (int u in e.OldItems.OfType<int>())
-                        userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
-                    break;
+                case NotifyDictionaryChangedAction.Remove:
+                    Debug.Assert(e.OldItems != null);
 
-                case NotifyCollectionChangedAction.Reset:
-                    userFlow.Clear();
+                    foreach ((int userId, _) in e.OldItems)
+                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
                     break;
             }
         });

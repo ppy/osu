@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public void RandomlyUpdateState()
             {
-                foreach (int userId in PlayingUsers)
+                foreach ((int userId, _) in PlayingUserStates)
                 {
                     if (RNG.NextBool())
                         continue;
