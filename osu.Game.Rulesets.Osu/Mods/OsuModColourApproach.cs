@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -21,14 +20,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override IconUsage? Icon => FontAwesome.Solid.Palette;
         public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles) };
-
-        private const double fade_in_duration_multiplier = 0.4;
-        private const double fade_out_duration_multiplier = 0.3;
         protected override bool IsFirstAdjustableObject(HitObject hitObject) => !(hitObject is Spinner || hitObject is SpinnerTick);
 
-        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state)
-        {
-        }
+        protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyColouredState(hitObject, state);
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => applyColouredState(hitObject, state);
 
@@ -41,15 +35,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             var h = (OsuHitObject)drawable.HitObject;
 
             //apply coloured effect
-            Color4 flashColourValue = Color4.Azure;
 
             switch (drawable)
             {
+                case DrawableSlider _:
                 case DrawableSliderHead _:
                 case DrawableHitCircle _:
                 {
                     using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
-                        drawable.FadeColour(flashColourValue, 300, Easing.InOutSine);
+                        drawable.FadeColour(Colour4.Red, h.TimePreempt * 0.33).Then().FadeColour(Colour4.Yellow, h.TimePreempt * 0.33).Then().FadeColour(Colour4.Green, h.TimePreempt * 0.33);
                     break;
                 }
             }
