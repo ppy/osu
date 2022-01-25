@@ -74,7 +74,7 @@ namespace osu.Game.Scoring
 
         public override bool IsAvailableLocally(ScoreInfo model)
         {
-            return Access.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+            return Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
         }
     }
 }
