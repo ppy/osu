@@ -250,8 +250,10 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(async () => await Import(model, archive, lowPriority, cancellationToken).ConfigureAwait(false),
-                cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap();
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+                cancellationToken,
+                TaskCreationOptions.HideScheduler,
+                lowPriority ? import_scheduler_low_priority : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
@@ -318,7 +320,7 @@ namespace osu.Game.Stores
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual ILive<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return Realm.Run(realm =>
             {
@@ -353,7 +355,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return Task.FromResult((ILive<TModel>?)existing.ToLive(Realm));
+                            return existing.ToLive(Realm);
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -388,7 +390,7 @@ namespace osu.Game.Stores
                                 existing.DeletePending = false;
                                 transaction.Commit();
 
-                                return Task.FromResult((ILive<TModel>?)existing.ToLive(Realm));
+                                return existing.ToLive(Realm);
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -414,7 +416,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return Task.FromResult((ILive<TModel>?)item.ToLive(Realm));
+                return (ILive<TModel>?)item.ToLive(Realm);
             });
         }
 

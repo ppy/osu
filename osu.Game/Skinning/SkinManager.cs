@@ -11,7 +11,6 @@ using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -151,7 +150,7 @@ namespace osu.Game.Skinning
                     Name = s.Name + @" (modified)",
                     Creator = s.Creator,
                     InstantiationInfo = s.InstantiationInfo,
-                }).GetResultSafely();
+                });
 
                 if (result != null)
                 {
@@ -278,7 +277,7 @@ namespace osu.Game.Skinning
             return skinModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<SkinInfo>> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public ILive<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(item, archive, lowPriority, cancellationToken);
         }

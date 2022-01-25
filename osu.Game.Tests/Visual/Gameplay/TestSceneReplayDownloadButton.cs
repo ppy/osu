@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
 
-            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)).GetResultSafely());
+            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)));
 
             AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
 
