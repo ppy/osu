@@ -40,9 +40,9 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Access));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Access, rulesets, API, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(Access);
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         [SetUpSteps]
