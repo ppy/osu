@@ -21,15 +21,15 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestConstructRealm()
         {
-            RunTestWithRealm((realmFactory, _) => { realmFactory.Run(realm => realm.Refresh()); });
+            RunTestWithRealm((realm, _) => { realm.Run(r => r.Refresh()); });
         }
 
         [Test]
         public void TestBlockOperations()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                using (realmFactory.BlockAllOperations())
+                using (realm.BlockAllOperations())
                 {
                 }
             });
@@ -42,24 +42,25 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestNestedContextCreationWithSubscription()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
                 bool callbackRan = false;
 
-                realmFactory.Run(realm =>
+                realm.RegisterCustomSubscription(r =>
                 {
-                    var subscription = realm.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    var subscription = r.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
                     {
-                        realmFactory.Run(_ =>
+                        realm.Run(_ =>
                         {
                             callbackRan = true;
                         });
                     });
 
                     // Force the callback above to run.
-                    realmFactory.Run(r => r.Refresh());
+                    realm.Run(rr => rr.Refresh());
 
                     subscription?.Dispose();
+                    return null;
                 });
 
                 Assert.IsTrue(callbackRan);
@@ -69,14 +70,14 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestBlockOperationsWithContention()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
                 ManualResetEventSlim stopThreadedUsage = new ManualResetEventSlim();
                 ManualResetEventSlim hasThreadedUsage = new ManualResetEventSlim();
 
                 Task.Factory.StartNew(() =>
                 {
-                    realmFactory.Run(_ =>
+                    realm.Run(_ =>
                     {
                         hasThreadedUsage.Set();
 
@@ -86,15 +87,30 @@ namespace osu.Game.Tests.Database
 
                 hasThreadedUsage.Wait();
 
+                // Usually the host would run the synchronization context work per frame.
+                // For the sake of keeping this test simple (there's only one update invocation),
+                // let's replace it so we can ensure work is run immediately.
+                SynchronizationContext.SetSynchronizationContext(new ImmediateExecuteSynchronizationContext());
+
                 Assert.Throws<TimeoutException>(() =>
                 {
-                    using (realmFactory.BlockAllOperations())
+                    using (realm.BlockAllOperations())
                     {
                     }
                 });
 
                 stopThreadedUsage.Set();
+
+                // Ensure we can block a second time after the usage has ended.
+                using (realm.BlockAllOperations())
+                {
+                }
             });
+        }
+
+        private class ImmediateExecuteSynchronizationContext : SynchronizationContext
+        {
+            public override void Post(SendOrPostCallback d, object? state) => d(state);
         }
     }
 }

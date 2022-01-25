@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Framework.Game game, RealmContextFactory realmContextFactory)
+        private void load(OsuConfigManager config, Framework.Game game, RealmAccess realm)
         {
             // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
@@ -97,9 +97,9 @@ namespace osu.Game.Screens.Menu
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {
-                realmContextFactory.Run(realm =>
+                realm.Run(r =>
                 {
-                    var usableBeatmapSets = realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
+                    var usableBeatmapSets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
 
                     int setCount = usableBeatmapSets.Count;
 

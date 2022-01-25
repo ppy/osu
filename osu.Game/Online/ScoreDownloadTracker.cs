@@ -23,7 +23,7 @@ namespace osu.Game.Online
         private IDisposable? realmSubscription;
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; } = null!;
+        private RealmAccess realm { get; set; } = null!;
 
         public ScoreDownloadTracker(ScoreInfo trackedItem)
             : base(trackedItem)
@@ -47,7 +47,7 @@ namespace osu.Game.Online
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
 
-            realmSubscription = realmContextFactory.Context.All<ScoreInfo>().Where(s => ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID) || s.Hash == TrackedItem.Hash) && !s.DeletePending).QueryAsyncWithNotifications((items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s => ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID) || s.Hash == TrackedItem.Hash) && !s.DeletePending), (items, changes, ___) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));

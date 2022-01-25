@@ -24,17 +24,17 @@ namespace osu.Game.Database
         /// </summary>
         private readonly T data;
 
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
 
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
         /// <param name="data">The realm data.</param>
-        /// <param name="realmFactory">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
-        public RealmLive(T data, RealmContextFactory realmFactory)
+        /// <param name="realm">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
+        public RealmLive(T data, RealmAccess realm)
         {
             this.data = data;
-            this.realmFactory = realmFactory;
+            this.realm = realm;
 
             ID = data.ID;
         }
@@ -51,10 +51,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            realmFactory.Run(realm =>
-            {
-                perform(retrieveFromID(realm, ID));
-            });
+            realm.Run(r => perform(retrieveFromID(r, ID)));
         }
 
         /// <summary>
@@ -66,9 +63,9 @@ namespace osu.Game.Database
             if (!IsManaged)
                 return perform(data);
 
-            return realmFactory.Run(realm =>
+            return realm.Run(r =>
             {
-                var returnData = perform(retrieveFromID(realm, ID));
+                var returnData = perform(retrieveFromID(r, ID));
 
                 if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
                     throw new InvalidOperationException(@$"Managed realm objects should not exit the scope of {nameof(PerformRead)}.");
@@ -104,7 +101,7 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                return realmFactory.Context.Find<T>(ID);
+                return realm.Realm.Find<T>(ID);
             }
         }
 

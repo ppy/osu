@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
@@ -40,6 +41,7 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("Enter compose mode", () => InputManager.Key(Key.F1));
             AddUntilStep("Wait for compose mode load", () => editor.ChildrenOfType<HitObjectComposer>().FirstOrDefault()?.IsLoaded == true);
 
+            AddStep("Set beat divisor", () => editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
             AddStep("Set overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty = 7);
             AddStep("Set artist and title", () =>
             {
@@ -88,6 +90,7 @@ namespace osu.Game.Tests.Visual.Editing
         private void checkMutations()
         {
             AddAssert("Beatmap contains single hitcircle", () => editorBeatmap.HitObjects.Count == 1);
+            AddAssert("Beatmap has correct beat divisor", () => editorBeatmap.BeatmapInfo.BeatDivisor == 16);
             AddAssert("Beatmap has correct overall difficulty", () => editorBeatmap.Difficulty.OverallDifficulty == 7);
             AddAssert("Beatmap has correct metadata", () => editorBeatmap.BeatmapInfo.Metadata.Artist == "artist" && editorBeatmap.BeatmapInfo.Metadata.Title == "title");
             AddAssert("Beatmap has correct author", () => editorBeatmap.BeatmapInfo.Metadata.Author.Username == "author");

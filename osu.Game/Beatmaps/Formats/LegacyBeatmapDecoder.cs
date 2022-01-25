@@ -340,9 +340,9 @@ namespace osu.Game.Beatmaps.Formats
             double beatLength = Parsing.ParseDouble(split[1].Trim());
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
-            TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
+            TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
             if (split.Length >= 3)
-                timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)Parsing.ParseInt(split[2]);
+                timeSignature = split[2][0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split[2]));
 
             LegacySampleBank sampleSet = defaultSampleBank;
             if (split.Length >= 4)
