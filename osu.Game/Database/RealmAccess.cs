@@ -607,7 +607,7 @@ namespace osu.Game.Database
                 // and must be posted to the synchronization context.
                 // This is because realm may fire event callbacks between the `unregisterAllSubscriptions` and `updateRealm.Dispose`
                 // calls above.
-                syncContext?.Post(_ =>
+                syncContext?.Send(_ =>
                 {
                     foreach (var action in notificationsResetMap.Values)
                         action();
@@ -647,8 +647,14 @@ namespace osu.Game.Database
             {
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
                 realmRetrievalLock.Release();
+
                 // Post back to the update thread to revive any subscriptions.
-                syncContext?.Post(_ => ensureUpdateRealm(), null);
+                // In the case we are on the update thread, let's also require this to run synchronously.
+                // This requirement is mostly due to test coverage, but shouldn't cause any harm.
+                if (ThreadSafety.IsUpdateThread)
+                    syncContext?.Send(_ => ensureUpdateRealm(), null);
+                else
+                    syncContext?.Post(_ => ensureUpdateRealm(), null);
             }
         }
 
