@@ -87,11 +87,6 @@ namespace osu.Game.Tests.Database
 
                 hasThreadedUsage.Wait();
 
-                // Usually the host would run the synchronization context work per frame.
-                // For the sake of keeping this test simple (there's only one update invocation),
-                // let's replace it so we can ensure work is run immediately.
-                SynchronizationContext.SetSynchronizationContext(new ImmediateExecuteSynchronizationContext());
-
                 Assert.Throws<TimeoutException>(() =>
                 {
                     using (realm.BlockAllOperations())
@@ -106,11 +101,6 @@ namespace osu.Game.Tests.Database
                 {
                 }
             });
-        }
-
-        private class ImmediateExecuteSynchronizationContext : SynchronizationContext
-        {
-            public override void Post(SendOrPostCallback d, object? state) => d(state);
         }
     }
 }
