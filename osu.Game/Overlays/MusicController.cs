@@ -30,16 +30,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets
-        {
-            get
-            {
-                if (LoadState < LoadState.Ready)
-                    throw new InvalidOperationException($"{nameof(BeatmapSets)} should not be accessed before the music controller is loaded.");
-
-                return beatmapSets;
-            }
-        }
+        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
 
         /// <summary>
         /// Point in time after which the current track will be restarted on triggering a "previous track" action.
@@ -88,13 +79,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            // ensure we're ready before completing async load.
-            // probably not a good way of handling this (as there is a period we aren't watching for changes until the realm subscription finishes up.
-            foreach (var s in queryRealmBeatmapSets())
-                beatmapSets.Add(s.Detach());
-
-            beatmapSubscription = realm.RegisterForNotifications(realm => queryRealmBeatmapSets(), beatmapsChanged);
+            beatmapSubscription = realm.RegisterForNotifications(r => queryRealmBeatmapSets(), beatmapsChanged);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)

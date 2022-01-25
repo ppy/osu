@@ -87,12 +87,12 @@ namespace osu.Game.Skinning
             };
 
             // Ensure the default entries are present.
-            realm.Write(realm =>
+            realm.Write(r =>
             {
                 foreach (var skin in defaultSkins)
                 {
-                    if (realm.Find<SkinInfo>(skin.SkinInfo.ID) == null)
-                        realm.Add(skin.SkinInfo.Value);
+                    if (r.Find<SkinInfo>(skin.SkinInfo.ID) == null)
+                        r.Add(skin.SkinInfo.Value);
                 }
             });
 
@@ -289,10 +289,10 @@ namespace osu.Game.Skinning
 
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                var items = realm.All<SkinInfo>()
-                                 .Where(s => !s.Protected && !s.DeletePending);
+                var items = r.All<SkinInfo>()
+                             .Where(s => !s.Protected && !s.DeletePending);
                 if (filter != null)
                     items = items.Where(filter);
 

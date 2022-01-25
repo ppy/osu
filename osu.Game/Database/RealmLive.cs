@@ -51,10 +51,7 @@ namespace osu.Game.Database
                 return;
             }
 
-            realm.Run(realm =>
-            {
-                perform(retrieveFromID(realm, ID));
-            });
+            realm.Run(r => perform(retrieveFromID(r, ID)));
         }
 
         /// <summary>
@@ -66,9 +63,9 @@ namespace osu.Game.Database
             if (!IsManaged)
                 return perform(data);
 
-            return realm.Run(realm =>
+            return realm.Run(r =>
             {
-                var returnData = perform(retrieveFromID(realm, ID));
+                var returnData = perform(retrieveFromID(r, ID));
 
                 if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
                     throw new InvalidOperationException(@$"Managed realm objects should not exit the scope of {nameof(PerformRead)}.");

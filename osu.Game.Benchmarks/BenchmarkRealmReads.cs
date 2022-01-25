@@ -29,7 +29,7 @@ namespace osu.Game.Benchmarks
 
             realm = new RealmAccess(storage, "client");
 
-            realm.Run(realm =>
+            realm.Run(r =>
             {
                 realm.Write(c => c.Add(TestResources.CreateTestBeatmapSetInfo(rulesets: new[] { new OsuRuleset().RulesetInfo })));
             });
@@ -41,9 +41,9 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkDirectPropertyRead()
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                var beatmapSet = realm.All<BeatmapSetInfo>().First();
+                var beatmapSet = r.All<BeatmapSetInfo>().First();
 
                 for (int i = 0; i < ReadsPerFetch; i++)
                 {
@@ -119,9 +119,9 @@ namespace osu.Game.Benchmarks
         [Benchmark]
         public void BenchmarkDetachedPropertyRead()
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
-                var beatmapSet = realm.All<BeatmapSetInfo>().First().Detach();
+                var beatmapSet = r.All<BeatmapSetInfo>().First().Detach();
 
                 for (int i = 0; i < ReadsPerFetch; i++)
                 {

@@ -87,10 +87,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(Access));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Access, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Access, Scheduler));
-            Dependencies.Cache(Access);
+            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            Dependencies.Cache(Realm);
 
             var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
@@ -122,10 +122,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            realm.Run(realm =>
+            realm.Run(r =>
             {
                 // Due to soft deletions, we can re-use deleted scores between test runs
-                scoreManager.Undelete(realm.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
+                scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
             });
 
             leaderboard.Scores = null;
