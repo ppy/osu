@@ -342,7 +342,8 @@ namespace osu.Game.Stores
                         // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                         // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                         if (CanSkipImport(existing, item) &&
-                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                            checkAllFilesExist(existing))
                         {
                             LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
@@ -459,7 +460,6 @@ namespace osu.Game.Stores
             if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
-            // import files to manager
             foreach (string file in reader.Filenames)
                 yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
         }
@@ -519,7 +519,11 @@ namespace osu.Game.Stores
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all File IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
+            checkAllFilesExist(existing);
+
+        private bool checkAllFilesExist(TModel model) =>
+            model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.

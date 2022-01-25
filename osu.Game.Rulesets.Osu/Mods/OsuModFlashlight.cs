@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -21,26 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        private const float default_flashlight_size = 180;
-
         private const double default_follow_delay = 120;
-
-        private OsuFlashlight flashlight;
-
-        public override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight();
-
-        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
-        {
-            if (drawable is DrawableSlider s)
-                s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
-        }
-
-        public override void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            base.ApplyToDrawableRuleset(drawableRuleset);
-
-            flashlight.FollowDelay = FollowDelay.Value;
-        }
 
         [SettingSource("Follow delay", "Milliseconds until the flashlight reaches the cursor")]
         public BindableNumber<double> FollowDelay { get; } = new BindableDouble(default_follow_delay)
@@ -50,13 +30,45 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = default_follow_delay,
         };
 
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
+        {
+            MinValue = 0.5f,
+            MaxValue = 2f,
+            Default = 1f,
+            Value = 1f,
+            Precision = 0.1f
+        };
+
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public override BindableBool ComboBasedSize { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
+        public override float DefaultFlashlightSize => 180;
+
+        private OsuFlashlight flashlight;
+
+        protected override Flashlight CreateFlashlight() => flashlight = new OsuFlashlight(this);
+
+        public void ApplyToDrawableHitObject(DrawableHitObject drawable)
+        {
+            if (drawable is DrawableSlider s)
+                s.Tracking.ValueChanged += flashlight.OnSliderTrackingChange;
+        }
+
         private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
-            public double FollowDelay { private get; set; }
+            private readonly double followDelay;
 
-            public OsuFlashlight()
+            public OsuFlashlight(OsuModFlashlight modFlashlight)
+                : base(modFlashlight)
             {
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                followDelay = modFlashlight.FollowDelay.Value;
+
+                FlashlightSize = new Vector2(0, GetSizeFor(0));
             }
 
             public void OnSliderTrackingChange(ValueChangedEvent<bool> e)
@@ -71,24 +83,14 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var destination = e.MousePosition;
 
                 FlashlightPosition = Interpolation.ValueAt(
-                    Math.Min(Math.Abs(Clock.ElapsedFrameTime), FollowDelay), position, destination, 0, FollowDelay, Easing.Out);
+                    Math.Min(Math.Abs(Clock.ElapsedFrameTime), followDelay), position, destination, 0, followDelay, Easing.Out);
 
                 return base.OnMouseMove(e);
             }
 
-            private float getSizeFor(int combo)
-            {
-                if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
-            }
-
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";
