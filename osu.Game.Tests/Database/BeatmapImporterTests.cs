@@ -685,7 +685,7 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestImportWithDuplicateBeatmapIDs()
         {
-            RunTestWithRealmAsync(async (realm, storage) =>
+            RunTestWithRealm((realm, storage) =>
             {
                 using var importer = new BeatmapModelManager(realm, storage);
                 using var store = new RulesetStore(realm, storage);
@@ -718,7 +718,7 @@ namespace osu.Game.Tests.Database
                     }
                 };
 
-                var imported = await importer.Import(toImport);
+                var imported = importer.Import(toImport);
 
                 Assert.NotNull(imported);
                 Debug.Assert(imported != null);

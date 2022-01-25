@@ -180,7 +180,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Load new scores via manager", () =>
             {
                 foreach (var score in generateSampleScores(beatmapInfo()))
-                    scoreManager.Import(score).WaitSafely();
+                    scoreManager.Import(score);
             });
         }
 
