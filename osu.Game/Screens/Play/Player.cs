@@ -983,6 +983,9 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
+            if (!GameplayState.HasPassed && !GameplayState.HasFailed)
+                GameplayState.HasQuit = true;
+
             screenSuspension?.RemoveAndDisposeImmediately();
             failAnimationLayer?.RemoveFilters();
 
