@@ -608,9 +608,9 @@ namespace osu.Game.Tests.Database
                 using var importer = new BeatmapModelManager(realmFactory, storage);
                 using var store = new RulesetStore(realmFactory, storage);
 
-                var imported = await LoadOszIntoStore(importer, realmFactory.Context);
+                var imported = await LoadOszIntoStore(importer, realmFactory.Realm);
 
-                deleteBeatmapSet(imported, realmFactory.Context);
+                deleteBeatmapSet(imported, realmFactory.Realm);
 
                 Assert.IsTrue(imported.DeletePending);
 
@@ -619,7 +619,7 @@ namespace osu.Game.Tests.Database
 
                 Assert.That(imported.Files.All(f => !storage.GetStorageForDirectory("files").Exists(f.File.GetStoragePath())));
 
-                var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Context);
+                var importedSecondTime = await LoadOszIntoStore(importer, realmFactory.Realm);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
                 Assert.IsTrue(imported.ID == importedSecondTime.ID);
