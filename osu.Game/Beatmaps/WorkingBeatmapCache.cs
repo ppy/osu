@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps
         TextureStore IBeatmapResourceProvider.LargeTextureStore => largeTextureStore;
         ITrackStore IBeatmapResourceProvider.Tracks => trackStore;
         AudioManager IStorageResourceProvider.AudioManager => audioManager;
-        RealmContextFactory IStorageResourceProvider.RealmContextFactory => null;
+        RealmAccess IStorageResourceProvider.RealmAccess => null;
         IResourceStore<byte[]> IStorageResourceProvider.Files => files;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host?.CreateTextureLoaderStore(underlyingStore);

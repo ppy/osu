@@ -47,10 +47,15 @@ namespace osu.Game.Overlays.Settings.Sections
         private SkinManager skins { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private IDisposable realmSubscription;
-        private IQueryable<SkinInfo> realmSkins;
+
+        private IQueryable<SkinInfo> queryRealmSkins() =>
+            realm.Realm.All<SkinInfo>()
+                 .Where(s => !s.DeletePending)
+                 .OrderByDescending(s => s.Protected) // protected skins should be at the top.
+                 .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
@@ -78,20 +83,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSkins = realmFactory.Context.All<SkinInfo>()
-                                     .Where(s => !s.DeletePending)
-                                     .OrderByDescending(s => s.Protected) // protected skins should be at the top.
-                                     .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
-
-            realmSubscription = realmSkins
-                .QueryAsyncWithNotifications((sender, changes, error) =>
-                {
-                    if (changes == null)
-                        return;
-
-                    // Eventually this should be handling the individual changes rather than refreshing the whole dropdown.
-                    updateItems();
-                });
+            realmSubscription = realm.RegisterForNotifications(r => queryRealmSkins(), (sender, changes, error) =>
+            {
+                // The first fire of this is a bit redundant due to the call below,
+                // but this is safest in case the subscription is restored after a context recycle.
+                updateItems();
+            });
 
             updateItems();
 
@@ -131,9 +128,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateItems()
         {
-            int protectedCount = realmSkins.Count(s => s.Protected);
+            int protectedCount = queryRealmSkins().Count(s => s.Protected);
 
-            skinItems = realmSkins.ToLive(realmFactory);
+            skinItems = queryRealmSkins().ToLive(realm);
 
             skinItems.Insert(protectedCount, random_skin_info);
 

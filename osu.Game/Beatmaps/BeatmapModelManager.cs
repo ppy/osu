@@ -33,8 +33,8 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        public BeatmapModelManager(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
-            : base(contextFactory, storage, onlineLookupQueue)
+        public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+            : base(realm, storage, onlineLookupQueue)
         {
         }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Beatmaps
         private static string getFilename(BeatmapInfo beatmapInfo)
         {
             var metadata = beatmapInfo.Metadata;
-            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
         }
 
         /// <summary>
@@ -98,12 +98,12 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query)
         {
-            return ContextFactory.Run(realm => realm.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
+            return Realm.Run(realm => realm.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
         }
 
         public void Update(BeatmapSetInfo item)
         {
-            ContextFactory.Write(realm =>
+            Realm.Write(realm =>
             {
                 var existing = realm.Find<BeatmapSetInfo>(item.ID);
                 item.CopyChangesToRealm(existing);

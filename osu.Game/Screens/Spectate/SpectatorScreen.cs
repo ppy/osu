@@ -17,6 +17,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Spectate
 {
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.Spectate
         }
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private IDisposable realmSubscription;
 
@@ -79,21 +80,19 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                realmSubscription = realmContextFactory.Context
-                                                       .All<BeatmapSetInfo>()
-                                                       .Where(s => !s.DeletePending)
-                                                       .QueryAsyncWithNotifications((items, changes, ___) =>
-                                                       {
-                                                           if (changes?.InsertedIndices == null)
-                                                               return;
-
-                                                           foreach (int c in changes.InsertedIndices)
-                                                               beatmapUpdated(items[c]);
-                                                       });
+                realmSubscription = realm.RegisterForNotifications(
+                    realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
                 foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> items, ChangeSet changes, Exception ___)
+        {
+            if (changes?.InsertedIndices == null) return;
+
+            foreach (int c in changes.InsertedIndices) beatmapUpdated(items[c]);
         }
 
         private void beatmapUpdated(BeatmapSetInfo beatmapSet)
