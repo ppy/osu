@@ -50,7 +50,10 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("close settings", () => Game.Settings.Hide());
 
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
             PushAndConfirm(() => new PlaySongSelect());
+
+            AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
 
             AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
 
