@@ -242,12 +242,7 @@ namespace osu.Game.Beatmaps.Formats
                     yield break;
 
                 foreach (var hitObject in hitObjects)
-                {
                     yield return hitObject.DifficultyControlPoint;
-
-                    foreach (var nested in collectDifficultyControlPoints(hitObject.NestedHitObjects))
-                        yield return nested;
-                }
             }
 
             void extractDifficultyControlPoints(IEnumerable<HitObject> hitObjects)
