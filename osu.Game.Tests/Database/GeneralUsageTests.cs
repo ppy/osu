@@ -95,6 +95,11 @@ namespace osu.Game.Tests.Database
                 });
 
                 stopThreadedUsage.Set();
+
+                // Ensure we can block a second time after the usage has ended.
+                using (realm.BlockAllOperations())
+                {
+                }
             });
         }
     }
