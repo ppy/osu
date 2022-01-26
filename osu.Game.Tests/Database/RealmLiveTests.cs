@@ -23,9 +23,9 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, _) =>
             {
-                ILive<BeatmapInfo> beatmap = realm.Run(r => r.Write(_ => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()))).ToLive(realm));
+                Live<BeatmapInfo> beatmap = realm.Run(r => r.Write(_ => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()))).ToLive(realm));
 
-                ILive<BeatmapInfo> beatmap2 = realm.Run(r => r.All<BeatmapInfo>().First().ToLive(realm));
+                Live<BeatmapInfo> beatmap2 = realm.Run(r => r.All<BeatmapInfo>().First().ToLive(realm));
 
                 Assert.AreEqual(beatmap, beatmap2);
             });
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Database
             {
                 var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
 
-                ILive<BeatmapInfo>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
 
                 realm.Run(r =>
                 {
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, _) =>
             {
-                ILive<BeatmapInfo>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
                 Task.Factory.StartNew(() =>
                 {
                     realm.Run(threadContext =>
@@ -129,7 +129,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, _) =>
             {
-                ILive<BeatmapInfo>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
                 Task.Factory.StartNew(() =>
                 {
                     realm.Run(threadContext =>
@@ -170,7 +170,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, _) =>
             {
-                ILive<BeatmapInfo>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
 
                 Task.Factory.StartNew(() =>
                 {
@@ -209,7 +209,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, _) =>
             {
-                ILive<BeatmapInfo>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
                 Task.Factory.StartNew(() =>
                 {
                     realm.Run(threadContext =>
@@ -242,7 +242,7 @@ namespace osu.Game.Tests.Database
                 realm.RegisterCustomSubscription(outerRealm =>
                 {
                     outerRealm.All<BeatmapInfo>().QueryAsyncWithNotifications(gotChange);
-                    ILive<BeatmapInfo>? liveBeatmap = null;
+                    Live<BeatmapInfo>? liveBeatmap = null;
 
                     Task.Factory.StartNew(() =>
                     {
