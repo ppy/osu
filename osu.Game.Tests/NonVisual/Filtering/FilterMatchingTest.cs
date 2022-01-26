@@ -84,7 +84,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
-                Ruleset = new RulesetInfo { OnlineID = -25 },
+                Ruleset = new RulesetInfo { OnlineID = -1 },
                 AllowConvertedBeatmaps = true
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
