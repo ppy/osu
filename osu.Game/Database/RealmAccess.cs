@@ -613,28 +613,6 @@ namespace osu.Game.Database
                     updateRealm = null;
                 }
 
-                // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
-                // and must be posted to the synchronization context.
-                // This is because realm may fire event callbacks between the `unregisterAllSubscriptions` and `updateRealm.Dispose`
-                // calls above.
-                syncContext?.Send(_ =>
-                {
-                    // Flag ensures that we don't get in a deadlocked scenario due to a callback attempting to access `RealmAccess.Realm` or `RealmAccess.Run`
-                    // and hitting `realmRetrievalLock` a second time. Generally such usages should not exist, and as such we throw when an attempt is made
-                    // to use in this fashion.
-                    isSendingNotificationResetEvents = true;
-
-                    try
-                    {
-                        foreach (var action in notificationsResetMap.Values)
-                            action();
-                    }
-                    finally
-                    {
-                        isSendingNotificationResetEvents = false;
-                    }
-                }, null);
-
                 const int sleep_length = 200;
                 int timeout = 5000;
 
@@ -656,6 +634,28 @@ namespace osu.Game.Database
                     // We still want to continue with the blocking operation, though.
                     Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
+
+                // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
+                // and must be posted to the synchronization context.
+                // This is because realm may fire event callbacks between the `unregisterAllSubscriptions` and `updateRealm.Dispose`
+                // calls above.
+                syncContext?.Send(_ =>
+                {
+                    // Flag ensures that we don't get in a deadlocked scenario due to a callback attempting to access `RealmAccess.Realm` or `RealmAccess.Run`
+                    // and hitting `realmRetrievalLock` a second time. Generally such usages should not exist, and as such we throw when an attempt is made
+                    // to use in this fashion.
+                    isSendingNotificationResetEvents = true;
+
+                    try
+                    {
+                        foreach (var action in notificationsResetMap.Values)
+                            action();
+                    }
+                    finally
+                    {
+                        isSendingNotificationResetEvents = false;
+                    }
+                }, null);
             }
             catch
             {
