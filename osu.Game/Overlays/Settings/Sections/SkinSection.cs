@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
+using Realms;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -51,12 +52,6 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private IDisposable realmSubscription;
 
-        private IQueryable<SkinInfo> queryRealmSkins() =>
-            realm.Realm.All<SkinInfo>()
-                 .Where(s => !s.DeletePending)
-                 .OrderByDescending(s => s.Protected) // protected skins should be at the top.
-                 .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
-
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
         {
@@ -83,37 +78,54 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSubscription = realm.RegisterForNotifications(r => queryRealmSkins(), (sender, changes, error) =>
-            {
-                // The first fire of this is a bit redundant due to the call below,
-                // but this is safest in case the subscription is restored after a context recycle.
-                updateItems();
-            });
-
-            updateItems();
+            realmSubscription = realm.RegisterForNotifications(r => realm.Realm.All<SkinInfo>()
+                                                                         .Where(s => !s.DeletePending)
+                                                                         .OrderByDescending(s => s.Protected) // protected skins should be at the top.
+                                                                         .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase), skinsChanged);
 
             configBindable.BindValueChanged(id => Scheduler.AddOnce(updateSelectedSkinFromConfig));
-            updateSelectedSkinFromConfig();
 
-            dropdownBindable.BindValueChanged(skin =>
+            dropdownBindable.BindValueChanged(dropdownSelectionChanged);
+        }
+
+        private void dropdownSelectionChanged(ValueChangedEvent<Live<SkinInfo>> skin)
+        {
+            // Only handle cases where it's clear the user has intent to change skins.
+            if (skin.OldValue == null) return;
+
+            if (skin.NewValue.Equals(random_skin_info))
             {
-                if (skin.NewValue.Equals(random_skin_info))
+                var skinBefore = skins.CurrentSkinInfo.Value;
+
+                skins.SelectRandomSkin();
+
+                if (skinBefore == skins.CurrentSkinInfo.Value)
                 {
-                    var skinBefore = skins.CurrentSkinInfo.Value;
-
-                    skins.SelectRandomSkin();
-
-                    if (skinBefore == skins.CurrentSkinInfo.Value)
-                    {
-                        // the random selection didn't change the skin, so we should manually update the dropdown to match.
-                        dropdownBindable.Value = skins.CurrentSkinInfo.Value;
-                    }
-
-                    return;
+                    // the random selection didn't change the skin, so we should manually update the dropdown to match.
+                    dropdownBindable.Value = skins.CurrentSkinInfo.Value;
                 }
 
-                configBindable.Value = skin.NewValue.ID.ToString();
-            });
+                return;
+            }
+
+            configBindable.Value = skin.NewValue.ID.ToString();
+        }
+
+        private void skinsChanged(IRealmCollection<SkinInfo> skins, ChangeSet changes, Exception error)
+        {
+            // This can only mean that realm is recycling, else we would see the protected skins.
+            // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
+            if (!skins.Any())
+                return;
+
+            int protectedCount = skins.Count(s => s.Protected);
+
+            skinItems = skins.ToLive(realm);
+            skinItems.Insert(protectedCount, random_skin_info);
+
+            skinDropdown.Items = skinItems;
+
+            updateSelectedSkinFromConfig();
         }
 
         private void updateSelectedSkinFromConfig()
@@ -124,17 +136,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 skin = skinDropdown.Items.FirstOrDefault(s => s.ID == configId);
 
             dropdownBindable.Value = skin ?? skinDropdown.Items.First();
-        }
-
-        private void updateItems()
-        {
-            int protectedCount = queryRealmSkins().Count(s => s.Protected);
-
-            skinItems = queryRealmSkins().ToLive(realm);
-
-            skinItems.Insert(protectedCount, random_skin_info);
-
-            skinDropdown.Items = skinItems;
         }
 
         protected override void Dispose(bool isDisposing)
