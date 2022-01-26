@@ -32,16 +32,16 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.PaintBrush
         };
 
-        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLiveUnmanaged() };
+        private readonly Bindable<Live<SkinInfo>> dropdownBindable = new Bindable<Live<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLiveUnmanaged() };
         private readonly Bindable<string> configBindable = new Bindable<string>();
 
-        private static readonly ILive<SkinInfo> random_skin_info = new SkinInfo
+        private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
             Name = "<Random Skin>",
         }.ToLiveUnmanaged();
 
-        private List<ILive<SkinInfo>> skinItems;
+        private List<Live<SkinInfo>> skinItems;
 
         [Resolved]
         private SkinManager skins { get; set; }
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateSelectedSkinFromConfig()
         {
-            ILive<SkinInfo> skin = null;
+            Live<SkinInfo> skin = null;
 
             if (Guid.TryParse(configBindable.Value, out var configId))
                 skin = skinDropdown.Items.FirstOrDefault(s => s.ID == configId);
@@ -144,13 +144,13 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<ILive<SkinInfo>>
+        private class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
         {
-            protected override OsuDropdown<ILive<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
+            protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override LocalisableString GenerateItemText(ILive<SkinInfo> item) => item.ToString();
+                protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
 
