@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Select.Carousel
             var beatmaps = carouselSet.Beatmaps.ToList();
 
             return beatmaps.Count > maximum_difficulty_icons
-                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.BeatmapInfo.RulesetID)
+                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.BeatmapInfo.Ruleset.ShortName)
                                                        .Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Last().BeatmapInfo.Ruleset))
                 : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }
