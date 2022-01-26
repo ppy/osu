@@ -2,22 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
-    /// <summary>
-    /// A non-generic interface for <see cref="SettingsItem{T}"/>s.
-    /// </summary>
-    public interface ISettingsItem : IExpandable, IDisposable
+    public interface ISettingsItem : IDrawable, IDisposable
     {
-        /// <summary>
-        /// Invoked when the setting value has changed.
-        /// </summary>
         event Action SettingChanged;
-
-        /// <summary>
-        /// Returns whether the UI control is currently in a dragged state.
-        /// </summary>
-        bool IsControlDragged { get; }
     }
 }
