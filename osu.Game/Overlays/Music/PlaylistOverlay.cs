@@ -24,9 +24,9 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+        public IBindableList<ILive<BeatmapSetInfo>> BeatmapSets => beatmapSets;
 
-        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+        private readonly BindableList<ILive<BeatmapSetInfo>> beatmapSets = new BindableList<ILive<BeatmapSetInfo>>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -85,13 +85,16 @@ namespace osu.Game.Overlays.Music
 
             filter.Search.OnCommit += (sender, newText) =>
             {
-                BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps.FirstOrDefault();
-
-                if (toSelect != null)
+                list.FirstVisibleSet.PerformRead(set =>
                 {
-                    beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
-                    beatmap.Value.Track.Restart();
-                }
+                    BeatmapInfo toSelect = set.Beatmaps.FirstOrDefault();
+
+                    if (toSelect != null)
+                    {
+                        beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
+                        beatmap.Value.Track.Restart();
+                    }
+                });
             };
         }
 
@@ -104,7 +107,7 @@ namespace osu.Game.Overlays.Music
                 beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
             list.Items.BindTo(beatmapSets);
-            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
+            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
         }
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -113,12 +116,12 @@ namespace osu.Game.Overlays.Music
             {
                 beatmapSets.Clear();
                 // must use AddRange to avoid RearrangeableList sort overhead per add op.
-                beatmapSets.AddRange(sender);
+                beatmapSets.AddRange(sender.ToLive(realm));
                 return;
             }
 
             foreach (int i in changes.InsertedIndices)
-                beatmapSets.Insert(i, sender[i]);
+                beatmapSets.Insert(i, sender[i].ToLive(realm));
 
             foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
                 beatmapSets.RemoveAt(i);
@@ -141,16 +144,19 @@ namespace osu.Game.Overlays.Music
             this.FadeOut(transition_duration);
         }
 
-        private void itemSelected(BeatmapSetInfo set)
+        private void itemSelected(ILive<BeatmapSetInfo> beatmapSet)
         {
-            if (set.Equals((beatmap.Value?.BeatmapSetInfo)))
+            beatmapSet.PerformRead(set =>
             {
-                beatmap.Value?.Track.Seek(0);
-                return;
-            }
+                if (set.Equals((beatmap.Value?.BeatmapSetInfo)))
+                {
+                    beatmap.Value?.Track.Seek(0);
+                    return;
+                }
 
-            beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
-            beatmap.Value.Track.Restart();
+                beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
+                beatmap.Value.Track.Restart();
+            });
         }
 
         protected override void Dispose(bool isDisposing)

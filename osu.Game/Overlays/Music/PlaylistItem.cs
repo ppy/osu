@@ -10,17 +10,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : OsuRearrangeableListItem<BeatmapSetInfo>, IFilterable
+    public class PlaylistItem : OsuRearrangeableListItem<ILive<BeatmapSetInfo>>, IFilterable
     {
-        public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<ILive<BeatmapSetInfo>> SelectedSet = new Bindable<ILive<BeatmapSetInfo>>();
 
-        public Action<BeatmapSetInfo> RequestSelection;
+        public Action<ILive<BeatmapSetInfo>> RequestSelection;
 
         private TextFlowContainer text;
         private ITextPart titlePart;
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.Music
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public PlaylistItem(BeatmapSetInfo item)
+        public PlaylistItem(ILive<BeatmapSetInfo> item)
             : base(item)
         {
             Padding = new MarginPadding { Left = 5 };
@@ -44,34 +45,37 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
-            var metadata = Model.Metadata;
-
-            var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
-            var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
-
-            titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
-            titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
-
-            text.AddText(@"  "); // to separate the title from the artist.
-            text.AddText(artist, sprite =>
+            Model.PerformRead(m =>
             {
-                sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
-                sprite.Colour = colours.Gray9;
-                sprite.Padding = new MarginPadding { Top = 1 };
+                var metadata = m.Metadata;
+
+                var title = new RomanisableString(metadata.TitleUnicode, metadata.Title);
+                var artist = new RomanisableString(metadata.ArtistUnicode, metadata.Artist);
+
+                titlePart = text.AddText(title, sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular));
+                titlePart.DrawablePartsRecreated += _ => updateSelectionState(true);
+
+                text.AddText(@"  "); // to separate the title from the artist.
+                text.AddText(artist, sprite =>
+                {
+                    sprite.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold);
+                    sprite.Colour = colours.Gray9;
+                    sprite.Padding = new MarginPadding { Top = 1 };
+                });
+
+                SelectedSet.BindValueChanged(set =>
+                {
+                    bool newSelected = set.NewValue?.Equals(Model) == true;
+
+                    if (newSelected == selected)
+                        return;
+
+                    selected = newSelected;
+                    updateSelectionState(false);
+                });
+
+                updateSelectionState(true);
             });
-
-            SelectedSet.BindValueChanged(set =>
-            {
-                bool newSelected = set.NewValue?.Equals(Model) == true;
-
-                if (newSelected == selected)
-                    return;
-
-                selected = newSelected;
-                updateSelectionState(false);
-            });
-
-            updateSelectionState(true);
         }
 
         private bool selected;
@@ -109,7 +113,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public IEnumerable<string> FilterTerms => Model.Metadata.GetSearchableTerms();
+        public IEnumerable<string> FilterTerms => Model.PerformRead(m => m.Metadata.GetSearchableTerms());
 
         private bool matchingFilter = true;
 

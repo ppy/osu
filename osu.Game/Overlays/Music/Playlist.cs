@@ -7,16 +7,17 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
-    public class Playlist : OsuRearrangeableListContainer<BeatmapSetInfo>
+    public class Playlist : OsuRearrangeableListContainer<ILive<BeatmapSetInfo>>
     {
-        public Action<BeatmapSetInfo> RequestSelection;
+        public Action<ILive<BeatmapSetInfo>> RequestSelection;
 
-        public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<ILive<BeatmapSetInfo>> SelectedSet = new Bindable<ILive<BeatmapSetInfo>>();
 
         public new MarginPadding Padding
         {
@@ -26,23 +27,23 @@ namespace osu.Game.Overlays.Music
 
         public void Filter(FilterCriteria criteria)
         {
-            var items = (SearchContainer<RearrangeableListItem<BeatmapSetInfo>>)ListContainer;
+            var items = (SearchContainer<RearrangeableListItem<ILive<BeatmapSetInfo>>>)ListContainer;
 
             foreach (var item in items.OfType<PlaylistItem>())
-                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => item.Model.Equals(b.BeatmapSet)) ?? true;
+                item.InSelectedCollection = criteria.Collection?.Beatmaps.Any(b => item.Model.ID == b.BeatmapSet?.ID) ?? true;
 
             items.SearchTerm = criteria.SearchText;
         }
 
-        public BeatmapSetInfo FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
+        public ILive<BeatmapSetInfo> FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
 
-        protected override OsuRearrangeableListItem<BeatmapSetInfo> CreateOsuDrawable(BeatmapSetInfo item) => new PlaylistItem(item)
+        protected override OsuRearrangeableListItem<ILive<BeatmapSetInfo>> CreateOsuDrawable(ILive<BeatmapSetInfo> item) => new PlaylistItem(item)
         {
             SelectedSet = { BindTarget = SelectedSet },
             RequestSelection = set => RequestSelection?.Invoke(set)
         };
 
-        protected override FillFlowContainer<RearrangeableListItem<BeatmapSetInfo>> CreateListFillFlowContainer() => new SearchContainer<RearrangeableListItem<BeatmapSetInfo>>
+        protected override FillFlowContainer<RearrangeableListItem<ILive<BeatmapSetInfo>>> CreateListFillFlowContainer() => new SearchContainer<RearrangeableListItem<ILive<BeatmapSetInfo>>>
         {
             Spacing = new Vector2(0, 3),
             LayoutDuration = 200,
