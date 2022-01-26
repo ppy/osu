@@ -47,16 +47,14 @@ namespace osu.Game.Tests.Database
                     liveBeatmap = beatmap.ToLive(realm);
                 });
 
-                using (realm.BlockAllOperations())
-                {
-                    // recycle realm before migrating
-                }
-
                 using (var migratedStorage = new TemporaryNativeStorage("realm-test-migration-target"))
                 {
                     migratedStorage.DeleteDirectory(string.Empty);
 
-                    storage.Migrate(migratedStorage);
+                    using (realm.BlockAllOperations())
+                    {
+                        storage.Migrate(migratedStorage);
+                    }
 
                     Assert.IsFalse(liveBeatmap?.PerformRead(l => l.Hidden));
                 }
