@@ -50,9 +50,14 @@ namespace osu.Game.Collections
             this.storage = storage;
         }
 
+        [Resolved(canBeNull: true)]
+        private DatabaseContextFactory efContextFactory { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            efContextFactory?.WaitForMigrationCompletion();
+
             Collections.CollectionChanged += collectionsChanged;
 
             if (storage.Exists(database_backup_name))
