@@ -73,6 +73,9 @@ namespace osu.Game.Overlays.Settings.Sections.DebugSettings
 
                     void unblock()
                     {
+                        if (token == null)
+                            return;
+
                         token?.Dispose();
                         token = null;
 
