@@ -182,7 +182,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
+        public Live<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
             return realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
@@ -279,22 +279,22 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.Import(tasks);
         }
 
-        public Task<IEnumerable<ILive<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return beatmapModelManager.Import(notification, tasks);
         }
 
-        public Task<ILive<BeatmapSetInfo>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public ILive<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
@@ -323,7 +323,7 @@ namespace osu.Game.Beatmaps
             return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
         }
 
-        public WorkingBeatmap GetWorkingBeatmap(ILive<BeatmapInfo>? importedBeatmap)
+        public WorkingBeatmap GetWorkingBeatmap(Live<BeatmapInfo>? importedBeatmap)
         {
             WorkingBeatmap working = workingBeatmapCache.GetWorkingBeatmap(null);
 
@@ -367,7 +367,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IPostImports<out BeatmapSetInfo>
 
-        public Action<IEnumerable<ILive<BeatmapSetInfo>>>? PostImport
+        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PostImport
         {
             set => beatmapModelManager.PostImport = value;
         }

@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestScoreImportThenDelete()
         {
-            ILive<ScoreInfo> imported = null;
+            Live<ScoreInfo> imported = null;
 
             AddStep("create button without replay", () =>
             {

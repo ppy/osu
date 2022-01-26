@@ -235,7 +235,7 @@ namespace osu.Game.Tests.Skins.IO
 
         #endregion
 
-        private void assertCorrectMetadata(ILive<SkinInfo> import1, string name, string creator, OsuGameBase osu)
+        private void assertCorrectMetadata(Live<SkinInfo> import1, string name, string creator, OsuGameBase osu)
         {
             import1.PerformRead(i =>
             {
@@ -250,7 +250,7 @@ namespace osu.Game.Tests.Skins.IO
             });
         }
 
-        private void assertImportedBoth(ILive<SkinInfo> import1, ILive<SkinInfo> import2)
+        private void assertImportedBoth(Live<SkinInfo> import1, Live<SkinInfo> import2)
         {
             import1.PerformRead(i1 => import2.PerformRead(i2 =>
             {
@@ -260,7 +260,7 @@ namespace osu.Game.Tests.Skins.IO
             }));
         }
 
-        private void assertImportedOnce(ILive<SkinInfo> import1, ILive<SkinInfo> import2)
+        private void assertImportedOnce(Live<SkinInfo> import1, Live<SkinInfo> import2)
         {
             import1.PerformRead(i1 => import2.PerformRead(i2 =>
             {
@@ -334,7 +334,7 @@ namespace osu.Game.Tests.Skins.IO
             }
         }
 
-        private async Task<ILive<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
+        private async Task<Live<SkinInfo>> loadSkinIntoOsu(OsuGameBase osu, ArchiveReader archive = null)
         {
             var skinManager = osu.Dependencies.Get<SkinManager>();
             return await skinManager.Import(archive);
