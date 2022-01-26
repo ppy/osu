@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
 {
     public abstract class Skin : IDisposable, ISkin
     {
-        public readonly ILive<SkinInfo> SkinInfo;
+        public readonly Live<SkinInfo> SkinInfo;
         private readonly IStorageResourceProvider resources;
 
         public SkinConfiguration Configuration { get; set; }

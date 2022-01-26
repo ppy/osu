@@ -47,7 +47,7 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
+        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
         {
             Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
         };
@@ -176,7 +176,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
+        public Live<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
         {
             return realm.Run(r => r.All<SkinInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
@@ -245,7 +245,7 @@ namespace osu.Game.Skinning
             set => skinModelManager.PostNotification = value;
         }
 
-        public Action<IEnumerable<ILive<SkinInfo>>> PostImport
+        public Action<IEnumerable<Live<SkinInfo>>> PostImport
         {
             set => skinModelManager.PostImport = value;
         }
@@ -262,22 +262,22 @@ namespace osu.Game.Skinning
 
         public IEnumerable<string> HandledExtensions => skinModelManager.HandledExtensions;
 
-        public Task<IEnumerable<ILive<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return skinModelManager.Import(notification, tasks);
         }
 
-        public Task<ILive<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public ILive<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(item, archive, lowPriority, cancellationToken);
         }

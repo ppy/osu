@@ -15,11 +15,9 @@ namespace osu.Game.Database
     /// Provides a method of working with realm objects over longer application lifetimes.
     /// </summary>
     /// <typeparam name="T">The underlying object type.</typeparam>
-    public class RealmLive<T> : ILive<T> where T : RealmObject, IHasGuidPrimaryKey
+    public class RealmLive<T> : Live<T> where T : RealmObject, IHasGuidPrimaryKey
     {
-        public Guid ID { get; }
-
-        public bool IsManaged => data.IsManaged;
+        public override bool IsManaged => data.IsManaged;
 
         /// <summary>
         /// The original live data used to create this instance.
@@ -36,11 +34,11 @@ namespace osu.Game.Database
         /// <param name="data">The realm data.</param>
         /// <param name="realm">The realm factory the data was sourced from. May be null for an unmanaged object.</param>
         public RealmLive(T data, RealmAccess realm)
+            : base(data.ID)
         {
             this.data = data;
             this.realm = realm;
 
-            ID = data.ID;
             dataIsFromUpdateThread = ThreadSafety.IsUpdateThread;
         }
 
@@ -48,7 +46,7 @@ namespace osu.Game.Database
         /// Perform a read operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public void PerformRead(Action<T> perform)
+        public override void PerformRead(Action<T> perform)
         {
             if (!IsManaged)
             {
@@ -74,7 +72,7 @@ namespace osu.Game.Database
         /// Perform a read operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public TReturn PerformRead<TReturn>(Func<T, TReturn> perform)
+        public override TReturn PerformRead<TReturn>(Func<T, TReturn> perform)
         {
             if (!IsManaged)
                 return perform(data);
@@ -101,7 +99,7 @@ namespace osu.Game.Database
         /// Perform a write operation on this live object.
         /// </summary>
         /// <param name="perform">The action to perform.</param>
-        public void PerformWrite(Action<T> perform)
+        public override void PerformWrite(Action<T> perform)
         {
             if (!IsManaged)
                 throw new InvalidOperationException(@"Can't perform writes on a non-managed underlying value");
@@ -115,7 +113,7 @@ namespace osu.Game.Database
             });
         }
 
-        public T Value
+        public override T Value
         {
             get
             {
@@ -160,10 +158,6 @@ namespace osu.Game.Database
 
             return found;
         }
-
-        public bool Equals(ILive<T>? other) => ID == other?.ID;
-
-        public override string ToString() => PerformRead(i => i.ToString());
     }
 
     internal static class RealmLiveStatistics

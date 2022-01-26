@@ -153,7 +153,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            ILive<BeatmapSetInfo> imported = null;
+            Live<BeatmapSetInfo> imported = null;
 
             Debug.Assert(beatmap.BeatmapSet != null);
 
