@@ -128,6 +128,7 @@ namespace osu.Game.Database
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
                 migrationCompleted.SetResult(true);
+                efContextFactory.SetMigrationCompletion();
             });
         }
 
