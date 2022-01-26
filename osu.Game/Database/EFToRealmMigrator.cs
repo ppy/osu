@@ -286,6 +286,7 @@ namespace osu.Game.Database
 
                 var transaction = r.BeginWrite();
                 int written = 0;
+                int missing = 0;
 
                 try
                 {
@@ -300,6 +301,13 @@ namespace osu.Game.Database
 
                         var beatmap = r.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
                         var ruleset = r.Find<RulesetInfo>(score.Ruleset.ShortName);
+
+                        if (ruleset == null)
+                        {
+                            log($"Skipping {++missing} scores with missing ruleset");
+                            continue;
+                        }
+
                         var user = new RealmUser
                         {
                             OnlineID = score.User.OnlineID,
