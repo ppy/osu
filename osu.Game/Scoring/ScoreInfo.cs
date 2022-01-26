@@ -133,6 +133,11 @@ namespace osu.Game.Scoring
             var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+            clone.RealmUser = new RealmUser
+            {
+                OnlineID = RealmUser.OnlineID,
+                Username = RealmUser.Username,
+            };
 
             return clone;
         }
