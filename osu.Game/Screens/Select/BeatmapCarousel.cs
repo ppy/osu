@@ -179,25 +179,24 @@ namespace osu.Game.Screens.Select
 
             if (!loadedTestBeatmaps)
             {
-                using (var realm = realmFactory.CreateContext())
-                    loadBeatmapSets(getBeatmapSets(realm));
+                realm.Run(r => loadBeatmapSets(getBeatmapSets(r)));
             }
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            subscriptionSets = getBeatmapSets(realmFactory.Context).QueryAsyncWithNotifications(beatmapSetsChanged);
-            subscriptionBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+            subscriptionSets = realm.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
+            subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
 
             // Can't use main subscriptions because we can't lookup deleted indices.
             // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-            subscriptionDeletedSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected).QueryAsyncWithNotifications(deletedBeatmapSetsChanged);
-            subscriptionHiddenBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+            subscriptionDeletedSets = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
+            subscriptionHiddenBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
         private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -232,7 +231,7 @@ namespace osu.Game.Screens.Select
                 foreach (var id in realmSets)
                 {
                     if (!root.BeatmapSetsByID.ContainsKey(id))
-                        UpdateBeatmapSet(realmFactory.Context.Find<BeatmapSetInfo>(id).Detach());
+                        UpdateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id).Detach());
                 }
 
                 foreach (var id in root.BeatmapSetsByID.Keys)
@@ -275,7 +274,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private IRealmCollection<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
+        private IQueryable<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) =>
             removeBeatmapSet(beatmapSet.ID);
@@ -553,10 +552,11 @@ namespace osu.Game.Screens.Select
 
         private void signalBeatmapsLoaded()
         {
-            Debug.Assert(BeatmapSetsLoaded == false);
-
-            BeatmapSetsChanged?.Invoke();
-            BeatmapSetsLoaded = true;
+            if (!BeatmapSetsLoaded)
+            {
+                BeatmapSetsChanged?.Invoke();
+                BeatmapSetsLoaded = true;
+            }
 
             itemsCache.Invalidate();
         }

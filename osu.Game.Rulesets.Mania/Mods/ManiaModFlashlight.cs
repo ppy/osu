@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Layout;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osuTK;
@@ -16,17 +17,35 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
-        private const float default_flashlight_size = 180;
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
+        {
+            MinValue = 0.5f,
+            MaxValue = 3f,
+            Default = 1f,
+            Value = 1f,
+            Precision = 0.1f
+        };
 
-        public override Flashlight CreateFlashlight() => new ManiaFlashlight();
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public override BindableBool ComboBasedSize { get; } = new BindableBool
+        {
+            Default = false,
+            Value = false
+        };
+
+        public override float DefaultFlashlightSize => 50;
+
+        protected override Flashlight CreateFlashlight() => new ManiaFlashlight(this);
 
         private class ManiaFlashlight : Flashlight
         {
             private readonly LayoutValue flashlightProperties = new LayoutValue(Invalidation.DrawSize);
 
-            public ManiaFlashlight()
+            public ManiaFlashlight(ManiaModFlashlight modFlashlight)
+                : base(modFlashlight)
             {
-                FlashlightSize = new Vector2(0, default_flashlight_size);
+                FlashlightSize = new Vector2(DrawWidth, GetSizeFor(0));
 
                 AddLayout(flashlightProperties);
             }
@@ -46,6 +65,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
+                this.TransformTo(nameof(FlashlightSize), new Vector2(DrawWidth, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "RectangularFlashlight";

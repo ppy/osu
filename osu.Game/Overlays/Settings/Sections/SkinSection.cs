@@ -32,25 +32,30 @@ namespace osu.Game.Overlays.Settings.Sections
             Icon = FontAwesome.Solid.PaintBrush
         };
 
-        private readonly Bindable<ILive<SkinInfo>> dropdownBindable = new Bindable<ILive<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLiveUnmanaged() };
+        private readonly Bindable<Live<SkinInfo>> dropdownBindable = new Bindable<Live<SkinInfo>> { Default = DefaultSkin.CreateInfo().ToLiveUnmanaged() };
         private readonly Bindable<string> configBindable = new Bindable<string>();
 
-        private static readonly ILive<SkinInfo> random_skin_info = new SkinInfo
+        private static readonly Live<SkinInfo> random_skin_info = new SkinInfo
         {
             ID = SkinInfo.RANDOM_SKIN,
             Name = "<Random Skin>",
         }.ToLiveUnmanaged();
 
-        private List<ILive<SkinInfo>> skinItems;
+        private List<Live<SkinInfo>> skinItems;
 
         [Resolved]
         private SkinManager skins { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         private IDisposable realmSubscription;
-        private IQueryable<SkinInfo> realmSkins;
+
+        private IQueryable<SkinInfo> queryRealmSkins() =>
+            realm.Realm.All<SkinInfo>()
+                 .Where(s => !s.DeletePending)
+                 .OrderByDescending(s => s.Protected) // protected skins should be at the top.
+                 .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuConfigManager config, [CanBeNull] SkinEditorOverlay skinEditor)
@@ -78,20 +83,12 @@ namespace osu.Game.Overlays.Settings.Sections
 
             skinDropdown.Current = dropdownBindable;
 
-            realmSkins = realmFactory.Context.All<SkinInfo>()
-                                     .Where(s => !s.DeletePending)
-                                     .OrderByDescending(s => s.Protected) // protected skins should be at the top.
-                                     .ThenBy(s => s.Name, StringComparer.OrdinalIgnoreCase);
-
-            realmSubscription = realmSkins
-                .QueryAsyncWithNotifications((sender, changes, error) =>
-                {
-                    if (changes == null)
-                        return;
-
-                    // Eventually this should be handling the individual changes rather than refreshing the whole dropdown.
-                    updateItems();
-                });
+            realmSubscription = realm.RegisterForNotifications(r => queryRealmSkins(), (sender, changes, error) =>
+            {
+                // The first fire of this is a bit redundant due to the call below,
+                // but this is safest in case the subscription is restored after a context recycle.
+                updateItems();
+            });
 
             updateItems();
 
@@ -121,7 +118,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateSelectedSkinFromConfig()
         {
-            ILive<SkinInfo> skin = null;
+            Live<SkinInfo> skin = null;
 
             if (Guid.TryParse(configBindable.Value, out var configId))
                 skin = skinDropdown.Items.FirstOrDefault(s => s.ID == configId);
@@ -131,9 +128,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateItems()
         {
-            int protectedCount = realmSkins.Count(s => s.Protected);
+            int protectedCount = queryRealmSkins().Count(s => s.Protected);
 
-            skinItems = realmSkins.ToLive(realmFactory);
+            skinItems = queryRealmSkins().ToLive(realm);
 
             skinItems.Insert(protectedCount, random_skin_info);
 
@@ -147,13 +144,13 @@ namespace osu.Game.Overlays.Settings.Sections
             realmSubscription?.Dispose();
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<ILive<SkinInfo>>
+        private class SkinSettingsDropdown : SettingsDropdown<Live<SkinInfo>>
         {
-            protected override OsuDropdown<ILive<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
+            protected override OsuDropdown<Live<SkinInfo>> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override LocalisableString GenerateItemText(ILive<SkinInfo> item) => item.ToString();
+                protected override LocalisableString GenerateItemText(Live<SkinInfo> item) => item.ToString();
             }
         }
 

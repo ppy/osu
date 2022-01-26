@@ -21,6 +21,7 @@ using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
+using Realms;
 
 namespace osu.Game.Screens.Menu
 {
@@ -84,7 +85,7 @@ namespace osu.Game.Screens.Menu
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Framework.Game game, RealmContextFactory realmContextFactory)
+        private void load(OsuConfigManager config, Framework.Game game, RealmAccess realm)
         {
             // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
@@ -93,28 +94,27 @@ namespace osu.Game.Screens.Menu
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
             seeya = audio.Samples.Get(SeeyaSampleName);
 
-            ILive<BeatmapSetInfo> setInfo = null;
-
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
-
-                if (sets.Count > 0)
+                realm.Run(r =>
                 {
-                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-                    setInfo?.PerformRead(s =>
-                    {
-                        if (s.Beatmaps.Count == 0)
-                            return;
+                    var usableBeatmapSets = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
 
-                        initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps[0]);
-                    });
-                }
+                    int setCount = usableBeatmapSets.Count;
+
+                    if (setCount > 0)
+                    {
+                        var found = usableBeatmapSets[RNG.Next(0, setCount - 1)].Beatmaps.FirstOrDefault();
+
+                        if (found != null)
+                            initialBeatmap = beatmaps.GetWorkingBeatmap(found);
+                    }
+                });
             }
 
             // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
-            if (setInfo == null)
+            if (initialBeatmap == null)
             {
                 if (!loadThemedIntro())
                 {
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Menu
 
             bool loadThemedIntro()
             {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+                var setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
 
                 if (setInfo == null)
                     return false;

@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
 
             if (!IsBeatSyncedWithTrack) return;
 
-            int timeSignature = (int)timingPoint.TimeSignature;
+            int timeSignature = timingPoint.TimeSignature.Numerator;
 
             // play metronome from one measure before the first object.
             if (BeatSyncClock.CurrentTime < firstHitTime - timingPoint.BeatLength * timeSignature)

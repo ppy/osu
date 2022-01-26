@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Configuration
     public abstract class RulesetConfigManager<TLookup> : ConfigManager<TLookup>, IRulesetConfigManager
         where TLookup : struct, Enum
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
 
         private readonly int variant;
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Configuration
 
         protected RulesetConfigManager(SettingsStore store, RulesetInfo ruleset, int? variant = null)
         {
-            realmFactory = store?.Realm;
+            realm = store?.Realm;
 
             rulesetName = ruleset.ShortName;
 
@@ -37,10 +37,10 @@ namespace osu.Game.Rulesets.Configuration
 
         protected override void PerformLoad()
         {
-            if (realmFactory != null)
+            if (realm != null)
             {
                 // As long as RulesetConfigCache exists, there is no need to subscribe to realm events.
-                databasedSettings = realmFactory.Context.All<RealmRulesetSetting>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).ToList();
+                databasedSettings = realm.Realm.All<RealmRulesetSetting>().Where(b => b.RulesetName == rulesetName && b.Variant == variant).ToList();
             }
         }
 
@@ -56,21 +56,15 @@ namespace osu.Game.Rulesets.Configuration
                 pendingWrites.Clear();
             }
 
-            if (realmFactory == null)
-                return true;
-
-            using (var context = realmFactory.CreateContext())
+            realm?.Write(r =>
             {
-                context.Write(realm =>
+                foreach (var c in changed)
                 {
-                    foreach (var c in changed)
-                    {
-                        var setting = realm.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
+                    var setting = r.All<RealmRulesetSetting>().First(s => s.RulesetName == rulesetName && s.Variant == variant && s.Key == c.ToString());
 
-                        setting.Value = ConfigStore[c].ToString();
-                    }
-                });
-            }
+                    setting.Value = ConfigStore[c].ToString();
+                }
+            });
 
             return true;
         }
@@ -95,7 +89,7 @@ namespace osu.Game.Rulesets.Configuration
                     Variant = variant,
                 };
 
-                realmFactory?.Context.Write(() => realmFactory.Context.Add(setting));
+                realm?.Realm.Write(() => realm.Realm.Add(setting));
 
                 databasedSettings.Add(setting);
             }

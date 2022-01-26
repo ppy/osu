@@ -27,8 +27,8 @@ namespace osu.Game.Skinning
 
         private readonly IStorageResourceProvider skinResources;
 
-        public SkinModelManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IStorageResourceProvider skinResources)
-            : base(storage, contextFactory)
+        public SkinModelManager(Storage storage, RealmAccess realm, GameHost host, IStorageResourceProvider skinResources)
+            : base(storage, realm)
         {
             this.skinResources = skinResources;
 
@@ -205,7 +205,7 @@ namespace osu.Game.Skinning
 
         private void populateMissingHashes()
         {
-            using (var realm = ContextFactory.CreateContext())
+            Realm.Run(realm =>
             {
                 var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
 
@@ -221,7 +221,7 @@ namespace osu.Game.Skinning
                         Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
                     }
                 }
-            }
+            });
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);

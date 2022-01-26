@@ -12,37 +12,37 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestCreateStore()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realm, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
-                Assert.AreEqual(4, realmFactory.Context.All<RulesetInfo>().Count());
+                Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
             });
         }
 
         [Test]
         public void TestCreateStoreTwiceDoesntAddRulesetsAgain()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RulesetStore(realmFactory, storage);
-                var rulesets2 = new RulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realm, storage);
+                var rulesets2 = new RulesetStore(realm, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
 
                 Assert.AreEqual(rulesets.AvailableRulesets.First(), rulesets2.AvailableRulesets.First());
-                Assert.AreEqual(4, realmFactory.Context.All<RulesetInfo>().Count());
+                Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
             });
         }
 
         [Test]
         public void TestRetrievedRulesetsAreDetached()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RulesetStore(realmFactory, storage);
+                var rulesets = new RulesetStore(realm, storage);
 
                 Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
                 Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);
