@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Spectate
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
-        private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
+        private readonly IBindableDictionary<int, SpectatorState> userStates = new BindableDictionary<int, SpectatorState>();
 
         private readonly Dictionary<int, APIUser> userMap = new Dictionary<int, APIUser>();
         private readonly Dictionary<int, SpectatorGameplayState> gameplayStates = new Dictionary<int, SpectatorGameplayState>();
@@ -77,8 +77,8 @@ namespace osu.Game.Screens.Spectate
                     userMap[u.Id] = u;
                 }
 
-                playingUserStates.BindTo(spectatorClient.PlayingUserStates);
-                playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
+                userStates.BindTo(spectatorClient.PlayingUserStates);
+                userStates.BindCollectionChanged(onUserStatesChanged, true);
 
                 realmSubscription = realm.RegisterForNotifications(
                     realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Spectate
         {
             foreach ((int userId, _) in userMap)
             {
-                if (!playingUserStates.TryGetValue(userId, out var userState))
+                if (!userStates.TryGetValue(userId, out var userState))
                     continue;
 
                 if (beatmapSet.Beatmaps.Any(b => b.OnlineID == userState.BeatmapID))
@@ -107,40 +107,41 @@ namespace osu.Game.Screens.Spectate
             }
         }
 
-        private void onPlayingUserStatesChanged(object sender, NotifyDictionaryChangedEventArgs<int, SpectatorState> e)
+        private void onUserStatesChanged(object sender, NotifyDictionaryChangedEventArgs<int, SpectatorState> e)
         {
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
                     foreach ((int userId, var state) in e.NewItems.AsNonNull())
-                        onUserStateAdded(userId, state);
+                        onUserStateChanged(userId, state);
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
-                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
+                    foreach ((int userId, _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
                     break;
 
                 case NotifyDictionaryChangedAction.Replace:
-                    foreach ((int userId, var _) in e.OldItems.AsNonNull())
-                        onUserStateRemoved(userId);
-
                     foreach ((int userId, var state) in e.NewItems.AsNonNull())
-                        onUserStateAdded(userId, state);
+                        onUserStateChanged(userId, state);
                     break;
             }
         }
 
-        private void onUserStateAdded(int userId, SpectatorState state)
+        private void onUserStateChanged(int userId, SpectatorState newState)
         {
-            if (state.RulesetID == null || state.BeatmapID == null)
+            if (newState.RulesetID == null || newState.BeatmapID == null)
                 return;
 
             if (!userMap.ContainsKey(userId))
                 return;
 
-            Schedule(() => OnUserStateChanged(userId, state));
-            updateGameplayState(userId);
+            // Do nothing for failed/completed states.
+            if (newState.State == SpectatingUserState.Playing)
+            {
+                Schedule(() => OnUserStateChanged(userId, newState));
+                updateGameplayState(userId);
+            }
         }
 
         private void onUserStateRemoved(int userId)
@@ -162,7 +163,7 @@ namespace osu.Game.Screens.Spectate
             Debug.Assert(userMap.ContainsKey(userId));
 
             var user = userMap[userId];
-            var spectatorState = playingUserStates[userId];
+            var spectatorState = userStates[userId];
 
             var resolvedRuleset = rulesets.AvailableRulesets.FirstOrDefault(r => r.OnlineID == spectatorState.RulesetID)?.CreateInstance();
             if (resolvedRuleset == null)
