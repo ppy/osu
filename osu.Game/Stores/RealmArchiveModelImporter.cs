@@ -64,7 +64,7 @@ namespace osu.Game.Stores
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<ILive<TModel>>>? PostImport { get; set; }
+        public Action<IEnumerable<Live<TModel>>>? PostImport { get; set; }
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -104,7 +104,7 @@ namespace osu.Game.Stores
             return Import(notification, tasks);
         }
 
-        public async Task<IEnumerable<ILive<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             if (tasks.Length == 0)
             {
@@ -118,7 +118,7 @@ namespace osu.Game.Stores
 
             int current = 0;
 
-            var imported = new List<ILive<TModel>>();
+            var imported = new List<Live<TModel>>();
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
@@ -196,11 +196,11 @@ namespace osu.Game.Stores
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<ILive<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            ILive<TModel>? import;
+            Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
                 import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
 
@@ -227,7 +227,7 @@ namespace osu.Game.Stores
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<ILive<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -320,7 +320,7 @@ namespace osu.Game.Stores
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual ILive<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return Realm.Run(realm =>
             {
@@ -416,7 +416,7 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return (ILive<TModel>?)item.ToLive(Realm);
+                return (Live<TModel>?)item.ToLive(Realm);
             });
         }
 
