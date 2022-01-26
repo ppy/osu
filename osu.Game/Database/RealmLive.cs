@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Development;
+using osu.Framework.Statistics;
 using Realms;
 
 #nullable enable
@@ -22,7 +24,9 @@ namespace osu.Game.Database
         /// <summary>
         /// The original live data used to create this instance.
         /// </summary>
-        private readonly T data;
+        private T data;
+
+        private bool dataIsFromUpdateThread;
 
         private readonly RealmAccess realm;
 
@@ -37,6 +41,7 @@ namespace osu.Game.Database
             this.realm = realm;
 
             ID = data.ID;
+            dataIsFromUpdateThread = ThreadSafety.IsUpdateThread;
         }
 
         /// <summary>
@@ -51,7 +56,18 @@ namespace osu.Game.Database
                 return;
             }
 
-            realm.Run(r => perform(retrieveFromID(r, ID)));
+            realm.Run(r =>
+            {
+                if (ThreadSafety.IsUpdateThread)
+                {
+                    ensureDataIsFromUpdateThread();
+                    perform(data);
+                    return;
+                }
+
+                perform(retrieveFromID(r, ID));
+                RealmLiveStatistics.USAGE_ASYNC.Value++;
+            });
         }
 
         /// <summary>
@@ -63,9 +79,16 @@ namespace osu.Game.Database
             if (!IsManaged)
                 return perform(data);
 
+            if (ThreadSafety.IsUpdateThread)
+            {
+                ensureDataIsFromUpdateThread();
+                return perform(data);
+            }
+
             return realm.Run(r =>
             {
                 var returnData = perform(retrieveFromID(r, ID));
+                RealmLiveStatistics.USAGE_ASYNC.Value++;
 
                 if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
                     throw new InvalidOperationException(@$"Managed realm objects should not exit the scope of {nameof(PerformRead)}.");
@@ -88,6 +111,7 @@ namespace osu.Game.Database
                 var transaction = t.Realm.BeginWrite();
                 perform(t);
                 transaction.Commit();
+                RealmLiveStatistics.WRITES.Value++;
             });
         }
 
@@ -101,8 +125,24 @@ namespace osu.Game.Database
                 if (!ThreadSafety.IsUpdateThread)
                     throw new InvalidOperationException($"Can't use {nameof(Value)} on managed objects from non-update threads");
 
-                return realm.Realm.Find<T>(ID);
+                ensureDataIsFromUpdateThread();
+                return data;
             }
+        }
+
+        private void ensureDataIsFromUpdateThread()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (dataIsFromUpdateThread && !data.Realm.IsClosed)
+            {
+                RealmLiveStatistics.USAGE_UPDATE_IMMEDIATE.Value++;
+                return;
+            }
+
+            dataIsFromUpdateThread = true;
+            data = retrieveFromID(realm.Realm, ID);
+            RealmLiveStatistics.USAGE_UPDATE_REFETCH.Value++;
         }
 
         private T retrieveFromID(Realm realm, Guid id)
@@ -124,5 +164,13 @@ namespace osu.Game.Database
         public bool Equals(ILive<T>? other) => ID == other?.ID;
 
         public override string ToString() => PerformRead(i => i.ToString());
+    }
+
+    internal static class RealmLiveStatistics
+    {
+        public static readonly GlobalStatistic<int> WRITES = GlobalStatistics.Get<int>(@"Realm", @"Live writes");
+        public static readonly GlobalStatistic<int> USAGE_UPDATE_IMMEDIATE = GlobalStatistics.Get<int>(@"Realm", @"Live update read (fast)");
+        public static readonly GlobalStatistic<int> USAGE_UPDATE_REFETCH = GlobalStatistics.Get<int>(@"Realm", @"Live update read (slow)");
+        public static readonly GlobalStatistic<int> USAGE_ASYNC = GlobalStatistics.Get<int>(@"Realm", @"Live async read");
     }
 }
