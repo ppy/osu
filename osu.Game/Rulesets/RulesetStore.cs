@@ -163,7 +163,10 @@ namespace osu.Game.Rulesets
                     }
                 }
 
-                availableRulesets.AddRange(detachedRulesets);
+                // add known official rulesets first..
+                availableRulesets.AddRange(detachedRulesets.Where(r => r.OnlineID >= 0).OrderBy(r => r.OnlineID));
+                // .. then add any customs
+                availableRulesets.AddRange(detachedRulesets.Where(r => r.OnlineID < 0).OrderBy(r => r.ShortName));
             });
         }
 
