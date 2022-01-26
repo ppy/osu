@@ -89,10 +89,15 @@ namespace osu.Game.Database
 
         private Realm? updateRealm;
 
+        private bool isSendingNotificationResetEvents;
+
         public Realm Realm => ensureUpdateRealm();
 
         private Realm ensureUpdateRealm()
         {
+            if (isSendingNotificationResetEvents)
+                throw new InvalidOperationException("Cannot retrieve a realm context from a notification callback during a blocking operation.");
+
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"Use {nameof(getRealmInstance)} when performing realm operations from a non-update thread");
 
@@ -614,8 +619,20 @@ namespace osu.Game.Database
                 // calls above.
                 syncContext?.Send(_ =>
                 {
-                    foreach (var action in notificationsResetMap.Values)
-                        action();
+                    // Flag ensures that we don't get in a deadlocked scenario due to a callback attempting to access `RealmAccess.Realm` or `RealmAccess.Run`
+                    // and hitting `realmRetrievalLock` a second time. Generally such usages should not exist, and as such we throw when an attempt is made
+                    // to use in this fashion.
+                    isSendingNotificationResetEvents = true;
+
+                    try
+                    {
+                        foreach (var action in notificationsResetMap.Values)
+                            action();
+                    }
+                    finally
+                    {
+                        isSendingNotificationResetEvents = false;
+                    }
                 }, null);
 
                 const int sleep_length = 200;
