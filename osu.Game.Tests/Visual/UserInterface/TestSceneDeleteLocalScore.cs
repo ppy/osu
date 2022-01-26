@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Ruleset = new OsuRuleset().RulesetInfo,
                     };
 
-                    importedScores.Add(scoreManager.Import(score).GetResultSafely().Value);
+                    importedScores.Add(scoreManager.Import(score).Value);
                 }
             });
 

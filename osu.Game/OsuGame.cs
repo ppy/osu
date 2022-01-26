@@ -249,7 +249,7 @@ namespace osu.Game
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                ILive<SkinInfo> skinInfo = null;
+                Live<SkinInfo> skinInfo = null;
 
                 if (Guid.TryParse(skinId.NewValue, out var guid))
                     skinInfo = SkinManager.Query(s => s.ID == guid);
@@ -439,7 +439,7 @@ namespace osu.Game
         /// </remarks>
         public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            ILive<BeatmapSetInfo> databasedSet = null;
+            Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
                 databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);

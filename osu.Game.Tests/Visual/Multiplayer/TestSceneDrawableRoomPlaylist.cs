@@ -8,7 +8,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -154,11 +153,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
-            ILive<BeatmapSetInfo> imported = null;
+            Live<BeatmapSetInfo> imported = null;
 
             Debug.Assert(beatmap.BeatmapSet != null);
 
-            AddStep("import beatmap", () => imported = manager.Import(beatmap.BeatmapSet).GetResultSafely());
+            AddStep("import beatmap", () => imported = manager.Import(beatmap.BeatmapSet));
 
             createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
 

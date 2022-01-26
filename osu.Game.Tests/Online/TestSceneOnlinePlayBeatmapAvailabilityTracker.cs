@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Online
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
-            AddUntilStep("wait for import", () => beatmaps.CurrentImportTask?.IsCompleted == true);
+            AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
             addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
         }
 
@@ -164,7 +164,7 @@ namespace osu.Game.Tests.Online
         {
             public TaskCompletionSource<bool> AllowImport = new TaskCompletionSource<bool>();
 
-            public Task<ILive<BeatmapSetInfo>> CurrentImportTask { get; private set; }
+            public Live<BeatmapSetInfo> CurrentImport { get; private set; }
 
             public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
                 : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
@@ -186,10 +186,10 @@ namespace osu.Game.Tests.Online
                     this.testBeatmapManager = testBeatmapManager;
                 }
 
-                public override async Task<ILive<BeatmapSetInfo>> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+                public override Live<BeatmapSetInfo> Import(BeatmapSetInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
                 {
-                    await testBeatmapManager.AllowImport.Task.ConfigureAwait(false);
-                    return await (testBeatmapManager.CurrentImportTask = base.Import(item, archive, lowPriority, cancellationToken)).ConfigureAwait(false);
+                    testBeatmapManager.AllowImport.Task.WaitSafely();
+                    return (testBeatmapManager.CurrentImport = base.Import(item, archive, lowPriority, cancellationToken));
                 }
             }
         }

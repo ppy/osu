@@ -17,6 +17,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Game.Screens.Edit.GameplayTest;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -43,9 +44,11 @@ namespace osu.Game.Tests.Visual.Editing
             base.SetUpSteps();
         }
 
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
+            => beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First(b => b.RulesetID == 0));
+
         protected override void LoadEditor()
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(importedBeatmapSet.Beatmaps.First(b => b.RulesetID == 0));
             SelectedMods.Value = new[] { new ModCinema() };
             base.LoadEditor();
         }
