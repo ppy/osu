@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         [SettingSource("Strength")]
         public BindableDouble WiggleStrength { get; } = new BindableDouble(1)
         {
-            MinValue = .1f,
+            MinValue = 0.1f,
             MaxValue = 2f,
-            Precision = .1f
+            Precision = 0.1f
         };
 
         [SettingSource("Duration", "Milliseconds per wiggle")]
