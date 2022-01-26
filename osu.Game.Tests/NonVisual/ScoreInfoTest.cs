@@ -34,8 +34,8 @@ namespace osu.Game.Tests.NonVisual
             Assert.That(scoreCopy.Rank, Is.EqualTo(ScoreRank.B));
             Assert.That(score.Rank, Is.EqualTo(ScoreRank.X));
 
-            Assert.That(scoreCopy.RealmUser.Username, Is.EqualTo("test"));
-            Assert.That(score.Rank, Is.Empty);
+            Assert.That(scoreCopy.RealmUser.Username, Is.Empty);
+            Assert.That(score.RealmUser.Username, Is.EqualTo("test"));
         }
 
         [Test]
