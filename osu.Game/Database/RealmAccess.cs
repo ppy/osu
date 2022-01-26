@@ -604,19 +604,17 @@ namespace osu.Game.Database
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
+                    // Force a flush of any pending callbacks in the synchronization context.
+                    // We want to ensure that the empty set callbacks are the last thing to arrive.
+                    syncContext?.Send(_ =>
+                    {
+                        foreach (var action in notificationsResetMap.Values)
+                            action();
+                    }, null);
+
                     updateRealm?.Dispose();
                     updateRealm = null;
                 }
-
-                // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
-                // and must be posted to the synchronization context.
-                // This is because realm may fire event callbacks between the `unregisterAllSubscriptions` and `updateRealm.Dispose`
-                // calls above.
-                syncContext?.Send(_ =>
-                {
-                    foreach (var action in notificationsResetMap.Values)
-                        action();
-                }, null);
 
                 const int sleep_length = 200;
                 int timeout = 5000;
