@@ -300,7 +300,7 @@ namespace osu.Game.Database
             return new InvokeOnDisposal(() =>
             {
                 if (ThreadSafety.IsUpdateThread)
-                    unsubscribe();
+                    syncContext.Send(_ => unsubscribe(), null);
                 else
                     syncContext.Post(_ => unsubscribe(), null);
 
