@@ -320,7 +320,7 @@ namespace osu.Game.Rulesets.Edit
         {
             if (distanceSpacingScrollActive)
             {
-                distanceSpacing.Value += e.ScrollDelta.Y * (e.ShiftPressed || e.IsPrecise ? 0.01f : 0.1f);
+                distanceSpacing.Value += e.ScrollDelta.Y * (e.IsPrecise ? 0.01f : 0.1f);
                 return true;
             }
 
