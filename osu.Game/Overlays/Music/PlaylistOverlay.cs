@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -10,9 +11,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
+using Realms;
 
 namespace osu.Game.Overlays.Music
 {
@@ -21,14 +24,19 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+        public IBindableList<Live<BeatmapSetInfo>> BeatmapSets => beatmapSets;
 
-        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        private IDisposable beatmapSubscription;
 
         private FilterControl filter;
         private Playlist list;
@@ -77,13 +85,16 @@ namespace osu.Game.Overlays.Music
 
             filter.Search.OnCommit += (sender, newText) =>
             {
-                BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps.FirstOrDefault();
-
-                if (toSelect != null)
+                list.FirstVisibleSet.PerformRead(set =>
                 {
-                    beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
-                    beatmap.Value.Track.Restart();
-                }
+                    BeatmapInfo toSelect = set.Beatmaps.FirstOrDefault();
+
+                    if (toSelect != null)
+                    {
+                        beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
+                        beatmap.Value.Track.Restart();
+                    }
+                });
             };
         }
 
@@ -91,8 +102,29 @@ namespace osu.Game.Overlays.Music
         {
             base.LoadComplete();
 
+            // tests might bind externally, in which case we don't want to involve realm.
+            if (beatmapSets.Count == 0)
+                beatmapSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
+
             list.Items.BindTo(beatmapSets);
-            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
+            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo.ToLive(realm), true);
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
+        {
+            if (changes == null)
+            {
+                beatmapSets.Clear();
+                // must use AddRange to avoid RearrangeableList sort overhead per add op.
+                beatmapSets.AddRange(sender.Select(b => b.ToLive(realm)));
+                return;
+            }
+
+            foreach (int i in changes.InsertedIndices)
+                beatmapSets.Insert(i, sender[i].ToLive(realm));
+
+            foreach (int i in changes.DeletedIndices.OrderByDescending(i => i))
+                beatmapSets.RemoveAt(i);
         }
 
         protected override void PopIn()
@@ -112,16 +144,25 @@ namespace osu.Game.Overlays.Music
             this.FadeOut(transition_duration);
         }
 
-        private void itemSelected(BeatmapSetInfo set)
+        private void itemSelected(Live<BeatmapSetInfo> beatmapSet)
         {
-            if (set.Equals((beatmap.Value?.BeatmapSetInfo)))
+            beatmapSet.PerformRead(set =>
             {
-                beatmap.Value?.Track.Seek(0);
-                return;
-            }
+                if (set.Equals((beatmap.Value?.BeatmapSetInfo)))
+                {
+                    beatmap.Value?.Track.Seek(0);
+                    return;
+                }
 
-            beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
-            beatmap.Value.Track.Restart();
+                beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
+                beatmap.Value.Track.Restart();
+            });
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapSubscription?.Dispose();
         }
     }
 }
