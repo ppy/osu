@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -84,10 +85,14 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(0f, 10f),
                 Children = new Drawable[]
                 {
                     label = new OsuSpriteText(),
-                    slider = new TSlider(),
+                    slider = new TSlider
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    },
                 }
             };
         }
@@ -108,7 +113,7 @@ namespace osu.Game.Overlays
             {
                 label.Text = v.NewValue ? expandedLabelText : contractedLabelText;
                 slider.FadeTo(v.NewValue ? 1f : 0f, 500, Easing.OutQuint);
-                slider.BypassAutoSizeAxes = v.NewValue ? Axes.Y : Axes.None;
+                slider.BypassAutoSizeAxes = !v.NewValue ? Axes.Y : Axes.None;
             }, true);
         }
     }
