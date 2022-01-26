@@ -28,20 +28,14 @@ namespace osu.Game.Rulesets
         public Ruleset CreateInstance()
         {
             if (!Available)
-                throw new RulesetLoadException(@"Ruleset not available");
+                return null;
 
             var type = Type.GetType(InstantiationInfo);
 
             if (type == null)
-                throw new RulesetLoadException(@"Type lookup failure");
+                return null;
 
             var ruleset = Activator.CreateInstance(type) as Ruleset;
-
-            if (ruleset == null)
-                throw new RulesetLoadException(@"Instantiation failure");
-
-            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
-            // ruleset.RulesetInfo = this;
 
             return ruleset;
         }
