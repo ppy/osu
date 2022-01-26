@@ -17,11 +17,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : OsuRearrangeableListItem<ILive<BeatmapSetInfo>>, IFilterable
+    public class PlaylistItem : OsuRearrangeableListItem<Live<BeatmapSetInfo>>, IFilterable
     {
-        public readonly Bindable<ILive<BeatmapSetInfo>> SelectedSet = new Bindable<ILive<BeatmapSetInfo>>();
+        public readonly Bindable<Live<BeatmapSetInfo>> SelectedSet = new Bindable<Live<BeatmapSetInfo>>();
 
-        public Action<ILive<BeatmapSetInfo>> RequestSelection;
+        public Action<Live<BeatmapSetInfo>> RequestSelection;
 
         private TextFlowContainer text;
         private ITextPart titlePart;
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Music
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public PlaylistItem(ILive<BeatmapSetInfo> item)
+        public PlaylistItem(Live<BeatmapSetInfo> item)
             : base(item)
         {
             Padding = new MarginPadding { Left = 5 };

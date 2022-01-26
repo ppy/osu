@@ -19,11 +19,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePlaylistOverlay : OsuManualInputManagerTestScene
     {
-        private readonly BindableList<ILive<BeatmapSetInfo>> beatmapSets = new BindableList<ILive<BeatmapSetInfo>>();
+        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
         private PlaylistOverlay playlistOverlay;
 
-        private ILive<BeatmapSetInfo> first;
+        private Live<BeatmapSetInfo> first;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("hold 1st item handle", () =>
             {
-                var handle = this.ChildrenOfType<OsuRearrangeableListItem<ILive<BeatmapSetInfo>>.PlaylistItemHandle>().First();
+                var handle = this.ChildrenOfType<OsuRearrangeableListItem<Live<BeatmapSetInfo>>.PlaylistItemHandle>().First();
                 InputManager.MoveMouseTo(handle.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });

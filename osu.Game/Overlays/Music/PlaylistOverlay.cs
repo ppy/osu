@@ -24,9 +24,9 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
-        public IBindableList<ILive<BeatmapSetInfo>> BeatmapSets => beatmapSets;
+        public IBindableList<Live<BeatmapSetInfo>> BeatmapSets => beatmapSets;
 
-        private readonly BindableList<ILive<BeatmapSetInfo>> beatmapSets = new BindableList<ILive<BeatmapSetInfo>>();
+        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Music
             this.FadeOut(transition_duration);
         }
 
-        private void itemSelected(ILive<BeatmapSetInfo> beatmapSet)
+        private void itemSelected(Live<BeatmapSetInfo> beatmapSet)
         {
             beatmapSet.PerformRead(set =>
             {
