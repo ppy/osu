@@ -16,12 +16,12 @@ namespace osu.Game.Input
 {
     public class RealmKeyBindingStore
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realm;
         private readonly ReadableKeyCombinationProvider keyCombinationProvider;
 
-        public RealmKeyBindingStore(RealmContextFactory realmFactory, ReadableKeyCombinationProvider keyCombinationProvider)
+        public RealmKeyBindingStore(RealmAccess realm, ReadableKeyCombinationProvider keyCombinationProvider)
         {
-            this.realmFactory = realmFactory;
+            this.realm = realm;
             this.keyCombinationProvider = keyCombinationProvider;
         }
 
@@ -34,7 +34,7 @@ namespace osu.Game.Input
         {
             List<string> combinations = new List<string>();
 
-            using (var context = realmFactory.CreateContext())
+            realm.Run(context =>
             {
                 foreach (var action in context.All<RealmKeyBinding>().Where(b => string.IsNullOrEmpty(b.RulesetName) && (GlobalAction)b.ActionInt == globalAction))
                 {
@@ -44,7 +44,7 @@ namespace osu.Game.Input
                     if (str.Length > 0)
                         combinations.Add(str);
                 }
-            }
+            });
 
             return combinations;
         }
@@ -56,24 +56,26 @@ namespace osu.Game.Input
         /// <param name="rulesets">The rulesets to populate defaults from.</param>
         public void Register(KeyBindingContainer container, IEnumerable<RulesetInfo> rulesets)
         {
-            using (var realm = realmFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realm.Run(r =>
             {
-                // intentionally flattened to a list rather than querying against the IQueryable, as nullable fields being queried against aren't indexed.
-                // this is much faster as a result.
-                var existingBindings = realm.All<RealmKeyBinding>().ToList();
-
-                insertDefaults(realm, existingBindings, container.DefaultKeyBindings);
-
-                foreach (var ruleset in rulesets)
+                using (var transaction = r.BeginWrite())
                 {
-                    var instance = ruleset.CreateInstance();
-                    foreach (int variant in instance.AvailableVariants)
-                        insertDefaults(realm, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
-                }
+                    // intentionally flattened to a list rather than querying against the IQueryable, as nullable fields being queried against aren't indexed.
+                    // this is much faster as a result.
+                    var existingBindings = r.All<RealmKeyBinding>().ToList();
 
-                transaction.Commit();
-            }
+                    insertDefaults(r, existingBindings, container.DefaultKeyBindings);
+
+                    foreach (var ruleset in rulesets)
+                    {
+                        var instance = ruleset.CreateInstance();
+                        foreach (int variant in instance.AvailableVariants)
+                            insertDefaults(r, existingBindings, instance.GetDefaultKeyBindings(variant), ruleset.ShortName, variant);
+                    }
+
+                    transaction.Commit();
+                }
+            });
         }
 
         private void insertDefaults(Realm realm, List<RealmKeyBinding> existingBindings, IEnumerable<IKeyBinding> defaults, string? rulesetName = null, int? variant = null)

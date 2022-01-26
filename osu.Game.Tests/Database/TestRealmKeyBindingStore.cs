@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Database
 
         private RealmKeyBindingStore keyBindingStore;
 
-        private RealmContextFactory realmContextFactory;
+        private RealmAccess realm;
 
         [SetUp]
         public void SetUp()
@@ -33,8 +33,8 @@ namespace osu.Game.Tests.Database
 
             storage = new NativeStorage(directory.FullName);
 
-            realmContextFactory = new RealmContextFactory(storage, "test");
-            keyBindingStore = new RealmKeyBindingStore(realmContextFactory, new ReadableKeyCombinationProvider());
+            realm = new RealmAccess(storage, "test");
+            keyBindingStore = new RealmKeyBindingStore(realm, new ReadableKeyCombinationProvider());
         }
 
         [Test]
@@ -60,15 +60,12 @@ namespace osu.Game.Tests.Database
             KeyBindingContainer testContainer = new TestKeyBindingContainer();
 
             // Add some excess bindings for an action which only supports 1.
-            using (var realm = realmContextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realm.Write(r =>
             {
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
-                realm.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
-
-                transaction.Commit();
-            }
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.A)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.S)));
+                r.Add(new RealmKeyBinding(GlobalAction.Back, new KeyCombination(InputKey.D)));
+            });
 
             Assert.That(queryCount(GlobalAction.Back), Is.EqualTo(3));
 
@@ -79,13 +76,13 @@ namespace osu.Game.Tests.Database
 
         private int queryCount(GlobalAction? match = null)
         {
-            using (var realm = realmContextFactory.CreateContext())
+            return realm.Run(r =>
             {
-                var results = realm.All<RealmKeyBinding>();
+                var results = r.All<RealmKeyBinding>();
                 if (match.HasValue)
                     results = results.Where(k => k.ActionInt == (int)match.Value);
                 return results.Count();
-            }
+            });
         }
 
         [Test]
@@ -95,32 +92,32 @@ namespace osu.Game.Tests.Database
 
             keyBindingStore.Register(testContainer, Enumerable.Empty<RulesetInfo>());
 
-            using (var primaryRealm = realmContextFactory.CreateContext())
+            realm.Run(outerRealm =>
             {
-                var backBinding = primaryRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
+                var backBinding = outerRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
 
                 Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.Escape }));
 
                 var tsr = ThreadSafeReference.Create(backBinding);
 
-                using (var threadedContext = realmContextFactory.CreateContext())
+                realm.Run(innerRealm =>
                 {
-                    var binding = threadedContext.ResolveReference(tsr);
-                    threadedContext.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
-                }
+                    var binding = innerRealm.ResolveReference(tsr);
+                    innerRealm.Write(() => binding.KeyCombination = new KeyCombination(InputKey.BackSpace));
+                });
 
                 Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
 
                 // check still correct after re-query.
-                backBinding = primaryRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
+                backBinding = outerRealm.All<RealmKeyBinding>().Single(k => k.ActionInt == (int)GlobalAction.Back);
                 Assert.That(backBinding.KeyCombination.Keys, Is.EquivalentTo(new[] { InputKey.BackSpace }));
-            }
+            });
         }
 
         [TearDown]
         public void TearDown()
         {
-            realmContextFactory.Dispose();
+            realm.Dispose();
             storage.DeleteDirectory(string.Empty);
         }
 

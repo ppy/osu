@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using AutoMapper;
 using AutoMapper.Internal;
-using osu.Framework.Development;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
@@ -205,28 +204,28 @@ namespace osu.Game.Database
         private static void copyChangesToRealm<T>(T source, T destination) where T : RealmObjectBase
             => write_mapper.Map(source, destination);
 
-        public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
+        public static List<Live<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<Live<T>>().ToList();
         }
 
-        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
+        public static Live<T> ToLiveUnmanaged<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLiveUnmanaged<T>(realmObject);
         }
 
-        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmContextFactory realmContextFactory)
+        public static List<Live<T>> ToLive<T>(this IEnumerable<T> realmList, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l, realmContextFactory)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLive<T>(l, realm)).Cast<Live<T>>().ToList();
         }
 
-        public static ILive<T> ToLive<T>(this T realmObject, RealmContextFactory realmContextFactory)
+        public static Live<T> ToLive<T>(this T realmObject, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return new RealmLive<T>(realmObject, realmContextFactory);
+            return new RealmLive<T>(realmObject, realm);
         }
 
         /// <summary>
@@ -272,9 +271,8 @@ namespace osu.Game.Database
         public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
-            // Subscriptions can only work on the main thread.
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException("Cannot subscribe for realm notifications from a non-update thread.");
+            if (!RealmAccess.CurrentThreadSubscriptionsAllowed)
+                throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
             return collection.SubscribeForNotifications(callback);
         }

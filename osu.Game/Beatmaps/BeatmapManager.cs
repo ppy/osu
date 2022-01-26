@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -41,11 +40,11 @@ namespace osu.Game.Beatmaps
         private readonly WorkingBeatmapCache workingBeatmapCache;
         private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
 
-        private readonly RealmContextFactory contextFactory;
+        private readonly RealmAccess realm;
 
-        public BeatmapManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
         {
-            this.contextFactory = contextFactory;
+            this.realm = realm;
 
             if (performOnlineLookups)
             {
@@ -55,11 +54,11 @@ namespace osu.Game.Beatmaps
                 onlineBeatmapLookupQueue = new BeatmapOnlineLookupQueue(api, storage);
             }
 
-            var userResources = new RealmFileStore(contextFactory, storage).Store;
+            var userResources = new RealmFileStore(realm, storage).Store;
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, onlineBeatmapLookupQueue);
+            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue);
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
@@ -70,8 +69,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmContextFactory contextFactory, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapModelManager(contextFactory, storage, onlineLookupQueue);
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
+            new BeatmapModelManager(realm, storage, onlineLookupQueue);
 
         /// <summary>
         /// Create a new <see cref="WorkingBeatmap"/>.
@@ -105,7 +104,7 @@ namespace osu.Game.Beatmaps
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
                 b.BeatmapSet = beatmapSet;
 
-            var imported = beatmapModelManager.Import(beatmapSet).GetResultSafely();
+            var imported = beatmapModelManager.Import(beatmapSet);
 
             if (imported == null)
                 throw new InvalidOperationException("Failed to import new beatmap");
@@ -119,15 +118,17 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
         public void Hide(BeatmapInfo beatmapInfo)
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realm.Run(r =>
             {
-                if (!beatmapInfo.IsManaged)
-                    beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+                using (var transaction = r.BeginWrite())
+                {
+                    if (!beatmapInfo.IsManaged)
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
 
-                beatmapInfo.Hidden = true;
-                transaction.Commit();
-            }
+                    beatmapInfo.Hidden = true;
+                    transaction.Commit();
+                }
+            });
         }
 
         /// <summary>
@@ -136,27 +137,31 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmapInfo)
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realm.Run(r =>
             {
-                if (!beatmapInfo.IsManaged)
-                    beatmapInfo = realm.Find<BeatmapInfo>(beatmapInfo.ID);
+                using (var transaction = r.BeginWrite())
+                {
+                    if (!beatmapInfo.IsManaged)
+                        beatmapInfo = r.Find<BeatmapInfo>(beatmapInfo.ID);
 
-                beatmapInfo.Hidden = false;
-                transaction.Commit();
-            }
+                    beatmapInfo.Hidden = false;
+                    transaction.Commit();
+                }
+            });
         }
 
         public void RestoreAll()
         {
-            using (var realm = contextFactory.CreateContext())
-            using (var transaction = realm.BeginWrite())
+            realm.Run(r =>
             {
-                foreach (var beatmap in realm.All<BeatmapInfo>().Where(b => b.Hidden))
-                    beatmap.Hidden = false;
+                using (var transaction = r.BeginWrite())
+                {
+                    foreach (var beatmap in r.All<BeatmapInfo>().Where(b => b.Hidden))
+                        beatmap.Hidden = false;
 
-                transaction.Commit();
-            }
+                    transaction.Commit();
+                }
+            });
         }
 
         /// <summary>
@@ -165,8 +170,11 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+            return realm.Run(r =>
+            {
+                r.Refresh();
+                return r.All<BeatmapSetInfo>().Where(b => !b.DeletePending).Detach();
+            });
         }
 
         /// <summary>
@@ -174,10 +182,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
+        public Live<BeatmapSetInfo>? QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            using (var context = contextFactory.CreateContext())
-                return context.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(contextFactory);
+            return realm.Run(r => r.All<BeatmapSetInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
 
         #region Delegation to BeatmapModelManager (methods which previously existed locally).
@@ -232,21 +239,20 @@ namespace osu.Game.Beatmaps
 
         public void Delete(Expression<Func<BeatmapSetInfo, bool>>? filter = null, bool silent = false)
         {
-            using (var context = contextFactory.CreateContext())
+            realm.Run(r =>
             {
-                var items = context.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
+                var items = r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
                 if (filter != null)
                     items = items.Where(filter);
 
                 beatmapModelManager.Delete(items.ToList(), silent);
-            }
+            });
         }
 
         public void UndeleteAll()
         {
-            using (var context = contextFactory.CreateContext())
-                beatmapModelManager.Undelete(context.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList());
+            realm.Run(r => beatmapModelManager.Undelete(r.All<BeatmapSetInfo>().Where(s => s.DeletePending).ToList()));
         }
 
         public void Undelete(List<BeatmapSetInfo> items, bool silent = false)
@@ -273,22 +279,22 @@ namespace osu.Game.Beatmaps
             return beatmapModelManager.Import(tasks);
         }
 
-        public Task<IEnumerable<ILive<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<Live<BeatmapSetInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return beatmapModelManager.Import(notification, tasks);
         }
 
-        public Task<ILive<BeatmapSetInfo>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<BeatmapSetInfo>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<BeatmapSetInfo>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<BeatmapSetInfo>?> Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Live<BeatmapSetInfo>? Import(BeatmapSetInfo item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return beatmapModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
@@ -305,19 +311,19 @@ namespace osu.Game.Beatmaps
             // If we seem to be missing files, now is a good time to re-fetch.
             if (importedBeatmap?.BeatmapSet?.Files.Count == 0)
             {
-                using (var realm = contextFactory.CreateContext())
+                realm.Run(r =>
                 {
-                    var refetch = realm.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
+                    var refetch = r.Find<BeatmapInfo>(importedBeatmap.ID)?.Detach();
 
                     if (refetch != null)
                         importedBeatmap = refetch;
-                }
+                });
             }
 
             return workingBeatmapCache.GetWorkingBeatmap(importedBeatmap);
         }
 
-        public WorkingBeatmap GetWorkingBeatmap(ILive<BeatmapInfo>? importedBeatmap)
+        public WorkingBeatmap GetWorkingBeatmap(Live<BeatmapInfo>? importedBeatmap)
         {
             WorkingBeatmap working = workingBeatmapCache.GetWorkingBeatmap(null);
 
@@ -361,7 +367,7 @@ namespace osu.Game.Beatmaps
 
         #region Implementation of IPostImports<out BeatmapSetInfo>
 
-        public Action<IEnumerable<ILive<BeatmapSetInfo>>>? PostImport
+        public Action<IEnumerable<Live<BeatmapSetInfo>>>? PostImport
         {
             set => beatmapModelManager.PostImport = value;
         }
