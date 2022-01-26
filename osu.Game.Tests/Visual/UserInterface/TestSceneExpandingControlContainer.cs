@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osuTK;
 using osuTK.Input;
@@ -20,8 +19,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
 
-        private SettingsSlider<float, SizeSlider> slider1;
-        private SettingsSlider<double> slider2;
+        private ExpandableSlider<float, SizeSlider> slider1;
+        private ExpandableSlider<double> slider2;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -37,7 +36,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Width = 1,
                     Children = new Drawable[]
                     {
-                        slider1 = new SettingsSlider<float, SizeSlider>
+                        slider1 = new ExpandableSlider<float, SizeSlider>
                         {
                             Current = new BindableFloat
                             {
@@ -47,7 +46,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                 Precision = 0.01f,
                             },
                         },
-                        slider2 = new SettingsSlider<double>
+                        slider2 = new ExpandableSlider<double>
                         {
                             Current = new BindableDouble
                             {
@@ -63,13 +62,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             slider1.Current.BindValueChanged(v =>
             {
-                slider1.LabelText = $"Slider One ({v.NewValue:0.##x})";
+                slider1.ExpandedLabelText = $"Slider One ({v.NewValue:0.##x})";
                 slider1.ContractedLabelText = $"S. 1. ({v.NewValue:0.##x})";
             }, true);
 
             slider2.Current.BindValueChanged(v =>
             {
-                slider2.LabelText = $"Slider Two ({v.NewValue:N2})";
+                slider2.ExpandedLabelText = $"Slider Two ({v.NewValue:N2})";
                 slider2.ContractedLabelText = $"S. 2. ({v.NewValue:N2})";
             }, true);
         });
@@ -172,7 +171,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("container still expanded", () => container.Expanded.Value);
         }
 
-        private class TestExpandingContainer : ExpandingControlContainer<ISettingsItem>
+        private class TestExpandingContainer : ExpandingControlContainer<IExpandableControl>
         {
             public TestExpandingContainer()
                 : base(120, 250)
