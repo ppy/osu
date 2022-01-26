@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool match =
                 criteria.Ruleset == null ||
-                BeatmapInfo.RulesetID == criteria.Ruleset.OnlineID ||
+                BeatmapInfo.Ruleset.ShortName == criteria.Ruleset.ShortName ||
                 (BeatmapInfo.RulesetID == 0 && criteria.Ruleset.OnlineID != 0 && criteria.AllowConvertedBeatmaps);
 
             if (BeatmapInfo.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
