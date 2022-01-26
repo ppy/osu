@@ -79,6 +79,20 @@ namespace osu.Game.Tests.NonVisual.Filtering
         }
 
         [Test]
+        public void TestCriteriaMatchingConvertedBeatmapsForCustomRulesets()
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Ruleset = new RulesetInfo { OnlineID = -25 },
+                AllowConvertedBeatmaps = true
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.IsFalse(carouselItem.Filtered.Value);
+        }
+
+        [Test]
         [TestCase(true)]
         [TestCase(false)]
         public void TestCriteriaMatchingRangeMin(bool inclusive)
