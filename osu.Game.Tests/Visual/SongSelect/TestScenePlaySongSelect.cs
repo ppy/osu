@@ -64,13 +64,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.SetUpSteps();
 
-            AddStep("delete all beatmaps", () =>
+            AddStep("reset defaults", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
-                manager?.Delete(manager.GetAllUsableBeatmapSets());
-
                 Beatmap.SetDefault();
             });
+
+            AddStep("delete all beatmaps", () => manager?.Delete());
         }
 
         [Test]
