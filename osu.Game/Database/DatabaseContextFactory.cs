@@ -184,5 +184,11 @@ namespace osu.Game.Database
         }
 
         public static string CreateDatabaseConnectionString(string filename, Storage storage) => string.Concat("Data Source=", storage.GetFullPath($@"{filename}", true));
+
+        private readonly ManualResetEventSlim migrationComplete = new ManualResetEventSlim();
+
+        public void SetMigrationCompletion() => migrationComplete.Set();
+
+        public void WaitForMigrationCompletion() => migrationComplete.Wait();
     }
 }
