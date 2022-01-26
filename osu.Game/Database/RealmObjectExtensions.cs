@@ -204,25 +204,25 @@ namespace osu.Game.Database
         private static void copyChangesToRealm<T>(T source, T destination) where T : RealmObjectBase
             => write_mapper.Map(source, destination);
 
-        public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
+        public static List<Live<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<Live<T>>().ToList();
         }
 
-        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
+        public static Live<T> ToLiveUnmanaged<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLiveUnmanaged<T>(realmObject);
         }
 
-        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmAccess realm)
+        public static List<Live<T>> ToLive<T>(this IEnumerable<T> realmList, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l, realm)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLive<T>(l, realm)).Cast<Live<T>>().ToList();
         }
 
-        public static ILive<T> ToLive<T>(this T realmObject, RealmAccess realm)
+        public static Live<T> ToLive<T>(this T realmObject, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLive<T>(realmObject, realm);
