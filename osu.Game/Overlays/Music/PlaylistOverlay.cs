@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Music
             {
                 beatmapSets.Clear();
                 // must use AddRange to avoid RearrangeableList sort overhead per add op.
-                beatmapSets.AddRange(sender.ToLive(realm));
+                beatmapSets.AddRange(sender.Select(b => b.ToLive(realm)));
                 return;
             }
 
