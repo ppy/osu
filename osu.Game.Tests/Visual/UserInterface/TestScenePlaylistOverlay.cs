@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Music;
 using osu.Game.Tests.Resources;
@@ -18,11 +19,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePlaylistOverlay : OsuManualInputManagerTestScene
     {
-        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+        private readonly BindableList<ILive<BeatmapSetInfo>> beatmapSets = new BindableList<ILive<BeatmapSetInfo>>();
 
         private PlaylistOverlay playlistOverlay;
 
-        private BeatmapSetInfo first;
+        private ILive<BeatmapSetInfo> first;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             for (int i = 0; i < 100; i++)
             {
-                beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo());
+                beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo().ToLiveUnmanaged());
             }
 
             first = beatmapSets.First();
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("hold 1st item handle", () =>
             {
-                var handle = this.ChildrenOfType<OsuRearrangeableListItem<BeatmapSetInfo>.PlaylistItemHandle>().First();
+                var handle = this.ChildrenOfType<OsuRearrangeableListItem<ILive<BeatmapSetInfo>>.PlaylistItemHandle>().First();
                 InputManager.MoveMouseTo(handle.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });
