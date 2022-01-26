@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 beatmapSetInfo.Beatmaps.Add(beatmap);
             }
 
-            manager.Import(beatmapSetInfo).WaitSafely();
+            manager.Import(beatmapSetInfo);
         }
 
         public override void SetUpSteps()
