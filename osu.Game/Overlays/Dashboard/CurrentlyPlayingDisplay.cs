@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
-        private readonly IBindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
+        private readonly IBindableDictionary<int, SpectatorState> userStates = new BindableDictionary<int, SpectatorState>();
 
         private FillFlowContainer<PlayingUserPanel> userFlow;
 
@@ -51,33 +51,32 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            playingUserStates.BindTo(spectatorClient.PlayingUserStates);
-            playingUserStates.BindCollectionChanged(onUsersChanged, true);
+            userStates.BindTo(spectatorClient.PlayingUserStates);
+            userStates.BindCollectionChanged(onUserStatesChanged, true);
         }
 
-        private void onUsersChanged(object sender, NotifyDictionaryChangedEventArgs<int, SpectatorState> e) => Schedule(() =>
+        private void onUserStatesChanged(object sender, NotifyDictionaryChangedEventArgs<int, SpectatorState> e) => Schedule(() =>
         {
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
+                case NotifyDictionaryChangedAction.Replace:
                     Debug.Assert(e.NewItems != null);
 
-                    foreach ((int userId, _) in e.NewItems)
+                    foreach ((int userId, SpectatorState state) in e.NewItems)
                     {
+                        if (state.State != SpectatingUserState.Playing)
+                        {
+                            removePlayingUser(userId);
+                            continue;
+                        }
+
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             var user = task.GetResultSafely();
 
-                            if (user == null) return;
-
-                            Schedule(() =>
-                            {
-                                // user may no longer be playing.
-                                if (!playingUserStates.ContainsKey(user.Id))
-                                    return;
-
-                                userFlow.Add(createUserPanel(user));
-                            });
+                            if (user != null)
+                                Schedule(() => addPlayingUser(user));
                         });
                     }
 
@@ -87,9 +86,20 @@ namespace osu.Game.Overlays.Dashboard
                     Debug.Assert(e.OldItems != null);
 
                     foreach ((int userId, _) in e.OldItems)
-                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
+                        removePlayingUser(userId);
                     break;
             }
+
+            void addPlayingUser(APIUser user)
+            {
+                // user may no longer be playing.
+                if (!userStates.TryGetValue(user.Id, out var state2) || state2.State != SpectatingUserState.Playing)
+                    return;
+
+                userFlow.Add(createUserPanel(user));
+            }
+
+            void removePlayingUser(int userId) => userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
         });
 
         private PlayingUserPanel createUserPanel(APIUser user) =>
