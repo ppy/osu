@@ -26,12 +26,16 @@ namespace osu.Game.Tests.NonVisual
 
             score.Statistics[HitResult.Good]++;
             score.Rank = ScoreRank.X;
+            score.RealmUser.Username = "test";
 
             Assert.That(scoreCopy.Statistics[HitResult.Good], Is.EqualTo(10));
             Assert.That(score.Statistics[HitResult.Good], Is.EqualTo(11));
 
             Assert.That(scoreCopy.Rank, Is.EqualTo(ScoreRank.B));
             Assert.That(score.Rank, Is.EqualTo(ScoreRank.X));
+
+            Assert.That(scoreCopy.RealmUser.Username, Is.EqualTo("test"));
+            Assert.That(score.Rank, Is.Empty);
         }
 
         [Test]
