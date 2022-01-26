@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections
             Name = "<Random Skin>",
         }.ToLiveUnmanaged();
 
-        private List<Live<SkinInfo>> skinItems;
+        private readonly List<Live<SkinInfo>> dropdownItems = new List<Live<SkinInfo>>();
 
         [Resolved]
         private SkinManager skins { get; set; }
@@ -111,19 +111,23 @@ namespace osu.Game.Overlays.Settings.Sections
             configBindable.Value = skin.NewValue.ID.ToString();
         }
 
-        private void skinsChanged(IRealmCollection<SkinInfo> skins, ChangeSet changes, Exception error)
+        private void skinsChanged(IRealmCollection<SkinInfo> sender, ChangeSet changes, Exception error)
         {
             // This can only mean that realm is recycling, else we would see the protected skins.
             // Because we are using `Live<>` in this class, we don't need to worry about this scenario too much.
-            if (!skins.Any())
+            if (!sender.Any())
                 return;
 
-            int protectedCount = skins.Count(s => s.Protected);
+            int protectedCount = sender.Count(s => s.Protected);
 
-            skinItems = skins.ToLive(realm);
-            skinItems.Insert(protectedCount, random_skin_info);
+            // For simplicity repopulate the full list.
+            // In the future we should change this to properly handle ChangeSet events.
+            dropdownItems.Clear();
+            foreach (var skin in sender)
+                dropdownItems.Add(skin.ToLive(realm));
+            dropdownItems.Insert(protectedCount, random_skin_info);
 
-            skinDropdown.Items = skinItems;
+            skinDropdown.Items = dropdownItems;
 
             updateSelectedSkinFromConfig();
         }
