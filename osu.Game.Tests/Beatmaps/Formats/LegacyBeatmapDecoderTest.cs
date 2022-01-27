@@ -794,5 +794,32 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(path.Distance, Is.EqualTo(1));
             }
         }
+
+        [Test]
+        public void TestLegacyDefaultsPreserved()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var memoryStream = new MemoryStream())
+            using (var stream = new LineBufferedReader(memoryStream))
+            {
+                var decoded = decoder.Decode(stream);
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(decoded.BeatmapInfo.AudioLeadIn, Is.EqualTo(0));
+                    Assert.That(decoded.BeatmapInfo.StackLeniency, Is.EqualTo(0.7f));
+                    Assert.That(decoded.BeatmapInfo.SpecialStyle, Is.False);
+                    Assert.That(decoded.BeatmapInfo.LetterboxInBreaks, Is.False);
+                    Assert.That(decoded.BeatmapInfo.WidescreenStoryboard, Is.False);
+                    Assert.That(decoded.BeatmapInfo.EpilepsyWarning, Is.False);
+                    Assert.That(decoded.BeatmapInfo.SamplesMatchPlaybackRate, Is.False);
+                    Assert.That(decoded.BeatmapInfo.Countdown, Is.EqualTo(CountdownType.Normal));
+                    Assert.That(decoded.BeatmapInfo.CountdownOffset, Is.EqualTo(0));
+                    Assert.That(decoded.BeatmapInfo.Metadata.PreviewTime, Is.EqualTo(-1));
+                    Assert.That(decoded.BeatmapInfo.Ruleset.OnlineID, Is.EqualTo(0));
+                });
+            }
+        }
     }
 }
