@@ -4,11 +4,13 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Screens.Select;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
@@ -115,6 +117,25 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Placed object still has non-default control points", () =>
                 EditorBeatmap.HitObjects[0].SampleControlPoint != SampleControlPoint.DEFAULT &&
                 EditorBeatmap.HitObjects[0].DifficultyControlPoint != DifficultyControlPoint.DEFAULT);
+        }
+
+        [Test]
+        public void TestExitWithoutSaveFromExistingBeatmap()
+        {
+            const string tags_to_save = "these tags will be saved";
+            const string tags_to_discard = "these tags should be discarded";
+
+            AddStep("Set tags", () => EditorBeatmap.BeatmapInfo.Metadata.Tags = tags_to_save);
+            SaveEditor();
+            AddAssert("Tags saved correctly", () => EditorBeatmap.BeatmapInfo.Metadata.Tags == tags_to_save);
+
+            ReloadEditorToSameBeatmap();
+            AddAssert("Tags saved correctly", () => EditorBeatmap.BeatmapInfo.Metadata.Tags == tags_to_save);
+            AddStep("Set tags again", () => EditorBeatmap.BeatmapInfo.Metadata.Tags = tags_to_discard);
+
+            AddStep("Exit editor", () => Editor.Exit());
+            AddUntilStep("Wait for song select", () => Game.ScreenStack.CurrentScreen is PlaySongSelect);
+            AddAssert("Tags reverted correctly", () => Game.Beatmap.Value.BeatmapInfo.Metadata.Tags == tags_to_save);
         }
     }
 }

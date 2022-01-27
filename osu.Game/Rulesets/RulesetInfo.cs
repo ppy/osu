@@ -37,14 +37,6 @@ namespace osu.Game.Rulesets
         {
         }
 
-        public RulesetInfo(int? onlineID, string name, string shortName, bool available)
-        {
-            OnlineID = onlineID ?? -1;
-            Name = name;
-            ShortName = shortName;
-            Available = available;
-        }
-
         public bool Available { get; set; }
 
         public bool Equals(RulesetInfo? other)
@@ -112,11 +104,5 @@ namespace osu.Game.Rulesets
 
             return ruleset;
         }
-
-        #region Compatibility properties
-
-        public int ID => OnlineID;
-
-        #endregion
     }
 }
