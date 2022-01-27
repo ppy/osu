@@ -25,10 +25,15 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
 
         public override string Name => "No Long Notes";
+
         public override string Acronym => "NL";
+        
         public override double ScoreMultiplier => 1;
+        
         public override string Description => @"Turns all held notes into tap notes. No coordination required.";
+        
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
+        
         public override ModType Type => ModType.Conversion;
 
         [SettingSource("Add end notes", "Also add a note at the end of a held note")]
