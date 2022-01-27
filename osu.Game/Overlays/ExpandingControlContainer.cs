@@ -118,6 +118,12 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Whether the given control is currently active, by checking whether it's hovered or dragged.
         /// </summary>
-        private bool isControlActive(TControl control) => control.IsHovered || control.IsDragged || (control is IExpandableControl expandable && expandable.IsControlDragged);
+        private bool isControlActive(TControl control)
+        {
+            if (control is IExpandable expandable)
+                return expandable.ShouldBeExpanded;
+
+            return control.IsHovered || control.IsDragged;
+        }
     }
 }

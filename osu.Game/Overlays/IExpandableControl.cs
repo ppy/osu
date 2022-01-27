@@ -8,9 +8,5 @@ namespace osu.Game.Overlays
     /// </summary>
     public interface IExpandableControl : IExpandable
     {
-        /// <summary>
-        /// Returns whether the UI control is currently in a dragged state.
-        /// </summary>
-        bool IsControlDragged { get; }
     }
 }
