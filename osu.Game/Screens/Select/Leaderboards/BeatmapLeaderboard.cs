@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     var scores = r.All<ScoreInfo>()
                                   .AsEnumerable()
                                   // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
-                                  .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
+                                  .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.ShortName == ruleset.Value.ShortName);
 
                     if (filterMods && !mods.Value.Any())
                     {

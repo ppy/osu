@@ -155,7 +155,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public int RulesetID
         {
-            get => Ruleset.OnlineID;
             set
             {
                 if (!string.IsNullOrEmpty(Ruleset.InstantiationInfo))
