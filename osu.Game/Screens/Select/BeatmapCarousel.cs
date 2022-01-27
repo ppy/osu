@@ -311,13 +311,10 @@ namespace osu.Game.Screens.Select
 
             itemsCache.Invalidate();
 
-            Schedule(() =>
-            {
-                if (!Scroll.UserScrolling)
-                    ScrollToSelected(true);
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
 
-                BeatmapSetsChanged?.Invoke();
-            });
+            BeatmapSetsChanged?.Invoke();
         });
 
         /// <summary>
