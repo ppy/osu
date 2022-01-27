@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -9,17 +10,24 @@ using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 using Realms;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers.Zip;
 
 #nullable enable
 
@@ -39,6 +47,15 @@ namespace osu.Game.Database
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame game { get; set; } = null!;
+
+        [Resolved]
+        private Storage storage { get; set; } = null!;
 
         private readonly OsuSpriteText currentOperationText;
 
@@ -96,7 +113,11 @@ namespace osu.Game.Database
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            beginMigration();
+        }
 
+        private void beginMigration()
+        {
             Task.Factory.StartNew(() =>
             {
                 using (var ef = efContextFactory.Get())
@@ -117,19 +138,65 @@ namespace osu.Game.Database
                     migrateBeatmaps(ef);
                     migrateScores(ef);
                 }
-
-                // Delete the database permanently.
-                // Will cause future startups to not attempt migration.
-                log("Migration successful, deleting EF database");
-                efContextFactory.ResetDatabase();
-
-                if (DebugUtils.IsDebugBuild)
-                    Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
+                if (t.Exception == null)
+                {
+                    log("Migration successful!");
+
+                    if (DebugUtils.IsDebugBuild)
+                        Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
+                }
+                else
+                {
+                    log("Migration failed!");
+                    Logger.Log(t.Exception.ToString(), LoggingTarget.Database);
+
+                    notificationOverlay.Post(new SimpleErrorNotification
+                    {
+                        Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. The previous version has been backed up.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
+                        Activated = () =>
+                        {
+                            game.OpenUrlExternally($@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue ({t.Exception.Message})&body=Please%20drag%20the%20""attach_me.zip""%20file%20here!&category=q-a", true);
+
+                            const string attachment_filename = "attach_me.zip";
+                            const string backup_folder = "backups";
+
+                            var backupStorage = storage.GetStorageForDirectory(backup_folder);
+
+                            backupStorage.Delete(attachment_filename);
+
+                            try
+                            {
+                                using (var zip = ZipArchive.Create())
+                                {
+                                    zip.AddAllFromDirectory(backupStorage.GetFullPath(string.Empty));
+                                    zip.SaveTo(Path.Combine(backupStorage.GetFullPath(string.Empty), attachment_filename), new ZipWriterOptions(CompressionType.Deflate));
+                                }
+                            }
+                            catch { }
+
+                            backupStorage.PresentFileExternally(attachment_filename);
+
+                            return true;
+                        }
+                    });
+                }
+
+                // Regardless of success, since the game is going to continue with startup let's move the ef database out of the way.
+                // If we were to not do this, the migration would run another time the next time the user starts the game.
+                deletePreRealmData();
+
                 migrationCompleted.SetResult(true);
                 efContextFactory.SetMigrationCompletion();
             });
+        }
+
+        private void deletePreRealmData()
+        {
+            // Delete the database permanently.
+            // Will cause future startups to not attempt migration.
+            efContextFactory.ResetDatabase();
         }
 
         private void log(string message)

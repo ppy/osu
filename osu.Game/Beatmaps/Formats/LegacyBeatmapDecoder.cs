@@ -141,9 +141,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Mode":
-                    beatmap.BeatmapInfo.RulesetID = Parsing.ParseInt(pair.Value);
+                    int rulesetID = Parsing.ParseInt(pair.Value);
 
-                    switch (beatmap.BeatmapInfo.RulesetID)
+                    beatmap.BeatmapInfo.RulesetID = rulesetID;
+
+                    switch (rulesetID)
                     {
                         case 0:
                             parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
@@ -397,7 +399,7 @@ namespace osu.Game.Beatmaps.Formats
                 OmitFirstBarLine = omitFirstBarSignature,
             };
 
-            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+            bool isOsuRuleset = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
             // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
             if (!isOsuRuleset)
                 effectPoint.ScrollSpeed = speedMultiplier;
