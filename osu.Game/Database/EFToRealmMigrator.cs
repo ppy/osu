@@ -166,11 +166,15 @@ namespace osu.Game.Database
 
                             backupStorage.Delete(attachment_filename);
 
-                            using (var zip = ZipArchive.Create())
+                            try
                             {
-                                zip.AddAllFromDirectory(backupStorage.GetFullPath(string.Empty));
-                                zip.SaveTo(Path.Combine(backupStorage.GetFullPath(string.Empty), attachment_filename), new ZipWriterOptions(CompressionType.Deflate));
+                                using (var zip = ZipArchive.Create())
+                                {
+                                    zip.AddAllFromDirectory(backupStorage.GetFullPath(string.Empty));
+                                    zip.SaveTo(Path.Combine(backupStorage.GetFullPath(string.Empty), attachment_filename), new ZipWriterOptions(CompressionType.Deflate));
+                                }
                             }
+                            catch { }
 
                             backupStorage.PresentFileExternally(attachment_filename);
 
