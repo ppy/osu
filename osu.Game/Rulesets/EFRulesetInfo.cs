@@ -42,6 +42,8 @@ namespace osu.Game.Rulesets
 
         public bool Equals(EFRulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
 
+        public int CompareTo(RulesetInfo other) => OnlineID.CompareTo(other.OnlineID);
+
         public override bool Equals(object obj) => obj is EFRulesetInfo rulesetInfo && Equals(rulesetInfo);
 
         public bool Equals(IRulesetInfo other) => other is RulesetInfo b && Equals(b);
