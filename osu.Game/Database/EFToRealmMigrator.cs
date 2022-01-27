@@ -142,6 +142,16 @@ namespace osu.Game.Database
                 {
                     log("Migration failed!");
                     Logger.Log(t.Exception.ToString(), LoggingTarget.Database);
+
+                    notificationOverlay.Post(new SimpleErrorNotification
+                    {
+                        Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. It has been backed up in your osu! folder.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
+                        Activated = () =>
+                        {
+                            game.OpenUrlExternally(@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue&body=Please%20attach%20your%20database%20backups%20by%20zipping%20them%20and%20dragging%20in%20here!&category=q-a");
+                            return true;
+                        }
+                    });
                 }
 
                 // Regardless of success, since the game is going to continue with startup let's move the ef database out of the way.
