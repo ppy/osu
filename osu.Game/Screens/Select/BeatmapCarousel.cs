@@ -286,6 +286,9 @@ namespace osu.Game.Screens.Select
 
             root.RemoveChild(existingSet);
             itemsCache.Invalidate();
+
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
         });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
@@ -311,13 +314,10 @@ namespace osu.Game.Screens.Select
 
             itemsCache.Invalidate();
 
-            Schedule(() =>
-            {
-                if (!Scroll.UserScrolling)
-                    ScrollToSelected(true);
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
 
-                BeatmapSetsChanged?.Invoke();
-            });
+            BeatmapSetsChanged?.Invoke();
         });
 
         /// <summary>
