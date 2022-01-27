@@ -13,6 +13,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
@@ -68,6 +69,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
+
+                songSelect = null;
             });
 
             AddStep("delete all beatmaps", () => manager?.Delete());
@@ -870,9 +873,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             return set.ChildrenOfType<FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
         }
 
-        private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
+        private void addRulesetImportStep(int id)
+        {
+            Live<BeatmapSetInfo> imported = null;
+            AddStep($"import test map for ruleset {id}", () => imported = importForRuleset(id));
+            // This is specifically for cases where the add is happening post song select load.
+            // For cases where song select is null, the assertions are provided by the load checks.
+            AddUntilStep("wait for imported to arrive in carousel", () => songSelect == null || songSelect.Carousel.BeatmapSets.Any(s => s.ID == imported?.ID));
+        }
 
-        private void importForRuleset(int id) => manager.Import(TestResources.CreateTestBeatmapSetInfo(3, rulesets.AvailableRulesets.Where(r => r.OnlineID == id).ToArray()));
+        private Live<BeatmapSetInfo> importForRuleset(int id) => manager.Import(TestResources.CreateTestBeatmapSetInfo(3, rulesets.AvailableRulesets.Where(r => r.OnlineID == id).ToArray()));
 
         private void checkMusicPlaying(bool playing) =>
             AddUntilStep($"music {(playing ? "" : "not ")}playing", () => music.IsPlaying == playing);
