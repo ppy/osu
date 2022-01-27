@@ -90,11 +90,5 @@ namespace osu.Game.Rulesets
 
             return ruleset;
         }
-
-        #region Compatibility properties
-
-        public int ID => OnlineID;
-
-        #endregion
     }
 }
