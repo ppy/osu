@@ -51,14 +51,14 @@ namespace osu.Game.Rulesets
 
         public int CompareTo(RulesetInfo other)
         {
+            if (OnlineID >= 0 && other.OnlineID >= 0)
+                return OnlineID.CompareTo(other.OnlineID);
+
             // Official rulesets are always given precedence for the time being.
             if (OnlineID >= 0)
-            {
-                if (other.OnlineID >= 0)
-                    return OnlineID.CompareTo(other.OnlineID);
-
                 return -1;
-            }
+            if (other.OnlineID >= 0)
+                return 1;
 
             return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
         }
