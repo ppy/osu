@@ -15,6 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
@@ -39,6 +41,12 @@ namespace osu.Game.Database
 
         [Resolved]
         private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; } = null!;
+
+        [Resolved]
+        private OsuGame game { get; set; } = null!;
 
         private readonly OsuSpriteText currentOperationText;
 
@@ -96,7 +104,11 @@ namespace osu.Game.Database
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            beginMigration();
+        }
 
+        private void beginMigration()
+        {
             Task.Factory.StartNew(() =>
             {
                 using (var ef = efContextFactory.Get())
@@ -117,19 +129,35 @@ namespace osu.Game.Database
                     migrateBeatmaps(ef);
                     migrateScores(ef);
                 }
-
-                // Delete the database permanently.
-                // Will cause future startups to not attempt migration.
-                log("Migration successful, deleting EF database");
-                efContextFactory.ResetDatabase();
-
-                if (DebugUtils.IsDebugBuild)
-                    Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
             }, TaskCreationOptions.LongRunning).ContinueWith(t =>
             {
+                if (t.Exception == null)
+                {
+                    log("Migration successful!");
+
+                    if (DebugUtils.IsDebugBuild)
+                        Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
+                }
+                else
+                {
+                    log("Migration failed!");
+                    Logger.Log(t.Exception.ToString(), LoggingTarget.Database);
+                }
+
+                // Regardless of success, since the game is going to continue with startup let's move the ef database out of the way.
+                // If we were to not do this, the migration would run another time the next time the user starts the game.
+                deletePreRealmData();
+
                 migrationCompleted.SetResult(true);
                 efContextFactory.SetMigrationCompletion();
             });
+        }
+
+        private void deletePreRealmData()
+        {
+            // Delete the database permanently.
+            // Will cause future startups to not attempt migration.
+            efContextFactory.ResetDatabase();
         }
 
         private void log(string message)
