@@ -69,20 +69,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 Beatmap.SetDefault();
+
+                songSelect = null;
             });
 
             AddStep("delete all beatmaps", () => manager?.Delete());
-        }
-
-        public override void TearDownSteps()
-        {
-            base.TearDownSteps();
-
-            AddStep("remove song select", () =>
-            {
-                songSelect?.Expire();
-                songSelect = null;
-            });
         }
 
         [Test]
