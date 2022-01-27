@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             Assert.That(!testBeatmap.HitObjects.OfType<HoldNote>().Any());
         }
 
-
         private static IBeatmap createBeatmap()
         {
             var beatmap = createRawBeatmap();
