@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             Value = 200.0,
             Precision = 1.0,
         };
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var maniaBeatmap = (ManiaBeatmap)beatmap;
