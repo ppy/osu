@@ -202,16 +202,18 @@ namespace osu.Game
             // See https://github.com/ppy/osu/pull/16547 for more discussion.
             if (EFContextFactory != null)
             {
+                const string backup_folder = "backups";
+
                 string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
-                EFContextFactory.CreateBackup($"client.{migration}.db");
-                realm.CreateBackup($"client.{migration}.realm");
+                EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
+                realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
 
                 using (var source = Storage.GetStream("collection.db"))
                 {
                     if (source != null)
                     {
-                        using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
                             source.CopyTo(destination);
                     }
                 }
