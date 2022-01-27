@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
-                importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
+                importedBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
             });
 
             AddStep("change to all players mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }));
