@@ -157,7 +157,7 @@ namespace osu.Game.Database
                         Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. The previous version has been backed up.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
                         Activated = () =>
                         {
-                            game.OpenUrlExternally(@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue&body=Please%20drag%20the%20""attach_me.zip""%20file%20here!&category=q-a", true);
+                            game.OpenUrlExternally($@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue ({t.Exception.Message})&body=Please%20drag%20the%20""attach_me.zip""%20file%20here!&category=q-a", true);
 
                             const string attachment_filename = "attach_me.zip";
                             const string backup_folder = "backups";
