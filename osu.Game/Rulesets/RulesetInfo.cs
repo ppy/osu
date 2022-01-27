@@ -49,6 +49,20 @@ namespace osu.Game.Rulesets
 
         public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
 
+        public int CompareTo(RulesetInfo other)
+        {
+            if (OnlineID >= 0 && other.OnlineID >= 0)
+                return OnlineID.CompareTo(other.OnlineID);
+
+            // Official rulesets are always given precedence for the time being.
+            if (OnlineID >= 0)
+                return -1;
+            if (other.OnlineID >= 0)
+                return 1;
+
+            return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
+        }
+
         public override int GetHashCode()
         {
             // Importantly, ignore the underlying realm hash code, as it will usually not match.
@@ -90,11 +104,5 @@ namespace osu.Game.Rulesets
 
             return ruleset;
         }
-
-        #region Compatibility properties
-
-        public int ID => OnlineID;
-
-        #endregion
     }
 }

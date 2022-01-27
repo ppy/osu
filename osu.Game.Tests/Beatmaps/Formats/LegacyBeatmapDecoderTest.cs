@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
                 Assert.AreEqual(164471, metadata.PreviewTime);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
-                Assert.IsTrue(beatmapInfo.RulesetID == 0);
+                Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
                 Assert.IsFalse(beatmapInfo.LetterboxInBreaks);
                 Assert.IsFalse(beatmapInfo.SpecialStyle);
                 Assert.IsFalse(beatmapInfo.WidescreenStoryboard);

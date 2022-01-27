@@ -232,6 +232,7 @@ namespace osu.Game.Database
 
                 var transaction = r.BeginWrite();
                 int written = 0;
+                int missing = 0;
 
                 try
                 {
@@ -260,6 +261,12 @@ namespace osu.Game.Database
                         {
                             var ruleset = r.Find<RulesetInfo>(beatmap.RulesetInfo.ShortName);
                             var metadata = getBestMetadata(beatmap.Metadata, beatmapSet.Metadata);
+
+                            if (ruleset == null)
+                            {
+                                log($"Skipping {++missing} beatmaps with missing ruleset");
+                                continue;
+                            }
 
                             var realmBeatmap = new BeatmapInfo(ruleset, new BeatmapDifficulty(beatmap.BaseDifficulty), metadata)
                             {

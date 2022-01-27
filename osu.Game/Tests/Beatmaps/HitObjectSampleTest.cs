@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Beatmaps
                         currentTestBeatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
                     // populate ruleset for beatmap converters that require it to be present.
-                    var ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.RulesetID);
+                    var ruleset = rulesetStore.GetRuleset(currentTestBeatmap.BeatmapInfo.Ruleset.OnlineID);
 
                     Debug.Assert(ruleset != null);
 
