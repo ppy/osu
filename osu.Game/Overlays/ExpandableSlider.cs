@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
 
         public BindableBool Expanded { get; } = new BindableBool();
 
-        public bool IsControlDragged => slider.IsDragged;
+        bool IExpandable.ShouldBeExpanded => IsHovered || slider.IsDragged;
 
         public override bool HandlePositionalInput => true;
 
