@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             BeatmapInfo selectedBeatmap = null;
 
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.RulesetID == new OsuRuleset().LegacyID).ElementAt(1)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.Ruleset.OnlineID == new OsuRuleset().LegacyID).ElementAt(1)));
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
 
             AddStep("exit song select", () => songSelect.Exit());
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.RulesetID == new TaikoRuleset().LegacyID)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
