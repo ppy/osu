@@ -25,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
                 new RulesetInfo("custom3", "Custom Ruleset 3", string.Empty, -1),
             };
 
-            var orderedRulesets = rulesets.OrderBy(r => r.SortID);
+            var orderedRulesets = rulesets.OrderBy(r => r);
 
             // Ensure all customs are after official.
             Assert.That(orderedRulesets.Select(r => r.OnlineID), Is.EqualTo(new[] { 0, 2, -1, -1, -1, -1 }));
