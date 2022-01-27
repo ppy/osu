@@ -27,9 +27,9 @@ namespace osu.Game.Online.Chat
             externalLinkWarning = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning);
         }
 
-        public void OpenUrlExternally(string url)
+        public void OpenUrlExternally(string url, bool bypassWarning = false)
         {
-            if (externalLinkWarning.Value)
+            if (!bypassWarning && externalLinkWarning.Value)
                 dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
                 host.OpenUrlExternally(url);
