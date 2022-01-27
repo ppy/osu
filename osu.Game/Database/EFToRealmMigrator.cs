@@ -374,12 +374,12 @@ namespace osu.Game.Database
                             log($"Migrated {written}/{count} scores...");
                         }
 
-                        var beatmap = r.All<BeatmapInfo>().First(b => b.Hash == score.BeatmapInfo.Hash);
+                        var beatmap = r.All<BeatmapInfo>().FirstOrDefault(b => b.Hash == score.BeatmapInfo.Hash);
                         var ruleset = r.Find<RulesetInfo>(score.Ruleset.ShortName);
 
-                        if (ruleset == null)
+                        if (beatmap == null || ruleset == null)
                         {
-                            log($"Skipping {++missing} scores with missing ruleset");
+                            log($"Skipping {++missing} scores with missing ruleset or beatmap");
                             continue;
                         }
 
