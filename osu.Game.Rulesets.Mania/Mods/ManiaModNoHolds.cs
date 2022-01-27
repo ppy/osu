@@ -69,7 +69,5 @@ namespace osu.Game.Rulesets.Mania.Mods
 
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
         }
-
     }
-
 }
