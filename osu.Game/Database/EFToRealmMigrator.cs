@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -22,6 +24,10 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using osuTK;
 using Realms;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers.Zip;
 
 #nullable enable
 
@@ -47,6 +53,9 @@ namespace osu.Game.Database
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
+
+        [Resolved]
+        private Storage storage { get; set; } = null!;
 
         private readonly OsuSpriteText currentOperationText;
 
@@ -145,10 +154,26 @@ namespace osu.Game.Database
 
                     notificationOverlay.Post(new SimpleErrorNotification
                     {
-                        Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. It has been backed up in your osu! folder.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
+                        Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. The previous version has been backed up.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
                         Activated = () =>
                         {
-                            game.OpenUrlExternally(@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue&body=Please%20attach%20your%20database%20backups%20by%20zipping%20them%20and%20dragging%20in%20here!&category=q-a");
+                            game.OpenUrlExternally(@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue&body=Please%20drag%20the%20""attach_me.zip""%20file%20here!&category=q-a");
+
+                            const string attachment_filename = "attach_me.zip";
+                            const string backup_folder = "backups";
+
+                            var backupStorage = storage.GetStorageForDirectory(backup_folder);
+
+                            backupStorage.Delete(attachment_filename);
+
+                            using (var zip = ZipArchive.Create())
+                            {
+                                zip.AddAllFromDirectory(backupStorage.GetFullPath(string.Empty));
+                                zip.SaveTo(Path.Combine(backupStorage.GetFullPath(string.Empty), attachment_filename), new ZipWriterOptions(CompressionType.Deflate));
+                            }
+
+                            backupStorage.PresentFileExternally(attachment_filename);
+
                             return true;
                         }
                     });
