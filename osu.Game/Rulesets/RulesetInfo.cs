@@ -24,11 +24,6 @@ namespace osu.Game.Rulesets
 
         public string InstantiationInfo { get; set; } = string.Empty;
 
-        /// <summary>
-        /// A best effort sort ID which provides stable ordering and puts online rulesets before non-online rulesets.
-        /// </summary>
-        public int SortID => OnlineID >= 0 ? OnlineID : Math.Abs(ShortName.GetHashCode());
-
         public RulesetInfo(string shortName, string name, string instantiationInfo, int onlineID)
         {
             ShortName = shortName;
@@ -61,6 +56,20 @@ namespace osu.Game.Rulesets
         }
 
         public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
+
+        public int CompareTo(RulesetInfo other)
+        {
+            // Official rulesets are always given precedence for the time being.
+            if (OnlineID >= 0)
+            {
+                if (other.OnlineID >= 0)
+                    return OnlineID.CompareTo(other.OnlineID);
+
+                return -1;
+            }
+
+            return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
+        }
 
         public override int GetHashCode()
         {

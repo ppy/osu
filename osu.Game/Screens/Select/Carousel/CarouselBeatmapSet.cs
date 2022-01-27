@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             beatmapSet.Beatmaps
                       .Where(b => !b.Hidden)
-                      .OrderBy(b => b.Ruleset.SortID)
+                      .OrderBy(b => b.Ruleset)
                       .ThenBy(b => b.StarRating)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
