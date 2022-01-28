@@ -3,9 +3,10 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Testing;
+using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Input;
@@ -19,28 +20,35 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private HoldForMenuButton holdForMenuButton;
+
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            HoldForMenuButton holdForMenuButton;
-
-            Add(holdForMenuButton = new HoldForMenuButton
+            AddStep("create button", () =>
             {
-                Origin = Anchor.BottomRight,
-                Anchor = Anchor.BottomRight,
-                Action = () => exitAction = true
+                exitAction = false;
+
+                Child = holdForMenuButton = new HoldForMenuButton
+                {
+                    Scale = new Vector2(2),
+                    Origin = Anchor.CentreRight,
+                    Anchor = Anchor.CentreRight,
+                    Action = () => exitAction = true
+                };
             });
+        }
 
-            var text = holdForMenuButton.Children.OfType<SpriteText>().First();
-
+        [Test]
+        public void TestMovementAndTrigger()
+        {
             AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(holdForMenuButton));
-            AddUntilStep("Text visible", () => text.IsPresent && !exitAction);
+            AddUntilStep("Text visible", () => getSpriteText().IsPresent && !exitAction);
             AddStep("Trigger text fade out", () => InputManager.MoveMouseTo(Vector2.One));
-            AddUntilStep("Text is not visible", () => !text.IsPresent && !exitAction);
+            AddUntilStep("Text is not visible", () => !getSpriteText().IsPresent && !exitAction);
 
             AddStep("Trigger exit action", () =>
             {
-                exitAction = false;
                 InputManager.MoveMouseTo(holdForMenuButton);
                 InputManager.PressButton(MouseButton.Left);
             });
@@ -50,6 +58,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("Trigger exit action", () => InputManager.PressButton(MouseButton.Left));
             AddUntilStep($"{nameof(holdForMenuButton.Action)} was triggered", () => exitAction);
+            AddStep("Release", () => InputManager.ReleaseButton(MouseButton.Left));
         }
     }
 }
