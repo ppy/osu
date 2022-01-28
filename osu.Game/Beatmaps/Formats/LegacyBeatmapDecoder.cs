@@ -311,10 +311,13 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"OverallDifficulty":
                     difficulty.OverallDifficulty = Parsing.ParseFloat(pair.Value);
+                    if (!hasApproachRate)
+                        difficulty.ApproachRate = difficulty.OverallDifficulty;
                     break;
 
                 case @"ApproachRate":
                     difficulty.ApproachRate = Parsing.ParseFloat(pair.Value);
+                    hasApproachRate = true;
                     break;
 
                 case @"SliderMultiplier":
@@ -432,6 +435,7 @@ namespace osu.Game.Beatmaps.Formats
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
         private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
+        private bool hasApproachRate;
 
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
         {
