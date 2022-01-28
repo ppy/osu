@@ -6,7 +6,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
-using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Input;
