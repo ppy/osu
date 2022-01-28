@@ -14,6 +14,7 @@ using osu.Framework.Utils;
 using osu.Game.Online.API;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual.Spectator
@@ -27,11 +28,21 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
 
+        public readonly Dictionary<int, ReplayFrame> LastReceivedFrame = new Dictionary<int, ReplayFrame>();
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
         private readonly Dictionary<int, int> userNextFrameDictionary = new Dictionary<int, int>();
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
+
+        public TestSpectatorClient()
+        {
+            OnNewFrames += (i, bundle) =>
+            {
+                if (PlayingUsers.Contains(i))
+                    LastReceivedFrame[i] = bundle.Frames[^1];
+            };
+        }
 
         /// <summary>
         /// Starts play for an arbitrary user.

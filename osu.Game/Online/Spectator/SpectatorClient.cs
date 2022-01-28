@@ -167,6 +167,9 @@ namespace osu.Game.Online.Spectator
                 if (!IsPlaying)
                     return;
 
+                if (pendingFrames.Count > 0)
+                    purgePendingFrames(true);
+
                 IsPlaying = false;
                 currentBeatmap = null;
 
@@ -238,9 +241,12 @@ namespace osu.Game.Online.Spectator
                 purgePendingFrames();
         }
 
-        private void purgePendingFrames()
+        private void purgePendingFrames(bool force = false)
         {
-            if (lastSend?.IsCompleted == false)
+            if (lastSend?.IsCompleted == false && !force)
+                return;
+
+            if (pendingFrames.Count == 0)
                 return;
 
             var frames = pendingFrames.ToArray();
