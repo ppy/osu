@@ -29,7 +29,7 @@ namespace osu.Game.Online.Leaderboards
     /// </summary>
     /// <typeparam name="TScope">The scope of the leaderboard (ie. global or local).</typeparam>
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
-    public abstract class Leaderboard<TScope, TScoreInfo> : Container
+    public abstract class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
         private const double fade_duration = 300;
 
@@ -57,10 +57,6 @@ namespace osu.Game.Online.Leaderboards
         private ScheduledDelegate pendingUpdateScores;
 
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        private readonly Container content;
-
-        protected override Container<Drawable> Content => content;
 
         private ICollection<TScoreInfo> scores;
 
@@ -231,7 +227,7 @@ namespace osu.Game.Online.Leaderboards
                             },
                             new Drawable[]
                             {
-                                content = new Container
+                                new Container
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
