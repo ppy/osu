@@ -132,7 +132,7 @@ namespace osu.Game.Online.Leaderboards
                     return;
 
                 scope = value;
-                RefreshScores();
+                RefetchScores();
             }
         }
 
@@ -160,7 +160,7 @@ namespace osu.Game.Online.Leaderboards
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
-                            Action = RefreshScores
+                            Action = RefetchScores
                         });
                         break;
 
@@ -272,15 +272,15 @@ namespace osu.Game.Online.Leaderboards
                 case APIState.Online:
                 case APIState.Offline:
                     if (IsOnlineScope)
-                        RefreshScores();
+                        RefetchScores();
 
                     break;
             }
         });
 
-        public void RefreshScores() => Scheduler.AddOnce(UpdateScores);
+        public void RefetchScores() => Scheduler.AddOnce(refetchScores);
 
-        protected void UpdateScores()
+        private void refetchScores()
         {
             // don't display any scores or placeholder until the first Scores_Set has been called.
             // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
