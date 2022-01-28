@@ -82,6 +82,11 @@ namespace osu.Game.Screens.Edit.Compose
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // May be null in the case of a ruleset that doesn't have editor support, see CreateMainContent().
+            if (composer == null)
+                return;
+
             EditorBeatmap.SelectedHitObjects.BindCollectionChanged((_, __) => updateClipboardActionAvailability());
             clipboard.BindValueChanged(_ => updateClipboardActionAvailability());
             composer.OnLoadComplete += _ => updateClipboardActionAvailability();

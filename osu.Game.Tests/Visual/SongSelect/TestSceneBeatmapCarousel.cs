@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -38,6 +39,36 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        [Test]
+        public void TestScrollPositionMaintainedOnAdd()
+        {
+            loadBeatmaps(count: 1, randomDifficulties: false);
+
+            for (int i = 0; i < 10; i++)
+            {
+                AddRepeatStep("Add some sets", () => carousel.UpdateBeatmapSet(TestResources.CreateTestBeatmapSetInfo()), 4);
+
+                checkSelectionIsCentered();
+            }
+        }
+
+        [Test]
+        public void TestScrollPositionMaintainedOnDelete()
+        {
+            loadBeatmaps(count: 50, randomDifficulties: false);
+
+            for (int i = 0; i < 10; i++)
+            {
+                AddRepeatStep("Remove some sets", () =>
+                    carousel.RemoveBeatmapSet(carousel.Items.Select(item => item.Item)
+                                                      .OfType<CarouselBeatmapSet>()
+                                                      .OrderBy(item => item.GetHashCode())
+                                                      .First(item => item.State.Value != CarouselItemState.Selected && item.Visible).BeatmapSet), 4);
+
+                checkSelectionIsCentered();
+            }
         }
 
         [Test]
@@ -811,6 +842,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             // until step required as we are querying against alive items, which are loaded asynchronously inside DrawableCarouselBeatmapSet.
             AddUntilStep($"{count} {(diff ? "diffs" : "sets")} visible", () =>
                 carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+        }
+
+        private void checkSelectionIsCentered()
+        {
+            AddAssert("Selected panel is centered", () =>
+            {
+                return Precision.AlmostEquals(
+                    carousel.ScreenSpaceDrawQuad.Centre,
+                    carousel.Items
+                            .First(i => i.Item.State.Value == CarouselItemState.Selected)
+                            .ScreenSpaceDrawQuad.Centre, 100);
+            });
         }
 
         private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);
