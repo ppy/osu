@@ -33,6 +33,8 @@ namespace osu.Game.Online.Leaderboards
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
     public abstract class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
+        protected abstract bool IsOnlineScope { get; }
+
         private const double fade_duration = 300;
 
         private readonly OsuScrollContainer scrollContainer;
@@ -48,8 +50,6 @@ namespace osu.Game.Online.Leaderboards
         private APIRequest getScoresRequest;
         private ScheduledDelegate getScoresRequestCallback;
 
-        protected abstract bool IsOnlineScope { get; }
-
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
@@ -62,49 +62,9 @@ namespace osu.Game.Online.Leaderboards
             get => scores;
             protected set
             {
-                Debug.Assert(ThreadSafety.IsUpdateThread);
-
                 scores = value;
 
-                scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
-                scrollFlow = null;
-
-                showScoresCancellationSource?.Cancel();
-
-                if (scores?.Any() != true)
-                {
-                    loading.Hide();
-                    return;
-                }
-
-                // ensure placeholder is hidden when displaying scores
-                PlaceholderState = PlaceholderState.Successful;
-
-                var scoreFlow = new FillFlowContainer<LeaderboardScore>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0f, 5f),
-                    Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                    ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
-                };
-
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                LoadComponentAsync(scoreFlow, _ =>
-                {
-                    scrollContainer.Add(scrollFlow = scoreFlow);
-
-                    int i = 0;
-
-                    foreach (var s in scrollFlow.Children)
-                    {
-                        using (s.BeginDelayedSequence(i++ * 50))
-                            s.Show();
-                    }
-
-                    scrollContainer.ScrollToStart(false);
-                    loading.Hide();
-                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
+                updateScoresDrawables();
             }
         }
 
@@ -322,6 +282,51 @@ namespace osu.Game.Online.Leaderboards
                         break;
                 }
             }
+        }
+
+        private void updateScoresDrawables()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
+            scrollFlow = null;
+
+            showScoresCancellationSource?.Cancel();
+
+            if (scores?.Any() != true)
+            {
+                loading.Hide();
+                return;
+            }
+
+            // ensure placeholder is hidden when displaying scores
+            PlaceholderState = PlaceholderState.Successful;
+
+            var scoreFlow = new FillFlowContainer<LeaderboardScore>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(0f, 5f),
+                Padding = new MarginPadding { Top = 10, Bottom = 5 },
+                ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
+            };
+
+            // schedule because we may not be loaded yet (LoadComponentAsync complains).
+            LoadComponentAsync(scoreFlow, _ =>
+            {
+                scrollContainer.Add(scrollFlow = scoreFlow);
+
+                int i = 0;
+
+                foreach (var s in scrollFlow.Children)
+                {
+                    using (s.BeginDelayedSequence(i++ * 50))
+                        s.Show();
+                }
+
+                scrollContainer.ScrollToStart(false);
+                loading.Hide();
+            }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
         }
 
         private void replacePlaceholder(Placeholder placeholder)
