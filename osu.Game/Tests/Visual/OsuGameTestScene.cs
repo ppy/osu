@@ -158,6 +158,14 @@ namespace osu.Game.Tests.Visual
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
             }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                // when running in visual tests and the window loses focus, we generally don't want the game to pause.
+                ((Bindable<bool>)IsActive).Value = true;
+            }
         }
 
         public class TestLoader : Loader
