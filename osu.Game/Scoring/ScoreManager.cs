@@ -266,6 +266,15 @@ namespace osu.Game.Scoring
             });
         }
 
+        public void Delete(BeatmapInfo beatmap, bool silent = false)
+        {
+            realm.Run(r =>
+            {
+                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
+                scoreModelManager.Delete(beatmapScores, silent);
+            });
+        }
+
         public void Delete(List<ScoreInfo> items, bool silent = false)
         {
             scoreModelManager.Delete(items, silent);
