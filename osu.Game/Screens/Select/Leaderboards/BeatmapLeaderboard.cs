@@ -25,12 +25,6 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         public Action<ScoreInfo> ScoreSelected;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
         private BeatmapInfo beatmapInfo;
 
         public BeatmapInfo BeatmapInfo
@@ -52,13 +46,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 beatmapInfo = value;
                 Scores = null;
 
-                if (IsOnlineScope)
-                    RefetchScores();
-                else
-                {
-                    if (IsLoaded)
-                        refreshRealmSubscription();
-                }
+                RefetchScores();
             }
         }
 
@@ -93,6 +81,14 @@ namespace osu.Game.Screens.Select.Leaderboards
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        private IDisposable scoreSubscription;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -102,33 +98,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     RefetchScores();
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            refreshRealmSubscription();
-        }
-
-        private IDisposable scoreSubscription;
-
-        private void refreshRealmSubscription()
-        {
-            scoreSubscription?.Dispose();
-            scoreSubscription = null;
-
-            if (beatmapInfo == null)
-                return;
-
-            scoreSubscription = realm.RegisterForNotifications(r =>
-                    r.All<ScoreInfo>()
-                     .Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} = $0", beatmapInfo.ID),
-                (_, changes, ___) =>
-                {
-                    if (!IsOnlineScope)
-                        RefetchScores();
-                });
         }
 
         protected override void Reset()
@@ -141,12 +110,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private CancellationTokenSource loadCancellationSource;
 
-        protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
+        protected override APIRequest FetchScores()
         {
             loadCancellationSource?.Cancel();
             loadCancellationSource = new CancellationTokenSource();
-
-            var cancellationToken = loadCancellationSource.Token;
 
             var fetchBeatmapInfo = BeatmapInfo;
 
@@ -158,31 +125,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                realm.Run(r =>
-                {
-                    var scores = r.All<ScoreInfo>()
-                                  .AsEnumerable()
-                                  // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
-                                  .Where(s => !s.DeletePending && s.BeatmapInfo.ID == fetchBeatmapInfo.ID && s.Ruleset.ShortName == ruleset.Value.ShortName);
-
-                    if (filterMods && !mods.Value.Any())
-                    {
-                        // we need to filter out all scores that have any mods to get all local nomod scores
-                        scores = scores.Where(s => !s.Mods.Any());
-                    }
-                    else if (filterMods)
-                    {
-                        // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
-                        // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                        var selectedMods = mods.Value.Select(m => m.Acronym);
-                        scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
-                    }
-
-                    scores = scores.Detach();
-
-                    scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                                .ContinueWith(ordered => scoresCallback?.Invoke(ordered.GetResultSafely()), TaskContinuationOptions.OnlyOnRanToCompletion);
-                });
+                subscribeToLocalScores();
 
                 return null;
             }
@@ -217,13 +160,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), loadCancellationSource.Token)
                             .ContinueWith(task => Schedule(() =>
                             {
-                                if (cancellationToken.IsCancellationRequested)
+                                if (loadCancellationSource.IsCancellationRequested)
                                     return;
 
-                                scoresCallback?.Invoke(task.GetResultSafely());
+                                Scores = task.GetResultSafely();
                                 TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
@@ -241,10 +184,53 @@ namespace osu.Game.Screens.Select.Leaderboards
             Action = () => ScoreSelected?.Invoke(model)
         };
 
+        private void subscribeToLocalScores()
+        {
+            scoreSubscription?.Dispose();
+            scoreSubscription = null;
+
+            if (beatmapInfo == null)
+                return;
+
+            scoreSubscription = realm.RegisterForNotifications(r =>
+                r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(BeatmapInfo.ID)} == $0"
+                                          + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
+                                          + $" AND {nameof(ScoreInfo.DeletePending)} == false"
+                    , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
+        }
+
+        private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception exception)
+        {
+            if (IsOnlineScope)
+                return;
+
+            var scores = sender.AsEnumerable();
+
+            if (filterMods && !mods.Value.Any())
+            {
+                // we need to filter out all scores that have any mods to get all local nomod scores
+                scores = scores.Where(s => !s.Mods.Any());
+            }
+            else if (filterMods)
+            {
+                // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
+                // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
+                var selectedMods = mods.Value.Select(m => m.Acronym);
+                scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+            }
+
+            scores = scores.Detach();
+
+            scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
+                        .ContinueWith(ordered =>
+                        {
+                            Scores = ordered.GetResultSafely();
+                        }, TaskContinuationOptions.OnlyOnRanToCompletion);
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
             scoreSubscription?.Dispose();
         }
     }
