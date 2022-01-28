@@ -60,5 +60,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep($"{nameof(holdForMenuButton.Action)} was triggered", () => exitAction);
             AddStep("Release", () => InputManager.ReleaseButton(MouseButton.Left));
         }
+
+        [Test]
+        public void TestFadeOnNoInput()
+        {
+            AddStep("move mouse away", () => InputManager.MoveMouseTo(Vector2.One));
+            AddUntilStep("wait for text fade out", () => !getSpriteText().IsPresent);
+            AddUntilStep("wait for button fade out", () => holdForMenuButton.Alpha < 0.1f);
+        }
+
+        private SpriteText getSpriteText() => holdForMenuButton.Children.OfType<SpriteText>().First();
     }
 }

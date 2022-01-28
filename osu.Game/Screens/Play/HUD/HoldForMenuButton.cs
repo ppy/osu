@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
         }
 
-        private float positionalAdjust;
+        private float positionalAdjust = 1; // Start at 1 to handle the case where a user never send positional input.
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
