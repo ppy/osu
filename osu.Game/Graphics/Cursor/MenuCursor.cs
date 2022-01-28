@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
@@ -30,13 +32,17 @@ namespace osu.Game.Graphics.Cursor
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
 
+        private Sample tapSample;
+
         [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
+        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager, AudioManager audio)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
 
             if (screenshotManager != null)
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
+
+            tapSample = audio.Samples.Get(@"UI/cursor-tap");
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -68,6 +74,18 @@ namespace osu.Game.Graphics.Cursor
             }
 
             return base.OnMouseMove(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            var channel = tapSample.GetChannel();
+
+            // scale to [-0.75, 0.75] so that the sample isn't fully panned left or right (sounds weird)
+            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * 0.75;
+            channel.Frequency.Value = 0.99 + RNG.NextDouble(0.02);
+            channel.Play();
+
+            return base.OnClick(e);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
