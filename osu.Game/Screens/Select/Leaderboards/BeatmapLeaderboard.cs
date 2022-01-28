@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception exception)
             {
-                if (IsOnlineScope || cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                     return;
 
                 var scores = sender.AsEnumerable();
