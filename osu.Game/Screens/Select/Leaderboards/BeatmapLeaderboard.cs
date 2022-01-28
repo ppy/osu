@@ -121,7 +121,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (Scope == BeatmapLeaderboardScope.Local)
             {
                 subscribeToLocalScores(cancellationToken);
-
                 return null;
             }
 
