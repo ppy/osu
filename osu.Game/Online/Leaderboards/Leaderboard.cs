@@ -82,7 +82,13 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var scoreFlow = CreateScoreFlow();
+                var scoreFlow = new FillFlowContainer<LeaderboardScore>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(0f, 5f),
+                    Padding = new MarginPadding { Top = 10, Bottom = 5 },
+                };
                 scoreFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
@@ -117,15 +123,6 @@ namespace osu.Game.Online.Leaderboards
                     topScoreContainer.Show();
             }
         }
-
-        protected virtual FillFlowContainer<LeaderboardScore> CreateScoreFlow()
-            => new FillFlowContainer<LeaderboardScore>
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(0f, 5f),
-                Padding = new MarginPadding { Top = 10, Bottom = 5 },
-            };
 
         private TScope scope;
 
@@ -345,9 +342,6 @@ namespace osu.Game.Online.Leaderboards
             currentPlaceholder = placeholder;
         }
 
-        protected virtual bool FadeBottom => true;
-        protected virtual bool FadeTop => false;
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -366,22 +360,21 @@ namespace osu.Game.Online.Leaderboards
                 float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
                 float bottomY = topY + LeaderboardScore.HEIGHT;
 
-                bool requireTopFade = FadeTop && topY <= fadeTop;
-                bool requireBottomFade = FadeBottom && bottomY >= fadeBottom;
+                bool requireBottomFade = bottomY >= fadeBottom;
 
-                if (!requireTopFade && !requireBottomFade)
+                if (!requireBottomFade)
                     c.Colour = Color4.White;
                 else if (topY > fadeBottom + LeaderboardScore.HEIGHT || bottomY < fadeTop - LeaderboardScore.HEIGHT)
                     c.Colour = Color4.Transparent;
                 else
                 {
-                    if (bottomY - fadeBottom > 0 && FadeBottom)
+                    if (bottomY - fadeBottom > 0)
                     {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
                     }
-                    else if (FadeTop)
+                    else
                     {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
