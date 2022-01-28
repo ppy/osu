@@ -46,6 +46,18 @@ namespace osu.Game.Online.Leaderboards
 
         private bool scoresLoadedOnce;
 
+        private APIRequest getScoresRequest;
+        private ScheduledDelegate getScoresRequestCallback;
+
+        protected abstract bool IsOnlineScope { get; }
+
+        [Resolved(CanBeNull = true)]
+        private IAPIProvider api { get; set; }
+
+        private ScheduledDelegate pendingUpdateScores;
+
+        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
+
         private readonly Container content;
 
         protected override Container<Drawable> Content => content;
@@ -239,44 +251,34 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual void Reset()
         {
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
+            cancelPendingWork();
+
             Scores = null;
         }
 
-        [Resolved(CanBeNull = true)]
-        private IAPIProvider api { get; set; }
-
-        private ScheduledDelegate pendingUpdateScores;
-
-        private readonly IBindable<APIState> apiState = new Bindable<APIState>();
-
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             if (api != null)
-                apiState.BindTo(api.State);
-
-            apiState.BindValueChanged(onlineStateChanged, true);
-        }
-
-        private APIRequest getScoresRequest;
-        private ScheduledDelegate getScoresRequestCallback;
-
-        protected abstract bool IsOnlineScope { get; }
-
-        private void onlineStateChanged(ValueChangedEvent<APIState> state) => Schedule(() =>
-        {
-            switch (state.NewValue)
             {
-                case APIState.Online:
-                case APIState.Offline:
-                    if (IsOnlineScope)
-                        RefetchScores();
+                apiState.BindTo(api.State);
+                apiState.BindValueChanged(state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case APIState.Online:
+                        case APIState.Offline:
+                            if (IsOnlineScope)
+                                RefetchScores();
 
-                    break;
+                            break;
+                    }
+                });
             }
-        });
+
+            RefetchScores();
+        }
 
         public void RefetchScores() => Scheduler.AddOnce(refetchScores);
 
@@ -286,13 +288,8 @@ namespace osu.Game.Online.Leaderboards
             // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
             if (!scoresLoadedOnce) return;
 
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
+            cancelPendingWork();
 
-            getScoresRequestCallback?.Cancel();
-            getScoresRequestCallback = null;
-
-            pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
                 PlaceholderState = PlaceholderState.Retrieving;
@@ -317,6 +314,18 @@ namespace osu.Game.Online.Leaderboards
 
                 api?.Queue(getScoresRequest);
             });
+        }
+
+        private void cancelPendingWork()
+        {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+
+            getScoresRequestCallback?.Cancel();
+            getScoresRequestCallback = null;
+
+            pendingUpdateScores?.Cancel();
+            pendingUpdateScores = null;
         }
 
         /// <summary>
