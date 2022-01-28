@@ -44,8 +44,6 @@ namespace osu.Game.Online.Leaderboards
         private ScheduledDelegate showScoresDelegate;
         private CancellationTokenSource showScoresCancellationSource;
 
-        private bool scoresLoadedOnce;
-
         private APIRequest getScoresRequest;
         private ScheduledDelegate getScoresRequestCallback;
 
@@ -64,8 +62,6 @@ namespace osu.Game.Online.Leaderboards
             protected set
             {
                 scores = value;
-
-                scoresLoadedOnce = true;
 
                 scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
@@ -230,10 +226,6 @@ namespace osu.Game.Online.Leaderboards
 
         private void refetchScores()
         {
-            // don't display any scores or placeholder until the first Scores_Set has been called.
-            // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
-            if (!scoresLoadedOnce) return;
-
             cancelPendingWork();
 
             PlaceholderState = PlaceholderState.Retrieving;
