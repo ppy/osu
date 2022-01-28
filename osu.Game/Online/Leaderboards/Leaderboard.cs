@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
@@ -43,11 +42,12 @@ namespace osu.Game.Online.Leaderboards
         private readonly Container placeholderContainer;
         private readonly UserTopScoreContainer<TScoreInfo> topScoreContainer;
 
-        private FillFlowContainer<LeaderboardScore> scrollFlow;
+        private FillFlowContainer<LeaderboardScore> scoreFlowContainer;
 
         private readonly LoadingSpinner loading;
 
         private CancellationTokenSource currentFetchCancellationSource;
+        private CancellationTokenSource currentScoresAsyncLoadCancellationSource;
 
         private APIRequest fetchScoresRequest;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Online.Leaderboards
             protected set
             {
                 scores = value;
-                updateScoresDrawables();
+                Scheduler.AddOnce(updateScoresDrawables);
             }
         }
 
@@ -239,6 +239,8 @@ namespace osu.Game.Online.Leaderboards
                 if (value == placeholderState)
                     return;
 
+                loading.Hide();
+
                 switch (placeholderState = value)
                 {
                     case PlaceholderState.NetworkFailure:
@@ -275,40 +277,41 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private void updateScoresDrawables() => Scheduler.Add(() =>
+        private void updateScoresDrawables()
         {
-            scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
-            scrollFlow = null;
+            currentScoresAsyncLoadCancellationSource?.Cancel();
+            currentScoresAsyncLoadCancellationSource = new CancellationTokenSource();
+
+            scoreFlowContainer?
+                .FadeOut(fade_duration, Easing.OutQuint)
+                .Expire();
+            scoreFlowContainer = null;
+
+            loading.Hide();
 
             if (scores?.Any() != true)
             {
-                loading.Hide();
                 PlaceholderState = PlaceholderState.NoScores;
                 return;
             }
 
-            Debug.Assert(!currentFetchCancellationSource.IsCancellationRequested);
-
             // ensure placeholder is hidden when displaying scores
             PlaceholderState = PlaceholderState.Successful;
 
-            var scoreFlow = new FillFlowContainer<LeaderboardScore>
+            LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(0f, 5f),
                 Padding = new MarginPadding { Top = 10, Bottom = 5 },
                 ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
-            };
-
-            // schedule because we may not be loaded yet (LoadComponentAsync complains).
-            LoadComponentAsync(scoreFlow, _ =>
+            }, newFlow =>
             {
-                scrollContainer.Add(scrollFlow = scoreFlow);
+                scrollContainer.Add(scoreFlowContainer = newFlow);
 
                 int i = 0;
 
-                foreach (var s in scrollFlow.Children)
+                foreach (var s in scoreFlowContainer.Children)
                 {
                     using (s.BeginDelayedSequence(i++ * 50))
                         s.Show();
@@ -316,8 +319,8 @@ namespace osu.Game.Online.Leaderboards
 
                 scrollContainer.ScrollToStart(false);
                 loading.Hide();
-            }, currentFetchCancellationSource.Token);
-        }, false);
+            }, currentScoresAsyncLoadCancellationSource.Token);
+        }
 
         private void replacePlaceholder(Placeholder placeholder)
         {
@@ -354,12 +357,12 @@ namespace osu.Game.Online.Leaderboards
             if (!scrollContainer.IsScrolledToEnd())
                 fadeBottom -= LeaderboardScore.HEIGHT;
 
-            if (scrollFlow == null)
+            if (scoreFlowContainer == null)
                 return;
 
-            foreach (var c in scrollFlow.Children)
+            foreach (var c in scoreFlowContainer.Children)
             {
-                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
+                float topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scoreFlowContainer).Y;
                 float bottomY = topY + LeaderboardScore.HEIGHT;
 
                 bool requireBottomFade = bottomY >= fadeBottom;
