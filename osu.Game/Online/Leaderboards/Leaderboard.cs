@@ -32,6 +32,9 @@ namespace osu.Game.Online.Leaderboards
     /// <typeparam name="TScoreInfo">The score model class.</typeparam>
     public abstract class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
+        /// <summary>
+        /// Whether the current scope should refetch in response to changes in API connectivity state.
+        /// </summary>
         protected abstract bool IsOnlineScope { get; }
 
         private const double fade_duration = 300;
