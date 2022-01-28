@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select
         {
             base.Refresh();
 
-            Leaderboard.RefreshScores();
+            Leaderboard.RefetchScores();
         }
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)

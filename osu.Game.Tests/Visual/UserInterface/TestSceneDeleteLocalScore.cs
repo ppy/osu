@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
 
             leaderboard.BeatmapInfo = beatmapInfo;
-            leaderboard.RefreshScores(); // Required in the case that the beatmap hasn't changed
+            leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
         });
 
         [SetUpSteps]

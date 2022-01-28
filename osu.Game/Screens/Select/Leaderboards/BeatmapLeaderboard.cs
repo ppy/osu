@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 Scores = null;
 
                 if (IsOnlineScope)
-                    UpdateScores();
+                    RefetchScores();
                 else
                 {
                     if (IsLoaded)
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 filterMods = value;
 
-                UpdateScores();
+                RefetchScores();
             }
         }
 
@@ -96,11 +96,11 @@ namespace osu.Game.Screens.Select.Leaderboards
         [BackgroundDependencyLoader]
         private void load()
         {
-            ruleset.ValueChanged += _ => UpdateScores();
+            ruleset.ValueChanged += _ => RefetchScores();
             mods.ValueChanged += _ =>
             {
                 if (filterMods)
-                    UpdateScores();
+                    RefetchScores();
             };
         }
 
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 (_, changes, ___) =>
                 {
                     if (!IsOnlineScope)
-                        RefreshScores();
+                        RefetchScores();
                 });
         }
 

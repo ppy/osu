@@ -26,7 +26,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                     return;
 
                 Scores = null;
-                UpdateScores();
+                RefetchScores();
             }, true);
         }
 
