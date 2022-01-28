@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
         protected override bool IsOnlineScope => true;
 
-        protected override APIRequest FetchScores()
+        protected override APIRequest FetchScores(CancellationToken cancellationToken)
         {
             if (roomId.Value == null)
                 return null;
@@ -39,6 +40,9 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             req.Success += r =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 Scores = r.Leaderboard;
                 TopScore = r.UserScore;
             };

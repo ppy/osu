@@ -108,13 +108,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
-        private CancellationTokenSource loadCancellationSource;
-
-        protected override APIRequest FetchScores()
+        protected override APIRequest FetchScores(CancellationToken cancellationToken)
         {
-            loadCancellationSource?.Cancel();
-            loadCancellationSource = new CancellationTokenSource();
-
             var fetchBeatmapInfo = BeatmapInfo;
 
             if (fetchBeatmapInfo == null)
@@ -125,7 +120,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                subscribeToLocalScores();
+                subscribeToLocalScores(cancellationToken);
 
                 return null;
             }
@@ -160,10 +155,10 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             req.Success += r =>
             {
-                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), loadCancellationSource.Token)
+                scoreManager.OrderByTotalScoreAsync(r.Scores.Select(s => s.CreateScoreInfo(rulesets, fetchBeatmapInfo)).ToArray(), cancellationToken)
                             .ContinueWith(task => Schedule(() =>
                             {
-                                if (loadCancellationSource.IsCancellationRequested)
+                                if (cancellationToken.IsCancellationRequested)
                                     return;
 
                                 Scores = task.GetResultSafely();
@@ -184,7 +179,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Action = () => ScoreSelected?.Invoke(model)
         };
 
-        private void subscribeToLocalScores()
+        private void subscribeToLocalScores(CancellationToken cancellationToken)
         {
             scoreSubscription?.Dispose();
             scoreSubscription = null;
@@ -197,35 +192,35 @@ namespace osu.Game.Screens.Select.Leaderboards
                                           + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
                                           + $" AND {nameof(ScoreInfo.DeletePending)} == false"
                     , beatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
-        }
 
-        private void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception exception)
-        {
-            if (IsOnlineScope)
-                return;
-
-            var scores = sender.AsEnumerable();
-
-            if (filterMods && !mods.Value.Any())
+            void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception exception)
             {
-                // we need to filter out all scores that have any mods to get all local nomod scores
-                scores = scores.Where(s => !s.Mods.Any());
-            }
-            else if (filterMods)
-            {
-                // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
-                // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
-                var selectedMods = mods.Value.Select(m => m.Acronym);
-                scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
-            }
+                if (IsOnlineScope || cancellationToken.IsCancellationRequested)
+                    return;
 
-            scores = scores.Detach();
+                var scores = sender.AsEnumerable();
 
-            scoreManager.OrderByTotalScoreAsync(scores.ToArray(), loadCancellationSource.Token)
-                        .ContinueWith(ordered =>
-                        {
-                            Scores = ordered.GetResultSafely();
-                        }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                if (filterMods && !mods.Value.Any())
+                {
+                    // we need to filter out all scores that have any mods to get all local nomod scores
+                    scores = scores.Where(s => !s.Mods.Any());
+                }
+                else if (filterMods)
+                {
+                    // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
+                    // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
+                    var selectedMods = mods.Value.Select(m => m.Acronym);
+                    scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+                }
+
+                scores = scores.Detach();
+
+                scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
+                            .ContinueWith(ordered =>
+                            {
+                                Scores = ordered.GetResultSafely();
+                            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            }
         }
 
         protected override void Dispose(bool isDisposing)

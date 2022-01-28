@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
@@ -13,7 +14,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
@@ -44,10 +44,9 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly LoadingSpinner loading;
 
-        private CancellationTokenSource showScoresCancellationSource;
+        private CancellationTokenSource currentFetchCancellationSource;
 
-        private APIRequest getScoresRequest;
-        private ScheduledDelegate getScoresRequestCallback;
+        private APIRequest fetchScoresRequest;
 
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
@@ -62,7 +61,6 @@ namespace osu.Game.Online.Leaderboards
             protected set
             {
                 scores = value;
-
                 updateScoresDrawables();
             }
         }
@@ -177,9 +175,10 @@ namespace osu.Game.Online.Leaderboards
         /// <summary>
         /// Performs a fetch/refresh of scores to be displayed.
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
         [CanBeNull]
-        protected abstract APIRequest FetchScores();
+        protected abstract APIRequest FetchScores(CancellationToken cancellationToken);
 
         protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
 
@@ -187,37 +186,36 @@ namespace osu.Game.Online.Leaderboards
 
         private void refetchScores()
         {
-            cancelPendingWork();
+            Reset();
 
             PlaceholderState = PlaceholderState.Retrieving;
             loading.Show();
 
-            getScoresRequest = FetchScores();
+            currentFetchCancellationSource = new CancellationTokenSource();
 
-            if (getScoresRequest == null)
+            fetchScoresRequest = FetchScores(currentFetchCancellationSource.Token);
+
+            if (fetchScoresRequest == null)
                 return;
 
-            getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
+            fetchScoresRequest.Failure += e => Schedule(() =>
             {
-                if (e is OperationCanceledException)
+                if (e is OperationCanceledException || currentFetchCancellationSource.IsCancellationRequested)
                     return;
 
                 PlaceholderState = PlaceholderState.NetworkFailure;
             });
 
-            api?.Queue(getScoresRequest);
+            api?.Queue(fetchScoresRequest);
         }
 
         private void cancelPendingWork()
         {
-            showScoresCancellationSource?.Cancel();
-            showScoresCancellationSource = null;
+            currentFetchCancellationSource?.Cancel();
+            currentFetchCancellationSource = null;
 
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
-
-            getScoresRequestCallback?.Cancel();
-            getScoresRequestCallback = null;
+            fetchScoresRequest?.Cancel();
+            fetchScoresRequest = null;
         }
 
         #region Placeholder handling
@@ -279,14 +277,14 @@ namespace osu.Game.Online.Leaderboards
             scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
             scrollFlow = null;
 
-            showScoresCancellationSource?.Cancel();
-
             if (scores?.Any() != true)
             {
                 loading.Hide();
                 PlaceholderState = PlaceholderState.NoScores;
                 return;
             }
+
+            Debug.Assert(!currentFetchCancellationSource.IsCancellationRequested);
 
             // ensure placeholder is hidden when displaying scores
             PlaceholderState = PlaceholderState.Successful;
@@ -315,7 +313,7 @@ namespace osu.Game.Online.Leaderboards
 
                 scrollContainer.ScrollToStart(false);
                 loading.Hide();
-            }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
+            }, currentFetchCancellationSource.Token);
         }, false);
 
         private void replacePlaceholder(Placeholder placeholder)
