@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.Scores = generateSampleScores(null));
+            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(null)));
         }
 
         [Test]
@@ -422,6 +423,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 PlaceholderState = state;
             }
+
+            public void SetScores(ICollection<ScoreInfo> scores) => Scores = scores;
         }
     }
 }

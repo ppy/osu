@@ -128,9 +128,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
             });
 
-            leaderboard.Scores = null;
-            leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
-
             leaderboard.BeatmapInfo = beatmapInfo;
             leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
         });
