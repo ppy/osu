@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -13,12 +15,12 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
     public class PageSelectorPrevNextButton : PageSelectorButton
     {
         private readonly bool rightAligned;
-        private readonly string text;
+        private readonly LocalisableString text;
 
         private SpriteIcon icon;
         private OsuSpriteText name;
 
-        public PageSelectorPrevNextButton(bool rightAligned, string text)
+        public PageSelectorPrevNextButton(bool rightAligned, LocalisableString text)
         {
             this.rightAligned = rightAligned;
             this.text = text;

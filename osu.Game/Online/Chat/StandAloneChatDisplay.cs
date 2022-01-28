@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
+using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 
 namespace osu.Game.Online.Chat
@@ -63,7 +64,7 @@ namespace osu.Game.Online.Chat
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = text_box_height,
-                    PlaceholderText = "type your message",
+                    PlaceholderText = ChatStrings.InputPlaceholder,
                     CornerRadius = corner_radius,
                     ReleaseFocusOnCommit = false,
                     HoldFocus = true,

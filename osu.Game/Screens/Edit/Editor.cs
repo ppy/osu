@@ -29,6 +29,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -252,7 +253,7 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = createFileMenuItems()
                                     },
-                                    new MenuItem("Edit")
+                                    new MenuItem(CommonStrings.ButtonsEdit)
                                     {
                                         Items = new[]
                                         {
