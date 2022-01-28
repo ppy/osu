@@ -23,6 +23,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
+    /// <summary>
+    /// A leaderboard which displays a scrolling list of top scores, along with a single "user best"
+    /// for the local user.
+    /// </summary>
+    /// <typeparam name="TScope">The scope of the leaderboard (ie. global or local).</typeparam>
+    /// <typeparam name="TScoreInfo">The score model class.</typeparam>
     public abstract class Leaderboard<TScope, TScoreInfo> : Container
     {
         private const double fade_duration = 300;
