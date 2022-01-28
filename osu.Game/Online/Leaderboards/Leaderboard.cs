@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -41,7 +43,6 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly LoadingSpinner loading;
 
-        private ScheduledDelegate showScoresDelegate;
         private CancellationTokenSource showScoresCancellationSource;
 
         private APIRequest getScoresRequest;
@@ -61,15 +62,16 @@ namespace osu.Game.Online.Leaderboards
             get => scores;
             protected set
             {
+                Debug.Assert(ThreadSafety.IsUpdateThread);
+
                 scores = value;
 
                 scrollFlow?.FadeOut(fade_duration, Easing.OutQuint).Expire();
                 scrollFlow = null;
 
-                showScoresDelegate?.Cancel();
                 showScoresCancellationSource?.Cancel();
 
-                if (scores == null || !scores.Any())
+                if (scores?.Any() != true)
                 {
                     loading.Hide();
                     return;
@@ -84,11 +86,11 @@ namespace osu.Game.Online.Leaderboards
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0f, 5f),
                     Padding = new MarginPadding { Top = 10, Bottom = 5 },
+                    ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
                 };
-                scoreFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate = Schedule(() => LoadComponentAsync(scoreFlow, _ =>
+                LoadComponentAsync(scoreFlow, _ =>
                 {
                     scrollContainer.Add(scrollFlow = scoreFlow);
 
@@ -100,9 +102,9 @@ namespace osu.Game.Online.Leaderboards
                             s.Show();
                     }
 
-                    scrollContainer.ScrollTo(0f, false);
+                    scrollContainer.ScrollToStart(false);
                     loading.Hide();
-                }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
+                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
             }
         }
 
@@ -253,6 +255,9 @@ namespace osu.Game.Online.Leaderboards
 
         private void cancelPendingWork()
         {
+            showScoresCancellationSource?.Cancel();
+            showScoresCancellationSource = null;
+
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
