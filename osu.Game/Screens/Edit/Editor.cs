@@ -28,6 +28,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -61,7 +63,16 @@ namespace osu.Game.Screens.Edit
 
         public override bool? AllowTrackAdjustments => false;
 
-        protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
+        protected bool HasUnsavedChanges
+        {
+            get
+            {
+                if (!canSave)
+                    return false;
+
+                return lastSavedHash != changeHandler?.CurrentStateHash;
+            }
+        }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -72,9 +83,14 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay notifications { get; set; }
+
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
 
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
+        private bool canSave;
 
         private bool exitConfirmed;
 
@@ -92,6 +108,8 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
+
+        [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
         private EditorMenuBar menuBar;
@@ -172,8 +190,14 @@ namespace osu.Game.Screens.Edit
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
-            changeHandler = new EditorChangeHandler(editorBeatmap);
-            dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+
+            canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
+
+            if (canSave)
+            {
+                changeHandler = new EditorChangeHandler(editorBeatmap);
+                dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+            }
 
             beatDivisor.Value = editorBeatmap.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
@@ -311,8 +335,8 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
-            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             menuBar.Mode.ValueChanged += onModeChanged;
         }
@@ -353,6 +377,12 @@ namespace osu.Game.Screens.Edit
 
         protected void Save()
         {
+            if (!canSave)
+            {
+                notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
+                return;
+            }
+
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
 
@@ -648,9 +678,9 @@ namespace osu.Game.Screens.Edit
 
         #endregion
 
-        protected void Undo() => changeHandler.RestoreState(-1);
+        protected void Undo() => changeHandler?.RestoreState(-1);
 
-        protected void Redo() => changeHandler.RestoreState(1);
+        protected void Redo() => changeHandler?.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {
@@ -761,7 +791,7 @@ namespace osu.Game.Screens.Edit
 
         private void updateLastSavedHash()
         {
-            lastSavedHash = changeHandler.CurrentStateHash;
+            lastSavedHash = changeHandler?.CurrentStateHash;
         }
 
         private List<MenuItem> createFileMenuItems()
