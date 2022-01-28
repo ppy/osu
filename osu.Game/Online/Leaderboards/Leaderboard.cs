@@ -61,7 +61,7 @@ namespace osu.Game.Online.Leaderboards
         public ICollection<TScoreInfo> Scores
         {
             get => scores;
-            set
+            protected set
             {
                 scores = value;
 
