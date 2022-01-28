@@ -54,8 +54,6 @@ namespace osu.Game.Online.Leaderboards
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
-        private ScheduledDelegate pendingUpdateScores;
-
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         private ICollection<TScoreInfo> scores;
@@ -248,7 +246,6 @@ namespace osu.Game.Online.Leaderboards
         protected virtual void Reset()
         {
             cancelPendingWork();
-
             Scores = null;
         }
 
@@ -286,30 +283,27 @@ namespace osu.Game.Online.Leaderboards
 
             cancelPendingWork();
 
-            pendingUpdateScores = Schedule(() =>
+            PlaceholderState = PlaceholderState.Retrieving;
+            loading.Show();
+
+            getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
             {
-                PlaceholderState = PlaceholderState.Retrieving;
-                loading.Show();
+                Scores = scores.ToArray();
+                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+            }));
 
-                getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
-                {
-                    Scores = scores.ToArray();
-                    PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-                }));
+            if (getScoresRequest == null)
+                return;
 
-                if (getScoresRequest == null)
+            getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
+            {
+                if (e is OperationCanceledException)
                     return;
 
-                getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
-                {
-                    if (e is OperationCanceledException)
-                        return;
-
-                    PlaceholderState = PlaceholderState.NetworkFailure;
-                });
-
-                api?.Queue(getScoresRequest);
+                PlaceholderState = PlaceholderState.NetworkFailure;
             });
+
+            api?.Queue(getScoresRequest);
         }
 
         private void cancelPendingWork()
@@ -319,9 +313,6 @@ namespace osu.Game.Online.Leaderboards
 
             getScoresRequestCallback?.Cancel();
             getScoresRequestCallback = null;
-
-            pendingUpdateScores?.Cancel();
-            pendingUpdateScores = null;
         }
 
         /// <summary>
