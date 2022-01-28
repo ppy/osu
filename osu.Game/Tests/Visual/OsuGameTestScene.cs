@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -110,6 +111,8 @@ namespace osu.Game.Tests.Visual
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
 
             public new ScreenStack ScreenStack => base.ScreenStack;
+
+            public RealmAccess Realm => Dependencies.Get<RealmAccess>();
 
             public new BackButton BackButton => base.BackButton;
 
