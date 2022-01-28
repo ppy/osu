@@ -38,6 +38,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             get => beatmapInfo;
             set
             {
+                if (beatmapInfo == null && value == null)
+                {
+                    // always null scores to ensure a correct initial display.
+                    // see weird `scoresLoadedOnce` logic in base implementation.
+                    Scores = null;
+                    return;
+                }
+
                 if (beatmapInfo?.Equals(value) == true)
                     return;
 
