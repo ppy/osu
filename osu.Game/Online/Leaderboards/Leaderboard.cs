@@ -139,6 +139,139 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        protected Leaderboard()
+        {
+            InternalChildren = new Drawable[]
+            {
+                new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Child = new GridContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
+                        },
+                        Content = new[]
+                        {
+                            new Drawable[]
+                            {
+                                scrollContainer = new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarVisible = false,
+                                }
+                            },
+                            new Drawable[]
+                            {
+                                new Container
+                                {
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
+                                },
+                            },
+                        },
+                    },
+                },
+                loading = new LoadingSpinner(),
+                placeholderContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (api != null)
+            {
+                apiState.BindTo(api.State);
+                apiState.BindValueChanged(state =>
+                {
+                    switch (state.NewValue)
+                    {
+                        case APIState.Online:
+                        case APIState.Offline:
+                            if (IsOnlineScope)
+                                RefetchScores();
+
+                            break;
+                    }
+                });
+            }
+
+            RefetchScores();
+        }
+
+        public void RefetchScores() => Scheduler.AddOnce(refetchScores);
+
+        protected virtual void Reset()
+        {
+            cancelPendingWork();
+            Scores = null;
+        }
+
+        /// <summary>
+        /// Performs a fetch/refresh of scores to be displayed.
+        /// </summary>
+        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
+        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
+        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreInfo>> scoresCallback);
+
+        protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
+
+        protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
+
+        private void refetchScores()
+        {
+            // don't display any scores or placeholder until the first Scores_Set has been called.
+            // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
+            if (!scoresLoadedOnce) return;
+
+            cancelPendingWork();
+
+            PlaceholderState = PlaceholderState.Retrieving;
+            loading.Show();
+
+            getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
+            {
+                Scores = scores.ToArray();
+                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
+            }));
+
+            if (getScoresRequest == null)
+                return;
+
+            getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
+            {
+                if (e is OperationCanceledException)
+                    return;
+
+                PlaceholderState = PlaceholderState.NetworkFailure;
+            });
+
+            api?.Queue(getScoresRequest);
+        }
+
+        private void cancelPendingWork()
+        {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+
+            getScoresRequestCallback?.Cancel();
+            getScoresRequestCallback = null;
+        }
+
+        #region Placeholder handling
+
+        private Placeholder currentPlaceholder;
+
         private PlaceholderState placeholderState;
 
         /// <summary>
@@ -194,133 +327,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected Leaderboard()
-        {
-            InternalChildren = new Drawable[]
-            {
-                new OsuContextMenuContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
-                            {
-                                scrollContainer = new OsuScrollContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ScrollbarVisible = false,
-                                }
-                            },
-                            new Drawable[]
-                            {
-                                new Container
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
-                                },
-                            },
-                        },
-                    },
-                },
-                loading = new LoadingSpinner(),
-                placeholderContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both
-                },
-            };
-        }
-
-        protected virtual void Reset()
-        {
-            cancelPendingWork();
-            Scores = null;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (api != null)
-            {
-                apiState.BindTo(api.State);
-                apiState.BindValueChanged(state =>
-                {
-                    switch (state.NewValue)
-                    {
-                        case APIState.Online:
-                        case APIState.Offline:
-                            if (IsOnlineScope)
-                                RefetchScores();
-
-                            break;
-                    }
-                });
-            }
-
-            RefetchScores();
-        }
-
-        public void RefetchScores() => Scheduler.AddOnce(refetchScores);
-
-        private void refetchScores()
-        {
-            // don't display any scores or placeholder until the first Scores_Set has been called.
-            // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
-            if (!scoresLoadedOnce) return;
-
-            cancelPendingWork();
-
-            PlaceholderState = PlaceholderState.Retrieving;
-            loading.Show();
-
-            getScoresRequest = FetchScores(scores => getScoresRequestCallback = Schedule(() =>
-            {
-                Scores = scores.ToArray();
-                PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-            }));
-
-            if (getScoresRequest == null)
-                return;
-
-            getScoresRequest.Failure += e => getScoresRequestCallback = Schedule(() =>
-            {
-                if (e is OperationCanceledException)
-                    return;
-
-                PlaceholderState = PlaceholderState.NetworkFailure;
-            });
-
-            api?.Queue(getScoresRequest);
-        }
-
-        private void cancelPendingWork()
-        {
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
-
-            getScoresRequestCallback?.Cancel();
-            getScoresRequestCallback = null;
-        }
-
-        /// <summary>
-        /// Performs a fetch/refresh of scores to be displayed.
-        /// </summary>
-        /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
-        /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreInfo>> scoresCallback);
-
-        private Placeholder currentPlaceholder;
-
         private void replacePlaceholder(Placeholder placeholder)
         {
             if (placeholder != null && placeholder.Equals(currentPlaceholder))
@@ -341,6 +347,10 @@ namespace osu.Game.Online.Leaderboards
 
             currentPlaceholder = placeholder;
         }
+
+        #endregion
+
+        #region Fade handling
 
         protected override void UpdateAfterChildren()
         {
@@ -384,8 +394,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
-
-        protected abstract LeaderboardScore CreateDrawableTopScore(TScoreInfo model);
+        #endregion
     }
 }
