@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
         /// The time in milliseconds to begin playing the track for preview purposes.
         /// If -1, the track should begin playing at 40% of its length.
         /// </summary>
-        public int PreviewTime { get; set; }
+        public int PreviewTime { get; set; } = -1;
 
         public string AudioFile { get; set; } = string.Empty;
         public string BackgroundFile { get; set; } = string.Empty;
