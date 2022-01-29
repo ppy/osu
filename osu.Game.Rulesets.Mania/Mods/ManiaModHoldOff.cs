@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 });
 
                 // Don't add an end note if the duration is shorter than some threshold, or end notes are disabled
-                double noteValue = getNoteValue(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
+                double noteValue = GetNoteDurationInBeatLength(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
 
                 if (AddEndNotes.Value && noteValue >= beatSnap)
                 {
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.Mods
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
         }
 
-        private static double getNoteValue(HoldNote holdNote, ManiaBeatmap beatmap)
+        public static double GetNoteDurationInBeatLength(HoldNote holdNote, ManiaBeatmap beatmap)
         {
             double bpmAtNoteTime = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BPM;
             return (60 * holdNote.Duration) / (1000 * bpmAtNoteTime);
