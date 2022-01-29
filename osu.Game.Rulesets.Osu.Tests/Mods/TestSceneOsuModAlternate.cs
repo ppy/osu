@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     },
                 },
             },
-            Frames = new List<ReplayFrame>
+            ReplayFrames = new List<ReplayFrame>
             {
                 new OsuReplayFrame(500, new Vector2(200), OsuAction.LeftButton),
                 new OsuReplayFrame(501, new Vector2(200)),
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     },
                 },
             },
-            Frames = new List<ReplayFrame>
+            ReplayFrames = new List<ReplayFrame>
             {
                 new OsuReplayFrame(500, new Vector2(100), OsuAction.LeftButton),
                 new OsuReplayFrame(501, new Vector2(100)),
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     },
                 },
             },
-            Frames = new List<ReplayFrame>
+            ReplayFrames = new List<ReplayFrame>
             {
                 new OsuReplayFrame(500, new Vector2(100), OsuAction.LeftButton),
                 new OsuReplayFrame(501, new Vector2(100)),
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     }
                 }
             },
-            Frames = new List<ReplayFrame>
+            ReplayFrames = new List<ReplayFrame>
             {
                 new OsuReplayFrame(500, new Vector2(100), OsuAction.LeftButton),
                 new OsuReplayFrame(501, new Vector2(100)),
