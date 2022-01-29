@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.Scores = generateSampleScores(null));
+            AddStep(@"New Scores", () => leaderboard.Scores = generateSampleScores(new BeatmapInfo()));
         }
 
         [Test]
