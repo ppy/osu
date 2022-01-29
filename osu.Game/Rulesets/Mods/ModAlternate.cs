@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => @"Alternate";
         public override string Acronym => @"AL";
-        public override string Description => @"Never hit the same key twice!";
+        public override string Description => @"Don't use the same key twice in a row!";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
         public override ModType Type => ModType.DifficultyIncrease;
@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Mods
         where THitObject : HitObject
         where TAction : struct
     {
+        /// <summary>
+        /// Whether incoming input must be checked by <see cref="InputInterceptor"/>.
+        /// </summary>
         public bool CanIntercept => !isBreakTime.Value;
 
         private IBindable<bool> isBreakTime;
@@ -51,8 +54,6 @@ namespace osu.Game.Rulesets.Mods
 
         protected abstract bool OnPressed(TAction key);
 
-        protected abstract void OnReleased(TAction key);
-
         private class InputInterceptor : Component, IKeyBindingHandler<TAction>
         {
             private readonly ModAlternate<THitObject, TAction> mod;
@@ -69,8 +70,6 @@ namespace osu.Game.Rulesets.Mods
 
             public void OnReleased(KeyBindingReleaseEvent<TAction> e)
             {
-                if (mod.CanIntercept)
-                    mod.OnReleased(e.Action);
             }
         }
     }
