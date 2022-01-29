@@ -50,10 +50,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModRelax))
             {
-                // These are probably less than ideal, but can be worked on in the future.
-                // Value "weighting":
-                // 0.6 - Less affected by relax, minimum nerf applied.
-                // 0.4 - More affected by relax, harsher nerf applied.
 
                 // Similar idea to the PP system speed crosscheck, but for star rating.
                 double speedCrosscheck = baseAimPerformance / baseSpeedPerformance;
@@ -64,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     baseSpeedPerformance *= Math.Max(0.1, crosscheckMultiplier);
                 }
 
-                // Base nerfs
-                baseAimPerformance *= 0.6;
-                baseSpeedPerformance *= 0.4;
+                // These are probably less than ideal, but can be worked on in the future.
+                baseAimPerformance *= 0.4;
+                baseSpeedPerformance *= 0.5;
                 baseFlashlightPerformance *= 0.6;
             }
 
