@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
+        public override double ScoreMultiplier => 0.8;
 
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.

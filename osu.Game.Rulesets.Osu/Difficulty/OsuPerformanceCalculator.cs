@@ -51,18 +51,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
-            if (mods.Any(h => h is OsuModRelax))
-            {
-                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
-                effectiveMissCount = Math.Min(effectiveMissCount + countOk + countMeh, totalHits);
-
-                multiplier *= 0.6;
-            }
-
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
             double accuracyValue = computeAccuracyValue();
             double flashlightValue = computeFlashlightValue();
+
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                // We want to avoid stream abuse with Relax as they are fundamentally easier due to their key element (tapping) being removed.
+                // The idea of the speed crosscheck is to punish easy to aim objects at higher bpms by this ratio.
+                double speedCrosscheck = aimValue / speedValue;
+
+                if (speedCrosscheck < 1.0) // From testing, higher values tend to be entirely unrelated or ridiculously difficult.
+                {
+                    double crosscheckMultiplier = Math.Min(1.0, 0.7 * speedCrosscheck);
+                    aimValue *= Math.Max(0.1, crosscheckMultiplier);
+                    speedValue *= Math.Max(0.1, crosscheckMultiplier);
+                }
+
+                // Further nerf values for balance
+                speedValue *= 0.8;
+                accuracyValue *= 0.95;
+
+                // Account for any relax gains which are non-specific
+                multiplier = 0.6;
+            }
+
             double totalValue =
                 Math.Pow(
                     Math.Pow(aimValue, 1.1) +
@@ -97,7 +111,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                aimValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+            {
+                // It is important to consider that aim is the only element of Relax, so misses should be penalised more.
+                double missPenaltyMultiplier = mods.Any(m => m is OsuModRelax) ? 0.95 : 0.97;
+
+                aimValue *= missPenaltyMultiplier * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
+            }
 
             aimValue *= getComboScalingFactor();
 
@@ -128,8 +147,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             aimValue *= accuracy;
+
             // It is important to consider accuracy difficulty when scaling with accuracy.
-            aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
+            if (mods.Any(m => m is OsuModRelax))
+            {
+                // It's important to consider the fact that Relax accuracy is considerably easier due to tapping being removed.
+                // Therefore, we will make accuracy scaling slightly lower for any Relax plays.
+                aimValue *= 0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
+            }
+            else
+                aimValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
             return aimValue;
         }
@@ -150,7 +177,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 0.0;
             if (Attributes.ApproachRate > 10.33)
-                approachRateFactor = 0.3 * (Attributes.ApproachRate - 10.33);
+            {
+                // When using Relax, reading has less of an effect on speed ability so higher AR should not be buffed as much.
+                double approachRateMultiplier = mods.Any(m => m is OsuModRelax) ? 0.2 : 0.3;
+
+                approachRateFactor = approachRateMultiplier * (Attributes.ApproachRate - 10.33);
+            }
 
             speedValue *= 1.0 + approachRateFactor * lengthBonus; // Buff for longer maps with high AR.
 
@@ -168,17 +200,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Scale the speed value with accuracy and OD.
             speedValue *= (0.95 + Math.Pow(Attributes.OverallDifficulty, 2) / 750) * Math.Pow(accuracy, (14.5 - Math.Max(Attributes.OverallDifficulty, 8)) / 2);
 
-            // Scale the speed value with # of 50s to punish doubletapping.
-            speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
+            if (mods.Any(m => m is OsuModRelax))
+            {
+                // There isn't much we can do with scaling speed for Relax, so the minimum nerf is given.
+                speedValue *= 0.9;
+            }
+            else
+            {
+                // Scale the speed value with # of 50s to punish doubletapping.
+                speedValue *= Math.Pow(0.98, countMeh < totalHits / 500.0 ? 0 : countMeh - totalHits / 500.0);
+            }
 
             return speedValue;
         }
 
         private double computeAccuracyValue()
         {
-            if (mods.Any(h => h is OsuModRelax))
-                return 0.0;
-
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
@@ -207,6 +244,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
+
+            // There isn't much we can do with scaling accuracy Relax, so the minimum nerf is given.
+            if (mods.Any(m => m is OsuModRelax))
+                accuracyValue *= 0.9;
 
             return accuracyValue;
         }
@@ -237,7 +278,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                (totalHits > 200 ? 0.2 * Math.Min(1.0, (totalHits - 200) / 200.0) : 0.0);
 
             // Scale the flashlight value with accuracy _slightly_.
-            flashlightValue *= 0.5 + accuracy / 2.0;
+            if (mods.Any(m => m is OsuModRelax))
+                flashlightValue *= 0.4 + accuracy / 2.0;
+            else
+                flashlightValue *= 0.5 + accuracy / 2.0;
+
             // It is important to also consider accuracy difficulty when doing that.
             flashlightValue *= 0.98 + Math.Pow(Attributes.OverallDifficulty, 2) / 2500;
 
