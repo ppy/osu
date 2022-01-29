@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -25,11 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
         public override ModType Type => ModType.DifficultyIncrease;
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
-
-        /// <summary>
-        /// Whether incoming input must be checked by <see cref="InputInterceptor"/> before it is passed to gameplay.
-        /// </summary>
-        public bool CanIntercept => !isBreakTime.Value && introEnded;
+        public bool ShouldAlternate => !isBreakTime.Value && introEnded;
 
         private bool introEnded;
         private double earliestStartTime;
@@ -86,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
-                => mod.CanIntercept && mod.onPressed(e.Action);
+                => mod.ShouldAlternate && mod.onPressed(e.Action);
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
