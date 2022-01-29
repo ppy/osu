@@ -135,11 +135,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUpSteps]
         public void SetupSteps()
         {
-            // Ensure the leaderboard has finished async-loading drawables
-            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
-
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
+            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
         }
 
         [Test]
