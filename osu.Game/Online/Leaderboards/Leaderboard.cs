@@ -303,10 +303,9 @@ namespace osu.Game.Online.Leaderboards
                 .Expire();
             scoreFlowContainer = null;
 
-            loading.Hide();
-
             if (scores?.Any() != true)
             {
+                loading.Hide();
                 PlaceholderState = PlaceholderState.NoScores;
                 return;
             }
