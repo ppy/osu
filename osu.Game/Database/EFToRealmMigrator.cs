@@ -133,6 +133,8 @@ namespace osu.Game.Database
                         r.RemoveAll<ScoreInfo>();
                     });
 
+                    ef.Migrate();
+
                     migrateSettings(ef);
                     migrateSkins(ef);
                     migrateBeatmaps(ef);
