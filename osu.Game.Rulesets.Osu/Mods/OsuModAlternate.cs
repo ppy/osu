@@ -37,9 +37,5 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             return false;
         }
-
-        protected override void OnReleased(OsuAction key)
-        {
-        }
     }
 }
