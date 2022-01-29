@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(null)));
+            AddStep(@"New Scores", () => leaderboard.Scores = generateSampleScores(null));
         }
 
         [Test]
@@ -417,7 +417,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                 PlaceholderState = state;
             }
 
-            public void SetScores(ICollection<ScoreInfo> scores) => Scores = scores;
+            public new ICollection<ScoreInfo> Scores
+            {
+                get => base.Scores;
+                set => base.Scores = value;
+            }
         }
     }
 }
