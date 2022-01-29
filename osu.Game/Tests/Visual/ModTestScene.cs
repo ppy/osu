@@ -72,14 +72,14 @@ namespace osu.Game.Tests.Visual
 
             protected override void PrepareReplay()
             {
-                if (currentTestData.Autoplay && currentTestData.Frames?.Count > 0)
-                    throw new InvalidOperationException(@$"{nameof(ModTestData.Autoplay)} must be false when {nameof(ModTestData.Frames)} is specified.");
+                if (currentTestData.Autoplay && currentTestData.ReplayFrames?.Count > 0)
+                    throw new InvalidOperationException(@$"{nameof(ModTestData.Autoplay)} must be false when {nameof(ModTestData.ReplayFrames)} is specified.");
 
-                if (currentTestData.Frames != null)
+                if (currentTestData.ReplayFrames != null)
                 {
                     DrawableRuleset?.SetReplayScore(new Score
                     {
-                        Replay = new Replay { Frames = currentTestData.Frames },
+                        Replay = new Replay { Frames = currentTestData.ReplayFrames },
                         ScoreInfo = new ScoreInfo { User = new APIUser { Username = @"Test" } },
                     });
                 }
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
             /// The frames to use for replay. <see cref="Autoplay"/> must be set to false.
             /// </summary>
             [CanBeNull]
-            public List<ReplayFrame> Frames;
+            public List<ReplayFrame> ReplayFrames;
 
             /// <summary>
             /// The beatmap for this test case.
