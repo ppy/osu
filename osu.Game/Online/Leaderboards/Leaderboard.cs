@@ -312,12 +312,14 @@ namespace osu.Game.Online.Leaderboards
             {
                 scrollContainer.Add(scoreFlowContainer = newFlow);
 
-                int i = 0;
+                double delay = 0;
 
                 foreach (var s in scoreFlowContainer.Children)
                 {
-                    using (s.BeginDelayedSequence(i++ * 50))
+                    using (s.BeginDelayedSequence(delay))
                         s.Show();
+
+                    delay += 50;
                 }
 
                 scrollContainer.ScrollToStart(false);
