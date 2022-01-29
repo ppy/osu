@@ -243,11 +243,10 @@ namespace osu.Game.Online.Leaderboards
 
                 placeholderState = value;
 
-                Debug.Assert(placeholderState != PlaceholderState.Successful || scores?.Any() == true);
-
                 switch (placeholderState)
                 {
                     case PlaceholderState.NetworkFailure:
+                        Debug.Assert(scores?.Any() != true);
                         replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                         {
                             Action = RefetchScores
@@ -255,26 +254,32 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NoneSelected:
+                        Debug.Assert(scores?.Any() != true);
                         replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
                         break;
 
                     case PlaceholderState.Unavailable:
+                        Debug.Assert(scores?.Any() != true);
                         replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
                         break;
 
                     case PlaceholderState.NoScores:
+                        Debug.Assert(scores?.Any() != true);
                         replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
                         break;
 
                     case PlaceholderState.NotLoggedIn:
+                        Debug.Assert(scores?.Any() != true);
                         replacePlaceholder(new LoginPlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
+                        Debug.Assert(scores?.Any() != true);
                         replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
 
                     default:
+                        Debug.Assert(scores?.Any() == true);
                         replacePlaceholder(null);
                         break;
                 }

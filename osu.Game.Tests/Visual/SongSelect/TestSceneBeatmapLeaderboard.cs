@@ -414,6 +414,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             public void SetRetrievalState(PlaceholderState state)
             {
+                Scores = null;
                 PlaceholderState = state;
             }
 
