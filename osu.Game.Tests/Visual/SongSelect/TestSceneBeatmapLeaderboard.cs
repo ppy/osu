@@ -122,13 +122,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
         }
 
-        [Test]
-        public void TestBeatmapStates()
-        {
-            foreach (BeatmapOnlineStatus status in Enum.GetValues(typeof(BeatmapOnlineStatus)))
-                AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
-        }
-
         private void showPersonalBestWithNullPosition()
         {
             leaderboard.TopScore = new ScoreInfo
