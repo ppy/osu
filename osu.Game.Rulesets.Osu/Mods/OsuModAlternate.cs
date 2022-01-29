@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
 
         /// <summary>
-        /// Whether incoming input must be checked by <see cref="InputInterceptor"/>.
+        /// Whether incoming input must be checked by <see cref="InputInterceptor"/> before it is passed to gameplay.
         /// </summary>
         public bool CanIntercept => !isBreakTime.Value && introEnded;
 
