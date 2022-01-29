@@ -53,6 +53,8 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest fetchScoresRequest;
 
+        private LeaderboardErrorState errorState;
+
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
@@ -169,12 +171,35 @@ namespace osu.Game.Online.Leaderboards
             RefetchScores();
         }
 
+        /// <summary>
+        /// Perform a full refetch of scores using current criteria.
+        /// </summary>
         public void RefetchScores() => Scheduler.AddOnce(refetchScores);
 
+        /// <summary>
+        /// Reset the leaderboard into an empty state.
+        /// </summary>
         protected virtual void Reset()
         {
             cancelPendingWork();
             Scores = null;
+        }
+
+        /// <summary>
+        /// Call when a retrieval or display failure happened to show a relevant message to the user.
+        /// </summary>
+        /// <param name="errorState">The state to display.</param>
+        protected void SetErrorState(LeaderboardErrorState errorState)
+        {
+            switch (errorState)
+            {
+                case LeaderboardErrorState.NoError:
+                    throw new InvalidOperationException($"State {errorState} cannot be set by a leaderboard implementation.");
+            }
+
+            Debug.Assert(scores?.Any() != true);
+
+            setErrorState(errorState);
         }
 
         /// <summary>
@@ -195,7 +220,7 @@ namespace osu.Game.Online.Leaderboards
 
             Reset();
 
-            PlaceholderState = PlaceholderState.Retrieving;
+            setErrorState(LeaderboardErrorState.NoError);
             loading.Show();
 
             currentFetchCancellationSource = new CancellationTokenSource();
@@ -210,7 +235,7 @@ namespace osu.Game.Online.Leaderboards
                 if (e is OperationCanceledException || currentFetchCancellationSource.IsCancellationRequested)
                     return;
 
-                PlaceholderState = PlaceholderState.NetworkFailure;
+                SetErrorState(LeaderboardErrorState.NetworkFailure);
             });
 
             api?.Queue(fetchScoresRequest);
@@ -221,77 +246,6 @@ namespace osu.Game.Online.Leaderboards
             currentFetchCancellationSource?.Cancel();
             currentScoresAsyncLoadCancellationSource?.Cancel();
             fetchScoresRequest?.Cancel();
-        }
-
-        #region Placeholder handling
-
-        private Placeholder currentPlaceholder;
-
-        private PlaceholderState placeholderState;
-
-        /// <summary>
-        /// Update the placeholder visibility.
-        /// Setting this to anything other than PlaceholderState.Successful will cancel all existing retrieval requests and hide scores.
-        /// </summary>
-        protected PlaceholderState PlaceholderState
-        {
-            get => placeholderState;
-            set
-            {
-                if (value == placeholderState)
-                    return;
-
-                placeholderState = value;
-
-                switch (placeholderState)
-                {
-                    case PlaceholderState.NetworkFailure:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
-                        {
-                            Action = RefetchScores
-                        });
-                        break;
-
-                    case PlaceholderState.NoneSelected:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
-                        break;
-
-                    case PlaceholderState.Unavailable:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
-                        break;
-
-                    case PlaceholderState.NoScores:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
-                        break;
-
-                    case PlaceholderState.NotLoggedIn:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(new LoginPlaceholder(@"Please sign in to view online leaderboards!"));
-                        break;
-
-                    case PlaceholderState.NotSupporter:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
-                        break;
-
-                    case PlaceholderState.Retrieving:
-                        Debug.Assert(scores?.Any() != true);
-                        replacePlaceholder(null);
-                        break;
-
-                    case PlaceholderState.Successful:
-                        Debug.Assert(scores?.Any() == true);
-                        replacePlaceholder(null);
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
         }
 
         private void updateScoresDrawables()
@@ -305,13 +259,14 @@ namespace osu.Game.Online.Leaderboards
 
             if (scores?.Any() != true)
             {
+                SetErrorState(LeaderboardErrorState.NoScores);
                 loading.Hide();
-                PlaceholderState = PlaceholderState.NoScores;
                 return;
             }
 
             // ensure placeholder is hidden when displaying scores
-            PlaceholderState = PlaceholderState.Successful;
+            setErrorState(LeaderboardErrorState.NoError);
+            loading.Show();
 
             LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
             {
@@ -339,25 +294,61 @@ namespace osu.Game.Online.Leaderboards
             }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
         }
 
-        private void replacePlaceholder(Placeholder placeholder)
+        #region Placeholder handling
+
+        private Placeholder placeholder;
+
+        private void setErrorState(LeaderboardErrorState errorState)
         {
-            if (placeholder != null && placeholder.Equals(currentPlaceholder))
+            if (errorState == this.errorState)
                 return;
 
-            currentPlaceholder?.FadeOut(150, Easing.OutQuint).Expire();
+            this.errorState = errorState;
+
+            placeholder?.FadeOut(150, Easing.OutQuint).Expire();
+
+            placeholder = getPlaceholderFor(errorState);
 
             if (placeholder == null)
-            {
-                currentPlaceholder = null;
                 return;
-            }
 
             placeholderContainer.Child = placeholder;
 
             placeholder.ScaleTo(0.8f).Then().ScaleTo(1, fade_duration * 3, Easing.OutQuint);
             placeholder.FadeInFromZero(fade_duration, Easing.OutQuint);
+        }
 
-            currentPlaceholder = placeholder;
+        private Placeholder getPlaceholderFor(LeaderboardErrorState errorState)
+        {
+            switch (errorState)
+            {
+                case LeaderboardErrorState.NetworkFailure:
+                    return new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
+                    {
+                        Action = RefetchScores
+                    };
+
+                case LeaderboardErrorState.NoneSelected:
+                    return new MessagePlaceholder(@"Please select a beatmap!");
+
+                case LeaderboardErrorState.Unavailable:
+                    return new MessagePlaceholder(@"Leaderboards are not available for this beatmap!");
+
+                case LeaderboardErrorState.NoScores:
+                    return new MessagePlaceholder(@"No records yet!");
+
+                case LeaderboardErrorState.NotLoggedIn:
+                    return new LoginPlaceholder(@"Please sign in to view online leaderboards!");
+
+                case LeaderboardErrorState.NotSupporter:
+                    return new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!");
+
+                case LeaderboardErrorState.NoError:
+                    return null;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         #endregion

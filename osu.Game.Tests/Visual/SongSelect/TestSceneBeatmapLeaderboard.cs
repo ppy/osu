@@ -114,12 +114,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestPlaceholderStates()
         {
-            AddStep(@"Empty Scores", () => leaderboard.SetRetrievalState(PlaceholderState.NoScores));
-            AddStep(@"Network failure", () => leaderboard.SetRetrievalState(PlaceholderState.NetworkFailure));
-            AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
-            AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
-            AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
-            AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
+            AddStep(@"Empty Scores", () => leaderboard.SetErrorState(LeaderboardErrorState.NoScores));
+            AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardErrorState.NetworkFailure));
+            AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardErrorState.NotSupporter));
+            AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardErrorState.NotLoggedIn));
+            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardErrorState.Unavailable));
+            AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardErrorState.NoneSelected));
         }
 
         private void showPersonalBestWithNullPosition()
@@ -401,22 +401,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private void showBeatmapWithStatus(BeatmapOnlineStatus status)
-        {
-            leaderboard.BeatmapInfo = new BeatmapInfo
-            {
-                OnlineID = 1113057,
-                Status = status,
-            };
-        }
-
         private class FailableLeaderboard : BeatmapLeaderboard
         {
-            public void SetRetrievalState(PlaceholderState state)
-            {
-                Scores = null;
-                PlaceholderState = state;
-            }
+            public new void SetErrorState(LeaderboardErrorState errorState) => base.SetErrorState(errorState);
 
             public new ICollection<ScoreInfo> Scores
             {
