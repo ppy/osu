@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 accuracyValue *= 0.95;
 
                 // Account for any relax gains which are non-specific
-                multiplier = 0.6;
+                multiplier *= 0.54;
             }
 
             double totalValue =
