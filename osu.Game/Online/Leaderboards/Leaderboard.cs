@@ -241,9 +241,11 @@ namespace osu.Game.Online.Leaderboards
                 if (value == placeholderState)
                     return;
 
-                loading.Hide();
+                placeholderState = value;
 
-                switch (placeholderState = value)
+                Debug.Assert(placeholderState != PlaceholderState.Successful || scores?.Any() == true);
+
+                switch (placeholderState)
                 {
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
