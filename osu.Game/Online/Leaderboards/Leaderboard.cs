@@ -66,7 +66,7 @@ namespace osu.Game.Online.Leaderboards
             protected set
             {
                 scores = value;
-                Scheduler.AddOnce(updateScoresDrawables);
+                Scheduler.Add(updateScoresDrawables, false);
             }
         }
 
