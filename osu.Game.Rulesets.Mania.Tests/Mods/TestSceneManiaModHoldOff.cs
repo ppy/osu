@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
             foreach (HoldNote h in testBeatmap.HitObjects.OfType<HoldNote>())
             {
-                noteValues.Add(ManiaModHoldOff.GetNoteDurationInBeatLength(h, (ManiaBeatmap)testBeatmap));
+                noteValues.Add(ManiaModHoldOff.GetNoteDurationInBeatLength(h, testBeatmap));
             }
 
             noteValues.Sort();
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
                 if (h.GetType() == typeof(HoldNote))
                 {
-                    var noteValue = ManiaModHoldOff.GetNoteDurationInBeatLength((HoldNote)h, (ManiaBeatmap)rawBeatmap);
+                    double noteValue = ManiaModHoldOff.GetNoteDurationInBeatLength((HoldNote)h, rawBeatmap);
 
                     if (noteValue >= beatSnapValue)
                     {
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 }
             }
 
-            Assert.That(testBeatmap.HitObjects.Count() == expectedObjectCount);
+            Assert.That(testBeatmap.HitObjects.Count == expectedObjectCount);
         }
 
         [Test]
@@ -86,16 +86,16 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         {
             // A lower minimum beat snap divisor should only make the map harder, never easier
             // (as more notes can be spawned)
-            var beatmaps = new ManiaBeatmap[]
+            var beatmaps = new[]
             {
-                createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Whole),
+                createModdedBeatmap(),
                 createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Half),
                 createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Quarter),
                 createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Eighth),
                 createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Sixteenth)
             };
 
-            var mapDifficulties = new double[beatmaps.Length];
+            double[] mapDifficulties = new double[beatmaps.Length];
 
             for (int i = 0; i < mapDifficulties.Length; i++)
             {
@@ -114,8 +114,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
         private static ManiaBeatmap createModdedBeatmap(ManiaModHoldOff.BeatDivisors minBeatSnap = ManiaModHoldOff.BeatDivisors.Whole)
         {
             var beatmap = createRawBeatmap();
-            var holdOffMod = new ManiaModHoldOff();
-            holdOffMod.MinBeatSnap.Value = minBeatSnap; // Set the specified beat snap setting
+            var holdOffMod = new ManiaModHoldOff
+            {
+                MinBeatSnap = { Value = minBeatSnap }
+            };
             Assert.AreEqual(holdOffMod.MinBeatSnap.Value, minBeatSnap);
 
             foreach (var hitObject in beatmap.HitObjects)
@@ -123,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
             holdOffMod.ApplyToBeatmap(beatmap);
 
-            return (ManiaBeatmap)beatmap;
+            return beatmap;
         }
 
         private static ManiaBeatmap createRawBeatmap()
