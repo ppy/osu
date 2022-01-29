@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual
         protected class ModTestPlayer : TestPlayer
         {
             private readonly bool allowFail;
-            private ModTestData currentTestData;
+            private readonly ModTestData currentTestData;
 
             protected override bool CheckModsAllowFailure() => allowFail;
 
