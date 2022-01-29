@@ -278,10 +278,18 @@ namespace osu.Game.Online.Leaderboards
                         replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
 
-                    default:
+                    case PlaceholderState.Retrieving:
+                        Debug.Assert(scores?.Any() != true);
+                        replacePlaceholder(null);
+                        break;
+
+                    case PlaceholderState.Successful:
                         Debug.Assert(scores?.Any() == true);
                         replacePlaceholder(null);
                         break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
         }
