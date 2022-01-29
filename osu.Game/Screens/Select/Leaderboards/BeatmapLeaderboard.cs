@@ -33,19 +33,12 @@ namespace osu.Game.Screens.Select.Leaderboards
             set
             {
                 if (beatmapInfo == null && value == null)
-                {
-                    // always null scores to ensure a correct initial display.
-                    // see weird `scoresLoadedOnce` logic in base implementation.
-                    Scores = null;
                     return;
-                }
 
                 if (beatmapInfo?.Equals(value) == true)
                     return;
 
                 beatmapInfo = value;
-                Scores = null;
-
                 RefetchScores();
             }
         }
@@ -114,7 +107,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (fetchBeatmapInfo == null)
             {
-                PlaceholderState = PlaceholderState.NoneSelected;
+                SetErrorState(LeaderboardErrorState.NoneSelected);
                 return null;
             }
 
@@ -126,19 +119,19 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (api?.IsLoggedIn != true)
             {
-                PlaceholderState = PlaceholderState.NotLoggedIn;
+                SetErrorState(LeaderboardErrorState.NotLoggedIn);
                 return null;
             }
 
             if (fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
-                PlaceholderState = PlaceholderState.Unavailable;
+                SetErrorState(LeaderboardErrorState.Unavailable);
                 return null;
             }
 
             if (!api.LocalUser.Value.IsSupporter && (Scope != BeatmapLeaderboardScope.Global || filterMods))
             {
-                PlaceholderState = PlaceholderState.NotSupporter;
+                SetErrorState(LeaderboardErrorState.NotSupporter);
                 return null;
             }
 
