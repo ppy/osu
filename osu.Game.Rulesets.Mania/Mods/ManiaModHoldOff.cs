@@ -43,7 +43,8 @@ namespace osu.Game.Rulesets.Mania.Mods
             var maniaBeatmap = (ManiaBeatmap)beatmap;
 
             var newObjects = new List<ManiaHitObject>();
-            var beatSnap = 1/(Math.Pow(2, (double)MinBeatSnap.Value));
+            double beatSnap = 1 / (Math.Pow(2, (double)MinBeatSnap.Value));
+
             foreach (var h in beatmap.HitObjects.OfType<HoldNote>())
             {
                 // Add a note for the beginning of the hold note
@@ -55,7 +56,8 @@ namespace osu.Game.Rulesets.Mania.Mods
                 });
 
                 // Don't add an end note if the duration is shorter than some threshold, or end notes are disabled
-                var noteValue = getNoteValue(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
+                double noteValue = getNoteValue(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
+
                 if (AddEndNotes.Value && noteValue >= beatSnap)
                 {
                     newObjects.Add(new Note
@@ -66,13 +68,14 @@ namespace osu.Game.Rulesets.Mania.Mods
                     });
                 }
             }
+
             maniaBeatmap.HitObjects = maniaBeatmap.HitObjects.OfType<Note>().Concat(newObjects).OrderBy(h => h.StartTime).ToList();
         }
 
-        public static double getNoteValue(HoldNote holdNote, ManiaBeatmap beatmap) {
-            var bpmAtNoteTime = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BPM;
-            var noteValue = (60*holdNote.Duration)/(1000*bpmAtNoteTime);
-            return noteValue;
+        private static double getNoteValue(HoldNote holdNote, ManiaBeatmap beatmap)
+        {
+            double bpmAtNoteTime = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BPM;
+            return (60 * holdNote.Duration) / (1000 * bpmAtNoteTime);
         }
 
         public enum BeatDivisors
