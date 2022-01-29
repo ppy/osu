@@ -40,17 +40,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            if (mods.Any(h => h is OsuModRelax))
-            {
-                // These are probably less than ideal, but can be worked on in the future.
-                // Value "weighting":
-                // 0.95 - Less affected by relax, minimum nerf applied.
-                // 0.9 - More affected by relax, harsher nerf applied.
-                // 0.85 - Largely affected by relax, harshest nerf applied.
-                aimRating *= 0.95;
-                speedRating *= 0.9;
-                flashlightRating *= 0.9;
-            }
 
             double baseAimPerformance = Math.Pow(5 * Math.Max(1, aimRating / 0.0675) - 4, 3) / 100000;
             double baseSpeedPerformance = Math.Pow(5 * Math.Max(1, speedRating / 0.0675) - 4, 3) / 100000;
@@ -58,6 +47,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
                 baseFlashlightPerformance = Math.Pow(flashlightRating, 2.0) * 25.0;
+
+            if (mods.Any(h => h is OsuModRelax))
+            {
+                // These are probably less than ideal, but can be worked on in the future.
+                // Value "weighting":
+                // 0.6 - Less affected by relax, minimum nerf applied.
+                // 0.4 - More affected by relax, harsher nerf applied.
+
+                // Similar idea to the PP system speed crosscheck, but for star rating.
+                double speedCrosscheck = baseAimPerformance / baseSpeedPerformance;
+                if (speedCrosscheck < 1.0) // From testing, higher values tend to be entirely unrelated or ridiculously difficult.
+                {
+                    double crosscheckMultiplier = Math.Min(1.0, 0.7 * speedCrosscheck);
+                    baseAimPerformance *= Math.Max(0.1, crosscheckMultiplier);
+                    baseSpeedPerformance *= Math.Max(0.1, crosscheckMultiplier);
+                }
+
+                // Base nerfs
+                baseAimPerformance *= 0.6;
+                baseSpeedPerformance *= 0.4;
+                baseFlashlightPerformance *= 0.6;
+            }
 
             double basePerformance =
                 Math.Pow(
