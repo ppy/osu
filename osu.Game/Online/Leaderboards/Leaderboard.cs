@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -189,6 +191,8 @@ namespace osu.Game.Online.Leaderboards
 
         private void refetchScores()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             Reset();
 
             PlaceholderState = PlaceholderState.Retrieving;
@@ -215,10 +219,8 @@ namespace osu.Game.Online.Leaderboards
         private void cancelPendingWork()
         {
             currentFetchCancellationSource?.Cancel();
-            currentFetchCancellationSource = null;
-
+            currentScoresAsyncLoadCancellationSource?.Cancel();
             fetchScoresRequest?.Cancel();
-            fetchScoresRequest = null;
         }
 
         #region Placeholder handling
@@ -280,7 +282,6 @@ namespace osu.Game.Online.Leaderboards
         private void updateScoresDrawables()
         {
             currentScoresAsyncLoadCancellationSource?.Cancel();
-            currentScoresAsyncLoadCancellationSource = new CancellationTokenSource();
 
             scoreFlowContainer?
                 .FadeOut(fade_duration, Easing.OutQuint)
@@ -319,7 +320,7 @@ namespace osu.Game.Online.Leaderboards
 
                 scrollContainer.ScrollToStart(false);
                 loading.Hide();
-            }, currentScoresAsyncLoadCancellationSource.Token);
+            }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
         }
 
         private void replacePlaceholder(Placeholder placeholder)
