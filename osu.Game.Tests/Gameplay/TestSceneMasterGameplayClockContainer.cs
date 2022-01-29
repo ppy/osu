@@ -2,7 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
@@ -12,6 +18,14 @@ namespace osu.Game.Tests.Gameplay
     [HeadlessTest]
     public class TestSceneMasterGameplayClockContainer : OsuTestScene
     {
+        private OsuConfigManager localConfig;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+        }
+
         [Test]
         public void TestStartThenElapsedTime()
         {
@@ -53,6 +67,44 @@ namespace osu.Game.Tests.Gameplay
             });
 
             AddAssert("current time < time at reset", () => gcc.GameplayClock.CurrentTime < timeAtReset);
+        }
+
+        [Test]
+        public void TestSeekPerformsInGameplayTime(
+            [Values(1.0, 0.5, 2.0)] double clockRate,
+            [Values(0.0, 200.0, -200.0)] double userOffset,
+            [Values(false, true)] bool whileStopped)
+        {
+            ClockBackedTestWorkingBeatmap working = null;
+            GameplayClockContainer gcc = null;
+
+            AddStep("create container", () =>
+            {
+                working = new ClockBackedTestWorkingBeatmap(new OsuRuleset().RulesetInfo, new FramedClock(new ManualClock()), Audio);
+                working.LoadTrack();
+
+                Add(gcc = new MasterGameplayClockContainer(working, 0));
+
+                if (whileStopped)
+                    gcc.Stop();
+
+                gcc.Reset();
+            });
+
+            AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(clockRate)));
+            AddStep($"set audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
+
+            AddStep("seek to 2500", () => gcc.Seek(2500));
+            AddAssert("gameplay clock time = 2500", () => Precision.AlmostEquals(gcc.CurrentTime, 2500, 10f));
+
+            AddStep("seek to 10000", () => gcc.Seek(10000));
+            AddAssert("gameplay clock time = 10000", () => Precision.AlmostEquals(gcc.CurrentTime, 10000, 10f));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            localConfig?.Dispose();
+            base.Dispose(isDisposing);
         }
     }
 }
