@@ -6,11 +6,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Graphics.Sprites;
-using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Framework.Bindables;
-using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -27,23 +24,13 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
 
         public override ModType Type => ModType.Conversion;
-
-        [SettingSource("Add end notes", "Also add a note at the end of a hold note")]
-        public BindableBool AddEndNotes { get; } = new BindableBool
-        {
-            Default = true,
-            Value = true
-        };
-
-        [SettingSource("Minimum end note beat snap", "Don't add end notes for hold notes shorter than this beat division")]
-        public Bindable<BeatDivisors> MinBeatSnap { get; } = new Bindable<BeatDivisors>(defaultValue: BeatDivisors.Half);
+        public const double Threshold = 1/2;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var maniaBeatmap = (ManiaBeatmap)beatmap;
 
             var newObjects = new List<ManiaHitObject>();
-            double beatSnap = 1 / (Math.Pow(2, (double)MinBeatSnap.Value));
 
             foreach (var h in beatmap.HitObjects.OfType<HoldNote>())
             {
@@ -55,10 +42,10 @@ namespace osu.Game.Rulesets.Mania.Mods
                     Samples = h.GetNodeSamples(0)
                 });
 
-                // Don't add an end note if the duration is shorter than some threshold, or end notes are disabled
+                // Don't add an end note if the duration is shorter than the threshold
                 double noteValue = GetNoteDurationInBeatLength(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
 
-                if (AddEndNotes.Value && noteValue >= beatSnap)
+                if (noteValue >= Threshold)
                 {
                     newObjects.Add(new Note
                     {
@@ -76,15 +63,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             double bpmAtNoteTime = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BPM;
             return (60 * holdNote.Duration) / (1000 * bpmAtNoteTime);
-        }
-
-        public enum BeatDivisors
-        {
-            Whole,
-            Half,
-            Quarter,
-            Eighth,
-            Sixteenth
         }
     }
 }
