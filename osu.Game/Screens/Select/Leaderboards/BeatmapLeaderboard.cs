@@ -93,12 +93,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             };
         }
 
-        protected override void Reset()
-        {
-            base.Reset();
-            TopScore = null;
-        }
-
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
         protected override APIRequest FetchScores(CancellationToken cancellationToken)
@@ -153,8 +147,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 if (cancellationToken.IsCancellationRequested)
                                     return;
 
-                                Scores = task.GetResultSafely();
-                                TopScore = r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo);
+                                SetScores(task.GetResultSafely(), r.UserScore?.CreateScoreInfo(rulesets, fetchBeatmapInfo));
                             }), TaskContinuationOptions.OnlyOnRanToCompletion);
             };
 
@@ -210,7 +203,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
                             .ContinueWith(ordered =>
                             {
-                                Scores = ordered.GetResultSafely();
+                                SetScores(ordered.GetResultSafely());
                             }, TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }

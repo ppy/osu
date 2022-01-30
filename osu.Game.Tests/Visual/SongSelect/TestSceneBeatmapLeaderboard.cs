@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.Scores = generateSampleScores(new BeatmapInfo()));
+            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void showPersonalBestWithNullPosition()
         {
-            leaderboard.TopScore = new ScoreInfo
+            leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
             {
                 Rank = ScoreRank.XH,
                 Accuracy = 1,
@@ -142,12 +142,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                         FlagName = @"ES",
                     },
                 },
-            };
+            });
         }
 
         private void showPersonalBest()
         {
-            leaderboard.TopScore = new ScoreInfo
+            leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
             {
                 Position = 999,
                 Rank = ScoreRank.XH,
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         FlagName = @"ES",
                     },
                 },
-            };
+            });
         }
 
         private void loadMoreScores(Func<BeatmapInfo> beatmapInfo)
@@ -404,12 +404,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private class FailableLeaderboard : BeatmapLeaderboard
         {
             public new void SetErrorState(LeaderboardErrorState errorState) => base.SetErrorState(errorState);
-
-            public new ICollection<ScoreInfo> Scores
-            {
-                get => base.Scores;
-                set => base.Scores = value;
-            }
+            public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo userScore = default) => base.SetScores(scores, userScore);
         }
     }
 }

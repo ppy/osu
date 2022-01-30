@@ -24,7 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                 if (id.NewValue == null)
                     return;
 
-                Scores = null;
+                SetScores(null);
                 RefetchScores();
             }, true);
         }
@@ -43,8 +43,7 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                Scores = r.Leaderboard;
-                TopScore = r.UserScore;
+                SetScores(r.Leaderboard, r.UserScore);
             };
 
             return req;
