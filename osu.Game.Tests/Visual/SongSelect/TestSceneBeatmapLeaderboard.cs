@@ -116,11 +116,11 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("ensure no scores displayed", () => leaderboard.SetScores(null));
 
-            AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardErrorState.NetworkFailure));
-            AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardErrorState.NotSupporter));
-            AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardErrorState.NotLoggedIn));
-            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardErrorState.Unavailable));
-            AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardErrorState.NoneSelected));
+            AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
+            AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
+            AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
+            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardState.Unavailable));
+            AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
         }
 
         private void showPersonalBestWithNullPosition()
@@ -404,7 +404,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private class FailableLeaderboard : BeatmapLeaderboard
         {
-            public new void SetErrorState(LeaderboardErrorState errorState) => base.SetErrorState(errorState);
+            public new void SetErrorState(LeaderboardState state) => base.SetErrorState(state);
             public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo userScore = default) => base.SetScores(scores, userScore);
         }
     }

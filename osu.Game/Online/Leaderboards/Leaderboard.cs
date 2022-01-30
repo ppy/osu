@@ -58,7 +58,7 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest fetchScoresRequest;
 
-        private LeaderboardErrorState errorState;
+        private LeaderboardState state;
 
         [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
@@ -160,19 +160,20 @@ namespace osu.Game.Online.Leaderboards
         /// <summary>
         /// Call when a retrieval or display failure happened to show a relevant message to the user.
         /// </summary>
-        /// <param name="errorState">The state to display.</param>
-        protected void SetErrorState(LeaderboardErrorState errorState)
+        /// <param name="state">The state to display.</param>
+        protected void SetErrorState(LeaderboardState state)
         {
-            switch (errorState)
+            switch (state)
             {
-                case LeaderboardErrorState.NoScores:
-                case LeaderboardErrorState.NoError:
-                    throw new InvalidOperationException($"State {errorState} cannot be set by a leaderboard implementation.");
+                case LeaderboardState.NoScores:
+                case LeaderboardState.Retrieving:
+                case LeaderboardState.Success:
+                    throw new InvalidOperationException($"State {state} cannot be set by a leaderboard implementation.");
             }
 
             Debug.Assert(scores?.Any() != true);
 
-            setErrorState(errorState);
+            setState(state);
         }
 
         /// <summary>
@@ -212,8 +213,7 @@ namespace osu.Game.Online.Leaderboards
             cancelPendingWork();
             SetScores(null);
 
-            setErrorState(LeaderboardErrorState.NoError);
-            loading.Show();
+            setState(LeaderboardState.Retrieving);
 
             currentFetchCancellationSource = new CancellationTokenSource();
 
@@ -227,7 +227,7 @@ namespace osu.Game.Online.Leaderboards
                 if (e is OperationCanceledException || currentFetchCancellationSource.IsCancellationRequested)
                     return;
 
-                SetErrorState(LeaderboardErrorState.NetworkFailure);
+                SetErrorState(LeaderboardState.NetworkFailure);
             });
 
             api?.Queue(fetchScoresRequest);
@@ -251,14 +251,9 @@ namespace osu.Game.Online.Leaderboards
 
             if (scores?.Any() != true)
             {
-                setErrorState(LeaderboardErrorState.NoScores);
-                loading.Hide();
+                setState(LeaderboardState.NoScores);
                 return;
             }
-
-            // ensure placeholder is hidden when displaying scores
-            setErrorState(LeaderboardErrorState.NoError);
-            loading.Show();
 
             LoadComponentAsync(new FillFlowContainer<LeaderboardScore>
             {
@@ -269,6 +264,8 @@ namespace osu.Game.Online.Leaderboards
                 ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
             }, newFlow =>
             {
+                setState(LeaderboardState.Success);
+
                 scrollContainer.Add(scoreFlowContainer = newFlow);
 
                 double delay = 0;
@@ -282,7 +279,6 @@ namespace osu.Game.Online.Leaderboards
                 }
 
                 scrollContainer.ScrollToStart(false);
-                loading.Hide();
             }, (currentScoresAsyncLoadCancellationSource = new CancellationTokenSource()).Token);
         }
 
@@ -290,16 +286,21 @@ namespace osu.Game.Online.Leaderboards
 
         private Placeholder placeholder;
 
-        private void setErrorState(LeaderboardErrorState errorState)
+        private void setState(LeaderboardState state)
         {
-            if (errorState == this.errorState)
+            if (state == this.state)
                 return;
 
-            this.errorState = errorState;
+            if (state == LeaderboardState.Retrieving)
+                loading.Show();
+            else
+                loading.Hide();
+
+            this.state = state;
 
             placeholder?.FadeOut(150, Easing.OutQuint).Expire();
 
-            placeholder = getPlaceholderFor(errorState);
+            placeholder = getPlaceholderFor(state);
 
             if (placeholder == null)
                 return;
@@ -310,32 +311,35 @@ namespace osu.Game.Online.Leaderboards
             placeholder.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
-        private Placeholder getPlaceholderFor(LeaderboardErrorState errorState)
+        private Placeholder getPlaceholderFor(LeaderboardState state)
         {
-            switch (errorState)
+            switch (state)
             {
-                case LeaderboardErrorState.NetworkFailure:
+                case LeaderboardState.NetworkFailure:
                     return new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
                     {
                         Action = RefetchScores
                     };
 
-                case LeaderboardErrorState.NoneSelected:
+                case LeaderboardState.NoneSelected:
                     return new MessagePlaceholder(@"Please select a beatmap!");
 
-                case LeaderboardErrorState.Unavailable:
+                case LeaderboardState.Unavailable:
                     return new MessagePlaceholder(@"Leaderboards are not available for this beatmap!");
 
-                case LeaderboardErrorState.NoScores:
+                case LeaderboardState.NoScores:
                     return new MessagePlaceholder(@"No records yet!");
 
-                case LeaderboardErrorState.NotLoggedIn:
+                case LeaderboardState.NotLoggedIn:
                     return new LoginPlaceholder(@"Please sign in to view online leaderboards!");
 
-                case LeaderboardErrorState.NotSupporter:
+                case LeaderboardState.NotSupporter:
                     return new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!");
 
-                case LeaderboardErrorState.NoError:
+                case LeaderboardState.Retrieving:
+                    return null;
+
+                case LeaderboardState.Success:
                     return null;
 
                 default:
