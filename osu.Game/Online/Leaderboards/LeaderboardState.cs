@@ -3,9 +3,10 @@
 
 namespace osu.Game.Online.Leaderboards
 {
-    public enum LeaderboardErrorState
+    public enum LeaderboardState
     {
-        NoError,
+        Success,
+        Retrieving,
         NetworkFailure,
         Unavailable,
         NoneSelected,

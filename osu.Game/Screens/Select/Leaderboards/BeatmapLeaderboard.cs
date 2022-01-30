@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (fetchBeatmapInfo == null)
             {
-                SetErrorState(LeaderboardErrorState.NoneSelected);
+                SetErrorState(LeaderboardState.NoneSelected);
                 return null;
             }
 
@@ -113,19 +113,19 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (api?.IsLoggedIn != true)
             {
-                SetErrorState(LeaderboardErrorState.NotLoggedIn);
+                SetErrorState(LeaderboardState.NotLoggedIn);
                 return null;
             }
 
             if (fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
-                SetErrorState(LeaderboardErrorState.Unavailable);
+                SetErrorState(LeaderboardState.Unavailable);
                 return null;
             }
 
             if (!api.LocalUser.Value.IsSupporter && (Scope != BeatmapLeaderboardScope.Global || filterMods))
             {
-                SetErrorState(LeaderboardErrorState.NotSupporter);
+                SetErrorState(LeaderboardState.NotSupporter);
                 return null;
             }
 
