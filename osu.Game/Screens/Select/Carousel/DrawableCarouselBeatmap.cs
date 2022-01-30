@@ -71,6 +71,9 @@ namespace osu.Game.Screens.Select.Carousel
         {
             beatmapInfo = panel.BeatmapInfo;
             Item = panel;
+
+            // Difficulty panels should start hidden for a better initial effect.
+            Hide();
         }
 
         [BackgroundDependencyLoader(true)]
