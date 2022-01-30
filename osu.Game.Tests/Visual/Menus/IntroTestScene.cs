@@ -20,6 +20,8 @@ namespace osu.Game.Tests.Visual.Menus
         [Cached]
         private OsuLogo logo;
 
+        protected abstract bool IntroReliesOnTrack { get; }
+
         protected OsuScreenStack IntroStack;
 
         private IntroScreen intro;
@@ -103,7 +105,9 @@ namespace osu.Game.Tests.Visual.Menus
             });
 
             AddUntilStep("wait for menu", () => intro.DidLoadMenu);
-            AddUntilStep("wait for notification", () => notifications.UnreadCount.Value == 1);
+
+            if (IntroReliesOnTrack)
+                AddUntilStep("wait for notification", () => notifications.UnreadCount.Value == 1);
 
             AddStep("uninstall delegate", () => trackResetDelegate?.Cancel());
         }
