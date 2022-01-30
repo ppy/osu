@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
@@ -11,8 +10,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Difficulty;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests.Mods
 {
@@ -42,24 +39,17 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             Assert.AreEqual(noteValues, new List<double> { 0.125, 0.250, 0.500, 1.000, 2.000 });
         }
 
-        [TestCase(ManiaModHoldOff.BeatDivisors.Whole)]
-        [TestCase(ManiaModHoldOff.BeatDivisors.Half)]
-        [TestCase(ManiaModHoldOff.BeatDivisors.Quarter)]
-        [TestCase(ManiaModHoldOff.BeatDivisors.Eighth)]
-        public void TestCorrectObjectCount(ManiaModHoldOff.BeatDivisors minBeatSnap)
+        [Test]
+        public void TestCorrectObjectCount()
         {
-            /*
-                This test is to ensure that, given that end notes are enabled,
-                the mod produces the expected number of objects when the mod is applied.
-            */
+            // Ensure that the mod produces the expected number of objects when applied.
 
-            // Mod settings will be set to include the correct beat snap value
             var rawBeatmap = createRawBeatmap();
-            var testBeatmap = createModdedBeatmap(minBeatSnap);
+            var testBeatmap = createModdedBeatmap();
 
             // Calculate expected number of objects
             int expectedObjectCount = 0;
-            double beatSnapValue = 1 / (Math.Pow(2, (int)minBeatSnap));
+            double beatSnapValue = ManiaModHoldOff.Threshold;
 
             foreach (ManiaHitObject h in rawBeatmap.HitObjects)
             {
@@ -81,44 +71,10 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
             Assert.That(testBeatmap.HitObjects.Count == expectedObjectCount);
         }
 
-        [Test]
-        public void TestDifficultyIncrease()
-        {
-            // A lower minimum beat snap divisor should only make the map harder, never easier
-            // (as more notes can be spawned)
-            var beatmaps = new[]
-            {
-                createModdedBeatmap(),
-                createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Half),
-                createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Quarter),
-                createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Eighth),
-                createModdedBeatmap(ManiaModHoldOff.BeatDivisors.Sixteenth)
-            };
-
-            double[] mapDifficulties = new double[beatmaps.Length];
-
-            for (int i = 0; i < mapDifficulties.Length; i++)
-            {
-                var workingBeatmap = new TestWorkingBeatmap(beatmaps[i]);
-                var difficultyCalculator = new ManiaDifficultyCalculator(new ManiaRuleset().RulesetInfo, workingBeatmap);
-                mapDifficulties[i] = difficultyCalculator.Calculate().StarRating;
-
-                if (i > 0)
-                {
-                    Assert.LessOrEqual(mapDifficulties[i - 1], mapDifficulties[i]);
-                    Assert.LessOrEqual(beatmaps[i - 1].HitObjects.Count, beatmaps[i].HitObjects.Count);
-                }
-            }
-        }
-
-        private static ManiaBeatmap createModdedBeatmap(ManiaModHoldOff.BeatDivisors minBeatSnap = ManiaModHoldOff.BeatDivisors.Whole)
+        private static ManiaBeatmap createModdedBeatmap()
         {
             var beatmap = createRawBeatmap();
-            var holdOffMod = new ManiaModHoldOff
-            {
-                MinBeatSnap = { Value = minBeatSnap }
-            };
-            Assert.AreEqual(holdOffMod.MinBeatSnap.Value, minBeatSnap);
+            var holdOffMod = new ManiaModHoldOff();
 
             foreach (var hitObject in beatmap.HitObjects)
                 hitObject.ApplyDefaults(beatmap.ControlPointInfo, new BeatmapDifficulty());
