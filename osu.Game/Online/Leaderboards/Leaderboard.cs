@@ -34,6 +34,11 @@ namespace osu.Game.Online.Leaderboards
     public abstract class Leaderboard<TScope, TScoreInfo> : CompositeDrawable
     {
         /// <summary>
+        /// The currently displayed scores.
+        /// </summary>
+        public IEnumerable<TScoreInfo> Scores => scores;
+
+        /// <summary>
         /// Whether the current scope should refetch in response to changes in API connectivity state.
         /// </summary>
         protected abstract bool IsOnlineScope { get; }
@@ -42,7 +47,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
-        private readonly UserTopScoreContainer<TScoreInfo> topScoreContainer;
+        private readonly UserTopScoreContainer<TScoreInfo> userScoreContainer;
 
         private FillFlowContainer<LeaderboardScore> scoreFlowContainer;
 
@@ -61,30 +66,6 @@ namespace osu.Game.Online.Leaderboards
         private readonly IBindable<APIState> apiState = new Bindable<APIState>();
 
         private ICollection<TScoreInfo> scores;
-
-        public ICollection<TScoreInfo> Scores
-        {
-            get => scores;
-            protected set
-            {
-                scores = value;
-                Scheduler.Add(updateScoresDrawables, false);
-            }
-        }
-
-        public TScoreInfo TopScore
-        {
-            get => topScoreContainer.Score.Value;
-            set
-            {
-                topScoreContainer.Score.Value = value;
-
-                if (value == null)
-                    topScoreContainer.Hide();
-                else
-                    topScoreContainer.Show();
-            }
-        }
 
         private TScope scope;
 
@@ -133,7 +114,7 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Child = topScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
+                                    Child = userScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
                                 },
                             },
                         },
@@ -177,15 +158,6 @@ namespace osu.Game.Online.Leaderboards
         public void RefetchScores() => Scheduler.AddOnce(refetchScores);
 
         /// <summary>
-        /// Reset the leaderboard into an empty state.
-        /// </summary>
-        protected virtual void Reset()
-        {
-            cancelPendingWork();
-            Scores = null;
-        }
-
-        /// <summary>
         /// Call when a retrieval or display failure happened to show a relevant message to the user.
         /// </summary>
         /// <param name="errorState">The state to display.</param>
@@ -200,6 +172,24 @@ namespace osu.Game.Online.Leaderboards
             Debug.Assert(scores?.Any() != true);
 
             setErrorState(errorState);
+        }
+
+        /// <summary>
+        /// Call when score retrieval is ready to be displayed.
+        /// </summary>
+        /// <param name="scores">The scores to display.</param>
+        /// <param name="userScore">The user top score, if any.</param>
+        protected void SetScores(IEnumerable<TScoreInfo> scores, TScoreInfo userScore = default)
+        {
+            this.scores = scores?.ToList();
+            userScoreContainer.Score.Value = userScore;
+
+            if (userScore == null)
+                userScoreContainer.Hide();
+            else
+                userScoreContainer.Show();
+
+            Scheduler.Add(updateScoresDrawables, false);
         }
 
         /// <summary>
@@ -218,7 +208,8 @@ namespace osu.Game.Online.Leaderboards
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            Reset();
+            cancelPendingWork();
+            SetScores(null);
 
             setErrorState(LeaderboardErrorState.NoError);
             loading.Show();
