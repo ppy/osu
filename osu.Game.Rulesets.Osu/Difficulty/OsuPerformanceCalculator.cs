@@ -51,6 +51,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
+            if (mods.Any(m => m is OsuModRelax))
+            {
+                // Add Oks and Mehs as decimals to overall misscount as accuracy pp is removed.
+                effectiveMissCount = Math.Min(effectiveMissCount + (0.33 * countOk) + (0.66 * countMeh), totalHits);
+            }
+
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
             double accuracyValue = computeAccuracyValue();
@@ -111,12 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-            {
-                // It is important to consider that aim is the only element of Relax, so misses should be penalised more.
-                double missPenaltyMultiplier = mods.Any(m => m is OsuModRelax) ? 0.95 : 0.97;
-
-                aimValue *= missPenaltyMultiplier * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
-            }
+                aimValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), effectiveMissCount);
 
             aimValue *= getComboScalingFactor();
 
@@ -216,6 +217,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue()
         {
+            if (mods.Any(m => m is OsuModRelax))
+                return 0.0;
+
             // This percentage only considers HitCircles of any value - in this part of the calculation we focus on hitting the timing hit window.
             double betterAccuracyPercentage;
             int amountHitObjectsWithAccuracy = Attributes.HitCircleCount;
@@ -244,10 +248,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(m => m is OsuModFlashlight))
                 accuracyValue *= 1.02;
-
-            // There isn't much we can do with scaling accuracy Relax, so the minimum nerf is given.
-            if (mods.Any(m => m is OsuModRelax))
-                accuracyValue *= 0.9;
 
             return accuracyValue;
         }
