@@ -176,7 +176,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         /// <summary>
-        /// Call when score retrieval is ready to be displayed.
+        /// Call when retrieved scores are ready to be displayed.
         /// </summary>
         /// <param name="scores">The scores to display.</param>
         /// <param name="userScore">The user top score, if any.</param>
