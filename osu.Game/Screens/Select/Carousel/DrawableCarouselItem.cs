@@ -85,8 +85,6 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        public void SetMultiplicativeAlpha(float alpha) => Header.BorderContainer.Alpha = alpha;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
