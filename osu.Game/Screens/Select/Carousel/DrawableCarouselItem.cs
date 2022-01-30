@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        protected DrawableCarouselItem()
+        protected DrawableCarouselItem(float headerHeight = MAX_HEIGHT)
         {
             RelativeSizeAxes = Axes.X;
 
@@ -73,10 +73,14 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        Header = new CarouselHeader(),
+                        Header = new CarouselHeader
+                        {
+                            Height = headerHeight,
+                        },
                         Content = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Y = headerHeight,
                         }
                     }
                 },
@@ -90,12 +94,6 @@ namespace osu.Game.Screens.Select.Carousel
             base.LoadComplete();
 
             UpdateItem();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            Content.Y = Header.Height;
         }
 
         protected virtual void UpdateItem()
