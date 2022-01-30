@@ -165,6 +165,7 @@ namespace osu.Game.Online.Leaderboards
         {
             switch (errorState)
             {
+                case LeaderboardErrorState.NoScores:
                 case LeaderboardErrorState.NoError:
                     throw new InvalidOperationException($"State {errorState} cannot be set by a leaderboard implementation.");
             }
@@ -250,7 +251,7 @@ namespace osu.Game.Online.Leaderboards
 
             if (scores?.Any() != true)
             {
-                SetErrorState(LeaderboardErrorState.NoScores);
+                setErrorState(LeaderboardErrorState.NoScores);
                 loading.Hide();
                 return;
             }

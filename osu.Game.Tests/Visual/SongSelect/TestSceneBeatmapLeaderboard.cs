@@ -114,7 +114,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestPlaceholderStates()
         {
-            AddStep(@"Empty Scores", () => leaderboard.SetErrorState(LeaderboardErrorState.NoScores));
+            AddStep("ensure no scores displayed", () => leaderboard.SetScores(null));
+
             AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardErrorState.NetworkFailure));
             AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardErrorState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardErrorState.NotLoggedIn));
