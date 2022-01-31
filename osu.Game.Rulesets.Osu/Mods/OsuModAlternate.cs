@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
         public override ModType Type => ModType.DifficultyIncrease;
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
-        public bool ShouldAlternate => !isBreakTime.Value && introEnded;
 
         private bool introEnded;
         private double earliestStartTime;
@@ -33,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double flash_duration = 1000;
         private OsuAction? lastActionPressed;
         private DrawableRuleset<OsuHitObject> ruleset;
+
+        private bool shouldAlternate => !isBreakTime.Value && introEnded;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -82,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
-                => mod.ShouldAlternate && mod.onPressed(e.Action);
+                => mod.shouldAlternate && mod.onPressed(e.Action);
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
