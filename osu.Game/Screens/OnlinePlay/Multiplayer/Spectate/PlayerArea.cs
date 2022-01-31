@@ -101,7 +101,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             stack.Push(new MultiSpectatorPlayerLoader(Score, () =>
             {
                 var player = new MultiSpectatorPlayer(Score, GameplayClock);
-                player.OnGameplayStarted += OnGameplayStarted;
+                player.OnGameplayStarted += () => OnGameplayStarted?.Invoke();
                 return player;
             }));
 
