@@ -128,7 +128,9 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("choose clear all scores", () => InputManager.Key(Key.Number4));
 
+            AddUntilStep("wait for dialog", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog != null);
             AddStep("confirm deletion", () => InputManager.Key(Key.Number1));
+            AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
 
             AddAssert("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 
@@ -170,7 +172,9 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddUntilStep("wait for dialog", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog != null);
             AddStep("confirm deletion", () => InputManager.Key(Key.Number1));
+            AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
 
             AddAssert("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 
