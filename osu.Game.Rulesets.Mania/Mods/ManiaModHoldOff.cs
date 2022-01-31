@@ -24,7 +24,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
 
         public override ModType Type => ModType.Conversion;
-        public const double Threshold = 1/2;
+
+        public const double END_NOTE_ALLOW_THRESHOLD = 0.5;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 // Don't add an end note if the duration is shorter than the threshold
                 double noteValue = GetNoteDurationInBeatLength(h, maniaBeatmap); // 1/1, 1/2, 1/4, etc.
 
-                if (noteValue >= Threshold)
+                if (noteValue >= END_NOTE_ALLOW_THRESHOLD)
                 {
                     newObjects.Add(new Note
                     {

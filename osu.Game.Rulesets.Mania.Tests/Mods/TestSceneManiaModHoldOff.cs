@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
 
             // Calculate expected number of objects
             int expectedObjectCount = 0;
-            double beatSnapValue = ManiaModHoldOff.Threshold;
 
             foreach (ManiaHitObject h in rawBeatmap.HitObjects)
             {
@@ -60,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Mods
                 {
                     double noteValue = ManiaModHoldOff.GetNoteDurationInBeatLength((HoldNote)h, rawBeatmap);
 
-                    if (noteValue >= beatSnapValue)
+                    if (noteValue >= ManiaModHoldOff.END_NOTE_ALLOW_THRESHOLD)
                     {
                         // Should generate an end note if it's longer than the minimum note value
                         expectedObjectCount++;
