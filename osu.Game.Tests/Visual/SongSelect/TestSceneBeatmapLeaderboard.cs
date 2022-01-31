@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestGlobalScoresDisplay()
         {
             AddStep(@"Set scope", () => leaderboard.Scope = BeatmapLeaderboardScope.Global);
-            AddStep(@"New Scores", () => leaderboard.Scores = generateSampleScores(null));
+            AddStep(@"New Scores", () => leaderboard.SetScores(generateSampleScores(new BeatmapInfo())));
         }
 
         [Test]
@@ -113,24 +114,18 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestPlaceholderStates()
         {
-            AddStep(@"Empty Scores", () => leaderboard.SetRetrievalState(PlaceholderState.NoScores));
-            AddStep(@"Network failure", () => leaderboard.SetRetrievalState(PlaceholderState.NetworkFailure));
-            AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
-            AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
-            AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
-            AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
-        }
+            AddStep("ensure no scores displayed", () => leaderboard.SetScores(null));
 
-        [Test]
-        public void TestBeatmapStates()
-        {
-            foreach (BeatmapOnlineStatus status in Enum.GetValues(typeof(BeatmapOnlineStatus)))
-                AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
+            AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
+            AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
+            AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
+            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardState.Unavailable));
+            AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
         }
 
         private void showPersonalBestWithNullPosition()
         {
-            leaderboard.TopScore = new ScoreInfo
+            leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
             {
                 Rank = ScoreRank.XH,
                 Accuracy = 1,
@@ -148,12 +143,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                         FlagName = @"ES",
                     },
                 },
-            };
+            });
         }
 
         private void showPersonalBest()
         {
-            leaderboard.TopScore = new ScoreInfo
+            leaderboard.SetScores(leaderboard.Scores, new ScoreInfo
             {
                 Position = 999,
                 Rank = ScoreRank.XH,
@@ -172,7 +167,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         FlagName = @"ES",
                     },
                 },
-            };
+            });
         }
 
         private void loadMoreScores(Func<BeatmapInfo> beatmapInfo)
@@ -407,21 +402,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             };
         }
 
-        private void showBeatmapWithStatus(BeatmapOnlineStatus status)
-        {
-            leaderboard.BeatmapInfo = new BeatmapInfo
-            {
-                OnlineID = 1113057,
-                Status = status,
-            };
-        }
-
         private class FailableLeaderboard : BeatmapLeaderboard
         {
-            public void SetRetrievalState(PlaceholderState state)
-            {
-                PlaceholderState = state;
-            }
+            public new void SetErrorState(LeaderboardState state) => base.SetErrorState(state);
+            public new void SetScores(IEnumerable<ScoreInfo> scores, ScoreInfo userScore = default) => base.SetScores(scores, userScore);
         }
     }
 }
