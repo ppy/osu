@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 },
                 background,
                 TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both },
-                new ColumnTouchInputArea()
+                new ColumnTouchInputArea(this)
             };
 
             hitPolicy = new OrderedHitPolicy(HitObjectContainer);
@@ -143,17 +143,19 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public class ColumnTouchInputArea : Drawable
         {
+            private readonly Column column;
+
             [Resolved(canBeNull: true)]
             private ManiaInputManager maniaInputManager { get; set; }
 
             private KeyBindingContainer<ManiaAction> keyBindingContainer;
 
-            public ColumnTouchInputArea()
+            public ColumnTouchInputArea(Column column)
             {
                 RelativeSizeAxes = Axes.Both;
-            }
 
-            private Column column => (Column)Parent;
+                this.column = column;
+            }
 
             protected override void LoadComplete()
             {
