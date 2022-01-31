@@ -110,12 +110,7 @@ namespace osu.Game.Online.Leaderboards
                             },
                             new Drawable[]
                             {
-                                new Container
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    Child = userScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
-                                },
+                                userScoreContainer = new UserTopScoreContainer<TScoreInfo>(CreateDrawableTopScore)
                             },
                         },
                     },
