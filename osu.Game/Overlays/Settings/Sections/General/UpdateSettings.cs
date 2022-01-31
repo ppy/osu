@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
@@ -45,9 +46,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Action = () =>
                     {
                         checkForUpdatesButton.Enabled.Value = false;
-                        Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(t => Schedule(() =>
+                        Task.Run(updateManager.CheckForUpdateAsync).ContinueWith(task => Schedule(() =>
                         {
-                            if (!t.Result)
+                            if (!task.GetResultSafely())
                             {
                                 notifications?.Post(new SimpleNotification
                                 {

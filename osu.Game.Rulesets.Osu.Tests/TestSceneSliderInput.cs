@@ -358,7 +358,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     },
                     BeatmapInfo =
                     {
-                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                        Difficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });

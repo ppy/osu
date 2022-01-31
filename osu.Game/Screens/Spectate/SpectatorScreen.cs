@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -15,6 +17,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using Realms;
 
 namespace osu.Game.Screens.Spectate
 {
@@ -53,13 +56,20 @@ namespace osu.Game.Screens.Spectate
             this.users.AddRange(users);
         }
 
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        private IDisposable realmSubscription;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(users => Schedule(() =>
+            userLookupCache.GetUsersAsync(users.ToArray()).ContinueWith(task => Schedule(() =>
             {
-                foreach (var u in users.Result)
+                var foundUsers = task.GetResultSafely();
+
+                foreach (var u in foundUsers)
                 {
                     if (u == null)
                         continue;
@@ -70,11 +80,19 @@ namespace osu.Game.Screens.Spectate
                 playingUserStates.BindTo(spectatorClient.PlayingUserStates);
                 playingUserStates.BindCollectionChanged(onPlayingUserStatesChanged, true);
 
-                beatmaps.ItemUpdated += beatmapUpdated;
+                realmSubscription = realm.RegisterForNotifications(
+                    realm => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending), beatmapsChanged);
 
                 foreach ((int id, var _) in userMap)
                     spectatorClient.WatchUser(id);
             }));
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> items, ChangeSet changes, Exception ___)
+        {
+            if (changes?.InsertedIndices == null) return;
+
+            foreach (int c in changes.InsertedIndices) beatmapUpdated(items[c]);
         }
 
         private void beatmapUpdated(BeatmapSetInfo beatmapSet)
@@ -216,8 +234,7 @@ namespace osu.Game.Screens.Spectate
                     spectatorClient.StopWatchingUser(userId);
             }
 
-            if (beatmaps != null)
-                beatmaps.ItemUpdated -= beatmapUpdated;
+            realmSubscription?.Dispose();
         }
     }
 }

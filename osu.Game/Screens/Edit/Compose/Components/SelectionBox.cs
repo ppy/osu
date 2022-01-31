@@ -15,6 +15,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
+    [Cached]
     public class SelectionBox : CompositeDrawable
     {
         public const float BORDER_RADIUS = 3;
@@ -306,7 +307,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor)
+                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;
@@ -319,7 +320,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxRotationHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e))
+                HandleRotate = angle => OnRotation?.Invoke(angle)
             };
 
             handle.OperationStarted += operationStarted;

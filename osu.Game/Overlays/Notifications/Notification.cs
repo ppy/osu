@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays.Notifications
         /// User requested close.
         /// </summary>
         public event Action Closed;
+
+        public abstract LocalisableString Text { get; set; }
 
         /// <summary>
         /// Whether this notification should forcefully display itself.
