@@ -28,7 +28,10 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
 
-        public readonly Dictionary<int, ReplayFrame> LastReceivedFrame = new Dictionary<int, ReplayFrame>();
+        public IReadOnlyDictionary<int, ReplayFrame> LastReceivedUserFrames => lastReceivedUserFrames;
+
+        private readonly Dictionary<int, ReplayFrame> lastReceivedUserFrames = new Dictionary<int, ReplayFrame>();
+
         private readonly Dictionary<int, int> userBeatmapDictionary = new Dictionary<int, int>();
         private readonly Dictionary<int, int> userNextFrameDictionary = new Dictionary<int, int>();
 
@@ -40,7 +43,7 @@ namespace osu.Game.Tests.Visual.Spectator
             OnNewFrames += (i, bundle) =>
             {
                 if (PlayingUsers.Contains(i))
-                    LastReceivedFrame[i] = bundle.Frames[^1];
+                    lastReceivedUserFrames[i] = bundle.Frames[^1];
             };
         }
 

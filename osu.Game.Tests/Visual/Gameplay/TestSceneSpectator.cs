@@ -215,7 +215,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             // We can't access API because we're an "online" test.
-            AddAssert("last received frame has time = 1000", () => spectatorClient.LastReceivedFrame.First().Value.Time == 1000);
+            AddAssert("last received frame has time = 1000", () => spectatorClient.LastReceivedUserFrames.First().Value.Time == 1000);
         }
 
         private OsuFramedReplayInputHandler replayHandler =>
