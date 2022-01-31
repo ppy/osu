@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
@@ -24,6 +25,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
 
         public override ModType Type => ModType.Conversion;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ManiaModInvert) };
 
         public const double END_NOTE_ALLOW_THRESHOLD = 0.5;
 
