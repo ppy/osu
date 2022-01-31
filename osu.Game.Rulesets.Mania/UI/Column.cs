@@ -143,6 +143,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public class ColumnTouchInputArea : Drawable
         {
+            [Resolved(canBeNull: true)]
+            private ManiaInputManager maniaInputManager { get; set; }
+
+            private KeyBindingContainer<ManiaAction> keyBindingContainer;
+
             public ColumnTouchInputArea()
             {
                 RelativeSizeAxes = Axes.Both;
@@ -152,32 +157,30 @@ namespace osu.Game.Rulesets.Mania.UI
 
             protected override void LoadComplete()
             {
-                keyBindingContainer = (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
+                keyBindingContainer = maniaInputManager?.KeyBindingContainer;
             }
-
-            private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
-                keyBindingContainer.TriggerPressed(column.Action.Value);
+                keyBindingContainer?.TriggerPressed(column.Action.Value);
                 return base.OnMouseDown(e);
             }
 
             protected override void OnMouseUp(MouseUpEvent e)
             {
-                keyBindingContainer.TriggerReleased(column.Action.Value);
+                keyBindingContainer?.TriggerReleased(column.Action.Value);
                 base.OnMouseUp(e);
             }
 
             protected override bool OnTouchDown(TouchDownEvent e)
             {
-                keyBindingContainer.TriggerPressed(column.Action.Value);
+                keyBindingContainer?.TriggerPressed(column.Action.Value);
                 return true;
             }
 
             protected override void OnTouchUp(TouchUpEvent e)
             {
-                keyBindingContainer.TriggerReleased(column.Action.Value);
+                keyBindingContainer?.TriggerReleased(column.Action.Value);
             }
         }
     }
