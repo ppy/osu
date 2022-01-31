@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
@@ -15,9 +16,26 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override double ScoreMultiplier => 1.12;
 
-        private const float default_flashlight_size = 350;
+        [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
+        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
+        {
+            MinValue = 0.5f,
+            MaxValue = 1.5f,
+            Default = 1f,
+            Value = 1f,
+            Precision = 0.1f
+        };
 
-        public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield);
+        [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
+        public override BindableBool ComboBasedSize { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
+
+        public override float DefaultFlashlightSize => 350;
+
+        protected override Flashlight CreateFlashlight() => new CatchFlashlight(this, playfield);
 
         private CatchPlayfield playfield;
 
@@ -31,10 +49,11 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             private readonly CatchPlayfield playfield;
 
-            public CatchFlashlight(CatchPlayfield playfield)
+            public CatchFlashlight(CatchModFlashlight modFlashlight, CatchPlayfield playfield)
+                : base(modFlashlight)
             {
                 this.playfield = playfield;
-                FlashlightSize = new Vector2(0, getSizeFor(0));
+                FlashlightSize = new Vector2(0, GetSizeFor(0));
             }
 
             protected override void Update()
@@ -44,19 +63,9 @@ namespace osu.Game.Rulesets.Catch.Mods
                 FlashlightPosition = playfield.CatcherArea.ToSpaceOfOtherDrawable(playfield.Catcher.DrawPosition, this);
             }
 
-            private float getSizeFor(int combo)
-            {
-                if (combo > 200)
-                    return default_flashlight_size * 0.8f;
-                else if (combo > 100)
-                    return default_flashlight_size * 0.9f;
-                else
-                    return default_flashlight_size;
-            }
-
             protected override void OnComboChange(ValueChangedEvent<int> e)
             {
-                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, GetSizeFor(e.NewValue)), FLASHLIGHT_FADE_DURATION);
             }
 
             protected override string FragmentShader => "CircularFlashlight";

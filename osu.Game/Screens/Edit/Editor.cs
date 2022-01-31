@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework;
@@ -27,6 +28,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
@@ -60,7 +63,16 @@ namespace osu.Game.Screens.Edit
 
         public override bool? AllowTrackAdjustments => false;
 
-        protected bool HasUnsavedChanges => lastSavedHash != changeHandler.CurrentStateHash;
+        protected bool HasUnsavedChanges
+        {
+            get
+            {
+                if (!canSave)
+                    return false;
+
+                return lastSavedHash != changeHandler?.CurrentStateHash;
+            }
+        }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -71,9 +83,14 @@ namespace osu.Game.Screens.Edit
         [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay notifications { get; set; }
+
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
 
         private readonly Bindable<bool> samplePlaybackDisabled = new Bindable<bool>();
+
+        private bool canSave;
 
         private bool exitConfirmed;
 
@@ -91,6 +108,8 @@ namespace osu.Game.Screens.Edit
 
         private IBeatmap playableBeatmap;
         private EditorBeatmap editorBeatmap;
+
+        [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
 
         private EditorMenuBar menuBar;
@@ -157,9 +176,6 @@ namespace osu.Game.Screens.Edit
                 return;
             }
 
-            beatDivisor.Value = playableBeatmap.BeatmapInfo.BeatDivisor;
-            beatDivisor.BindValueChanged(divisor => playableBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
-
             // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             clock = new EditorClock(playableBeatmap, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(loadableBeatmap.Track);
@@ -174,8 +190,17 @@ namespace osu.Game.Screens.Edit
 
             AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap, loadableBeatmap.GetSkin(), loadableBeatmap.BeatmapInfo));
             dependencies.CacheAs(editorBeatmap);
-            changeHandler = new EditorChangeHandler(editorBeatmap);
-            dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+
+            canSave = editorBeatmap.BeatmapInfo.Ruleset.CreateInstance() is ILegacyRuleset;
+
+            if (canSave)
+            {
+                changeHandler = new EditorChangeHandler(editorBeatmap);
+                dependencies.CacheAs<IEditorChangeHandler>(changeHandler);
+            }
+
+            beatDivisor.Value = editorBeatmap.BeatmapInfo.BeatDivisor;
+            beatDivisor.BindValueChanged(divisor => editorBeatmap.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
             updateLastSavedHash();
 
@@ -310,8 +335,8 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
-            changeHandler.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
-            changeHandler.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
+            changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
 
             menuBar.Mode.ValueChanged += onModeChanged;
         }
@@ -337,7 +362,7 @@ namespace osu.Game.Screens.Edit
         public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.RulesetID == nextBeatmap.RulesetID ? Clipboard.Content.Value : string.Empty
+            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextBeatmap.Ruleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
 
         /// <summary>
@@ -352,11 +377,14 @@ namespace osu.Game.Screens.Edit
 
         protected void Save()
         {
+            if (!canSave)
+            {
+                notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
+                return;
+            }
+
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
-
-            // apply any set-level metadata changes.
-            beatmapManager.Update(editorBeatmap.BeatmapInfo.BeatmapSet);
 
             // save the loaded beatmap's data stream.
             beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
@@ -576,7 +604,9 @@ namespace osu.Game.Screens.Edit
             // To update the game-wide beatmap with any changes, perform a re-fetch on exit/suspend.
             // This is required as the editor makes its local changes via EditorBeatmap
             // (which are not propagated outwards to a potentially cached WorkingBeatmap).
-            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo);
+            ((IWorkingBeatmapCache)beatmapManager).Invalidate(Beatmap.Value.BeatmapInfo);
+            var refetchedBeatmapInfo = beatmapManager.QueryBeatmap(b => b.ID == Beatmap.Value.BeatmapInfo.ID);
+            var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(refetchedBeatmapInfo);
 
             if (!(refetchedBeatmap is DummyWorkingBeatmap))
             {
@@ -601,7 +631,8 @@ namespace osu.Game.Screens.Edit
             if (isNewBeatmap)
             {
                 // confirming exit without save means we should delete the new beatmap completely.
-                beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
+                if (playableBeatmap.BeatmapInfo.BeatmapSet != null)
+                    beatmapManager.Delete(playableBeatmap.BeatmapInfo.BeatmapSet);
 
                 // eagerly clear contents before restoring default beatmap to prevent value change callbacks from firing.
                 ClearInternal();
@@ -647,9 +678,9 @@ namespace osu.Game.Screens.Edit
 
         #endregion
 
-        protected void Undo() => changeHandler.RestoreState(-1);
+        protected void Undo() => changeHandler?.RestoreState(-1);
 
-        protected void Redo() => changeHandler.RestoreState(1);
+        protected void Redo() => changeHandler?.RestoreState(1);
 
         private void resetTrack(bool seekToStart = false)
         {
@@ -760,7 +791,7 @@ namespace osu.Game.Screens.Edit
 
         private void updateLastSavedHash()
         {
-            lastSavedHash = changeHandler.CurrentStateHash;
+            lastSavedHash = changeHandler?.CurrentStateHash;
         }
 
         private List<MenuItem> createFileMenuItems()
@@ -775,11 +806,13 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
-            var beatmapSet = beatmapManager.QueryBeatmapSet(bs => bs.ID == Beatmap.Value.BeatmapSetInfo.ID) ?? playableBeatmap.BeatmapInfo.BeatmapSet;
+            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
+
+            Debug.Assert(beatmapSet != null);
 
             var difficultyItems = new List<MenuItem>();
 
-            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.RulesetID).OrderBy(group => group.Key))
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset.ShortName).OrderBy(group => group.Key))
             {
                 if (difficultyItems.Count > 0)
                     difficultyItems.Add(new EditorMenuItemSpacer());

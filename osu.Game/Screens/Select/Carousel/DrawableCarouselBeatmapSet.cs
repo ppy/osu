@@ -61,7 +61,11 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapOverlay)
         {
-            restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
+            restoreHiddenRequested = s =>
+            {
+                foreach (var b in s.Beatmaps)
+                    manager.Restore(b);
+            };
 
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
@@ -118,11 +122,9 @@ namespace osu.Game.Screens.Select.Carousel
                 },
             };
 
-            background.DelayedLoadComplete += fadeContentIn;
-            mainFlow.DelayedLoadComplete += fadeContentIn;
+            background.DelayedLoadComplete += d => d.FadeInFromZero(750, Easing.OutQuint);
+            mainFlow.DelayedLoadComplete += d => d.FadeInFromZero(500, Easing.OutQuint);
         }
-
-        private void fadeContentIn(Drawable d) => d.FadeInFromZero(750, Easing.OutQuint);
 
         protected override void Deselected()
         {
@@ -214,8 +216,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
-                if (beatmapSet.OnlineID != null && viewDetails != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID.Value)));
+                if (beatmapSet.OnlineID > 0 && viewDetails != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => viewDetails(beatmapSet.OnlineID)));
 
                 if (collectionManager != null)
                 {

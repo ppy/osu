@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -28,8 +27,8 @@ namespace osu.Game.Skinning
 
         private readonly IStorageResourceProvider skinResources;
 
-        public SkinModelManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IStorageResourceProvider skinResources)
-            : base(storage, contextFactory)
+        public SkinModelManager(Storage storage, RealmAccess realm, GameHost host, IStorageResourceProvider skinResources)
+            : base(storage, realm)
         {
             this.skinResources = skinResources;
 
@@ -49,7 +48,7 @@ namespace osu.Game.Skinning
 
         protected override bool HasCustomHashFunction => true;
 
-        protected override Task Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override void Populate(SkinInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             var skinInfoFile = model.Files.SingleOrDefault(f => f.Filename == skin_info_file);
 
@@ -83,8 +82,6 @@ namespace osu.Game.Skinning
             model.InstantiationInfo = createInstance(model).GetType().GetInvariantInstantiationInfo();
 
             checkSkinIniMetadata(model, realm);
-
-            return Task.CompletedTask;
         }
 
         private void checkSkinIniMetadata(SkinInfo item, Realm realm)
@@ -208,15 +205,15 @@ namespace osu.Game.Skinning
 
         private void populateMissingHashes()
         {
-            using (var realm = ContextFactory.CreateContext())
+            Realm.Run(realm =>
             {
-                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => string.IsNullOrEmpty(i.Hash)).ToArray();
+                var skinsWithoutHashes = realm.All<SkinInfo>().Where(i => !i.Protected && string.IsNullOrEmpty(i.Hash)).ToArray();
 
                 foreach (SkinInfo skin in skinsWithoutHashes)
                 {
                     try
                     {
-                        Update(skin);
+                        realm.Write(r => skin.Hash = ComputeHash(skin));
                     }
                     catch (Exception e)
                     {
@@ -224,7 +221,7 @@ namespace osu.Game.Skinning
                         Logger.Error(e, $"Existing skin {skin} has been deleted during hash recomputation due to being invalid");
                     }
                 }
-            }
+            });
         }
 
         private Skin createInstance(SkinInfo item) => item.CreateInstance(skinResources);
@@ -262,5 +259,7 @@ namespace osu.Game.Skinning
                 s.Hash = ComputeHash(s);
             });
         }
+
+        public override bool IsAvailableLocally(SkinInfo model) => true; // skins do not have online download support yet.
     }
 }

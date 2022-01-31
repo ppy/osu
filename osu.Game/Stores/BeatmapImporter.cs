@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -34,7 +33,7 @@ namespace osu.Game.Stores
     /// Handles the storage and retrieval of Beatmaps/WorkingBeatmaps.
     /// </summary>
     [ExcludeFromDynamicCompile]
-    public class BeatmapImporter : RealmArchiveModelImporter<RealmBeatmapSet>, IDisposable
+    public abstract class BeatmapImporter : RealmArchiveModelManager<BeatmapSetInfo>, IDisposable
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osz" };
 
@@ -45,31 +44,34 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        public BeatmapImporter(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
-            : base(storage, contextFactory)
+        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+            : base(storage, realm)
         {
             this.onlineLookupQueue = onlineLookupQueue;
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path).ToLowerInvariant() == ".osz";
 
-        protected override Task Populate(RealmBeatmapSet beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
         {
             if (archive != null)
                 beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet.Files, realm));
 
-            foreach (RealmBeatmap b in beatmapSet.Beatmaps)
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+            {
                 b.BeatmapSet = beatmapSet;
+
+                // ensure we aren't trying to add a new ruleset to the database
+                // this can happen in tests, mostly
+                if (!b.Ruleset.IsManaged)
+                    b.Ruleset = realm.Find<RulesetInfo>(b.Ruleset.ShortName) ?? throw new ArgumentNullException(nameof(b.Ruleset));
+            }
 
             validateOnlineIds(beatmapSet, realm);
 
             bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
 
-            if (onlineLookupQueue != null)
-            {
-                // TODO: this required `BeatmapOnlineLookupQueue` to somehow support new types.
-                // await onlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
-            }
+            onlineLookupQueue?.Update(beatmapSet);
 
             // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
             if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
@@ -80,11 +82,9 @@ namespace osu.Game.Stores
                     LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
                 }
             }
-
-            return Task.CompletedTask;
         }
 
-        protected override void PreImport(RealmBeatmapSet beatmapSet, Realm realm)
+        protected override void PreImport(BeatmapSetInfo beatmapSet, Realm realm)
         {
             // We are about to import a new beatmap. Before doing so, ensure that no other set shares the online IDs used by the new one.
             // Note that this means if the previous beatmap is restored by the user, it will no longer be linked to its online IDs.
@@ -93,7 +93,7 @@ namespace osu.Game.Stores
 
             if (beatmapSet.OnlineID > 0)
             {
-                var existingSetWithSameOnlineID = realm.All<RealmBeatmapSet>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
+                var existingSetWithSameOnlineID = realm.All<BeatmapSetInfo>().SingleOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
 
                 if (existingSetWithSameOnlineID != null)
                 {
@@ -108,7 +108,7 @@ namespace osu.Game.Stores
             }
         }
 
-        private void validateOnlineIds(RealmBeatmapSet beatmapSet, Realm realm)
+        private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineID > 0).Select(b => b.OnlineID).ToList();
 
@@ -121,10 +121,10 @@ namespace osu.Game.Stores
             }
 
             // find any existing beatmaps in the database that have matching online ids
-            List<RealmBeatmap> existingBeatmaps = new List<RealmBeatmap>();
+            List<BeatmapInfo> existingBeatmaps = new List<BeatmapInfo>();
 
             foreach (int id in beatmapIds)
-                existingBeatmaps.AddRange(realm.All<RealmBeatmap>().Where(b => b.OnlineID == id));
+                existingBeatmaps.AddRange(realm.All<BeatmapInfo>().Where(b => b.OnlineID == id));
 
             if (existingBeatmaps.Any())
             {
@@ -143,7 +143,7 @@ namespace osu.Game.Stores
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = -1);
         }
 
-        protected override bool CanSkipImport(RealmBeatmapSet existing, RealmBeatmapSet import)
+        protected override bool CanSkipImport(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
             if (!base.CanSkipImport(existing, import))
                 return false;
@@ -151,7 +151,7 @@ namespace osu.Game.Stores
             return existing.Beatmaps.Any(b => b.OnlineID > 0);
         }
 
-        protected override bool CanReuseExisting(RealmBeatmapSet existing, RealmBeatmapSet import)
+        protected override bool CanReuseExisting(BeatmapSetInfo existing, BeatmapSetInfo import)
         {
             if (!base.CanReuseExisting(existing, import))
                 return false;
@@ -163,9 +163,14 @@ namespace osu.Game.Stores
             return existing.OnlineID == import.OnlineID && existingIds.SequenceEqual(importIds);
         }
 
+        public override bool IsAvailableLocally(BeatmapSetInfo model)
+        {
+            return Realm.Run(realm => realm.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID));
+        }
+
         public override string HumanisedModelName => "beatmap";
 
-        protected override RealmBeatmapSet? CreateModel(ArchiveReader reader)
+        protected override BeatmapSetInfo? CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
             string? mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu", StringComparison.OrdinalIgnoreCase));
@@ -180,7 +185,7 @@ namespace osu.Game.Stores
             using (var stream = new LineBufferedReader(reader.GetStream(mapName)))
                 beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
-            return new RealmBeatmapSet
+            return new BeatmapSetInfo
             {
                 OnlineID = beatmap.BeatmapInfo.BeatmapSet?.OnlineID ?? -1,
                 // Metadata = beatmap.Metadata,
@@ -189,11 +194,11 @@ namespace osu.Game.Stores
         }
 
         /// <summary>
-        /// Create all required <see cref="RealmBeatmap"/>s for the provided archive.
+        /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
         /// </summary>
-        private List<RealmBeatmap> createBeatmapDifficulties(IList<RealmNamedFileUsage> files, Realm realm)
+        private List<BeatmapInfo> createBeatmapDifficulties(IList<RealmNamedFileUsage> files, Realm realm)
         {
-            var beatmaps = new List<RealmBeatmap>();
+            var beatmaps = new List<BeatmapInfo>();
 
             foreach (var file in files.Where(f => f.Filename.EndsWith(".osu", StringComparison.OrdinalIgnoreCase)))
             {
@@ -212,17 +217,17 @@ namespace osu.Game.Stores
                     }
 
                     var decodedInfo = decoded.BeatmapInfo;
-                    var decodedDifficulty = decodedInfo.BaseDifficulty;
+                    var decodedDifficulty = decodedInfo.Difficulty;
 
-                    var ruleset = realm.All<RealmRuleset>().FirstOrDefault(r => r.OnlineID == decodedInfo.RulesetID);
+                    var ruleset = realm.All<RulesetInfo>().FirstOrDefault(r => r.OnlineID == decodedInfo.Ruleset.OnlineID);
 
                     if (ruleset?.Available != true)
                     {
-                        Logger.Log($"Skipping import of {file.Filename} due to missing local ruleset {decodedInfo.RulesetID}.", LoggingTarget.Database);
+                        Logger.Log($"Skipping import of {file.Filename} due to missing local ruleset {decodedInfo.Ruleset.OnlineID}.", LoggingTarget.Database);
                         continue;
                     }
 
-                    var difficulty = new RealmBeatmapDifficulty
+                    var difficulty = new BeatmapDifficulty
                     {
                         DrainRate = decodedDifficulty.DrainRate,
                         CircleSize = decodedDifficulty.CircleSize,
@@ -232,7 +237,7 @@ namespace osu.Game.Stores
                         SliderTickRate = decodedDifficulty.SliderTickRate,
                     };
 
-                    var metadata = new RealmBeatmapMetadata
+                    var metadata = new BeatmapMetadata
                     {
                         Title = decoded.Metadata.Title,
                         TitleUnicode = decoded.Metadata.TitleUnicode,
@@ -240,7 +245,7 @@ namespace osu.Game.Stores
                         ArtistUnicode = decoded.Metadata.ArtistUnicode,
                         Author =
                         {
-                            OnlineID = decoded.Metadata.Author.Id,
+                            OnlineID = decoded.Metadata.Author.OnlineID,
                             Username = decoded.Metadata.Author.Username
                         },
                         Source = decoded.Metadata.Source,
@@ -250,11 +255,11 @@ namespace osu.Game.Stores
                         BackgroundFile = decoded.Metadata.BackgroundFile,
                     };
 
-                    var beatmap = new RealmBeatmap(ruleset, difficulty, metadata)
+                    var beatmap = new BeatmapInfo(ruleset, difficulty, metadata)
                     {
                         Hash = hash,
                         DifficultyName = decodedInfo.DifficultyName,
-                        OnlineID = decodedInfo.OnlineID ?? -1,
+                        OnlineID = decodedInfo.OnlineID,
                         AudioLeadIn = decodedInfo.AudioLeadIn,
                         StackLeniency = decodedInfo.StackLeniency,
                         SpecialStyle = decodedInfo.SpecialStyle,
@@ -278,7 +283,7 @@ namespace osu.Game.Stores
             return beatmaps;
         }
 
-        private void updateBeatmapStatistics(RealmBeatmap beatmap, IBeatmap decoded)
+        private void updateBeatmapStatistics(BeatmapInfo beatmap, IBeatmap decoded)
         {
             var rulesetInstance = ((IRulesetInfo)beatmap.Ruleset).CreateInstance();
 
