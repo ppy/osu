@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void onNewFrames(int userId, FrameDataBundle frames)
         {
-            Logger.Log($"Received {frames.Frames.Count()} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
+            Logger.Log($"Received {frames.Frames.Count} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
 
             foreach (var legacyFrame in frames.Frames)
             {
