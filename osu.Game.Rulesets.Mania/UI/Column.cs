@@ -28,7 +28,6 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float COLUMN_WIDTH = 80;
         public const float SPECIAL_COLUMN_WIDTH = 70;
-        public const float TOUCH_AREA_HEIGHT = 100;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -44,37 +43,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public Container UnderlayElements => HitObjectArea.UnderlayElements;
 
         private readonly GameplaySampleTriggerSource sampleTriggerSource;
-
-        public class ColumnTouchInputArea : Drawable
-        {
-            public ColumnTouchInputArea()
-            {
-                RelativeSizeAxes = Axes.X;
-                Anchor = Anchor.BottomCentre;
-                Origin = Anchor.BottomCentre;
-                Height = TOUCH_AREA_HEIGHT;
-            }
-
-            private Column column => (Column)Parent;
-
-            protected override void LoadComplete()
-            {
-                keyBindingContainer = (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
-            }
-
-            private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
-
-            protected override bool OnTouchDown(TouchDownEvent e)
-            {
-                keyBindingContainer.TriggerPressed(column.Action.Value);
-                return false;
-            }
-
-            protected override void OnTouchUp(TouchUpEvent e)
-            {
-                keyBindingContainer.TriggerReleased(column.Action.Value);
-            }
-        }
 
         public Column(int index)
         {
@@ -172,5 +140,45 @@ namespace osu.Game.Rulesets.Mania.UI
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(Stage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
+
+        public class ColumnTouchInputArea : Drawable
+        {
+            public ColumnTouchInputArea()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            private Column column => (Column)Parent;
+
+            protected override void LoadComplete()
+            {
+                keyBindingContainer = (ManiaInputManager.RulesetKeyBindingContainer)((ManiaInputManager)GetContainingInputManager()).KeyBindingContainer;
+            }
+
+            private ManiaInputManager.RulesetKeyBindingContainer keyBindingContainer { get; set; }
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                keyBindingContainer.TriggerPressed(column.Action.Value);
+                return base.OnMouseDown(e);
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                keyBindingContainer.TriggerReleased(column.Action.Value);
+                base.OnMouseUp(e);
+            }
+
+            protected override bool OnTouchDown(TouchDownEvent e)
+            {
+                keyBindingContainer.TriggerPressed(column.Action.Value);
+                return true;
+            }
+
+            protected override void OnTouchUp(TouchUpEvent e)
+            {
+                keyBindingContainer.TriggerReleased(column.Action.Value);
+            }
+        }
     }
 }
