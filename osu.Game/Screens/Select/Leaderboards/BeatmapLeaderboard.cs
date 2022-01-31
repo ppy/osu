@@ -201,10 +201,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scores = scores.Detach();
 
                 scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationToken)
-                            .ContinueWith(ordered =>
+                            .ContinueWith(ordered => Schedule(() =>
                             {
+                                if (cancellationToken.IsCancellationRequested)
+                                    return;
+
                                 SetScores(ordered.GetResultSafely());
-                            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+                            }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
 
