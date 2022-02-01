@@ -55,7 +55,9 @@ namespace osu.Game.Rulesets.UI
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            spectatorClient?.EndPlaying();
+
+            if (spectatorClient != null && gameplayState != null)
+                spectatorClient.EndPlaying(gameplayState);
         }
 
         protected override void Update()

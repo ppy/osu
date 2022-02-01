@@ -138,6 +138,7 @@ namespace osu.Game.Online.Spectator
                 currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
+                currentState.State = SpectatingUserState.Playing;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
@@ -148,7 +149,7 @@ namespace osu.Game.Online.Spectator
 
         public void SendFrames(FrameDataBundle data) => lastSend = SendFramesInternal(data);
 
-        public void EndPlaying()
+        public void EndPlaying(GameplayState state)
         {
             // This method is most commonly called via Dispose(), which is can be asynchronous (via the AsyncDisposalQueue).
             // We probably need to find a better way to handle this...
@@ -162,6 +163,13 @@ namespace osu.Game.Online.Spectator
 
                 IsPlaying = false;
                 currentBeatmap = null;
+
+                if (state.HasPassed)
+                    currentState.State = SpectatingUserState.Completed;
+                else if (state.HasFailed)
+                    currentState.State = SpectatingUserState.Failed;
+                else
+                    currentState.State = SpectatingUserState.Quit;
 
                 EndPlayingInternal(currentState);
             });
