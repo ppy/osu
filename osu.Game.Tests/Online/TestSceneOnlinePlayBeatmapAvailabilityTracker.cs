@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Online
         {
             Dependencies.Cache(rulesets = new RulesetStore(Realm));
             Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
-            Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API, host));
+            Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API));
         }
 
         [SetUp]
@@ -196,7 +196,7 @@ namespace osu.Game.Tests.Online
 
         internal class TestBeatmapModelDownloader : BeatmapModelDownloader
         {
-            public TestBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> importer, IAPIProvider apiProvider, GameHost gameHost)
+            public TestBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> importer, IAPIProvider apiProvider)
                 : base(importer, apiProvider)
             {
             }
