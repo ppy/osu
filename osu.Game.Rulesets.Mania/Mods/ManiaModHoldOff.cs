@@ -65,8 +65,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public static double GetNoteDurationInBeatLength(HoldNote holdNote, ManiaBeatmap beatmap)
         {
-            double bpmAtNoteTime = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BPM;
-            return (60 * holdNote.Duration) / (1000 * bpmAtNoteTime);
+            double beatLength = beatmap.ControlPointInfo.TimingPointAt(holdNote.StartTime).BeatLength;
+            return holdNote.Duration / beatLength;
         }
     }
 }
