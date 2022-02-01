@@ -47,55 +47,42 @@ namespace osu.Game.Online.Leaderboards
                     Alpha = 0.9f,
                     Colour = colours.Gray3,
                 },
-                new GridContainer
+                new FillFlowContainer
                 {
                     Margin = new MarginPadding(5f),
+                    Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
-                    RowDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    Content = new[]
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
                         // Info row
-                        new Drawable[]
+                        timestampLabel = new OsuSpriteText
                         {
-                            timestampLabel = new OsuSpriteText
-                            {
-                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            }
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                         },
                         // Mods row
-                        new Drawable[]
+                        modStatistics = new FillFlowContainer<ModCell>
                         {
-                            modStatistics = new FillFlowContainer<ModCell>
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                            }
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
                         },
-                        // Actual stats rows
-                        new Drawable[]
+                        new FillFlowContainer
                         {
-                            topScoreStatistics = new FillFlowContainer<HitResultCell>
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            bottomScoreStatistics = new FillFlowContainer<HitResultCell>
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
+                                // Actual stats rows
+                                topScoreStatistics = new FillFlowContainer<HitResultCell>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                },
+                                bottomScoreStatistics = new FillFlowContainer<HitResultCell>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                },
                             }
                         },
                     }
