@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(),
-                        createGameplayComponents(Beatmap.Value, playableBeatmap)
+                        createGameplayComponents(Beatmap.Value)
                     }
                 },
                 FailOverlay = new FailOverlay
@@ -364,7 +364,7 @@ namespace osu.Game.Screens.Play
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
