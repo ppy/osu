@@ -60,6 +60,12 @@ namespace osu.Game.Tests.Gameplay
             Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(1_000_000));
             Assert.That(scoreProcessor.JudgedHits, Is.EqualTo(1));
 
+            // No header shouldn't cause any change
+            scoreProcessor.ResetFromReplayFrame(new OsuRuleset(), new OsuReplayFrame());
+
+            Assert.That(scoreProcessor.TotalScore.Value, Is.EqualTo(1_000_000));
+            Assert.That(scoreProcessor.JudgedHits, Is.EqualTo(1));
+
             // Reset with a miss instead.
             scoreProcessor.ResetFromReplayFrame(new OsuRuleset(), new OsuReplayFrame
             {
