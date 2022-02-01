@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns></returns>
         public virtual IEnumerable<PerformanceDisplayAttribute> GetAttributesForDisplay()
         {
-            yield return new PerformanceDisplayAttribute(nameof(Total), "Final PP", Total);
+            yield return new PerformanceDisplayAttribute(nameof(Total), "Achieved PP", Total);
         }
     }
 }
