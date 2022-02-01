@@ -63,7 +63,7 @@ namespace osu.Game.Database
                     return;
                 }
 
-                perform(retrieveFromID(r, ID));
+                perform(retrieveFromID(r));
                 RealmLiveStatistics.USAGE_ASYNC.Value++;
             });
         }
@@ -85,7 +85,7 @@ namespace osu.Game.Database
 
             return realm.Run(r =>
             {
-                var returnData = perform(retrieveFromID(r, ID));
+                var returnData = perform(retrieveFromID(r));
                 RealmLiveStatistics.USAGE_ASYNC.Value++;
 
                 if (returnData is RealmObjectBase realmObject && realmObject.IsManaged)
@@ -139,11 +139,11 @@ namespace osu.Game.Database
             }
 
             dataIsFromUpdateThread = true;
-            data = retrieveFromID(realm.Realm, ID);
+            data = retrieveFromID(realm.Realm);
             RealmLiveStatistics.USAGE_UPDATE_REFETCH.Value++;
         }
 
-        private T retrieveFromID(Realm realm, Guid id)
+        private T retrieveFromID(Realm realm)
         {
             var found = realm.Find<T>(ID);
 
