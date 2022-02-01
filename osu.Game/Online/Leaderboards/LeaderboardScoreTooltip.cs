@@ -119,7 +119,7 @@ namespace osu.Game.Online.Leaderboards
                 (result.Result > HitResult.Perfect
                         ? bottomScoreStatistics
                         : topScoreStatistics
-                        ).Add(new HitResultCell(result));
+                    ).Add(new HitResultCell(result));
             }
         }
 
@@ -130,18 +130,18 @@ namespace osu.Game.Online.Leaderboards
 
         private class HitResultCell : CompositeDrawable
         {
-            private readonly string DisplayName;
-            private readonly HitResult Result;
-            private readonly int Count;
+            private readonly string displayName;
+            private readonly HitResult result;
+            private readonly int count;
 
             public HitResultCell(HitResultDisplayStatistic stat)
             {
                 AutoSizeAxes = Axes.Both;
-                Padding = new MarginPadding{ Horizontal = 5f };
+                Padding = new MarginPadding { Horizontal = 5f };
 
-                DisplayName = stat.DisplayName;
-                Result = stat.Result;
-                Count = stat.Count;
+                displayName = stat.DisplayName;
+                result = stat.Result;
+                count = stat.Count;
             }
 
             [BackgroundDependencyLoader]
@@ -169,12 +169,12 @@ namespace osu.Game.Online.Leaderboards
                                 },
                                 new OsuSpriteText
                                 {
-                                    Padding = new MarginPadding{ Horizontal = 2f },
+                                    Padding = new MarginPadding { Horizontal = 2f },
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                                    Text = DisplayName.ToUpperInvariant(),
-                                    Colour = colours.ForHitResult(Result),
+                                    Text = displayName.ToUpperInvariant(),
+                                    Colour = colours.ForHitResult(result),
                                 }
                             }
                         },
@@ -182,7 +182,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             RelativeSizeAxes = Axes.Y,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = Count.ToString(),
+                            Text = count.ToString(),
                         },
                     }
                 };
@@ -191,13 +191,13 @@ namespace osu.Game.Online.Leaderboards
 
         private class ModCell : CompositeDrawable
         {
-            private readonly Mod Mod;
+            private readonly Mod mod;
 
             public ModCell(Mod mod)
             {
                 AutoSizeAxes = Axes.Both;
-                Padding = new MarginPadding{ Horizontal = 5f };
-                Mod = mod;
+                Padding = new MarginPadding { Horizontal = 5f };
+                this.mod = mod;
             }
 
             [BackgroundDependencyLoader]
@@ -212,7 +212,7 @@ namespace osu.Game.Online.Leaderboards
                     Spacing = new Vector2(2f, 0f),
                     Children = new Drawable[]
                     {
-                        new ModIcon(Mod, showTooltip: false).With(icon =>
+                        new ModIcon(mod, showTooltip: false).With(icon =>
                         {
                             icon.Origin = Anchor.CentreLeft;
                             icon.Anchor = Anchor.CentreLeft;
@@ -221,14 +221,15 @@ namespace osu.Game.Online.Leaderboards
                     }
                 };
 
-                string description = Mod.SettingDescription;
+                string description = mod.SettingDescription;
+
                 if (!string.IsNullOrEmpty(description))
                 {
                     container.Add(new OsuSpriteText
                     {
                         RelativeSizeAxes = Axes.Y,
                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                        Text = Mod.SettingDescription,
+                        Text = mod.SettingDescription,
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
                     });
