@@ -16,6 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
@@ -25,6 +26,11 @@ namespace osu.Game.Rulesets.UI
         where T : struct
     {
         public readonly KeyBindingContainer<T> KeyBindingContainer;
+
+        private readonly Ruleset ruleset;
+
+        [Resolved(CanBeNull = true)]
+        private ScoreProcessor scoreProcessor { get; set; }
 
         private ReplayRecorder recorder;
 
@@ -51,6 +57,8 @@ namespace osu.Game.Rulesets.UI
 
         protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
         {
+            this.ruleset = ruleset.CreateInstance();
+
             InternalChild = KeyBindingContainer =
                 CreateKeyBindingContainer(ruleset, variant, unique)
                     .WithChild(content = new Container { RelativeSizeAxes = Axes.Both });
@@ -66,17 +74,23 @@ namespace osu.Game.Rulesets.UI
 
         public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
         {
-            if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
+            switch (inputStateChange)
             {
-                foreach (var action in replayStateChanged.ReleasedActions)
-                    KeyBindingContainer.TriggerReleased(action);
+                case ReplayStateChangeEvent<T> stateChangeEvent:
+                    foreach (var action in stateChangeEvent.ReleasedActions)
+                        KeyBindingContainer.TriggerReleased(action);
 
-                foreach (var action in replayStateChanged.PressedActions)
-                    KeyBindingContainer.TriggerPressed(action);
-            }
-            else
-            {
-                base.HandleInputStateChange(inputStateChange);
+                    foreach (var action in stateChangeEvent.PressedActions)
+                        KeyBindingContainer.TriggerPressed(action);
+                    break;
+
+                case ReplayStatisticsFrameEvent statisticsStateChangeEvent:
+                    scoreProcessor?.ResetFromReplayFrame(ruleset, statisticsStateChangeEvent.Frame);
+                    break;
+
+                default:
+                    base.HandleInputStateChange(inputStateChange);
+                    break;
             }
         }
 
