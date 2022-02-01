@@ -15,6 +15,8 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
+#nullable enable
+
 namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
@@ -94,14 +96,14 @@ namespace osu.Game.Online.Leaderboards
             };
         }
 
-        private ScoreInfo currentScore;
+        private ScoreInfo? displayedScore;
 
         public void SetContent(ScoreInfo score)
         {
-            if (currentScore.Equals(score))
+            if (displayedScore?.Equals(score) == true)
                 return;
 
-            currentScore = score;
+            displayedScore = score;
 
             timestampLabel.Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}";
 
