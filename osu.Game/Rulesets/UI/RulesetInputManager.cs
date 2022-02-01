@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasRecordingHandler
         where T : struct
     {
+        public readonly KeyBindingContainer<T> KeyBindingContainer;
+
         private ReplayRecorder recorder;
 
         public ReplayRecorder Recorder
@@ -42,8 +44,6 @@ namespace osu.Game.Rulesets.UI
         }
 
         protected override InputState CreateInitialState() => new RulesetInputManagerInputState<T>(base.CreateInitialState());
-
-        protected readonly KeyBindingContainer<T> KeyBindingContainer;
 
         protected override Container<Drawable> Content => content;
 
