@@ -10,7 +10,6 @@ using osuTK;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -49,7 +48,7 @@ namespace osu.Game.Online.Leaderboards
                 },
                 new FillFlowContainer
                 {
-                    Margin = new MarginPadding(5f),
+                    Margin = new MarginPadding(5),
                     Spacing = new Vector2(10),
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -63,8 +62,10 @@ namespace osu.Game.Online.Leaderboards
                         // Mods row
                         modStatistics = new FillFlowContainer<ModCell>
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Direction = FillDirection.Full,
+                            Spacing = new Vector2(5, 0),
                         },
                         new FillFlowContainer
                         {
@@ -77,11 +78,13 @@ namespace osu.Game.Online.Leaderboards
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(10, 0),
                                 },
                                 bottomScoreStatistics = new FillFlowContainer<HitResultCell>
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(10, 0),
                                 },
                             }
                         },
@@ -133,7 +136,6 @@ namespace osu.Game.Online.Leaderboards
             public HitResultCell(HitResultDisplayStatistic stat)
             {
                 AutoSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Horizontal = 5f };
 
                 displayName = stat.DisplayName;
                 result = stat.Result;
@@ -148,35 +150,17 @@ namespace osu.Game.Online.Leaderboards
                     Height = 12,
                     AutoSizeAxes = Axes.X,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(2f, 0f),
+                    Spacing = new Vector2(5f, 0f),
                     Children = new Drawable[]
                     {
-                        new CircularContainer
+                        new OsuSpriteText
                         {
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4Extensions.FromHex("#222")
-                                },
-                                new OsuSpriteText
-                                {
-                                    Padding = new MarginPadding(2),
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
-                                    Text = displayName.ToUpperInvariant(),
-                                    Colour = colours.ForHitResult(result),
-                                }
-                            }
+                            Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                            Text = displayName.ToUpperInvariant(),
+                            Colour = colours.ForHitResult(result),
                         },
                         new OsuSpriteText
                         {
-                            RelativeSizeAxes = Axes.Y,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                             Text = count.ToString(),
                         },
@@ -192,7 +176,6 @@ namespace osu.Game.Online.Leaderboards
             public ModCell(Mod mod)
             {
                 AutoSizeAxes = Axes.Both;
-                Padding = new MarginPadding { Horizontal = 5f };
                 this.mod = mod;
             }
 
@@ -228,6 +211,7 @@ namespace osu.Game.Online.Leaderboards
                         Text = mod.SettingDescription,
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
+                        Margin = new MarginPadding { Top = 1 },
                     });
                 }
             }
