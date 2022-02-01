@@ -1000,7 +1000,7 @@ namespace osu.Game.Screens.Play
             // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
             // To resolve test failures, forcefully end playing synchronously when this screen exits.
             // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
-            spectatorClient.EndPlaying();
+            spectatorClient.EndPlaying(GameplayState);
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.

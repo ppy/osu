@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("send frames and finish play", () =>
             {
                 spectatorClient.HandleFrame(new OsuReplayFrame(1000, Vector2.Zero));
-                spectatorClient.EndPlaying();
+                spectatorClient.EndPlaying(new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset()) { HasPassed = true });
             });
 
             // We can't access API because we're an "online" test.
