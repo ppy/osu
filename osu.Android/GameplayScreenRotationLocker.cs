@@ -27,7 +27,7 @@ namespace osu.Android
         {
             gameActivity.RunOnUiThread(() =>
             {
-                gameActivity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : ScreenOrientation.FullUser;
+                gameActivity.RequestedOrientation = userPlaying.NewValue ? ScreenOrientation.Locked : OsuGameActivity.DEFAULT_ORIENTATION;
             });
         }
     }
