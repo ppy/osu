@@ -186,7 +186,6 @@ namespace osu.Game.Online.Leaderboards
                                                     Anchor = Anchor.BottomLeft,
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10f, 0f),
                                                     Margin = new MarginPadding { Left = edge_margin },
                                                     Children = statisticsLabels
                                                 },
@@ -231,7 +230,6 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(1),
                                     ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
@@ -316,6 +314,7 @@ namespace osu.Game.Online.Leaderboards
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
+                    Padding = new MarginPadding { Right = 10 },
                     Children = new Drawable[]
                     {
                         new Container
