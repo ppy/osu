@@ -21,24 +21,31 @@ namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
     {
-        private readonly OsuSpriteText timestampLabel;
-        private readonly FillFlowContainer<HitResultCell> topScoreStatistics;
-        private readonly FillFlowContainer<HitResultCell> bottomScoreStatistics;
-        private readonly FillFlowContainer<ModCell> modStatistics;
+        private OsuSpriteText timestampLabel = null!;
+        private FillFlowContainer<HitResultCell> topScoreStatistics = null!;
+        private FillFlowContainer<HitResultCell> bottomScoreStatistics = null!;
+        private FillFlowContainer<ModCell> modStatistics = null!;
 
         public LeaderboardScoreTooltip()
         {
             AutoSizeAxes = Axes.Both;
+            AutoSizeDuration = 200;
+            AutoSizeEasing = Easing.OutQuint;
+
             Masking = true;
             CornerRadius = 5;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.7f,
-                    Colour = Colour4.Black,
+                    Alpha = 0.9f,
+                    Colour = colours.Gray3,
                 },
                 new GridContainer
                 {
@@ -118,10 +125,10 @@ namespace osu.Game.Online.Leaderboards
 
             foreach (var result in score.GetStatisticsForDisplay())
             {
-                (result.Result > HitResult.Perfect
-                        ? bottomScoreStatistics
-                        : topScoreStatistics
-                    ).Add(new HitResultCell(result));
+                if (result.Result > HitResult.Perfect)
+                    bottomScoreStatistics.Add(new HitResultCell(result));
+                else
+                    topScoreStatistics.Add(new HitResultCell(result));
             }
         }
 
@@ -171,7 +178,7 @@ namespace osu.Game.Online.Leaderboards
                                 },
                                 new OsuSpriteText
                                 {
-                                    Padding = new MarginPadding { Horizontal = 2f },
+                                    Padding = new MarginPadding(2),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
