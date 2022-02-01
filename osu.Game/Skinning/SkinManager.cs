@@ -77,7 +77,7 @@ namespace osu.Game.Skinning
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
-            skinModelManager = new SkinModelManager(storage, realm, host, this);
+            skinModelManager = new SkinModelManager(storage, realm, this);
 
             var defaultSkins = new[]
             {
