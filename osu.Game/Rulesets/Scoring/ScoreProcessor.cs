@@ -396,11 +396,8 @@ namespace osu.Game.Rulesets.Scoring
                         break;
                 }
 
-                for (int i = 0; i < count; i++)
-                {
-                    baseScore += Judgement.ToNumericResult(result);
-                    rollingMaxBaseScore += Judgement.ToNumericResult(maxResult);
-                }
+                baseScore += count * Judgement.ToNumericResult(result);
+                rollingMaxBaseScore += count * Judgement.ToNumericResult(maxResult);
             }
 
             scoreResultCounts.Clear();
