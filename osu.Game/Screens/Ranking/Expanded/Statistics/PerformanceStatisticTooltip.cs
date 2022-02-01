@@ -72,16 +72,73 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             UpdateDisplay(performance);
         }
 
-        private Drawable createAttributeItem(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
+        private Drawable createItemForTotal(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
         {
-            bool isTotal = attribute.PropertyName == nameof(PerformanceAttributes.Total);
-            float fraction = (float)(attribute.Value / perfectAttribute.Value);
-            if (float.IsNaN(fraction))
-                fraction = 0;
-            string text = fraction.ToLocalisableString("0%").ToString();
+            return
+                new GridContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Margin = new MarginPadding { Bottom = 10 },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Absolute, 250),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                                Text = attribute.DisplayName,
+                                Colour = titleColor
+                            },
+                            new OsuSpriteText
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
+                                Text = Math.Round(attribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString(),
+                                Colour = titleColor
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                                Text = "Maximum",
+                                Colour = OsuColour.Gray(0.7f)
+                            },
+                            new OsuSpriteText
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular),
+                                Text = Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero).ToLocalisableString(),
+                                Colour = OsuColour.Gray(0.7f)
+                            }
+                        }
+                    }
+                };
+        }
 
-            if (isTotal)
-                text = (int)Math.Round(attribute.Value, MidpointRounding.AwayFromZero) + "/" + (int)Math.Round(perfectAttribute.Value, MidpointRounding.AwayFromZero);
+        private Drawable createItemForAttribute(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
+        {
+            float percentage = (float)(attribute.Value / perfectAttribute.Value);
+            if (float.IsNaN(percentage))
+                percentage = 0;
+            string text = percentage.ToLocalisableString("0%").ToString();
 
             return new GridContainer
             {
@@ -106,7 +163,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.Regular),
                             Text = attribute.DisplayName,
-                            Colour = isTotal ? titleColor : textColour
+                            Colour = textColour
                         },
                         new Bar
                         {
@@ -115,8 +172,8 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Width = 130,
                             Height = 5,
                             BackgroundColour = Color4.White.Opacity(0.5f),
-                            Colour = isTotal ? titleColor : textColour,
-                            Length = fraction,
+                            Colour = textColour,
+                            Length = percentage,
                             Margin = new MarginPadding { Left = 5, Right = 5 }
                         },
                         new OsuSpriteText
@@ -125,7 +182,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                             Text = text,
-                            Colour = isTotal ? titleColor : textColour
+                            Colour = textColour
                         }
                     }
                 }
@@ -142,7 +199,9 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             foreach (PerformanceDisplayAttribute attr in displayAttributes)
             {
-                Content.Add(createAttributeItem(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName)));
+                Content.Add(attr.PropertyName == nameof(PerformanceAttributes.Total)
+                    ? createItemForTotal(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName))
+                    : createItemForAttribute(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName)));
             }
         }
 
