@@ -19,10 +19,10 @@ namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScoreTooltip : VisibilityContainer, ITooltip<ScoreInfo>
     {
-        private OsuSpriteText timestampLabel;
-        private FillFlowContainer<HitResultCell> topScoreStatistics;
-        private FillFlowContainer<HitResultCell> bottomScoreStatistics;
-        private FillFlowContainer<ModCell> modStatistics;
+        private readonly OsuSpriteText timestampLabel;
+        private readonly FillFlowContainer<HitResultCell> topScoreStatistics;
+        private readonly FillFlowContainer<HitResultCell> bottomScoreStatistics;
+        private readonly FillFlowContainer<ModCell> modStatistics;
 
         public LeaderboardScoreTooltip()
         {
@@ -58,7 +58,7 @@ namespace osu.Game.Online.Leaderboards
                         // Info row
                         new Drawable[]
                         {
-                            timestampLabel = new OsuSpriteText()
+                            timestampLabel = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                             }
@@ -98,8 +98,9 @@ namespace osu.Game.Online.Leaderboards
 
         public void SetContent(ScoreInfo score)
         {
-            if (currentScore == score)
+            if (currentScore.Equals(score))
                 return;
+
             currentScore = score;
 
             timestampLabel.Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}";
@@ -116,9 +117,9 @@ namespace osu.Game.Online.Leaderboards
             foreach (var result in score.GetStatisticsForDisplay())
             {
                 (result.Result > HitResult.Perfect
-                    ? bottomScoreStatistics
-                    : topScoreStatistics
-                ).Add(new HitResultCell(result));
+                        ? bottomScoreStatistics
+                        : topScoreStatistics
+                        ).Add(new HitResultCell(result));
             }
         }
 
@@ -129,9 +130,9 @@ namespace osu.Game.Online.Leaderboards
 
         private class HitResultCell : CompositeDrawable
         {
-            readonly private string DisplayName;
-            readonly private HitResult Result;
-            readonly private int Count;
+            private readonly string DisplayName;
+            private readonly HitResult Result;
+            private readonly int Count;
 
             public HitResultCell(HitResultDisplayStatistic stat)
             {
@@ -190,7 +191,7 @@ namespace osu.Game.Online.Leaderboards
 
         private class ModCell : CompositeDrawable
         {
-            readonly private Mod Mod;
+            private readonly Mod Mod;
 
             public ModCell(Mod mod)
             {
