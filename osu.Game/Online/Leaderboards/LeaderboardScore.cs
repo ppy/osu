@@ -32,7 +32,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu
+    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const float HEIGHT = 60;
 
@@ -69,6 +69,9 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved]
         private Storage storage { get; set; }
+
+        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
+        public ScoreInfo TooltipContent => Score;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
