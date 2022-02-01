@@ -199,7 +199,8 @@ namespace osu.Game.Online.Leaderboards
             [BackgroundDependencyLoader]
             private void load()
             {
-                InternalChild = new FillFlowContainer
+                FillFlowContainer container;
+                InternalChild = container = new FillFlowContainer
                 {
                     Height = 15,
                     AutoSizeAxes = Axes.X,
@@ -209,16 +210,25 @@ namespace osu.Game.Online.Leaderboards
                     {
                         new ModIcon(Mod, showTooltip: false).With(icon =>
                         {
+                            icon.Origin = Anchor.CentreLeft;
+                            icon.Anchor = Anchor.CentreLeft;
                             icon.Scale = new Vector2(15f / icon.Height);
                         }),
-                        new OsuSpriteText
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = Mod.SettingDescription,
-                        }
                     }
                 };
+
+                string description = Mod.SettingDescription;
+                if (!string.IsNullOrEmpty(description))
+                {
+                    container.Add(new OsuSpriteText
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                        Text = Mod.SettingDescription,
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                    });
+                }
             }
         }
     }
