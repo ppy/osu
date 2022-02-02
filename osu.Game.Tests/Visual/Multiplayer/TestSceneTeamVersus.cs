@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -41,8 +42,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         public override void SetUpSteps()
@@ -51,8 +53,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
             });
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));
@@ -71,7 +73,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new PlaylistItem
                     {
-                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     }
                 }
@@ -92,7 +94,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new PlaylistItem
                     {
-                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     }
                 }
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new PlaylistItem
                     {
-                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     }
                 }
@@ -156,7 +158,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     new PlaylistItem
                     {
-                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.RulesetID == 0)).BeatmapInfo },
+                        Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
                         Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     }
                 }

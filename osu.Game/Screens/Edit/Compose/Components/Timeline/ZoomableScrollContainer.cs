@@ -136,10 +136,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
             transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
+
+            OnZoomChanged();
         }
 
         private void transformZoomTo(float newZoom, float focusPoint, double duration = 0, Easing easing = Easing.None)
             => this.TransformTo(this.PopulateTransform(new TransformZoom(focusPoint, zoomedContent.DrawWidth, Current), newZoom, duration, easing));
+
+        /// <summary>
+        /// Invoked when <see cref="Zoom"/> has changed.
+        /// </summary>
+        protected virtual void OnZoomChanged()
+        {
+        }
 
         private class TransformZoom : Transform<float, ZoomableScrollContainer>
         {

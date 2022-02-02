@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -43,6 +44,11 @@ namespace osu.Game.Screens.Play
         /// The delay upon completion of the beatmap before displaying the results screen.
         /// </summary>
         public const double RESULTS_DISPLAY_DELAY = 1000.0;
+
+        /// <summary>
+        /// Raised after <see cref="StartGameplay"/> is called.
+        /// </summary>
+        public event Action OnGameplayStarted;
 
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
@@ -164,6 +170,7 @@ namespace osu.Game.Screens.Play
             PrepareReplay();
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
+            ScoreProcessor.OnResetFromReplayFrame += () => ScoreProcessor.PopulateScore(Score.ScoreInfo);
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
@@ -225,8 +232,6 @@ namespace osu.Game.Screens.Play
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
-            if (ruleset.RulesetInfo.ID != null)
-                Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.ID.Value;
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
@@ -246,7 +251,7 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(),
-                        createGameplayComponents(Beatmap.Value, playableBeatmap)
+                        createGameplayComponents(Beatmap.Value)
                     }
                 },
                 FailOverlay = new FailOverlay
@@ -359,7 +364,7 @@ namespace osu.Game.Screens.Play
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
@@ -486,6 +491,9 @@ namespace osu.Game.Screens.Play
 
                 var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
+
+                if (ruleset == null)
+                    throw new RulesetLoadException("Instantiation failure");
 
                 try
                 {
@@ -770,7 +778,7 @@ namespace osu.Game.Screens.Play
                     // This player instance may already be in the process of exiting.
                     return;
 
-                this.Push(CreateResults(prepareScoreForDisplayTask.Result));
+                this.Push(CreateResults(prepareScoreForDisplayTask.GetResultSafely()));
             }, Time.Current + delay, 50);
 
             Scheduler.Add(resultsDisplayDelegate);
@@ -956,7 +964,9 @@ namespace osu.Game.Screens.Play
             updateGameplayState();
 
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
             StartGameplay();
+            OnGameplayStarted?.Invoke();
         }
 
         /// <summary>
@@ -1022,11 +1032,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual async Task ImportScore(Score score)
+        protected virtual Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return;
+                return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;
 
@@ -1036,18 +1046,26 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
+            // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
+            var importableScore = score.ScoreInfo.DeepClone();
+
             // For the time being, online ID responses are not really useful for anything.
             // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
             //
             // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
             // conflicts across various systems (ie. solo and multiplayer).
-            long? onlineScoreId = score.ScoreInfo.OnlineID;
-            score.ScoreInfo.OnlineID = -1;
+            importableScore.OnlineID = -1;
 
-            await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
+            var imported = scoreManager.Import(importableScore, replayReader);
 
-            // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
-            score.ScoreInfo.OnlineID = onlineScoreId;
+            imported.PerformRead(s =>
+            {
+                // because of the clone above, it's required that we copy back the post-import hash/ID to use for availability matching.
+                score.ScoreInfo.Hash = s.Hash;
+                score.ScoreInfo.ID = s.ID;
+            });
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

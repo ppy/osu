@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNoSubmissionOnResultsWithNoToken()
         {
-            prepareTokenResponse(false);
+            prepareTestAPI(false);
 
             createPlayerTest();
 
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSubmissionOnResults()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest();
 
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSubmissionForDifferentRuleset()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest(createRuleset: () => new TaikoRuleset());
 
@@ -110,13 +110,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
-            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.RulesetID == new TaikoRuleset().RulesetInfo.ID);
+            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.Ruleset.ShortName == new TaikoRuleset().RulesetInfo.ShortName);
         }
 
         [Test]
         public void TestSubmissionForConvertedBeatmap()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest(createRuleset: () => new ManiaRuleset(), createBeatmap: _ => createTestBeatmap(new OsuRuleset().RulesetInfo));
 
@@ -130,13 +130,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddUntilStep("results displayed", () => Player.GetChildScreen() is ResultsScreen);
             AddAssert("ensure passing submission", () => Player.SubmittedScore?.ScoreInfo.Passed == true);
-            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.RulesetID == new ManiaRuleset().RulesetInfo.ID);
+            AddAssert("submitted score has correct ruleset ID", () => Player.SubmittedScore?.ScoreInfo.Ruleset.ShortName == new ManiaRuleset().RulesetInfo.ShortName);
         }
 
         [Test]
         public void TestNoSubmissionOnExitWithNoToken()
         {
-            prepareTokenResponse(false);
+            prepareTestAPI(false);
 
             createPlayerTest();
 
@@ -153,7 +153,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNoSubmissionOnEmptyFail()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest(true);
 
@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSubmissionOnFail()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest(true);
 
@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNoSubmissionOnEmptyExit()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest();
 
@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSubmissionOnExit()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest();
 
@@ -213,7 +213,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSubmissionOnExitDuringImport()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest();
             AddStep("block imports", () => Player.AllowImportCompletion.Wait());
@@ -226,18 +226,18 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("exit", () => Player.Exit());
             AddStep("allow import to proceed", () => Player.AllowImportCompletion.Release(1));
-            AddAssert("ensure submission", () => Player.SubmittedScore != null && Player.ImportedScore != null);
+            AddUntilStep("ensure submission", () => Player.SubmittedScore != null && Player.ImportedScore != null);
         }
 
         [Test]
         public void TestNoSubmissionOnLocalBeatmap()
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
             createPlayerTest(false, r =>
             {
                 var beatmap = createTestBeatmap(r);
-                beatmap.BeatmapInfo.OnlineID = null;
+                beatmap.BeatmapInfo.OnlineID = -1;
                 return beatmap;
             });
 
@@ -253,9 +253,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [TestCase(10)]
         public void TestNoSubmissionOnCustomRuleset(int? rulesetId)
         {
-            prepareTokenResponse(true);
+            prepareTestAPI(true);
 
-            createPlayerTest(false, createRuleset: () => new OsuRuleset { RulesetInfo = { OnlineID = rulesetId ?? -1 } });
+            createPlayerTest(false, createRuleset: () => new OsuRuleset
+            {
+                RulesetInfo =
+                {
+                    Name = "custom",
+                    ShortName = $"custom{rulesetId}",
+                    OnlineID = rulesetId ?? -1
+                }
+            });
 
             AddUntilStep("wait for token request", () => Player.TokenCreationRequested);
 
@@ -275,7 +283,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             }));
         }
 
-        private void prepareTokenResponse(bool validToken)
+        private void prepareTestAPI(bool validToken)
         {
             AddStep("Prepare test API", () =>
             {
@@ -289,6 +297,31 @@ namespace osu.Game.Tests.Visual.Gameplay
                             else
                                 tokenRequest.TriggerFailure(new APIException("something went wrong!", null));
                             return true;
+
+                        case SubmitSoloScoreRequest submissionRequest:
+                            if (validToken)
+                            {
+                                var requestScore = submissionRequest.Score;
+
+                                submissionRequest.TriggerSuccess(new MultiplayerScore
+                                {
+                                    ID = 1234,
+                                    User = dummyAPI.LocalUser.Value,
+                                    Rank = requestScore.Rank,
+                                    TotalScore = requestScore.TotalScore,
+                                    Accuracy = requestScore.Accuracy,
+                                    MaxCombo = requestScore.MaxCombo,
+                                    Mods = requestScore.Mods,
+                                    Statistics = requestScore.Statistics,
+                                    Passed = requestScore.Passed,
+                                    EndedAt = DateTimeOffset.Now,
+                                    Position = 1
+                                });
+
+                                return true;
+                            }
+
+                            break;
                     }
 
                     return false;

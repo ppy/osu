@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
+using osu.Game.Extensions;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using Realms;
@@ -19,43 +17,43 @@ using Realms;
 namespace osu.Game.Stores
 {
     /// <summary>
-    /// Class which adds all the missing pieces bridging the gap between <see cref="RealmArchiveModelImporter{TModel}"/> and <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+    /// Class which adds all the missing pieces bridging the gap between <see cref="RealmArchiveModelImporter{TModel}"/> and (legacy) ArchiveModelManager.
     /// </summary>
     public abstract class RealmArchiveModelManager<TModel> : RealmArchiveModelImporter<TModel>, IModelManager<TModel>, IModelFileManager<TModel, RealmNamedFileUsage>
         where TModel : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey, ISoftDelete
     {
-        public event Action<TModel>? ItemUpdated
-        {
-            // This may be brought back for beatmaps to ease integration.
-            // The eventual goal would be not requiring this and using realm subscriptions in its place.
-            add => throw new NotImplementedException();
-            remove => throw new NotImplementedException();
-        }
-
-        public event Action<TModel>? ItemRemoved
-        {
-            // This may be brought back for beatmaps to ease integration.
-            // The eventual goal would be not requiring this and using realm subscriptions in its place.
-            add => throw new NotImplementedException();
-            remove => throw new NotImplementedException();
-        }
-
         private readonly RealmFileStore realmFileStore;
 
-        protected RealmArchiveModelManager(Storage storage, RealmContextFactory contextFactory)
-            : base(storage, contextFactory)
+        protected RealmArchiveModelManager(Storage storage, RealmAccess realm)
+            : base(storage, realm)
         {
-            realmFileStore = new RealmFileStore(contextFactory, storage);
+            realmFileStore = new RealmFileStore(realm, storage);
         }
 
         public void DeleteFile(TModel item, RealmNamedFileUsage file) =>
-            item.Realm.Write(() => DeleteFile(item, file, item.Realm));
+            performFileOperation(item, managed => DeleteFile(managed, managed.Files.First(f => f.Filename == file.Filename), managed.Realm));
 
-        public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents)
-            => item.Realm.Write(() => ReplaceFile(file, contents, item.Realm));
+        public void ReplaceFile(TModel item, RealmNamedFileUsage file, Stream contents) =>
+            performFileOperation(item, managed => ReplaceFile(file, contents, managed.Realm));
 
-        public void AddFile(TModel item, Stream contents, string filename)
-            => item.Realm.Write(() => AddFile(item, contents, filename, item.Realm));
+        public void AddFile(TModel item, Stream contents, string filename) =>
+            performFileOperation(item, managed => AddFile(managed, contents, filename, managed.Realm));
+
+        private void performFileOperation(TModel item, Action<TModel> operation)
+        {
+            // While we are detaching so often, this seems like the easiest way to keep things in sync.
+            // This method should be removed as soon as all the surrounding pieces support non-detached operations.
+            if (!item.IsManaged)
+            {
+                var managed = Realm.Realm.Find<TModel>(item.ID);
+                managed.Realm.Write(() => operation(managed));
+
+                item.Files.Clear();
+                item.Files.AddRange(managed.Files.Detach());
+            }
+            else
+                operation(item);
+        }
 
         /// <summary>
         /// Delete a file from within an ongoing realm transaction.
@@ -90,11 +88,6 @@ namespace osu.Game.Stores
             var namedUsage = new RealmNamedFileUsage(file, filename);
 
             item.Files.Add(namedUsage);
-        }
-
-        public override async Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
-        {
-            return await base.Import(item, archive, lowPriority, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -172,25 +165,33 @@ namespace osu.Game.Stores
 
         public bool Delete(TModel item)
         {
-            if (item.DeletePending)
-                return false;
+            return Realm.Run(realm =>
+            {
+                if (!item.IsManaged)
+                    item = realm.Find<TModel>(item.ID);
 
-            item.Realm.Write(r => item.DeletePending = true);
-            return true;
+                if (item?.DeletePending != false)
+                    return false;
+
+                realm.Write(r => item.DeletePending = true);
+                return true;
+            });
         }
 
         public void Undelete(TModel item)
         {
-            if (!item.DeletePending)
-                return;
+            Realm.Run(realm =>
+            {
+                if (!item.IsManaged)
+                    item = realm.Find<TModel>(item.ID);
 
-            item.Realm.Write(r => item.DeletePending = false);
+                if (item?.DeletePending != true)
+                    return;
+
+                realm.Write(r => item.DeletePending = false);
+            });
         }
 
-        public virtual bool IsAvailableLocally(TModel model) => false; // Not relevant for skins since they can't be downloaded yet.
-
-        public void Update(TModel skin)
-        {
-        }
+        public abstract bool IsAvailableLocally(TModel model);
     }
 }

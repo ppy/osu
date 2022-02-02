@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
+using osu.Game.Utils;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -66,7 +68,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             Current.BindValueChanged(val =>
             {
-                textBox.Text = val.NewValue.ToString();
+                decimal decimalValue = slider.Current.Value.ToDecimal(NumberFormatInfo.InvariantInfo);
+                textBox.Text = decimalValue.ToString($@"N{FormatUtils.FindPrecision(decimalValue)}");
             }, true);
         }
 

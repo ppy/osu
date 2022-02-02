@@ -36,9 +36,9 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// The height of a carousel beatmap, including vertical spacing.
         /// </summary>
-        public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
+        public const float HEIGHT = header_height + CAROUSEL_BEATMAP_SPACING;
 
-        private const float height = MAX_HEIGHT * 0.6f;
+        private const float header_height = MAX_HEIGHT * 0.6f;
 
         private readonly BeatmapInfo beatmapInfo;
 
@@ -67,16 +67,18 @@ namespace osu.Game.Screens.Select.Carousel
         private CancellationTokenSource starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
+            : base(header_height)
         {
             beatmapInfo = panel.BeatmapInfo;
             Item = panel;
+
+            // Difficulty panels should start hidden for a better initial effect.
+            Hide();
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager, SongSelect songSelect)
         {
-            Header.Height = height;
-
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
@@ -142,7 +144,7 @@ namespace osu.Game.Screens.Select.Carousel
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = $"{(beatmapInfo.Metadata ?? beatmapInfo.BeatmapSet.Metadata).Author.Username}",
+                                            Text = $"{beatmapInfo.Metadata.Author.Username}",
                                             Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
@@ -159,7 +161,6 @@ namespace osu.Game.Screens.Select.Carousel
                                         new TopLocalRank(beatmapInfo)
                                         {
                                             Scale = new Vector2(0.8f),
-                                            Size = new Vector2(40, 20)
                                         },
                                         starCounter = new StarCounter
                                         {
@@ -238,8 +239,8 @@ namespace osu.Game.Screens.Select.Carousel
                 if (editRequested != null)
                     items.Add(new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested(beatmapInfo)));
 
-                if (beatmapInfo.OnlineID.HasValue && beatmapOverlay != null)
-                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID.Value)));
+                if (beatmapInfo.OnlineID > 0 && beatmapOverlay != null)
+                    items.Add(new OsuMenuItem("Details...", MenuItemType.Standard, () => beatmapOverlay.FetchAndShowBeatmap(beatmapInfo.OnlineID)));
 
                 if (collectionManager != null)
                 {

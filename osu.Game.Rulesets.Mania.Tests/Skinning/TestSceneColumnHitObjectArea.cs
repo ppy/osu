@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new ColumnHitObjectArea(0, new HitObjectContainer())
+                        Child = new ColumnHitObjectArea(new HitObjectContainer())
                         {
                             RelativeSizeAxes = Axes.Both
                         }
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Skinning
                     {
                         RelativeSizeAxes = Axes.Both,
                         Width = 0.5f,
-                        Child = new ColumnHitObjectArea(1, new HitObjectContainer())
+                        Child = new ColumnHitObjectArea(new HitObjectContainer())
                         {
                             RelativeSizeAxes = Axes.Both
                         }

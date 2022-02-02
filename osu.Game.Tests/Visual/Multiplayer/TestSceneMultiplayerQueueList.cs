@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -37,8 +38,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         public override void SetUpSteps()
@@ -58,9 +60,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
-                importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                importedBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
             });
 
             AddStep("change to all players mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }));
@@ -125,7 +127,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap },
-                    BeatmapID = importedBeatmap.OnlineID ?? -1,
+                    BeatmapID = importedBeatmap.OnlineID,
                 });
 
                 Client.AddUserPlaylistItem(userId(), item);
