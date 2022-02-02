@@ -110,9 +110,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                 {
                     var columnsToDisplay = hitEventsAvailable
                         ? row.Columns
-                        : row.Columns?.Where(c => !c.RequiresHitEvents).ToArray();
+                        : row.Columns.Where(c => !c.RequiresHitEvents).ToArray();
 
-                    if (columnsToDisplay?.Any() ?? false)
+                    if (columnsToDisplay.Any())
                         panelIsEmpty = false;
                     else
                         continue;
@@ -132,8 +132,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                                 Origin = Anchor.Centre,
                             }).Cast<Drawable>().ToArray()
                         },
-                        ColumnDimensions = Enumerable.Range(0, columnsToDisplay?.Length ?? 0)
-                                                     .Select(i => columnsToDisplay?[i].Dimension ?? new Dimension()).ToArray(),
+                        ColumnDimensions = Enumerable.Range(0, columnsToDisplay.Length)
+                                                     .Select(i => columnsToDisplay[i].Dimension ?? new Dimension()).ToArray(),
                         RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                     });
                 }
