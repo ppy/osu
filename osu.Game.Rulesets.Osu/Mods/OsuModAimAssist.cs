@@ -11,8 +11,8 @@ using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Configuration;
 using osu.Framework.Bindables;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -34,10 +34,16 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 1.0f,
         };
 
-        private double? lastUpdate;
+        private const float spin_radius = 30;
+
+        private Vector2? prevCursorPos;
+        private OsuInputManager inputManager;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
+            // Grab the input manager for future use
+            inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+
             // Hide judgment displays and follow points
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
             (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
@@ -45,29 +51,75 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
+            var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
             double currentTime = playfield.Clock.CurrentTime;
 
-            if (currentTime - (lastUpdate ?? double.MinValue) < 100)
-                return;
-
-            Vector2 cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
-
+            // Move all currently alive object to new destination
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
                 var h = drawable.HitObject;
 
-                if (currentTime < h.StartTime && (drawable is DrawableHitCircle || drawable is DrawableSlider))
+                switch (drawable)
                 {
-                    double timeMoving = currentTime - (h.StartTime - h.TimePreempt);
-                    float percentDoneMoving = (float)(timeMoving / h.TimePreempt);
-                    float percentDistLeft = Math.Clamp(AssistStrength.Value - percentDoneMoving + 0.1f, 0, 1);
+                    case DrawableHitCircle circle:
 
-                    Vector2 targetPos = drawable.Position + percentDistLeft * (cursorPos - drawable.Position);
-                    drawable.MoveTo(targetPos, h.StartTime - currentTime);
+                        // 10ms earlier on the note to reduce chance of missing when clicking early / cursor moves fast
+                        circle.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
+                        // FIXME: some circles cause flash at original(?) position when clicked too early
+
+                        break;
+
+                    case DrawableSlider slider:
+
+                        // Move slider to cursor
+                        if (currentTime < h.StartTime)
+                        {
+                            slider.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
+                        }
+                        // Move slider so that sliderball stays on the cursor
+                        else
+                        {
+                            slider.HeadCircle.Hide(); // hide flash, triangles, ... so they don't move with slider
+                            slider.MoveTo(cursorPos - slider.Ball.DrawPosition);
+                            // FIXME: some sliders re-appearing at their original position for a single frame when they're done
+                        }
+
+                        break;
+
+                    case DrawableSpinner spinner:
+
+                        // Move spinner _next_ to cursor
+                        if (currentTime < h.StartTime)
+                        {
+                            spinner.MoveTo(cursorPos + new Vector2(0, -spin_radius), Math.Max(0, h.StartTime - currentTime - 10));
+                        }
+                        else
+                        {
+                            // Move spinner visually
+                            Vector2 delta = spin_radius * (spinner.Position - prevCursorPos ?? cursorPos).Normalized();
+                            const float angle = 3 * MathF.PI / 180; // radians per update, arbitrary value
+
+                            // Rotation matrix
+                            var targetPos = new Vector2(
+                                delta.X * MathF.Cos(angle) - delta.Y * MathF.Sin(angle) + cursorPos.X,
+                                delta.X * MathF.Sin(angle) + delta.Y * MathF.Cos(angle) + cursorPos.Y
+                            );
+
+                            spinner.MoveTo(targetPos);
+
+                            // Move spinner logically
+                            if (inputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false)
+                            {
+                                // Arbitrary value, might lead to some inconsistencies depending on clock rate, replay, ...
+                                spinner.RotationTracker.AddRotation(2 * MathF.PI);
+                            }
+                        }
+
+                        break;
                 }
             }
 
-            lastUpdate = currentTime;
+            prevCursorPos = cursorPos;
         }
     }
 }
