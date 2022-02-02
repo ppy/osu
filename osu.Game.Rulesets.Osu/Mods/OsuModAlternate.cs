@@ -33,8 +33,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private OsuAction? lastActionPressed;
         private DrawableRuleset<OsuHitObject> ruleset;
 
-        private bool shouldAlternate => !isBreakTime.Value && introEnded;
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             ruleset = drawableRuleset;
@@ -54,16 +52,22 @@ namespace osu.Game.Rulesets.Osu.Mods
             };
         }
 
-        private bool onPressed(OsuAction key)
+        private bool checkCorrectAction(OsuAction action)
         {
-            if (lastActionPressed == key)
+            if (isBreakTime.Value)
+                return true;
+
+            if (!introEnded)
+                return true;
+
+            if (lastActionPressed != action)
             {
-                ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
+                // User alternated correctly
+                lastActionPressed = action;
                 return true;
             }
 
-            lastActionPressed = key;
-
+            ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
             return false;
         }
 
@@ -83,7 +87,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
-                => mod.shouldAlternate && mod.onPressed(e.Action);
+                // if the pressed action is incorrect, block it from reaching gameplay.
+                => !mod.checkCorrectAction(e.Action);
 
             public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
