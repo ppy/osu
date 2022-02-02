@@ -203,14 +203,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                         new OsuModHardRock(),
                         new OsuModFlashlight
                         {
-                            FollowDelay = { Value = 200 }
+                            FollowDelay = { Value = 200 },
+                            SizeMultiplier = { Value = 5 },
                         },
                         new OsuModDifficultyAdjust
                         {
-                            CircleSize = { Value = 8 },
-                            ApproachRate = { Value = 7 },
-                            OverallDifficulty = { Value = 6 },
-                            DrainRate = { Value = 5 },
+                            CircleSize = { Value = 11 },
+                            ApproachRate = { Value = 10 },
+                            OverallDifficulty = { Value = 10 },
+                            DrainRate = { Value = 10 },
+                            ExtendedLimits = { Value = true }
                         }
                     },
                     Ruleset = new OsuRuleset().RulesetInfo,

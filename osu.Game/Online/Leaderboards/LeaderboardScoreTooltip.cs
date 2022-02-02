@@ -62,9 +62,8 @@ namespace osu.Game.Online.Leaderboards
                         // Mods row
                         modStatistics = new FillFlowContainer<ModCell>
                         {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Full,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
                             Spacing = new Vector2(5, 0),
                         },
                         new FillFlowContainer
