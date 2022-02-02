@@ -71,7 +71,7 @@ namespace osu.Game.Online.Leaderboards
         private Storage storage { get; set; }
 
         public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
-        public ScoreInfo TooltipContent => Score;
+        public virtual ScoreInfo TooltipContent => Score;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
