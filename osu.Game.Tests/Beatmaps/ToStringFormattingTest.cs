@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
 
 namespace osu.Game.Tests.Beatmaps
 {
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Beatmaps
                 {
                     Artist = "artist",
                     Title = "title",
-                    Author = new APIUser { Username = "creator" }
+                    Author = new RealmUser { Username = "creator" }
                 }
             };
 
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Beatmaps
                 {
                     Artist = "artist",
                     Title = "title",
-                    Author = new APIUser { Username = "creator" }
+                    Author = new RealmUser { Username = "creator" }
                 },
                 DifficultyName = "difficulty"
             };

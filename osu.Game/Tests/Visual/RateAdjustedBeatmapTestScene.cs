@@ -12,8 +12,11 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            // note that this will override any mod rate application
-            Beatmap.Value.Track.Tempo.Value = Clock.Rate;
+            if (Beatmap.Value.TrackLoaded)
+            {
+                // note that this will override any mod rate application
+                Beatmap.Value.Track.Tempo.Value = Clock.Rate;
+            }
         }
     }
 }

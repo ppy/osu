@@ -197,7 +197,6 @@ namespace osu.Game.Overlays
                 {
                     dragContainer.Add(playlist);
 
-                    playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
                     playlist.State.BindValueChanged(s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint), true);
 
                     togglePlaylist();

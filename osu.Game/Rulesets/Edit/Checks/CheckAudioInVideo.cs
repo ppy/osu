@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             foreach (string filename in videoPaths)
             {
-                string storagePath = beatmapSet.GetPathForFile(filename);
+                string storagePath = beatmapSet?.GetPathForFile(filename);
 
                 if (storagePath == null)
                 {

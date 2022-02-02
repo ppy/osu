@@ -30,10 +30,10 @@ namespace osu.Game.Beatmaps
         {
             this.beatmap = beatmap;
 
-            beatmap.BeatmapInfo.Ruleset = rulesetProvider(beatmap.BeatmapInfo.RulesetID).RulesetInfo;
+            beatmap.BeatmapInfo.Ruleset = rulesetProvider(beatmap.BeatmapInfo.Ruleset.OnlineID).RulesetInfo;
 
             if (beatmapId.HasValue)
-                beatmap.BeatmapInfo.OnlineID = beatmapId;
+                beatmap.BeatmapInfo.OnlineID = beatmapId.Value;
         }
 
         private static Beatmap readFromFile(string filename)

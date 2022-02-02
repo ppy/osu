@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 
@@ -13,7 +14,13 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneMetadataSection : OsuTestScene
     {
         [Cached]
-        private EditorBeatmap editorBeatmap = new EditorBeatmap(new Beatmap());
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new Beatmap
+        {
+            BeatmapInfo =
+            {
+                Ruleset = new OsuRuleset().RulesetInfo
+            },
+        });
 
         private TestMetadataSection metadataSection;
 

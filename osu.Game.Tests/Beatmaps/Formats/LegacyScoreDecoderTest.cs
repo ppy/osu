@@ -12,6 +12,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
@@ -51,6 +52,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.AreEqual(829_931, score.ScoreInfo.TotalScore);
                 Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
+
+                Assert.IsTrue(score.ScoreInfo.Mods.Any(m => m is ManiaModClassic));
+                Assert.IsTrue(score.ScoreInfo.APIMods.Any(m => m.Acronym == "CL"));
+                Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
+
                 Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
@@ -95,7 +101,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(decodedAfterEncode, Is.Not.Null);
 
                 Assert.That(decodedAfterEncode.ScoreInfo.User.Username, Is.EqualTo(scoreInfo.User.Username));
-                Assert.That(decodedAfterEncode.ScoreInfo.BeatmapInfoID, Is.EqualTo(scoreInfo.BeatmapInfoID));
                 Assert.That(decodedAfterEncode.ScoreInfo.Ruleset, Is.EqualTo(scoreInfo.Ruleset));
                 Assert.That(decodedAfterEncode.ScoreInfo.TotalScore, Is.EqualTo(scoreInfo.TotalScore));
                 Assert.That(decodedAfterEncode.ScoreInfo.MaxCombo, Is.EqualTo(scoreInfo.MaxCombo));
@@ -129,7 +134,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 {
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
-                    BaseDifficulty = new BeatmapDifficulty()
+                    Difficulty = new BeatmapDifficulty()
                 }
             });
         }

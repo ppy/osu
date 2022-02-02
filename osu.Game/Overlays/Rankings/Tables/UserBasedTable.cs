@@ -24,6 +24,31 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected virtual IEnumerable<LocalisableString> GradeColumns => new List<LocalisableString> { RankingsStrings.Statss, RankingsStrings.Stats, RankingsStrings.Stata };
 
+        protected override Drawable CreateRowBackground(UserStatistics item)
+        {
+            var background = base.CreateRowBackground(item);
+
+            // see: https://github.com/ppy/osu-web/blob/9de00a0b874c56893d98261d558d78d76259d81b/resources/views/multiplayer/rooms/_rankings_table.blade.php#L23
+            if (!item.User.Active)
+                background.Alpha = 0.5f;
+
+            return background;
+        }
+
+        protected override Drawable[] CreateRowContent(int index, UserStatistics item)
+        {
+            var content = base.CreateRowContent(index, item);
+
+            // see: https://github.com/ppy/osu-web/blob/9de00a0b874c56893d98261d558d78d76259d81b/resources/views/multiplayer/rooms/_rankings_table.blade.php#L23
+            if (!item.User.Active)
+            {
+                foreach (var d in content)
+                    d.Alpha = 0.5f;
+            }
+
+            return content;
+        }
+
         protected override RankingsTableColumn[] CreateAdditionalHeaders() => new[]
             {
                 new RankingsTableColumn(RankingsStrings.StatAccuracy, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),

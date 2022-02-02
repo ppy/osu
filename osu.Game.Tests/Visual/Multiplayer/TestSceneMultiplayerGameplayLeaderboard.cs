@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).Result);
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).GetResultSafely());
 
             AddStep("create leaderboard", () =>
             {
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID ?? 0);
+                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
                     multiplayerUsers.Add(OnlinePlayDependencies.Client.AddUser(new APIUser { Id = user }, true));
                 }
 
@@ -90,7 +91,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestUserQuit()
         {
             foreach (int user in users)
-                AddStep($"mark user {user} quit", () => Client.RemoveUser(LookupCache.GetUserAsync(user).Result.AsNonNull()));
+                AddStep($"mark user {user} quit", () => Client.RemoveUser(LookupCache.GetUserAsync(user).GetResultSafely().AsNonNull()));
         }
 
         [Test]

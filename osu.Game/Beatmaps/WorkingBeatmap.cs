@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
@@ -30,7 +31,7 @@ namespace osu.Game.Beatmaps
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
-        public BeatmapMetadata Metadata => BeatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
         public Waveform Waveform => waveform.Value;
 
@@ -56,7 +57,7 @@ namespace osu.Game.Beatmaps
             this.audioManager = audioManager;
 
             BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapInfo.BeatmapSet;
+            BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
             waveform = new Lazy<Waveform>(GetWaveform);
             storyboard = new Lazy<Storyboard>(GetStoryboard);
@@ -185,7 +186,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return loadBeatmapAsync().Result;
+                    return loadBeatmapAsync().GetResultSafely();
                 }
                 catch (AggregateException ae)
                 {
