@@ -74,85 +74,92 @@ namespace osu.Game.Screens.Ranking.Statistics
             if (newScore == null)
                 return;
 
-            if (newScore.HitEvents.Count == 0)
+            spinner.Show();
+
+            var localCancellationSource = loadCancellation = new CancellationTokenSource();
+            IBeatmap playableBeatmap = null;
+
+            // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
+            Task.Run(() =>
             {
-                content.Add(new FillFlowContainer
+                playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
+            }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
+            {
+                var rows = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    Spacing = new Vector2(30, 15),
+                    Alpha = 0
+                };
+
+                bool panelIsEmpty = true;
+                bool hitEventsAvailable = newScore.HitEvents.Count != 0;
+
+                foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
+                {
+                    var columnsToDisplay = hitEventsAvailable
+                        ? row.Columns
+                        : row.Columns?.Where(c => !c.RequiresHitEvents).ToArray();
+
+                    if (columnsToDisplay?.Any() ?? false)
+                        panelIsEmpty = false;
+
+                    rows.Add(new GridContainer
                     {
-                        new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
-                        new ReplayDownloadButton(newScore)
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Content = new[]
                         {
-                            Scale = new Vector2(1.5f),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            columnsToDisplay?.Select(c => new StatisticContainer(c)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            }).Cast<Drawable>().ToArray()
                         },
-                    }
-                });
-            }
-            else
-            {
-                spinner.Show();
+                        ColumnDimensions = Enumerable.Range(0, columnsToDisplay?.Length ?? 0)
+                                                     .Select(i => columnsToDisplay?[i].Dimension ?? new Dimension()).ToArray(),
+                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                    });
+                }
 
-                var localCancellationSource = loadCancellation = new CancellationTokenSource();
-                IBeatmap playableBeatmap = null;
-
-                // Todo: The placement of this is temporary. Eventually we'll both generate the playable beatmap _and_ run through it in a background task to generate the hit events.
-                Task.Run(() =>
+                if (!hitEventsAvailable)
                 {
-                    playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
-                }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
-                {
-                    var rows = new FillFlowContainer
+                    rows.Add(new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(30, 15),
-                        Alpha = 0
-                    };
-
-                    foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
-                    {
-                        var columnsToDisplay = newScore.HitEvents.Count == 0
-                            ? row.Columns?.Where(c => !c.RequiresHitEvents).ToArray()
-                            : row.Columns;
-
-                        rows.Add(new GridContainer
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Content = new[]
+                            new MessagePlaceholder(panelIsEmpty
+                                ? "Extended statistics are only available after watching a replay!"
+                                : "More statistics available after watching a replay!"),
+                            new ReplayDownloadButton(newScore)
                             {
-                                columnsToDisplay?.Select(c => new StatisticContainer(c)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                }).Cast<Drawable>().ToArray()
+                                Scale = new Vector2(1.5f),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
                             },
-                            ColumnDimensions = Enumerable.Range(0, columnsToDisplay?.Length ?? 0)
-                                                         .Select(i => columnsToDisplay?[i].Dimension ?? new Dimension()).ToArray(),
-                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
-                        });
-                    }
+                        }
+                    });
+                }
 
-                    LoadComponentAsync(rows, d =>
-                    {
-                        if (!Score.Value.Equals(newScore))
-                            return;
+                LoadComponentAsync(rows, d =>
+                {
+                    if (!Score.Value.Equals(newScore))
+                        return;
 
-                        spinner.Hide();
-                        content.Add(d);
-                        d.FadeIn(250, Easing.OutQuint);
-                    }, localCancellationSource.Token);
-                }), localCancellationSource.Token);
-            }
+                    spinner.Hide();
+                    content.Add(d);
+                    d.FadeIn(250, Easing.OutQuint);
+                }, localCancellationSource.Token);
+            }), localCancellationSource.Token);
         }
 
         protected override bool OnClick(ClickEvent e)
