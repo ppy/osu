@@ -137,8 +137,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         {
             float percentage = (float)(attribute.Value / perfectAttribute.Value);
             if (float.IsNaN(percentage))
-                percentage = 0;
-            string text = percentage.ToLocalisableString("0%").ToString();
+                return null;
 
             return new GridContainer
             {
@@ -181,7 +180,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
-                            Text = text,
+                            Text = percentage.ToLocalisableString("0%"),
                             Colour = textColour
                         }
                     }
@@ -199,9 +198,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
             foreach (PerformanceDisplayAttribute attr in displayAttributes)
             {
-                Content.Add(attr.PropertyName == nameof(PerformanceAttributes.Total)
+                var attributeItem = attr.PropertyName == nameof(PerformanceAttributes.Total)
                     ? createItemForTotal(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName))
-                    : createItemForAttribute(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName)));
+                    : createItemForAttribute(attr, perfectDisplayAttributes.First(a => a.PropertyName == attr.PropertyName));
+
+                if (attributeItem != null)
+                    Content.Add(attributeItem);
             }
         }
 
