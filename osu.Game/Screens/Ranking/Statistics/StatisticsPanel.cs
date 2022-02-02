@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Placeholders;
 using osu.Game.Scoring;
@@ -85,15 +86,21 @@ namespace osu.Game.Screens.Ranking.Statistics
                 playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
             }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
             {
-                var rows = new FillFlowContainer
+                FillFlowContainer rows;
+                Container<Drawable> container = new OsuScrollContainer(Direction.Vertical)
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(30, 15),
-                    Alpha = 0
+                    Alpha = 0,
+                    Children = new[]
+                    {
+                        rows = new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
+                    }
                 };
 
                 bool panelIsEmpty = true;
@@ -107,6 +114,8 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     if (columnsToDisplay?.Any() ?? false)
                         panelIsEmpty = false;
+                    else
+                        continue;
 
                     rows.Add(new GridContainer
                     {
@@ -114,6 +123,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Bottom = 15 },
                         Content = new[]
                         {
                             columnsToDisplay?.Select(c => new StatisticContainer(c)
@@ -130,27 +140,51 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 if (!hitEventsAvailable)
                 {
-                    rows.Add(new FillFlowContainer
+                    if (panelIsEmpty)
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        // Replace the scroll container with fill flow container to get the message centered.
+                        container = new FillFlowContainer
                         {
-                            new MessagePlaceholder(panelIsEmpty
-                                ? "Extended statistics are only available after watching a replay!"
-                                : "More statistics available after watching a replay!"),
-                            new ReplayDownloadButton(newScore)
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
                             {
-                                Scale = new Vector2(1.5f),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                            },
-                        }
-                    });
+                                new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
+                                new ReplayDownloadButton(newScore)
+                                {
+                                    Scale = new Vector2(1.5f),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                            }
+                        };
+                    }
+                    else
+                    {
+                        rows.Add(new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Children = new Drawable[]
+                            {
+                                new MessagePlaceholder("More statistics available after watching a replay!"),
+                                new ReplayDownloadButton(newScore)
+                                {
+                                    Scale = new Vector2(1.5f),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                },
+                            }
+                        });
+                    }
                 }
 
-                LoadComponentAsync(rows, d =>
+                LoadComponentAsync(container, d =>
                 {
                     if (!Score.Value.Equals(newScore))
                         return;
