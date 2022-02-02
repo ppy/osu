@@ -105,6 +105,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 };
 
                 bool panelIsEmpty = true;
+                bool panelIsComplete = true;
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
 
                 foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
@@ -112,6 +113,9 @@ namespace osu.Game.Screens.Ranking.Statistics
                     var columnsToDisplay = hitEventsAvailable
                         ? row.Columns
                         : row.Columns.Where(c => !c.RequiresHitEvents).ToArray();
+
+                    if (columnsToDisplay.Length < row.Columns.Length)
+                        panelIsComplete = false;
 
                     if (columnsToDisplay.Any())
                         panelIsEmpty = false;
@@ -163,7 +167,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                             }
                         };
                     }
-                    else
+                    else if (!panelIsComplete)
                     {
                         rows.Add(new FillFlowContainer
                         {
