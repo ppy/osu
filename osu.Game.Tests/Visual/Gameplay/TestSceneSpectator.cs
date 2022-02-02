@@ -218,6 +218,22 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("last received frame has time = 1000", () => spectatorClient.LastReceivedUserFrames.First().Value.Time == 1000);
         }
 
+        [Test]
+        public void TestFinalFrameInBundleHasHeader()
+        {
+            FrameDataBundle lastBundle = null;
+
+            AddStep("bind to client", () => spectatorClient.OnNewFrames += (_, bundle) => lastBundle = bundle);
+
+            start(-1234);
+            sendFrames();
+            finish();
+
+            AddUntilStep("bundle received", () => lastBundle != null);
+            AddAssert("first frame does not have header", () => lastBundle.Frames[0].Header == null);
+            AddAssert("last frame has header", () => lastBundle.Frames[^1].Header != null);
+        }
+
         private OsuFramedReplayInputHandler replayHandler =>
             (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
 
