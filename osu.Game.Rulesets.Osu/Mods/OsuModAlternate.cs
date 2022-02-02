@@ -16,7 +16,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModAlternate : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer, IUpdatableByPlayfield
+    public class OsuModAlternate : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
         public override string Name => @"Alternate";
         public override string Acronym => @"AL";
@@ -26,12 +26,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
 
-        private bool introEnded;
-        private double earliestStartTime;
+        private double firstObjectValidJudgementTime;
         private IBindable<bool> isBreakTime;
         private const double flash_duration = 1000;
         private OsuAction? lastActionPressed;
         private DrawableRuleset<OsuHitObject> ruleset;
+
+        private IFrameStableClock gameplayClock;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
@@ -39,7 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
             var firstHitObject = ruleset.Objects.FirstOrDefault();
-            earliestStartTime = (firstHitObject?.StartTime ?? 0) - (firstHitObject?.HitWindows.WindowFor(HitResult.Meh) ?? 0);
+            firstObjectValidJudgementTime = (firstHitObject?.StartTime ?? 0) - (firstHitObject?.HitWindows.WindowFor(HitResult.Meh) ?? 0);
+
+            gameplayClock = drawableRuleset.FrameStableClock;
         }
 
         public void ApplyToPlayer(Player player)
@@ -57,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (isBreakTime.Value)
                 return true;
 
-            if (!introEnded)
+            if (gameplayClock.CurrentTime < firstObjectValidJudgementTime)
                 return true;
 
             switch (action)
@@ -80,12 +83,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             ruleset.Cursor.FlashColour(Colour4.Red, flash_duration, Easing.OutQuint);
             return false;
-        }
-
-        public void Update(Playfield playfield)
-        {
-            if (!introEnded)
-                introEnded = playfield.Clock.CurrentTime > earliestStartTime;
         }
 
         private class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
