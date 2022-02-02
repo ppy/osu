@@ -197,7 +197,24 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[]
+                    {
+                        new OsuModHidden(),
+                        new OsuModHardRock(),
+                        new OsuModFlashlight
+                        {
+                            FollowDelay = { Value = 200 },
+                            SizeMultiplier = { Value = 5 },
+                        },
+                        new OsuModDifficultyAdjust
+                        {
+                            CircleSize = { Value = 11 },
+                            ApproachRate = { Value = 10 },
+                            OverallDifficulty = { Value = 10 },
+                            DrainRate = { Value = 10 },
+                            ExtendedLimits = { Value = true }
+                        }
+                    },
                     Ruleset = new OsuRuleset().RulesetInfo,
                     BeatmapInfo = beatmapInfo,
                     User = new APIUser
@@ -217,7 +234,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
                     User = new APIUser
@@ -237,7 +254,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -258,7 +275,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -279,7 +296,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -300,7 +317,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.9826,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -321,7 +338,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.9654,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -342,7 +359,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.6025,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -363,7 +380,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 
@@ -384,7 +401,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.4222,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    //Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
 

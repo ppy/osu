@@ -149,6 +149,10 @@ namespace osu.Game.Rulesets
                         var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
 
+                        // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
+                        // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
+                        resolvedType.Assembly.GetTypes();
+
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
