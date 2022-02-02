@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override string Description => @"Turns all hold notes into normal notes. No coordination required.";
+        public override string Description => @"Replaces all hold notes with normal notes.";
 
         public override IconUsage? Icon => FontAwesome.Solid.DotCircle;
 
