@@ -155,11 +155,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             waitForPlayer();
             checkPaused(true);
+            sendFrames();
 
-            finish();
+            finish(SpectatingUserState.Failed);
 
-            checkPaused(false);
-            // TODO: should replay until running out of frames then fail
+            checkPaused(false); // Should continue playing until out of frames
+            checkPaused(true);
         }
 
         [Test]
@@ -246,7 +247,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void start(int? beatmapId = null) => AddStep("start play", () => spectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish() => AddStep("end play", () => spectatorClient.EndPlay(streamingUser.Id));
+        private void finish(SpectatingUserState state = SpectatingUserState.Quit) => AddStep("end play", () => spectatorClient.EndPlay(streamingUser.Id, state));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);
