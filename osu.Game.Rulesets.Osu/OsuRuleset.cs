@@ -278,7 +278,8 @@ namespace osu.Game.Rulesets.Osu
                     Columns = new[]
                     {
                         new StatisticItem("Timing Distribution",
-                            new HitEventTimingDistributionGraph(timedHitEvents)
+                            true,
+                            () => new HitEventTimingDistributionGraph(timedHitEvents)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = 250
@@ -289,21 +290,25 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }),
+                        new StatisticItem("Accuracy Heatmap",
+                            true,
+                            () => new AccuracyHeatmap(score, playableBeatmap)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 250
+                            }),
                     }
                 },
                 new StatisticRow
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
-                        {
-                            new UnstableRate(timedHitEvents)
-                        }))
+                        new StatisticItem(string.Empty,
+                            true,
+                            () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                            {
+                                new UnstableRate(timedHitEvents)
+                            }))
                     }
                 }
             };

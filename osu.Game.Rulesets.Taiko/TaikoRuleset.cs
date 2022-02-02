@@ -213,21 +213,25 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(timedHitEvents)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }),
+                        new StatisticItem("Timing Distribution",
+                            true,
+                            () => new HitEventTimingDistributionGraph(timedHitEvents)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 250
+                            }),
                     }
                 },
                 new StatisticRow
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
-                        {
-                            new UnstableRate(timedHitEvents)
-                        }))
+                        new StatisticItem(string.Empty,
+                            true,
+                            () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                            {
+                                new UnstableRate(timedHitEvents)
+                            }))
                     }
                 }
             };

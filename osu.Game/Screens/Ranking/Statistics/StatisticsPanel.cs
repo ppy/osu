@@ -118,6 +118,10 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                     foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
                     {
+                        var columnsToDisplay = newScore.HitEvents.Count == 0
+                            ? row.Columns?.Where(c => !c.RequiresHitEvents).ToArray()
+                            : row.Columns;
+
                         rows.Add(new GridContainer
                         {
                             Anchor = Anchor.TopCentre,
@@ -126,14 +130,14 @@ namespace osu.Game.Screens.Ranking.Statistics
                             AutoSizeAxes = Axes.Y,
                             Content = new[]
                             {
-                                row.Columns?.Select(c => new StatisticContainer(c)
+                                columnsToDisplay?.Select(c => new StatisticContainer(c)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                 }).Cast<Drawable>().ToArray()
                             },
-                            ColumnDimensions = Enumerable.Range(0, row.Columns?.Length ?? 0)
-                                                         .Select(i => row.Columns[i].Dimension ?? new Dimension()).ToArray(),
+                            ColumnDimensions = Enumerable.Range(0, columnsToDisplay?.Length ?? 0)
+                                                         .Select(i => columnsToDisplay?[i].Dimension ?? new Dimension()).ToArray(),
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         });
                     }
