@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 1.0f,
         };
 
-        private const float spin_radius = 50;
-
         private OsuInputManager inputManager;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
@@ -82,34 +80,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         {
                             slider.HeadCircle.Hide(); // hide flash, triangles, ... so they don't move with slider
                             easeTo(slider, cursorPos - slider.Ball.DrawPosition);
-                            // FIXME: some sliders re-appearing at their original position for a single frame when they're done
-                        }
-
-                        break;
-
-                    case DrawableSpinner spinner:
-
-                        // Move spinner _next_ to cursor
-                        if (currentTime < h.StartTime)
-                        {
-                            easeTo(spinner, cursorPos + new Vector2(0, -spin_radius));
-                        }
-                        else
-                        {
-                            // Move spinner visually
-                            Vector2 delta = new Vector2(spin_radius);
-                            float angle = (float)gameplayClock.CurrentTime * 10;
-
-                            // Move spinner logically
-                            if (inputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false)
-                            {
-                                var targetPos = new Vector2(
-                                    delta.X * MathF.Cos(angle) - delta.Y * MathF.Sin(angle) + cursorPos.X,
-                                    delta.X * MathF.Sin(angle) + delta.Y * MathF.Cos(angle) + cursorPos.Y
-                                );
-
-                                easeTo(spinner, targetPos);
-                            }
                         }
 
                         break;
