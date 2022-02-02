@@ -105,6 +105,7 @@ namespace osu.Game.Rulesets.Mods
                     {
                         ShowsDefaultIndicator = false,
                         Current = currentNumber,
+                        KeyboardStep = 0.1f,
                     }
                 };
 
