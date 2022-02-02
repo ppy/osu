@@ -56,6 +56,8 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
+            applyLegacyDefaults(this.beatmap.BeatmapInfo);
+
             base.ParseStreamInto(stream, beatmap);
 
             flushPendingPoints();
@@ -68,6 +70,19 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var hitObject in this.beatmap.HitObjects)
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
+        }
+
+        /// <summary>
+        /// Some `BeatmapInfo` members have default values that differ from the default values used by stable.
+        /// In addition, legacy beatmaps will sometimes not contain some configuration keys, in which case
+        /// the legacy default values should be used.
+        /// This method's intention is to restore those legacy defaults.
+        /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
+        /// </summary>
+        private void applyLegacyDefaults(BeatmapInfo beatmapInfo)
+        {
+            beatmapInfo.WidescreenStoryboard = false;
+            beatmapInfo.SamplesMatchPlaybackRate = false;
         }
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
@@ -296,10 +311,13 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"OverallDifficulty":
                     difficulty.OverallDifficulty = Parsing.ParseFloat(pair.Value);
+                    if (!hasApproachRate)
+                        difficulty.ApproachRate = difficulty.OverallDifficulty;
                     break;
 
                 case @"ApproachRate":
                     difficulty.ApproachRate = Parsing.ParseFloat(pair.Value);
+                    hasApproachRate = true;
                     break;
 
                 case @"SliderMultiplier":
@@ -417,6 +435,7 @@ namespace osu.Game.Beatmaps.Formats
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
         private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
+        private bool hasApproachRate;
 
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
         {

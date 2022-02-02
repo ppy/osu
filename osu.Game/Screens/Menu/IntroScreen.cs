@@ -18,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
@@ -147,6 +148,36 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+            ensureEventuallyArrivingAtMenu();
+        }
+
+        [Resolved]
+        private NotificationOverlay notifications { get; set; }
+
+        private void ensureEventuallyArrivingAtMenu()
+        {
+            // This intends to handle the case where an intro may get stuck.
+            // Historically, this could happen if the host system's audio device is in a state it can't
+            // play audio, causing a clock to never elapse time and the intro to never end.
+            //
+            // This safety measure gives the user a chance to fix the problem from the settings menu.
+            Scheduler.AddDelayed(() =>
+            {
+                if (DidLoadMenu)
+                    return;
+
+                PrepareMenuLoad();
+                LoadMenu();
+                notifications.Post(new SimpleErrorNotification
+                {
+                    Text = "osu! doesn't seem to be able to play audio correctly.\n\nPlease try changing your audio device to a working setting."
+                });
+            }, 5000);
+        }
+
         public override void OnResuming(IScreen last)
         {
             this.FadeIn(300);
@@ -241,6 +272,9 @@ namespace osu.Game.Screens.Menu
 
         protected void PrepareMenuLoad()
         {
+            if (nextScreen != null)
+                return;
+
             nextScreen = createNextScreen?.Invoke();
 
             if (nextScreen != null)
@@ -249,6 +283,9 @@ namespace osu.Game.Screens.Menu
 
         protected void LoadMenu()
         {
+            if (DidLoadMenu)
+                return;
+
             beatmap.Return();
 
             DidLoadMenu = true;
