@@ -143,6 +143,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     if (panelIsEmpty)
                     {
                         // Replace the scroll container with fill flow container to get the message centered.
+                        container.Dispose();
                         container = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.Both,
