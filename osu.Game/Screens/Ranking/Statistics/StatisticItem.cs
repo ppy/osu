@@ -19,9 +19,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         public readonly string Name;
 
         /// <summary>
-        /// The <see cref="Drawable"/> content to be displayed.
+        /// A function returning the <see cref="Drawable"/> content to be displayed.
         /// </summary>
-        public readonly Func<Drawable> Content;
+        public readonly Func<Drawable> CreateContent;
 
         /// <summary>
         /// The <see cref="Dimension"/> of this row. This can be thought of as the column dimension of an encompassing <see cref="GridContainer"/>.
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Ranking.Statistics
         public readonly Dimension Dimension;
 
         /// <summary>
-        /// Whether this item requires hit events. If true, the <see cref="Content"/> will not be created if no hit events are available.
+        /// Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.
         /// </summary>
         public readonly bool RequiresHitEvents;
 
@@ -37,14 +37,14 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// Creates a new <see cref="StatisticItem"/>, to be displayed inside a <see cref="StatisticRow"/> in the results screen.
         /// </summary>
         /// <param name="name">The name of the item. Can be <see cref="string.Empty"/> to hide the item header.</param>
-        /// <param name="requiresHitEvents">Whether this item requires hit events. If true, the <see cref="Content"/> will not be created if no hit events are available.</param>
-        /// <param name="content">The <see cref="Drawable"/> content to be displayed.</param>
+        /// <param name="requiresHitEvents">Whether this item requires hit events. If true, <see cref="CreateContent"/> will not be called if no hit events are available.</param>
+        /// <param name="createContent">A function returning the <see cref="Drawable"/> content to be displayed.</param>
         /// <param name="dimension">The <see cref="Dimension"/> of this item. This can be thought of as the column dimension of an encompassing <see cref="GridContainer"/>.</param>
-        public StatisticItem([NotNull] string name, bool requiresHitEvents, [NotNull] Func<Drawable> content, [CanBeNull] Dimension dimension = null)
+        public StatisticItem([NotNull] string name, bool requiresHitEvents, [NotNull] Func<Drawable> createContent, [CanBeNull] Dimension dimension = null)
         {
             Name = name;
             RequiresHitEvents = requiresHitEvents;
-            Content = content;
+            CreateContent = createContent;
             Dimension = dimension;
         }
     }
