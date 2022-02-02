@@ -370,8 +370,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
-                    new StatisticItem("Timing Distribution",
-                        true,
+                    new StatisticItem("Timing Distribution", true,
                         () => new HitEventTimingDistributionGraph(score.HitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
@@ -383,8 +382,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
-                    new StatisticItem(string.Empty,
-                        true,
+                    new StatisticItem(string.Empty, true,
                         () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
                             new UnstableRate(score.HitEvents)
