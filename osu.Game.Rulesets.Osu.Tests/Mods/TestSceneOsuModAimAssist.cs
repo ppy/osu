@@ -8,15 +8,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
     public class TestSceneOsuModAimAssist : OsuModTestScene
     {
-        [Test]
-        public void TestAimAssist()
+        [TestCase(0.1f)]
+        [TestCase(0.5f)]
+        [TestCase(1)]
+        public void TestAimAssist(float strength)
         {
-            var mod = new OsuModAimAssist();
-
             CreateModTest(new ModTestData
             {
+                Mod = new OsuModAimAssist
+                {
+                    AssistStrength = { Value = strength },
+                },
+                PassCondition = () => true,
                 Autoplay = false,
-                Mod = mod,
             });
         }
     }
