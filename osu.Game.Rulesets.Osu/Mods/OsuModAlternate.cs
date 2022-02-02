@@ -60,9 +60,20 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!introEnded)
                 return true;
 
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    break;
+
+                // Any action which is not left or right button should be ignored.
+                default:
+                    return true;
+            }
+
             if (lastActionPressed != action)
             {
-                // User alternated correctly
+                // User alternated correctly.
                 lastActionPressed = action;
                 return true;
             }
