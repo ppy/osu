@@ -27,7 +27,7 @@ namespace osu.Game.Skinning
 
         private readonly IStorageResourceProvider skinResources;
 
-        public SkinModelManager(Storage storage, RealmAccess realm, GameHost host, IStorageResourceProvider skinResources)
+        public SkinModelManager(Storage storage, RealmAccess realm, IStorageResourceProvider skinResources)
             : base(storage, realm)
         {
             this.skinResources = skinResources;

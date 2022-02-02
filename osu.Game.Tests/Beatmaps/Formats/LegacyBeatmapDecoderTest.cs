@@ -821,5 +821,47 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 });
             }
         }
+
+        [Test]
+        public void TestUndefinedApproachRateInheritsOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("undefined-approach-rate.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(1));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestApproachRateDefinedBeforeOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("approach-rate-before-overall-difficulty.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void TestApproachRateDefinedAfterOverallDifficulty()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("approach-rate-after-overall-difficulty.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var decoded = decoder.Decode(stream);
+                Assert.That(decoded.Difficulty.ApproachRate, Is.EqualTo(9));
+                Assert.That(decoded.Difficulty.OverallDifficulty, Is.EqualTo(1));
+            }
+        }
     }
 }

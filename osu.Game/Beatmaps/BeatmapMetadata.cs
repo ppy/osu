@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata(RealmUser? user = null)
         {
-            Author = new RealmUser();
+            Author = user ?? new RealmUser();
         }
 
         [UsedImplicitly] // Realm
