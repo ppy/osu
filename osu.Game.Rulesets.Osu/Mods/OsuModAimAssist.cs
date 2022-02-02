@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
@@ -23,30 +22,26 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "AA";
         public override IconUsage? Icon => FontAwesome.Solid.MousePointer;
         public override ModType Type => ModType.Fun;
-        public override string Description => "No need to chase the circle, the circle chases you";
+        public override string Description => "No need to chase the circle – the circle chases you!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
         private IFrameStableClock gameplayClock;
 
-        [SettingSource("Assist strength", "Change the distance notes should travel towards you.", 0)]
+        [SettingSource("Assist strength", "How much this mod will assist you.", 0)]
         public BindableFloat AssistStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
-            MinValue = 0.1f,
+            MinValue = 0.05f,
             MaxValue = 1.0f,
         };
 
-        private OsuInputManager inputManager;
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            // Grab the input manager for future use
-            inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-
             gameplayClock = drawableRuleset.FrameStableClock;
 
-            // Hide judgment displays and follow points
+            // Hide judgment displays and follow points as they won't make any sense.
+            // Judgements can potentially be turned on in a future where they display at a position relative to their drawable counterpart.
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
             (drawableRuleset.Playfield as OsuPlayfield)?.FollowPoints.Hide();
         }
@@ -54,33 +49,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void Update(Playfield playfield)
         {
             var cursorPos = playfield.Cursor.ActiveCursor.DrawPosition;
-            double currentTime = playfield.Clock.CurrentTime;
 
-            // Move all currently alive object to new destination
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
+            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                var h = drawable.HitObject;
-
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
                         easeTo(circle, cursorPos);
-
                         break;
 
                     case DrawableSlider slider:
 
-                        // Move slider to cursor
                         if (!slider.HeadCircle.Result.HasResult)
-                        {
                             easeTo(slider, cursorPos);
-                        }
-                        // Move slider so that sliderball stays on the cursor
                         else
-                        {
-                            slider.HeadCircle.Hide(); // hide flash, triangles, ... so they don't move with slider
                             easeTo(slider, cursorPos - slider.Ball.DrawPosition);
-                        }
 
                         break;
                 }
@@ -89,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void easeTo(DrawableHitObject hitObject, Vector2 destination)
         {
-            double dampLength = Interpolation.Lerp(500, 50, AssistStrength.Value);
+            double dampLength = Interpolation.Lerp(3000, 40, AssistStrength.Value);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);
