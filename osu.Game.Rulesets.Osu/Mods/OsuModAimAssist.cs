@@ -2,17 +2,18 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Osu.UI;
-using osuTK;
 using System.Linq;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -26,23 +27,26 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
+        private IFrameStableClock gameplayClock;
+
         [SettingSource("Assist strength", "Change the distance notes should travel towards you.", 0)]
-        public BindableFloat AssistStrength { get; } = new BindableFloat(0.3f)
+        public BindableFloat AssistStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
-            MinValue = 0.0f,
+            MinValue = 0.1f,
             MaxValue = 1.0f,
         };
 
-        private const float spin_radius = 30;
+        private const float spin_radius = 50;
 
-        private Vector2? prevCursorPos;
         private OsuInputManager inputManager;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // Grab the input manager for future use
             inputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+
+            gameplayClock = drawableRuleset.FrameStableClock;
 
             // Hide judgment displays and follow points
             drawableRuleset.Playfield.DisplayJudgements.Value = false;
@@ -62,10 +66,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 switch (drawable)
                 {
                     case DrawableHitCircle circle:
-
-                        // 10ms earlier on the note to reduce chance of missing when clicking early / cursor moves fast
-                        circle.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
-                        // FIXME: some circles cause flash at original(?) position when clicked too early
+                        easeTo(circle, cursorPos);
 
                         break;
 
@@ -74,13 +75,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // Move slider to cursor
                         if (!slider.HeadCircle.Result.HasResult)
                         {
-                            slider.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
+                            easeTo(slider, cursorPos);
                         }
                         // Move slider so that sliderball stays on the cursor
                         else
                         {
                             slider.HeadCircle.Hide(); // hide flash, triangles, ... so they don't move with slider
-                            slider.MoveTo(cursorPos - slider.Ball.DrawPosition);
+                            easeTo(slider, cursorPos - slider.Ball.DrawPosition);
                             // FIXME: some sliders re-appearing at their original position for a single frame when they're done
                         }
 
@@ -91,35 +92,39 @@ namespace osu.Game.Rulesets.Osu.Mods
                         // Move spinner _next_ to cursor
                         if (currentTime < h.StartTime)
                         {
-                            spinner.MoveTo(cursorPos + new Vector2(0, -spin_radius), Math.Max(0, h.StartTime - currentTime - 10));
+                            easeTo(spinner, cursorPos + new Vector2(0, -spin_radius));
                         }
                         else
                         {
                             // Move spinner visually
-                            Vector2 delta = spin_radius * (spinner.Position - prevCursorPos ?? cursorPos).Normalized();
-                            const float angle = 3 * MathF.PI / 180; // radians per update, arbitrary value
-
-                            // Rotation matrix
-                            var targetPos = new Vector2(
-                                delta.X * MathF.Cos(angle) - delta.Y * MathF.Sin(angle) + cursorPos.X,
-                                delta.X * MathF.Sin(angle) + delta.Y * MathF.Cos(angle) + cursorPos.Y
-                            );
-
-                            spinner.MoveTo(targetPos);
+                            Vector2 delta = new Vector2(spin_radius);
+                            float angle = (float)gameplayClock.CurrentTime * 10;
 
                             // Move spinner logically
                             if (inputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false)
                             {
-                                // Arbitrary value, might lead to some inconsistencies depending on clock rate, replay, ...
-                                spinner.RotationTracker.AddRotation(2 * MathF.PI);
+                                var targetPos = new Vector2(
+                                    delta.X * MathF.Cos(angle) - delta.Y * MathF.Sin(angle) + cursorPos.X,
+                                    delta.X * MathF.Sin(angle) + delta.Y * MathF.Cos(angle) + cursorPos.Y
+                                );
+
+                                easeTo(spinner, targetPos);
                             }
                         }
 
                         break;
                 }
             }
+        }
 
-            prevCursorPos = cursorPos;
+        private void easeTo(DrawableHitObject hitObject, Vector2 destination)
+        {
+            double dampLength = Interpolation.Lerp(500, 50, AssistStrength.Value);
+
+            float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
+            float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);
+
+            hitObject.Position = new Vector2(x, y);
         }
     }
 }
