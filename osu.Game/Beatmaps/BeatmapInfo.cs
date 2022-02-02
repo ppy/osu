@@ -99,11 +99,11 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
 
-        public bool WidescreenStoryboard { get; set; }
+        public bool WidescreenStoryboard { get; set; } = true;
 
         public bool EpilepsyWarning { get; set; }
 
-        public bool SamplesMatchPlaybackRate { get; set; }
+        public bool SamplesMatchPlaybackRate { get; set; } = true;
 
         public double DistanceSpacing { get; set; }
 

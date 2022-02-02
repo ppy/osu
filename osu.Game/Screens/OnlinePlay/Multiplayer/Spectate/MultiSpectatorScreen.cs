@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             Container leaderboardContainer;
             Container scoreDisplayContainer;
 
-            masterClockContainer = new MasterGameplayClockContainer(Beatmap.Value, 0);
+            masterClockContainer = CreateMasterGameplayClockContainer(Beatmap.Value);
 
             InternalChildren = new[]
             {
@@ -235,5 +236,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             return base.OnBackButton();
         }
+
+        protected virtual MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap) => new MasterGameplayClockContainer(beatmap, 0);
     }
 }

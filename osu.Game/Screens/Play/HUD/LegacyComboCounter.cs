@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 if (isRolling)
-                    onDisplayedCountRolling(displayedCount, value);
+                    onDisplayedCountRolling(value);
                 else if (displayedCount + 1 == value)
                     onDisplayedCountIncrement(value);
                 else
@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (prev + 1 == Current.Value)
                     onCountIncrement(prev, Current.Value);
                 else
-                    onCountChange(prev, Current.Value);
+                    onCountChange(Current.Value);
             }
             else
             {
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
             transformRoll(currentValue, newValue);
         }
 
-        private void onCountChange(int currentValue, int newValue)
+        private void onCountChange(int newValue)
         {
             scheduledPopOutCurrentId++;
 
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Play.HUD
             DisplayedCount = newValue;
         }
 
-        private void onDisplayedCountRolling(int currentValue, int newValue)
+        private void onDisplayedCountRolling(int newValue)
         {
             if (newValue == 0)
                 displayedCountSpriteText.FadeOut(fade_out_duration);

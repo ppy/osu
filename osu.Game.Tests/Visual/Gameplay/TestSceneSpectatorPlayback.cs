@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void onNewFrames(int userId, FrameDataBundle frames)
         {
-            Logger.Log($"Received {frames.Frames.Count()} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
+            Logger.Log($"Received {frames.Frames.Count} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
 
             foreach (var legacyFrame in frames.Frames)
             {
@@ -259,7 +259,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public override void CollectPendingInputs(List<IInput> inputs)
+            protected override void CollectReplayInputs(List<IInput> inputs)
             {
                 inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero) });
                 inputs.Add(new ReplayState<TestAction> { PressedActions = CurrentFrame?.Actions ?? new List<TestAction>() });

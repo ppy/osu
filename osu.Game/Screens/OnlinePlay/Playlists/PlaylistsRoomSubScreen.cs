@@ -220,7 +220,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         protected override Screen CreateGameplayScreen() => new PlayerLoader(() => new PlaylistsPlayer(Room, SelectedItem.Value)
         {
-            Exited = () => leaderboard.RefreshScores()
+            Exited = () => leaderboard.RefetchScores()
         });
     }
 }

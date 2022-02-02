@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.EmptyFreeform.Replays
 
         protected override bool IsImportant(EmptyFreeformReplayFrame frame) => frame.Actions.Any();
 
-        public override void CollectPendingInputs(List<IInput> inputs)
+        protected override void CollectReplayInputs(List<IInput> inputs)
         {
             var position = Interpolation.ValueAt(CurrentTime, StartFrame.Position, EndFrame.Position, StartFrame.Time, EndFrame.Time);
 
