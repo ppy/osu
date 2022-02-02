@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     case DrawableSlider slider:
 
                         // Move slider to cursor
-                        if (currentTime < h.StartTime)
+                        if (!slider.HeadCircle.Result.HasResult)
                         {
                             slider.MoveTo(cursorPos, Math.Max(0, h.StartTime - currentTime - 10));
                         }
