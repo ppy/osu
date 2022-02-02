@@ -34,11 +34,17 @@ namespace osu.Game.IO
 
         private string locateSongsDirectory()
         {
-            string configFile = GetFiles(".", $"osu!.{Environment.UserName}.cfg").SingleOrDefault();
+            var configurationFiles = GetFiles(".", $"osu!.{Environment.UserName}.cfg");
 
-            if (configFile != null)
+            // GetFiles returns case insensitive results, so multiple files could exist.
+            // Prefer a case-correct match, but fallback to any available.
+            string usableConfigFile =
+                configurationFiles.FirstOrDefault(f => f.Contains(Environment.UserName, StringComparison.Ordinal))
+                ?? configurationFiles.FirstOrDefault();
+
+            if (usableConfigFile != null)
             {
-                using (var stream = GetStream(configFile))
+                using (var stream = GetStream(usableConfigFile))
                 using (var textReader = new StreamReader(stream))
                 {
                     string line;

@@ -619,6 +619,10 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
+            // Without this, it's possible for a transfer to happen while we are not the current screen.
+            transferRulesetValue();
+
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 

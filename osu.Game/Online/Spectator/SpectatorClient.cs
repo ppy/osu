@@ -129,6 +129,9 @@ namespace osu.Game.Online.Spectator
 
         Task ISpectatorClient.UserSentFrames(int userId, FrameDataBundle data)
         {
+            if (data.Frames.Count > 0)
+                data.Frames[^1].Header = data.Header;
+
             Schedule(() => OnNewFrames?.Invoke(userId, data));
 
             return Task.CompletedTask;
@@ -166,6 +169,9 @@ namespace osu.Game.Online.Spectator
             {
                 if (!IsPlaying)
                     return;
+
+                if (pendingFrames.Count > 0)
+                    purgePendingFrames(true);
 
                 IsPlaying = false;
                 currentBeatmap = null;
@@ -238,9 +244,12 @@ namespace osu.Game.Online.Spectator
                 purgePendingFrames();
         }
 
-        private void purgePendingFrames()
+        private void purgePendingFrames(bool force = false)
         {
-            if (lastSend?.IsCompleted == false)
+            if (lastSend?.IsCompleted == false && !force)
+                return;
+
+            if (pendingFrames.Count == 0)
                 return;
 
             var frames = pendingFrames.ToArray();
