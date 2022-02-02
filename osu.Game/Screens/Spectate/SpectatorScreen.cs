@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Spectate
                     userMap[u.Id] = u;
                 }
 
-                userStates.BindTo(spectatorClient.PlayingUserStates);
+                userStates.BindTo(spectatorClient.WatchingUserStates);
                 userStates.BindCollectionChanged(onUserStatesChanged, true);
 
                 realmSubscription = realm.RegisterForNotifications(

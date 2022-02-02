@@ -37,8 +37,8 @@ namespace osu.Game.Online.Spectator
 
         private readonly List<int> watchingUsers = new List<int>();
 
-        public IBindableDictionary<int, SpectatorState> PlayingUserStates => playingUserStates;
-        private readonly BindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
+        public IBindableDictionary<int, SpectatorState> WatchingUserStates => watchingUserStates;
+        private readonly BindableDictionary<int, SpectatorState> watchingUserStates = new BindableDictionary<int, SpectatorState>();
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
@@ -85,7 +85,7 @@ namespace osu.Game.Online.Spectator
                         BeginPlayingInternal(currentState);
                 }
                 else
-                    playingUserStates.Clear();
+                    watchingUserStates.Clear();
             }), true);
         }
 
@@ -94,7 +94,7 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 if (watchingUsers.Contains(userId))
-                    playingUserStates[userId] = state;
+                    watchingUserStates[userId] = state;
                 OnUserBeganPlaying?.Invoke(userId, state);
             });
 
@@ -106,7 +106,7 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 if (watchingUsers.Contains(userId))
-                    playingUserStates[userId] = state;
+                    watchingUserStates[userId] = state;
                 OnUserFinishedPlaying?.Invoke(userId, state);
             });
 
@@ -193,7 +193,7 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 watchingUsers.Remove(userId);
-                playingUserStates.Remove(userId);
+                watchingUserStates.Remove(userId);
                 StopWatchingUserInternal(userId);
             });
         }

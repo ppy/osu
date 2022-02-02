@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            userStates.BindTo(spectatorClient.PlayingUserStates);
+            userStates.BindTo(spectatorClient.WatchingUserStates);
             userStates.BindCollectionChanged(onUserStatesChanged, true);
         }
 
