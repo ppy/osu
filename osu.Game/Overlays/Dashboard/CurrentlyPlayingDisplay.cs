@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Dashboard
 {
     internal class CurrentlyPlayingDisplay : CompositeDrawable
     {
-        private readonly IBindableDictionary<int, SpectatorState> userStates = new BindableDictionary<int, SpectatorState>();
+        private readonly IBindableList<int> playingUsers = new BindableList<int>();
 
         private FillFlowContainer<PlayingUserPanel> userFlow;
 
@@ -51,55 +52,46 @@ namespace osu.Game.Overlays.Dashboard
         {
             base.LoadComplete();
 
-            userStates.BindTo(spectatorClient.WatchingUserStates);
-            userStates.BindCollectionChanged(onUserStatesChanged, true);
+            playingUsers.BindTo(spectatorClient.PlayingUsers);
+            playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
 
-        private void onUserStatesChanged(object sender, NotifyDictionaryChangedEventArgs<int, SpectatorState> e) => Schedule(() =>
+        private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
-                case NotifyDictionaryChangedAction.Add:
-                case NotifyDictionaryChangedAction.Replace:
+                case NotifyCollectionChangedAction.Add:
                     Debug.Assert(e.NewItems != null);
 
-                    foreach ((int userId, SpectatorState state) in e.NewItems)
+                    foreach (int userId in e.NewItems)
                     {
-                        if (state.State != SpectatingUserState.Playing)
-                        {
-                            removePlayingUser(userId);
-                            continue;
-                        }
-
                         users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             var user = task.GetResultSafely();
 
                             if (user != null)
-                                Schedule(() => addPlayingUser(user));
+                            {
+                                Schedule(() =>
+                                {
+                                    // user may no longer be playing.
+                                    if (!playingUsers.Contains(user.Id))
+                                        return;
+
+                                    userFlow.Add(createUserPanel(user));
+                                });
+                            }
                         });
                     }
 
                     break;
 
-                case NotifyDictionaryChangedAction.Remove:
+                case NotifyCollectionChangedAction.Remove:
                     Debug.Assert(e.OldItems != null);
 
-                    foreach ((int userId, _) in e.OldItems)
-                        removePlayingUser(userId);
+                    foreach (int userId in e.OldItems)
+                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
                     break;
             }
-
-            void addPlayingUser(APIUser user)
-            {
-                // user may no longer be playing.
-                if (!userStates.TryGetValue(user.Id, out var state2) || state2.State != SpectatingUserState.Playing)
-                    return;
-
-                userFlow.Add(createUserPanel(user));
-            }
-
-            void removePlayingUser(int userId) => userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
         });
 
         private PlayingUserPanel createUserPanel(APIUser user) =>

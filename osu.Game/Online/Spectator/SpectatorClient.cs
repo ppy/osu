@@ -35,15 +35,27 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
 
+        /// <summary>
+        /// The states of all users currently being watched.
+        /// </summary>
+        public IBindableDictionary<int, SpectatorState> WatchingUserStates => watchingUserStates;
+
+        /// <summary>
+        /// A global list of all players currently playing.
+        /// </summary>
+        public IBindableList<int> PlayingUsers => playingUsers;
+
+        /// <summary>
+        /// All users currently being watched.
+        /// </summary>
         private readonly List<int> watchingUsers = new List<int>();
 
-        public IBindableDictionary<int, SpectatorState> WatchingUserStates => watchingUserStates;
         private readonly BindableDictionary<int, SpectatorState> watchingUserStates = new BindableDictionary<int, SpectatorState>();
+        private readonly BindableList<int> playingUsers = new BindableList<int>();
+        private readonly SpectatorState currentState = new SpectatorState();
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
-
-        private readonly SpectatorState currentState = new SpectatorState();
 
         /// <summary>
         /// Whether the local user is playing.
@@ -85,7 +97,10 @@ namespace osu.Game.Online.Spectator
                         BeginPlayingInternal(currentState);
                 }
                 else
+                {
                     watchingUserStates.Clear();
+                    playingUsers.Clear();
+                }
             }), true);
         }
 
@@ -93,8 +108,12 @@ namespace osu.Game.Online.Spectator
         {
             Schedule(() =>
             {
+                if (!playingUsers.Contains(userId))
+                    playingUsers.Add(userId);
+
                 if (watchingUsers.Contains(userId))
                     watchingUserStates[userId] = state;
+
                 OnUserBeganPlaying?.Invoke(userId, state);
             });
 
@@ -105,8 +124,11 @@ namespace osu.Game.Online.Spectator
         {
             Schedule(() =>
             {
+                playingUsers.Remove(userId);
+
                 if (watchingUsers.Contains(userId))
                     watchingUserStates[userId] = state;
+
                 OnUserFinishedPlaying?.Invoke(userId, state);
             });
 
