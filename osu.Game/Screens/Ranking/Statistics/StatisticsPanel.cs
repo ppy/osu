@@ -98,7 +98,8 @@ namespace osu.Game.Screens.Ranking.Statistics
                         rows = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
+                            AutoSizeAxes = Axes.Y,
+                            Spacing = new Vector2(30, 15)
                         }
                     }
                 };
@@ -123,7 +124,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Origin = Anchor.TopCentre,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Bottom = 15 },
                         Content = new[]
                         {
                             columnsToDisplay?.Select(c => new StatisticContainer(c)
