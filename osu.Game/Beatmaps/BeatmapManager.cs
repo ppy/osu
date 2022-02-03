@@ -120,15 +120,19 @@ namespace osu.Game.Beatmaps
             // but cases where this isn't true seem rather rare / pathological.
             var referenceBeatmap = GetWorkingBeatmap(beatmapSetInfo.Beatmaps.First());
 
-            var newBeatmap = new Beatmap
-            {
-                BeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone())
-            };
+            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
 
+            // populate circular beatmap set info <-> beatmap info references manually.
+            // several places like `BeatmapModelManager.Save()` or `GetWorkingBeatmap()`
+            // rely on them being freely traversable in both directions for correct operation.
+            beatmapSetInfo.Beatmaps.Add(newBeatmapInfo);
+            newBeatmapInfo.BeatmapSet = beatmapSetInfo;
+
+            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
             foreach (var timingPoint in referenceBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
-            beatmapModelManager.AddDifficultyToBeatmapSet(beatmapSetInfo, newBeatmap);
+            beatmapModelManager.Save(newBeatmapInfo, newBeatmap);
 
             workingBeatmapCache.Invalidate(beatmapSetInfo);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
