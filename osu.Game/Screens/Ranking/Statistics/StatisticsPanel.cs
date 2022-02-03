@@ -86,88 +86,86 @@ namespace osu.Game.Screens.Ranking.Statistics
                 playableBeatmap = beatmapManager.GetWorkingBeatmap(newScore.BeatmapInfo).GetPlayableBeatmap(newScore.Ruleset, newScore.Mods);
             }, loadCancellation.Token).ContinueWith(t => Schedule(() =>
             {
-                FillFlowContainer rows;
-                Container<Drawable> container = new OsuScrollContainer(Direction.Vertical)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
-                    Children = new[]
-                    {
-                        rows = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(30, 15)
-                        }
-                    }
-                };
-
-                bool panelIsEmpty = true;
-                bool panelIsComplete = true;
                 bool hitEventsAvailable = newScore.HitEvents.Count != 0;
+                Container<Drawable> container;
 
-                foreach (var row in newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap))
+                var statisticRows = newScore.Ruleset.CreateInstance().CreateStatisticsForScore(newScore, playableBeatmap);
+
+                if (!hitEventsAvailable && statisticRows.SelectMany(r => r.Columns).All(c => c.RequiresHitEvents))
                 {
-                    var columnsToDisplay = hitEventsAvailable
-                        ? row.Columns
-                        : row.Columns.Where(c => !c.RequiresHitEvents).ToArray();
-
-                    if (columnsToDisplay.Length < row.Columns.Length)
-                        panelIsComplete = false;
-
-                    if (columnsToDisplay.Any())
-                        panelIsEmpty = false;
-                    else
-                        continue;
-
-                    rows.Add(new GridContainer
+                    container = new FillFlowContainer
                     {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Content = new[]
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
                         {
-                            columnsToDisplay?.Select(c => new StatisticContainer(c)
+                            new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
+                            new ReplayDownloadButton(newScore)
                             {
+                                Scale = new Vector2(1.5f),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                            }).Cast<Drawable>().ToArray()
-                        },
-                        ColumnDimensions = Enumerable.Range(0, columnsToDisplay.Length)
-                                                     .Select(i => columnsToDisplay[i].Dimension ?? new Dimension()).ToArray(),
-                        RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
-                    });
+                            },
+                        }
+                    };
                 }
-
-                if (!hitEventsAvailable)
+                else
                 {
-                    if (panelIsEmpty)
+                    FillFlowContainer rows;
+                    container = new OsuScrollContainer(Direction.Vertical)
                     {
-                        // Replace the scroll container with fill flow container to get the message centered.
-                        rows.Dispose();
-                        container.Dispose();
-                        container = new FillFlowContainer
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0,
+                        Children = new[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Direction = FillDirection.Vertical,
-                            Children = new Drawable[]
+                            rows = new FillFlowContainer
                             {
-                                new MessagePlaceholder("Extended statistics are only available after watching a replay!"),
-                                new ReplayDownloadButton(newScore)
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Spacing = new Vector2(30, 15)
+                            }
+                        }
+                    };
+
+                    bool panelIsComplete = true;
+
+                    foreach (var row in statisticRows)
+                    {
+                        var columnsToDisplay = hitEventsAvailable
+                            ? row.Columns
+                            : row.Columns.Where(c => !c.RequiresHitEvents).ToArray();
+
+                        if (columnsToDisplay.Length < row.Columns.Length)
+                            panelIsComplete = false;
+
+                        if (columnsToDisplay.Length == 0)
+                            continue;
+
+                        rows.Add(new GridContainer
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Content = new[]
+                            {
+                                columnsToDisplay?.Select(c => new StatisticContainer(c)
                                 {
-                                    Scale = new Vector2(1.5f),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                },
-                            }
-                        };
+                                }).Cast<Drawable>().ToArray()
+                            },
+                            ColumnDimensions = Enumerable.Range(0, columnsToDisplay.Length)
+                                                         .Select(i => columnsToDisplay[i].Dimension ?? new Dimension()).ToArray(),
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
+                        });
                     }
-                    else if (!panelIsComplete)
+
+                    if (!hitEventsAvailable && !panelIsComplete)
                     {
                         rows.Add(new FillFlowContainer
                         {
