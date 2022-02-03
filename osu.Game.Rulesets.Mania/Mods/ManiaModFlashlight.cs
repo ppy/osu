@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public override BindableNumber<float> SizeMultiplier { get; } = new BindableNumber<float>
+        public override BindableFloat SizeMultiplier { get; } = new BindableFloat
         {
             MinValue = 0.5f,
             MaxValue = 3f,

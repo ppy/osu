@@ -169,6 +169,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
+                        new OsuModAlternate(),
                     };
 
                 case ModType.Automation:
@@ -193,6 +194,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModApproachDifferent(),
                         new OsuModMuted(),
                         new OsuModNoScope(),
+                        new OsuModAimAssist(),
                     };
 
                 case ModType.System:
