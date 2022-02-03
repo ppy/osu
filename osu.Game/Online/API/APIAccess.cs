@@ -400,7 +400,7 @@ namespace osu.Game.Online.API
             {
                 if (state.Value == APIState.Offline)
                 {
-                    request.Fail(new WebException("Disconnected from server"));
+                    failFromAPIOffline(request);
                     return;
                 }
 
@@ -419,7 +419,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException(@"Disconnected from server"));
+                        failFromAPIOffline(req);
                 }
             }
         }
@@ -438,6 +438,13 @@ namespace osu.Game.Online.API
 
             state.Value = APIState.Offline;
             flushQueue();
+        }
+
+        private void failFromAPIOffline(APIRequest req)
+        {
+            Debug.Assert(state.Value == APIState.Offline);
+
+            req.Fail(new WebException(@"User not logged in"));
         }
 
         private static APIUser createGuestUser() => new GuestUser();
