@@ -93,19 +93,14 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Add a new difficulty to the beatmap set represented by the provided <see cref="BeatmapSetInfo"/>.
         /// </summary>
-        public BeatmapInfo AddDifficultyToBeatmapSet(BeatmapSetInfo beatmapSetInfo, Beatmap beatmap)
+        public void AddDifficultyToBeatmapSet(BeatmapSetInfo beatmapSetInfo, Beatmap beatmap)
         {
-            return Realm.Run(realm =>
-            {
-                var beatmapInfo = beatmap.BeatmapInfo;
+            var beatmapInfo = beatmap.BeatmapInfo;
 
-                beatmapSetInfo.Beatmaps.Add(beatmapInfo);
-                beatmapInfo.BeatmapSet = beatmapSetInfo;
+            beatmapSetInfo.Beatmaps.Add(beatmapInfo);
+            beatmapInfo.BeatmapSet = beatmapSetInfo;
 
-                Save(beatmapInfo, beatmap);
-
-                return beatmapInfo.Detach();
-            });
+            Save(beatmapInfo, beatmap);
         }
 
         private static string getFilename(BeatmapInfo beatmapInfo)
