@@ -202,16 +202,18 @@ namespace osu.Game
             // See https://github.com/ppy/osu/pull/16547 for more discussion.
             if (EFContextFactory != null)
             {
+                const string backup_folder = "backups";
+
                 string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
-                EFContextFactory.CreateBackup($"client.{migration}.db");
-                realm.CreateBackup($"client.{migration}.realm");
+                EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
+                realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
 
                 using (var source = Storage.GetStream("collection.db"))
                 {
                     if (source != null)
                     {
-                        using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
+                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
                             source.CopyTo(destination);
                     }
                 }
@@ -245,7 +247,7 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, Host, () => difficultyCache, LocalConfig));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, () => difficultyCache, LocalConfig));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));

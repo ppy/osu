@@ -15,11 +15,14 @@ using osu.Game.Online.Spectator;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Beatmaps.IO;
 using osu.Game.Tests.Visual.Multiplayer;
 using osu.Game.Tests.Visual.Spectator;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -62,7 +65,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("import beatmap", () =>
             {
                 importedBeatmap = BeatmapImportHelper.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
-                importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.RulesetID == 0).OnlineID;
+                importedBeatmapId = importedBeatmap.Beatmaps.First(b => b.Ruleset.OnlineID == 0).OnlineID;
             });
         }
 
@@ -198,6 +201,37 @@ namespace osu.Game.Tests.Visual.Gameplay
             sendFrames();
 
             AddAssert("screen didn't change", () => Stack.CurrentScreen is SoloSpectator);
+        }
+
+        [Test]
+        public void TestFinalFramesPurgedBeforeEndingPlay()
+        {
+            AddStep("begin playing", () => spectatorClient.BeginPlaying(new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset()), new Score()));
+
+            AddStep("send frames and finish play", () =>
+            {
+                spectatorClient.HandleFrame(new OsuReplayFrame(1000, Vector2.Zero));
+                spectatorClient.EndPlaying();
+            });
+
+            // We can't access API because we're an "online" test.
+            AddAssert("last received frame has time = 1000", () => spectatorClient.LastReceivedUserFrames.First().Value.Time == 1000);
+        }
+
+        [Test]
+        public void TestFinalFrameInBundleHasHeader()
+        {
+            FrameDataBundle lastBundle = null;
+
+            AddStep("bind to client", () => spectatorClient.OnNewFrames += (_, bundle) => lastBundle = bundle);
+
+            start(-1234);
+            sendFrames();
+            finish();
+
+            AddUntilStep("bundle received", () => lastBundle != null);
+            AddAssert("first frame does not have header", () => lastBundle.Frames[0].Header == null);
+            AddAssert("last frame has header", () => lastBundle.Frames[^1].Header != null);
         }
 
         private OsuFramedReplayInputHandler replayHandler =>

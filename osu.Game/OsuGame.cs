@@ -357,12 +357,12 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
 
-            externalLinkOpener.OpenUrlExternally(url);
+            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
 
         /// <summary>

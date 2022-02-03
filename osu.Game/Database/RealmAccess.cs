@@ -89,10 +89,15 @@ namespace osu.Game.Database
 
         private Realm? updateRealm;
 
+        private bool isSendingNotificationResetEvents;
+
         public Realm Realm => ensureUpdateRealm();
 
         private Realm ensureUpdateRealm()
         {
+            if (isSendingNotificationResetEvents)
+                throw new InvalidOperationException("Cannot retrieve a realm context from a notification callback during a blocking operation.");
+
             if (!ThreadSafety.IsUpdateThread)
                 throw new InvalidOperationException(@$"Use {nameof(getRealmInstance)} when performing realm operations from a non-update thread");
 
@@ -300,7 +305,7 @@ namespace osu.Game.Database
             return new InvokeOnDisposal(() =>
             {
                 if (ThreadSafety.IsUpdateThread)
-                    unsubscribe();
+                    syncContext.Send(_ => unsubscribe(), null);
                 else
                     syncContext.Post(_ => unsubscribe(), null);
 
@@ -336,25 +341,6 @@ namespace osu.Game.Database
                 current_thread_subscriptions_allowed.Value = true;
                 customSubscriptionsResetMap[action] = action(realm);
                 current_thread_subscriptions_allowed.Value = false;
-            }
-        }
-
-        /// <summary>
-        /// Unregister all subscriptions when the realm instance is to be recycled.
-        /// Subscriptions will still remain and will be re-subscribed when the realm instance returns.
-        /// </summary>
-        private void unregisterAllSubscriptions()
-        {
-            lock (realmLock)
-            {
-                foreach (var action in notificationsResetMap.Values)
-                    action();
-
-                foreach (var action in customSubscriptionsResetMap)
-                {
-                    action.Value?.Dispose();
-                    customSubscriptionsResetMap[action.Key] = null;
-                }
             }
         }
 
@@ -610,9 +596,16 @@ namespace osu.Game.Database
                             throw new InvalidOperationException(@$"{nameof(BlockAllOperations)} must be called from the update thread.");
 
                         syncContext = SynchronizationContext.Current;
-                    }
 
-                    unregisterAllSubscriptions();
+                        // Before disposing the update context, clean up all subscriptions.
+                        // Note that in the case of realm notification subscriptions, this is not really required (they will be cleaned up by disposal).
+                        // In the case of custom subscriptions, we want them to fire before the update realm is disposed in case they do any follow-up work.
+                        foreach (var action in customSubscriptionsResetMap)
+                        {
+                            action.Value?.Dispose();
+                            customSubscriptionsResetMap[action.Key] = null;
+                        }
+                    }
 
                     Logger.Log(@"Blocking realm operations.", LoggingTarget.Database);
 
@@ -641,6 +634,28 @@ namespace osu.Game.Database
                     // We still want to continue with the blocking operation, though.
                     Logger.Log($"Realm compact failed with error {e}", LoggingTarget.Database);
                 }
+
+                // In order to ensure events arrive in the correct order, these *must* be fired post disposal of the update realm,
+                // and must be posted to the synchronization context.
+                // This is because realm may fire event callbacks between the `unregisterAllSubscriptions` and `updateRealm.Dispose`
+                // calls above.
+                syncContext?.Send(_ =>
+                {
+                    // Flag ensures that we don't get in a deadlocked scenario due to a callback attempting to access `RealmAccess.Realm` or `RealmAccess.Run`
+                    // and hitting `realmRetrievalLock` a second time. Generally such usages should not exist, and as such we throw when an attempt is made
+                    // to use in this fashion.
+                    isSendingNotificationResetEvents = true;
+
+                    try
+                    {
+                        foreach (var action in notificationsResetMap.Values)
+                            action();
+                    }
+                    finally
+                    {
+                        isSendingNotificationResetEvents = false;
+                    }
+                }, null);
             }
             catch
             {
@@ -654,8 +669,14 @@ namespace osu.Game.Database
             {
                 Logger.Log(@"Restoring realm operations.", LoggingTarget.Database);
                 realmRetrievalLock.Release();
+
                 // Post back to the update thread to revive any subscriptions.
-                syncContext?.Post(_ => ensureUpdateRealm(), null);
+                // In the case we are on the update thread, let's also require this to run synchronously.
+                // This requirement is mostly due to test coverage, but shouldn't cause any harm.
+                if (ThreadSafety.IsUpdateThread)
+                    syncContext?.Send(_ => ensureUpdateRealm(), null);
+                else
+                    syncContext?.Post(_ => ensureUpdateRealm(), null);
             }
         }
 

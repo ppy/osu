@@ -301,8 +301,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
-
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
         }
 
         private class SecondarySource : ISkin
@@ -314,8 +312,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public ISample GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
-
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => throw new NotImplementedException();
         }
 
         [Cached(typeof(ISkinSource))]

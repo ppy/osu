@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -111,6 +112,8 @@ namespace osu.Game.Tests.Visual
 
             public new ScreenStack ScreenStack => base.ScreenStack;
 
+            public RealmAccess Realm => Dependencies.Get<RealmAccess>();
+
             public new BackButton BackButton => base.BackButton;
 
             public new BeatmapManager BeatmapManager => base.BeatmapManager;
@@ -157,6 +160,14 @@ namespace osu.Game.Tests.Visual
                 API.Login("Rhythm Champion", "osu!");
 
                 Dependencies.Get<SessionStatics>().SetValue(Static.MutedAudioNotificationShownOnce, true);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                // when running in visual tests and the window loses focus, we generally don't want the game to pause.
+                ((Bindable<bool>)IsActive).Value = true;
             }
         }
 
