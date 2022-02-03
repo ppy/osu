@@ -126,6 +126,14 @@ namespace osu.Game.Screens.Select.Carousel
             mainFlow.DelayedLoadComplete += d => d.FadeInFromZero(500, Easing.OutQuint);
         }
 
+        protected override void ApplyStateFromChildChange()
+        {
+            base.ApplyStateFromChildChange();
+
+            if (Item.State.Value == CarouselItemState.Selected)
+                Scheduler.AddOnce(updateBeatmapDifficulties);
+        }
+
         protected override void Deselected()
         {
             base.Deselected();
@@ -141,14 +149,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             MovementContainer.MoveToX(-100, 500, Easing.OutExpo);
 
-            updateBeatmapDifficulties();
+            Scheduler.AddOnce(updateBeatmapDifficulties);
         }
 
         private void updateBeatmapDifficulties()
         {
-            var carouselBeatmapSet = (CarouselBeatmapSet)Item;
-
-            var visibleBeatmaps = carouselBeatmapSet.Children.Where(c => c.Visible).ToArray();
+            var visibleBeatmaps = ((CarouselBeatmapSet)Item).Children.Where(c => c.Visible).ToArray();
 
             // if we are already displaying all the correct beatmaps, only run animation updates.
             // note that the displayed beatmaps may change due to the applied filter.
