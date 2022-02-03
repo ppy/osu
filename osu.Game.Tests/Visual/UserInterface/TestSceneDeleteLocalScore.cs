@@ -128,21 +128,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                 scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
             });
 
-            leaderboard.Scores = null;
-            leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
-
             leaderboard.BeatmapInfo = beatmapInfo;
-            leaderboard.RefreshScores(); // Required in the case that the beatmap hasn't changed
+            leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
         });
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            // Ensure the leaderboard has finished async-loading drawables
-            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
-
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
+            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
         }
 
         [Test]

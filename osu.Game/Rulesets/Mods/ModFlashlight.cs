@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Restricted view area.";
 
         [SettingSource("Flashlight size", "Multiplier applied to the default flashlight size.")]
-        public abstract BindableNumber<float> SizeMultiplier { get; }
+        public abstract BindableFloat SizeMultiplier { get; }
 
         [SettingSource("Change size based on combo", "Decrease the flashlight size as combo increases.")]
         public abstract BindableBool ComboBasedSize { get; }

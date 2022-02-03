@@ -282,7 +282,7 @@ namespace osu.Game.Tests.Visual
                         Status = beatmap.Status,
                         Checksum = beatmap.MD5Hash,
                         AuthorID = beatmap.Metadata.Author.OnlineID,
-                        RulesetID = beatmap.RulesetID,
+                        RulesetID = beatmap.Ruleset.OnlineID,
                         StarRating = beatmap.StarRating,
                         DifficultyName = beatmap.DifficultyName,
                     }

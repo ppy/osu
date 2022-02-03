@@ -60,11 +60,9 @@ namespace osu.Game.Screens.Select.Carousel
             }
         }
 
-        protected DrawableCarouselItem()
+        protected DrawableCarouselItem(float headerHeight = MAX_HEIGHT)
         {
             RelativeSizeAxes = Axes.X;
-
-            Alpha = 0;
 
             InternalChildren = new Drawable[]
             {
@@ -73,29 +71,25 @@ namespace osu.Game.Screens.Select.Carousel
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        Header = new CarouselHeader(),
+                        Header = new CarouselHeader
+                        {
+                            Height = headerHeight,
+                        },
                         Content = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
+                            Y = headerHeight,
                         }
                     }
                 },
             };
         }
 
-        public void SetMultiplicativeAlpha(float alpha) => Header.BorderContainer.Alpha = alpha;
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             UpdateItem();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            Content.Y = Header.Height;
         }
 
         protected virtual void UpdateItem()
@@ -121,29 +115,56 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void onStateChange(ValueChangedEvent<bool> _) => Scheduler.AddOnce(ApplyState);
 
+        private CarouselItemState? lastAppliedState;
+
         protected virtual void ApplyState()
         {
-            // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
-            // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
-            Height = Item.TotalHeight;
-
             Debug.Assert(Item != null);
 
-            switch (Item.State.Value)
+            if (lastAppliedState != Item.State.Value)
             {
-                case CarouselItemState.NotSelected:
-                    Deselected();
-                    break;
+                lastAppliedState = Item.State.Value;
 
-                case CarouselItemState.Selected:
-                    Selected();
-                    break;
+                // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
+                // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
+                Height = Item.TotalHeight;
+
+                switch (lastAppliedState)
+                {
+                    case CarouselItemState.NotSelected:
+                        Deselected();
+                        break;
+
+                    case CarouselItemState.Selected:
+                        Selected();
+                        break;
+                }
             }
 
             if (!Item.Visible)
-                this.FadeOut(300, Easing.OutQuint);
+                Hide();
             else
-                this.FadeIn(250);
+                Show();
+        }
+
+        private bool isVisible = true;
+
+        public override void Show()
+        {
+            if (isVisible)
+                return;
+
+            isVisible = true;
+            this.FadeIn(250);
+        }
+
+        public override void Hide()
+        {
+            if (!isVisible)
+                return;
+
+            isVisible = false;
+            this.FadeOut(300, Easing.OutQuint);
         }
 
         protected virtual void Selected()

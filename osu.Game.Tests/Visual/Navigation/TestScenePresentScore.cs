@@ -16,6 +16,7 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.Navigation
 {
@@ -92,6 +93,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelect([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
@@ -102,6 +106,9 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestFromSongSelectDifferentRuleset([Values] ScorePresentType type)
         {
+            AddStep("enter song select", () => Game.ChildrenOfType<ButtonSystem>().Single().OnSolo.Invoke());
+            AddUntilStep("song select is current", () => Game.ScreenStack.CurrentScreen is PlaySongSelect songSelect && songSelect.BeatmapSetsLoaded);
+
             var firstImport = importScore(1);
             presentAndConfirm(firstImport, type);
 
