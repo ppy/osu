@@ -128,10 +128,10 @@ namespace osu.Game.Beatmaps
             foreach (var timingPoint in referenceBeatmap.Beatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
-            var createdBeatmapInfo = beatmapModelManager.AddDifficultyToBeatmapSet(beatmapSetInfo, newBeatmap);
+            beatmapModelManager.AddDifficultyToBeatmapSet(beatmapSetInfo, newBeatmap);
 
-            workingBeatmapCache.Invalidate(createdBeatmapInfo.BeatmapSet);
-            return GetWorkingBeatmap(createdBeatmapInfo);
+            workingBeatmapCache.Invalidate(beatmapSetInfo);
+            return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
         }
 
         // TODO: add back support for making a copy of another difficulty
