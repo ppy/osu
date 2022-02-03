@@ -215,8 +215,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         protected override void StartGameplay(int userId, SpectatorGameplayState spectatorGameplayState)
             => instances.Single(i => i.UserId == userId).LoadScore(spectatorGameplayState.Score);
 
-        protected override void EndGameplay(int userId)
+        protected override void EndGameplay(int userId, SpectatorState state)
         {
+            if (state.State == SpectatingUserState.Completed || state.State == SpectatingUserState.Failed)
+                return;
+
             RemoveUser(userId);
 
             var instance = instances.Single(i => i.UserId == userId);

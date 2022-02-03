@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
             scheduleStart(spectatorGameplayState);
         }
 
-        protected override void EndGameplay(int userId)
+        protected override void EndGameplay(int userId, SpectatorState state)
         {
             scheduledStart?.Cancel();
             immediateSpectatorGameplayState = null;
