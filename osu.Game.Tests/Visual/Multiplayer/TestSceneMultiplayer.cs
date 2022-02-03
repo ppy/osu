@@ -914,6 +914,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddUntilStep("wait for loading", () => client.Room?.State == MultiplayerRoomState.WaitingForLoad);
                 AddStep("set player loaded", () => client.ChangeUserState(1234, MultiplayerUserState.Loaded));
                 AddUntilStep("wait for gameplay to start", () => client.Room?.State == MultiplayerRoomState.Playing);
+                AddUntilStep("wait for local user to enter spectator", () => multiplayerComponents.CurrentScreen is MultiSpectatorScreen);
             }
         }
 
