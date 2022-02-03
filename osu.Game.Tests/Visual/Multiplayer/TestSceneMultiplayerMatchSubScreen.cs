@@ -15,8 +15,12 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Rulesets.Taiko.Mods;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
+using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Resources;
 
@@ -75,6 +79,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
             AddUntilStep("wait for join", () => RoomJoined);
+        }
+
+        [Test]
+        public void TestTaikoOnlyMod()
+        {
+            AddStep("add playlist item", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new TaikoRuleset().RulesetInfo },
+                    AllowedMods = { new TaikoModSwap() }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            AddStep("select swap mod", () => Client.ChangeUserMods(API.LocalUser.Value.OnlineID, new[] { new TaikoModSwap() }));
+            AddUntilStep("participant panel has mod", () => this.ChildrenOfType<ParticipantPanel>().Any(p => p.ChildrenOfType<ModIcon>().Any(m => m.Mod is TaikoModSwap)));
         }
 
         [Test]

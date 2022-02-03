@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
@@ -30,13 +32,17 @@ namespace osu.Game.Graphics.Cursor
         private DragRotationState dragRotationState;
         private Vector2 positionMouseDown;
 
+        private Sample tapSample;
+
         [BackgroundDependencyLoader(true)]
-        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
+        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager, AudioManager audio)
         {
             cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
 
             if (screenshotManager != null)
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
+
+            tapSample = audio.Samples.Get(@"UI/cursor-tap");
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -87,6 +93,8 @@ namespace osu.Game.Graphics.Cursor
                     dragRotationState = DragRotationState.DragStarted;
                     positionMouseDown = e.MousePosition;
                 }
+
+                playTapSample();
             }
 
             return base.OnMouseDown(e);
@@ -104,6 +112,9 @@ namespace osu.Game.Graphics.Cursor
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
                     dragRotationState = DragRotationState.NotDragging;
                 }
+
+                if (State.Value == Visibility.Visible)
+                    playTapSample(0.8);
             }
 
             base.OnMouseUp(e);
@@ -119,6 +130,18 @@ namespace osu.Game.Graphics.Cursor
         {
             activeCursor.FadeTo(0, 250, Easing.OutQuint);
             activeCursor.ScaleTo(0.6f, 250, Easing.In);
+        }
+
+        private void playTapSample(double baseFrequency = 1f)
+        {
+            const float random_range = 0.02f;
+            SampleChannel channel = tapSample.GetChannel();
+
+            // Scale to [-0.75, 0.75] so that the sample isn't fully panned left or right (sounds weird)
+            channel.Balance.Value = ((activeCursor.X / DrawWidth) * 2 - 1) * 0.75;
+            channel.Frequency.Value = baseFrequency - (random_range / 2f) + RNG.NextDouble(random_range);
+
+            channel.Play();
         }
 
         public class Cursor : Container
