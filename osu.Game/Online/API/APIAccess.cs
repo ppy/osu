@@ -399,7 +399,10 @@ namespace osu.Game.Online.API
             lock (queue)
             {
                 if (state.Value == APIState.Offline)
+                {
+                    request.Fail(new WebException("Disconnected from server"));
                     return;
+                }
 
                 queue.Enqueue(request);
             }
