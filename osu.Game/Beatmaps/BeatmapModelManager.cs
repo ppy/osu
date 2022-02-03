@@ -90,19 +90,6 @@ namespace osu.Game.Beatmaps
             WorkingBeatmapCache?.Invalidate(beatmapInfo);
         }
 
-        /// <summary>
-        /// Add a new difficulty to the beatmap set represented by the provided <see cref="BeatmapSetInfo"/>.
-        /// </summary>
-        public void AddDifficultyToBeatmapSet(BeatmapSetInfo beatmapSetInfo, Beatmap beatmap)
-        {
-            var beatmapInfo = beatmap.BeatmapInfo;
-
-            beatmapSetInfo.Beatmaps.Add(beatmapInfo);
-            beatmapInfo.BeatmapSet = beatmapSetInfo;
-
-            Save(beatmapInfo, beatmap);
-        }
-
         private static string getFilename(BeatmapInfo beatmapInfo)
         {
             var metadata = beatmapInfo.Metadata;
