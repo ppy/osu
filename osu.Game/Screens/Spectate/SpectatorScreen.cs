@@ -118,8 +118,8 @@ namespace osu.Game.Screens.Spectate
                     break;
 
                 case NotifyDictionaryChangedAction.Remove:
-                    foreach ((int userId, _) in e.OldItems.AsNonNull())
-                        onUserStateRemoved(userId);
+                    foreach ((int userId, SpectatorState state) in e.OldItems.AsNonNull())
+                        onUserStateRemoved(userId, state);
                     break;
             }
         }
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Spectate
             }
         }
 
-        private void onUserStateRemoved(int userId)
+        private void onUserStateRemoved(int userId, SpectatorState state)
         {
             if (!userMap.ContainsKey(userId))
                 return;
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Spectate
             gameplayState.Score.Replay.HasReceivedAllFrames = true;
 
             gameplayStates.Remove(userId);
-            Schedule(() => EndGameplay(userId));
+            Schedule(() => EndGameplay(userId, state));
         }
 
         private void updateGameplayState(int userId)
@@ -212,7 +212,8 @@ namespace osu.Game.Screens.Spectate
         /// Ends gameplay for a user.
         /// </summary>
         /// <param name="userId">The user to end gameplay for.</param>
-        protected abstract void EndGameplay(int userId);
+        /// <param name="state">The final user state.</param>
+        protected abstract void EndGameplay(int userId, SpectatorState state);
 
         /// <summary>
         /// Stops spectating a user.
@@ -220,7 +221,10 @@ namespace osu.Game.Screens.Spectate
         /// <param name="userId">The user to stop spectating.</param>
         protected void RemoveUser(int userId)
         {
-            onUserStateRemoved(userId);
+            if (!userStates.TryGetValue(userId, out var state))
+                return;
+
+            onUserStateRemoved(userId, state);
 
             users.Remove(userId);
             userMap.Remove(userId);
