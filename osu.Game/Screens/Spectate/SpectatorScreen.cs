@@ -112,6 +112,7 @@ namespace osu.Game.Screens.Spectate
             switch (e.Action)
             {
                 case NotifyDictionaryChangedAction.Add:
+                case NotifyDictionaryChangedAction.Replace:
                     foreach ((int userId, var state) in e.NewItems.AsNonNull())
                         onUserStateChanged(userId, state);
                     break;
@@ -119,11 +120,6 @@ namespace osu.Game.Screens.Spectate
                 case NotifyDictionaryChangedAction.Remove:
                     foreach ((int userId, _) in e.OldItems.AsNonNull())
                         onUserStateRemoved(userId);
-                    break;
-
-                case NotifyDictionaryChangedAction.Replace:
-                    foreach ((int userId, var state) in e.NewItems.AsNonNull())
-                        onUserStateChanged(userId, state);
                     break;
             }
         }
@@ -136,11 +132,18 @@ namespace osu.Game.Screens.Spectate
             if (!userMap.ContainsKey(userId))
                 return;
 
-            // Do nothing for failed/completed states.
-            if (newState.State == SpectatingUserState.Playing)
+            switch (newState.State)
             {
-                Schedule(() => OnUserStateChanged(userId, newState));
-                updateGameplayState(userId);
+                case SpectatingUserState.Completed:
+                    // Make sure that gameplay completes to the end.
+                    if (gameplayStates.TryGetValue(userId, out var gameplayState))
+                        gameplayState.Score.Replay.HasReceivedAllFrames = true;
+                    break;
+
+                case SpectatingUserState.Playing:
+                    Schedule(() => OnUserStateChanged(userId, newState));
+                    updateGameplayState(userId);
+                    break;
             }
         }
 
