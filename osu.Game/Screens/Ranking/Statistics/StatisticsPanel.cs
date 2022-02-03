@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -131,19 +132,34 @@ namespace osu.Game.Screens.Ranking.Statistics
                         }
                     };
 
-                    bool panelIsComplete = true;
+                    bool anyRequiredHitEvents = false;
 
                     foreach (var row in statisticRows)
                     {
-                        var columnsToDisplay = hitEventsAvailable
-                            ? row.Columns
-                            : row.Columns.Where(c => !c.RequiresHitEvents).ToArray();
+                        var columns = row.Columns;
 
-                        if (columnsToDisplay.Length < row.Columns.Length)
-                            panelIsComplete = false;
-
-                        if (columnsToDisplay.Length == 0)
+                        if (columns.Length == 0)
                             continue;
+
+                        var columnContent = new List<Drawable>();
+                        var dimensions = new List<Dimension>();
+
+                        foreach (var col in columns)
+                        {
+                            if (!hitEventsAvailable && col.RequiresHitEvents)
+                            {
+                                anyRequiredHitEvents = true;
+                                continue;
+                            }
+
+                            columnContent.Add(new StatisticContainer(col)
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                            });
+
+                            dimensions.Add(col.Dimension ?? new Dimension());
+                        }
 
                         rows.Add(new GridContainer
                         {
@@ -151,21 +167,13 @@ namespace osu.Game.Screens.Ranking.Statistics
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Content = new[]
-                            {
-                                columnsToDisplay?.Select(c => new StatisticContainer(c)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                }).Cast<Drawable>().ToArray()
-                            },
-                            ColumnDimensions = Enumerable.Range(0, columnsToDisplay.Length)
-                                                         .Select(i => columnsToDisplay[i].Dimension ?? new Dimension()).ToArray(),
+                            Content = new[] { columnContent.ToArray() },
+                            ColumnDimensions = dimensions.ToArray(),
                             RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         });
                     }
 
-                    if (!hitEventsAvailable && !panelIsComplete)
+                    if (anyRequiredHitEvents)
                     {
                         rows.Add(new FillFlowContainer
                         {
