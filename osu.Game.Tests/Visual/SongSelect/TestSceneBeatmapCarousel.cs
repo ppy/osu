@@ -42,6 +42,68 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestExternalRulesetChange()
+        {
+            createCarousel(new List<BeatmapSetInfo>());
+
+            AddStep("filter to ruleset 0", () => carousel.Filter(new FilterCriteria
+            {
+                Ruleset = rulesets.AvailableRulesets.ElementAt(0),
+                AllowConvertedBeatmaps = true,
+            }, false));
+
+            AddStep("add mixed ruleset beatmapset", () =>
+            {
+                var testMixed = TestResources.CreateTestBeatmapSetInfo(3);
+
+                for (int i = 0; i <= 2; i++)
+                {
+                    testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
+                }
+
+                carousel.UpdateBeatmapSet(testMixed);
+            });
+
+            AddUntilStep("wait for filtered difficulties", () =>
+            {
+                var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
+
+                return visibleBeatmapPanels.Length == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1;
+            });
+
+            AddStep("filter to ruleset 1", () => carousel.Filter(new FilterCriteria
+            {
+                Ruleset = rulesets.AvailableRulesets.ElementAt(1),
+                AllowConvertedBeatmaps = true,
+            }, false));
+
+            AddUntilStep("wait for filtered difficulties", () =>
+            {
+                var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
+
+                return visibleBeatmapPanels.Length == 2
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 1) == 1;
+            });
+
+            AddStep("filter to ruleset 2", () => carousel.Filter(new FilterCriteria
+            {
+                Ruleset = rulesets.AvailableRulesets.ElementAt(2),
+                AllowConvertedBeatmaps = true,
+            }, false));
+
+            AddUntilStep("wait for filtered difficulties", () =>
+            {
+                var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
+
+                return visibleBeatmapPanels.Length == 2
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 2) == 1;
+            });
+        }
+
+        [Test]
         public void TestScrollPositionMaintainedOnAdd()
         {
             loadBeatmaps(count: 1, randomDifficulties: false);
