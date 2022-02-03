@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 loadedTestBeatmaps = true;
-                loadBeatmapSets(value);
+                Schedule(() => loadBeatmapSets(value));
             }
         }
 
