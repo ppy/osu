@@ -44,7 +44,11 @@ namespace osu.Android
     {
         private static readonly string[] osu_url_schemes = { "osu", "osump" };
 
-        public ScreenOrientation ScreenOrientation = ScreenOrientation.Unspecified;
+        /// <summary>
+        /// The default screen orientation.
+        /// </summary>
+        /// <remarks>Adjusted on startup to match expected UX for the current device type (phone/tablet).</remarks>
+        public ScreenOrientation DefaultOrientation = ScreenOrientation.Unspecified;
 
         private OsuGameAndroid game;
 
@@ -72,7 +76,7 @@ namespace osu.Android
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             bool isTablet = smallestWidthDp >= 600f;
 
-            RequestedOrientation = ScreenOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+            RequestedOrientation = DefaultOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
         }
 
         protected override void OnNewIntent(Intent intent) => handleIntent(intent);
