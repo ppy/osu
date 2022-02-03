@@ -601,7 +601,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapSetInfo testMixed = null;
 
-            createCarousel();
+            createCarousel(new List<BeatmapSetInfo>());
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
@@ -765,21 +765,21 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             bool changed = false;
 
-            createCarousel(c =>
+            if (beatmapSets == null)
+            {
+                beatmapSets = new List<BeatmapSetInfo>();
+
+                for (int i = 1; i <= (count ?? set_count); i++)
+                {
+                    beatmapSets.Add(randomDifficulties
+                        ? TestResources.CreateTestBeatmapSetInfo()
+                        : TestResources.CreateTestBeatmapSetInfo(3));
+                }
+            }
+
+            createCarousel(beatmapSets, c =>
             {
                 carouselAdjust?.Invoke(c);
-
-                if (beatmapSets == null)
-                {
-                    beatmapSets = new List<BeatmapSetInfo>();
-
-                    for (int i = 1; i <= (count ?? set_count); i++)
-                    {
-                        beatmapSets.Add(randomDifficulties
-                            ? TestResources.CreateTestBeatmapSetInfo()
-                            : TestResources.CreateTestBeatmapSetInfo(3));
-                    }
-                }
 
                 carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
@@ -789,7 +789,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Wait for load", () => changed);
         }
 
-        private void createCarousel(Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
+        private void createCarousel(List<BeatmapSetInfo> beatmapSets, Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
         {
             AddStep("Create carousel", () =>
             {
@@ -802,6 +802,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 };
 
                 carouselAdjust?.Invoke(carousel);
+
+                carousel.BeatmapSets = beatmapSets;
 
                 (target ?? this).Child = carousel;
             });
