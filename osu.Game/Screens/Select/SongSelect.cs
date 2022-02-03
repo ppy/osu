@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Select
 
         private double audioFeedbackLastPlaybackTime;
 
-        private bool randomClicked;
+        private bool randomSelectionPending;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -321,12 +321,12 @@ namespace osu.Game.Screens.Select
             {
                 NextRandom = () =>
                 {
-                    randomClicked = true;
+                    randomSelectionPending = true;
                     Carousel.SelectNextRandom();
                 },
                 PreviousRandom = () =>
                 {
-                    randomClicked = true;
+                    randomSelectionPending = true;
                     Carousel.SelectPreviousRandom();
                 }
             }, null),
@@ -498,7 +498,7 @@ namespace osu.Game.Screens.Select
             {
                 if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
                 {
-                    if (randomClicked)
+                    if (randomSelectionPending)
                         sampleRandomBeatmap.Play();
                     else if (beatmap.BeatmapSet?.ID == beatmapInfoPrevious.BeatmapSet?.ID)
                         sampleChangeDifficulty.Play();
@@ -508,7 +508,7 @@ namespace osu.Game.Screens.Select
                     audioFeedbackLastPlaybackTime = Time.Current;
                 }
 
-                randomClicked = false;
+                randomSelectionPending = false;
                 beatmapInfoPrevious = beatmap;
             }
 
