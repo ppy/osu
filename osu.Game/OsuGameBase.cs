@@ -89,6 +89,12 @@ namespace osu.Game
             }
         }
 
+        /// <summary>
+        /// The <see cref="Edges"/> that the game should be drawn over at a top level.
+        /// Defaults to <see cref="Edges.None"/>.
+        /// </summary>
+        public virtual Edges SafeAreaOverrideEdges { get; set; }
+
         protected OsuConfigManager LocalConfig { get; private set; }
 
         protected SessionStatics SessionStatics { get; private set; }
@@ -301,7 +307,7 @@ namespace osu.Game
 
             base.Content.Add(new SafeAreaContainer
             {
-                SafeAreaOverrideEdges = Edges.Bottom,
+                SafeAreaOverrideEdges = SafeAreaOverrideEdges,
                 RelativeSizeAxes = Axes.Both,
                 Child = CreateScalingContainer().WithChildren(new Drawable[]
                 {
