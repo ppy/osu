@@ -126,6 +126,9 @@ namespace osu.Game.Screens.Select.Carousel
         /// </summary>
         protected virtual void ApplyStateFromChildrenChange()
         {
+            // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
+            // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
+            Height = Item.TotalHeight;
         }
 
         /// <summary>
@@ -138,10 +141,6 @@ namespace osu.Game.Screens.Select.Carousel
             if (lastAppliedState != Item.State.Value)
             {
                 lastAppliedState = Item.State.Value;
-
-                // Use the fact that we know the precise height of the item from the model to avoid the need for AutoSize overhead.
-                // Additionally, AutoSize doesn't work well due to content starting off-screen and being masked away.
-                Height = Item.TotalHeight;
 
                 switch (lastAppliedState)
                 {
