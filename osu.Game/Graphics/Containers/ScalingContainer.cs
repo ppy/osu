@@ -129,7 +129,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.LoadComplete();
 
-            Scheduler.AddOnce(updateSize);
+            updateSize();
             sizableContainer.FinishTransforms();
         }
 
