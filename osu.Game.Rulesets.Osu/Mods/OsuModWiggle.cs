@@ -31,15 +31,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             MaxValue = 2f,
             Precision = 0.1f
         };
-
-        [SettingSource("Duration", "Milliseconds per wiggle")]
-        public BindableInt WiggleDuration { get; } = new BindableInt(90)
-        {
-            MinValue = 40,
-            MaxValue = 300,
-            Precision = 5
-        };
-
         protected override void ApplyIncreasedVisibilityState(DrawableHitObject hitObject, ArmedState state) => drawableOnApplyCustomUpdateState(hitObject, state);
 
         protected override void ApplyNormalVisibilityState(DrawableHitObject hitObject, ArmedState state) => drawableOnApplyCustomUpdateState(hitObject, state);
@@ -57,18 +48,18 @@ namespace osu.Game.Rulesets.Osu.Mods
             Random objRand = new Random((int)osuObject.StartTime);
 
             // Wiggle all objects during TimePreempt
-            int amountWiggles = (int)osuObject.TimePreempt / WiggleDuration.Value;
+            int amountWiggles = (int)osuObject.TimePreempt / 70;
 
             void wiggle()
             {
                 float nextAngle = (float)(objRand.NextDouble() * 2 * Math.PI);
                 float nextDist = (float)(objRand.NextDouble() * WiggleStrength.Value * 7);
-                drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), WiggleDuration.Value);
+                drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), 70);
             }
 
             for (int i = 0; i < amountWiggles; i++)
             {
-                using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * WiggleDuration.Value))
+                using (drawable.BeginAbsoluteSequence(osuObject.StartTime - osuObject.TimePreempt + i * 70))
                     wiggle();
             }
 
@@ -76,11 +67,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!(osuObject is IHasDuration endTime))
                 return;
 
-            amountWiggles = (int)(endTime.Duration / WiggleDuration.Value);
+            amountWiggles = (int)(endTime.Duration / 70);
 
             for (int i = 0; i < amountWiggles; i++)
             {
-                using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * WiggleDuration.Value))
+                using (drawable.BeginAbsoluteSequence(osuObject.StartTime + i * 70))
                     wiggle();
             }
         }
