@@ -58,7 +58,16 @@ namespace osu.Game.Database
                      if (existing != null)
                          copyChangesToRealm(beatmap, existing);
                      else
-                         d.Beatmaps.Add(beatmap);
+                     {
+                         var newBeatmap = new BeatmapInfo
+                         {
+                             ID = beatmap.ID,
+                             BeatmapSet = d,
+                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)
+                         };
+                         d.Beatmaps.Add(newBeatmap);
+                         copyChangesToRealm(beatmap, newBeatmap);
+                     }
                  }
              });
 
