@@ -19,7 +19,7 @@ namespace osu.iOS
 
         protected override BatteryInfo CreateBatteryInfo() => new IOSBatteryInfo();
 
-        public override Edges SafeAreaOverrideEdges =>
+        protected override Edges SafeAreaOverrideEdges =>
             // iOS shows a home indicator at the bottom, and adds a safe area to account for this.
             // Because we have the home indicator (mostly) hidden we don't really care about drawing in this region.
             Edges.Bottom;
