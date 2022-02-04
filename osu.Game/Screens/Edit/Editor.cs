@@ -834,7 +834,7 @@ namespace osu.Game.Screens.Edit
         {
             var rulesetItems = new List<MenuItem>();
 
-            foreach (var ruleset in rulesets.AvailableRulesets.OrderBy(ruleset => ruleset.OnlineID))
+            foreach (var ruleset in rulesets.AvailableRulesets)
                 rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => CreateNewDifficulty(ruleset)));
 
             return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
