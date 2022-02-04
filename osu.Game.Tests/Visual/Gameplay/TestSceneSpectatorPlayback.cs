@@ -36,8 +36,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneSpectatorPlayback : OsuManualInputManagerTestScene
     {
-        protected override bool UseOnlineAPI => true;
-
         private TestRulesetInputManager playbackManager;
         private TestRulesetInputManager recordingManager;
 
