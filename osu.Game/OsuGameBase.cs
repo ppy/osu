@@ -89,6 +89,12 @@ namespace osu.Game
             }
         }
 
+        /// <summary>
+        /// The <see cref="Edges"/> that the game should be drawn over at a top level.
+        /// Defaults to <see cref="Edges.None"/>.
+        /// </summary>
+        protected virtual Edges SafeAreaOverrideEdges => Edges.None;
+
         protected OsuConfigManager LocalConfig { get; private set; }
 
         protected SessionStatics SessionStatics { get; private set; }
@@ -299,16 +305,23 @@ namespace osu.Game
 
             GlobalActionContainer globalBindings;
 
-            var mainContent = new Drawable[]
+            base.Content.Add(new SafeAreaContainer
             {
-                MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
-                // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                globalBindings = new GlobalActionContainer(this)
-            };
-
-            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
-
-            base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
+                SafeAreaOverrideEdges = SafeAreaOverrideEdges,
+                RelativeSizeAxes = Axes.Both,
+                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                {
+                    (MenuCursorContainer = new MenuCursorContainer
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }).WithChild(content = new OsuTooltipContainer(MenuCursorContainer.Cursor)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }),
+                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
+                    globalBindings = new GlobalActionContainer(this)
+                })
+            });
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);

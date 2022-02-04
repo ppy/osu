@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -106,7 +108,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 loadedTestBeatmaps = true;
-                loadBeatmapSets(value);
+                Schedule(() => loadBeatmapSets(value));
             }
         }
 
@@ -151,6 +153,11 @@ namespace osu.Game.Screens.Select
 
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
+        private Sample spinSample;
+        private Sample randomSelectSample;
+
+        private int visibleSetsCount;
+
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
@@ -169,8 +176,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, AudioManager audio)
         {
+            spinSample = audio.Samples.Get("SongSelect/random-spin");
+            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
+
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
@@ -419,6 +429,9 @@ namespace osu.Game.Screens.Select
                 return false;
 
             var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
+
+            visibleSetsCount = visibleSets.Count;
+
             if (!visibleSets.Any())
                 return false;
 
@@ -450,6 +463,9 @@ namespace osu.Game.Screens.Select
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
+            if (selectedBeatmapSet != null)
+                playSpinSample(distanceBetween(set, selectedBeatmapSet));
+
             select(set);
             return true;
         }
@@ -464,10 +480,25 @@ namespace osu.Game.Screens.Select
                 {
                     if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
                         previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
+
+                    if (selectedBeatmapSet != null)
+                        playSpinSample(distanceBetween(beatmap, selectedBeatmapSet));
+
                     select(beatmap);
                     break;
                 }
             }
+        }
+
+        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / DrawableCarouselItem.MAX_HEIGHT);
+
+        private void playSpinSample(double distance)
+        {
+            var chan = spinSample.GetChannel();
+            chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
+            chan.Play();
+
+            randomSelectSample?.Play();
         }
 
         private void select(CarouselItem item)
