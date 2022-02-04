@@ -29,11 +29,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             // Usually this would be placed between the host and the game, but that's a bit of a pain to do with the test scene hierarchy.
 
             // Add is required for the container to get a size (and give out correct metrics to the usages in SafeAreaContainer).
-            Add(
-                safeAreaContainer = new SafeAreaDefiningContainer(safeArea = new BindableSafeArea())
-                {
-                    RelativeSizeAxes = Axes.Both
-                });
+            Add(safeAreaContainer = new SafeAreaDefiningContainer(safeArea = new BindableSafeArea())
+            {
+                RelativeSizeAxes = Axes.Both
+            });
 
             // Cache is required for the test game to see the safe area.
             Dependencies.CacheAs<ISafeArea>(safeAreaContainer);
