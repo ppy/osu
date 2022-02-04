@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -40,11 +39,7 @@ namespace osu.Game.Tests.Visual.Spectator
 
         public TestSpectatorClient()
         {
-            OnNewFrames += (i, bundle) =>
-            {
-                if (PlayingUsers.Contains(i))
-                    lastReceivedUserFrames[i] = bundle.Frames[^1];
-            };
+            OnNewFrames += (i, bundle) => lastReceivedUserFrames[i] = bundle.Frames[^1];
         }
 
         /// <summary>
@@ -65,7 +60,7 @@ namespace osu.Game.Tests.Visual.Spectator
         /// <param name="userId">The user to end play for.</param>
         public void EndPlay(int userId)
         {
-            if (!PlayingUsers.Contains(userId))
+            if (!userBeatmapDictionary.ContainsKey(userId))
                 return;
 
             ((ISpectatorClient)this).UserFinishedPlaying(userId, new SpectatorState
@@ -73,6 +68,8 @@ namespace osu.Game.Tests.Visual.Spectator
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
             });
+
+            userBeatmapDictionary.Remove(userId);
         }
 
         public new void Schedule(Action action) => base.Schedule(action);
@@ -131,7 +128,7 @@ namespace osu.Game.Tests.Visual.Spectator
         protected override Task WatchUserInternal(int userId)
         {
             // When newly watching a user, the server sends the playing state immediately.
-            if (PlayingUsers.Contains(userId))
+            if (userBeatmapDictionary.ContainsKey(userId))
                 sendPlayingState(userId);
 
             return Task.CompletedTask;
