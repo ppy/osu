@@ -301,6 +301,7 @@ namespace osu.Game
 
             base.Content.Add(new SafeAreaContainer
             {
+                SafeAreaOverrideEdges = Edges.Bottom,
                 RelativeSizeAxes = Axes.Both,
                 Child = CreateScalingContainer().WithChildren(new Drawable[]
                 {
