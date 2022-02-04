@@ -93,7 +93,7 @@ namespace osu.Game
         /// The <see cref="Edges"/> that the game should be drawn over at a top level.
         /// Defaults to <see cref="Edges.None"/>.
         /// </summary>
-        public virtual Edges SafeAreaOverrideEdges { get; set; }
+        protected virtual Edges SafeAreaOverrideEdges => Edges.None;
 
         protected OsuConfigManager LocalConfig { get; private set; }
 
