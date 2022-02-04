@@ -53,6 +53,9 @@ namespace osu.Game.Overlays
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        [Resolved]
         private RealmAccess realm { get; set; }
 
         [BackgroundDependencyLoader]
@@ -389,11 +392,14 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
+            audioManager.TrackMixer.Effects.Clear();
 
             if (allowTrackAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
+                foreach (var mod in mods.Value.OfType<IApplicableToTrackMixer>())
+                    mod.ApplyToTrackMixer(audioManager.TrackMixer);
             }
         }
     }

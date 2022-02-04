@@ -101,6 +101,9 @@ namespace osu.Game.Screens.Play
         private MusicController musicController { get; set; }
 
         [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        [Resolved]
         private SpectatorClient spectatorClient { get; set; }
 
         public GameplayState GameplayState { get; private set; }
@@ -960,6 +963,8 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(musicController.CurrentTrack);
+            foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrackMixer>())
+                mod.ApplyToTrackMixer(audioManager.TrackMixer);
 
             updateGameplayState();
 
