@@ -101,6 +101,9 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        [Resolved]
+        private ISafeArea safeArea { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -118,6 +121,8 @@ namespace osu.Game.Graphics.Containers
 
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
             posY.ValueChanged += _ => updateSize();
+
+            safeArea.SafeAreaPadding.BindValueChanged(_ => updateSize());
         }
 
         protected override void LoadComplete()
@@ -161,7 +166,10 @@ namespace osu.Game.Graphics.Containers
 
             var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
             var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
-            bool requiresMasking = scaling && targetSize != Vector2.One;
+            bool requiresMasking = scaling && targetSize != Vector2.One
+                                   // For the top level scaling container, for now we apply masking if safe areas are in use.
+                                   // In the future this can likely be removed as more of the actual UI supports overflowing into the safe areas.
+                                   || (targetMode == ScalingMode.Everything && safeArea.SafeAreaPadding.Value.Total != Vector2.Zero);
 
             if (requiresMasking)
                 sizableContainer.Masking = true;
