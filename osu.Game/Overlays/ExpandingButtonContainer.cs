@@ -1,17 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Graphics.UserInterface;
-
 namespace osu.Game.Overlays
 {
     /// <summary>
-    /// An <see cref="ExpandingControlContainer{TControl}"/> with a long hover expansion delay for buttons.
+    /// An <see cref="ExpandingContainer"/> with a long hover expansion delay.
     /// </summary>
     /// <remarks>
     /// Mostly used for buttons with explanatory labels, in which the label would display after a "long hover".
     /// </remarks>
-    public class ExpandingButtonContainer : ExpandingControlContainer<OsuButton>
+    public class ExpandingButtonContainer : ExpandingContainer
     {
         protected ExpandingButtonContainer(float contractedWidth, float expandedWidth)
             : base(contractedWidth, expandedWidth)
