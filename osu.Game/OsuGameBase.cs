@@ -299,16 +299,22 @@ namespace osu.Game
 
             GlobalActionContainer globalBindings;
 
-            var mainContent = new Drawable[]
+            base.Content.Add(new SafeAreaContainer
             {
-                MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
-                // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                globalBindings = new GlobalActionContainer(this)
-            };
-
-            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
-
-            base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
+                RelativeSizeAxes = Axes.Both,
+                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                {
+                    (MenuCursorContainer = new MenuCursorContainer
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }).WithChild(content = new OsuTooltipContainer(MenuCursorContainer.Cursor)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }),
+                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
+                    globalBindings = new GlobalActionContainer(this)
+                })
+            });
 
             KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
