@@ -154,6 +154,7 @@ namespace osu.Game.Screens.Select
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
         private Sample spinSample;
+        private Sample randomSelectSample;
 
         private int visibleSetsCount;
 
@@ -178,6 +179,7 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config, AudioManager audio)
         {
             spinSample = audio.Samples.Get("SongSelect/random-spin");
+            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
@@ -495,6 +497,8 @@ namespace osu.Game.Screens.Select
             var chan = spinSample.GetChannel();
             chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
             chan.Play();
+
+            randomSelectSample?.Play();
         }
 
         private void select(CarouselItem item)

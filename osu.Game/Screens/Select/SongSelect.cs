@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Select
 
         private Sample sampleChangeDifficulty;
         private Sample sampleChangeBeatmap;
-        private Sample sampleRandomBeatmap;
 
         private Container carouselContainer;
 
@@ -109,8 +108,6 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         private double audioFeedbackLastPlaybackTime;
-
-        private bool randomSelectionPending;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -291,7 +288,6 @@ namespace osu.Game.Screens.Select
 
             sampleChangeDifficulty = audio.Samples.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Samples.Get(@"SongSelect/select-expand");
-            sampleRandomBeatmap = audio.Samples.Get(@"SongSelect/select-random");
             SampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
 
             if (dialogOverlay != null)
@@ -319,16 +315,8 @@ namespace osu.Game.Screens.Select
             (new FooterButtonMods { Current = Mods }, ModSelect),
             (new FooterButtonRandom
             {
-                NextRandom = () =>
-                {
-                    randomSelectionPending = true;
-                    Carousel.SelectNextRandom();
-                },
-                PreviousRandom = () =>
-                {
-                    randomSelectionPending = true;
-                    Carousel.SelectPreviousRandom();
-                }
+                NextRandom = () => Carousel.SelectNextRandom(),
+                PreviousRandom = Carousel.SelectPreviousRandom
             }, null),
             (new FooterButtonOptions(), BeatmapOptions)
         };
@@ -498,9 +486,7 @@ namespace osu.Game.Screens.Select
             {
                 if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
                 {
-                    if (randomSelectionPending)
-                        sampleRandomBeatmap.Play();
-                    else if (beatmap.BeatmapSet?.ID == beatmapInfoPrevious.BeatmapSet?.ID)
+                    if (beatmap.BeatmapSet?.ID == beatmapInfoPrevious.BeatmapSet?.ID)
                         sampleChangeDifficulty.Play();
                     else
                         sampleChangeBeatmap.Play();
@@ -508,7 +494,6 @@ namespace osu.Game.Screens.Select
                     audioFeedbackLastPlaybackTime = Time.Current;
                 }
 
-                randomSelectionPending = false;
                 beatmapInfoPrevious = beatmap;
             }
 
