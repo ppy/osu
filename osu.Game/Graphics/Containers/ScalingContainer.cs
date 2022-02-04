@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Containers
                     return;
 
                 allowScaling = value;
-                if (IsLoaded) updateSize();
+                if (IsLoaded) Scheduler.AddOnce(updateSize);
             }
         }
 
@@ -107,29 +107,29 @@ namespace osu.Game.Graphics.Containers
         private void load(OsuConfigManager config, ISafeArea safeArea)
         {
             scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
-            scalingMode.ValueChanged += _ => updateSize();
+            scalingMode.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
-            sizeX.ValueChanged += _ => updateSize();
+            sizeX.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
-            sizeY.ValueChanged += _ => updateSize();
+            sizeY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
-            posX.ValueChanged += _ => updateSize();
+            posX.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
-            posY.ValueChanged += _ => updateSize();
+            posY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
-            safeAreaPadding.BindValueChanged(_ => updateSize());
+            safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            updateSize();
+            Scheduler.AddOnce(updateSize);
             sizableContainer.FinishTransforms();
         }
 
