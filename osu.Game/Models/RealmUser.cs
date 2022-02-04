@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Database;
 using osu.Game.Users;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Models
 {
-    public class RealmUser : EmbeddedObject, IUser, IEquatable<RealmUser>
+    public class RealmUser : EmbeddedObject, IUser, IEquatable<RealmUser>, IDeepCloneable<RealmUser>
     {
         public int OnlineID { get; set; } = 1;
 
@@ -22,5 +24,7 @@ namespace osu.Game.Models
 
             return OnlineID == other.OnlineID && Username == other.Username;
         }
+
+        public RealmUser DeepClone() => (RealmUser)this.Detach().MemberwiseClone();
     }
 }
