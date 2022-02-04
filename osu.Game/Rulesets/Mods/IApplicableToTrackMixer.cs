@@ -6,7 +6,7 @@ using osu.Framework.Audio.Mixing;
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// An interface for mods that add effects to an <see cref="AudioMixer"/>
+    /// An interface for mods that add effects to the track mixer.
     /// </summary>
     public interface IApplicableToTrackMixer : IApplicableMod
     {
