@@ -1,20 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneExpandingControlContainer : OsuManualInputManagerTestScene
+    public class TestSceneExpandingContainer : OsuManualInputManagerTestScene
     {
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
@@ -84,42 +80,20 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// Tests hovering over controls expands the parenting container appropriately and does not contract until hover is lost from container.
+        /// Tests hovering expands the container and does not contract until hover is lost.
         /// </summary>
         [Test]
-        public void TestHoveringControlExpandsContainer()
+        public void TestHoveringExpandsContainer()
         {
             AddAssert("ensure container contracted", () => !container.Expanded.Value);
 
-            AddStep("hover slider", () => InputManager.MoveMouseTo(slider1));
+            AddStep("hover container", () => InputManager.MoveMouseTo(container));
             AddAssert("container expanded", () => container.Expanded.Value);
             AddAssert("controls expanded", () => slider1.Expanded.Value && slider2.Expanded.Value);
-
-            AddStep("hover group top", () => InputManager.MoveMouseTo(toolboxGroup.ScreenSpaceDrawQuad.TopLeft + new Vector2(5)));
-            AddAssert("container still expanded", () => container.Expanded.Value);
-            AddAssert("controls still expanded", () => slider1.Expanded.Value && slider2.Expanded.Value);
 
             AddStep("hover away", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("container contracted", () => !container.Expanded.Value);
             AddAssert("controls contracted", () => !slider1.Expanded.Value && !slider2.Expanded.Value);
-        }
-
-        /// <summary>
-        /// Tests dragging a UI control (e.g. <see cref="OsuSliderBar{T}"/>) outside its parenting container does not contract it until dragging is finished.
-        /// </summary>
-        [Test]
-        public void TestDraggingControlOutsideDoesntContractContainer()
-        {
-            AddStep("hover slider", () => InputManager.MoveMouseTo(slider1));
-            AddAssert("container expanded", () => container.Expanded.Value);
-
-            AddStep("hover slider nub", () => InputManager.MoveMouseTo(slider1.ChildrenOfType<Nub>().Single()));
-            AddStep("hold slider nub", () => InputManager.PressButton(MouseButton.Left));
-            AddStep("drag outside container", () => InputManager.MoveMouseTo(Vector2.Zero));
-            AddAssert("container still expanded", () => container.Expanded.Value);
-
-            AddStep("release slider nub", () => InputManager.ReleaseButton(MouseButton.Left));
-            AddAssert("container contracted", () => !container.Expanded.Value);
         }
 
         /// <summary>
@@ -157,21 +131,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         /// <summary>
-        /// Tests expanding a container via <see cref="ExpandingControlContainer{TControl}.Expanded"/> does not get contracted by losing hover.
+        /// Tests expanding a container via <see cref="ExpandingContainer.Expanded"/> does not get contracted by losing hover.
         /// </summary>
         [Test]
         public void TestExpandingContainerDoesntGetContractedByHover()
         {
             AddStep("expand container", () => container.Expanded.Value = true);
 
-            AddStep("hover control", () => InputManager.MoveMouseTo(slider1));
+            AddStep("hover container", () => InputManager.MoveMouseTo(container));
             AddAssert("container still expanded", () => container.Expanded.Value);
 
             AddStep("hover away", () => InputManager.MoveMouseTo(Vector2.Zero));
             AddAssert("container still expanded", () => container.Expanded.Value);
         }
 
-        private class TestExpandingContainer : ExpandingControlContainer<IExpandableControl>
+        private class TestExpandingContainer : ExpandingContainer
         {
             public TestExpandingContainer()
                 : base(120, 250)

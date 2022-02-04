@@ -17,7 +17,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
     /// </summary>
-    public class ExpandableSlider<T, TSlider> : CompositeDrawable, IExpandableControl, IHasCurrentValue<T>
+    public class ExpandableSlider<T, TSlider> : CompositeDrawable, IExpandable, IHasCurrentValue<T>
         where T : struct, IEquatable<T>, IComparable<T>, IConvertible
         where TSlider : OsuSliderBar<T>, new()
     {
@@ -71,8 +71,6 @@ namespace osu.Game.Overlays
         }
 
         public BindableBool Expanded { get; } = new BindableBool();
-
-        bool IExpandable.ShouldBeExpanded => IsHovered || slider.IsDragged;
 
         public override bool HandlePositionalInput => true;
 
