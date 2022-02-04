@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Carousel
                     if (item is CarouselGroup group)
                     {
                         foreach (var c in group.Children)
-                            c.Filtered.ValueChanged -= onChildStateChanged;
+                            c.Filtered.ValueChanged -= onChildrenChanged;
                     }
                 }
 
@@ -107,22 +107,24 @@ namespace osu.Game.Screens.Select.Carousel
             if (Item is CarouselGroup group)
             {
                 foreach (var c in group.Children)
-                    c.Filtered.ValueChanged += onChildStateChanged;
+                    c.Filtered.ValueChanged += onChildrenChanged;
             }
+
+            Scheduler.AddOnce(ApplyStateFromChildrenChange);
         }
 
         private void onStateChange(ValueChangedEvent<CarouselItemState> obj) => Scheduler.AddOnce(ApplyState);
 
         private void onStateChange(ValueChangedEvent<bool> _) => Scheduler.AddOnce(ApplyState);
 
-        private void onChildStateChanged(ValueChangedEvent<bool> _) => Scheduler.AddOnce(ApplyStateFromChildChange);
+        private void onChildrenChanged(ValueChangedEvent<bool> _) => Scheduler.AddOnce(ApplyStateFromChildrenChange);
 
         private CarouselItemState? lastAppliedState;
 
         /// <summary>
         /// If <see cref="Item"/> is a <see cref="CarouselGroup"/>, will fire whenever a child's <see cref="CarouselItem.Filtered"/> state changes.
         /// </summary>
-        protected virtual void ApplyStateFromChildChange()
+        protected virtual void ApplyStateFromChildrenChange()
         {
         }
 

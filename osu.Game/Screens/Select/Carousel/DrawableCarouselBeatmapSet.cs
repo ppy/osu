@@ -126,9 +126,9 @@ namespace osu.Game.Screens.Select.Carousel
             mainFlow.DelayedLoadComplete += d => d.FadeInFromZero(500, Easing.OutQuint);
         }
 
-        protected override void ApplyStateFromChildChange()
+        protected override void ApplyStateFromChildrenChange()
         {
-            base.ApplyStateFromChildChange();
+            base.ApplyStateFromChildrenChange();
 
             if (Item.State.Value == CarouselItemState.Selected)
                 Scheduler.AddOnce(updateBeatmapDifficulties);
