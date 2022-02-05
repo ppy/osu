@@ -7,6 +7,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -53,12 +54,11 @@ namespace osu.Game.Overlays
         public DrawableTrack CurrentTrack { get; private set; } = new DrawableTrack(new TrackVirtual(1000));
 
         [Resolved]
-        private AudioManager audioManager { get; set; }
-
-        [Resolved]
         private RealmAccess realm { get; set; }
 
         private readonly DrawableAudioMixer drawableAudioMixer;
+
+        public IAudioMixer AudioMixer => drawableAudioMixer;
 
         public MusicController()
         {
