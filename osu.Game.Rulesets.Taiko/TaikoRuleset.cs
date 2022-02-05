@@ -224,6 +224,17 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
                         new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
                             new UnstableRate(timedHitEvents)
