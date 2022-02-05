@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -105,6 +106,25 @@ namespace osu.Game.Rulesets.Scoring
                 MaxHits = JudgedHits;
 
             JudgedHits = 0;
+        }
+
+        /// <summary>
+        /// Reset all statistics based on header information contained within a replay frame.
+        /// </summary>
+        /// <remarks>
+        /// If the provided replay frame does not have any header information, this will be a noop.
+        /// </remarks>
+        /// <param name="ruleset">The ruleset to be used for retrieving statistics.</param>
+        /// <param name="frame">The replay frame to read header statistics from.</param>
+        public virtual void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
+        {
+            if (frame.Header == null)
+                return;
+
+            JudgedHits = 0;
+
+            foreach ((_, int count) in frame.Header.Statistics)
+                JudgedHits += count;
         }
 
         /// <summary>

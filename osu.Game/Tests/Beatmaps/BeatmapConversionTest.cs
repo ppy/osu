@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Beatmaps
                 var beatmap = decoder.Decode(stream);
 
                 var rulesetInstance = CreateRuleset();
-                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
+                beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.Ruleset.OnlineID == rulesetInstance.RulesetInfo.OnlineID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
                 return beatmap;
             }

@@ -25,21 +25,21 @@ namespace osu.Game.Scoring
 {
     public class ScoreManager : IModelManager<ScoreInfo>, IModelImporter<ScoreInfo>
     {
-        private readonly RealmContextFactory contextFactory;
+        private readonly RealmAccess realm;
         private readonly Scheduler scheduler;
         private readonly Func<BeatmapDifficultyCache> difficulties;
         private readonly OsuConfigManager configManager;
         private readonly ScoreModelManager scoreModelManager;
 
-        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmContextFactory contextFactory, Scheduler scheduler,
-                            IIpcHost importHost = null, Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
+        public ScoreManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm, Scheduler scheduler,
+                            Func<BeatmapDifficultyCache> difficulties = null, OsuConfigManager configManager = null)
         {
-            this.contextFactory = contextFactory;
+            this.realm = realm;
             this.scheduler = scheduler;
             this.difficulties = difficulties;
             this.configManager = configManager;
 
-            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, contextFactory);
+            scoreModelManager = new ScoreModelManager(rulesets, beatmaps, storage, realm);
         }
 
         public Score GetScore(ScoreInfo score) => scoreModelManager.GetScore(score);
@@ -51,7 +51,7 @@ namespace osu.Game.Scoring
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query)
         {
-            return contextFactory.Run(realm => realm.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
+            return realm.Run(r => r.All<ScoreInfo>().FirstOrDefault(query)?.Detach());
         }
 
         /// <summary>
@@ -254,15 +254,24 @@ namespace osu.Game.Scoring
 
         public void Delete([CanBeNull] Expression<Func<ScoreInfo, bool>> filter = null, bool silent = false)
         {
-            contextFactory.Run(realm =>
+            realm.Run(r =>
             {
-                var items = realm.All<ScoreInfo>()
-                                 .Where(s => !s.DeletePending);
+                var items = r.All<ScoreInfo>()
+                             .Where(s => !s.DeletePending);
 
                 if (filter != null)
                     items = items.Where(filter);
 
                 scoreModelManager.Delete(items.ToList(), silent);
+            });
+        }
+
+        public void Delete(BeatmapInfo beatmap, bool silent = false)
+        {
+            realm.Run(r =>
+            {
+                var beatmapScores = r.Find<BeatmapInfo>(beatmap.ID).Scores.ToList();
+                scoreModelManager.Delete(beatmapScores, silent);
             });
         }
 
@@ -293,22 +302,22 @@ namespace osu.Game.Scoring
 
         public IEnumerable<string> HandledExtensions => scoreModelManager.HandledExtensions;
 
-        public Task<IEnumerable<ILive<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<Live<ScoreInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return scoreModelManager.Import(notification, tasks);
         }
 
-        public Task<ILive<ScoreInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<ScoreInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<ScoreInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<ScoreInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<ScoreInfo>> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Live<ScoreInfo> Import(ScoreInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return scoreModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
@@ -322,7 +331,7 @@ namespace osu.Game.Scoring
 
         #region Implementation of IPresentImports<ScoreInfo>
 
-        public Action<IEnumerable<ILive<ScoreInfo>>> PostImport
+        public Action<IEnumerable<Live<ScoreInfo>>> PostImport
         {
             set => scoreModelManager.PostImport = value;
         }

@@ -30,7 +30,7 @@ namespace osu.Game.Online.Rooms
         protected override bool RequiresChildrenUpdate => true;
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; } = null!;
+        private RealmAccess realm { get; set; } = null!;
 
         /// <summary>
         /// The availability state of the currently selected playlist item.
@@ -78,7 +78,7 @@ namespace osu.Game.Online.Rooms
 
                 // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
                 realmSubscription?.Dispose();
-                realmSubscription = filteredBeatmaps().QueryAsyncWithNotifications((items, changes, ___) =>
+                realmSubscription = realm.RegisterForNotifications(r => filteredBeatmaps(), (items, changes, ___) =>
                 {
                     if (changes == null)
                         return;
@@ -128,9 +128,9 @@ namespace osu.Game.Online.Rooms
             int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
             string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
 
-            return realmContextFactory.Context
-                                      .All<BeatmapInfo>()
-                                      .Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", onlineId, checksum);
+            return realm.Realm
+                        .All<BeatmapInfo>()
+                        .Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", onlineId, checksum);
         }
 
         protected override void Dispose(bool isDisposing)

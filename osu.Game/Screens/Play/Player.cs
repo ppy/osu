@@ -45,6 +45,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double RESULTS_DISPLAY_DELAY = 1000.0;
 
+        /// <summary>
+        /// Raised after <see cref="StartGameplay"/> is called.
+        /// </summary>
+        public event Action OnGameplayStarted;
+
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -165,6 +170,7 @@ namespace osu.Game.Screens.Play
             PrepareReplay();
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
+            ScoreProcessor.OnResetFromReplayFrame += () => ScoreProcessor.PopulateScore(Score.ScoreInfo);
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
@@ -245,7 +251,7 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(),
-                        createGameplayComponents(Beatmap.Value, playableBeatmap)
+                        createGameplayComponents(Beatmap.Value)
                     }
                 },
                 FailOverlay = new FailOverlay
@@ -358,7 +364,7 @@ namespace osu.Game.Screens.Play
         private Drawable createUnderlayComponents() =>
             DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
@@ -958,7 +964,9 @@ namespace osu.Game.Screens.Play
             updateGameplayState();
 
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
             StartGameplay();
+            OnGameplayStarted?.Invoke();
         }
 
         /// <summary>
@@ -1024,11 +1032,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual async Task ImportScore(Score score)
+        protected virtual Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return;
+                return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;
 
@@ -1048,7 +1056,7 @@ namespace osu.Game.Screens.Play
             // conflicts across various systems (ie. solo and multiplayer).
             importableScore.OnlineID = -1;
 
-            var imported = await scoreManager.Import(importableScore, replayReader).ConfigureAwait(false);
+            var imported = scoreManager.Import(importableScore, replayReader);
 
             imported.PerformRead(s =>
             {
@@ -1056,6 +1064,8 @@ namespace osu.Game.Screens.Play
                 score.ScoreInfo.Hash = s.Hash;
                 score.ScoreInfo.ID = s.ID;
             });
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

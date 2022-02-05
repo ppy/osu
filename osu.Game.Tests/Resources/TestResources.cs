@@ -80,7 +80,10 @@ namespace osu.Game.Tests.Resources
         public static BeatmapSetInfo CreateTestBeatmapSetInfo(int? difficultyCount = null, RulesetInfo[] rulesets = null)
         {
             int j = 0;
-            RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length] ?? new OsuRuleset().RulesetInfo;
+
+            rulesets ??= new[] { new OsuRuleset().RulesetInfo };
+
+            RulesetInfo getRuleset() => rulesets?[j++ % rulesets.Length];
 
             int setId = Interlocked.Increment(ref importId);
 

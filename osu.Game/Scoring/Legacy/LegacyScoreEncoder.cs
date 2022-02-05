@@ -34,7 +34,7 @@ namespace osu.Game.Scoring.Legacy
             this.score = score;
             this.beatmap = beatmap;
 
-            if (score.ScoreInfo.BeatmapInfo.RulesetID < 0 || score.ScoreInfo.BeatmapInfo.RulesetID > 3)
+            if (score.ScoreInfo.BeatmapInfo.Ruleset.OnlineID < 0 || score.ScoreInfo.BeatmapInfo.Ruleset.OnlineID > 3)
                 throw new ArgumentException("Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 
