@@ -2,21 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
 {
-    public class PerformanceStatistic : StatisticDisplay, IHasCustomTooltip<PerformanceBreakdown>
+    public class PerformanceStatistic : StatisticDisplay
     {
         private readonly ScoreInfo score;
 
@@ -26,15 +22,6 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
 
         private RollingCounter<int> counter;
 
-        [Resolved]
-        private ScorePerformanceCache performanceCache { get; set; }
-
-        [Resolved]
-        private BeatmapDifficultyCache difficultyCache { get; set; }
-
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
         public PerformanceStatistic(ScoreInfo score)
             : base("PP")
         {
@@ -42,21 +29,23 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ScorePerformanceCache performanceCache)
         {
-            new PerformanceBreakdownCalculator(beatmapManager, difficultyCache, performanceCache)
-                .CalculateAsync(score, cancellationTokenSource.Token)
-                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
+            if (score.PP.HasValue)
+            {
+                setPerformanceValue(score.PP.Value);
+            }
+            else
+            {
+                performanceCache.CalculatePerformanceAsync(score, cancellationTokenSource.Token)
+                                .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely().Total)), cancellationTokenSource.Token);
+            }
         }
 
-        private void setPerformanceValue(PerformanceBreakdown breakdown)
+        private void setPerformanceValue(double? pp)
         {
-            // Don't display the tooltip if "Total" is the only item
-            if (breakdown != null && breakdown.Performance.GetAttributesForDisplay().Count() > 1)
-            {
-                TooltipContent = breakdown;
-                performance.Value = (int)Math.Round(breakdown.Performance.Total, MidpointRounding.AwayFromZero);
-            }
+            if (pp.HasValue)
+                performance.Value = (int)Math.Round(pp.Value, MidpointRounding.AwayFromZero);
         }
 
         public override void Appear()
@@ -76,9 +65,5 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
             Anchor = Anchor.TopCentre,
             Origin = Anchor.TopCentre
         };
-
-        public ITooltip<PerformanceBreakdown> GetCustomTooltip() => new PerformanceStatisticTooltip();
-
-        public PerformanceBreakdown TooltipContent { get; private set; }
     }
 }
