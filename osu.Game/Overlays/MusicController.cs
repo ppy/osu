@@ -393,7 +393,6 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
             audioManager.TrackMixer.Effects.Clear();
-            audioManager.SampleMixer.Effects.Clear();
 
             if (allowTrackAdjustments)
             {
@@ -401,8 +400,6 @@ namespace osu.Game.Overlays
                     mod.ApplyToTrack(CurrentTrack);
                 foreach (var mod in mods.Value.OfType<IApplicableToTrackMixer>())
                     mod.ApplyToTrackMixer(audioManager.TrackMixer);
-                foreach (var mod in mods.Value.OfType<IApplicableToSampleMixer>())
-                    mod.ApplyToSampleMixer(audioManager.SampleMixer);
             }
         }
     }
