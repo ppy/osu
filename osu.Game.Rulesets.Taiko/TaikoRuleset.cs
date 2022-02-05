@@ -213,22 +213,22 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250
-                        }, true),
+                            AutoSizeAxes = Axes.Y
+                        }),
                     }
                 },
                 new StatisticRow
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }),
+                            Height = 250
+                        }, true),
                     }
                 },
                 new StatisticRow
