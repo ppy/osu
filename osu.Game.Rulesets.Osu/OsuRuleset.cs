@@ -301,7 +301,7 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score)
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y

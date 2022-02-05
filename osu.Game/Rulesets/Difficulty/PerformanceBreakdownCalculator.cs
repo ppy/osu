@@ -16,13 +16,13 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public class PerformanceBreakdownCalculator
     {
-        private readonly BeatmapManager beatmapManager;
+        private readonly IBeatmap playableBeatmap;
         private readonly BeatmapDifficultyCache difficultyCache;
         private readonly ScorePerformanceCache performanceCache;
 
-        public PerformanceBreakdownCalculator(BeatmapManager beatmapManager, BeatmapDifficultyCache difficultyCache, ScorePerformanceCache performanceCache)
+        public PerformanceBreakdownCalculator(IBeatmap playableBeatmap, BeatmapDifficultyCache difficultyCache, ScorePerformanceCache performanceCache)
         {
-            this.beatmapManager = beatmapManager;
+            this.playableBeatmap = playableBeatmap;
             this.difficultyCache = difficultyCache;
             this.performanceCache = performanceCache;
         }
@@ -46,14 +46,13 @@ namespace osu.Game.Rulesets.Difficulty
             return Task.Run(async () =>
             {
                 Ruleset ruleset = score.Ruleset.CreateInstance();
-                IBeatmap beatmap = beatmapManager.GetWorkingBeatmap(score.BeatmapInfo).GetPlayableBeatmap(score.Ruleset, score.Mods);
                 ScoreInfo perfectPlay = score.DeepClone();
                 perfectPlay.Accuracy = 1;
                 perfectPlay.Passed = true;
 
                 // calculate max combo
                 var difficulty = await difficultyCache.GetDifficultyAsync(
-                    beatmap.BeatmapInfo,
+                    playableBeatmap.BeatmapInfo,
                     score.Ruleset,
                     score.Mods,
                     cancellationToken
@@ -65,10 +64,10 @@ namespace osu.Game.Rulesets.Difficulty
                 perfectPlay.MaxCombo = difficulty.Value.MaxCombo;
 
                 // create statistics assuming all hit objects have perfect hit result
-                var statistics = beatmap.HitObjects
-                                        .SelectMany(getPerfectHitResults)
-                                        .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
-                                        .ToDictionary(pair => pair.hitResult, pair => pair.count);
+                var statistics = playableBeatmap.HitObjects
+                                                .SelectMany(getPerfectHitResults)
+                                                .GroupBy(hr => hr, (hr, list) => (hitResult: hr, count: list.Count()))
+                                                .ToDictionary(pair => pair.hitResult, pair => pair.count);
                 perfectPlay.Statistics = statistics;
 
                 // calculate total score
