@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class CarouselHeader : Container
     {
+        public Container BorderContainer;
+
         public readonly Bindable<CarouselItemState> State = new Bindable<CarouselItemState>(CarouselItemState.NotSelected);
 
         private readonly HoverLayer hoverLayer;
@@ -35,14 +37,17 @@ namespace osu.Game.Screens.Select.Carousel
             RelativeSizeAxes = Axes.X;
             Height = DrawableCarouselItem.MAX_HEIGHT;
 
-            Masking = true;
-            CornerRadius = corner_radius;
-            BorderColour = new Color4(221, 255, 255, 255);
-
-            InternalChildren = new Drawable[]
+            InternalChild = BorderContainer = new Container
             {
-                Content,
-                hoverLayer = new HoverLayer()
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                CornerRadius = corner_radius,
+                BorderColour = new Color4(221, 255, 255, 255),
+                Children = new Drawable[]
+                {
+                    Content,
+                    hoverLayer = new HoverLayer()
+                }
             };
         }
 
@@ -61,21 +66,21 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.NotSelected:
                     hoverLayer.InsetForBorder = false;
 
-                    BorderThickness = 0;
-                    EdgeEffect = new EdgeEffectParameters
+                    BorderContainer.BorderThickness = 0;
+                    BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Offset = new Vector2(1),
                         Radius = 10,
-                        Colour = Color4.Black.Opacity(0.5f),
+                        Colour = Color4.Black.Opacity(100),
                     };
                     break;
 
                 case CarouselItemState.Selected:
                     hoverLayer.InsetForBorder = true;
 
-                    BorderThickness = border_thickness;
-                    EdgeEffect = new EdgeEffectParameters
+                    BorderContainer.BorderThickness = border_thickness;
+                    BorderContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = new Color4(130, 204, 255, 150),
