@@ -16,7 +16,7 @@ namespace osu.Game.Audio.Effects
         /// </summary>
         public const int MAX_LOWPASS_CUTOFF = 22049; // nyquist - 1hz
 
-        private readonly AudioMixer mixer;
+        private readonly IAudioMixer mixer;
         private readonly BQFParameters filter;
         private readonly BQFType type;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Audio.Effects
         /// </summary>
         /// <param name="mixer">The mixer this effect should be applied to.</param>
         /// <param name="type">The type of filter (e.g. LowPass, HighPass, etc)</param>
-        public AudioFilter(AudioMixer mixer, BQFType type = BQFType.LowPass)
+        public AudioFilter(IAudioMixer mixer, BQFType type = BQFType.LowPass)
         {
             this.mixer = mixer;
             this.type = type;

@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public interface IApplicableToTrackMixer : IApplicableMod
     {
-        void ApplyToTrackMixer(AudioMixer mixer);
+        void ApplyToTrackMixer(IAudioMixer mixer);
     }
 }
