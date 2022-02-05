@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Ranking.Statistics
     public class PerformanceBreakdownChart : Container
     {
         private readonly ScoreInfo score;
+        private readonly IBeatmap playableBeatmap;
 
         private Drawable spinner;
         private Drawable content;
@@ -41,12 +42,10 @@ namespace osu.Game.Screens.Ranking.Statistics
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
 
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
-        public PerformanceBreakdownChart(ScoreInfo score)
+        public PerformanceBreakdownChart(ScoreInfo score, IBeatmap playableBeatmap)
         {
             this.score = score;
+            this.playableBeatmap = playableBeatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -146,7 +145,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             spinner.Show();
 
-            new PerformanceBreakdownCalculator(beatmapManager, difficultyCache, performanceCache)
+            new PerformanceBreakdownCalculator(playableBeatmap, difficultyCache, performanceCache)
                 .CalculateAsync(score, cancellationTokenSource.Token)
                 .ContinueWith(t => Schedule(() => setPerformanceValue(t.GetResultSafely())));
         }
