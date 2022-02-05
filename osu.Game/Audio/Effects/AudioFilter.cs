@@ -131,7 +131,9 @@ namespace osu.Game.Audio.Effects
             if (!isAttached)
                 return;
 
-            Debug.Assert(mixer.Effects.Contains(filter));
+            // Do not assert for the existence of the filter in mixer
+            // There are cases where effects are cleared from the mixer's side,
+            // causing the filter to still think it's attached when it isn't
             mixer.Effects.Remove(filter);
             isAttached = false;
         }
