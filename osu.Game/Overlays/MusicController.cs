@@ -58,6 +58,13 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; }
 
+        private readonly DrawableAudioMixer drawableAudioMixer;
+
+        public MusicController()
+        {
+            AddInternal(drawableAudioMixer = new DrawableAudioMixer { Name = $"{nameof(MusicController)} {nameof(DrawableAudioMixer)}" });
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -331,7 +338,7 @@ namespace osu.Game.Overlays
 
                 if (queuedTrack == CurrentTrack)
                 {
-                    AddInternal(queuedTrack);
+                    drawableAudioMixer.Add(queuedTrack);
                     queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
                 }
                 else
@@ -392,14 +399,14 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
-            audioManager.TrackMixer.Effects.Clear();
+            drawableAudioMixer.Effects.Clear();
 
             if (allowTrackAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
                 foreach (var mod in mods.Value.OfType<IApplicableToTrackMixer>())
-                    mod.ApplyToTrackMixer(audioManager.TrackMixer);
+                    mod.ApplyToTrackMixer(drawableAudioMixer);
             }
         }
     }
