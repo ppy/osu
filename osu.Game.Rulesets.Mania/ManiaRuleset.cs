@@ -243,7 +243,8 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModDifficultyAdjust(),
                         new ManiaModClassic(),
                         new ManiaModInvert(),
-                        new ManiaModConstantSpeed()
+                        new ManiaModConstantSpeed(),
+                        new ManiaModHoldOff()
                     };
 
                 case ModType.Automation:
@@ -369,21 +370,21 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
-                    new StatisticItem("Timing Distribution", new HitEventTimingDistributionGraph(score.HitEvents)
+                    new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 250
-                    }),
+                    }, true),
                 }
             },
             new StatisticRow
             {
                 Columns = new[]
                 {
-                    new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                    new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                     {
                         new UnstableRate(score.HitEvents)
-                    }))
+                    }), true)
                 }
             }
         };

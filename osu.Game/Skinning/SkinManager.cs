@@ -11,7 +11,6 @@ using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
@@ -48,13 +47,13 @@ namespace osu.Game.Skinning
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>();
 
-        public readonly Bindable<ILive<SkinInfo>> CurrentSkinInfo = new Bindable<ILive<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
+        public readonly Bindable<Live<SkinInfo>> CurrentSkinInfo = new Bindable<Live<SkinInfo>>(Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged())
         {
             Default = Skinning.DefaultSkin.CreateInfo().ToLiveUnmanaged()
         };
 
         private readonly SkinModelManager skinModelManager;
-        private readonly RealmContextFactory contextFactory;
+        private readonly RealmAccess realm;
 
         private readonly IResourceStore<byte[]> userFiles;
 
@@ -68,9 +67,9 @@ namespace osu.Game.Skinning
         /// </summary>
         public Skin DefaultLegacySkin { get; }
 
-        public SkinManager(Storage storage, RealmContextFactory contextFactory, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
         {
-            this.contextFactory = contextFactory;
+            this.realm = realm;
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
@@ -78,7 +77,7 @@ namespace osu.Game.Skinning
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
-            skinModelManager = new SkinModelManager(storage, contextFactory, host, this);
+            skinModelManager = new SkinModelManager(storage, realm, this);
 
             var defaultSkins = new[]
             {
@@ -87,12 +86,12 @@ namespace osu.Game.Skinning
             };
 
             // Ensure the default entries are present.
-            contextFactory.Write(realm =>
+            realm.Write(r =>
             {
                 foreach (var skin in defaultSkins)
                 {
-                    if (realm.Find<SkinInfo>(skin.SkinInfo.ID) == null)
-                        realm.Add(skin.SkinInfo.Value);
+                    if (r.Find<SkinInfo>(skin.SkinInfo.ID) == null)
+                        r.Add(skin.SkinInfo.Value);
                 }
             });
 
@@ -110,10 +109,10 @@ namespace osu.Game.Skinning
 
         public void SelectRandomSkin()
         {
-            contextFactory.Run(realm =>
+            realm.Run(r =>
             {
                 // choose from only user skins, removing the current selection to ensure a new one is chosen.
-                var randomChoices = realm.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
+                var randomChoices = r.All<SkinInfo>().Where(s => !s.DeletePending && s.ID != CurrentSkinInfo.Value.ID).ToArray();
 
                 if (randomChoices.Length == 0)
                 {
@@ -123,7 +122,7 @@ namespace osu.Game.Skinning
 
                 var chosen = randomChoices.ElementAt(RNG.Next(0, randomChoices.Length));
 
-                CurrentSkinInfo.Value = chosen.ToLive(contextFactory);
+                CurrentSkinInfo.Value = chosen.ToLive(realm);
             });
         }
 
@@ -151,7 +150,7 @@ namespace osu.Game.Skinning
                     Name = s.Name + @" (modified)",
                     Creator = s.Creator,
                     InstantiationInfo = s.InstantiationInfo,
-                }).GetResultSafely();
+                });
 
                 if (result != null)
                 {
@@ -177,9 +176,9 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public ILive<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
+        public Live<SkinInfo> Query(Expression<Func<SkinInfo, bool>> query)
         {
-            return contextFactory.Run(realm => realm.All<SkinInfo>().FirstOrDefault(query)?.ToLive(contextFactory));
+            return realm.Run(r => r.All<SkinInfo>().FirstOrDefault(query)?.ToLive(realm));
         }
 
         public event Action SourceChanged;
@@ -234,7 +233,7 @@ namespace osu.Game.Skinning
         AudioManager IStorageResourceProvider.AudioManager => audio;
         IResourceStore<byte[]> IStorageResourceProvider.Resources => resources;
         IResourceStore<byte[]> IStorageResourceProvider.Files => userFiles;
-        RealmContextFactory IStorageResourceProvider.RealmContextFactory => contextFactory;
+        RealmAccess IStorageResourceProvider.RealmAccess => realm;
         IResourceStore<TextureUpload> IStorageResourceProvider.CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => host.CreateTextureLoaderStore(underlyingStore);
 
         #endregion
@@ -246,7 +245,7 @@ namespace osu.Game.Skinning
             set => skinModelManager.PostNotification = value;
         }
 
-        public Action<IEnumerable<ILive<SkinInfo>>> PostImport
+        public Action<IEnumerable<Live<SkinInfo>>> PostImport
         {
             set => skinModelManager.PostImport = value;
         }
@@ -263,22 +262,22 @@ namespace osu.Game.Skinning
 
         public IEnumerable<string> HandledExtensions => skinModelManager.HandledExtensions;
 
-        public Task<IEnumerable<ILive<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public Task<IEnumerable<Live<SkinInfo>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             return skinModelManager.Import(notification, tasks);
         }
 
-        public Task<ILive<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<SkinInfo>> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(task, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Task<Live<SkinInfo>> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(archive, lowPriority, cancellationToken);
         }
 
-        public Task<ILive<SkinInfo>> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public Live<SkinInfo> Import(SkinInfo item, ArchiveReader archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             return skinModelManager.Import(item, archive, lowPriority, cancellationToken);
         }
@@ -289,10 +288,10 @@ namespace osu.Game.Skinning
 
         public void Delete([CanBeNull] Expression<Func<SkinInfo, bool>> filter = null, bool silent = false)
         {
-            contextFactory.Run(realm =>
+            realm.Run(r =>
             {
-                var items = realm.All<SkinInfo>()
-                                 .Where(s => !s.Protected && !s.DeletePending);
+                var items = r.All<SkinInfo>()
+                             .Where(s => !s.Protected && !s.DeletePending);
                 if (filter != null)
                     items = items.Where(filter);
 

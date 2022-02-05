@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// An array of all scorable <see cref="HitResult"/>s.
         /// </summary>
-        public static readonly HitResult[] SCORABLE_TYPES = ((HitResult[])Enum.GetValues(typeof(HitResult))).Where(r => r.IsScorable()).ToArray();
+        public static readonly HitResult[] ALL_TYPES = ((HitResult[])Enum.GetValues(typeof(HitResult))).ToArray();
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> is valid within a given <see cref="HitResult"/> range.

@@ -42,9 +42,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
             beatmaps = new List<BeatmapInfo>();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 beatmapSetInfo.Beatmaps.Add(beatmap);
             }
 
-            manager.Import(beatmapSetInfo).WaitSafely();
+            manager.Import(beatmapSetInfo);
         }
 
         public override void SetUpSteps()
@@ -107,7 +107,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             BeatmapInfo selectedBeatmap = null;
 
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.RulesetID == new OsuRuleset().LegacyID).ElementAt(1)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.Ruleset.OnlineID == new OsuRuleset().LegacyID).ElementAt(1)));
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
 
             AddStep("exit song select", () => songSelect.Exit());
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.RulesetID == new TaikoRuleset().LegacyID)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 

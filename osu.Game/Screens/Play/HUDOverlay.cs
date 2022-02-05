@@ -17,6 +17,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -83,10 +84,7 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
-                mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                mainComponents = new MainComponentsContainer(),
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -323,6 +321,30 @@ namespace osu.Game.Screens.Play
                     holdingForHUD = false;
                     updateVisibility();
                     break;
+            }
+        }
+
+        private class MainComponentsContainer : SkinnableTargetContainer
+        {
+            private Bindable<ScoringMode> scoringMode;
+
+            [Resolved]
+            private OsuConfigManager config { get; set; }
+
+            public MainComponentsContainer()
+                : base(SkinnableTarget.MainHUDComponents)
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // When the scoring mode changes, relative positions of elements may change (see DefaultSkin.GetDrawableComponent).
+                // This is a best effort implementation for cases where users haven't customised layouts.
+                scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+                scoringMode.BindValueChanged(val => Reload());
             }
         }
     }

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -106,7 +108,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 loadedTestBeatmaps = true;
-                loadBeatmapSets(value);
+                Schedule(() => loadBeatmapSets(value));
             }
         }
 
@@ -151,6 +153,11 @@ namespace osu.Game.Screens.Select
 
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
+        private Sample spinSample;
+        private Sample randomSelectSample;
+
+        private int visibleSetsCount;
+
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
@@ -169,8 +176,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, AudioManager audio)
         {
+            spinSample = audio.Samples.Get("SongSelect/random-spin");
+            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
+
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
@@ -179,24 +189,24 @@ namespace osu.Game.Screens.Select
 
             if (!loadedTestBeatmaps)
             {
-                realmFactory.Run(realm => loadBeatmapSets(getBeatmapSets(realm)));
+                realm.Run(r => loadBeatmapSets(getBeatmapSets(r)));
             }
         }
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            subscriptionSets = getBeatmapSets(realmFactory.Context).QueryAsyncWithNotifications(beatmapSetsChanged);
-            subscriptionBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => !b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+            subscriptionSets = realm.RegisterForNotifications(getBeatmapSets, beatmapSetsChanged);
+            subscriptionBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => !b.Hidden), beatmapsChanged);
 
             // Can't use main subscriptions because we can't lookup deleted indices.
             // https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-1605595.
-            subscriptionDeletedSets = realmFactory.Context.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected).QueryAsyncWithNotifications(deletedBeatmapSetsChanged);
-            subscriptionHiddenBeatmaps = realmFactory.Context.All<BeatmapInfo>().Where(b => b.Hidden).QueryAsyncWithNotifications(beatmapsChanged);
+            subscriptionDeletedSets = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.DeletePending && !s.Protected), deletedBeatmapSetsChanged);
+            subscriptionHiddenBeatmaps = realm.RegisterForNotifications(r => r.All<BeatmapInfo>().Where(b => b.Hidden), beatmapsChanged);
         }
 
         private void deletedBeatmapSetsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet changes, Exception error)
@@ -231,7 +241,7 @@ namespace osu.Game.Screens.Select
                 foreach (var id in realmSets)
                 {
                     if (!root.BeatmapSetsByID.ContainsKey(id))
-                        UpdateBeatmapSet(realmFactory.Context.Find<BeatmapSetInfo>(id).Detach());
+                        UpdateBeatmapSet(realm.Realm.Find<BeatmapSetInfo>(id).Detach());
                 }
 
                 foreach (var id in root.BeatmapSetsByID.Keys)
@@ -274,7 +284,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private IRealmCollection<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected).AsRealmCollection();
+        private IQueryable<BeatmapSetInfo> getBeatmapSets(Realm realm) => realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected);
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet) =>
             removeBeatmapSet(beatmapSet.ID);
@@ -286,6 +296,9 @@ namespace osu.Game.Screens.Select
 
             root.RemoveChild(existingSet);
             itemsCache.Invalidate();
+
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
         });
 
         public void UpdateBeatmapSet(BeatmapSetInfo beatmapSet) => Schedule(() =>
@@ -311,13 +324,10 @@ namespace osu.Game.Screens.Select
 
             itemsCache.Invalidate();
 
-            Schedule(() =>
-            {
-                if (!Scroll.UserScrolling)
-                    ScrollToSelected(true);
+            if (!Scroll.UserScrolling)
+                ScrollToSelected(true);
 
-                BeatmapSetsChanged?.Invoke();
-            });
+            BeatmapSetsChanged?.Invoke();
         });
 
         /// <summary>
@@ -419,6 +429,9 @@ namespace osu.Game.Screens.Select
                 return false;
 
             var visibleSets = beatmapSets.Where(s => !s.Filtered.Value).ToList();
+
+            visibleSetsCount = visibleSets.Count;
+
             if (!visibleSets.Any())
                 return false;
 
@@ -450,6 +463,9 @@ namespace osu.Game.Screens.Select
             else
                 set = visibleSets.ElementAt(RNG.Next(visibleSets.Count));
 
+            if (selectedBeatmapSet != null)
+                playSpinSample(distanceBetween(set, selectedBeatmapSet));
+
             select(set);
             return true;
         }
@@ -464,10 +480,25 @@ namespace osu.Game.Screens.Select
                 {
                     if (RandomAlgorithm.Value == RandomSelectAlgorithm.RandomPermutation)
                         previouslyVisitedRandomSets.Remove(selectedBeatmapSet);
+
+                    if (selectedBeatmapSet != null)
+                        playSpinSample(distanceBetween(beatmap, selectedBeatmapSet));
+
                     select(beatmap);
                     break;
                 }
             }
+        }
+
+        private double distanceBetween(CarouselItem item1, CarouselItem item2) => Math.Ceiling(Math.Abs(item1.CarouselYPosition - item2.CarouselYPosition) / DrawableCarouselItem.MAX_HEIGHT);
+
+        private void playSpinSample(double distance)
+        {
+            var chan = spinSample.GetChannel();
+            chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
+            chan.Play();
+
+            randomSelectSample?.Play();
         }
 
         private void select(CarouselItem item)
@@ -552,10 +583,11 @@ namespace osu.Game.Screens.Select
 
         private void signalBeatmapsLoaded()
         {
-            Debug.Assert(BeatmapSetsLoaded == false);
-
-            BeatmapSetsChanged?.Invoke();
-            BeatmapSetsLoaded = true;
+            if (!BeatmapSetsLoaded)
+            {
+                BeatmapSetsChanged?.Invoke();
+                BeatmapSetsLoaded = true;
+            }
 
             itemsCache.Invalidate();
         }
