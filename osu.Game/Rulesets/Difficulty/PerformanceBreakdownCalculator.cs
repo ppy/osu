@@ -51,6 +51,7 @@ namespace osu.Game.Rulesets.Difficulty
                 perfectPlay.Passed = true;
 
                 // calculate max combo
+                // todo: Get max combo from difficulty calculator instead when diffcalc properly supports lazer-first scores
                 perfectPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
 
                 // create statistics assuming all hit objects have perfect hit result
