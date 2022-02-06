@@ -11,7 +11,6 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -80,12 +79,12 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void ScheduleSwitchToNewDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo, EditorState editorState)
+        public void ScheduleSwitchToNewDifficulty(NewDifficultyCreationParameters creationParameters)
             => scheduleDifficultySwitch(() =>
             {
                 try
                 {
-                    return beatmapManager.CreateNewBlankDifficulty(beatmapSetInfo, rulesetInfo);
+                    return beatmapManager.CreateNewBlankDifficulty(creationParameters);
                 }
                 catch (Exception ex)
                 {
@@ -94,7 +93,7 @@ namespace osu.Game.Screens.Edit
                     Logger.Error(ex, ex.Message);
                     return Beatmap.Value;
                 }
-            }, editorState);
+            }, creationParameters.EditorState);
 
         public void ScheduleSwitchToExistingDifficulty(BeatmapInfo beatmapInfo, EditorState editorState)
             => scheduleDifficultySwitch(() => beatmapManager.GetWorkingBeatmap(beatmapInfo), editorState);
