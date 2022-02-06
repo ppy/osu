@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override string Description => "他们不会就那样老老实实的待着...";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModTransform), typeof(OsuModAimAssist) };
 
         private const int wiggle_duration = 90; // (ms) Higher = fewer wiggles
         private const int wiggle_strength = 10; // Higher = stronger wiggles

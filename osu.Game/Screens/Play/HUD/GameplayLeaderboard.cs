@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
         protected readonly FillFlowContainer<GameplayLeaderboardScore> Flow;
 
         private bool requiresScroll;
-        private readonly OsuScrollContainer scroll;
+        protected readonly OsuScrollContainer Scroll;
 
         private GameplayLeaderboardScore trackedScore;
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.HUD
 
             InternalChildren = new Drawable[]
             {
-                scroll = new InputDisabledScrollContainer
+                Scroll = new InputDisabledScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = Flow = new FillFlowContainer<GameplayLeaderboardScore>
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             Flow.Clear();
             trackedScore = null;
-            scroll.ScrollToStart(false);
+            Scroll.ScrollToStart(false);
         }
 
         protected virtual GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked) =>
@@ -115,17 +115,17 @@ namespace osu.Game.Screens.Play.HUD
 
             if (requiresScroll && trackedScore != null)
             {
-                float scrollTarget = scroll.GetChildPosInContent(trackedScore) + trackedScore.DrawHeight / 2 - scroll.DrawHeight / 2;
-                scroll.ScrollTo(scrollTarget, false);
+                float scrollTarget = Scroll.GetChildPosInContent(trackedScore) + trackedScore.DrawHeight / 2 - Scroll.DrawHeight / 2;
+                Scroll.ScrollTo(scrollTarget, false);
             }
 
             const float panel_height = GameplayLeaderboardScore.PANEL_HEIGHT;
 
-            float fadeBottom = scroll.Current + scroll.DrawHeight;
-            float fadeTop = scroll.Current + panel_height;
+            float fadeBottom = Scroll.Current + Scroll.DrawHeight;
+            float fadeTop = Scroll.Current + panel_height;
 
-            if (scroll.Current <= 0) fadeTop -= panel_height;
-            if (!scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
+            if (Scroll.Current <= 0) fadeTop -= panel_height;
+            if (!Scroll.IsScrolledToEnd()) fadeBottom -= panel_height;
 
             // logic is mostly shared with Leaderboard, copied here for simplicity.
             foreach (var c in Flow.Children)

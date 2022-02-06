@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -19,19 +21,21 @@ namespace osu.Game.Beatmaps
     public class BeatmapSetInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<BeatmapSetInfo>, IBeatmapSetInfo
     {
         [PrimaryKey]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public Guid ID { get; set; }
 
         [Indexed]
         public int OnlineID { get; set; } = -1;
 
         public DateTimeOffset DateAdded { get; set; }
 
+        [JsonIgnore]
         public IBeatmapMetadataInfo Metadata => Beatmaps.FirstOrDefault()?.Metadata ?? new BeatmapMetadata();
 
         public IList<BeatmapInfo> Beatmaps { get; } = null!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
+        [Ignored]
         public BeatmapOnlineStatus Status
         {
             get => (BeatmapOnlineStatus)StatusInt;
@@ -55,6 +59,19 @@ namespace osu.Game.Beatmaps
         public double MaxLength => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.Length);
 
         public double MaxBPM => Beatmaps.Count == 0 ? 0 : Beatmaps.Max(b => b.BPM);
+
+        public BeatmapSetInfo(IEnumerable<BeatmapInfo>? beatmaps = null)
+            : this()
+        {
+            ID = Guid.NewGuid();
+            if (beatmaps != null)
+                Beatmaps.AddRange(beatmaps);
+        }
+
+        [UsedImplicitly] // Realm
+        private BeatmapSetInfo()
+        {
+        }
 
         /// <summary>
         /// Returns the storage path for the file in this beatmapset with the given filename, if any exists, otherwise null.

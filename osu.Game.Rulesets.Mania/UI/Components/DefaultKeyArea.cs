@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                                 AlwaysPresent = true
                             }
                         }
-                    }
+                    },
                 }
             };
 

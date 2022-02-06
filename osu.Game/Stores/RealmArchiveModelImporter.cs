@@ -59,23 +59,23 @@ namespace osu.Game.Stores
 
         protected readonly RealmFileStore Files;
 
-        protected readonly RealmContextFactory ContextFactory;
+        protected readonly RealmAccess Realm;
 
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<ILive<TModel>>>? PostImport { get; set; }
+        public Action<IEnumerable<Live<TModel>>>? PostImport { get; set; }
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
         public Action<Notification>? PostNotification { protected get; set; }
 
-        protected RealmArchiveModelImporter(Storage storage, RealmContextFactory contextFactory)
+        protected RealmArchiveModelImporter(Storage storage, RealmAccess realm)
         {
-            ContextFactory = contextFactory;
+            Realm = realm;
 
-            Files = new RealmFileStore(contextFactory, storage);
+            Files = new RealmFileStore(realm, storage);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace osu.Game.Stores
             return Import(notification, tasks);
         }
 
-        public async Task<IEnumerable<ILive<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
+        public async Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks)
         {
             if (tasks.Length == 0)
             {
@@ -118,7 +118,7 @@ namespace osu.Game.Stores
 
             int current = 0;
 
-            var imported = new List<ILive<TModel>>();
+            var imported = new List<Live<TModel>>();
 
             bool isLowPriorityImport = tasks.Length > low_priority_import_batch_size;
 
@@ -196,11 +196,11 @@ namespace osu.Game.Stores
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        public async Task<ILive<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            ILive<TModel>? import;
+            Live<TModel>? import;
             using (ArchiveReader reader = task.GetReader())
                 import = await Import(reader, lowPriority, cancellationToken).ConfigureAwait(false);
 
@@ -227,7 +227,7 @@ namespace osu.Game.Stores
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public async Task<ILive<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public async Task<Live<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -250,8 +250,10 @@ namespace osu.Game.Stores
                 return null;
             }
 
-            var scheduledImport = Task.Factory.StartNew(async () => await Import(model, archive, lowPriority, cancellationToken).ConfigureAwait(false),
-                cancellationToken, TaskCreationOptions.HideScheduler, lowPriority ? import_scheduler_low_priority : import_scheduler).Unwrap();
+            var scheduledImport = Task.Factory.StartNew(() => Import(model, archive, lowPriority, cancellationToken),
+                cancellationToken,
+                TaskCreationOptions.HideScheduler,
+                lowPriority ? import_scheduler_low_priority : import_scheduler);
 
             return await scheduledImport.ConfigureAwait(false);
         }
@@ -318,9 +320,9 @@ namespace osu.Game.Stores
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        public virtual Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
+        public virtual Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default)
         {
-            using (var realm = ContextFactory.CreateContext())
+            return Realm.Run(realm =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -342,7 +344,8 @@ namespace osu.Game.Stores
                         // note that this should really be checking filesizes on disk (of existing files) for some degree of sanity.
                         // or alternatively doing a faster hash check. either of these require database changes and reprocessing of existing files.
                         if (CanSkipImport(existing, item) &&
-                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)))
+                            getFilenames(existing.Files).SequenceEqual(getShortenedFilenames(archive).Select(p => p.shortened).OrderBy(f => f)) &&
+                            checkAllFilesExist(existing))
                         {
                             LogForModel(item, @$"Found existing (optimised) {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
@@ -352,7 +355,7 @@ namespace osu.Game.Stores
                                 transaction.Commit();
                             }
 
-                            return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
+                            return existing.ToLive(Realm);
                         }
 
                         LogForModel(item, @"Found existing (optimised) but failed pre-check.");
@@ -387,7 +390,7 @@ namespace osu.Game.Stores
                                 existing.DeletePending = false;
                                 transaction.Commit();
 
-                                return Task.FromResult((ILive<TModel>?)existing.ToLive(ContextFactory));
+                                return existing.ToLive(Realm);
                             }
 
                             LogForModel(item, @"Found existing but failed re-use check.");
@@ -413,8 +416,8 @@ namespace osu.Game.Stores
                     throw;
                 }
 
-                return Task.FromResult((ILive<TModel>?)item.ToLive(ContextFactory));
-            }
+                return (Live<TModel>?)item.ToLive(Realm);
+            });
         }
 
         private string computeHashFast(ArchiveReader reader)
@@ -459,7 +462,6 @@ namespace osu.Game.Stores
             if (!(prefix.EndsWith('/') || prefix.EndsWith('\\')))
                 prefix = string.Empty;
 
-            // import files to manager
             foreach (string file in reader.Filenames)
                 yield return (file, file.Substring(prefix.Length).ToStandardisedPath());
         }
@@ -519,7 +521,11 @@ namespace osu.Game.Stores
             // for the best or worst, we copy and import files of a new import before checking whether
             // it is a duplicate. so to check if anything has changed, we can just compare all File IDs.
             getIDs(existing.Files).SequenceEqual(getIDs(import.Files)) &&
-            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files));
+            getFilenames(existing.Files).SequenceEqual(getFilenames(import.Files)) &&
+            checkAllFilesExist(existing);
+
+        private bool checkAllFilesExist(TModel model) =>
+            model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.

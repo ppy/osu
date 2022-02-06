@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
 using osu.Framework.Bindables;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Screens.Backgrounds;
 using osuTK.Graphics;
 
@@ -70,13 +72,17 @@ namespace osu.Game.Screens.Menu
             base.OnSuspending(next);
         }
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         protected override void LoadMenu()
         {
             base.LoadMenu();
 
             if (LoadDirectToSongSelect.Value)
             {
-                game?.PresentBeatmap(SetInfo);
+                var beatmapSets = beatmapManager.GetAllUsableBeatmapSets();
+                game?.PresentBeatmap(beatmapSets[RNG.Next(beatmapSets.Count)]);
             }
         }
     }

@@ -39,6 +39,7 @@ using System.Diagnostics;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Screens.Select
 {
@@ -116,6 +117,10 @@ namespace osu.Game.Screens.Select
 
         [Resolved]
         private MusicController music { get; set; }
+
+        //LLin
+        public Bindable<BeatmapLeaderboardScope> CurrentScope = new Bindable<BeatmapLeaderboardScope>();
+        public Bindable<bool> FilterMods = new Bindable<bool>();
 
         [BackgroundDependencyLoader(true)]
         private void load(MConfigManager config, AudioManager audio, DialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
@@ -518,7 +523,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -635,6 +640,10 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
+            // Without this, it's possible for a transfer to happen while we are not the current screen.
+            transferRulesetValue();
+
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 

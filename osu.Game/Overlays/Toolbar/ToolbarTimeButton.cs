@@ -6,6 +6,7 @@ using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Toolbar
@@ -22,11 +23,25 @@ namespace osu.Game.Overlays.Toolbar
             AutoSizeAxes = Axes.X;
         }
 
+        private int beatmapCountReal;
+
+        private int beatmapCount
+        {
+            get => beatmapCountReal;
+            set
+            {
+                beatmapCountReal = value;
+                Schedule(updateBeatmapTooltip);
+                Logger.Log($"更新！ -> {value}");
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            //beatmapManager.PostImport ItemUpdated += _ => updateBeatmapTooltip();
-            //beatmapManager.ItemRemoved += _ => updateBeatmapTooltip();
+            beatmapCount = beatmapManager.GetAllUsableBeatmapSets().Count;
+            beatmapManager.OnBeatmapAdded += c => beatmapCount += c;
+            beatmapManager.OnBeatmapHide += c => beatmapCount -= c;
         }
 
         protected override void LoadComplete()
@@ -56,8 +71,8 @@ namespace osu.Game.Overlays.Toolbar
             this.Delay(500).Schedule(updateTime);
         }
 
-        private void updateBeatmapTooltip() => TooltipSub = "因为API更改，暂时无法显示谱面总数orz";
-        //    TooltipSub = $"你共有{beatmapManager.QueryBeatmaps(_ => true).ToList().Count}张谱面!";
+        private void updateBeatmapTooltip() =>
+            TooltipSub = $"你共有{beatmapCount}张谱面!";
 
         protected override bool OnClick(ClickEvent e)
         {

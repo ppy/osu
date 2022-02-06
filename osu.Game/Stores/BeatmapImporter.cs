@@ -44,8 +44,8 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        protected BeatmapImporter(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
-            : base(storage, contextFactory)
+        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+            : base(storage, realm)
         {
             this.onlineLookupQueue = onlineLookupQueue;
         }
@@ -165,8 +165,7 @@ namespace osu.Game.Stores
 
         public override bool IsAvailableLocally(BeatmapSetInfo model)
         {
-            using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID);
+            return Realm.Run(realm => realm.All<BeatmapInfo>().Any(b => b.OnlineID == model.OnlineID));
         }
 
         public override string HumanisedModelName => "beatmap";
@@ -218,13 +217,13 @@ namespace osu.Game.Stores
                     }
 
                     var decodedInfo = decoded.BeatmapInfo;
-                    var decodedDifficulty = decodedInfo.BaseDifficulty;
+                    var decodedDifficulty = decodedInfo.Difficulty;
 
-                    var ruleset = realm.All<RulesetInfo>().FirstOrDefault(r => r.OnlineID == decodedInfo.RulesetID);
+                    var ruleset = realm.All<RulesetInfo>().FirstOrDefault(r => r.OnlineID == decodedInfo.Ruleset.OnlineID);
 
                     if (ruleset?.Available != true)
                     {
-                        Logger.Log($"Skipping import of {file.Filename} due to missing local ruleset {decodedInfo.RulesetID}.", LoggingTarget.Database);
+                        Logger.Log($"Skipping import of {file.Filename} due to missing local ruleset {decodedInfo.Ruleset.OnlineID}.", LoggingTarget.Database);
                         continue;
                     }
 

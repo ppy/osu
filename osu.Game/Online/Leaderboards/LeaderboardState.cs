@@ -3,9 +3,9 @@
 
 namespace osu.Game.Online.Leaderboards
 {
-    public enum PlaceholderState
+    public enum LeaderboardState
     {
-        Successful,
+        Success,
         Retrieving,
         NetworkFailure,
         Unavailable,

@@ -187,8 +187,10 @@ namespace osu.Game.Overlays
                 Alpha = 0,
                 Margin = new MarginPadding
                 {
-                    Vertical = 15,
-                    Bottom = ExpandedContentScrollContainer.HEIGHT
+                    Top = 15,
+                    // the + 20 adjustment is roughly eyeballed in order to fit all of the expanded content height after it's scaled
+                    // as well as provide visual balance to the top margin.
+                    Bottom = ExpandedContentScrollContainer.HEIGHT + 20
                 },
                 ChildrenEnumerable = newCards
             };

@@ -37,6 +37,9 @@ namespace osu.Game.Screens.Select
             Add(Leaderboard = new BeatmapLeaderboard { RelativeSizeAxes = Axes.Both });
         }
 
+        [Resolved]
+        private SongSelect songSelect { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -54,7 +57,7 @@ namespace osu.Game.Screens.Select
         {
             base.Refresh();
 
-            Leaderboard.RefreshScores();
+            Leaderboard.RefetchScores();
         }
 
         protected override void OnTabChanged(BeatmapDetailAreaTabItem tab, bool selectedMods)
@@ -74,6 +77,9 @@ namespace osu.Game.Screens.Select
                     Leaderboard.Hide();
                     break;
             }
+
+            songSelect.CurrentScope.Value = Leaderboard.Scope;
+            songSelect.FilterMods.Value = Leaderboard.FilterMods;
         }
 
         protected override BeatmapDetailAreaTabItem[] CreateTabItems() => base.CreateTabItems().Concat(new BeatmapDetailAreaTabItem[]

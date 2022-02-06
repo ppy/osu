@@ -36,21 +36,21 @@ namespace osu.Game.Tests.Visual.Ranking
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            using (var realm = realmContextFactory.CreateContext())
+            realm.Run(r =>
             {
-                var beatmapInfo = realm.All<BeatmapInfo>()
-                                       .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
-                                       .FirstOrDefault();
+                var beatmapInfo = r.All<BeatmapInfo>()
+                                   .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
+                                   .FirstOrDefault();
 
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
-            }
+            });
         }
 
         [Test]

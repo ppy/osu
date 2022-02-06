@@ -168,7 +168,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModDifficultyAdjust(),
                         new OsuModMirror(),
                         new OsuModClassic(),
-                        new OsuModRandom()
+                        new OsuModRandom(),
+                        new OsuModAlternate(),
                     };
 
                 case ModType.Automation:
@@ -194,7 +195,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModApproachDifferent(),
                         new OsuModMuted(),
                         new OsuModNoScope(),
-                        new ModNoDrain()
+                        new ModNoDrain(),
+                        new OsuModAimAssist(),
                     };
 
                 case ModType.System:
@@ -279,33 +281,32 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("误差",
-                            new HitEventTimingDistributionGraph(timedHitEvents)
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 250
-                            }),
-                    }
-                },
-                new StatisticRow
-                {
-                    Columns = new[]
-                    {
-                        new StatisticItem("准确率热图", new AccuracyHeatmap(score, playableBeatmap)
+                        new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 250
-                        }),
+                        }, true),
                     }
                 },
                 new StatisticRow
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        new StatisticItem("准确率热图", () => new AccuracyHeatmap(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }, true),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
                             new UnstableRate(timedHitEvents)
-                        }))
+                        }), true)
                     }
                 }
             };

@@ -15,6 +15,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
+using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Localisation;
@@ -120,6 +121,8 @@ namespace osu.Game.Overlays
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
+
+            Logger.Log($"⚠️ {notification.Text}");
 
             notification.Closed += notificationClosed;
 

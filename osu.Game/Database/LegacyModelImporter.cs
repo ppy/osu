@@ -14,7 +14,7 @@ namespace osu.Game.Database
     /// A class which handles importing legacy user data of a single type from osu-stable.
     /// </summary>
     public abstract class LegacyModelImporter<TModel>
-        where TModel : class
+        where TModel : class, IHasGuidPrimaryKey
     {
         /// <summary>
         /// The relative path from osu-stable's data directory to import items from.

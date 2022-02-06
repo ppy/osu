@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
                     Text = @"是的,抹除这些黑历史",
                     Action = () =>
                     {
-                        Task.Run(() => scoreManager.Delete(s => !s.DeletePending && s.BeatmapInfo.ID == beatmapInfo.ID))
+                        Task.Run(() => scoreManager.Delete(beatmapInfo))
                             .ContinueWith(_ => onCompletion);
                     }
                 },

@@ -72,6 +72,7 @@ namespace osu.Game.Screens.Play
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
                 convertedFrame.Time = frame.Time;
+                convertedFrame.Header = frame.Header;
 
                 score.Replay.Frames.Add(convertedFrame);
             }

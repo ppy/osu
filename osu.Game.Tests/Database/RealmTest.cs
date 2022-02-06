@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Database
             storage.DeleteDirectory(string.Empty);
         }
 
-        protected void RunTestWithRealm(Action<RealmContextFactory, OsuStorage> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealm(Action<RealmAccess, OsuStorage> testAction, [CallerMemberName] string caller = "")
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
@@ -39,22 +39,22 @@ namespace osu.Game.Tests.Database
                     // ReSharper disable once AccessToDisposedClosure
                     var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, "client"))
                     {
-                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                        testAction(realmFactory, testStorage);
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
+                        testAction(realm, testStorage);
 
-                        realmFactory.Dispose();
+                        realm.Dispose();
 
-                        Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                        realmFactory.Compact();
-                        Logger.Log($"Final database size after compact: {getFileSize(testStorage, realmFactory)}");
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
+                        realm.Compact();
+                        Logger.Log($"Final database size after compact: {getFileSize(testStorage, realm)}");
                     }
                 }));
             }
         }
 
-        protected void RunTestWithRealmAsync(Func<RealmContextFactory, Storage, Task> testAction, [CallerMemberName] string caller = "")
+        protected void RunTestWithRealmAsync(Func<RealmAccess, Storage, Task> testAction, [CallerMemberName] string caller = "")
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(callingMethodName: caller))
             {
@@ -62,15 +62,15 @@ namespace osu.Game.Tests.Database
                 {
                     var testStorage = storage.GetStorageForDirectory(caller);
 
-                    using (var realmFactory = new RealmContextFactory(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, "client"))
                     {
-                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realmFactory.Filename)}");
-                        await testAction(realmFactory, testStorage);
+                        Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
+                        await testAction(realm, testStorage);
 
-                        realmFactory.Dispose();
+                        realm.Dispose();
 
-                        Logger.Log($"Final database size: {getFileSize(testStorage, realmFactory)}");
-                        realmFactory.Compact();
+                        Logger.Log($"Final database size: {getFileSize(testStorage, realm)}");
+                        realm.Compact();
                     }
                 }));
             }
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Database
         }
 
         protected static RulesetInfo CreateRuleset() =>
-            new RulesetInfo(0, "osu!", "osu", true);
+            new RulesetInfo("osu", "osu!", string.Empty, 0) { Available = true };
 
         private class RealmTestGame : Framework.Game
         {
@@ -138,11 +138,11 @@ namespace osu.Game.Tests.Database
             }
         }
 
-        private static long getFileSize(Storage testStorage, RealmContextFactory realmFactory)
+        private static long getFileSize(Storage testStorage, RealmAccess realm)
         {
             try
             {
-                using (var stream = testStorage.GetStream(realmFactory.Filename))
+                using (var stream = testStorage.GetStream(realm.Filename))
                     return stream?.Length ?? 0;
             }
             catch

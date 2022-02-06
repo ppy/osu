@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets
     [ExcludeFromDynamicCompile]
     public abstract class Ruleset
     {
-        public RulesetInfo RulesetInfo { get; internal set; }
+        public RulesetInfo RulesetInfo { get; }
 
         private static readonly ConcurrentDictionary<string, IMod[]> mod_reference_cache = new ConcurrentDictionary<string, IMod[]>();
 
