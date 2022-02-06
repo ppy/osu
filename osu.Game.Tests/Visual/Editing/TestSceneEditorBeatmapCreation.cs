@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
@@ -236,16 +237,24 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
+
+            BeatmapInfo refetchedBeatmap = null;
+            Live<BeatmapSetInfo> refetchedBeatmapSet = null;
+
+            AddStep("refetch from database", () =>
+            {
+                refetchedBeatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == secondDifficultyName);
+                refetchedBeatmapSet = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+            });
+
             AddAssert("new beatmap persisted", () =>
             {
-                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == secondDifficultyName);
-                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
-
-                return beatmap != null
-                       && beatmap.DifficultyName == secondDifficultyName
-                       && set != null
-                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName));
+                return refetchedBeatmap != null
+                       && refetchedBeatmap.DifficultyName == secondDifficultyName
+                       && refetchedBeatmapSet != null
+                       && refetchedBeatmapSet.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName));
             });
+            AddAssert("old beatmap file not deleted", () => refetchedBeatmapSet.AsNonNull().PerformRead(s => s.Files.Count == 2));
         }
 
         [Test]
