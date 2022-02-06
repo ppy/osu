@@ -101,8 +101,6 @@ namespace osu.Game.Screens.Menu
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
             seeya = audio.Samples.Get(SeeyaSampleName);
 
-            ILive<BeatmapSetInfo> setInfo = null;
-
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
             {

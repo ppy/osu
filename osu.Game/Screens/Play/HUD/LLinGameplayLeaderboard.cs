@@ -29,6 +29,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
+using Realms;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -94,8 +95,12 @@ namespace osu.Game.Screens.Play.HUD
             }, true);
 
             player.IsBreakTime.BindValueChanged(_ => updateDisplayState());
+        }
 
+        protected override void LoadComplete()
+        {
             loadScore(infos => Schedule(() => onScoreLoaded(infos)));
+            base.LoadComplete();
         }
 
         private void updateDisplayState()
@@ -157,7 +162,7 @@ namespace osu.Game.Screens.Play.HUD
         #region 加载成绩
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
@@ -178,6 +183,7 @@ namespace osu.Game.Screens.Play.HUD
         private NotificationOverlay notificationOverlay { get; set; }
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private IDisposable scoreSubscription;
 
         /// <summary>
         /// From <see cref="BeatmapLeaderboard"/>
@@ -189,20 +195,42 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scope.Value == BeatmapLeaderboardScope.Local)
             {
-                using (var realm = realmFactory.CreateContext())
-                {
-                    var scores = realm.All<ScoreInfo>()
-                                      .AsEnumerable()
-                                      // TODO: update to use a realm filter directly (or at least figure out the beatmap part to reduce scope).
-                                      .Where(s => !s.DeletePending && s.BeatmapInfo.ID == targetBeatmapInfo.ID && s.Ruleset.OnlineID == ruleset.Value.ID);
+                scoreSubscription = realm.RegisterForNotifications(r =>
+                    r.All<ScoreInfo>().Filter($"{nameof(ScoreInfo.BeatmapInfo)}.{nameof(targetBeatmapInfo.ID)} == $0"
+                                              + $" AND {nameof(ScoreInfo.Ruleset)}.{nameof(RulesetInfo.ShortName)} == $1"
+                                              + $" AND {nameof(ScoreInfo.DeletePending)} == false"
+                        , targetBeatmapInfo.ID, ruleset.Value.ShortName), localScoresChanged);
 
-                    // we need to filter out all scores that have any mods to get all local nomod scores
-                    //scores = scores.Where(s => !s.Mods.Any());
+                void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception exception)
+                {
+                    if (cancellationTokenSource.IsCancellationRequested)
+                        return;
+
+                    var scores = sender.AsEnumerable();
+
+                    if (songSelect.FilterMods.Value && !mods.Value.Any())
+                    {
+                        // we need to filter out all scores that have any mods to get all local nomod scores
+                        scores = scores.Where(s => !s.Mods.Any());
+                    }
+                    else if (songSelect.FilterMods.Value)
+                    {
+                        // otherwise find all the scores that have *any* of the currently selected mods (similar to how web applies mod filters)
+                        // we're creating and using a string list representation of selected mods so that it can be translated into the DB query itself
+                        var selectedMods = mods.Value.Select(m => m.Acronym);
+                        scores = scores.Where(s => s.Mods.Any(m => selectedMods.Contains(m.Acronym)));
+                    }
+
                     scores = scores.Detach();
 
                     scoreManager.OrderByTotalScoreAsync(scores.ToArray(), cancellationTokenSource.Token)
-                                .ContinueWith(o => scoresCallback?.Invoke(o.GetResultSafely()),
-                                    TaskContinuationOptions.OnlyOnRanToCompletion);
+                                .ContinueWith(ordered => Schedule(() =>
+                                {
+                                    if (cancellationTokenSource.IsCancellationRequested)
+                                        return;
+
+                                    scoresCallback.Invoke(ordered.GetResultSafely());
+                                }), TaskContinuationOptions.OnlyOnRanToCompletion);
                 }
 
                 return;

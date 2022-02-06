@@ -24,6 +24,10 @@ namespace osu.Game.Screens
     {
         private bool showDisclaimer;
 
+        public override bool CursorVisible => cursorVisible;
+
+        private bool cursorVisible = false;
+
         public Loader()
         {
             ValidForResume = false;
@@ -78,6 +82,9 @@ namespace osu.Game.Screens
 
         private EFToRealmMigrator realmMigrator;
 
+        [Resolved(canBeNull: true)]
+        private OsuGame osuGame { get; set; }
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -87,13 +94,11 @@ namespace osu.Game.Screens
             // A non-null context factory means there's still content to migrate.
             if (efContextFactory != null)
             {
-                LoadComponentAsync(realmMigrator = new EFToRealmMigrator(), AddInternal);
-                realmMigrator.MigrationCompleted.ContinueWith(_ => Schedule(() =>
-                {
-                    // Delay initial screen loading to ensure that the migration is in a complete and sane state
-                    // before the intro screen may import the game intro beatmap.
-                    LoadComponentAsync(loadableScreen = CreateLoadableScreen());
-                }));
+                osuGame?.ForceWindowFadeIn();
+
+                cursorVisible = true;
+
+                LoadComponentAsync(new PreMigrateNotifier(startMigrate, this.Exit), AddInternal);
             }
             else
             {
@@ -112,6 +117,24 @@ namespace osu.Game.Screens
             });
 
             checkIfLoaded();
+        }
+
+        private void startMigrate(bool clearData)
+        {
+            cursorVisible = false;
+            LoadComponentAsync(realmMigrator = new EFToRealmMigrator(clearData), d =>
+            {
+                d.Alpha = 0.01f;
+                d.FadeIn(300, Easing.OutQuint);
+
+                AddInternal(d);
+            });
+            realmMigrator.MigrationCompleted.ContinueWith(_ => Schedule(() =>
+            {
+                // Delay initial screen loading to ensure that the migration is in a complete and sane state
+                // before the intro screen may import the game intro beatmap.
+                LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+            }));
         }
 
         private void checkIfLoaded()

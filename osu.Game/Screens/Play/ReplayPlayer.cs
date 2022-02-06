@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
         protected override Score CreateScore(IBeatmap beatmap) => createScore(beatmap, Mods.Value);
 
         // Don't re-import replay scores as they're already present in the database.
-        protected override Task ImportScore(Score score, bool bypassCheck = false) => Task.CompletedTask;
+        protected override Task ImportScore(Score score, bool bypassChesk = false) => Task.CompletedTask;
 
         protected override ResultsScreen CreateResults(ScoreInfo score) => new SoloResultsScreen(score, false);
 

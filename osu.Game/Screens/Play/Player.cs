@@ -1033,11 +1033,12 @@ namespace osu.Game.Screens.Play
         /// Imports the player's <see cref="Scoring.Score"/> to the local database.
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
+        /// <param name="bypassCheck">绕过分数检查，用于DanceMod</param>
         /// <returns>The imported score.</returns>
-        protected virtual Task ImportScore(Score score)
+        protected virtual Task ImportScore(Score score, bool bypassCheck = false)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
-            if (DrawableRuleset.ReplayScore != null)
+            if (DrawableRuleset.ReplayScore != null || bypassCheck)
                 return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;

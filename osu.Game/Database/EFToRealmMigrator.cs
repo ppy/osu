@@ -59,9 +59,12 @@ namespace osu.Game.Database
 
         private readonly OsuSpriteText currentOperationText;
 
-        public EFToRealmMigrator()
+        private readonly bool clearData;
+
+        public EFToRealmMigrator(bool clearData)
         {
             RelativeSizeAxes = Axes.Both;
+            this.clearData = clearData;
 
             InternalChildren = new Drawable[]
             {
@@ -78,21 +81,21 @@ namespace osu.Game.Database
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "Database migration in progress",
+                            Text = "正在合并数据库",
                             Font = OsuFont.Default.With(size: 40)
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "This could take a few minutes depending on the speed of your disk(s).",
+                            Text = "这将花费数分钟的时间(具体视磁盘而定)",
                             Font = OsuFont.Default.With(size: 30)
                         },
                         new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Text = "Please keep the window open until this completes!",
+                            Text = "请不要关闭此窗口！",
                             Font = OsuFont.Default.With(size: 30)
                         },
                         new LoadingSpinner(true)
@@ -122,16 +125,19 @@ namespace osu.Game.Database
             {
                 using (var ef = efContextFactory.Get())
                 {
-                    realm.Write(r =>
+                    if (clearData)
                     {
-                        // Before beginning, ensure realm is in an empty state.
-                        // Migrations which are half-completed could lead to issues if the user tries a second time.
-                        // Note that we only do this for beatmaps and scores since the other migrations are yonks old.
-                        r.RemoveAll<BeatmapSetInfo>();
-                        r.RemoveAll<BeatmapInfo>();
-                        r.RemoveAll<BeatmapMetadata>();
-                        r.RemoveAll<ScoreInfo>();
-                    });
+                        realm.Write(r =>
+                        {
+                            // Before beginning, ensure realm is in an empty state.
+                            // Migrations which are half-completed could lead to issues if the user tries a second time.
+                            // Note that we only do this for beatmaps and scores since the other migrations are yonks old.
+                            r.RemoveAll<BeatmapSetInfo>();
+                            r.RemoveAll<BeatmapInfo>();
+                            r.RemoveAll<BeatmapMetadata>();
+                            r.RemoveAll<ScoreInfo>();
+                        });
+                    }
 
                     ef.Migrate();
 
@@ -144,22 +150,23 @@ namespace osu.Game.Database
             {
                 if (t.Exception == null)
                 {
-                    log("Migration successful!");
+                    log("合并完成！");
 
                     if (DebugUtils.IsDebugBuild)
                         Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
                 }
                 else
                 {
-                    log("Migration failed!");
+                    log("合并失败！");
                     Logger.Log(t.Exception.ToString(), LoggingTarget.Database);
 
                     notificationOverlay.Post(new SimpleErrorNotification
                     {
-                        Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. The previous version has been backed up.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
+                        //Text = "IMPORTANT: During data migration, some of your data could not be successfully migrated. The previous version has been backed up.\n\nFor further assistance, please open a discussion on github and attach your backup files (click to get started).",
+                        Text = "注意: 合并数据时, 您的一些数据没有被正确处理。 原有数据库已备份, 您可以尝试将其恢复后回滚到之前版本继续游玩。\n\n我们不建议将此问题直接报告给上游, 因为我们也不知道mfosu中的相关功能是否有更改。",
                         Activated = () =>
                         {
-                            game.OpenUrlExternally($@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue ({t.Exception.Message})&body=Please%20drag%20the%20""attach_me.zip""%20file%20here!&category=q-a", true);
+                            //game.OpenUrlExternally($@"https://github.com/ppy/osu/discussions/new?title=Realm%20migration%20issue ({t.Exception.Message})&body=Please%20drag%20the%20""attach_me.zip""%20file%20here!&category=q-a", true);
 
                             const string attachment_filename = "attach_me.zip";
                             const string backup_folder = "backups";

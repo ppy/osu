@@ -168,6 +168,8 @@ namespace osu.Desktop
 
         private BindableFloat windowOpacity;
 
+        public override void ForceWindowFadeIn() => TransformWindowOpacity(1, 300);
+
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);

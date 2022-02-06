@@ -236,6 +236,10 @@ namespace osu.Game
             stream.Dispose();
         }
 
+        public virtual void ForceWindowFadeIn()
+        {
+        }
+
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
