@@ -136,6 +136,8 @@ namespace osu.Game.Beatmaps
                 newBeatmapInfo.ID = Guid.NewGuid();
                 // clear difficulty name to avoid clashes on save.
                 newBeatmapInfo.DifficultyName = string.Empty;
+                // also clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
+                newBeatmapInfo.Hash = string.Empty;
             }
 
             // populate circular beatmap set info <-> beatmap info references manually.
