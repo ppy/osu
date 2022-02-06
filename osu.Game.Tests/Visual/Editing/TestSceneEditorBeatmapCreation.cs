@@ -10,6 +10,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
@@ -92,7 +93,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestCreateNewDifficulty()
+        public void TestCreateNewDifficulty([Values] bool sameRuleset)
         {
             string firstDifficultyName = Guid.NewGuid().ToString();
             string secondDifficultyName = Guid.NewGuid().ToString();
@@ -111,7 +112,14 @@ namespace osu.Game.Tests.Visual.Editing
             });
             AddAssert("can save again", () => Editor.Save());
 
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(sameRuleset ? new OsuRuleset().RulesetInfo : new CatchRuleset().RulesetInfo));
+
+            if (sameRuleset)
+            {
+                AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            }
+
             AddUntilStep("wait for created", () =>
             {
                 string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
@@ -154,7 +162,7 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestCreateNewBeatmapFailsWithSameNamedDifficulties()
+        public void TestCreateNewBeatmapFailsWithSameNamedDifficulties([Values] bool sameRuleset)
         {
             Guid setId = Guid.Empty;
             const string duplicate_difficulty_name = "duplicate";
@@ -168,7 +176,14 @@ namespace osu.Game.Tests.Visual.Editing
                 return set != null && set.PerformRead(s => s.Beatmaps.Count == 1 && s.Files.Count == 1);
             });
 
-            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(sameRuleset ? new OsuRuleset().RulesetInfo : new CatchRuleset().RulesetInfo));
+
+            if (sameRuleset)
+            {
+                AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+                AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+            }
+
             AddUntilStep("wait for created", () =>
             {
                 string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
