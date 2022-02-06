@@ -9,13 +9,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
+using osuTK;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 
@@ -99,6 +103,21 @@ namespace osu.Game.Tests.Visual.Editing
             string secondDifficultyName = Guid.NewGuid().ToString();
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new HitCircle
+                {
+                    Position = new Vector2(0),
+                    StartTime = 0
+                },
+                new HitCircle
+                {
+                    Position = OsuPlayfield.BASE_SIZE,
+                    StartTime = 1000
+                }
+            }));
+
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
             {
@@ -125,6 +144,80 @@ namespace osu.Game.Tests.Visual.Editing
                 string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
                 return difficultyName != null && difficultyName != firstDifficultyName;
             });
+
+            AddAssert("created difficulty has timing point", () =>
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
+                return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+            AddAssert("created difficulty has no objects", () => EditorBeatmap.HitObjects.Count == 0);
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == secondDifficultyName);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+
+                return beatmap != null
+                       && beatmap.DifficultyName == secondDifficultyName
+                       && set != null
+                       && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName));
+            });
+        }
+
+        [Test]
+        public void TestCopyDifficulty()
+        {
+            string firstDifficultyName = Guid.NewGuid().ToString();
+            string secondDifficultyName = Guid.NewGuid().ToString();
+
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
+            AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
+            {
+                new HitCircle
+                {
+                    Position = new Vector2(0),
+                    StartTime = 0
+                },
+                new HitCircle
+                {
+                    Position = OsuPlayfield.BASE_SIZE,
+                    StartTime = 1000
+                }
+            }));
+
+            AddStep("save beatmap", () => Editor.Save());
+            AddAssert("new beatmap persisted", () =>
+            {
+                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == firstDifficultyName);
+                var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
+
+                return beatmap != null
+                       && beatmap.DifficultyName == firstDifficultyName
+                       && set != null
+                       && set.PerformRead(s => s.Beatmaps.Single().ID == beatmap.ID);
+            });
+            AddAssert("can save again", () => Editor.Save());
+
+            AddStep("create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
+
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation as a copy", () => DialogOverlay.CurrentDialog.Buttons.ElementAt(1).TriggerClick());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != firstDifficultyName;
+            });
+
+            AddAssert("created difficulty has timing point", () =>
+            {
+                var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
+                return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
+            });
+            AddAssert("created difficulty has objects", () => EditorBeatmap.HitObjects.Count == 2);
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
