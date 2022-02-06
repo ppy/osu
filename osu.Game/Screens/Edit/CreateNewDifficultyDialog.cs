@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit
 
         public CreateNewDifficultyDialog(CreateNewDifficulty createNewDifficulty)
         {
-            HeaderText = "Would you like to clear all objects?";
+            HeaderText = "Would you like to create a blank difficulty?";
 
             Icon = FontAwesome.Regular.Clone;
 
