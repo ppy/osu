@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -188,6 +190,16 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             }));
             AddStep("set approach rate", () => EditorBeatmap.Difficulty.ApproachRate = 4);
+            AddStep("set combo colours", () =>
+            {
+                var beatmapSkin = EditorBeatmap.BeatmapSkin.AsNonNull();
+                beatmapSkin.ComboColours.Clear();
+                beatmapSkin.ComboColours.AddRange(new[]
+                {
+                    new Colour4(255, 0, 0, 255),
+                    new Colour4(0, 0, 255, 255)
+                });
+            });
 
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
@@ -220,6 +232,7 @@ namespace osu.Game.Tests.Visual.Editing
             });
             AddAssert("created difficulty has objects", () => EditorBeatmap.HitObjects.Count == 2);
             AddAssert("approach rate correctly copied", () => EditorBeatmap.Difficulty.ApproachRate == 4);
+            AddAssert("combo colours correctly copied", () => EditorBeatmap.BeatmapSkin.AsNonNull().ComboColours.Count == 2);
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
