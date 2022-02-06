@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit
             {
                 try
                 {
-                    return beatmapManager.CreateNewBlankDifficulty(creationParameters);
+                    return beatmapManager.CreateNewDifficulty(creationParameters);
                 }
                 catch (Exception ex)
                 {

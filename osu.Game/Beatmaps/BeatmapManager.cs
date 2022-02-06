@@ -113,7 +113,7 @@ namespace osu.Game.Beatmaps
         /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
         /// and represented by the returned <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public virtual WorkingBeatmap CreateNewBlankDifficulty(NewDifficultyCreationParameters creationParameters)
+        public virtual WorkingBeatmap CreateNewDifficulty(NewDifficultyCreationParameters creationParameters)
         {
             var referenceBeatmap = creationParameters.ReferenceBeatmap;
             var targetBeatmapSet = creationParameters.BeatmapSet;
@@ -121,7 +121,7 @@ namespace osu.Game.Beatmaps
             BeatmapInfo newBeatmapInfo;
             IBeatmap newBeatmap;
 
-            if (creationParameters.ClearAllObjects)
+            if (creationParameters.CreateBlank)
             {
                 newBeatmapInfo = new BeatmapInfo(creationParameters.Ruleset, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
                 newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };

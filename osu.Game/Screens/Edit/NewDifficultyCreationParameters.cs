@@ -32,9 +32,14 @@ namespace osu.Game.Screens.Edit
         public ISkin? ReferenceBeatmapSkin { get; }
 
         /// <summary>
-        /// Whether all objects should be cleared from the new difficulty.
+        /// Whether the new difficulty should be blank.
         /// </summary>
-        public bool ClearAllObjects { get; }
+        /// <remarks>
+        /// A blank difficulty will have no objects, no control points other than timing points taken from <see cref="ReferenceBeatmap"/>
+        /// and will not share <see cref="BeatmapInfo"/> values with <see cref="ReferenceBeatmap"/>,
+        /// but it will share metadata and timing information with <see cref="ReferenceBeatmap"/>.
+        /// </remarks>
+        public bool CreateBlank { get; }
 
         /// <summary>
         /// The saved state of the previous <see cref="Editor"/> which should be restored upon opening the newly-created difficulty.
@@ -46,14 +51,14 @@ namespace osu.Game.Screens.Edit
             RulesetInfo ruleset,
             IBeatmap referenceBeatmap,
             ISkin? referenceBeatmapSkin,
-            bool clearAllObjects,
+            bool createBlank,
             EditorState editorState)
         {
             BeatmapSet = beatmapSet;
             Ruleset = ruleset;
             ReferenceBeatmap = referenceBeatmap;
             ReferenceBeatmapSkin = referenceBeatmapSkin;
-            ClearAllObjects = clearAllObjects;
+            CreateBlank = createBlank;
             EditorState = editorState;
         }
     }
