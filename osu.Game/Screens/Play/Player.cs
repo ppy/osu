@@ -961,7 +961,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(musicController.CurrentTrack);
             foreach (var mod in GameplayState.Mods.OfType<IApplicableToTrackMixer>())
-                mod.ApplyToTrackMixer(musicController.AudioMixer);
+                mod.ApplyToTrackMixer(musicController.TrackMixer);
 
             updateGameplayState();
 

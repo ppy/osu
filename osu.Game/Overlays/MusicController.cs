@@ -56,13 +56,17 @@ namespace osu.Game.Overlays
         [Resolved]
         private RealmAccess realm { get; set; }
 
-        private readonly DrawableAudioMixer drawableAudioMixer;
+        private readonly DrawableAudioMixer trackMixer;
 
-        public IAudioMixer AudioMixer => drawableAudioMixer;
+        /// <summary>
+        /// Get the local audio mixer layered on top of <see cref="CurrentTrack"/>.
+        /// This mixer allows components (like mods) to apply audio filters to the current track without interfering with the global track mixer.
+        /// </summary>
+        public IAudioMixer TrackMixer => trackMixer;
 
         public MusicController()
         {
-            AddInternal(drawableAudioMixer = new DrawableAudioMixer { Name = $"{nameof(MusicController)} {nameof(DrawableAudioMixer)}" });
+            AddInternal(trackMixer = new DrawableAudioMixer { Name = $"{nameof(MusicController)} {nameof(TrackMixer)}" });
         }
 
         [BackgroundDependencyLoader]
@@ -338,7 +342,7 @@ namespace osu.Game.Overlays
 
                 if (queuedTrack == CurrentTrack)
                 {
-                    drawableAudioMixer.Add(queuedTrack);
+                    trackMixer.Add(queuedTrack);
                     queuedTrack.VolumeTo(0).Then().VolumeTo(1, 300, Easing.Out);
                 }
                 else
@@ -399,14 +403,14 @@ namespace osu.Game.Overlays
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Frequency);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Tempo);
             CurrentTrack.RemoveAllAdjustments(AdjustableProperty.Volume);
-            drawableAudioMixer.Effects.Clear();
+            trackMixer.Effects.Clear();
 
             if (allowTrackAdjustments)
             {
                 foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
                     mod.ApplyToTrack(CurrentTrack);
                 foreach (var mod in mods.Value.OfType<IApplicableToTrackMixer>())
-                    mod.ApplyToTrackMixer(drawableAudioMixer);
+                    mod.ApplyToTrackMixer(trackMixer);
             }
         }
     }
