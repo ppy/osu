@@ -187,6 +187,7 @@ namespace osu.Game.Tests.Visual.Editing
                     StartTime = 1000
                 }
             }));
+            AddStep("set approach rate", () => EditorBeatmap.Difficulty.ApproachRate = 4);
 
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
@@ -218,6 +219,7 @@ namespace osu.Game.Tests.Visual.Editing
                 return timingPoint.Time == 0 && timingPoint.BeatLength == 1000;
             });
             AddAssert("created difficulty has objects", () => EditorBeatmap.HitObjects.Count == 2);
+            AddAssert("approach rate correctly copied", () => EditorBeatmap.Difficulty.ApproachRate == 4);
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
