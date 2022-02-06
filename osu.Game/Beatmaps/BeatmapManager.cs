@@ -20,6 +20,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Edit;
 using osu.Game.Skinning;
 using osu.Game.Stores;
 
@@ -112,29 +113,36 @@ namespace osu.Game.Beatmaps
         /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
         /// and represented by the returned <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public virtual WorkingBeatmap CreateNewBlankDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo)
+        public virtual WorkingBeatmap CreateNewBlankDifficulty(NewDifficultyCreationParameters creationParameters)
         {
-            // fetch one of the existing difficulties to copy timing points and metadata from,
-            // so that the user doesn't have to fill all of that out again.
-            // this silently assumes that all difficulties have the same timing points and metadata,
-            // but cases where this isn't true seem rather rare / pathological.
-            var referenceBeatmap = GetWorkingBeatmap(beatmapSetInfo.Beatmaps.First());
+            var referenceBeatmap = creationParameters.ReferenceBeatmap;
+            var targetBeatmapSet = creationParameters.BeatmapSet;
 
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
+            var newBeatmapInfo = new BeatmapInfo(creationParameters.Ruleset, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
 
             // populate circular beatmap set info <-> beatmap info references manually.
             // several places like `BeatmapModelManager.Save()` or `GetWorkingBeatmap()`
             // rely on them being freely traversable in both directions for correct operation.
-            beatmapSetInfo.Beatmaps.Add(newBeatmapInfo);
-            newBeatmapInfo.BeatmapSet = beatmapSetInfo;
+            targetBeatmapSet.Beatmaps.Add(newBeatmapInfo);
+            newBeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
-            foreach (var timingPoint in referenceBeatmap.Beatmap.ControlPointInfo.TimingPoints)
-                newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+            IBeatmap newBeatmap;
+
+            if (creationParameters.ClearAllObjects)
+            {
+                newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+                foreach (var timingPoint in referenceBeatmap.ControlPointInfo.TimingPoints)
+                    newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+            }
+            else
+            {
+                newBeatmap = referenceBeatmap.Clone();
+                newBeatmap.BeatmapInfo = newBeatmapInfo;
+            }
 
             beatmapModelManager.Save(newBeatmapInfo, newBeatmap);
 
-            workingBeatmapCache.Invalidate(beatmapSetInfo);
+            workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
         }
 

@@ -841,7 +841,25 @@ namespace osu.Game.Screens.Edit
         }
 
         protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
-            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo.BeatmapSet, rulesetInfo, GetState());
+        {
+            if (!rulesetInfo.Equals(editorBeatmap.BeatmapInfo.Ruleset))
+            {
+                switchToNewDifficulty(rulesetInfo, true);
+                return;
+            }
+
+            dialogOverlay.Push(new CreateNewDifficultyDialog(clearAllObjects => switchToNewDifficulty(rulesetInfo, clearAllObjects)));
+        }
+
+        private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool clearAllObjects)
+            => loader?.ScheduleSwitchToNewDifficulty(new NewDifficultyCreationParameters
+            {
+                BeatmapSet = editorBeatmap.BeatmapInfo.BeatmapSet,
+                Ruleset = rulesetInfo,
+                ReferenceBeatmap = playableBeatmap,
+                ClearAllObjects = clearAllObjects,
+                EditorState = GetState()
+            });
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
