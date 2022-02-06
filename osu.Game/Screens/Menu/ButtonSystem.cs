@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Menu
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
 
+        [CanBeNull]
         private OsuLogo logo;
 
         /// <summary>
@@ -380,9 +382,9 @@ namespace osu.Game.Screens.Menu
 
                         game?.Toolbar.Hide();
 
-                        logo.ClearTransforms(targetMember: nameof(Position));
-                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                        logo?.ClearTransforms(targetMember: nameof(Position));
+                        logo?.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo?.ScaleTo(1, 800, Easing.OutExpo);
                     }, buttonArea.Alpha * 150);
                     break;
 
@@ -406,7 +408,7 @@ namespace osu.Game.Screens.Menu
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
                                 if (impact)
-                                    logo.Impact();
+                                    logo?.Impact();
 
                                 game?.Toolbar.Show();
                             }, 200);

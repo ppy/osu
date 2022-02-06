@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps
                     Title = "无可用谱面!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                BaseDifficulty = new BeatmapDifficulty
+                Difficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
                     CircleSize = 0,

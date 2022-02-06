@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -48,7 +49,11 @@ namespace osu.Game.Tests.Visual
         public virtual void SetUpSteps() => addExitAllScreensStep();
 
         [TearDownSteps]
-        public virtual void TearDownSteps() => addExitAllScreensStep();
+        public virtual void TearDownSteps()
+        {
+            if (DebugUtils.IsNUnitRunning)
+                addExitAllScreensStep();
+        }
 
         private void addExitAllScreensStep()
         {

@@ -8,7 +8,6 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -40,9 +39,9 @@ namespace osu.Game.Tests.Visual.Playlists
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, API, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         [SetUpSteps]
@@ -151,7 +150,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
                 Debug.Assert(modifiedBeatmap.BeatmapInfo.BeatmapSet != null);
 
-                manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet).WaitSafely();
+                manager.Import(modifiedBeatmap.BeatmapInfo.BeatmapSet);
             });
 
             // Create the room using the real beatmap values.
@@ -196,7 +195,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
                 Debug.Assert(originalBeatmap.BeatmapInfo.BeatmapSet != null);
 
-                manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet).WaitSafely();
+                manager.Import(originalBeatmap.BeatmapInfo.BeatmapSet);
             });
 
             AddUntilStep("match has correct beatmap", () => realHash == match.Beatmap.Value.BeatmapInfo.MD5Hash);
@@ -219,7 +218,7 @@ namespace osu.Game.Tests.Visual.Playlists
 
             Debug.Assert(beatmap.BeatmapInfo.BeatmapSet != null);
 
-            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet).GetResultSafely()?.Value.Detach();
+            importedBeatmap = manager.Import(beatmap.BeatmapInfo.BeatmapSet)?.Value.Detach();
         });
 
         private class TestPlaylistsRoomSubScreen : PlaylistsRoomSubScreen

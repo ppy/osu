@@ -29,11 +29,11 @@ namespace osu.Game.Scoring
     public class ScoreInfo : RealmObject, IHasGuidPrimaryKey, IHasRealmFiles, ISoftDelete, IEquatable<ScoreInfo>, IScoreInfo
     {
         [PrimaryKey]
-        public Guid ID { get; set; } = Guid.NewGuid();
+        public Guid ID { get; set; }
 
-        public BeatmapInfo BeatmapInfo { get; set; }
+        public BeatmapInfo BeatmapInfo { get; set; } = null!;
 
-        public RulesetInfo Ruleset { get; set; }
+        public RulesetInfo Ruleset { get; set; } = null!;
 
         public IList<RealmNamedFileUsage> Files { get; } = null!;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Scoring
         public long OnlineID { get; set; } = -1;
 
         [MapTo("User")]
-        public RealmUser RealmUser { get; set; }
+        public RealmUser RealmUser { get; set; } = null!;
 
         [MapTo("Mods")]
         public string ModsJson { get; set; } = string.Empty;
@@ -65,19 +65,17 @@ namespace osu.Game.Scoring
         [MapTo("Statistics")]
         public string StatisticsJson { get; set; } = string.Empty;
 
-        public ScoreInfo(BeatmapInfo beatmap, RulesetInfo ruleset, RealmUser realmUser)
+        public ScoreInfo(BeatmapInfo? beatmap = null, RulesetInfo? ruleset = null, RealmUser? realmUser = null)
         {
-            Ruleset = ruleset;
-            BeatmapInfo = beatmap;
-            RealmUser = realmUser;
+            Ruleset = ruleset ?? new RulesetInfo();
+            BeatmapInfo = beatmap ?? new BeatmapInfo();
+            RealmUser = realmUser ?? new RealmUser();
+            ID = Guid.NewGuid();
         }
 
-        [UsedImplicitly]
-        public ScoreInfo() // TODO: consider removing this and migrating all usages to ctor with parameters.
+        [UsedImplicitly] // Realm
+        private ScoreInfo()
         {
-            Ruleset = new RulesetInfo();
-            RealmUser = new RealmUser();
-            BeatmapInfo = new BeatmapInfo();
         }
 
         // TODO: this is a bit temporary to account for the fact that this class is used to ferry API user data to certain UI components.
@@ -104,6 +102,7 @@ namespace osu.Game.Scoring
             }
         }
 
+        [Ignored]
         public ScoreRank Rank
         {
             get => (ScoreRank)RankInt;
@@ -134,6 +133,11 @@ namespace osu.Game.Scoring
             var clone = (ScoreInfo)this.Detach().MemberwiseClone();
 
             clone.Statistics = new Dictionary<HitResult, int>(clone.Statistics);
+            clone.RealmUser = new RealmUser
+            {
+                OnlineID = RealmUser.OnlineID,
+                Username = RealmUser.Username,
+            };
 
             return clone;
         }
@@ -190,9 +194,8 @@ namespace osu.Game.Scoring
             }
             set
             {
-                apiMods = null;
+                clearAllMods();
                 mods = value;
-
                 updateModsJson();
             }
         }
@@ -219,17 +222,24 @@ namespace osu.Game.Scoring
             }
             set
             {
+                clearAllMods();
                 apiMods = value;
-                mods = null;
-
-                // We potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
                 updateModsJson();
             }
         }
 
+        private void clearAllMods()
+        {
+            ModsJson = string.Empty;
+            mods = null;
+            apiMods = null;
+        }
+
         private void updateModsJson()
         {
-            ModsJson = JsonConvert.SerializeObject(APIMods);
+            ModsJson = APIMods.Length > 0
+                ? JsonConvert.SerializeObject(APIMods)
+                : string.Empty;
         }
 
         public bool IsReplay = true;

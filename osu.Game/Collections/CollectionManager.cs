@@ -50,9 +50,14 @@ namespace osu.Game.Collections
             this.storage = storage;
         }
 
+        [Resolved(canBeNull: true)]
+        private DatabaseContextFactory efContextFactory { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            efContextFactory?.WaitForMigrationCompletion();
+
             Collections.CollectionChanged += collectionsChanged;
 
             if (storage.Exists(database_backup_name))
@@ -209,7 +214,7 @@ namespace osu.Game.Collections
 
                             string checksum = sr.ReadString();
 
-                            var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum)?.Detach();
+                            var beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == checksum);
                             if (beatmap != null)
                                 collection.Beatmaps.Add(beatmap);
                         }

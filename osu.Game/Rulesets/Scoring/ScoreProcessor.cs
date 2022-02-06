@@ -8,9 +8,11 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
@@ -18,6 +20,11 @@ namespace osu.Game.Rulesets.Scoring
     public class ScoreProcessor : JudgementProcessor
     {
         private const double max_score = 1000000;
+
+        /// <summary>
+        /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
+        /// </summary>
+        public event Action OnResetFromReplayFrame;
 
         /// <summary>
         /// The current total score.
@@ -126,6 +133,8 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
+            scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
+
             if (!result.Type.IsScorable())
                 return;
 
@@ -152,8 +161,6 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
-            scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) + 1;
-
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
 
@@ -176,6 +183,8 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement)
                 return;
 
+            scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) - 1;
+
             if (!result.Type.IsScorable())
                 return;
 
@@ -186,8 +195,6 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore -= scoreIncrease;
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
-
-            scoreResultCounts[result.Type] = scoreResultCounts.GetValueOrDefault(result.Type) - 1;
 
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
@@ -330,12 +337,6 @@ namespace osu.Game.Rulesets.Scoring
             HighestCombo.Value = 0;
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            hitEvents.Clear();
-        }
-
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
@@ -347,10 +348,71 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Accuracy.Value;
             score.Rank = Rank.Value;
 
-            foreach (var result in HitResultExtensions.SCORABLE_TYPES)
+            foreach (var result in HitResultExtensions.ALL_TYPES)
                 score.Statistics[result] = GetStatistic(result);
 
             score.HitEvents = hitEvents;
+        }
+
+        /// <summary>
+        /// Maximum <see cref="HitResult"/> for a normal hit (i.e. not tick/bonus) for this ruleset. Only populated via <see cref="ResetFromReplayFrame"/>.
+        /// </summary>
+        private HitResult? maxNormalResult;
+
+        public override void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
+        {
+            base.ResetFromReplayFrame(ruleset, frame);
+
+            if (frame.Header == null)
+                return;
+
+            baseScore = 0;
+            rollingMaxBaseScore = 0;
+            HighestCombo.Value = frame.Header.MaxCombo;
+
+            foreach ((HitResult result, int count) in frame.Header.Statistics)
+            {
+                // Bonus scores are counted separately directly from the statistics dictionary later on.
+                if (!result.IsScorable() || result.IsBonus())
+                    continue;
+
+                // The maximum result of this judgement if it wasn't a miss.
+                // E.g. For a GOOD judgement, the max result is either GREAT/PERFECT depending on which one the ruleset uses (osu!: GREAT, osu!mania: PERFECT).
+                HitResult maxResult;
+
+                switch (result)
+                {
+                    case HitResult.LargeTickHit:
+                    case HitResult.LargeTickMiss:
+                        maxResult = HitResult.LargeTickHit;
+                        break;
+
+                    case HitResult.SmallTickHit:
+                    case HitResult.SmallTickMiss:
+                        maxResult = HitResult.SmallTickHit;
+                        break;
+
+                    default:
+                        maxResult = maxNormalResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
+                        break;
+                }
+
+                baseScore += count * Judgement.ToNumericResult(result);
+                rollingMaxBaseScore += count * Judgement.ToNumericResult(maxResult);
+            }
+
+            scoreResultCounts.Clear();
+            scoreResultCounts.AddRange(frame.Header.Statistics);
+
+            updateScore();
+
+            OnResetFromReplayFrame?.Invoke();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            hitEvents.Clear();
         }
     }
 

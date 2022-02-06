@@ -16,9 +16,9 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     public interface IModelImporter<TModel> : IPostNotifications, IPostImports<TModel>, ICanAcceptFiles
-        where TModel : class
+        where TModel : class, IHasGuidPrimaryKey
     {
-        Task<IEnumerable<ILive<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks);
+        Task<IEnumerable<Live<TModel>>> Import(ProgressNotification notification, params ImportTask[] tasks);
 
         /// <summary>
         /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
@@ -28,7 +28,7 @@ namespace osu.Game.Database
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
         /// <returns>The imported model, if successful.</returns>
-        Task<ILive<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default);
+        Task<Live<TModel>?> Import(ImportTask task, bool lowPriority = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Silently import an item from an <see cref="ArchiveReader"/>.
@@ -36,7 +36,7 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        Task<ILive<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default);
+        Task<Live<TModel>?> Import(ArchiveReader archive, bool lowPriority = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Silently import an item from a <typeparamref name="TModel"/>.
@@ -45,7 +45,7 @@ namespace osu.Game.Database
         /// <param name="archive">An optional archive to use for model population.</param>
         /// <param name="lowPriority">Whether this is a low priority import.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
-        Task<ILive<TModel>?> Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default);
+        Live<TModel>? Import(TModel item, ArchiveReader? archive = null, bool lowPriority = false, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// A user displayable name for the model type associated with this manager.

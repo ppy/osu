@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mods
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            int beatsPerBar = (int)timingPoint.TimeSignature;
+            int beatsPerBar = timingPoint.TimeSignature.Numerator;
             int segmentLength = beatsPerBar * Divisor * bars_per_segment;
 
             if (!IsBeatSyncedWithTrack)

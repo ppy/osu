@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Notifications
     {
         private LocalisableString text;
 
-        public LocalisableString Text
+        public override LocalisableString Text
         {
             get => text;
             set
