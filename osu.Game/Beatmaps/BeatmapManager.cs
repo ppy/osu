@@ -118,18 +118,12 @@ namespace osu.Game.Beatmaps
             var referenceBeatmap = creationParameters.ReferenceBeatmap;
             var targetBeatmapSet = creationParameters.BeatmapSet;
 
-            var newBeatmapInfo = new BeatmapInfo(creationParameters.Ruleset, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
-
-            // populate circular beatmap set info <-> beatmap info references manually.
-            // several places like `BeatmapModelManager.Save()` or `GetWorkingBeatmap()`
-            // rely on them being freely traversable in both directions for correct operation.
-            targetBeatmapSet.Beatmaps.Add(newBeatmapInfo);
-            newBeatmapInfo.BeatmapSet = targetBeatmapSet;
-
+            BeatmapInfo newBeatmapInfo;
             IBeatmap newBeatmap;
 
             if (creationParameters.ClearAllObjects)
             {
+                newBeatmapInfo = new BeatmapInfo(creationParameters.Ruleset, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
                 newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
                 foreach (var timingPoint in referenceBeatmap.ControlPointInfo.TimingPoints)
                     newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
@@ -137,8 +131,18 @@ namespace osu.Game.Beatmaps
             else
             {
                 newBeatmap = referenceBeatmap.Clone();
-                newBeatmap.BeatmapInfo = newBeatmapInfo;
+                newBeatmap.BeatmapInfo = newBeatmapInfo = referenceBeatmap.BeatmapInfo.Clone();
+                // assign a new ID to the clone.
+                newBeatmapInfo.ID = Guid.NewGuid();
+                // clear difficulty name to avoid clashes on save.
+                newBeatmapInfo.DifficultyName = string.Empty;
             }
+
+            // populate circular beatmap set info <-> beatmap info references manually.
+            // several places like `BeatmapModelManager.Save()` or `GetWorkingBeatmap()`
+            // rely on them being freely traversable in both directions for correct operation.
+            targetBeatmapSet.Beatmaps.Add(newBeatmapInfo);
+            newBeatmapInfo.BeatmapSet = targetBeatmapSet;
 
             beatmapModelManager.Save(newBeatmapInfo, newBeatmap);
 
