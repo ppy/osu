@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -853,13 +854,14 @@ namespace osu.Game.Screens.Edit
 
         private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool clearAllObjects)
             => loader?.ScheduleSwitchToNewDifficulty(new NewDifficultyCreationParameters
-            {
-                BeatmapSet = editorBeatmap.BeatmapInfo.BeatmapSet,
-                Ruleset = rulesetInfo,
-                ReferenceBeatmap = playableBeatmap,
-                ClearAllObjects = clearAllObjects,
-                EditorState = GetState()
-            });
+            (
+                editorBeatmap.BeatmapInfo.BeatmapSet.AsNonNull(),
+                rulesetInfo,
+                playableBeatmap,
+                editorBeatmap.BeatmapSkin,
+                clearAllObjects,
+                GetState()
+            ));
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
