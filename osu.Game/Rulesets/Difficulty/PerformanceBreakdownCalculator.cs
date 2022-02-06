@@ -51,17 +51,7 @@ namespace osu.Game.Rulesets.Difficulty
                 perfectPlay.Passed = true;
 
                 // calculate max combo
-                var difficulty = await difficultyCache.GetDifficultyAsync(
-                    playableBeatmap.BeatmapInfo,
-                    score.Ruleset,
-                    score.Mods,
-                    cancellationToken
-                ).ConfigureAwait(false);
-
-                if (difficulty == null)
-                    return null;
-
-                perfectPlay.MaxCombo = difficulty.Value.MaxCombo;
+                perfectPlay.MaxCombo = calculateMaxCombo(playableBeatmap);
 
                 // create statistics assuming all hit objects have perfect hit result
                 var statistics = playableBeatmap.HitObjects
@@ -86,9 +76,21 @@ namespace osu.Game.Rulesets.Difficulty
                 }
 
                 // calculate performance for this perfect score
+                var difficulty = await difficultyCache.GetDifficultyAsync(
+                    playableBeatmap.BeatmapInfo,
+                    score.Ruleset,
+                    score.Mods,
+                    cancellationToken
+                ).ConfigureAwait(false);
+
                 // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
-                return ruleset.CreatePerformanceCalculator(difficulty.Value.Attributes, perfectPlay)?.Calculate();
+                return difficulty == null ? null : ruleset.CreatePerformanceCalculator(difficulty.Value.Attributes, perfectPlay)?.Calculate();
             }, cancellationToken);
+        }
+
+        private int calculateMaxCombo(IBeatmap beatmap)
+        {
+            return beatmap.HitObjects.SelectMany(getPerfectHitResults).Count(r => r.AffectsCombo());
         }
 
         private IEnumerable<HitResult> getPerfectHitResults(HitObject hitObject)
