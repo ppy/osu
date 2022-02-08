@@ -8,6 +8,7 @@ using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Rulesets.Difficulty;
 
 namespace osu.Game.Scoring
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Scoring
     /// A component which performs and acts as a central cache for performance calculations of locally databased scores.
     /// Currently not persisted between game sessions.
     /// </summary>
-    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, double?>
+    public class ScorePerformanceCache : MemoryCachingComponent<ScorePerformanceCache.PerformanceCacheLookup, PerformanceAttributes>
     {
         [Resolved]
         private BeatmapDifficultyCache difficultyCache { get; set; }
@@ -27,10 +28,10 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="score">The score to do the calculation on. </param>
         /// <param name="token">An optional <see cref="CancellationToken"/> to cancel the operation.</param>
-        public Task<double?> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default) =>
+        public Task<PerformanceAttributes> CalculatePerformanceAsync([NotNull] ScoreInfo score, CancellationToken token = default) =>
             GetAsync(new PerformanceCacheLookup(score), token);
 
-        protected override async Task<double?> ComputeValueAsync(PerformanceCacheLookup lookup, CancellationToken token = default)
+        protected override async Task<PerformanceAttributes> ComputeValueAsync(PerformanceCacheLookup lookup, CancellationToken token = default)
         {
             var score = lookup.ScoreInfo;
 
@@ -44,7 +45,7 @@ namespace osu.Game.Scoring
 
             var calculator = score.Ruleset.CreateInstance().CreatePerformanceCalculator(attributes.Value.Attributes, score);
 
-            return calculator?.Calculate().Total;
+            return calculator?.Calculate();
         }
 
         public readonly struct PerformanceCacheLookup

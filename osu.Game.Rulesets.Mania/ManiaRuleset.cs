@@ -370,6 +370,17 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
+                    new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y
+                    }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
                     new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(score.HitEvents)
                     {
                         RelativeSizeAxes = Axes.X,
