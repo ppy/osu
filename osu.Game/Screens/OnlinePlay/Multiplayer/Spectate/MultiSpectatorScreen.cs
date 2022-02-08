@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -228,7 +227,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         public override bool OnBackButton()
         {
-            Debug.Assert(multiplayerClient.Room != null);
+            if (multiplayerClient.Room == null)
+                return base.OnBackButton();
 
             // On a manual exit, set the player back to idle unless gameplay has finished.
             if (multiplayerClient.Room.State != MultiplayerRoomState.Open)
