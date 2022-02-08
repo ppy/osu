@@ -216,7 +216,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override void EndGameplay(int userId, SpectatorState state)
         {
-            if (state.State == SpectatingUserState.Completed || state.State == SpectatingUserState.Failed)
+            if (state.State == SpectatingUserState.Passed || state.State == SpectatingUserState.Failed)
                 return;
 
             RemoveUser(userId);

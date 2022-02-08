@@ -186,7 +186,7 @@ namespace osu.Game.Online.Spectator
                 currentBeatmap = null;
 
                 if (state.HasPassed)
-                    currentState.State = SpectatingUserState.Completed;
+                    currentState.State = SpectatingUserState.Passed;
                 else if (state.HasFailed)
                     currentState.State = SpectatingUserState.Failed;
                 else
