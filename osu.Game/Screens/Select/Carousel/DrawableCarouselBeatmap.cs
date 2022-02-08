@@ -36,9 +36,9 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// The height of a carousel beatmap, including vertical spacing.
         /// </summary>
-        public const float HEIGHT = header_height + CAROUSEL_BEATMAP_SPACING;
+        public const float HEIGHT = height + CAROUSEL_BEATMAP_SPACING;
 
-        private const float header_height = MAX_HEIGHT * 0.6f;
+        private const float height = MAX_HEIGHT * 0.6f;
 
         private readonly BeatmapInfo beatmapInfo;
 
@@ -67,18 +67,16 @@ namespace osu.Game.Screens.Select.Carousel
         private CancellationTokenSource starDifficultyCancellationSource;
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
-            : base(header_height)
         {
             beatmapInfo = panel.BeatmapInfo;
             Item = panel;
-
-            // Difficulty panels should start hidden for a better initial effect.
-            Hide();
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager manager, SongSelect songSelect)
         {
+            Header.Height = height;
+
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);
