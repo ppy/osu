@@ -16,6 +16,11 @@ namespace osu.Game.Online.Spectator
         Playing,
 
         /// <summary>
+        /// The spectated user is currently paused. Unused for the time being.
+        /// </summary>
+        Paused,
+
+        /// <summary>
         /// The spectated user has passed gameplay.
         /// </summary>
         Passed,
