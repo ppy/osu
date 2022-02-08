@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("click to right of panel", () =>
             {
                 var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
-                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(100, 0));
+                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(50, 0));
                 InputManager.Click(MouseButton.Left);
             });
 

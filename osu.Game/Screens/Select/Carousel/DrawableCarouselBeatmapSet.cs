@@ -122,9 +122,11 @@ namespace osu.Game.Screens.Select.Carousel
                 },
             };
 
-            background.DelayedLoadComplete += d => d.FadeInFromZero(750, Easing.OutQuint);
-            mainFlow.DelayedLoadComplete += d => d.FadeInFromZero(500, Easing.OutQuint);
+            background.DelayedLoadComplete += fadeContentIn;
+            mainFlow.DelayedLoadComplete += fadeContentIn;
         }
+
+        private void fadeContentIn(Drawable d) => d.FadeInFromZero(750, Easing.OutQuint);
 
         protected override void Deselected()
         {
