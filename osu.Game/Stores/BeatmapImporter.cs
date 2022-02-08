@@ -165,7 +165,7 @@ namespace osu.Game.Stores
 
         public override bool IsAvailableLocally(BeatmapSetInfo model)
         {
-            return Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(b => b.OnlineID == model.OnlineID));
+            return Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
         }
 
         public override string HumanisedModelName => "beatmap";
