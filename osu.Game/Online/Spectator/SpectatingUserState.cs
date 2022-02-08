@@ -6,7 +6,7 @@ namespace osu.Game.Online.Spectator
     public enum SpectatingUserState
     {
         /// <summary>
-        /// The spectated user has not yet played.
+        /// The spectated user is not yet playing.
         /// </summary>
         Idle,
 
@@ -16,17 +16,17 @@ namespace osu.Game.Online.Spectator
         Playing,
 
         /// <summary>
-        /// The spectated user has successfully completed gameplay.
+        /// The spectated user has passed gameplay.
         /// </summary>
-        Completed,
+        Passed,
 
         /// <summary>
-        /// The spectator user has failed during gameplay.
+        /// The spectator user has failed gameplay.
         /// </summary>
         Failed,
 
         /// <summary>
-        /// The spectated user has quit during gameplay.
+        /// The spectated user has quit gameplay.
         /// </summary>
         Quit
     }

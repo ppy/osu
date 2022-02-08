@@ -247,7 +247,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestCompletionState()
+        public void TestPassedState()
         {
             loadSpectatingScreen();
 
@@ -255,8 +255,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             sendFrames();
             waitForPlayer();
 
-            AddStep("send completion", () => spectatorClient.EndPlay(streamingUser.Id, SpectatingUserState.Completed));
-            AddUntilStep("state is completed", () => spectatorClient.WatchingUserStates[streamingUser.Id].State == SpectatingUserState.Completed);
+            AddStep("send passed", () => spectatorClient.EndPlay(streamingUser.Id, SpectatingUserState.Passed));
+            AddUntilStep("state is passed", () => spectatorClient.WatchingUserStates[streamingUser.Id].State == SpectatingUserState.Passed);
 
             start();
             sendFrames();

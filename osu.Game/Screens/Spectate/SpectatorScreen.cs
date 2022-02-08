@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Spectate
 
             switch (newState.State)
             {
-                case SpectatingUserState.Completed:
+                case SpectatingUserState.Passed:
                     // Make sure that gameplay completes to the end.
                     if (gameplayStates.TryGetValue(userId, out var gameplayState))
                         gameplayState.Score.Replay.HasReceivedAllFrames = true;
