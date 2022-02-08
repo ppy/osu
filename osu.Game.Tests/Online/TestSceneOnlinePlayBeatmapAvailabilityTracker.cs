@@ -92,7 +92,8 @@ namespace osu.Game.Tests.Online
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
             AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
-            addAvailabilityCheckStep("state locally available", BeatmapAvailability.LocallyAvailable);
+            AddAssert("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
+            addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
         }
 
         [Test]
