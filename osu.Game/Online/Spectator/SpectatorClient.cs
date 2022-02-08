@@ -98,8 +98,8 @@ namespace osu.Game.Online.Spectator
                 }
                 else
                 {
-                    watchingUserStates.Clear();
                     playingUsers.Clear();
+                    watchingUserStates.Clear();
                 }
             }), true);
         }
