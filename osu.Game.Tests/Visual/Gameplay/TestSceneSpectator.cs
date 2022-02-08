@@ -160,7 +160,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             finish(SpectatingUserState.Failed);
 
             checkPaused(false); // Should continue playing until out of frames
-            checkPaused(true);
+            checkPaused(true); // And eventually stop after running out of frames and fail.
+            // Todo: Should check for + display a failed message.
         }
 
         [Test]

@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; set; }
 
         /// <summary>
-        /// Whether the user quit gameplay without either having either passed or failed.
+        /// Whether the user quit gameplay without having either passed or failed.
         /// </summary>
         public bool HasQuit { get; set; }
 

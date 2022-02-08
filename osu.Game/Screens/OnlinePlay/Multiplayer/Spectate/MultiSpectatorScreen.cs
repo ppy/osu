@@ -216,6 +216,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
         protected override void EndGameplay(int userId, SpectatorState state)
         {
+            // Allowed passed/failed users to complete their remaining replay frames.
+            // The failed state isn't really possible in multiplayer (yet?) but is added here just for safety in case it starts being used.
             if (state.State == SpectatingUserState.Passed || state.State == SpectatingUserState.Failed)
                 return;
 

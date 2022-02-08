@@ -69,17 +69,17 @@ namespace osu.Game.Overlays.Dashboard
                         {
                             var user = task.GetResultSafely();
 
-                            if (user != null)
-                            {
-                                Schedule(() =>
-                                {
-                                    // user may no longer be playing.
-                                    if (!playingUsers.Contains(user.Id))
-                                        return;
+                            if (user == null)
+                                return;
 
-                                    userFlow.Add(createUserPanel(user));
-                                });
-                            }
+                            Schedule(() =>
+                            {
+                                // user may no longer be playing.
+                                if (!playingUsers.Contains(user.Id))
+                                    return;
+
+                                userFlow.Add(createUserPanel(user));
+                            });
                         });
                     }
 
