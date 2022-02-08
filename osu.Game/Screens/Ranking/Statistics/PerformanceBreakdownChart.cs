@@ -12,6 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -192,9 +193,12 @@ namespace osu.Game.Screens.Ranking.Statistics
         [CanBeNull]
         private Drawable[] createAttributeRow(PerformanceDisplayAttribute attribute, PerformanceDisplayAttribute perfectAttribute)
         {
-            float percentage = (float)(attribute.Value / perfectAttribute.Value);
-            if (float.IsNaN(percentage))
+            // Don't display the attribute if its maximum is 0
+            // For example, flashlight bonus would be zero if flashlight mod isn't on
+            if (Precision.AlmostEquals(perfectAttribute.Value, 0f))
                 return null;
+
+            float percentage = (float)(attribute.Value / perfectAttribute.Value);
 
             return new Drawable[]
             {
