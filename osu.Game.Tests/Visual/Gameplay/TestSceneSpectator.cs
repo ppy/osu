@@ -274,7 +274,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             sendFrames();
             waitForPlayer();
 
-            AddStep("send quit", () => spectatorClient.EndPlay(streamingUser.Id, SpectatingUserState.Quit));
+            AddStep("send quit", () => spectatorClient.EndPlay(streamingUser.Id));
             AddUntilStep("state is quit", () => spectatorClient.WatchingUserStates[streamingUser.Id].State == SpectatingUserState.Quit);
 
             start();
