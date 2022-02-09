@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Spectate
                     continue;
 
                 if (beatmapSet.Beatmaps.Any(b => b.OnlineID == userState.BeatmapID))
-                    updateGameplayState(userId);
+                    startGameplay(userId);
             }
         }
 
@@ -141,8 +141,8 @@ namespace osu.Game.Screens.Spectate
                     break;
 
                 case SpectatedUserState.Playing:
-                    Schedule(() => OnUserStateChanged(userId, newState));
-                    updateGameplayState(userId);
+                    Schedule(() => OnNewPlayingUserState(userId, newState));
+                    startGameplay(userId);
                     break;
             }
         }
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Spectate
             Schedule(() => EndGameplay(userId, state));
         }
 
-        private void updateGameplayState(int userId)
+        private void startGameplay(int userId)
         {
             Debug.Assert(userMap.ContainsKey(userId));
 
@@ -195,11 +195,11 @@ namespace osu.Game.Screens.Spectate
         }
 
         /// <summary>
-        /// Invoked when a spectated user's state has changed.
+        /// Invoked when a spectated user's state has changed to a new state indicating the player is currently playing.
         /// </summary>
         /// <param name="userId">The user whose state has changed.</param>
         /// <param name="spectatorState">The new state.</param>
-        protected abstract void OnUserStateChanged(int userId, [NotNull] SpectatorState spectatorState);
+        protected abstract void OnNewPlayingUserState(int userId, [NotNull] SpectatorState spectatorState);
 
         /// <summary>
         /// Starts gameplay for a user.
