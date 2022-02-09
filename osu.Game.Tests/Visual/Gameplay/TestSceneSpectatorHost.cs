@@ -37,8 +37,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestClientSendsCorrectRuleset()
         {
-            AddUntilStep("spectator client sending frames", () => spectatorClient.WatchingUserStates.ContainsKey(dummy_user_id));
-            AddAssert("spectator client sent correct ruleset", () => spectatorClient.WatchingUserStates[dummy_user_id].RulesetID == Ruleset.Value.OnlineID);
+            AddUntilStep("spectator client sending frames", () => spectatorClient.WatchedUserStates.ContainsKey(dummy_user_id));
+            AddAssert("spectator client sent correct ruleset", () => spectatorClient.WatchedUserStates[dummy_user_id].RulesetID == Ruleset.Value.OnlineID);
         }
 
         public override void TearDownSteps()

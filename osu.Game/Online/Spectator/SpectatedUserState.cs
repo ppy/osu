@@ -3,7 +3,7 @@
 
 namespace osu.Game.Online.Spectator
 {
-    public enum SpectatingUserState
+    public enum SpectatedUserState
     {
         /// <summary>
         /// The spectated user is not yet playing.
@@ -26,7 +26,7 @@ namespace osu.Game.Online.Spectator
         Passed,
 
         /// <summary>
-        /// The spectator user has failed gameplay.
+        /// The spectated user has failed gameplay.
         /// </summary>
         Failed,
 

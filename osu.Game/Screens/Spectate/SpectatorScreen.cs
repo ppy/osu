@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Spectate
                     userMap[u.Id] = u;
                 }
 
-                userStates.BindTo(spectatorClient.WatchingUserStates);
+                userStates.BindTo(spectatorClient.WatchedUserStates);
                 userStates.BindCollectionChanged(onUserStatesChanged, true);
 
                 realmSubscription = realm.RegisterForNotifications(
@@ -134,13 +134,13 @@ namespace osu.Game.Screens.Spectate
 
             switch (newState.State)
             {
-                case SpectatingUserState.Passed:
+                case SpectatedUserState.Passed:
                     // Make sure that gameplay completes to the end.
                     if (gameplayStates.TryGetValue(userId, out var gameplayState))
                         gameplayState.Score.Replay.HasReceivedAllFrames = true;
                     break;
 
-                case SpectatingUserState.Playing:
+                case SpectatedUserState.Playing:
                     Schedule(() => OnUserStateChanged(userId, newState));
                     updateGameplayState(userId);
                     break;
