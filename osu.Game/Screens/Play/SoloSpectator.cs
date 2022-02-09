@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
             automaticDownload.Current.BindValueChanged(_ => checkForAutomaticDownload());
         }
 
-        protected override void OnUserStateChanged(int userId, SpectatorState spectatorState)
+        protected override void OnNewPlayingUserState(int userId, SpectatorState spectatorState)
         {
             clearDisplay();
             showBeatmapPanel(spectatorState);
