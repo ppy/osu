@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -54,9 +55,7 @@ namespace osu.Game.Rulesets.UI
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            if (spectatorClient != null && gameplayState != null)
-                spectatorClient.EndPlaying(gameplayState);
+            spectatorClient?.EndPlaying(gameplayState);
         }
 
         protected override void Update()
