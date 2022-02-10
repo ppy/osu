@@ -35,18 +35,27 @@ namespace osu.Game.Online.Spectator
         /// </summary>
         public abstract IBindable<bool> IsConnected { get; }
 
-        private readonly List<int> watchingUsers = new List<int>();
+        /// <summary>
+        /// The states of all users currently being watched.
+        /// </summary>
+        public IBindableDictionary<int, SpectatorState> WatchedUserStates => watchedUserStates;
 
+        /// <summary>
+        /// A global list of all players currently playing.
+        /// </summary>
         public IBindableList<int> PlayingUsers => playingUsers;
-        private readonly BindableList<int> playingUsers = new BindableList<int>();
 
-        public IBindableDictionary<int, SpectatorState> PlayingUserStates => playingUserStates;
-        private readonly BindableDictionary<int, SpectatorState> playingUserStates = new BindableDictionary<int, SpectatorState>();
+        /// <summary>
+        /// All users currently being watched.
+        /// </summary>
+        private readonly List<int> watchedUsers = new List<int>();
+
+        private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
+        private readonly BindableList<int> playingUsers = new BindableList<int>();
+        private readonly SpectatorState currentState = new SpectatorState();
 
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
-
-        private readonly SpectatorState currentState = new SpectatorState();
 
         /// <summary>
         /// Whether the local user is playing.
@@ -76,8 +85,8 @@ namespace osu.Game.Online.Spectator
                 if (connected.NewValue)
                 {
                     // get all the users that were previously being watched
-                    int[] users = watchingUsers.ToArray();
-                    watchingUsers.Clear();
+                    int[] users = watchedUsers.ToArray();
+                    watchedUsers.Clear();
 
                     // resubscribe to watched users.
                     foreach (int userId in users)
@@ -90,7 +99,7 @@ namespace osu.Game.Online.Spectator
                 else
                 {
                     playingUsers.Clear();
-                    playingUserStates.Clear();
+                    watchedUserStates.Clear();
                 }
             }), true);
         }
@@ -102,11 +111,8 @@ namespace osu.Game.Online.Spectator
                 if (!playingUsers.Contains(userId))
                     playingUsers.Add(userId);
 
-                // UserBeganPlaying() is called by the server regardless of whether the local user is watching the remote user, and is called a further time when the remote user is watched.
-                // This may be a temporary thing (see: https://github.com/ppy/osu-server-spectator/blob/2273778e02cfdb4a9c6a934f2a46a8459cb5d29c/osu.Server.Spectator/Hubs/SpectatorHub.cs#L28-L29).
-                // We don't want the user states to update unless the player is being watched, otherwise calling BindUserBeganPlaying() can lead to double invocations.
-                if (watchingUsers.Contains(userId))
-                    playingUserStates[userId] = state;
+                if (watchedUsers.Contains(userId))
+                    watchedUserStates[userId] = state;
 
                 OnUserBeganPlaying?.Invoke(userId, state);
             });
@@ -119,7 +125,9 @@ namespace osu.Game.Online.Spectator
             Schedule(() =>
             {
                 playingUsers.Remove(userId);
-                playingUserStates.Remove(userId);
+
+                if (watchedUsers.Contains(userId))
+                    watchedUserStates[userId] = state;
 
                 OnUserFinishedPlaying?.Invoke(userId, state);
             });
@@ -151,6 +159,7 @@ namespace osu.Game.Online.Spectator
                 currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
                 currentState.Mods = score.ScoreInfo.Mods.Select(m => new APIMod(m)).ToArray();
+                currentState.State = SpectatedUserState.Playing;
 
                 currentBeatmap = state.Beatmap;
                 currentScore = score;
@@ -161,7 +170,7 @@ namespace osu.Game.Online.Spectator
 
         public void SendFrames(FrameDataBundle data) => lastSend = SendFramesInternal(data);
 
-        public void EndPlaying()
+        public void EndPlaying(GameplayState state)
         {
             // This method is most commonly called via Dispose(), which is can be asynchronous (via the AsyncDisposalQueue).
             // We probably need to find a better way to handle this...
@@ -176,6 +185,13 @@ namespace osu.Game.Online.Spectator
                 IsPlaying = false;
                 currentBeatmap = null;
 
+                if (state.HasPassed)
+                    currentState.State = SpectatedUserState.Passed;
+                else if (state.HasFailed)
+                    currentState.State = SpectatedUserState.Failed;
+                else
+                    currentState.State = SpectatedUserState.Quit;
+
                 EndPlayingInternal(currentState);
             });
         }
@@ -184,10 +200,10 @@ namespace osu.Game.Online.Spectator
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            if (watchingUsers.Contains(userId))
+            if (watchedUsers.Contains(userId))
                 return;
 
-            watchingUsers.Add(userId);
+            watchedUsers.Add(userId);
 
             WatchUserInternal(userId);
         }
@@ -198,8 +214,8 @@ namespace osu.Game.Online.Spectator
             // Todo: This should not be a thing, but requires framework changes.
             Schedule(() =>
             {
-                watchingUsers.Remove(userId);
-                playingUserStates.Remove(userId);
+                watchedUsers.Remove(userId);
+                watchedUserStates.Remove(userId);
                 StopWatchingUserInternal(userId);
             });
         }
