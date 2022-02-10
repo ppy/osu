@@ -155,11 +155,13 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             waitForPlayer();
             checkPaused(true);
+            sendFrames();
 
-            finish();
+            finish(SpectatedUserState.Failed);
 
-            checkPaused(false);
-            // TODO: should replay until running out of frames then fail
+            checkPaused(false); // Should continue playing until out of frames
+            checkPaused(true); // And eventually stop after running out of frames and fail.
+            // Todo: Should check for + display a failed message.
         }
 
         [Test]
@@ -211,7 +213,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("send frames and finish play", () =>
             {
                 spectatorClient.HandleFrame(new OsuReplayFrame(1000, Vector2.Zero));
-                spectatorClient.EndPlaying();
+                spectatorClient.EndPlaying(new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset()) { HasPassed = true });
             });
 
             // We can't access API because we're an "online" test.
@@ -234,6 +236,71 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("last frame has header", () => lastBundle.Frames[^1].Header != null);
         }
 
+        [Test]
+        public void TestPlayingState()
+        {
+            loadSpectatingScreen();
+
+            start();
+            sendFrames();
+            waitForPlayer();
+            AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
+        }
+
+        [Test]
+        public void TestPassedState()
+        {
+            loadSpectatingScreen();
+
+            start();
+            sendFrames();
+            waitForPlayer();
+
+            AddStep("send passed", () => spectatorClient.EndPlay(streamingUser.Id, SpectatedUserState.Passed));
+            AddUntilStep("state is passed", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Passed);
+
+            start();
+            sendFrames();
+            waitForPlayer();
+            AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
+        }
+
+        [Test]
+        public void TestQuitState()
+        {
+            loadSpectatingScreen();
+
+            start();
+            sendFrames();
+            waitForPlayer();
+
+            AddStep("send quit", () => spectatorClient.EndPlay(streamingUser.Id));
+            AddUntilStep("state is quit", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Quit);
+
+            start();
+            sendFrames();
+            waitForPlayer();
+            AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
+        }
+
+        [Test]
+        public void TestFailedState()
+        {
+            loadSpectatingScreen();
+
+            start();
+            sendFrames();
+            waitForPlayer();
+
+            AddStep("send failed", () => spectatorClient.EndPlay(streamingUser.Id, SpectatedUserState.Failed));
+            AddUntilStep("state is failed", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Failed);
+
+            start();
+            sendFrames();
+            waitForPlayer();
+            AddUntilStep("state is playing", () => spectatorClient.WatchedUserStates[streamingUser.Id].State == SpectatedUserState.Playing);
+        }
+
         private OsuFramedReplayInputHandler replayHandler =>
             (OsuFramedReplayInputHandler)Stack.ChildrenOfType<OsuInputManager>().First().ReplayInputHandler;
 
@@ -246,7 +313,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void start(int? beatmapId = null) => AddStep("start play", () => spectatorClient.StartPlay(streamingUser.Id, beatmapId ?? importedBeatmapId));
 
-        private void finish() => AddStep("end play", () => spectatorClient.EndPlay(streamingUser.Id));
+        private void finish(SpectatedUserState state = SpectatedUserState.Quit) => AddStep("end play", () => spectatorClient.EndPlay(streamingUser.Id, state));
 
         private void checkPaused(bool state) =>
             AddUntilStep($"game is {(state ? "paused" : "playing")}", () => player.ChildrenOfType<DrawableRuleset>().First().IsPaused.Value == state);

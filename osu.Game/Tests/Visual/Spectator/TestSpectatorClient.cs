@@ -58,7 +58,8 @@ namespace osu.Game.Tests.Visual.Spectator
         /// Ends play for an arbitrary user.
         /// </summary>
         /// <param name="userId">The user to end play for.</param>
-        public void EndPlay(int userId)
+        /// <param name="state">The spectator state to end play with.</param>
+        public void EndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
         {
             if (!userBeatmapDictionary.ContainsKey(userId))
                 return;
@@ -67,6 +68,7 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                State = state
             });
 
             userBeatmapDictionary.Remove(userId);
@@ -142,6 +144,7 @@ namespace osu.Game.Tests.Visual.Spectator
             {
                 BeatmapID = userBeatmapDictionary[userId],
                 RulesetID = 0,
+                State = SpectatedUserState.Playing
             });
         }
     }
