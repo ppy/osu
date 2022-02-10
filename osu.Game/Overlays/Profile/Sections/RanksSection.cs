@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
+                // todo: update to use UsersStrings.ShowExtraTopRanksPinnedTitle once that exists.
+                new PaginatedScoreContainer(ScoreType.Pinned, User, "Pinned Scores"),
                 new PaginatedScoreContainer(ScoreType.Best, User, UsersStrings.ShowExtraTopRanksBestTitle),
                 new PaginatedScoreContainer(ScoreType.Firsts, User, UsersStrings.ShowExtraTopRanksFirstTitle)
             };
