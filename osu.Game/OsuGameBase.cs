@@ -413,7 +413,7 @@ namespace osu.Game
                 Scheduler.AddDelayed(GracefullyExit, 2000);
         }
 
-        public void Migrate(string path)
+        public bool Migrate(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
 
@@ -432,14 +432,15 @@ namespace osu.Game
 
                 readyToRun.Wait();
 
-                (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+                bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+
+                Logger.Log(@"Migration complete!");
+                return cleanupSucceded != false;
             }
             finally
             {
                 realmBlocker?.Dispose();
             }
-
-            Logger.Log(@"Migration complete!");
         }
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
