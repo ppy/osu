@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Components.Menus
         public BeatmapInfo BeatmapInfo { get; }
 
         public DifficultyMenuItem(BeatmapInfo beatmapInfo, bool selected, Action<BeatmapInfo> difficultyChangeFunc)
-            : base(beatmapInfo.DifficultyName ?? "(unnamed)", null)
+            : base(string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? "(unnamed)" : beatmapInfo.DifficultyName, null)
         {
             BeatmapInfo = beatmapInfo;
             State.Value = selected;

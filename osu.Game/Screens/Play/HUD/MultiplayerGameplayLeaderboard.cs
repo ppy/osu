@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Configuration;
 using osu.Game.Database;
@@ -76,9 +77,11 @@ namespace osu.Game.Screens.Play.HUD
                     TeamScores.Add(team, new BindableInt());
             }
 
-            userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(users => Schedule(() =>
+            userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(task => Schedule(() =>
             {
-                foreach (var user in users.Result)
+                var users = task.GetResultSafely();
+
+                foreach (var user in users)
                 {
                     if (user == null)
                         continue;

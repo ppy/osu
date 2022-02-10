@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Platform;
 
 namespace osu.Game.Tournament.Tests
 {
     public class TestSceneTournamentSceneManager : TournamentTestScene
     {
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load()
         {
             Add(new TournamentSceneManager());
         }

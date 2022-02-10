@@ -15,13 +15,14 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
+    [Cached]
     public class SelectionBox : CompositeDrawable
     {
         public const float BORDER_RADIUS = 3;
 
         public Func<float, bool> OnRotation;
         public Func<Vector2, Anchor, bool> OnScale;
-        public Func<Direction, bool> OnFlip;
+        public Func<Direction, bool, bool> OnFlip;
         public Func<bool> OnReverse;
 
         public Action OperationStarted;
@@ -174,12 +175,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 case Key.G:
                     return CanReverse && runOperationFromHotkey(OnReverse);
-
-                case Key.H:
-                    return CanFlipX && runOperationFromHotkey(() => OnFlip?.Invoke(Direction.Horizontal) ?? false);
-
-                case Key.J:
-                    return CanFlipY && runOperationFromHotkey(() => OnFlip?.Invoke(Direction.Vertical) ?? false);
             }
 
             return base.OnKeyDown(e);
@@ -287,12 +282,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void addXFlipComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally (Ctrl-H)", () => OnFlip?.Invoke(Direction.Horizontal));
+            addButton(FontAwesome.Solid.ArrowsAltH, "Flip horizontally", () => OnFlip?.Invoke(Direction.Horizontal, false));
         }
 
         private void addYFlipComponents()
         {
-            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically (Ctrl-J)", () => OnFlip?.Invoke(Direction.Vertical));
+            addButton(FontAwesome.Solid.ArrowsAltV, "Flip vertically", () => OnFlip?.Invoke(Direction.Vertical, false));
         }
 
         private void addButton(IconUsage icon, string tooltip, Action action)
@@ -312,7 +307,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxScaleHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnScale?.Invoke(e.Delta, anchor)
+                HandleScale = (delta, a) => OnScale?.Invoke(delta, a)
             };
 
             handle.OperationStarted += operationStarted;
@@ -325,7 +320,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var handle = new SelectionBoxRotationHandle
             {
                 Anchor = anchor,
-                HandleDrag = e => OnRotation?.Invoke(convertDragEventToAngleOfRotation(e))
+                HandleRotate = angle => OnRotation?.Invoke(angle)
             };
 
             handle.OperationStarted += operationStarted;

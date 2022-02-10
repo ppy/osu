@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Input
@@ -63,8 +65,17 @@ namespace osu.Game.Input
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e) => updateLastInteractionTime();
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         protected override bool Handle(UIEvent e)
         {
+            // Even when not active, `MouseMoveEvent`s will arrive.
+            // We don't want these to trigger a non-idle state as it's quite often the user interacting
+            // with other windows while osu! is in the background.
+            if (!host.IsActive.Value)
+                return base.Handle(e);
+
             switch (e)
             {
                 case KeyDownEvent _:

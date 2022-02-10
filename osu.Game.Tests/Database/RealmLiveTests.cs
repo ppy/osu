@@ -6,9 +6,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Models;
 using Realms;
 
 #nullable enable
@@ -20,11 +21,11 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestLiveEquality()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                ILive<RealmBeatmap> beatmap = realmFactory.CreateContext().Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata()))).ToLive(realmFactory);
+                Live<BeatmapInfo> beatmap = realm.Run(r => r.Write(_ => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata()))).ToLive(realm));
 
-                ILive<RealmBeatmap> beatmap2 = realmFactory.CreateContext().All<RealmBeatmap>().First().ToLive(realmFactory);
+                Live<BeatmapInfo> beatmap2 = realm.Run(r => r.All<BeatmapInfo>().First().ToLive(realm));
 
                 Assert.AreEqual(beatmap, beatmap2);
             });
@@ -33,26 +34,29 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestAccessAfterStorageMigrate()
         {
-            RunTestWithRealm((realmFactory, storage) =>
+            RunTestWithRealm((realm, storage) =>
             {
-                var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+                var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
 
-                ILive<RealmBeatmap> liveBeatmap;
+                Live<BeatmapInfo>? liveBeatmap = null;
 
-                using (var context = realmFactory.CreateContext())
+                realm.Run(r =>
                 {
-                    context.Write(r => r.Add(beatmap));
+                    r.Write(_ => r.Add(beatmap));
 
-                    liveBeatmap = beatmap.ToLive(realmFactory);
-                }
+                    liveBeatmap = beatmap.ToLive(realm);
+                });
 
                 using (var migratedStorage = new TemporaryNativeStorage("realm-test-migration-target"))
                 {
                     migratedStorage.DeleteDirectory(string.Empty);
 
-                    storage.Migrate(migratedStorage);
+                    using (realm.BlockAllOperations())
+                    {
+                        storage.Migrate(migratedStorage);
+                    }
 
-                    Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
+                    Assert.IsFalse(liveBeatmap?.PerformRead(l => l.Hidden));
                 }
             });
         }
@@ -60,14 +64,13 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestAccessAfterAttach()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+                var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
 
-                var liveBeatmap = beatmap.ToLive(realmFactory);
+                var liveBeatmap = beatmap.ToLive(realm);
 
-                using (var context = realmFactory.CreateContext())
-                    context.Write(r => r.Add(beatmap));
+                realm.Run(r => r.Write(_ => r.Add(beatmap)));
 
                 Assert.IsFalse(liveBeatmap.PerformRead(l => l.Hidden));
             });
@@ -76,7 +79,7 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestAccessNonManaged()
         {
-            var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
+            var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
             var liveBeatmap = beatmap.ToLiveUnmanaged();
 
             Assert.IsFalse(beatmap.Hidden);
@@ -93,18 +96,18 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestScopedReadWithoutContext()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                ILive<RealmBeatmap>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
                 Task.Factory.StartNew(() =>
                 {
-                    using (var threadContext = realmFactory.CreateContext())
+                    realm.Run(threadContext =>
                     {
-                        var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+                        var beatmap = threadContext.Write(r => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata())));
 
-                        liveBeatmap = beatmap.ToLive(realmFactory);
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                        liveBeatmap = beatmap.ToLive(realm);
+                    });
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -115,25 +118,25 @@ namespace osu.Game.Tests.Database
                         Assert.IsTrue(beatmap.IsValid);
                         Assert.IsFalse(beatmap.Hidden);
                     });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
         [Test]
         public void TestScopedWriteWithoutContext()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                ILive<RealmBeatmap>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
                 Task.Factory.StartNew(() =>
                 {
-                    using (var threadContext = realmFactory.CreateContext())
+                    realm.Run(threadContext =>
                     {
-                        var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+                        var beatmap = threadContext.Write(r => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata())));
 
-                        liveBeatmap = beatmap.ToLive(realmFactory);
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                        liveBeatmap = beatmap.ToLive(realm);
+                    });
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -141,17 +144,17 @@ namespace osu.Game.Tests.Database
                 {
                     liveBeatmap.PerformWrite(beatmap => { beatmap.Hidden = true; });
                     liveBeatmap.PerformRead(beatmap => { Assert.IsTrue(beatmap.Hidden); });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
         [Test]
         public void TestValueAccessNonManaged()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                var beatmap = new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata());
-                var liveBeatmap = beatmap.ToLive(realmFactory);
+                var beatmap = new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata());
+                var liveBeatmap = beatmap.ToLive(realm);
 
                 Assert.DoesNotThrow(() =>
                 {
@@ -163,19 +166,19 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestValueAccessWithOpenContextFails()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                ILive<RealmBeatmap>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
 
                 Task.Factory.StartNew(() =>
                 {
-                    using (var threadContext = realmFactory.CreateContext())
+                    realm.Run(threadContext =>
                     {
-                        var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+                        var beatmap = threadContext.Write(r => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata())));
 
-                        liveBeatmap = beatmap.ToLive(realmFactory);
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                        liveBeatmap = beatmap.ToLive(realm);
+                    });
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -188,32 +191,32 @@ namespace osu.Game.Tests.Database
                     });
 
                     // Can't be used, even from within a valid context.
-                    using (realmFactory.CreateContext())
+                    realm.Run(threadContext =>
                     {
                         Assert.Throws<InvalidOperationException>(() =>
                         {
                             var __ = liveBeatmap.Value;
                         });
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                    });
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
         [Test]
         public void TestValueAccessWithoutOpenContextFails()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                ILive<RealmBeatmap>? liveBeatmap = null;
+                Live<BeatmapInfo>? liveBeatmap = null;
                 Task.Factory.StartNew(() =>
                 {
-                    using (var threadContext = realmFactory.CreateContext())
+                    realm.Run(threadContext =>
                     {
-                        var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(CreateRuleset(), new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+                        var beatmap = threadContext.Write(r => r.Add(new BeatmapInfo(CreateRuleset(), new BeatmapDifficulty(), new BeatmapMetadata())));
 
-                        liveBeatmap = beatmap.ToLive(realmFactory);
-                    }
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                        liveBeatmap = beatmap.ToLive(realm);
+                    });
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                 Debug.Assert(liveBeatmap != null);
 
@@ -223,63 +226,65 @@ namespace osu.Game.Tests.Database
                     {
                         var unused = liveBeatmap.Value;
                     });
-                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
             });
         }
 
         [Test]
         public void TestLiveAssumptions()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
                 int changesTriggered = 0;
 
-                using (var updateThreadContext = realmFactory.CreateContext())
+                realm.RegisterCustomSubscription(outerRealm =>
                 {
-                    updateThreadContext.All<RealmBeatmap>().QueryAsyncWithNotifications(gotChange);
-                    ILive<RealmBeatmap>? liveBeatmap = null;
+                    outerRealm.All<BeatmapInfo>().QueryAsyncWithNotifications(gotChange);
+                    Live<BeatmapInfo>? liveBeatmap = null;
 
                     Task.Factory.StartNew(() =>
                     {
-                        using (var threadContext = realmFactory.CreateContext())
+                        realm.Run(innerRealm =>
                         {
                             var ruleset = CreateRuleset();
-                            var beatmap = threadContext.Write(r => r.Add(new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+                            var beatmap = innerRealm.Write(r => r.Add(new BeatmapInfo(ruleset, new BeatmapDifficulty(), new BeatmapMetadata())));
 
                             // add a second beatmap to ensure that a full refresh occurs below.
                             // not just a refresh from the resolved Live.
-                            threadContext.Write(r => r.Add(new RealmBeatmap(ruleset, new RealmBeatmapDifficulty(), new RealmBeatmapMetadata())));
+                            innerRealm.Write(r => r.Add(new BeatmapInfo(ruleset, new BeatmapDifficulty(), new BeatmapMetadata())));
 
-                            liveBeatmap = beatmap.ToLive(realmFactory);
-                        }
-                    }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).Wait();
+                            liveBeatmap = beatmap.ToLive(realm);
+                        });
+                    }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler).WaitSafely();
 
                     Debug.Assert(liveBeatmap != null);
 
                     // not yet seen by main context
-                    Assert.AreEqual(0, updateThreadContext.All<RealmBeatmap>().Count());
+                    Assert.AreEqual(0, outerRealm.All<BeatmapInfo>().Count());
                     Assert.AreEqual(0, changesTriggered);
 
                     liveBeatmap.PerformRead(resolved =>
                     {
                         // retrieval causes an implicit refresh. even changes that aren't related to the retrieval are fired at this point.
                         // ReSharper disable once AccessToDisposedClosure
-                        Assert.AreEqual(2, updateThreadContext.All<RealmBeatmap>().Count());
+                        Assert.AreEqual(2, outerRealm.All<BeatmapInfo>().Count());
                         Assert.AreEqual(1, changesTriggered);
 
                         // can access properties without a crash.
                         Assert.IsFalse(resolved.Hidden);
 
                         // ReSharper disable once AccessToDisposedClosure
-                        updateThreadContext.Write(r =>
+                        outerRealm.Write(r =>
                         {
                             // can use with the main context.
                             r.Remove(resolved);
                         });
                     });
-                }
 
-                void gotChange(IRealmCollection<RealmBeatmap> sender, ChangeSet changes, Exception error)
+                    return null;
+                });
+
+                void gotChange(IRealmCollection<BeatmapInfo> sender, ChangeSet changes, Exception error)
                 {
                     changesTriggered++;
                 }

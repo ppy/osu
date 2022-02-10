@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
         private int direction = 1;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameplayClock clock, ISamplePlaybackDisabler sampleDisabler)
+        private void load(GameplayClock clock)
         {
             if (clock != null)
             {

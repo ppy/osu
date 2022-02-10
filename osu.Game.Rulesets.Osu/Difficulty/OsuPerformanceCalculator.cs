@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        private int effectiveMissCount;
+        private double effectiveMissCount;
 
         public OsuPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
             : base(ruleset, attributes, score)
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
 
-            if (mods.Any(m => m is OsuModSpunOut))
+            if (mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
                 multiplier *= 1.0 - Math.Pow((double)Attributes.SpinnerCount / totalHits, 0.85);
 
             if (mods.Any(h => h is OsuModRelax))
@@ -222,7 +222,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Penalize misses by assessing # of misses relative to the total # of objects. Default a 3% reduction for any # of misses.
             if (effectiveMissCount > 0)
-                flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow((double)effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
+                flashlightValue *= 0.97 * Math.Pow(1 - Math.Pow(effectiveMissCount / totalHits, 0.775), Math.Pow(effectiveMissCount, .875));
 
             flashlightValue *= getComboScalingFactor();
 
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return flashlightValue;
         }
 
-        private int calculateEffectiveMissCount()
+        private double calculateEffectiveMissCount()
         {
             // Guess the number of misses + slider breaks from combo
             double comboBasedMissCount = 0.0;
@@ -250,10 +250,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     comboBasedMissCount = fullComboThreshold / Math.Max(1.0, scoreMaxCombo);
             }
 
-            // Clamp misscount since it's derived from combo and can be higher than total hits and that breaks some calculations
+            // Clamp miss count since it's derived from combo and can be higher than total hits and that breaks some calculations
             comboBasedMissCount = Math.Min(comboBasedMissCount, totalHits);
 
-            return Math.Max(countMiss, (int)Math.Floor(comboBasedMissCount));
+            return Math.Max(countMiss, comboBasedMissCount);
         }
 
         // Miss penalty assumes that a player will miss on the hardest parts of a map,

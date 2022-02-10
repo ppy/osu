@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         if (beat == 0 && i == 0)
                             nextMinTick = float.MinValue;
 
-                        int indexInBar = beat % ((int)point.TimeSignature * beatDivisor.Value);
+                        int indexInBar = beat % (point.TimeSignature.Numerator * beatDivisor.Value);
 
                         int divisor = BindableBeatDivisor.GetDivisorForBeatIndex(beat, beatDivisor.Value);
                         var colour = BindableBeatDivisor.GetColourFor(divisor, colours);

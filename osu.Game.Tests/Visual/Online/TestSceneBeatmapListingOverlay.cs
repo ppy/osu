@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -108,18 +109,30 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
+        public void TestCorrectOldContentExpiration()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(100);
+
+            AddStep("show more results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 30).ToArray()));
+            assertAllCardsOfType<BeatmapCardNormal>(30);
+        }
+
+        [Test]
         public void TestCardSizeSwitching()
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
             AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
-            assertAllCardsOfType<BeatmapCardNormal>();
+            assertAllCardsOfType<BeatmapCardNormal>(100);
 
             setCardSize(BeatmapCardSize.Extra);
-            assertAllCardsOfType<BeatmapCardExtra>();
+            assertAllCardsOfType<BeatmapCardExtra>(100);
 
             setCardSize(BeatmapCardSize.Normal);
-            assertAllCardsOfType<BeatmapCardNormal>();
+            assertAllCardsOfType<BeatmapCardNormal>(100);
 
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
@@ -280,6 +293,33 @@ namespace osu.Game.Tests.Visual.Online
             noPlaceholderShown();
         }
 
+        [Test]
+        public void TestExpandedCardContentNotClipped()
+        {
+            AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
+
+            AddStep("show result with many difficulties", () =>
+            {
+                var beatmapSet = CreateAPIBeatmapSet(Ruleset.Value);
+                beatmapSet.Beatmaps = Enumerable.Repeat(beatmapSet.Beatmaps.First(), 100).ToArray();
+                fetchFor(beatmapSet);
+            });
+            assertAllCardsOfType<BeatmapCardNormal>(1);
+
+            AddStep("hover extra info row", () =>
+            {
+                var difficultyArea = this.ChildrenOfType<BeatmapCardExtraInfoRow>().Single();
+                InputManager.MoveMouseTo(difficultyArea);
+            });
+            AddUntilStep("wait for expanded", () => this.ChildrenOfType<BeatmapCardNormal>().Single().Expanded.Value);
+            AddAssert("expanded content not clipped", () =>
+            {
+                var cardContainer = this.ChildrenOfType<ReverseChildIDFillFlowContainer<BeatmapCard>>().Single().Parent;
+                var expandedContent = this.ChildrenOfType<ExpandedContentScrollContainer>().Single();
+                return expandedContent.ScreenSpaceDrawQuad.GetVertices().ToArray().All(v => cardContainer.ScreenSpaceDrawQuad.Contains(v));
+            });
+        }
+
         private static int searchCount;
 
         private void fetchFor(params APIBeatmapSet[] beatmaps)
@@ -323,13 +363,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void setCardSize(BeatmapCardSize cardSize) => AddStep($"set card size to {cardSize}", () => overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize);
 
-        private void assertAllCardsOfType<T>()
+        private void assertAllCardsOfType<T>(int expectedCount)
             where T : BeatmapCard =>
             AddUntilStep($"all loaded beatmap cards are {typeof(T)}", () =>
             {
                 int loadedCorrectCount = this.ChildrenOfType<BeatmapCard>().Count(card => card.IsLoaded && card.GetType() == typeof(T));
-                int totalCount = this.ChildrenOfType<BeatmapCard>().Count();
-                return loadedCorrectCount > 0 && loadedCorrectCount == totalCount;
+                return loadedCorrectCount > 0 && loadedCorrectCount == expectedCount;
             });
     }
 }

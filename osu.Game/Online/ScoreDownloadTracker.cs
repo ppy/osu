@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Scoring;
@@ -14,22 +16,25 @@ namespace osu.Game.Online
     public class ScoreDownloadTracker : DownloadTracker<ScoreInfo>
     {
         [Resolved(CanBeNull = true)]
-        protected ScoreManager? Manager { get; private set; }
-
-        [Resolved(CanBeNull = true)]
         protected ScoreModelDownloader? Downloader { get; private set; }
 
         private ArchiveDownloadRequest<IScoreInfo>? attachedRequest;
+
+        private IDisposable? realmSubscription;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         public ScoreDownloadTracker(ScoreInfo trackedItem)
             : base(trackedItem)
         {
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load()
+        protected override void LoadComplete()
         {
-            if (Manager == null || Downloader == null)
+            base.LoadComplete();
+
+            if (Downloader == null)
                 return;
 
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
@@ -39,15 +44,22 @@ namespace osu.Game.Online
                 OnlineID = TrackedItem.OnlineID
             };
 
-            if (Manager.IsAvailableLocally(scoreInfo))
-                UpdateState(DownloadState.LocallyAvailable);
-            else
-                attachDownload(Downloader.GetExistingDownload(scoreInfo));
-
             Downloader.DownloadBegan += downloadBegan;
             Downloader.DownloadFailed += downloadFailed;
-            Manager.ItemUpdated += itemUpdated;
-            Manager.ItemRemoved += itemRemoved;
+
+            realmSubscription = realm.RegisterForNotifications(r => r.All<ScoreInfo>().Where(s => ((s.OnlineID > 0 && s.OnlineID == TrackedItem.OnlineID) || s.Hash == TrackedItem.Hash) && !s.DeletePending), (items, changes, ___) =>
+            {
+                if (items.Any())
+                    Schedule(() => UpdateState(DownloadState.LocallyAvailable));
+                else
+                {
+                    Schedule(() =>
+                    {
+                        UpdateState(DownloadState.NotDownloaded);
+                        attachDownload(Downloader.GetExistingDownload(scoreInfo));
+                    });
+                }
+            });
         }
 
         private void downloadBegan(ArchiveDownloadRequest<IScoreInfo> request) => Schedule(() =>
@@ -102,18 +114,6 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemUpdated(ScoreInfo item) => Schedule(() =>
-        {
-            if (checkEquality(item, TrackedItem))
-                UpdateState(DownloadState.LocallyAvailable);
-        });
-
-        private void itemRemoved(ScoreInfo item) => Schedule(() =>
-        {
-            if (checkEquality(item, TrackedItem))
-                UpdateState(DownloadState.NotDownloaded);
-        });
-
         private bool checkEquality(IScoreInfo x, IScoreInfo y) => x.MatchesOnlineID(y);
 
         #region Disposal
@@ -123,16 +123,12 @@ namespace osu.Game.Online
             base.Dispose(isDisposing);
             attachDownload(null);
 
+            realmSubscription?.Dispose();
+
             if (Downloader != null)
             {
                 Downloader.DownloadBegan -= downloadBegan;
                 Downloader.DownloadFailed -= downloadFailed;
-            }
-
-            if (Manager != null)
-            {
-                Manager.ItemUpdated -= itemUpdated;
-                Manager.ItemRemoved -= itemRemoved;
             }
         }
 

@@ -3,13 +3,10 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
@@ -18,12 +15,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
     {
         private FillFlowContainer<ParticipantPanel> panels;
 
-        private Sample userJoinSample;
-        private Sample userLeftSample;
-        private Sample userKickedSample;
-
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             InternalChild = new OsuContextMenuContainer
             {
@@ -41,31 +34,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     }
                 }
             };
-
-            userJoinSample = audio.Samples.Get(@"Multiplayer/player-joined");
-            userLeftSample = audio.Samples.Get(@"Multiplayer/player-left");
-            userKickedSample = audio.Samples.Get(@"Multiplayer/player-kicked");
-        }
-
-        protected override void UserJoined(MultiplayerRoomUser user)
-        {
-            base.UserJoined(user);
-
-            userJoinSample?.Play();
-        }
-
-        protected override void UserLeft(MultiplayerRoomUser user)
-        {
-            base.UserLeft(user);
-
-            userLeftSample?.Play();
-        }
-
-        protected override void UserKicked(MultiplayerRoomUser user)
-        {
-            base.UserKicked(user);
-
-            userKickedSample?.Play();
         }
 
         protected override void OnRoomUpdated()

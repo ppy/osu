@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             BackgroundColour = Color4.Transparent;
             BackgroundColourHover = Color4Extensions.FromHex(@"172023");
@@ -118,6 +117,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     NormalText = new OsuSpriteText
                     {
+                        AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: text_size),
@@ -125,7 +125,7 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     BoldText = new OsuSpriteText
                     {
-                        AlwaysPresent = true,
+                        AlwaysPresent = true, // ensures that the menu item does not change width when switching between normal and bold text.
                         Alpha = 0,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,

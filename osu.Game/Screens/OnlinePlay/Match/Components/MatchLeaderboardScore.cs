@@ -14,8 +14,10 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
     {
         private readonly APIUserScoreAggregate score;
 
-        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool allowHighlight = true)
-            : base(score.CreateScoreInfo(), rank, allowHighlight)
+        public override ScoreInfo TooltipContent => null; // match aggregate scores can't show statistics that the custom tooltip displays.
+
+        public MatchLeaderboardScore(APIUserScoreAggregate score, int? rank, bool isOnlineScope = true)
+            : base(score.CreateScoreInfo(), rank, isOnlineScope)
         {
             this.score = score;
         }

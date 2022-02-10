@@ -113,11 +113,14 @@ namespace osu.Game.IO
             }
         }
 
-        public override void Migrate(Storage newStorage)
+        public override bool Migrate(Storage newStorage)
         {
-            base.Migrate(newStorage);
+            bool cleanupSucceeded = base.Migrate(newStorage);
+
             storageConfig.SetValue(StorageConfig.FullPath, newStorage.GetFullPath("."));
             storageConfig.Save();
+
+            return cleanupSucceeded;
         }
     }
 

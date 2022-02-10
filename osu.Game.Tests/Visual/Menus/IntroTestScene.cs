@@ -5,6 +5,8 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
+using osu.Game.Overlays;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -18,9 +20,16 @@ namespace osu.Game.Tests.Visual.Menus
         [Cached]
         private OsuLogo logo;
 
+        protected abstract bool IntroReliesOnTrack { get; }
+
         protected OsuScreenStack IntroStack;
 
         private IntroScreen intro;
+
+        [Cached]
+        private NotificationOverlay notifications;
+
+        private ScheduledDelegate trackResetDelegate;
 
         protected IntroTestScene()
         {
@@ -38,6 +47,11 @@ namespace osu.Game.Tests.Visual.Menus
                     RelativePositionAxes = Axes.Both,
                     Depth = float.MinValue,
                     Position = new Vector2(0.5f),
+                },
+                notifications = new NotificationOverlay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                 }
             };
         }
@@ -61,6 +75,41 @@ namespace osu.Game.Tests.Visual.Menus
             });
 
             AddUntilStep("wait for menu", () => intro.DidLoadMenu);
+        }
+
+        [Test]
+        public virtual void TestPlayIntroWithFailingAudioDevice()
+        {
+            AddStep("hide notifications", () => notifications.Hide());
+            AddStep("restart sequence", () =>
+            {
+                logo.FinishTransforms();
+                logo.IsTracking = false;
+
+                IntroStack?.Expire();
+
+                Add(IntroStack = new OsuScreenStack
+                {
+                    RelativeSizeAxes = Axes.Both,
+                });
+
+                IntroStack.Push(intro = CreateScreen());
+            });
+
+            AddStep("trigger failure", () =>
+            {
+                trackResetDelegate = Scheduler.AddDelayed(() =>
+                {
+                    intro.Beatmap.Value.Track.Seek(0);
+                }, 0, true);
+            });
+
+            AddUntilStep("wait for menu", () => intro.DidLoadMenu);
+
+            if (IntroReliesOnTrack)
+                AddUntilStep("wait for notification", () => notifications.UnreadCount.Value == 1);
+
+            AddStep("uninstall delegate", () => trackResetDelegate?.Cancel());
         }
 
         protected abstract IntroScreen CreateScreen();
