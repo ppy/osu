@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                                 .ContinueWith(t =>
                                 {
                                     if (t.IsFaulted)
-                                        Logger.Log($"Error during migration: {t.Exception?.Message}", level: LogLevel.Error);
+                                        Logger.Error(t.Exception, $"Error during migration: {t.Exception?.Message}");
 
                                     Schedule(this.Exit);
                                 });
