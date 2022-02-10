@@ -3,32 +3,69 @@
 
 using System.IO;
 using System.Threading;
+using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Settings.Sections.Maintenance;
 
 namespace osu.Game.Tests.Visual.Settings
 {
     public class TestSceneMigrationScreens : ScreenTestScene
     {
+        [Cached]
+        private readonly NotificationOverlay notifications;
+
         public TestSceneMigrationScreens()
         {
-            AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen()));
+            Children = new Drawable[]
+            {
+                notifications = new NotificationOverlay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                }
+            };
+        }
+
+        [Test]
+        public void TestDeleteSuccess()
+        {
+            AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen(true)));
+        }
+
+        [Test]
+        public void TestDeleteFails()
+        {
+            AddStep("Push screen", () => Stack.Push(new TestMigrationSelectScreen(false)));
         }
 
         private class TestMigrationSelectScreen : MigrationSelectScreen
         {
-            protected override void BeginMigration(DirectoryInfo target) => this.Push(new TestMigrationRunScreen());
+            private readonly bool deleteSuccess;
+
+            public TestMigrationSelectScreen(bool deleteSuccess)
+            {
+                this.deleteSuccess = deleteSuccess;
+            }
+
+            protected override void BeginMigration(DirectoryInfo target) => this.Push(new TestMigrationRunScreen(deleteSuccess));
 
             private class TestMigrationRunScreen : MigrationRunScreen
             {
-                protected override void PerformMigration()
-                {
-                    Thread.Sleep(3000);
-                }
+                private readonly bool success;
 
-                public TestMigrationRunScreen()
+                public TestMigrationRunScreen(bool success)
                     : base(null)
                 {
+                    this.success = success;
+                }
+
+                protected override bool PerformMigration()
+                {
+                    Thread.Sleep(3000);
+                    return success;
                 }
             }
         }
