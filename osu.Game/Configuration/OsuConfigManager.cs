@@ -98,6 +98,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuParallax, true);
 
             // Gameplay
+            SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
+            SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
             SetDefault(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             SetDefault(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             SetDefault(OsuSetting.LightenDuringBreaks, true);
@@ -109,7 +111,6 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             SetDefault(OsuSetting.FadePlayfieldWhenHealthLow, true);
             SetDefault(OsuSetting.KeyOverlay, false);
-            SetDefault(OsuSetting.PositionalHitSounds, true);
             SetDefault(OsuSetting.AlwaysPlayFirstComboBreak, true);
 
             SetDefault(OsuSetting.FloatingComments, false);
@@ -175,9 +176,11 @@ namespace osu.Game.Configuration
 
             int combined = (year * 10000) + monthDay;
 
-            if (combined < 20210413)
+            if (combined < 20220103)
             {
-                SetValue(OsuSetting.EditorWaveformOpacity, 0.25f);
+                var positionalHitsoundsEnabled = GetBindable<bool>(OsuSetting.PositionalHitsounds);
+                if (!positionalHitsoundsEnabled.Value)
+                    SetValue(OsuSetting.PositionalHitsoundsLevel, 0);
             }
         }
 
@@ -256,7 +259,8 @@ namespace osu.Game.Configuration
         LightenDuringBreaks,
         ShowStoryboard,
         KeyOverlay,
-        PositionalHitSounds,
+        PositionalHitsounds,
+        PositionalHitsoundsLevel,
         AlwaysPlayFirstComboBreak,
         FloatingComments,
         HUDVisibilityMode,

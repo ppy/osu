@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 
+#nullable enable
+
 namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 {
     internal class KiaiFlashingDrawable : BeatSyncedContainer
@@ -15,18 +17,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private const float flash_opacity = 0.3f;
 
-        public KiaiFlashingDrawable(Func<Drawable> creationFunc)
+        public KiaiFlashingDrawable(Func<Drawable?> creationFunc)
         {
             AutoSizeAxes = Axes.Both;
 
             Children = new[]
             {
-                creationFunc.Invoke().With(d =>
+                (creationFunc.Invoke() ?? Empty()).With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;
                 }),
-                flashingDrawable = creationFunc.Invoke().With(d =>
+                flashingDrawable = (creationFunc.Invoke() ?? Empty()).With(d =>
                 {
                     d.Anchor = Anchor.Centre;
                     d.Origin = Anchor.Centre;

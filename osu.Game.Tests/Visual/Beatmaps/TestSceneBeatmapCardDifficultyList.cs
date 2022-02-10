@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Drawables.Cards;
-using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Tests.Visual.Beatmaps
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             var beatmapSet = new APIBeatmapSet
             {

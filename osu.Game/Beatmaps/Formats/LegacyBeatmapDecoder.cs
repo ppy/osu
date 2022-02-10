@@ -56,6 +56,8 @@ namespace osu.Game.Beatmaps.Formats
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
 
+            applyLegacyDefaults(this.beatmap.BeatmapInfo);
+
             base.ParseStreamInto(stream, beatmap);
 
             flushPendingPoints();
@@ -68,6 +70,19 @@ namespace osu.Game.Beatmaps.Formats
 
             foreach (var hitObject in this.beatmap.HitObjects)
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.Difficulty);
+        }
+
+        /// <summary>
+        /// Some `BeatmapInfo` members have default values that differ from the default values used by stable.
+        /// In addition, legacy beatmaps will sometimes not contain some configuration keys, in which case
+        /// the legacy default values should be used.
+        /// This method's intention is to restore those legacy defaults.
+        /// See also: https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
+        /// </summary>
+        private void applyLegacyDefaults(BeatmapInfo beatmapInfo)
+        {
+            beatmapInfo.WidescreenStoryboard = false;
+            beatmapInfo.SamplesMatchPlaybackRate = false;
         }
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
@@ -141,9 +156,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Mode":
-                    beatmap.BeatmapInfo.RulesetID = Parsing.ParseInt(pair.Value);
+                    int rulesetID = Parsing.ParseInt(pair.Value);
 
-                    switch (beatmap.BeatmapInfo.RulesetID)
+                    beatmap.BeatmapInfo.RulesetID = rulesetID;
+
+                    switch (rulesetID)
                     {
                         case 0:
                             parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
@@ -251,7 +268,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Creator":
-                    metadata.AuthorString = pair.Value;
+                    metadata.Author.Username = pair.Value;
                     break;
 
                 case @"Version":
@@ -294,10 +311,13 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"OverallDifficulty":
                     difficulty.OverallDifficulty = Parsing.ParseFloat(pair.Value);
+                    if (!hasApproachRate)
+                        difficulty.ApproachRate = difficulty.OverallDifficulty;
                     break;
 
                 case @"ApproachRate":
                     difficulty.ApproachRate = Parsing.ParseFloat(pair.Value);
+                    hasApproachRate = true;
                     break;
 
                 case @"SliderMultiplier":
@@ -340,9 +360,9 @@ namespace osu.Game.Beatmaps.Formats
             double beatLength = Parsing.ParseDouble(split[1].Trim());
             double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
-            TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
+            TimeSignature timeSignature = TimeSignature.SimpleQuadruple;
             if (split.Length >= 3)
-                timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)Parsing.ParseInt(split[2]);
+                timeSignature = split[2][0] == '0' ? TimeSignature.SimpleQuadruple : new TimeSignature(Parsing.ParseInt(split[2]));
 
             LegacySampleBank sampleSet = defaultSampleBank;
             if (split.Length >= 4)
@@ -397,7 +417,7 @@ namespace osu.Game.Beatmaps.Formats
                 OmitFirstBarLine = omitFirstBarSignature,
             };
 
-            bool isOsuRuleset = beatmap.BeatmapInfo.RulesetID == 0;
+            bool isOsuRuleset = beatmap.BeatmapInfo.Ruleset.OnlineID == 0;
             // scrolling rulesets use effect points rather than difficulty points for scroll speed adjustments.
             if (!isOsuRuleset)
                 effectPoint.ScrollSpeed = speedMultiplier;
@@ -415,6 +435,7 @@ namespace osu.Game.Beatmaps.Formats
         private readonly List<ControlPoint> pendingControlPoints = new List<ControlPoint>();
         private readonly HashSet<Type> pendingControlPointTypes = new HashSet<Type>();
         private double pendingControlPointsTime;
+        private bool hasApproachRate;
 
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
         {

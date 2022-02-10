@@ -64,7 +64,11 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 Recorder = recorder = new TestReplayRecorder(new Score
                                 {
                                     Replay = replay,
-                                    ScoreInfo = { BeatmapInfo = gameplayState.Beatmap.BeatmapInfo }
+                                    ScoreInfo =
+                                    {
+                                        BeatmapInfo = gameplayState.Beatmap.BeatmapInfo,
+                                        Ruleset = new OsuRuleset().RulesetInfo,
+                                    }
                                 })
                                 {
                                     ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
@@ -206,7 +210,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            public override void CollectPendingInputs(List<IInput> inputs)
+            protected override void CollectReplayInputs(List<IInput> inputs)
             {
                 inputs.Add(new MousePositionAbsoluteInput { Position = GamefieldToScreenSpace(CurrentFrame?.Position ?? Vector2.Zero) });
                 inputs.Add(new ReplayState<TestAction> { PressedActions = CurrentFrame?.Actions ?? new List<TestAction>() });

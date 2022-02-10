@@ -23,6 +23,8 @@ namespace osu.Game.Graphics.Containers
         private Bindable<float> posX;
         private Bindable<float> posY;
 
+        private Bindable<MarginPadding> safeAreaPadding;
+
         private readonly ScalingMode? targetMode;
 
         private Bindable<ScalingMode> scalingMode;
@@ -50,7 +52,7 @@ namespace osu.Game.Graphics.Containers
                     return;
 
                 allowScaling = value;
-                if (IsLoaded) updateSize();
+                if (IsLoaded) Scheduler.AddOnce(updateSize);
             }
         }
 
@@ -102,22 +104,25 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, ISafeArea safeArea)
         {
             scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
-            scalingMode.ValueChanged += _ => updateSize();
+            scalingMode.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
-            sizeX.ValueChanged += _ => updateSize();
+            sizeX.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
-            sizeY.ValueChanged += _ => updateSize();
+            sizeY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
-            posX.ValueChanged += _ => updateSize();
+            posX.ValueChanged += _ => Scheduler.AddOnce(updateSize);
 
             posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
-            posY.ValueChanged += _ => updateSize();
+            posY.ValueChanged += _ => Scheduler.AddOnce(updateSize);
+
+            safeAreaPadding = safeArea.SafeAreaPadding.GetBoundCopy();
+            safeAreaPadding.BindValueChanged(_ => Scheduler.AddOnce(updateSize));
         }
 
         protected override void LoadComplete()
@@ -161,7 +166,10 @@ namespace osu.Game.Graphics.Containers
 
             var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
             var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
-            bool requiresMasking = scaling && targetSize != Vector2.One;
+            bool requiresMasking = (scaling && targetSize != Vector2.One)
+                                   // For the top level scaling container, for now we apply masking if safe areas are in use.
+                                   // In the future this can likely be removed as more of the actual UI supports overflowing into the safe areas.
+                                   || (targetMode == ScalingMode.Everything && safeAreaPadding.Value.Total != Vector2.Zero);
 
             if (requiresMasking)
                 sizableContainer.Masking = true;

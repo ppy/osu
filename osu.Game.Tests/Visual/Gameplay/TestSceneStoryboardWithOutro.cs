@@ -53,8 +53,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             CreateTest(null);
             AddUntilStep("completion set by processor", () => Player.ScoreProcessor.HasCompleted.Value);
             AddStep("skip outro", () => InputManager.Key(osuTK.Input.Key.Space));
+            AddAssert("player is no longer current screen", () => !Player.IsCurrentScreen());
             AddUntilStep("wait for score shown", () => Player.IsScoreShown);
-            AddUntilStep("time less than storyboard duration", () => Player.GameplayClockContainer.GameplayClock.CurrentTime < currentStoryboardDuration);
         }
 
         [Test]
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AddStep("set storyboard duration to 0.6s", () => currentStoryboardDuration = 600);
             });
 
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("storyboard ends", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= currentStoryboardDuration);
             AddUntilStep("wait for fail overlay", () => Player.FailOverlay.State.Value == Visibility.Visible);
         }

@@ -9,6 +9,7 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public class TestSceneIntroCircles : IntroTestScene
     {
+        protected override bool IntroReliesOnTrack => false;
         protected override IntroScreen CreateScreen() => new IntroCircles();
     }
 }

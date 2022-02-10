@@ -29,7 +29,13 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         private ScrollingTestContainer.TestScrollingInfo scrollingInfo = new ScrollingTestContainer.TestScrollingInfo();
 
         [Cached(typeof(EditorBeatmap))]
-        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition()));
+        private EditorBeatmap editorBeatmap = new EditorBeatmap(new ManiaBeatmap(new StageDefinition())
+        {
+            BeatmapInfo =
+            {
+                Ruleset = new ManiaRuleset().RulesetInfo
+            }
+        });
 
         private readonly ManiaBeatSnapGrid beatSnapGrid;
 
