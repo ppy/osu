@@ -457,9 +457,11 @@ namespace osu.Game.Tests.Visual.UserInterface
             public override ModType Type => ModType.Conversion;
         }
 
-        private class TestUnimplementedModOsuRuleset : OsuRuleset
+        private class TestUnimplementedModOsuRuleset : OsuRuleset, ILegacyRuleset
         {
             public override string ShortName => "unimplemented";
+
+            int ILegacyRuleset.LegacyID => -1;
 
             public override IEnumerable<Mod> GetModsFor(ModType type)
             {
