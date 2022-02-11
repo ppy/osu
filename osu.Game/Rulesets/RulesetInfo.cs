@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
     [MapTo("Ruleset")]
-    public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IRulesetInfo
+    public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IComparable<RulesetInfo>, IRulesetInfo
     {
         [PrimaryKey]
         public string ShortName { get; set; } = string.Empty;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets
             return ShortName == other.ShortName;
         }
 
-        public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
+        public bool Equals(IRulesetInfo? other) => other is RulesetInfo r && Equals(r);
 
         public int CompareTo(RulesetInfo other)
         {
@@ -61,6 +61,14 @@ namespace osu.Game.Rulesets
                 return 1;
 
             return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
+        }
+
+        public int CompareTo(IRulesetInfo other)
+        {
+            if (!(other is RulesetInfo ruleset))
+                throw new ArgumentException($@"Object is not of type {nameof(RulesetInfo)}.", nameof(other));
+
+            return CompareTo(ruleset);
         }
 
         public override int GetHashCode()
