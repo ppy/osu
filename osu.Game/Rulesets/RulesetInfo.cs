@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets
             if (ReferenceEquals(this, other)) return true;
             if (other == null) return false;
 
-            if (OnlineID >= 0 && other.OnlineID >= 0)
-                return OnlineID == other.OnlineID;
-
             return ShortName == other.ShortName;
         }
 
