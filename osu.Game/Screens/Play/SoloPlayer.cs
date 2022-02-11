@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
             Debug.Assert(beatmap.OnlineID > 0);
 
-            return new SubmitSoloScoreRequest(beatmap.OnlineID, token, score.ScoreInfo);
+            return new SubmitSoloScoreRequest(score.ScoreInfo, token, beatmap.OnlineID);
         }
     }
 }
