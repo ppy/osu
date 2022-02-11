@@ -19,7 +19,7 @@ namespace osu.Game.Online.Rooms
         protected SubmitScoreRequest(ScoreInfo scoreInfo, long scoreId)
         {
             Score = new SubmittableScore(scoreInfo);
-            this.ScoreId = scoreId;
+            ScoreId = scoreId;
         }
 
         protected override WebRequest CreateWebRequest()
