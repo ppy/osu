@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             InternalChild = new FillFlowContainer
             {
@@ -127,7 +126,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 }
             };
 
-            createColourBars(colours);
+            createColourBars();
         }
 
         protected override void LoadComplete()
@@ -150,7 +149,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             iconLate.Rotation = -Rotation;
         }
 
-        private void createColourBars(OsuColour colours)
+        private void createColourBars()
         {
             var windows = HitWindows.GetAllAvailableWindows().ToArray();
 

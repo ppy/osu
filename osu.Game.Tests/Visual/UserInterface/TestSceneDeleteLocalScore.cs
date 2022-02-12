@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -16,10 +17,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Tests.Resources;
@@ -41,6 +44,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapInfo beatmapInfo;
 
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
         [Cached]
         private readonly DialogOverlay dialogOverlay;
 
@@ -59,13 +65,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Scope = BeatmapLeaderboardScope.Local,
                         BeatmapInfo = new BeatmapInfo
                         {
-                            ID = 1,
+                            ID = Guid.NewGuid(),
                             Metadata = new BeatmapMetadata
                             {
-                                ID = 1,
                                 Title = "TestSong",
                                 Artist = "TestArtist",
-                                Author = new APIUser
+                                Author = new RealmUser
                                 {
                                     Username = "TestAuthor"
                                 },
@@ -82,28 +87,34 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
+            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            Dependencies.Cache(Realm);
 
-            beatmapInfo = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely().Value.Beatmaps[0];
+            var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
-            for (int i = 0; i < 50; i++)
+            imported?.PerformRead(s =>
             {
-                var score = new ScoreInfo
-                {
-                    OnlineID = i,
-                    BeatmapInfo = beatmapInfo,
-                    BeatmapInfoID = beatmapInfo.ID,
-                    Accuracy = RNG.NextDouble(),
-                    TotalScore = RNG.Next(1, 1000000),
-                    MaxCombo = RNG.Next(1, 1000),
-                    Rank = ScoreRank.XH,
-                    User = new APIUser { Username = "TestUser" },
-                };
+                beatmapInfo = s.Beatmaps[0];
 
-                importedScores.Add(scoreManager.Import(score).GetResultSafely().Value);
-            }
+                for (int i = 0; i < 50; i++)
+                {
+                    var score = new ScoreInfo
+                    {
+                        OnlineID = i,
+                        BeatmapInfo = beatmapInfo,
+                        Accuracy = RNG.NextDouble(),
+                        TotalScore = RNG.Next(1, 1000000),
+                        MaxCombo = RNG.Next(1, 1000),
+                        Rank = ScoreRank.XH,
+                        User = new APIUser { Username = "TestUser" },
+                        Ruleset = new OsuRuleset().RulesetInfo,
+                    };
+
+                    importedScores.Add(scoreManager.Import(score).Value);
+                }
+            });
 
             return dependencies;
         }
@@ -111,24 +122,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            // Due to soft deletions, we can re-use deleted scores between test runs
-            scoreManager.Undelete(scoreManager.QueryScores(s => s.DeletePending).ToList());
-
-            leaderboard.Scores = null;
-            leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
+            realm.Run(r =>
+            {
+                // Due to soft deletions, we can re-use deleted scores between test runs
+                scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
+            });
 
             leaderboard.BeatmapInfo = beatmapInfo;
-            leaderboard.RefreshScores(); // Required in the case that the beatmap hasn't changed
+            leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
         });
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            // Ensure the leaderboard has finished async-loading drawables
-            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
-
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
+            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
         }
 
         [Test]

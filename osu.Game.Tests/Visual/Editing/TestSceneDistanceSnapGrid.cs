@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
@@ -29,7 +30,13 @@ namespace osu.Game.Tests.Visual.Editing
 
         public TestSceneDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            });
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
         }
 

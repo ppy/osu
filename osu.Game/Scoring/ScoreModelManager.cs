@@ -4,10 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -15,10 +13,14 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Stores;
+using Realms;
+
+#nullable enable
 
 namespace osu.Game.Scoring
 {
-    public class ScoreModelManager : ArchiveModelManager<ScoreInfo, ScoreFileInfo>
+    public class ScoreModelManager : RealmArchiveModelManager<ScoreInfo>
     {
         public override IEnumerable<string> HandledExtensions => new[] { ".osr" };
 
@@ -27,18 +29,15 @@ namespace osu.Game.Scoring
         private readonly RulesetStore rulesets;
         private readonly Func<BeatmapManager> beatmaps;
 
-        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
-            : base(storage, contextFactory, new ScoreStore(contextFactory, storage), importHost)
+        public ScoreModelManager(RulesetStore rulesets, Func<BeatmapManager> beatmaps, Storage storage, RealmAccess realm)
+            : base(storage, realm)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
         }
 
-        protected override ScoreInfo CreateModel(ArchiveReader archive)
+        protected override ScoreInfo? CreateModel(ArchiveReader archive)
         {
-            if (archive == null)
-                return null;
-
             using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr", StringComparison.OrdinalIgnoreCase))))
             {
                 try
@@ -55,17 +54,27 @@ namespace osu.Game.Scoring
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps(), Files.Store);
 
-        public List<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+        protected override void Populate(ScoreInfo model, ArchiveReader? archive, Realm realm, CancellationToken cancellationToken = default)
+        {
+            // Ensure the beatmap is not detached.
+            if (!model.BeatmapInfo.IsManaged)
+                model.BeatmapInfo = realm.Find<BeatmapInfo>(model.BeatmapInfo.ID);
 
-        public IEnumerable<ScoreInfo> QueryScores(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().Where(query);
+            if (!model.Ruleset.IsManaged)
+                model.Ruleset = realm.Find<RulesetInfo>(model.Ruleset.ShortName);
 
-        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+            // These properties are known to be non-null, but these final checks ensure a null hasn't come from somewhere (or the refetch has failed).
+            // Under no circumstance do we want these to be written to realm as null.
+            if (model.BeatmapInfo == null) throw new ArgumentNullException(nameof(model.BeatmapInfo));
+            if (model.Ruleset == null) throw new ArgumentNullException(nameof(model.Ruleset));
 
-        protected override Task Populate(ScoreInfo model, ArchiveReader archive, CancellationToken cancellationToken = default)
-            => Task.CompletedTask;
+            if (string.IsNullOrEmpty(model.StatisticsJson))
+                model.StatisticsJson = JsonConvert.SerializeObject(model.Statistics);
+        }
 
-        protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
-            => base.CheckLocalAvailability(model, items)
-               || (model.OnlineID > 0 && items.Any(i => i.OnlineID == model.OnlineID));
+        public override bool IsAvailableLocally(ScoreInfo model)
+        {
+            return Realm.Run(realm => realm.All<ScoreInfo>().Any(s => s.OnlineID == model.OnlineID));
+        }
     }
 }

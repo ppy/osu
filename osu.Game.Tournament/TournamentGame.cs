@@ -61,18 +61,15 @@ namespace osu.Game.Tournament
 
             loadingSpinner.Show();
 
-            BracketLoadTask.ContinueWith(t =>
+            BracketLoadTask.ContinueWith(t => Schedule(() =>
             {
                 if (t.IsFaulted)
                 {
-                    Schedule(() =>
-                    {
-                        loadingSpinner.Hide();
-                        loadingSpinner.Expire();
+                    loadingSpinner.Hide();
+                    loadingSpinner.Expire();
 
-                        Logger.Error(t.Exception, "Couldn't load bracket with error");
-                        Add(new WarningBox($"Your {BRACKET_FILENAME} file could not be parsed. Please check runtime.log for more details."));
-                    });
+                    Logger.Error(t.Exception, "Couldn't load bracket with error");
+                    Add(new WarningBox($"Your {BRACKET_FILENAME} file could not be parsed. Please check runtime.log for more details."));
 
                     return;
                 }
@@ -143,7 +140,7 @@ namespace osu.Game.Tournament
                         windowMode.Value = WindowMode.Windowed;
                     }), true);
                 });
-            });
+            }));
         }
     }
 }

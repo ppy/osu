@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Models;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Tests.Resources;
@@ -157,10 +158,10 @@ namespace osu.Game.Tests.Visual.Ranking
         public void TestSelectMultipleScores()
         {
             var firstScore = TestResources.CreateTestScoreInfo();
-            var secondScore = TestResources.CreateTestScoreInfo();
+            firstScore.RealmUser = new RealmUser { Username = "A" };
 
-            firstScore.UserString = "A";
-            secondScore.UserString = "B";
+            var secondScore = TestResources.CreateTestScoreInfo();
+            secondScore.RealmUser = new RealmUser { Username = "B" };
 
             createListStep(() => new ScorePanelList());
 
@@ -178,7 +179,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
             AddStep("select second score", () =>
             {
-                InputManager.MoveMouseTo(list.ChildrenOfType<ScorePanel>().Single(p => p.Score == secondScore));
+                InputManager.MoveMouseTo(list.ChildrenOfType<ScorePanel>().Single(p => p.Score.Equals(secondScore)));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -303,6 +304,6 @@ namespace osu.Game.Tests.Visual.Ranking
             => AddUntilStep("first panel centred", () => Precision.AlmostEquals(list.ChildrenOfType<ScorePanel>().First().ScreenSpaceDrawQuad.Centre.X, list.ScreenSpaceDrawQuad.Centre.X, 1));
 
         private void assertScoreState(ScoreInfo score, bool expanded)
-            => AddUntilStep($"score expanded = {expanded}", () => (list.ChildrenOfType<ScorePanel>().Single(p => p.Score == score).State == PanelState.Expanded) == expanded);
+            => AddUntilStep($"score expanded = {expanded}", () => (list.ChildrenOfType<ScorePanel>().Single(p => p.Score.Equals(score)).State == PanelState.Expanded) == expanded);
     }
 }

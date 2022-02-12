@@ -47,8 +47,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         public override void SetUpSteps()
@@ -58,9 +59,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("import beatmap", () =>
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
-                InitialBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
-                OtherBeatmap = importedSet.Beatmaps.Last(b => b.RulesetID == 0);
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                InitialBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
+                OtherBeatmap = importedSet.Beatmaps.Last(b => b.Ruleset.OnlineID == 0);
             });
 
             AddStep("load multiplayer", () => LoadScreen(multiplayerComponents = new TestMultiplayerComponents()));

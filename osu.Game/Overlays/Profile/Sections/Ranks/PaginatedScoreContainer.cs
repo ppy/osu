@@ -46,6 +46,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 case ScoreType.Recent:
                     return user.ScoresRecentCount;
 
+                case ScoreType.Pinned:
+                    return user.ScoresPinnedCount;
+
                 default:
                     return 0;
             }
