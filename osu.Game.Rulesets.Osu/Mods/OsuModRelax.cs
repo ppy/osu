@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         break;
 
                     case DrawableSpinner spinner:
-                        requiresHold = spinner.HitObject.SpinsRequired > 0;
+                        requiresHold |= spinner.HitObject.SpinsRequired > 0;
                         break;
                 }
             }
