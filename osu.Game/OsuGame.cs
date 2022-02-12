@@ -154,6 +154,8 @@ namespace osu.Game
 
         private MainMenu menuScreen;
 
+        private VersionManager versionManager;
+
         [CanBeNull]
         private IntroScreen introScreen;
 
@@ -247,7 +249,7 @@ namespace osu.Game
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                ILive<SkinInfo> skinInfo = null;
+                Live<SkinInfo> skinInfo = null;
 
                 if (Guid.TryParse(skinId.NewValue, out var guid))
                     skinInfo = SkinManager.Query(s => s.ID == guid);
@@ -355,12 +357,12 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
 
-            externalLinkOpener.OpenUrlExternally(url);
+            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
 
         /// <summary>
@@ -437,7 +439,7 @@ namespace osu.Game
         /// </remarks>
         public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            BeatmapSetInfo databasedSet = null;
+            Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
                 databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
@@ -451,14 +453,16 @@ namespace osu.Game
                 return;
             }
 
+            var detachedSet = databasedSet.PerformRead(s => s.Detach());
+
             PerformFromScreen(screen =>
             {
                 // Find beatmaps that match our predicate.
-                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
+                var beatmaps = detachedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
 
                 // Use all beatmaps if predicate matched nothing
                 if (beatmaps.Count == 0)
-                    beatmaps = databasedSet.Beatmaps;
+                    beatmaps = detachedSet.Beatmaps.ToList();
 
                 // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
                 var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
@@ -481,7 +485,7 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        public void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
+        public void PresentScore(IScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
@@ -490,7 +494,8 @@ namespace osu.Game
             if (score.OnlineID > 0)
                 databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
 
-            databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
+            if (score is ScoreInfo scoreInfo)
+                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -742,6 +747,9 @@ namespace osu.Game
 
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
+
+            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
 
             loadComponentSingleFile(osuLogo, logo =>
             {
@@ -1126,10 +1134,16 @@ namespace osu.Game
             {
                 case IntroScreen intro:
                     introScreen = intro;
+                    versionManager?.Show();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
+                    versionManager?.Show();
+                    break;
+
+                default:
+                    versionManager?.Hide();
                     break;
             }
 

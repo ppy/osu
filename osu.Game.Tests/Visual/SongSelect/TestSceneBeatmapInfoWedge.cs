@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Metadata = new BeatmapMetadata
                     {
-                        AuthorString = $"{ruleset.ShortName}Author",
+                        Author = { Username = $"{ruleset.ShortName}Author" },
                         Artist = $"{ruleset.ShortName}Artist",
                         Source = $"{ruleset.ShortName}Source",
                         Title = $"{ruleset.ShortName}Title"
@@ -216,7 +216,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Ruleset = ruleset,
                     StarRating = 6,
                     DifficultyName = $"{ruleset.ShortName}Version",
-                    BaseDifficulty = new BeatmapDifficulty()
+                    Difficulty = new BeatmapDifficulty()
                 },
                 HitObjects = objects
             };
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Metadata = new BeatmapMetadata
                     {
-                        AuthorString = "WWWWWWWWWWWWWWW",
+                        Author = { Username = "WWWWWWWWWWWWWWW" },
                         Artist = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
                         Source = "Verrrrry long Source",
                         Title = "Verrrrry long Title"

@@ -47,9 +47,10 @@ namespace osu.Game.Tests.Visual.Background
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
+            Dependencies.Cache(Realm);
 
             manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 
@@ -386,6 +387,9 @@ namespace osu.Game.Tests.Visual.Background
             {
                 while (BlockLoad && !token.IsCancellationRequested)
                     Thread.Sleep(1);
+
+                if (!LoadedBeatmapSuccessfully)
+                    return;
 
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 DrawableRuleset.IsPaused.BindTo(IsPaused);

@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         {
             var beatmap = decodeAsJson(normal);
             var meta = beatmap.BeatmapInfo.Metadata;
-            Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineID);
+            Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet?.OnlineID);
             Assert.AreEqual("Soleily", meta.Artist);
             Assert.AreEqual("Soleily", meta.ArtistUnicode);
             Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.AreEqual(0, beatmapInfo.AudioLeadIn);
             Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
             Assert.AreEqual(false, beatmapInfo.SpecialStyle);
-            Assert.IsTrue(beatmapInfo.RulesetID == 0);
+            Assert.IsTrue(beatmapInfo.Ruleset.OnlineID == 0);
             Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
             Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
             Assert.AreEqual(CountdownType.None, beatmapInfo.Countdown);

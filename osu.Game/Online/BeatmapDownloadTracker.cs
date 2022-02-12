@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.API;
 
 #nullable enable
@@ -13,36 +15,46 @@ namespace osu.Game.Online
     public class BeatmapDownloadTracker : DownloadTracker<IBeatmapSetInfo>
     {
         [Resolved(CanBeNull = true)]
-        protected BeatmapManager? Manager { get; private set; }
-
-        [Resolved(CanBeNull = true)]
         protected BeatmapModelDownloader? Downloader { get; private set; }
 
         private ArchiveDownloadRequest<IBeatmapSetInfo>? attachedRequest;
+
+        private IDisposable? realmSubscription;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
 
         public BeatmapDownloadTracker(IBeatmapSetInfo trackedItem)
             : base(trackedItem)
         {
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load()
+        protected override void LoadComplete()
         {
-            if (Manager == null || Downloader == null)
+            base.LoadComplete();
+
+            if (Downloader == null)
                 return;
+
+            Downloader.DownloadBegan += downloadBegan;
+            Downloader.DownloadFailed += downloadFailed;
 
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineID = TrackedItem.OnlineID };
 
-            if (Manager.IsAvailableLocally(beatmapSetInfo))
-                UpdateState(DownloadState.LocallyAvailable);
-            else
-                attachDownload(Downloader.GetExistingDownload(beatmapSetInfo));
-
-            Downloader.DownloadBegan += downloadBegan;
-            Downloader.DownloadFailed += downloadFailed;
-            Manager.ItemUpdated += itemUpdated;
-            Manager.ItemRemoved += itemRemoved;
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID && !s.DeletePending), (items, changes, ___) =>
+            {
+                if (items.Any())
+                    Schedule(() => UpdateState(DownloadState.LocallyAvailable));
+                else
+                {
+                    Schedule(() =>
+                    {
+                        UpdateState(DownloadState.NotDownloaded);
+                        attachDownload(Downloader.GetExistingDownload(beatmapSetInfo));
+                    });
+                }
+            });
         }
 
         private void downloadBegan(ArchiveDownloadRequest<IBeatmapSetInfo> request) => Schedule(() =>
@@ -97,18 +109,6 @@ namespace osu.Game.Online
 
         private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void itemUpdated(BeatmapSetInfo item) => Schedule(() =>
-        {
-            if (checkEquality(item, TrackedItem))
-                UpdateState(DownloadState.LocallyAvailable);
-        });
-
-        private void itemRemoved(BeatmapSetInfo item) => Schedule(() =>
-        {
-            if (checkEquality(item, TrackedItem))
-                UpdateState(DownloadState.NotDownloaded);
-        });
-
         private bool checkEquality(IBeatmapSetInfo x, IBeatmapSetInfo y) => x.OnlineID == y.OnlineID;
 
         #region Disposal
@@ -118,16 +118,12 @@ namespace osu.Game.Online
             base.Dispose(isDisposing);
             attachDownload(null);
 
+            realmSubscription?.Dispose();
+
             if (Downloader != null)
             {
                 Downloader.DownloadBegan -= downloadBegan;
                 Downloader.DownloadFailed -= downloadFailed;
-            }
-
-            if (Manager != null)
-            {
-                Manager.ItemUpdated -= itemUpdated;
-                Manager.ItemRemoved -= itemRemoved;
             }
         }
 

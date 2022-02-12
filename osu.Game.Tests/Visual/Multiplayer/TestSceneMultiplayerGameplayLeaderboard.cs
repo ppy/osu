@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID ?? 0);
+                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
                     multiplayerUsers.Add(OnlinePlayDependencies.Client.AddUser(new APIUser { Id = user }, true));
                 }
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public void RandomlyUpdateState()
             {
-                foreach (int userId in PlayingUsers)
+                foreach ((int userId, _) in WatchedUserStates)
                 {
                     if (RNG.NextBool())
                         continue;
