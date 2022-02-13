@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
@@ -24,6 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class BeatDivisorControl : CompositeDrawable
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+        private readonly Bindable<BeatDivisorType> divisorType = new Bindable<BeatDivisorType>();
 
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
         {
@@ -84,7 +88,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Horizontal = 5 },
                                         Child = new GridContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -92,13 +95,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                             {
                                                 new Drawable[]
                                                 {
-                                                    new DivisorButton
+                                                    new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = beatDivisor.Previous
                                                     },
-                                                    new DivisorText(beatDivisor),
-                                                    new DivisorButton
+                                                    new DivisorText { BeatDivisor = { BindTarget = beatDivisor } },
+                                                    new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
                                                         Action = beatDivisor.Next
@@ -121,29 +124,80 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "beat snap divisor",
+                                Text = "beat snap",
                                 RelativeSizeAxes = Axes.X,
                                 TextAnchor = Anchor.TopCentre
                             },
-                        }
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = colours.Gray4
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Content = new[]
+                                            {
+                                                new Drawable[]
+                                                {
+                                                    new ChevronButton
+                                                    {
+                                                        Icon = FontAwesome.Solid.ChevronLeft,
+                                                        Action = () => cycleDivisorType(-1)
+                                                    },
+                                                    new DivisorTypeText { BeatDivisorType = { BindTarget = divisorType } },
+                                                    new ChevronButton
+                                                    {
+                                                        Icon = FontAwesome.Solid.ChevronRight,
+                                                        Action = () => cycleDivisorType(1)
+                                                    }
+                                                },
+                                            },
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.Absolute, 20),
+                                                new Dimension(),
+                                                new Dimension(GridSizeMode.Absolute, 20)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                     },
                     RowDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 30),
-                        new Dimension(GridSizeMode.Absolute, 25),
+                        new Dimension(GridSizeMode.Absolute, 20),
+                        new Dimension(GridSizeMode.Absolute, 15)
                     }
                 }
             };
         }
 
+        private void cycleDivisorType(int direction)
+        {
+            Debug.Assert(Math.Abs(direction) == 1);
+            divisorType.Value = (BeatDivisorType)(((int)divisorType.Value + direction) % (int)(BeatDivisorType.Last + 1));
+        }
+
         private class DivisorText : SpriteText
         {
-            private readonly Bindable<int> beatDivisor = new Bindable<int>();
+            public Bindable<int> BeatDivisor { get; } = new Bindable<int>();
 
-            public DivisorText(BindableBeatDivisor beatDivisor)
+            public DivisorText()
             {
-                this.beatDivisor.BindTo(beatDivisor);
-
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
             }
@@ -157,13 +211,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                beatDivisor.BindValueChanged(val => Text = $"1/{val.NewValue}", true);
+                BeatDivisor.BindValueChanged(val => Text = $"1/{val.NewValue}", true);
             }
         }
 
-        private class DivisorButton : IconButton
+        private class DivisorTypeText : OsuSpriteText
         {
-            public DivisorButton()
+            public Bindable<BeatDivisorType> BeatDivisorType { get; } = new Bindable<BeatDivisorType>();
+
+            public DivisorTypeText()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+
+                Font = OsuFont.Default.With(size: 14);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                BeatDivisorType.BindValueChanged(val => Text = val.NewValue.Humanize(LetterCasing.LowerCase), true);
+            }
+        }
+
+        private class ChevronButton : IconButton
+        {
+            public ChevronButton()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
