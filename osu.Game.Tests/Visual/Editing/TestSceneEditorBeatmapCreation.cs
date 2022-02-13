@@ -201,6 +201,11 @@ namespace osu.Game.Tests.Visual.Editing
                     new Colour4(0, 0, 255, 255)
                 });
             });
+            AddStep("set status & online ID", () =>
+            {
+                EditorBeatmap.BeatmapInfo.OnlineID = 123456;
+                EditorBeatmap.BeatmapInfo.Status = BeatmapOnlineStatus.WIP;
+            });
 
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
@@ -234,6 +239,9 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("created difficulty has objects", () => EditorBeatmap.HitObjects.Count == 2);
             AddAssert("approach rate correctly copied", () => EditorBeatmap.Difficulty.ApproachRate == 4);
             AddAssert("combo colours correctly copied", () => EditorBeatmap.BeatmapSkin.AsNonNull().ComboColours.Count == 2);
+
+            AddAssert("status not copied", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.None);
+            AddAssert("online ID not copied", () => EditorBeatmap.BeatmapInfo.OnlineID == -1);
 
             AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
