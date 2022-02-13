@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             // for that reason using ElapsedFrameTime directly leads to fewer SPM with Half Time and more SPM with Double Time.
             // for spinners we want the real (wall clock) elapsed time; to achieve that, unapply the clock rate locally here.
             double rateIndependentElapsedTime = spinner.Clock.ElapsedFrameTime / spinner.Clock.Rate;
-            float rotationSpeed = (float)(spinner.HitObject.SpinsRequired / spinner.HitObject.Duration / 1.01);
+            float rotationSpeed = (float)(spinner.HitObject.SpinsRequired / (spinner.HitObject.Duration / 1.01));
             spinner.RotationTracker.AddRotation(MathUtils.RadiansToDegrees((float)rateIndependentElapsedTime * rotationSpeed * MathF.PI * 2.0f));
         }
     }
