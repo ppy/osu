@@ -20,8 +20,8 @@ namespace osu.Game.Tests.Visual.Editing
         private BeatDivisorControl beatDivisorControl;
         private BindableBeatDivisor bindableBeatDivisor;
 
-        private SliderBar<int> tickSliderBar;
-        private EquilateralTriangle tickMarkerHead;
+        private SliderBar<int> tickSliderBar => beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
+        private EquilateralTriangle tickMarkerHead => tickSliderBar.ChildrenOfType<EquilateralTriangle>().Single();
 
         [SetUp]
         public void SetUp() => Schedule(() =>
@@ -32,9 +32,6 @@ namespace osu.Game.Tests.Visual.Editing
                 Origin = Anchor.Centre,
                 Size = new Vector2(90, 90)
             };
-
-            tickSliderBar = beatDivisorControl.ChildrenOfType<SliderBar<int>>().Single();
-            tickMarkerHead = tickSliderBar.ChildrenOfType<EquilateralTriangle>().Single();
         });
 
         [Test]
