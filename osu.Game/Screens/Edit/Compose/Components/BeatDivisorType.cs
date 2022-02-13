@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         Custom,
 
+        First = Common,
         Last = Custom
     }
 }

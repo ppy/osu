@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class BeatDivisorControl : CompositeDrawable
     {
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-        private readonly Bindable<BeatDivisorType> divisorType = new Bindable<BeatDivisorType>();
 
         public BeatDivisorControl(BindableBeatDivisor beatDivisor)
         {
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.Black
                                     },
-                                    new TickSliderBar(beatDivisor, BindableBeatDivisor.VALID_DIVISORS)
+                                    new TickSliderBar(beatDivisor)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                     }
@@ -156,7 +155,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                         Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = () => cycleDivisorType(-1)
                                                     },
-                                                    new DivisorTypeText { BeatDivisorType = { BindTarget = divisorType } },
+                                                    new DivisorTypeText { BeatDivisor = { BindTarget = beatDivisor } },
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
@@ -189,7 +188,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void cycleDivisorType(int direction)
         {
             Debug.Assert(Math.Abs(direction) == 1);
-            divisorType.Value = (BeatDivisorType)(((int)divisorType.Value + direction) % (int)(BeatDivisorType.Last + 1));
+            int nextDivisorType = (int)beatDivisor.ValidDivisors.Value.Type + direction;
+            if (nextDivisorType > (int)BeatDivisorType.Last)
+                nextDivisorType = (int)BeatDivisorType.First;
+            else if (nextDivisorType < (int)BeatDivisorType.First)
+                nextDivisorType = (int)BeatDivisorType.Last;
+
+            switch ((BeatDivisorType)nextDivisorType)
+            {
+                case BeatDivisorType.Common:
+                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                    break;
+
+                case BeatDivisorType.Triplets:
+                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                    break;
+
+                case BeatDivisorType.Custom:
+                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(18); // todo
+                    break;
+            }
         }
 
         private class DivisorText : SpriteText
@@ -217,7 +235,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private class DivisorTypeText : OsuSpriteText
         {
-            public Bindable<BeatDivisorType> BeatDivisorType { get; } = new Bindable<BeatDivisorType>();
+            public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
             public DivisorTypeText()
             {
@@ -230,7 +248,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                BeatDivisorType.BindValueChanged(val => Text = val.NewValue.Humanize(LetterCasing.LowerCase), true);
+                BeatDivisor.ValidDivisors.BindValueChanged(val => Text = val.NewValue.Type.Humanize(LetterCasing.LowerCase), true);
             }
         }
 
@@ -265,20 +283,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
             private OsuColour colours { get; set; }
 
             private readonly BindableBeatDivisor beatDivisor;
-            private readonly int[] availableDivisors;
 
-            public TickSliderBar(BindableBeatDivisor beatDivisor, params int[] divisors)
+            public TickSliderBar(BindableBeatDivisor beatDivisor)
             {
                 CurrentNumber.BindTo(this.beatDivisor = beatDivisor);
-                availableDivisors = divisors;
 
                 Padding = new MarginPadding { Horizontal = 5 };
             }
 
-            [BackgroundDependencyLoader]
-            private void load()
+            protected override void LoadComplete()
             {
-                foreach (int t in availableDivisors)
+                base.LoadComplete();
+
+                beatDivisor.ValidDivisors.BindValueChanged(_ => updateDivisors(), true);
+            }
+
+            private void updateDivisors()
+            {
+                ClearInternal();
+                CurrentNumber.ValueChanged -= moveMarker;
+
+                foreach (int t in beatDivisor.ValidDivisors.Value.Presets)
                 {
                     AddInternal(new Tick
                     {
@@ -291,17 +316,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
 
                 AddInternal(marker = new Marker());
+                CurrentNumber.ValueChanged += moveMarker;
+                CurrentNumber.TriggerChange();
             }
 
-            protected override void LoadComplete()
+            private void moveMarker(ValueChangedEvent<int> divisor)
             {
-                base.LoadComplete();
-
-                CurrentNumber.BindValueChanged(div =>
-                {
-                    marker.MoveToX(getMappedPosition(div.NewValue), 100, Easing.OutQuint);
-                    marker.Flash();
-                }, true);
+                marker.MoveToX(getMappedPosition(divisor.NewValue), 100, Easing.OutQuint);
+                marker.Flash();
             }
 
             protected override void UpdateValue(float value)
@@ -362,11 +384,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 // copied from SliderBar so we can do custom spacing logic.
                 float xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
-                CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
+                CurrentNumber.Value = beatDivisor.ValidDivisors.Value.Presets.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (beatDivisor.ValidDivisors.Value.Presets.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {
