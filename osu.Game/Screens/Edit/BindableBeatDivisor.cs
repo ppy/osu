@@ -52,10 +52,11 @@ namespace osu.Game.Screens.Edit
 
         public override void BindTo(Bindable<int> them)
         {
-            base.BindTo(them);
-
+            // bind to valid divisors first (if applicable) to ensure correct transfer of the actual divisor.
             if (them is BindableBeatDivisor otherBeatDivisor)
                 ValidDivisors.BindTo(otherBeatDivisor.ValidDivisors);
+
+            base.BindTo(them);
         }
 
         protected override Bindable<int> CreateInstance() => new BindableBeatDivisor();
