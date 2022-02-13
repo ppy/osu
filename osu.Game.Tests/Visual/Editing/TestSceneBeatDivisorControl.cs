@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
@@ -26,11 +27,15 @@ namespace osu.Game.Tests.Visual.Editing
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Child = beatDivisorControl = new BeatDivisorControl(bindableBeatDivisor = new BindableBeatDivisor(16))
+            Child = new PopoverContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(90, 90)
+                RelativeSizeAxes = Axes.Both,
+                Child = beatDivisorControl = new BeatDivisorControl(bindableBeatDivisor = new BindableBeatDivisor(16))
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(90, 90)
+                }
             };
         });
 

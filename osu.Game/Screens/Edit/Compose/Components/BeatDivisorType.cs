@@ -19,8 +19,5 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Fully arbitrary/custom beat divisors.
         /// </summary>
         Custom,
-
-        First = Common,
-        Last = Custom
     }
 }

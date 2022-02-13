@@ -7,17 +7,21 @@ using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -99,7 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                                                         Icon = FontAwesome.Solid.ChevronLeft,
                                                         Action = beatDivisor.Previous
                                                     },
-                                                    new DivisorText { BeatDivisor = { BindTarget = beatDivisor } },
+                                                    new DivisorDisplay { BeatDivisor = { BindTarget = beatDivisor } },
                                                     new ChevronButton
                                                     {
                                                         Icon = FontAwesome.Solid.ChevronRight,
@@ -189,10 +193,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Debug.Assert(Math.Abs(direction) == 1);
             int nextDivisorType = (int)beatDivisor.ValidDivisors.Value.Type + direction;
-            if (nextDivisorType > (int)BeatDivisorType.Last)
-                nextDivisorType = (int)BeatDivisorType.First;
-            else if (nextDivisorType < (int)BeatDivisorType.First)
-                nextDivisorType = (int)BeatDivisorType.Last;
+            if (nextDivisorType > (int)BeatDivisorType.Triplets)
+                nextDivisorType = (int)BeatDivisorType.Common;
+            else if (nextDivisorType < (int)BeatDivisorType.Common)
+                nextDivisorType = (int)BeatDivisorType.Triplets;
 
             switch ((BeatDivisorType)nextDivisorType)
             {
@@ -205,31 +209,122 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     break;
 
                 case BeatDivisorType.Custom:
-                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(18); // todo
+                    beatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(beatDivisor.ValidDivisors.Value.Presets.Max());
                     break;
             }
         }
 
-        private class DivisorText : SpriteText
+        private class DivisorDisplay : OsuAnimatedButton, IHasPopover
         {
-            public Bindable<int> BeatDivisor { get; } = new Bindable<int>();
+            public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
-            public DivisorText()
+            private readonly OsuSpriteText divisorText;
+
+            public DivisorDisplay()
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
+
+                AutoSizeAxes = Axes.Both;
+
+                Add(divisorText = new OsuSpriteText
+                {
+                    Font = OsuFont.Default.With(size: 20),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Margin = new MarginPadding
+                    {
+                        Horizontal = 5
+                    }
+                });
+
+                Action = this.ShowPopover;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Colour = colours.BlueLighter;
+                divisorText.Colour = colours.BlueLighter;
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                BeatDivisor.BindValueChanged(val => Text = $"1/{val.NewValue}", true);
+                updateState();
+            }
+
+            private void updateState()
+            {
+                BeatDivisor.BindValueChanged(val => divisorText.Text = $"1/{val.NewValue}", true);
+            }
+
+            public Popover GetPopover() => new CustomDivisorPopover
+            {
+                BeatDivisor = { BindTarget = BeatDivisor }
+            };
+        }
+
+        private class CustomDivisorPopover : OsuPopover
+        {
+            public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
+
+            private readonly OsuNumberBox divisorTextBox;
+
+            public CustomDivisorPopover()
+            {
+                Child = new FillFlowContainer
+                {
+                    Width = 150,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
+                    {
+                        divisorTextBox = new OsuNumberBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            PlaceholderText = "Beat divisor"
+                        },
+                        new OsuTextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Text = "All other applicable smaller divisors will be automatically added to the list of presets."
+                        }
+                    }
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                BeatDivisor.BindValueChanged(_ => updateState(), true);
+                divisorTextBox.OnCommit += (_, __) => setPresets();
+            }
+
+            private void setPresets()
+            {
+                if (!int.TryParse(divisorTextBox.Text, out int divisor) || divisor < 1 || divisor > 64)
+                {
+                    updateState();
+                    return;
+                }
+
+                if (!BeatDivisor.ValidDivisors.Value.Presets.Contains(divisor))
+                {
+                    if (BeatDivisorPresetCollection.COMMON.Presets.Contains(divisor))
+                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.COMMON;
+                    else if (BeatDivisorPresetCollection.TRIPLETS.Presets.Contains(divisor))
+                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.TRIPLETS;
+                    else
+                        BeatDivisor.ValidDivisors.Value = BeatDivisorPresetCollection.Custom(divisor);
+                }
+
+                BeatDivisor.Value = divisor;
+            }
+
+            private void updateState()
+            {
+                divisorTextBox.Text = BeatDivisor.Value.ToString();
             }
         }
 
