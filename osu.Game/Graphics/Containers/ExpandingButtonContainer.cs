@@ -16,6 +16,6 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        protected override double HoverExpansionDelay => 750;
+        protected override double HoverExpansionDelay => 400;
     }
 }
