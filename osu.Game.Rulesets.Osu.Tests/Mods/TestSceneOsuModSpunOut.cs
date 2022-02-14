@@ -48,7 +48,19 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                 PassCondition = () =>
                 {
                     var counter = Player.ChildrenOfType<SpinnerSpmCalculator>().SingleOrDefault();
-                    return counter != null && Precision.AlmostEquals(counter.Result.Value, 286, 1);
+                    var spinner = Player.ChildrenOfType<DrawableSpinner>().FirstOrDefault();
+
+                    if (counter == null || spinner == null)
+                        return false;
+
+                    // ignore cases where the spinner hasn't started as these lead to false-positives
+                    if (Precision.AlmostEquals(counter.Result.Value, 0, 1))
+                        return false;
+
+                    double rateIndependentElapsedTime = spinner.Clock.ElapsedFrameTime / spinner.Clock.Rate;
+                    float rotationSpeed = (float)(1.01 * spinner.HitObject.SpinsRequired / spinner.HitObject.Duration);
+
+                    return Precision.AlmostEquals(counter.Result.Value, rotationSpeed * 1000 * 60, 1);
                 }
             });
         }
