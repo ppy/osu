@@ -3,8 +3,9 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// A target expanding container that should be resolved by children <see cref="IExpandable"/>s to propagate state changes.
