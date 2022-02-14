@@ -87,8 +87,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                         requiresHold |= slider.Ball.IsHovered || h.IsHovered;
                         break;
 
-                    case DrawableSpinner _:
-                        requiresHold = true;
+                    case DrawableSpinner spinner:
+                        requiresHold |= spinner.HitObject.SpinsRequired > 0;
                         break;
                 }
             }

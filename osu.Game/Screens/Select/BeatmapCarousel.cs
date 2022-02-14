@@ -154,6 +154,7 @@ namespace osu.Game.Screens.Select
         private readonly DrawablePool<DrawableCarouselBeatmapSet> setPool = new DrawablePool<DrawableCarouselBeatmapSet>(100);
 
         private Sample spinSample;
+        private Sample randomSelectSample;
 
         private int visibleSetsCount;
 
@@ -178,6 +179,7 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config, AudioManager audio)
         {
             spinSample = audio.Samples.Get("SongSelect/random-spin");
+            randomSelectSample = audio.Samples.Get(@"SongSelect/select-random");
 
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
@@ -495,6 +497,8 @@ namespace osu.Game.Screens.Select
             var chan = spinSample.GetChannel();
             chan.Frequency.Value = 1f + Math.Min(1f, distance / visibleSetsCount);
             chan.Play();
+
+            randomSelectSample?.Play();
         }
 
         private void select(CarouselItem item)
@@ -921,8 +925,10 @@ namespace osu.Game.Screens.Select
             // child items (difficulties) are still visible.
             item.Header.X = offsetX(dist, visibleHalfHeight) - (parent?.X ?? 0);
 
-            // We are applying alpha to the header here such that we can layer alpha transformations on top.
-            item.Header.Alpha = Math.Clamp(1.75f - 1.5f * dist, 0, 1);
+            // We are applying a multiplicative alpha (which is internally done by nesting an
+            // additional container and setting that container's alpha) such that we can
+            // layer alpha transformations on top.
+            item.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private enum PendingScrollOperation
