@@ -857,7 +857,7 @@ namespace osu.Game.Screens.Edit
             (
                 editorBeatmap.BeatmapInfo.BeatmapSet.AsNonNull(),
                 rulesetInfo,
-                playableBeatmap,
+                editorBeatmap,
                 editorBeatmap.BeatmapSkin,
                 clearAllObjects,
                 GetState()
