@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
@@ -57,13 +58,33 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     if (Precision.AlmostEquals(counter.Result.Value, 0, 1))
                         return false;
 
-                    double rateIndependentElapsedTime = spinner.Clock.ElapsedFrameTime / spinner.Clock.Rate;
                     float rotationSpeed = (float)(1.01 * spinner.HitObject.SpinsRequired / spinner.HitObject.Duration);
 
                     return Precision.AlmostEquals(counter.Result.Value, rotationSpeed * 1000 * 60, 1);
                 }
             });
         }
+
+        [Test]
+        public void TestSpinnerOnlyComplete() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModSpunOut(),
+            Autoplay = false,
+            Beatmap = singleSpinnerBeatmap,
+            PassCondition = () =>
+            {
+                var spinner = Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault();
+                var gameplayClockContainer = Player.ChildrenOfType<GameplayClockContainer>().SingleOrDefault();
+
+                if (spinner == null || gameplayClockContainer == null)
+                    return false;
+
+                if (!Precision.AlmostEquals(gameplayClockContainer.CurrentTime, spinner.HitObject.StartTime + spinner.HitObject.Duration, 200.0f))
+                    return false;
+
+                return Precision.AlmostEquals(spinner.Progress, 1.0f, 0.05f) && Precision.AlmostEquals(spinner.GainedBonus.Value, 0, 1);
+            }
+        });
 
         private Beatmap singleSpinnerBeatmap => new Beatmap
         {
