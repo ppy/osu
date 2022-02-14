@@ -4,7 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// An interface for drawables with ability to expand/contract.

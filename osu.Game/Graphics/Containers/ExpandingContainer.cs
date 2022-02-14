@@ -6,9 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
-using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Graphics.Containers
 {
     /// <summary>
     /// Represents a <see cref="Container"/> with the ability to expand/contract on hover.

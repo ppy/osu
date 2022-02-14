@@ -8,11 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
     /// An <see cref="IExpandable"/> implementation for the UI slider bar control.
