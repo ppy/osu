@@ -101,11 +101,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
             AddAssert("distance spacing increased by 0.5", () => Precision.AlmostEquals(editorBeatmap.BeatmapInfo.DistanceSpacing, originalSpacing + 0.5f));
 
-            AddStep("hold shift", () => InputManager.PressKey(Key.LShift));
-            AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
-            AddAssert("distance spacing increased by 0.05", () => Precision.AlmostEquals(editorBeatmap.BeatmapInfo.DistanceSpacing, originalSpacing + 0.55f));
-
-            AddStep("release shift", () => InputManager.ReleaseKey(Key.LShift));
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release D", () => InputManager.ReleaseKey(Key.D));
         }
