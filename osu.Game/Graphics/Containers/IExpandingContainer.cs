@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
