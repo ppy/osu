@@ -173,7 +173,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             currentRhythm = calculateRhythmBonus(current);
 
-            return currentStrain * currentRhythm;
+            double totalStrain = currentStrain * currentRhythm;
+
+            objectStrains.Add(totalStrain);
+
+            return totalStrain;
         }
     }
 }
