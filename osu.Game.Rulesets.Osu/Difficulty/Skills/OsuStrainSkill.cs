@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         protected virtual double DifficultyMultiplier => 1.06;
 
+        protected List<double> objectStrains = new List<double>();
+
         protected OsuStrainSkill(Mod[] mods)
             : base(mods)
         {
@@ -64,10 +66,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public double CountDifficultStrains(double clockRate)
         {
-            List<double> strains = GetCurrentStrainPeaks().ToList();
-            double topStrain = strains.Max();
+            double topStrain = objectStrains.Max();
 
-            double realtimeCount = strains.Sum(s => Math.Pow(s / topStrain, 4));
+            double realtimeCount = objectStrains.Sum(s => Math.Pow(s / topStrain, 4));
             return clockRate * realtimeCount;
         }
     }
