@@ -84,7 +84,14 @@ namespace osu.Game.Screens.Edit
             {
                 try
                 {
-                    return beatmapManager.CreateNewDifficulty(creationParameters);
+                    var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(creationParameters.ReferenceBeatmap.BeatmapInfo);
+                    return beatmapManager.CreateNewDifficulty(new NewDifficultyCreationParameters(
+                        refetchedBeatmap.BeatmapSetInfo,
+                        refetchedBeatmap.BeatmapInfo.Ruleset,
+                        refetchedBeatmap.Beatmap,
+                        refetchedBeatmap.Skin,
+                        creationParameters.CreateBlank,
+                        creationParameters.EditorState));
                 }
                 catch (Exception ex)
                 {

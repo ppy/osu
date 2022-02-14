@@ -134,8 +134,8 @@ namespace osu.Game.Beatmaps
                 newBeatmap.BeatmapInfo = newBeatmapInfo = referenceBeatmap.BeatmapInfo.Clone();
                 // assign a new ID to the clone.
                 newBeatmapInfo.ID = Guid.NewGuid();
-                // clear difficulty name to avoid clashes on save.
-                newBeatmapInfo.DifficultyName = string.Empty;
+                // add "(copy)" suffix to difficulty name to avoid clashes on save.
+                newBeatmapInfo.DifficultyName += " (copy)";
                 // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
                 newBeatmapInfo.Hash = string.Empty;
                 // clear online properties.
