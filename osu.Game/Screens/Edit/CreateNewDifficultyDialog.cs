@@ -10,11 +10,11 @@ namespace osu.Game.Screens.Edit
     {
         /// <summary>
         /// Delegate used to create new difficulties.
-        /// A value of <see langword="true"/> in the <c>clearAllObjects</c> parameter
-        /// indicates that the new difficulty should have its hitobjects cleared;
-        /// otherwise, the new difficulty should be an exact copy of an existing one.
+        /// A value of <see langword="true"/> in the <c>createCopy</c> parameter
+        /// indicates that the new difficulty should be an exact copy of an existing one;
+        /// otherwise, the new difficulty should have its hitobjects and beatmap-level settings cleared.
         /// </summary>
-        public delegate void CreateNewDifficulty(bool clearAllObjects);
+        public delegate void CreateNewDifficulty(bool createCopy);
 
         public CreateNewDifficultyDialog(CreateNewDifficulty createNewDifficulty)
         {
@@ -27,12 +27,12 @@ namespace osu.Game.Screens.Edit
                 new PopupDialogOkButton
                 {
                     Text = "Yeah, let's start from scratch!",
-                    Action = () => createNewDifficulty.Invoke(true)
+                    Action = () => createNewDifficulty.Invoke(false)
                 },
                 new PopupDialogCancelButton
                 {
                     Text = "No, create an exact copy of this difficulty",
-                    Action = () => createNewDifficulty.Invoke(false)
+                    Action = () => createNewDifficulty.Invoke(true)
                 },
                 new PopupDialogCancelButton
                 {

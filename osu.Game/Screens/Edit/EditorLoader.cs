@@ -4,6 +4,7 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -11,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
@@ -79,19 +81,18 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void ScheduleSwitchToNewDifficulty(NewDifficultyCreationParameters creationParameters)
+        public void ScheduleSwitchToNewDifficulty(BeatmapInfo referenceBeatmapInfo, RulesetInfo rulesetInfo, bool createCopy, EditorState editorState)
             => scheduleDifficultySwitch(() =>
             {
                 try
                 {
-                    var refetchedBeatmap = beatmapManager.GetWorkingBeatmap(creationParameters.ReferenceBeatmap.BeatmapInfo);
-                    return beatmapManager.CreateNewDifficulty(new NewDifficultyCreationParameters(
-                        refetchedBeatmap.BeatmapSetInfo,
-                        refetchedBeatmap.BeatmapInfo.Ruleset,
-                        refetchedBeatmap.Beatmap,
-                        refetchedBeatmap.Skin,
-                        creationParameters.CreateBlank,
-                        creationParameters.EditorState));
+                    // fetch a fresh detached reference from database to avoid polluting model instances attached to cached working beatmaps.
+                    var targetBeatmapSet = beatmapManager.QueryBeatmap(b => b.ID == referenceBeatmapInfo.ID).AsNonNull().BeatmapSet.AsNonNull();
+                    var referenceWorkingBeatmap = beatmapManager.GetWorkingBeatmap(referenceBeatmapInfo);
+
+                    return createCopy
+                        ? beatmapManager.CopyExistingDifficulty(targetBeatmapSet, referenceWorkingBeatmap)
+                        : beatmapManager.CreateNewDifficulty(targetBeatmapSet, referenceWorkingBeatmap, rulesetInfo);
                 }
                 catch (Exception ex)
                 {
@@ -100,7 +101,7 @@ namespace osu.Game.Screens.Edit
                     Logger.Error(ex, ex.Message);
                     return Beatmap.Value;
                 }
-            }, creationParameters.EditorState);
+            }, editorState);
 
         public void ScheduleSwitchToExistingDifficulty(BeatmapInfo beatmapInfo, EditorState editorState)
             => scheduleDifficultySwitch(() => beatmapManager.GetWorkingBeatmap(beatmapInfo), editorState);
