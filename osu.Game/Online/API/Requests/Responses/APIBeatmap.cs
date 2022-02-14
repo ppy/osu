@@ -98,7 +98,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string MD5Hash => Checksum;
 
-        public IRulesetInfo Ruleset => new RulesetInfo { OnlineID = RulesetID };
+        public IRulesetInfo Ruleset => new APIRuleset { OnlineID = RulesetID };
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
@@ -106,5 +106,29 @@ namespace osu.Game.Online.API.Requests.Responses
         #endregion
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
+
+        private class APIRuleset : IRulesetInfo
+        {
+            public int OnlineID { get; set; } = -1;
+
+            public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
+            public string ShortName => nameof(APIRuleset);
+            public string InstantiationInfo => string.Empty;
+
+            public Ruleset CreateInstance() => throw new NotImplementedException();
+
+            public bool Equals(IRulesetInfo? other) => other is APIRuleset r && this.MatchesOnlineID(r);
+
+            public int CompareTo(IRulesetInfo other)
+            {
+                if (!(other is APIRuleset ruleset))
+                    throw new ArgumentException($@"Object is not of type {nameof(APIRuleset)}.", nameof(other));
+
+                return OnlineID.CompareTo(ruleset.OnlineID);
+            }
+
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => OnlineID;
+        }
     }
 }

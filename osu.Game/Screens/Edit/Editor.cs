@@ -851,7 +851,7 @@ namespace osu.Game.Screens.Edit
 
             var difficultyItems = new List<MenuItem>();
 
-            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset.ShortName).OrderBy(group => group.Key))
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset).OrderBy(group => group.Key))
             {
                 if (difficultyItems.Count > 0)
                     difficultyItems.Add(new EditorMenuItemSpacer());
