@@ -131,28 +131,13 @@ namespace osu.Game.Beatmaps
             else
             {
                 newBeatmap = referenceBeatmap.Clone();
-
-                var referenceBeatmapInfo = referenceBeatmap.BeatmapInfo;
-                newBeatmap.BeatmapInfo = newBeatmapInfo = new BeatmapInfo(referenceBeatmapInfo.Ruleset, referenceBeatmapInfo.Difficulty.Clone(), referenceBeatmapInfo.Metadata.DeepClone())
-                {
-                    // Only selected appropriate properties are copied over.
-                    // Things like database ID, online status/ID, MD5 hash, star rating, etc. are omitted
-                    // because they should not be copied over and/or they will be recomputed on save.
-                    AudioLeadIn = referenceBeatmapInfo.AudioLeadIn,
-                    StackLeniency = referenceBeatmapInfo.StackLeniency,
-                    SpecialStyle = referenceBeatmapInfo.SpecialStyle,
-                    LetterboxInBreaks = referenceBeatmapInfo.LetterboxInBreaks,
-                    WidescreenStoryboard = referenceBeatmapInfo.WidescreenStoryboard,
-                    EpilepsyWarning = referenceBeatmapInfo.EpilepsyWarning,
-                    SamplesMatchPlaybackRate = referenceBeatmapInfo.SamplesMatchPlaybackRate,
-                    DistanceSpacing = referenceBeatmapInfo.DistanceSpacing,
-                    BeatDivisor = referenceBeatmapInfo.BeatDivisor,
-                    GridSize = referenceBeatmapInfo.GridSize,
-                    TimelineZoom = referenceBeatmapInfo.TimelineZoom,
-                    Countdown = referenceBeatmapInfo.Countdown,
-                    CountdownOffset = referenceBeatmapInfo.CountdownOffset,
-                    Bookmarks = (int[])referenceBeatmapInfo.Bookmarks.Clone()
-                };
+                newBeatmap.BeatmapInfo = newBeatmapInfo = referenceBeatmap.BeatmapInfo.Clone();
+                // assign a new ID to the clone.
+                newBeatmapInfo.ID = Guid.NewGuid();
+                // clear difficulty name to avoid clashes on save.
+                newBeatmapInfo.DifficultyName = string.Empty;
+                // also clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
+                newBeatmapInfo.Hash = string.Empty;
             }
 
             // populate circular beatmap set info <-> beatmap info references manually.
