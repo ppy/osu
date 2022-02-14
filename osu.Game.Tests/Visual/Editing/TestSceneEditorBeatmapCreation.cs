@@ -172,10 +172,10 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestCopyDifficulty()
         {
-            string firstDifficultyName = Guid.NewGuid().ToString();
-            string secondDifficultyName = Guid.NewGuid().ToString();
+            string originalDifficultyName = Guid.NewGuid().ToString();
+            string copyDifficultyName = $"{originalDifficultyName} (copy)";
 
-            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = firstDifficultyName);
+            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = originalDifficultyName);
             AddStep("add timing point", () => EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 }));
             AddStep("add hitobjects", () => EditorBeatmap.AddRange(new[]
             {
@@ -210,11 +210,11 @@ namespace osu.Game.Tests.Visual.Editing
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
             {
-                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == firstDifficultyName);
+                var beatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == originalDifficultyName);
                 var set = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
 
                 return beatmap != null
-                       && beatmap.DifficultyName == firstDifficultyName
+                       && beatmap.DifficultyName == originalDifficultyName
                        && set != null
                        && set.PerformRead(s => s.Beatmaps.Single().ID == beatmap.ID);
             });
@@ -228,9 +228,10 @@ namespace osu.Game.Tests.Visual.Editing
             AddUntilStep("wait for created", () =>
             {
                 string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
-                return difficultyName != null && difficultyName != firstDifficultyName;
+                return difficultyName != null && difficultyName != originalDifficultyName;
             });
 
+            AddAssert("created difficulty has copy suffix in name", () => EditorBeatmap.BeatmapInfo.DifficultyName == copyDifficultyName);
             AddAssert("created difficulty has timing point", () =>
             {
                 var timingPoint = EditorBeatmap.ControlPointInfo.TimingPoints.Single();
@@ -243,7 +244,6 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("status not copied", () => EditorBeatmap.BeatmapInfo.Status == BeatmapOnlineStatus.None);
             AddAssert("online ID not copied", () => EditorBeatmap.BeatmapInfo.OnlineID == -1);
 
-            AddStep("set unique difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = secondDifficultyName);
             AddStep("save beatmap", () => Editor.Save());
 
             BeatmapInfo refetchedBeatmap = null;
@@ -251,16 +251,19 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("refetch from database", () =>
             {
-                refetchedBeatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == secondDifficultyName);
+                refetchedBeatmap = beatmapManager.QueryBeatmap(b => b.DifficultyName == copyDifficultyName);
                 refetchedBeatmapSet = beatmapManager.QueryBeatmapSet(s => s.ID == EditorBeatmap.BeatmapInfo.BeatmapSet.ID);
             });
 
             AddAssert("new beatmap persisted", () =>
             {
                 return refetchedBeatmap != null
-                       && refetchedBeatmap.DifficultyName == secondDifficultyName
+                       && refetchedBeatmap.DifficultyName == copyDifficultyName
                        && refetchedBeatmapSet != null
-                       && refetchedBeatmapSet.PerformRead(s => s.Beatmaps.Count == 2 && s.Beatmaps.Any(b => b.DifficultyName == secondDifficultyName));
+                       && refetchedBeatmapSet.PerformRead(s =>
+                           s.Beatmaps.Count == 2
+                           && s.Beatmaps.Any(b => b.DifficultyName == originalDifficultyName)
+                           && s.Beatmaps.Any(b => b.DifficultyName == copyDifficultyName));
             });
             AddAssert("old beatmap file not deleted", () => refetchedBeatmapSet.AsNonNull().PerformRead(s => s.Files.Count == 2));
         }
