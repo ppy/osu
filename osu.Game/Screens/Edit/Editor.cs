@@ -78,6 +78,9 @@ namespace osu.Game.Screens.Edit
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [Resolved]
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -375,21 +378,34 @@ namespace osu.Game.Screens.Edit
             Clipboard.Content.Value = state.ClipboardContent;
         });
 
-        protected void Save()
+        /// <summary>
+        /// Saves the currently edited beatmap.
+        /// </summary>
+        /// <returns>Whether the save was successful.</returns>
+        protected bool Save()
         {
             if (!canSave)
             {
                 notifications?.Post(new SimpleErrorNotification { Text = "Saving is not supported for this ruleset yet, sorry!" });
-                return;
+                return false;
+            }
+
+            try
+            {
+                // save the loaded beatmap's data stream.
+                beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
+            }
+            catch (Exception ex)
+            {
+                // can fail e.g. due to duplicated difficulty names.
+                Logger.Error(ex, ex.Message);
+                return false;
             }
 
             // no longer new after first user-triggered save.
             isNewBeatmap = false;
-
-            // save the loaded beatmap's data stream.
-            beatmapManager.Save(editorBeatmap.BeatmapInfo, editorBeatmap.PlayableBeatmap, editorBeatmap.BeatmapSkin);
-
             updateLastSavedHash();
+            return true;
         }
 
         protected override void Update()
@@ -798,7 +814,7 @@ namespace osu.Game.Screens.Edit
         {
             var fileMenuItems = new List<MenuItem>
             {
-                new EditorMenuItem("Save", MenuItemType.Standard, Save)
+                new EditorMenuItem("Save", MenuItemType.Standard, () => Save())
             };
 
             if (RuntimeInfo.IsDesktop)
@@ -806,35 +822,51 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
 
-            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
-
-            Debug.Assert(beatmapSet != null);
-
-            var difficultyItems = new List<MenuItem>();
-
-            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset.ShortName).OrderBy(group => group.Key))
-            {
-                if (difficultyItems.Count > 0)
-                    difficultyItems.Add(new EditorMenuItemSpacer());
-
-                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarRating))
-                    difficultyItems.Add(createDifficultyMenuItem(beatmap));
-            }
-
-            fileMenuItems.Add(new EditorMenuItem("Change difficulty") { Items = difficultyItems });
+            fileMenuItems.Add(createDifficultyCreationMenu());
+            fileMenuItems.Add(createDifficultySwitchMenu());
 
             fileMenuItems.Add(new EditorMenuItemSpacer());
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
             return fileMenuItems;
         }
 
-        private DifficultyMenuItem createDifficultyMenuItem(BeatmapInfo beatmapInfo)
+        private EditorMenuItem createDifficultyCreationMenu()
         {
-            bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmapInfo);
-            return new DifficultyMenuItem(beatmapInfo, isCurrentDifficulty, SwitchToDifficulty);
+            var rulesetItems = new List<MenuItem>();
+
+            foreach (var ruleset in rulesets.AvailableRulesets)
+                rulesetItems.Add(new EditorMenuItem(ruleset.Name, MenuItemType.Standard, () => CreateNewDifficulty(ruleset)));
+
+            return new EditorMenuItem("Create new difficulty") { Items = rulesetItems };
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleDifficultySwitch(nextBeatmap, GetState(nextBeatmap));
+        protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
+            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo.BeatmapSet, rulesetInfo, GetState());
+
+        private EditorMenuItem createDifficultySwitchMenu()
+        {
+            var beatmapSet = playableBeatmap.BeatmapInfo.BeatmapSet;
+
+            Debug.Assert(beatmapSet != null);
+
+            var difficultyItems = new List<MenuItem>();
+
+            foreach (var rulesetBeatmaps in beatmapSet.Beatmaps.GroupBy(b => b.Ruleset).OrderBy(group => group.Key))
+            {
+                if (difficultyItems.Count > 0)
+                    difficultyItems.Add(new EditorMenuItemSpacer());
+
+                foreach (var beatmap in rulesetBeatmaps.OrderBy(b => b.StarRating))
+                {
+                    bool isCurrentDifficulty = playableBeatmap.BeatmapInfo.Equals(beatmap);
+                    difficultyItems.Add(new DifficultyMenuItem(beatmap, isCurrentDifficulty, SwitchToDifficulty));
+                }
+            }
+
+            return new EditorMenuItem("Change difficulty") { Items = difficultyItems };
+        }
+
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap));
 
         private void cancelExit()
         {
