@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Extensions;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
@@ -71,7 +72,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change queue mode", () => Client.ChangeSettings(new MultiplayerRoomSettings
             {
                 QueueMode = QueueMode.AllPlayers
-            }));
+            }).WaitSafely());
 
             AddUntilStep("api room updated", () => Client.APIRoom?.QueueMode.Value == QueueMode.AllPlayers);
         }
