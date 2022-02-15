@@ -46,9 +46,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Name = { Value = "test name" },
                 Playlist =
                 {
-                    new PlaylistItem
+                    new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                     {
-                        Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
                         RulesetID = Ruleset.Value.OnlineID
                     }
                 }
