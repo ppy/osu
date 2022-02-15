@@ -7,7 +7,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetBeatmapsRequest : APIRequest<GetBeatmapsResponse>
     {
-        private readonly int[] beatmapIds;
+        public readonly int[] BeatmapIds;
 
         private const int max_ids_per_request = 50;
 
@@ -16,9 +16,9 @@ namespace osu.Game.Online.API.Requests
             if (beatmapIds.Length > max_ids_per_request)
                 throw new ArgumentException($"{nameof(GetBeatmapsRequest)} calls only support up to {max_ids_per_request} IDs at once");
 
-            this.beatmapIds = beatmapIds;
+            BeatmapIds = beatmapIds;
         }
 
-        protected override string Target => "beatmaps/?ids[]=" + string.Join("&ids[]=", beatmapIds);
+        protected override string Target => "beatmaps/?ids[]=" + string.Join("&ids[]=", BeatmapIds);
     }
 }

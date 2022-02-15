@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
@@ -46,6 +47,9 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private readonly BeatmapLookupCache beatmapLookupCache = new BeatmapLookupCache();
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         private readonly OsuScreenStack screenStack;
         private readonly TestMultiplayer multiplayerScreen;
 
@@ -69,9 +73,9 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuGameBase game)
+        private void load(IAPIProvider api)
         {
-            ((DummyAPIAccess)api).HandleRequest = request => multiplayerScreen.RequestsHandler.HandleRequest(request, api.LocalUser.Value, game);
+            ((DummyAPIAccess)api).HandleRequest = request => multiplayerScreen.RequestsHandler.HandleRequest(request, api.LocalUser.Value, beatmapManager);
         }
 
         public override bool OnBackButton() => (screenStack.CurrentScreen as OsuScreen)?.OnBackButton() ?? base.OnBackButton();
