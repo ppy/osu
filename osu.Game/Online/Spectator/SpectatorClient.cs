@@ -94,6 +94,7 @@ namespace osu.Game.Online.Spectator
 
                     // re-send state in case it wasn't received
                     if (IsPlaying)
+                        // TODO: this is likely sent out of order after a reconnect scenario. needs further consideration.
                         BeginPlayingInternal(currentState);
                 }
                 else
