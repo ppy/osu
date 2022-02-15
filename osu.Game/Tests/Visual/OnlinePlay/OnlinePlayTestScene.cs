@@ -60,23 +60,15 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             drawableDependenciesContainer.Clear();
             dependencies.OnlinePlayDependencies = CreateOnlinePlayDependencies();
             drawableDependenciesContainer.AddRange(OnlinePlayDependencies.DrawableComponents);
+
+            var handler = OnlinePlayDependencies.RequestsHandler;
+
+            // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
+            // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
+            var beatmapManager = dependencies.Get<BeatmapManager>();
+
+            ((DummyAPIAccess)API).HandleRequest = request => handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
         });
-
-        public override void SetUpSteps()
-        {
-            base.SetUpSteps();
-
-            AddStep("setup API", () =>
-            {
-                var handler = OnlinePlayDependencies.RequestsHandler;
-
-                // Resolving the BeatmapManager in the test scene will inject the game-wide BeatmapManager, while many test scenes cache their own BeatmapManager instead.
-                // To get around this, the BeatmapManager is looked up from the dependencies provided to the children of the test scene instead.
-                var beatmapManager = dependencies.Get<BeatmapManager>();
-
-                ((DummyAPIAccess)API).HandleRequest = request => handler.HandleRequest(request, API.LocalUser.Value, beatmapManager);
-            });
-        }
 
         /// <summary>
         /// Creates the room dependencies. Called every <see cref="Setup"/>.
