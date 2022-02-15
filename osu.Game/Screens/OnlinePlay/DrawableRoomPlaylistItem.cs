@@ -69,8 +69,9 @@ namespace osu.Game.Screens.OnlinePlay
         private readonly DelayedLoadWrapper onScreenLoader = new DelayedLoadWrapper(Empty) { RelativeSizeAxes = Axes.Both };
         private readonly IBindable<bool> valid = new Bindable<bool>();
         private readonly Bindable<IBeatmapInfo> beatmap = new Bindable<IBeatmapInfo>();
-        private readonly Bindable<IRulesetInfo> ruleset = new Bindable<IRulesetInfo>();
-        private readonly BindableList<Mod> requiredMods = new BindableList<Mod>();
+
+        private IRulesetInfo ruleset;
+        private Mod[] requiredMods;
 
         private Container maskingContainer;
         private Container difficultyIconContainer;
@@ -85,6 +86,9 @@ namespace osu.Game.Screens.OnlinePlay
         private Drawable removeButton;
         private PanelBackground panelBackground;
         private FillFlowContainer mainFillFlow;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -108,8 +112,6 @@ namespace osu.Game.Screens.OnlinePlay
 
             beatmap.BindTo(item.Beatmap);
             valid.BindTo(item.Valid);
-            ruleset.BindTo(item.Ruleset);
-            requiredMods.BindTo(item.RequiredMods);
 
             if (item.Expired)
                 Colour = OsuColour.Gray(0.5f);
@@ -119,6 +121,11 @@ namespace osu.Game.Screens.OnlinePlay
         private void load()
         {
             maskingContainer.BorderColour = colours.Yellow;
+
+            ruleset = rulesets.GetRuleset(Item.RulesetID);
+            var rulesetInstance = ruleset?.CreateInstance();
+
+            requiredMods = Item.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
         }
 
         protected override void LoadComplete()
@@ -145,9 +152,7 @@ namespace osu.Game.Screens.OnlinePlay
             }, true);
 
             beatmap.BindValueChanged(_ => Scheduler.AddOnce(refresh));
-            ruleset.BindValueChanged(_ => Scheduler.AddOnce(refresh));
             valid.BindValueChanged(_ => Scheduler.AddOnce(refresh));
-            requiredMods.CollectionChanged += (_, __) => Scheduler.AddOnce(refresh);
 
             onScreenLoader.DelayedLoadStarted += _ =>
             {
@@ -276,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
 
             if (Item.Beatmap.Value != null)
-                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset.Value, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(icon_height) };
+                difficultyIconContainer.Child = new DifficultyIcon(Item.Beatmap.Value, ruleset, requiredMods, performBackgroundDifficultyLookup: false) { Size = new Vector2(icon_height) };
             else
                 difficultyIconContainer.Clear();
 

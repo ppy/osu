@@ -66,8 +66,8 @@ namespace osu.Game.Online.Rooms
             BeatmapID = item.BeatmapID;
             BeatmapChecksum = item.Beatmap.Value?.MD5Hash ?? string.Empty;
             RulesetID = item.RulesetID;
-            RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray();
-            AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray();
+            RequiredMods = item.RequiredMods.ToArray();
+            AllowedMods = item.AllowedMods.ToArray();
             Expired = item.Expired;
             PlaylistOrder = item.PlaylistOrder ?? 0;
             PlayedAt = item.PlayedAt;

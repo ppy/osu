@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Playlist.Add(new PlaylistItem
                 {
                     Beatmap = { Value = importedBeatmap.Beatmaps.First() },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Playlists
                             }
                         }
                     },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
 
