@@ -97,9 +97,6 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved]
         private BeatmapLookupCache beatmapLookupCache { get; set; }
 
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
         protected override bool ShouldBeConsideredForInput(Drawable child) => AllowReordering || AllowDeletion || !AllowSelection || SelectedItem.Value == Model;
 
         public DrawableRoomPlaylistItem(PlaylistItem item)
@@ -444,7 +441,7 @@ namespace osu.Game.Screens.OnlinePlay
                     Alpha = AllowShowingResults ? 1 : 0,
                     TooltipText = "View results"
                 },
-                OnlinePlayBeatmapAvailabilityTracker.QueryBeatmapForOnlinePlay(realm.Realm, beatmap).Any() ? Empty() : new PlaylistDownloadButton(beatmap),
+                beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
                 editButton = new PlaylistEditButton
                 {
                     Size = new Vector2(30, 30),
