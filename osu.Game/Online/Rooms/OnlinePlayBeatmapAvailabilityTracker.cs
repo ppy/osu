@@ -96,7 +96,7 @@ namespace osu.Game.Online.Rooms
 
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
             realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(r => QueryBeatmapForOnlinePlay(r, SelectedItem.Value.Beatmap), (items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(r => filteredBeatmaps(beatmap), (items, changes, ___) =>
             {
                 if (changes == null)
                     return;
@@ -125,7 +125,7 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    bool available = QueryBeatmapForOnlinePlay(realm.Realm, beatmap).Any();
+                    bool available = filteredBeatmaps(beatmap).Any();
 
                     availability.Value = available ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
@@ -140,15 +140,14 @@ namespace osu.Game.Online.Rooms
             }
         }
 
-        /// <summary>
-        /// Performs a query for a local <see cref="BeatmapInfo"/> matching a requested one for the purpose of online play.
-        /// </summary>
-        /// <param name="realm">The realm to query from.</param>
-        /// <param name="beatmap">The requested beatmap.</param>
-        /// <returns>A beatmap query.</returns>
-        public static IQueryable<BeatmapInfo> QueryBeatmapForOnlinePlay(Realm realm, IBeatmapInfo beatmap)
+        private IQueryable<BeatmapInfo> filteredBeatmaps(APIBeatmap beatmap)
         {
-            return realm.All<BeatmapInfo>().Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", beatmap.OnlineID, beatmap.MD5Hash);
+            int onlineId = beatmap.OnlineID;
+            string checksum = beatmap.MD5Hash;
+
+            return realm.Realm
+                        .All<BeatmapInfo>()
+                        .Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", onlineId, checksum);
         }
 
         protected override void Dispose(bool isDisposing)
