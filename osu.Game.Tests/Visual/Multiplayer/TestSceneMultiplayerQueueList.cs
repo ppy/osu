@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -26,9 +25,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerQueueList : MultiplayerTestScene
     {
-        [Cached(typeof(UserLookupCache))]
-        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
-
         private MultiplayerQueueList playlist;
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;

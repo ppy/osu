@@ -10,7 +10,6 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -40,9 +39,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayerComponents multiplayerComponents;
 
         protected TestMultiplayerClient Client => multiplayerComponents.Client;
-
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)

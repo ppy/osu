@@ -10,7 +10,6 @@ using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
@@ -35,9 +34,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private TestMultiplayerComponents multiplayerComponents;
 
         private TestMultiplayerClient client => multiplayerComponents.Client;
-
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
