@@ -19,7 +19,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         public TestMultiplayerClient Client => OnlinePlayDependencies.Client;
         public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
-        public TestUserLookupCache LookupCache => OnlinePlayDependencies?.LookupCache;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
