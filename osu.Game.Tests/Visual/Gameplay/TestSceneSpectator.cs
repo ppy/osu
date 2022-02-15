@@ -39,7 +39,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        private TestSpectatorClient spectatorClient;
+        private TestSpectatorClient spectatorClient => dependenciesScreen.Client;
+        private DependenciesScreen dependenciesScreen;
         private SoloSpectator spectatorScreen;
 
         private BeatmapSetInfo importedBeatmap;
@@ -48,16 +49,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUpSteps]
         public void SetupSteps()
         {
-            DependenciesScreen dependenciesScreen = null;
-
             AddStep("load dependencies", () =>
             {
-                spectatorClient = new TestSpectatorClient();
+                LoadScreen(dependenciesScreen = new DependenciesScreen());
 
-                // The screen gets suspended so it stops receiving updates.
-                Child = spectatorClient;
-
-                LoadScreen(dependenciesScreen = new DependenciesScreen(spectatorClient));
+                // The dependencies screen gets suspended so it stops receiving updates. So its children are manually added to the test scene instead.
+                Children = new Drawable[]
+                {
+                    dependenciesScreen.UserLookupCache,
+                    dependenciesScreen.Client,
+                };
             });
 
             AddUntilStep("wait for dependencies to load", () => dependenciesScreen.IsLoaded);
@@ -335,12 +336,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class DependenciesScreen : OsuScreen
         {
             [Cached(typeof(SpectatorClient))]
-            public readonly TestSpectatorClient Client;
+            public readonly TestSpectatorClient Client = new TestSpectatorClient();
 
-            public DependenciesScreen(TestSpectatorClient client)
-            {
-                Client = client;
-            }
+            [Cached(typeof(UserLookupCache))]
+            public readonly TestUserLookupCache UserLookupCache = new TestUserLookupCache();
         }
     }
 }

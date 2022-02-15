@@ -17,7 +17,6 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -55,9 +54,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private TestMultiplayerClient client => multiplayerComponents.Client;
         private TestMultiplayerRoomManager roomManager => multiplayerComponents.RoomManager;
-
-        [Cached(typeof(UserLookupCache))]
-        private UserLookupCache lookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
