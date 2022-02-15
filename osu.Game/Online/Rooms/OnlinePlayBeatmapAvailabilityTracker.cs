@@ -78,7 +78,7 @@ namespace osu.Game.Online.Rooms
 
                 // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
                 realmSubscription?.Dispose();
-                realmSubscription = realm.RegisterForNotifications(r => filteredBeatmaps(), (items, changes, ___) =>
+                realmSubscription = realm.RegisterForNotifications(r => QueryBeatmapForOnlinePlay(r, SelectedItem.Value.Beatmap.Value), (items, changes, ___) =>
                 {
                     if (changes == null)
                         return;
@@ -108,12 +108,12 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    bool hashMatches = filteredBeatmaps().Any();
+                    bool available = QueryBeatmapForOnlinePlay(realm.Realm, SelectedItem.Value.Beatmap.Value).Any();
 
-                    availability.Value = hashMatches ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
+                    availability.Value = available ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
                     // only display a message to the user if a download seems to have just completed.
-                    if (!hashMatches && downloadTracker.Progress.Value == 1)
+                    if (!available && downloadTracker.Progress.Value == 1)
                         Logger.Log("The imported beatmap set does not match the online version.", LoggingTarget.Runtime, LogLevel.Important);
 
                     break;
@@ -123,14 +123,15 @@ namespace osu.Game.Online.Rooms
             }
         }
 
-        private IQueryable<BeatmapInfo> filteredBeatmaps()
+        /// <summary>
+        /// Performs a query for a local <see cref="BeatmapInfo"/> matching a requested one for the purpose of online play.
+        /// </summary>
+        /// <param name="realm">The realm to query from.</param>
+        /// <param name="beatmap">The requested beatmap.</param>
+        /// <returns>A beatmap query.</returns>
+        public static IQueryable<BeatmapInfo> QueryBeatmapForOnlinePlay(Realm realm, IBeatmapInfo beatmap)
         {
-            int onlineId = SelectedItem.Value.Beatmap.Value.OnlineID;
-            string checksum = SelectedItem.Value.Beatmap.Value.MD5Hash;
-
-            return realm.Realm
-                        .All<BeatmapInfo>()
-                        .Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", onlineId, checksum);
+            return realm.All<BeatmapInfo>().Filter("OnlineID == $0 && MD5Hash == $1 && BeatmapSet.DeletePending == false", beatmap.OnlineID, beatmap.MD5Hash);
         }
 
         protected override void Dispose(bool isDisposing)
