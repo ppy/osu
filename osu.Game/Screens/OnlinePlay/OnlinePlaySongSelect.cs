@@ -113,12 +113,8 @@ namespace osu.Game.Screens.OnlinePlay
         {
             itemSelected = true;
 
-            var item = new PlaylistItem
+            var item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
-                Beatmap =
-                {
-                    Value = Beatmap.Value.BeatmapInfo
-                },
                 RulesetID = Ruleset.Value.OnlineID,
                 RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()

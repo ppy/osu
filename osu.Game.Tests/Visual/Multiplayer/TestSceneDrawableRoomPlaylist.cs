@@ -209,10 +209,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Size = new Vector2(500, 300),
                     Items =
                     {
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                         {
                             ID = 0,
-                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                             Expired = true,
                             RequiredMods = new[]
@@ -222,10 +221,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 new APIMod(new OsuModAutoplay())
                             }
                         },
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                         {
                             ID = 1,
-                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                             RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                             RequiredMods = new[]
                             {
@@ -293,25 +291,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 for (int i = 0; i < 20; i++)
                 {
-                    playlist.Items.Add(new PlaylistItem
+                    playlist.Items.Add(new PlaylistItem(i % 2 == 1
+                        ? new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+                        : new BeatmapInfo
+                        {
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "Artist",
+                                Author = new RealmUser { Username = "Creator name here" },
+                                Title = "Long title used to check background colour",
+                            },
+                            BeatmapSet = new BeatmapSetInfo()
+                        })
                     {
                         ID = i,
                         OwnerID = 2,
-                        Beatmap =
-                        {
-                            Value = i % 2 == 1
-                                ? new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
-                                : new BeatmapInfo
-                                {
-                                    Metadata = new BeatmapMetadata
-                                    {
-                                        Artist = "Artist",
-                                        Author = new RealmUser { Username = "Creator name here" },
-                                        Title = "Long title used to check background colour",
-                                    },
-                                    BeatmapSet = new BeatmapSetInfo()
-                                }
-                        },
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                         RequiredMods = new[]
                         {
@@ -341,11 +335,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (var b in beatmaps())
                 {
-                    playlist.Items.Add(new PlaylistItem
+                    playlist.Items.Add(new PlaylistItem(b)
                     {
                         ID = index++,
                         OwnerID = 2,
-                        Beatmap = { Value = b },
                         RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                         RequiredMods = new[]
                         {

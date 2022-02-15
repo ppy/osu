@@ -41,10 +41,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         private void createNewItem()
         {
-            PlaylistItem item = new PlaylistItem
+            PlaylistItem item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
                 ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1,
-                Beatmap = { Value = Beatmap.Value.BeatmapInfo },
                 RulesetID = Ruleset.Value.OnlineID,
                 RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
                 AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()

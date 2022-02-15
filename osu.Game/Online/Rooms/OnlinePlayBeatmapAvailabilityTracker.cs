@@ -64,11 +64,11 @@ namespace osu.Game.Online.Rooms
 
                 downloadTracker?.RemoveAndDisposeImmediately();
 
-                beatmapLookupCache.GetBeatmapAsync(item.NewValue.Beatmap.Value.OnlineID).ContinueWith(task => Schedule(() =>
+                beatmapLookupCache.GetBeatmapAsync(item.NewValue.Beatmap.OnlineID).ContinueWith(task => Schedule(() =>
                 {
                     var beatmap = task.GetResultSafely();
 
-                    if (SelectedItem.Value?.Beatmap.Value.OnlineID == beatmap.OnlineID)
+                    if (SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
                         beginTracking(beatmap);
                 }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }, true);
@@ -96,7 +96,7 @@ namespace osu.Game.Online.Rooms
 
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
             realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(r => QueryBeatmapForOnlinePlay(r, SelectedItem.Value.Beatmap.Value), (items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(r => QueryBeatmapForOnlinePlay(r, SelectedItem.Value.Beatmap), (items, changes, ___) =>
             {
                 if (changes == null)
                     return;

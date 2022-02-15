@@ -120,11 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("add playlist item", () =>
             {
-                MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem
-                {
-                    Beatmap = { Value = importedBeatmap },
-                    BeatmapID = importedBeatmap.OnlineID,
-                });
+                MultiplayerPlaylistItem item = new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap));
 
                 Client.AddUserPlaylistItem(userId(), item);
 

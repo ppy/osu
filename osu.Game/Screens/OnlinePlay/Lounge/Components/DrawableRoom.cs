@@ -409,7 +409,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     return;
 
                 var cancellationSource = beatmapLookupCancellation = new CancellationTokenSource();
-                beatmapLookupCache.GetBeatmapAsync(beatmap.Value.OnlineID, cancellationSource.Token)
+                beatmapLookupCache.GetBeatmapAsync(beatmap.OnlineID, cancellationSource.Token)
                                   .ContinueWith(task => Schedule(() =>
                                   {
                                       if (cancellationSource.IsCancellationRequested)

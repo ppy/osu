@@ -161,7 +161,7 @@ namespace osu.Game.Screens.OnlinePlay
                             Schedule(() => ownerAvatar.User = foundUser);
                         }
 
-                        beatmap = await beatmapLookupCache.GetBeatmapAsync(Item.Beatmap.Value.OnlineID).ConfigureAwait(false);
+                        beatmap = await beatmapLookupCache.GetBeatmapAsync(Item.Beatmap.OnlineID).ConfigureAwait(false);
 
                         Scheduler.AddOnce(refresh);
                     }
