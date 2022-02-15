@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
 using osu.Framework.Statistics;
@@ -12,8 +11,9 @@ using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using osu.Game.Skinning;
+using SQLitePCL;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace osu.Game.Database
 {
@@ -40,10 +40,10 @@ namespace osu.Game.Database
         static OsuDbContext()
         {
             // required to initialise native SQLite libraries on some platforms.
-            SQLitePCL.Batteries_V2.Init();
+            Batteries_V2.Init();
 
             // https://github.com/aspnet/EntityFrameworkCore/issues/9994#issuecomment-508588678
-            SQLitePCL.raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
+            raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
         }
 
         /// <summary>
@@ -116,7 +116,6 @@ namespace osu.Game.Database
             optionsBuilder
                 // this is required for the time being due to the way we are querying in places like BeatmapStore.
                 // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
-                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
                 .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
         }
