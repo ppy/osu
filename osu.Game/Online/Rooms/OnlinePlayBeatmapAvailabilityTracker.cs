@@ -4,14 +4,17 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Online.API.Requests.Responses;
 using Realms;
 
 namespace osu.Game.Online.Rooms
@@ -31,6 +34,9 @@ namespace osu.Game.Online.Rooms
 
         [Resolved]
         private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         /// <summary>
         /// The availability state of the currently selected playlist item.
@@ -58,39 +64,50 @@ namespace osu.Game.Online.Rooms
 
                 downloadTracker?.RemoveAndDisposeImmediately();
 
-                Debug.Assert(item.NewValue.Beatmap.Value.BeatmapSet != null);
-
-                downloadTracker = new BeatmapDownloadTracker(item.NewValue.Beatmap.Value.BeatmapSet);
-
-                AddInternal(downloadTracker);
-
-                downloadTracker.State.BindValueChanged(_ => Scheduler.AddOnce(updateAvailability), true);
-                downloadTracker.Progress.BindValueChanged(_ =>
+                beatmapLookupCache.GetBeatmapAsync(item.NewValue.Beatmap.Value.OnlineID).ContinueWith(task => Schedule(() =>
                 {
-                    if (downloadTracker.State.Value != DownloadState.Downloading)
-                        return;
+                    var beatmap = task.GetResultSafely();
 
-                    // incoming progress changes are going to be at a very high rate.
-                    // we don't want to flood the network with this, so rate limit how often we send progress updates.
-                    if (progressUpdate?.Completed != false)
-                        progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
-                }, true);
-
-                // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
-                realmSubscription?.Dispose();
-                realmSubscription = realm.RegisterForNotifications(r => QueryBeatmapForOnlinePlay(r, SelectedItem.Value.Beatmap.Value), (items, changes, ___) =>
-                {
-                    if (changes == null)
-                        return;
-
-                    Scheduler.AddOnce(updateAvailability);
-                });
+                    if (SelectedItem.Value?.Beatmap.Value.OnlineID == beatmap.OnlineID)
+                        beginTracking(beatmap);
+                }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }, true);
         }
 
-        private void updateAvailability()
+        private void beginTracking(APIBeatmap beatmap)
         {
-            if (downloadTracker == null || SelectedItem.Value == null)
+            Debug.Assert(beatmap.BeatmapSet != null);
+
+            downloadTracker = new BeatmapDownloadTracker(beatmap.BeatmapSet);
+
+            AddInternal(downloadTracker);
+
+            downloadTracker.State.BindValueChanged(_ => Scheduler.AddOnce(updateAvailability, beatmap), true);
+            downloadTracker.Progress.BindValueChanged(_ =>
+            {
+                if (downloadTracker.State.Value != DownloadState.Downloading)
+                    return;
+
+                // incoming progress changes are going to be at a very high rate.
+                // we don't want to flood the network with this, so rate limit how often we send progress updates.
+                if (progressUpdate?.Completed != false)
+                    progressUpdate = Scheduler.AddDelayed(updateAvailability, beatmap, progressUpdate == null ? 0 : 500);
+            }, true);
+
+            // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
+            realmSubscription?.Dispose();
+            realmSubscription = realm.RegisterForNotifications(r => QueryBeatmapForOnlinePlay(r, SelectedItem.Value.Beatmap.Value), (items, changes, ___) =>
+            {
+                if (changes == null)
+                    return;
+
+                Scheduler.AddOnce(updateAvailability, beatmap);
+            });
+        }
+
+        private void updateAvailability(APIBeatmap beatmap)
+        {
+            if (downloadTracker == null)
                 return;
 
             switch (downloadTracker.State.Value)
@@ -108,7 +125,7 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    bool available = QueryBeatmapForOnlinePlay(realm.Realm, SelectedItem.Value.Beatmap.Value).Any();
+                    bool available = QueryBeatmapForOnlinePlay(realm.Realm, beatmap).Any();
 
                     availability.Value = available ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
