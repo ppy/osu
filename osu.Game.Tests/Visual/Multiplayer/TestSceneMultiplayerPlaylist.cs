@@ -146,12 +146,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         new PlaylistItem
                         {
                             Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value }
+                            RulesetID = Ruleset.Value.OnlineID,
                         },
                         new PlaylistItem
                         {
                             Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value },
+                            RulesetID = Ruleset.Value.OnlineID,
                             Expired = true
                         }
                     }

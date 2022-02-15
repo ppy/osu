@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                 {
                     room.Playlist.Add(new PlaylistItem
                     {
-                        Ruleset = { Value = ruleset },
+                        RulesetID = ruleset.OnlineID,
                         Beatmap =
                         {
                             Value = new BeatmapInfo
