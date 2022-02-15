@@ -168,8 +168,6 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        public void SendFrames(FrameDataBundle data) => lastSend = SendFramesInternal(data);
-
         public void EndPlaying(GameplayState state)
         {
             // This method is most commonly called via Dispose(), which is can be asynchronous (via the AsyncDisposalQueue).
@@ -180,7 +178,7 @@ namespace osu.Game.Online.Spectator
                     return;
 
                 if (pendingFrames.Count > 0)
-                    purgePendingFrames(true);
+                    purgePendingFrames();
 
                 IsPlaying = false;
                 currentBeatmap = null;
@@ -230,9 +228,11 @@ namespace osu.Game.Online.Spectator
 
         protected abstract Task StopWatchingUserInternal(int userId);
 
+        private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
+
         private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
 
-        private double lastSendTime;
+        private double lastPurgeTime;
 
         private Task? lastSend;
 
@@ -242,7 +242,7 @@ namespace osu.Game.Online.Spectator
         {
             base.Update();
 
-            if (pendingFrames.Count > 0 && Time.Current - lastSendTime > TIME_BETWEEN_SENDS)
+            if (pendingFrames.Count > 0 && Time.Current - lastPurgeTime > TIME_BETWEEN_SENDS)
                 purgePendingFrames();
         }
 
@@ -260,23 +260,41 @@ namespace osu.Game.Online.Spectator
                 purgePendingFrames();
         }
 
-        private void purgePendingFrames(bool force = false)
+        private void purgePendingFrames()
         {
-            if (lastSend?.IsCompleted == false && !force)
-                return;
-
             if (pendingFrames.Count == 0)
                 return;
 
-            var frames = pendingFrames.ToArray();
-
-            pendingFrames.Clear();
-
             Debug.Assert(currentScore != null);
 
-            SendFrames(new FrameDataBundle(currentScore.ScoreInfo, frames));
+            var frames = pendingFrames.ToArray();
+            var bundle = new FrameDataBundle(currentScore.ScoreInfo, frames);
 
-            lastSendTime = Time.Current;
+            pendingFrames.Clear();
+            lastPurgeTime = Time.Current;
+
+            pendingFrameBundles.Enqueue(bundle);
+
+            sendNextBundleIfRequired();
+        }
+
+        private void sendNextBundleIfRequired()
+        {
+            if (lastSend?.IsCompleted == false)
+                return;
+
+            if (!pendingFrameBundles.TryPeek(out var bundle))
+                return;
+
+            lastSend = SendFramesInternal(bundle);
+            lastSend.ContinueWith(t => Schedule(() =>
+            {
+                // If the last bundle send wasn't successful, try again without dequeuing.
+                if (t.IsCompletedSuccessfully)
+                    pendingFrameBundles.Dequeue();
+
+                sendNextBundleIfRequired();
+            }));
         }
     }
 }
