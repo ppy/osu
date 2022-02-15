@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 LoadScreen(resultsScreen = new TestResultsScreen(getScore?.Invoke(), 1, new PlaylistItem
                 {
                     Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 }));
             });
 

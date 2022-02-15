@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new PlaylistItem
                     {
                         Beatmap = { Value = InitialBeatmap },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 }
             }));

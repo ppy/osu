@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Online
             selectedItem.Value = new PlaylistItem
             {
                 Beatmap = { Value = testBeatmapInfo },
-                Ruleset = { Value = testBeatmapInfo.Ruleset },
+                RulesetID = testBeatmapInfo.Ruleset.OnlineID,
             };
 
             Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker

@@ -11,7 +11,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -71,8 +70,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     BeatmapID = item.BeatmapID,
                     BeatmapChecksum = item.Beatmap.Value.MD5Hash,
                     RulesetID = item.RulesetID,
-                    RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
-                    AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
+                    RequiredMods = item.RequiredMods.ToArray(),
+                    AllowedMods = item.AllowedMods.ToArray()
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);

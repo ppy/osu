@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             selectedItem.Value = new PlaylistItem
             {
                 Beatmap = { Value = Beatmap.Value.BeatmapInfo },
-                Ruleset = { Value = Beatmap.Value.BeatmapInfo.Ruleset },
+                RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
             };
 
             if (button != null)
