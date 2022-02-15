@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
+        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies?.UserLookupCache;
 
         /// <summary>
         /// All dependencies required for online play components and screens.
