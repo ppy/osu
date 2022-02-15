@@ -173,7 +173,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
 
-            AddAssert("mod select contains only double time mod", () => this.ChildrenOfType<UserModSelectOverlay>().Single().ChildrenOfType<ModButton>().Single().Mod is OsuModDoubleTime);
+            AddUntilStep("mod select contains only double time mod",
+                () => this.ChildrenOfType<UserModSelectOverlay>().SingleOrDefault()?.ChildrenOfType<ModButton>().SingleOrDefault()?.Mod is OsuModDoubleTime);
         }
     }
 }
