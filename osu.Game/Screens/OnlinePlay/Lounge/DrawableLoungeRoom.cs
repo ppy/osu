@@ -246,7 +246,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
             {
                 base.LoadComplete();
 
-                Schedule(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(passwordTextBox));
                 passwordTextBox.OnCommit += (_, __) => performJoin();
             }
 
