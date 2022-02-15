@@ -24,6 +24,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker { get; }
         public TestRoomRequestsHandler RequestsHandler { get; }
         public TestUserLookupCache UserLookupCache { get; }
+        public BeatmapLookupCache BeatmapLookupCache { get; }
 
         /// <summary>
         /// All cached dependencies which are also <see cref="Drawable"/> components.
@@ -41,6 +42,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             AvailabilityTracker = new OnlinePlayBeatmapAvailabilityTracker();
             RoomManager = CreateRoomManager();
             UserLookupCache = new TestUserLookupCache();
+            BeatmapLookupCache = new BeatmapLookupCache();
 
             dependencies = new DependencyContainer(new CachedModelDependencyContainer<Room>(null) { Model = { BindTarget = SelectedRoom } });
 
@@ -51,6 +53,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             CacheAs(AvailabilityTracker);
             CacheAs(new OverlayColourProvider(OverlayColourScheme.Plum));
             CacheAs<UserLookupCache>(UserLookupCache);
+            CacheAs(BeatmapLookupCache);
         }
 
         public object Get(Type type)
