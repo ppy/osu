@@ -183,7 +183,8 @@ namespace osu.Game.Overlays.Login
                     break;
             }
 
-            if (form != null) GetContainingInputManager()?.ChangeFocus(form);
+            if (form != null)
+                ScheduleAfterChildren(() => GetContainingInputManager()?.ChangeFocus(form));
         });
 
         public override bool AcceptsFocus => true;
