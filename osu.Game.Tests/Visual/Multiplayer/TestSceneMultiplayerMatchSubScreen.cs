@@ -14,11 +14,14 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.OnlinePlay.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Participants;
@@ -149,6 +152,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             AddUntilStep("match started", () => Client.Room?.State == MultiplayerRoomState.WaitingForLoad);
+        }
+
+        [Test]
+        public void TestFreeModSelectionHasAllowedMods()
+        {
+            AddStep("add playlist item with allowed mod", () =>
+            {
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                {
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
+                });
+            });
+
+            ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
+
+            AddUntilStep("wait for join", () => RoomJoined);
+
+            ClickButtonWhenEnabled<RoomSubScreen.UserModSelectButton>();
+
+            AddAssert("mod select contains only double time mod", () => this.ChildrenOfType<UserModSelectOverlay>().Single().ChildrenOfType<ModButton>().Single().Mod is OsuModDoubleTime);
         }
     }
 }
