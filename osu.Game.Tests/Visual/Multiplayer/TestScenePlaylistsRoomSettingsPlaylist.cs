@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Models;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -161,12 +162,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                     BeatmapSet = new BeatmapSetInfo()
                                 }
                         },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        RequiredMods =
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods = new[]
                         {
-                            new OsuModHardRock(),
-                            new OsuModDoubleTime(),
-                            new OsuModAutoplay()
+                            new APIMod(new OsuModHardRock()),
+                            new APIMod(new OsuModDoubleTime()),
+                            new APIMod(new OsuModAutoplay())
                         }
                     });
                 }

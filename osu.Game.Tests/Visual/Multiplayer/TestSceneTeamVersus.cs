@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new PlaylistItem
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 }
             });
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new PlaylistItem
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 }
             });
@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new PlaylistItem
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 }
             });
@@ -143,7 +143,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change match type", () => client.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
-            }));
+            }).WaitSafely());
 
             AddUntilStep("api room updated to team versus", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
         }
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     new PlaylistItem
                     {
                         Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                     }
                 }
             });

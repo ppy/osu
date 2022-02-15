@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -35,12 +36,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 ID = SelectedRoom.Value.Playlist.Count,
                 Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                RequiredMods =
+                RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                RequiredMods = new[]
                 {
-                    new OsuModHardRock(),
-                    new OsuModDoubleTime(),
-                    new OsuModAutoplay()
+                    new APIMod(new OsuModHardRock()),
+                    new APIMod(new OsuModDoubleTime()),
+                    new APIMod(new OsuModAutoplay())
                 }
             });
         }
