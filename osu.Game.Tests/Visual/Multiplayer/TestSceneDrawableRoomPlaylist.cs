@@ -168,7 +168,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertDownloadButtonVisible(false);
 
             void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
-                () => playlist.ChildrenOfType<BeatmapDownloadButton>().Single().Alpha == (visible ? 1 : 0));
+                () => playlist.ChildrenOfType<BeatmapDownloadButton>().SingleOrDefault()?.Alpha == (visible ? 1 : 0));
         }
 
         [Test]
@@ -260,7 +260,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void moveToItem(int index, Vector2? offset = null)
-            => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
+            => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(index), offset));
 
         private void moveToDragger(int index, Vector2? offset = null) => AddStep($"move mouse to dragger {index}", () =>
         {
