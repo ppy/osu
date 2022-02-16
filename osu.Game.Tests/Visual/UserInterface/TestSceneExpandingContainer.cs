@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private TestExpandingContainer container;
         private SettingsToolboxGroup toolboxGroup;
 
-        private ExpandableSlider<float, SizeSlider> slider1;
+        private ExpandableSlider<float, SizeSlider<float>> slider1;
         private ExpandableSlider<double> slider2;
 
         [SetUp]
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Width = 1,
                     Children = new Drawable[]
                     {
-                        slider1 = new ExpandableSlider<float, SizeSlider>
+                        slider1 = new ExpandableSlider<float, SizeSlider<float>>
                         {
                             Current = new BindableFloat
                             {
