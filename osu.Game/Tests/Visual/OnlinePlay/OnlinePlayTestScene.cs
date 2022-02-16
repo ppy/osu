@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay;
@@ -22,6 +23,8 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         public IRoomManager RoomManager => OnlinePlayDependencies?.RoomManager;
         public OngoingOperationTracker OngoingOperationTracker => OnlinePlayDependencies?.OngoingOperationTracker;
         public OnlinePlayBeatmapAvailabilityTracker AvailabilityTracker => OnlinePlayDependencies?.AvailabilityTracker;
+        public TestUserLookupCache UserLookupCache => OnlinePlayDependencies?.UserLookupCache;
+        public BeatmapLookupCache BeatmapLookupCache => OnlinePlayDependencies?.BeatmapLookupCache;
 
         /// <summary>
         /// All dependencies required for online play components and screens.
@@ -46,7 +49,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             });
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        protected sealed override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DelegatedDependencyContainer(base.CreateChildDependencies(parent));
             return dependencies;

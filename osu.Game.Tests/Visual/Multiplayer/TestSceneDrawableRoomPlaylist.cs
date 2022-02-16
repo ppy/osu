@@ -30,15 +30,12 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomPlaylist : OsuManualInputManagerTestScene
+    public class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
         private TestPlaylist playlist;
 
         private BeatmapManager manager;
         private RulesetStore rulesets;
-
-        [Cached(typeof(UserLookupCache))]
-        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
