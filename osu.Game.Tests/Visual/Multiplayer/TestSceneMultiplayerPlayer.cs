@@ -28,15 +28,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("initialise gameplay", () =>
             {
-                Stack.Push(player = new MultiplayerPlayer(Client.APIRoom, new PlaylistItem
+                Stack.Push(player = new MultiplayerPlayer(MultiplayerClient.APIRoom, new PlaylistItem
                 {
                     Beatmap = { Value = Beatmap.Value.BeatmapInfo },
                     RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-                }, Client.Room?.Users.ToArray()));
+                }, MultiplayerClient.Room?.Users.ToArray()));
             });
 
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen() && player.IsLoaded);
-            AddStep("start gameplay", () => ((IMultiplayerClient)Client).MatchStarted());
+            AddStep("start gameplay", () => ((IMultiplayerClient)MultiplayerClient).MatchStarted());
         }
 
         [Test]

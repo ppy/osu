@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual
         public new bool IsLoaded => base.IsLoaded && MultiplayerScreen.IsLoaded;
 
         [Cached(typeof(MultiplayerClient))]
-        public readonly TestMultiplayerClient Client;
+        public readonly TestMultiplayerClient MultiplayerClient;
 
         [Cached(typeof(UserLookupCache))]
         private readonly UserLookupCache userLookupCache = new TestUserLookupCache();
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual
             {
                 userLookupCache,
                 beatmapLookupCache,
-                Client = new TestMultiplayerClient(RoomManager),
+                MultiplayerClient = new TestMultiplayerClient(RoomManager),
                 screenStack = new OsuScreenStack
                 {
                     Name = nameof(TestMultiplayerComponents),

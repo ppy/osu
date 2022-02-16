@@ -14,16 +14,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
     /// </summary>
     public class MultiplayerTestSceneDependencies : OnlinePlayTestSceneDependencies, IMultiplayerTestSceneDependencies
     {
-        public TestMultiplayerClient Client { get; }
+        public TestMultiplayerClient MultiplayerClient { get; }
         public TestSpectatorClient SpectatorClient { get; }
         public new TestMultiplayerRoomManager RoomManager => (TestMultiplayerRoomManager)base.RoomManager;
 
         public MultiplayerTestSceneDependencies()
         {
-            Client = new TestMultiplayerClient(RoomManager);
+            MultiplayerClient = new TestMultiplayerClient(RoomManager);
             SpectatorClient = CreateSpectatorClient();
 
-            CacheAs<MultiplayerClient>(Client);
+            CacheAs<MultiplayerClient>(MultiplayerClient);
             CacheAs<SpectatorClient>(SpectatorClient);
         }
 
