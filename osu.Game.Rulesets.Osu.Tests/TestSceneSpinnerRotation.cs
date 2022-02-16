@@ -147,8 +147,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddAssert("player score matching expected bonus score", () =>
             {
-                // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
-                double totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
+                double totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value;
                 return totalScore == (int)(drawableSpinner.Result.RateAdjustedRotation / 360) * new SpinnerTick().CreateJudgement().MaxNumericResult;
             });
 
