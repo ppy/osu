@@ -408,11 +408,11 @@ namespace osu.Game.Online.Leaderboards
                 if (difference.TotalMinutes < 1)
                     return CommonStrings.TimeNow.ToString();
                 if (difference.TotalHours < 1)
-                    return $@"{Math.Ceiling(difference.TotalMinutes)}min";
+                    return $@"{Math.Floor(difference.TotalMinutes)}min";
                 if (difference.TotalDays < 1)
-                    return $@"{Math.Ceiling(difference.TotalHours)}h";
+                    return $@"{Math.Floor(difference.TotalHours)}h";
                 if (difference.TotalDays < 7)
-                    return $@"{Math.Ceiling(difference.TotalDays)}d";
+                    return $@"{Math.Floor(difference.TotalDays)}d";
 
                 return string.Empty;
             }
