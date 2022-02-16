@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private OsuGameBase game { get; set; }
 
-        private TestSpectatorClient spectatorClient => dependenciesScreen.Client;
+        private TestSpectatorClient spectatorClient => dependenciesScreen.SpectatorClient;
         private DependenciesScreen dependenciesScreen;
         private SoloSpectator spectatorScreen;
 
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Children = new Drawable[]
                 {
                     dependenciesScreen.UserLookupCache,
-                    dependenciesScreen.Client,
+                    dependenciesScreen.SpectatorClient,
                 };
             });
 
@@ -336,7 +336,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class DependenciesScreen : OsuScreen
         {
             [Cached(typeof(SpectatorClient))]
-            public readonly TestSpectatorClient Client = new TestSpectatorClient();
+            public readonly TestSpectatorClient SpectatorClient = new TestSpectatorClient();
 
             [Cached(typeof(UserLookupCache))]
             public readonly TestUserLookupCache UserLookupCache = new TestUserLookupCache();

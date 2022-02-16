@@ -17,13 +17,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public const int PLAYER_1_ID = 55;
         public const int PLAYER_2_ID = 56;
 
-        public TestMultiplayerClient Client => OnlinePlayDependencies.Client;
+        public TestMultiplayerClient MultiplayerClient => OnlinePlayDependencies.MultiplayerClient;
         public new TestMultiplayerRoomManager RoomManager => OnlinePlayDependencies.RoomManager;
         public TestSpectatorClient SpectatorClient => OnlinePlayDependencies?.SpectatorClient;
 
         protected new MultiplayerTestSceneDependencies OnlinePlayDependencies => (MultiplayerTestSceneDependencies)base.OnlinePlayDependencies;
 
-        public bool RoomJoined => Client.RoomJoined;
+        public bool RoomJoined => MultiplayerClient.RoomJoined;
 
         private readonly bool joinRoom;
 

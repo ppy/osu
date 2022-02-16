@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for join", () => RoomJoined);
 
-            AddStep("select swap mod", () => Client.ChangeUserMods(API.LocalUser.Value.OnlineID, new[] { new TaikoModSwap() }));
+            AddStep("select swap mod", () => MultiplayerClient.ChangeUserMods(API.LocalUser.Value.OnlineID, new[] { new TaikoModSwap() }));
             AddUntilStep("participant panel has mod", () => this.ChildrenOfType<ParticipantPanel>().Any(p => p.ChildrenOfType<ModIcon>().Any(m => m.Mod is TaikoModSwap)));
         }
 
@@ -141,17 +141,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("join other user (ready)", () =>
             {
-                Client.AddUser(new APIUser { Id = PLAYER_1_ID });
-                Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
+                MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID });
+                MultiplayerClient.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready);
             });
 
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
 
-            AddUntilStep("wait for spectating user state", () => Client.LocalUser?.State == MultiplayerUserState.Spectating);
+            AddUntilStep("wait for spectating user state", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
-            AddUntilStep("match started", () => Client.Room?.State == MultiplayerRoomState.WaitingForLoad);
+            AddUntilStep("match started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
         }
 
         [Test]
