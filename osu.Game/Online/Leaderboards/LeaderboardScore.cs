@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -29,6 +30,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Utils;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -42,6 +44,7 @@ namespace osu.Game.Online.Leaderboards
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
         private const float rank_width = 35;
+        private const float date_width = 35;
 
         protected Container RankContainer { get; private set; }
 
@@ -100,10 +103,18 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Y,
                     Width = rank_width,
                 },
+                new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = date_width,
+                    Child = new DateLabel(Score.Date),
+                },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = rank_width, },
+                    Padding = new MarginPadding { Left = rank_width, Right = date_width, },
                     Children = new Drawable[]
                     {
                         new Container
@@ -375,6 +386,36 @@ namespace osu.Game.Online.Leaderboards
             }
 
             public LocalisableString TooltipText { get; }
+        }
+
+        private class DateLabel : DrawableDate
+        {
+            public DateLabel(DateTimeOffset date)
+                : base(date, 20)
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+            }
+
+            protected override string Format()
+            {
+                var now = DateTime.Now;
+                var difference = now - Date;
+
+                // TODO(optional): support localisation (probably via `CommonStrings.CountHours()` etc.)
+                // requires pluralisable string support framework-side
+
+                if (difference.TotalMinutes < 1)
+                    return CommonStrings.TimeNow.ToString();
+                if (difference.TotalHours < 1)
+                    return $@"{Math.Ceiling(difference.TotalMinutes)}min";
+                if (difference.TotalDays < 1)
+                    return $@"{Math.Ceiling(difference.TotalHours)}h";
+                if (difference.TotalDays < 7)
+                    return $@"{Math.Ceiling(difference.TotalDays)}d";
+
+                return string.Empty;
+            }
         }
 
         public class LeaderboardScoreStatistic
