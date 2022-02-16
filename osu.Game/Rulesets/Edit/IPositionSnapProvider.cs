@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Edit
         /// The spacing multiplier applied to beat snap distances.
         /// </summary>
         /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
-        IBindable<float> DistanceSpacingMultiplier { get; }
+        IBindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
         /// Given a position, find a valid time and position snap.

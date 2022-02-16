@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
             set => InternalChild = value;
         }
 
-        public override IBindable<float> DistanceSpacingMultiplier => throw new System.NotImplementedException();
+        public override IBindable<double> DistanceSpacingMultiplier => throw new System.NotImplementedException();
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {

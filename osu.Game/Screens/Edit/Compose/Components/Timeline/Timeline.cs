@@ -317,7 +317,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;
 
-        public IBindable<float> DistanceSpacingMultiplier => throw new NotImplementedException();
+        public IBindable<double> DistanceSpacingMultiplier => throw new NotImplementedException();
 
         public float GetBeatSnapDistanceAt(HitObject referenceObject) => throw new NotImplementedException();
 
