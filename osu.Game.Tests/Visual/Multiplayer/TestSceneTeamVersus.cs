@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change match type", () => client.ChangeSettings(new MultiplayerRoomSettings
             {
                 MatchType = MatchType.TeamVersus
-            }));
+            }).WaitSafely());
 
             AddUntilStep("api room updated to team versus", () => client.APIRoom?.Type.Value == MatchType.TeamVersus);
         }
