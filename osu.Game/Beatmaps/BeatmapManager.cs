@@ -108,38 +108,72 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Add a new difficulty to the beatmap set represented by the provided <see cref="BeatmapSetInfo"/>.
+        /// Add a new difficulty to the provided <paramref name="targetBeatmapSet"/> based on the provided <paramref name="referenceWorkingBeatmap"/>.
         /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
         /// and represented by the returned <see cref="WorkingBeatmap"/>.
         /// </summary>
-        public virtual WorkingBeatmap CreateNewBlankDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo)
+        /// <remarks>
+        /// Contrary to <see cref="CopyExistingDifficulty"/>, this method does not preserve hitobjects and beatmap-level settings from <paramref name="referenceWorkingBeatmap"/>.
+        /// The created beatmap will have zero hitobjects and will have default settings (including difficulty settings), but will preserve metadata and existing timing points.
+        /// </remarks>
+        /// <param name="targetBeatmapSet">The <see cref="BeatmapSetInfo"/> to add the new difficulty to.</param>
+        /// <param name="referenceWorkingBeatmap">The <see cref="WorkingBeatmap"/> to use as a baseline reference when creating the new difficulty.</param>
+        /// <param name="rulesetInfo">The ruleset with which the new difficulty should be created.</param>
+        public virtual WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
         {
-            // fetch one of the existing difficulties to copy timing points and metadata from,
-            // so that the user doesn't have to fill all of that out again.
-            // this silently assumes that all difficulties have the same timing points and metadata,
-            // but cases where this isn't true seem rather rare / pathological.
-            var referenceBeatmap = GetWorkingBeatmap(beatmapSetInfo.Beatmaps.First());
+            var playableBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(rulesetInfo);
 
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), referenceBeatmap.Metadata.DeepClone());
+            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), playableBeatmap.Metadata.DeepClone());
+            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
+            foreach (var timingPoint in playableBeatmap.ControlPointInfo.TimingPoints)
+                newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
 
+            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
+        }
+
+        /// <summary>
+        /// Add a copy of the provided <paramref name="referenceWorkingBeatmap"/> to the provided <paramref name="targetBeatmapSet"/>.
+        /// The new difficulty will be backed by a <see cref="BeatmapInfo"/> model
+        /// and represented by the returned <see cref="WorkingBeatmap"/>.
+        /// </summary>
+        /// <remarks>
+        /// Contrary to <see cref="CreateNewDifficulty"/>, this method creates a nearly-exact copy of <paramref name="referenceWorkingBeatmap"/>
+        /// (with the exception of a few key properties that cannot be copied under any circumstance, like difficulty name, beatmap hash, or online status).
+        /// </remarks>
+        /// <param name="targetBeatmapSet">The <see cref="BeatmapSetInfo"/> to add the copy to.</param>
+        /// <param name="referenceWorkingBeatmap">The <see cref="WorkingBeatmap"/> to be copied.</param>
+        public virtual WorkingBeatmap CopyExistingDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap)
+        {
+            var newBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(referenceWorkingBeatmap.BeatmapInfo.Ruleset).Clone();
+            BeatmapInfo newBeatmapInfo;
+
+            newBeatmap.BeatmapInfo = newBeatmapInfo = referenceWorkingBeatmap.BeatmapInfo.Clone();
+            // assign a new ID to the clone.
+            newBeatmapInfo.ID = Guid.NewGuid();
+            // add "(copy)" suffix to difficulty name to avoid clashes on save.
+            newBeatmapInfo.DifficultyName += " (copy)";
+            // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
+            newBeatmapInfo.Hash = string.Empty;
+            // clear online properties.
+            newBeatmapInfo.OnlineID = -1;
+            newBeatmapInfo.Status = BeatmapOnlineStatus.None;
+
+            return addDifficultyToSet(targetBeatmapSet, newBeatmap, referenceWorkingBeatmap.Skin);
+        }
+
+        private WorkingBeatmap addDifficultyToSet(BeatmapSetInfo targetBeatmapSet, IBeatmap newBeatmap, ISkin beatmapSkin)
+        {
             // populate circular beatmap set info <-> beatmap info references manually.
             // several places like `BeatmapModelManager.Save()` or `GetWorkingBeatmap()`
             // rely on them being freely traversable in both directions for correct operation.
-            beatmapSetInfo.Beatmaps.Add(newBeatmapInfo);
-            newBeatmapInfo.BeatmapSet = beatmapSetInfo;
+            targetBeatmapSet.Beatmaps.Add(newBeatmap.BeatmapInfo);
+            newBeatmap.BeatmapInfo.BeatmapSet = targetBeatmapSet;
 
-            var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
-            foreach (var timingPoint in referenceBeatmap.Beatmap.ControlPointInfo.TimingPoints)
-                newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
+            beatmapModelManager.Save(newBeatmap.BeatmapInfo, newBeatmap, beatmapSkin);
 
-            beatmapModelManager.Save(newBeatmapInfo, newBeatmap);
-
-            workingBeatmapCache.Invalidate(beatmapSetInfo);
+            workingBeatmapCache.Invalidate(targetBeatmapSet);
             return GetWorkingBeatmap(newBeatmap.BeatmapInfo);
         }
-
-        // TODO: add back support for making a copy of another difficulty
-        // (likely via a separate `CopyDifficulty()` method).
 
         /// <summary>
         /// Delete a beatmap difficulty.
