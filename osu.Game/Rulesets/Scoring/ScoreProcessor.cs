@@ -92,8 +92,6 @@ namespace osu.Game.Rulesets.Scoring
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject lastHitObject;
 
-        private double scoreMultiplier = 1;
-
         public ScoreProcessor()
         {
             accuracyPortion = DefaultAccuracyPortion;
@@ -111,15 +109,6 @@ namespace osu.Game.Rulesets.Scoring
             };
 
             Mode.ValueChanged += _ => updateScore();
-            Mods.ValueChanged += mods =>
-            {
-                scoreMultiplier = 1;
-
-                foreach (var m in mods.NewValue)
-                    scoreMultiplier *= m.ScoreMultiplier;
-
-                updateScore();
-            };
         }
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
@@ -235,7 +224,7 @@ namespace osu.Game.Rulesets.Scoring
                 case ScoringMode.Standardised:
                     double accuracyScore = accuracyPortion * accuracyRatio;
                     double comboScore = comboPortion * comboRatio;
-                    return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics)) * scoreMultiplier;
+                    return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics));
 
                 case ScoringMode.Classic:
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.

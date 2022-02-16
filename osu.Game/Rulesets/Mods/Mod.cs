@@ -80,10 +80,13 @@ namespace osu.Game.Rulesets.Mods
         }
 
         /// <summary>
-        /// The score multiplier of this mod.
+        /// The (legacy) score multiplier of this mod.
         /// </summary>
+        /// <remarks>
+        /// This is not applied for newly set scores, but may be required for display purposes when showing legacy scores.
+        /// </remarks>
         [JsonIgnore]
-        public abstract double ScoreMultiplier { get; }
+        public virtual double ScoreMultiplier => 1;
 
         /// <summary>
         /// Returns true if this mod is implemented (and playable).
