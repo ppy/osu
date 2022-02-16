@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             AddStep("seek to first control point", () => EditorClock.Seek(Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.First().Time));
             AddStep("set distance spacing to 1", () =>
             {
-                var distanceSpacing = (BindableFloat)Editor.ChildrenOfType<HitObjectComposer>().Single().DistanceSpacingMultiplier;
+                var distanceSpacing = (BindableDouble)Editor.ChildrenOfType<HitObjectComposer>().Single().DistanceSpacingMultiplier;
                 distanceSpacing.Value = 1;
             });
         }
