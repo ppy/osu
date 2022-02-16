@@ -269,11 +269,12 @@ namespace osu.Game.Tests.Visual.Editing
         }
 
         [Test]
-        public void TestCreateNewBeatmapFailsWithBlankNamedDifficulties()
+        public void TestCreateMultipleNewDifficultiesSucceeds()
         {
             Guid setId = Guid.Empty;
 
             AddStep("retrieve set ID", () => setId = EditorBeatmap.BeatmapInfo.BeatmapSet!.ID);
+            AddStep("set difficulty name", () => EditorBeatmap.BeatmapInfo.DifficultyName = "New Difficulty");
             AddStep("save beatmap", () => Editor.Save());
             AddAssert("new beatmap persisted", () =>
             {
@@ -282,15 +283,24 @@ namespace osu.Game.Tests.Visual.Editing
             });
 
             AddStep("try to create new difficulty", () => Editor.CreateNewDifficulty(new OsuRuleset().RulesetInfo));
-            AddAssert("beatmap set unchanged", () =>
+            AddUntilStep("wait for dialog", () => DialogOverlay.CurrentDialog is CreateNewDifficultyDialog);
+            AddStep("confirm creation with no objects", () => DialogOverlay.CurrentDialog.PerformOkAction());
+
+            AddUntilStep("wait for created", () =>
+            {
+                string difficultyName = Editor.ChildrenOfType<EditorBeatmap>().SingleOrDefault()?.BeatmapInfo.DifficultyName;
+                return difficultyName != null && difficultyName != "New Difficulty";
+            });
+            AddAssert("new difficulty has correct name", () => EditorBeatmap.BeatmapInfo.DifficultyName == "New Difficulty (1)");
+            AddAssert("new difficulty persisted", () =>
             {
                 var set = beatmapManager.QueryBeatmapSet(s => s.ID == setId);
-                return set != null && set.PerformRead(s => s.Beatmaps.Count == 1 && s.Files.Count == 1);
+                return set != null && set.PerformRead(s => s.Beatmaps.Count == 2 && s.Files.Count == 2);
             });
         }
 
         [Test]
-        public void TestCreateNewBeatmapFailsWithSameNamedDifficulties([Values] bool sameRuleset)
+        public void TestSavingBeatmapFailsWithSameNamedDifficulties([Values] bool sameRuleset)
         {
             Guid setId = Guid.Empty;
             const string duplicate_difficulty_name = "duplicate";
