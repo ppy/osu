@@ -48,6 +48,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
+                // In osu-stable mania, rate-adjustment mods don't affect the hit window.
+                // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
                 GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
