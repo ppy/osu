@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<float, SizeSlider>
+                new SettingsSlider<float, SizeSlider<float>>
                 {
                     LabelText = SkinSettingsStrings.GameplayCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
