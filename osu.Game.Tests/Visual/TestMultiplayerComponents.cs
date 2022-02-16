@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens;
@@ -37,7 +38,13 @@ namespace osu.Game.Tests.Visual
         public new bool IsLoaded => base.IsLoaded && MultiplayerScreen.IsLoaded;
 
         [Cached(typeof(MultiplayerClient))]
-        public readonly TestMultiplayerClient Client;
+        public readonly TestMultiplayerClient MultiplayerClient;
+
+        [Cached(typeof(UserLookupCache))]
+        private readonly UserLookupCache userLookupCache = new TestUserLookupCache();
+
+        [Cached]
+        private readonly BeatmapLookupCache beatmapLookupCache = new BeatmapLookupCache();
 
         private readonly OsuScreenStack screenStack;
         private readonly TestMultiplayer multiplayerScreen;
@@ -48,7 +55,9 @@ namespace osu.Game.Tests.Visual
 
             InternalChildren = new Drawable[]
             {
-                Client = new TestMultiplayerClient(RoomManager),
+                userLookupCache,
+                beatmapLookupCache,
+                MultiplayerClient = new TestMultiplayerClient(RoomManager),
                 screenStack = new OsuScreenStack
                 {
                     Name = nameof(TestMultiplayerComponents),

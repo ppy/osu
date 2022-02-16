@@ -37,10 +37,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("end joining room", () => joiningRoomOperation.Dispose());
             assertButtonEnableState(true);
 
-            AddStep("disconnect client", () => Client.Disconnect());
+            AddStep("disconnect client", () => MultiplayerClient.Disconnect());
             assertButtonEnableState(false);
 
-            AddStep("re-connect client", () => Client.Connect());
+            AddStep("re-connect client", () => MultiplayerClient.Connect());
             assertButtonEnableState(true);
         }
 

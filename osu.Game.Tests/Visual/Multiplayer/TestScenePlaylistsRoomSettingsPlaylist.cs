@@ -4,13 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Models;
 using osu.Game.Online.API;
@@ -20,17 +18,15 @@ using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Playlists;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual.OnlinePlay;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestScenePlaylistsRoomSettingsPlaylist : OsuManualInputManagerTestScene
+    public class TestScenePlaylistsRoomSettingsPlaylist : OnlinePlayTestScene
     {
         private TestPlaylist playlist;
-
-        [Cached(typeof(UserLookupCache))]
-        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
 
         [Test]
         public void TestItemRemovedOnDeletion()
