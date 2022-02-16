@@ -9,9 +9,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaDifficultyAttributes : DifficultyAttributes
     {
+        /// <summary>
+        /// The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
+        /// </summary>
+        /// <remarks>
+        /// Rate-adjusting mods don't directly affect the hit window, but have a perceived effect as a result of adjusting audio timing.
+        /// </remarks>
         [JsonProperty("great_hit_window")]
         public double GreatHitWindow { get; set; }
 
+        /// <summary>
+        /// The score multiplier applied via score-reducing mods.
+        /// </summary>
         [JsonProperty("score_multiplier")]
         public double ScoreMultiplier { get; set; }
 
