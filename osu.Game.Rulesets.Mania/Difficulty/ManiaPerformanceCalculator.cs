@@ -43,14 +43,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             countMeh = Score.Statistics.GetValueOrDefault(HitResult.Meh);
             countMiss = Score.Statistics.GetValueOrDefault(HitResult.Miss);
 
-            IEnumerable<Mod> scoreIncreaseMods = Ruleset.GetModsFor(ModType.DifficultyIncrease);
-
-            double scoreMultiplier = 1.0;
-            foreach (var m in mods.Where(m => !scoreIncreaseMods.Contains(m)))
-                scoreMultiplier *= m.ScoreMultiplier;
-
-            // Scale score up, so it's comparable to other keymods
-            scaledScore *= 1.0 / scoreMultiplier;
+            if (Attributes.ScoreMultiplier > 0)
+            {
+                // Scale score up, so it's comparable to other keymods
+                scaledScore *= 1.0 / Attributes.ScoreMultiplier;
+            }
 
             // Arbitrary initial value for scaling pp in order to standardize distributions across game modes.
             // The specific number has no intrinsic meaning and can be adjusted as needed.
@@ -80,6 +77,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue()
         {
+            if (Attributes.ScoreMultiplier <= 0)
+                return 0;
+
             double difficultyValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
             difficultyValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
