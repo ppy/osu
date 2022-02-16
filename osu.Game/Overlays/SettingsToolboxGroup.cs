@@ -22,11 +22,6 @@ namespace osu.Game.Overlays
 {
     public class SettingsToolboxGroup : Container, IExpandable
     {
-        /// <summary>
-        /// The title of this toolbox group.
-        /// </summary>
-        public string Title { get; }
-
         private const float transition_duration = 250;
         private const int container_width = 270;
         private const int border_thickness = 2;
@@ -53,8 +48,6 @@ namespace osu.Game.Overlays
         /// <param name="title">The title to be displayed in the header of this group.</param>
         public SettingsToolboxGroup(string title)
         {
-            Title = title;
-
             AutoSizeAxes = Axes.Y;
             Width = container_width;
             Masking = true;
