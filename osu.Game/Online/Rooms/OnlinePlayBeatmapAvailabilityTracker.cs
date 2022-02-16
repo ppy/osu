@@ -46,10 +46,9 @@ namespace osu.Game.Online.Rooms
         private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.NotDownloaded());
 
         private ScheduledDelegate progressUpdate;
-
         private BeatmapDownloadTracker downloadTracker;
-
         private IDisposable realmSubscription;
+        private APIBeatmap selectedBeatmap;
 
         protected override void LoadComplete()
         {
@@ -63,26 +62,30 @@ namespace osu.Game.Online.Rooms
                     return;
 
                 downloadTracker?.RemoveAndDisposeImmediately();
+                selectedBeatmap = null;
 
                 beatmapLookupCache.GetBeatmapAsync(item.NewValue.Beatmap.OnlineID).ContinueWith(task => Schedule(() =>
                 {
                     var beatmap = task.GetResultSafely();
 
                     if (SelectedItem.Value?.Beatmap.OnlineID == beatmap.OnlineID)
-                        beginTracking(beatmap);
+                    {
+                        selectedBeatmap = beatmap;
+                        beginTracking();
+                    }
                 }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }, true);
         }
 
-        private void beginTracking(APIBeatmap beatmap)
+        private void beginTracking()
         {
-            Debug.Assert(beatmap.BeatmapSet != null);
+            Debug.Assert(selectedBeatmap.BeatmapSet != null);
 
-            downloadTracker = new BeatmapDownloadTracker(beatmap.BeatmapSet);
+            downloadTracker = new BeatmapDownloadTracker(selectedBeatmap.BeatmapSet);
 
             AddInternal(downloadTracker);
 
-            downloadTracker.State.BindValueChanged(_ => Scheduler.AddOnce(updateAvailability, beatmap), true);
+            downloadTracker.State.BindValueChanged(_ => Scheduler.AddOnce(updateAvailability), true);
             downloadTracker.Progress.BindValueChanged(_ =>
             {
                 if (downloadTracker.State.Value != DownloadState.Downloading)
@@ -91,23 +94,23 @@ namespace osu.Game.Online.Rooms
                 // incoming progress changes are going to be at a very high rate.
                 // we don't want to flood the network with this, so rate limit how often we send progress updates.
                 if (progressUpdate?.Completed != false)
-                    progressUpdate = Scheduler.AddDelayed(updateAvailability, beatmap, progressUpdate == null ? 0 : 500);
+                    progressUpdate = Scheduler.AddDelayed(updateAvailability, progressUpdate == null ? 0 : 500);
             }, true);
 
             // handles changes to hash that didn't occur from the import process (ie. a user editing the beatmap in the editor, somehow).
             realmSubscription?.Dispose();
-            realmSubscription = realm.RegisterForNotifications(r => filteredBeatmaps(beatmap), (items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(r => filteredBeatmaps(), (items, changes, ___) =>
             {
                 if (changes == null)
                     return;
 
-                Scheduler.AddOnce(updateAvailability, beatmap);
+                Scheduler.AddOnce(updateAvailability);
             });
         }
 
-        private void updateAvailability(APIBeatmap beatmap)
+        private void updateAvailability()
         {
-            if (downloadTracker == null)
+            if (downloadTracker == null || selectedBeatmap == null)
                 return;
 
             switch (downloadTracker.State.Value)
@@ -125,7 +128,7 @@ namespace osu.Game.Online.Rooms
                     break;
 
                 case DownloadState.LocallyAvailable:
-                    bool available = filteredBeatmaps(beatmap).Any();
+                    bool available = filteredBeatmaps().Any();
 
                     availability.Value = available ? BeatmapAvailability.LocallyAvailable() : BeatmapAvailability.NotDownloaded();
 
@@ -140,10 +143,10 @@ namespace osu.Game.Online.Rooms
             }
         }
 
-        private IQueryable<BeatmapInfo> filteredBeatmaps(APIBeatmap beatmap)
+        private IQueryable<BeatmapInfo> filteredBeatmaps()
         {
-            int onlineId = beatmap.OnlineID;
-            string checksum = beatmap.MD5Hash;
+            int onlineId = selectedBeatmap.OnlineID;
+            string checksum = selectedBeatmap.MD5Hash;
 
             return realm.Realm
                         .All<BeatmapInfo>()
