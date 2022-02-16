@@ -11,12 +11,28 @@ using osu.Framework.Platform;
 
 namespace osu.Game.Rulesets
 {
+    /// <summary>
+    /// A ruleset store that populates from loaded assemblies (and optionally, assemblies in a storage).
+    /// </summary>
     public class AssemblyRulesetStore : RulesetStore
     {
         public override IEnumerable<RulesetInfo> AvailableRulesets => availableRulesets;
 
         private readonly List<RulesetInfo> availableRulesets = new List<RulesetInfo>();
 
+        /// <summary>
+        /// Create an assembly ruleset store that populates from loaded assemblies and an external location.
+        /// </summary>
+        /// <param name="path">An path containing ruleset DLLs.</param>
+        public AssemblyRulesetStore(string path)
+            : this(new NativeStorage(path))
+        {
+        }
+
+        /// <summary>
+        /// Create an assembly ruleset store that populates from loaded assemblies and an optional storage source.
+        /// </summary>
+        /// <param name="storage">An optional storage containing ruleset DLLs.</param>
         public AssemblyRulesetStore(Storage? storage = null)
             : base(storage)
 
