@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                             Task.Run(async () =>
                             {
-                                await Client.ToggleSpectate();
+                                await MultiplayerClient.ToggleSpectate();
                                 readyClickOperation.Dispose();
                             });
                         }
@@ -93,13 +93,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                             Task.Run(async () =>
                             {
-                                if (Client.IsHost && Client.LocalUser?.State == MultiplayerUserState.Ready)
+                                if (MultiplayerClient.IsHost && MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready)
                                 {
-                                    await Client.StartMatch();
+                                    await MultiplayerClient.StartMatch();
                                     return;
                                 }
 
-                                await Client.ToggleReady();
+                                await MultiplayerClient.ToggleReady();
 
                                 readyClickOperation.Dispose();
                             });
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(MultiplayerRoomState.Playing)]
         public void TestEnabledWhenRoomOpenOrInGameplay(MultiplayerRoomState roomState)
         {
-            AddStep($"change room to {roomState}", () => Client.ChangeRoomState(roomState));
+            AddStep($"change room to {roomState}", () => MultiplayerClient.ChangeRoomState(roomState));
             assertSpectateButtonEnablement(true);
         }
 
@@ -123,16 +123,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestToggleWhenIdle(MultiplayerUserState initialState)
         {
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
-            AddUntilStep("user is spectating", () => Client.Room?.Users[0].State == MultiplayerUserState.Spectating);
+            AddUntilStep("user is spectating", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Spectating);
 
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
-            AddUntilStep("user is idle", () => Client.Room?.Users[0].State == MultiplayerUserState.Idle);
+            AddUntilStep("user is idle", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Idle);
         }
 
         [TestCase(MultiplayerRoomState.Closed)]
         public void TestDisabledWhenClosed(MultiplayerRoomState roomState)
         {
-            AddStep($"change room to {roomState}", () => Client.ChangeRoomState(roomState));
+            AddStep($"change room to {roomState}", () => MultiplayerClient.ChangeRoomState(roomState));
             assertSpectateButtonEnablement(false);
         }
 
@@ -146,8 +146,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestReadyButtonEnabledWhenHostAndUsersReady()
         {
-            AddStep("add user", () => Client.AddUser(new APIUser { Id = PLAYER_1_ID }));
-            AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
+            AddStep("add user", () => MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }));
+            AddStep("set user ready", () => MultiplayerClient.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             assertReadyButtonEnablement(true);
@@ -158,11 +158,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add user and transfer host", () =>
             {
-                Client.AddUser(new APIUser { Id = PLAYER_1_ID });
-                Client.TransferHost(PLAYER_1_ID);
+                MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID });
+                MultiplayerClient.TransferHost(PLAYER_1_ID);
             });
 
-            AddStep("set user ready", () => Client.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
+            AddStep("set user ready", () => MultiplayerClient.ChangeUserState(PLAYER_1_ID, MultiplayerUserState.Ready));
 
             ClickButtonWhenEnabled<MultiplayerSpectateButton>();
             assertReadyButtonEnablement(false);

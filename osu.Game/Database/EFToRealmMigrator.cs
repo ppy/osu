@@ -215,7 +215,8 @@ namespace osu.Game.Database
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                         .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
                                         .Include(s => s.Files).ThenInclude(f => f.FileInfo)
-                                        .Include(s => s.Metadata);
+                                        .Include(s => s.Metadata)
+                                        .AsSplitQuery();
 
             log("Beginning beatmaps migration to realm");
 
@@ -344,7 +345,8 @@ namespace osu.Game.Database
                                    .Include(s => s.Ruleset)
                                    .Include(s => s.BeatmapInfo)
                                    .Include(s => s.Files)
-                                   .ThenInclude(f => f.FileInfo);
+                                   .ThenInclude(f => f.FileInfo)
+                                   .AsSplitQuery();
 
             log("Beginning scores migration to realm");
 
@@ -434,6 +436,7 @@ namespace osu.Game.Database
             var existingSkins = db.SkinInfo
                                   .Include(s => s.Files)
                                   .ThenInclude(f => f.FileInfo)
+                                  .AsSplitQuery()
                                   .ToList();
 
             // previous entries in EF are removed post migration.

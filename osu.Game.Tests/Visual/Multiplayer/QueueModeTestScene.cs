@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private TestMultiplayerComponents multiplayerComponents;
 
-        protected TestMultiplayerClient Client => multiplayerComponents.Client;
+        protected TestMultiplayerClient MultiplayerClient => multiplayerComponents.MultiplayerClient;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -83,21 +83,21 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<MultiplayerMatchSettingsOverlay.CreateOrUpdateButton>();
 
-            AddUntilStep("wait for join", () => Client.RoomJoined);
+            AddUntilStep("wait for join", () => MultiplayerClient.RoomJoined);
         }
 
         [Test]
         public void TestCreatedWithCorrectMode()
         {
-            AddAssert("room created with correct mode", () => Client.APIRoom?.QueueMode.Value == Mode);
+            AddAssert("room created with correct mode", () => MultiplayerClient.APIRoom?.QueueMode.Value == Mode);
         }
 
         protected void RunGameplay()
         {
-            AddUntilStep("wait for idle", () => Client.LocalUser?.State == MultiplayerUserState.Idle);
+            AddUntilStep("wait for idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
-            AddUntilStep("wait for ready", () => Client.LocalUser?.State == MultiplayerUserState.Ready);
+            AddUntilStep("wait for ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player player && player.IsLoaded);
