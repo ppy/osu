@@ -430,34 +430,31 @@ namespace osu.Game.Screens.OnlinePlay
             };
         }
 
-        private IEnumerable<Drawable> createButtons()
+        private IEnumerable<Drawable> createButtons() => new[]
         {
-            return new[]
+            showResultsButton = new GrayButton(FontAwesome.Solid.ChartPie)
             {
-                showResultsButton = new GrayButton(FontAwesome.Solid.ChartPie)
-                {
-                    Size = new Vector2(30, 30),
-                    Action = () => RequestResults?.Invoke(Item),
-                    Alpha = AllowShowingResults ? 1 : 0,
-                    TooltipText = "View results"
-                },
-                beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
-                editButton = new PlaylistEditButton
-                {
-                    Size = new Vector2(30, 30),
-                    Alpha = AllowEditing ? 1 : 0,
-                    Action = () => RequestEdit?.Invoke(Item),
-                    TooltipText = "Edit"
-                },
-                removeButton = new PlaylistRemoveButton
-                {
-                    Size = new Vector2(30, 30),
-                    Alpha = AllowDeletion ? 1 : 0,
-                    Action = () => RequestDeletion?.Invoke(Item),
-                    TooltipText = "Remove from playlist"
-                },
-            };
-        }
+                Size = new Vector2(30, 30),
+                Action = () => RequestResults?.Invoke(Item),
+                Alpha = AllowShowingResults ? 1 : 0,
+                TooltipText = "View results"
+            },
+            beatmap == null ? Empty() : new PlaylistDownloadButton(beatmap),
+            editButton = new PlaylistEditButton
+            {
+                Size = new Vector2(30, 30),
+                Alpha = AllowEditing ? 1 : 0,
+                Action = () => RequestEdit?.Invoke(Item),
+                TooltipText = "Edit"
+            },
+            removeButton = new PlaylistRemoveButton
+            {
+                Size = new Vector2(30, 30),
+                Alpha = AllowDeletion ? 1 : 0,
+                Action = () => RequestDeletion?.Invoke(Item),
+                TooltipText = "Remove from playlist"
+            },
+        };
 
         protected override bool OnClick(ClickEvent e)
         {
