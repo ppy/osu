@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Online
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API));
         }
