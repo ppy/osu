@@ -66,15 +66,15 @@ namespace osu.Game.Rulesets.Edit
         /// </remarks>
         protected abstract bool SupportsDistanceSpacing { get; }
 
-        private readonly BindableFloat distanceSpacing = new BindableFloat
+        private readonly BindableDouble distanceSpacing = new BindableDouble
         {
-            Default = 1.0f,
-            MinValue = 0.1f,
-            MaxValue = 6.0f,
-            Precision = 0.01f,
+            Default = 1.0,
+            MinValue = 0.1,
+            MaxValue = 6.0,
+            Precision = 0.01,
         };
 
-        public override IBindable<float> DistanceSpacingMultiplier => distanceSpacing;
+        public override IBindable<double> DistanceSpacingMultiplier => distanceSpacing;
 
         private SnappingToolboxContainer snappingToolboxContainer;
 
@@ -161,11 +161,11 @@ namespace osu.Game.Rulesets.Edit
                 },
             };
 
-            distanceSpacing.Value = (float)EditorBeatmap.BeatmapInfo.DistanceSpacing;
+            distanceSpacing.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
 
             if (SupportsDistanceSpacing)
             {
-                ExpandableSlider<float, SizeSlider> distanceSpacingSlider;
+                ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
 
                 AddInternal(snappingToolboxContainer = new SnappingToolboxContainer
                 {
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Edit
                     Origin = Anchor.TopRight,
                     Child = new EditorToolboxGroup("snapping")
                     {
-                        Child = distanceSpacingSlider = new ExpandableSlider<float, SizeSlider>
+                        Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
                         {
                             Current = { BindTarget = distanceSpacing },
                             KeyboardStep = 0.01f,
@@ -563,7 +563,7 @@ namespace osu.Game.Rulesets.Edit
 
         #region IPositionSnapProvider
 
-        public abstract IBindable<float> DistanceSpacingMultiplier { get; }
+        public abstract IBindable<double> DistanceSpacingMultiplier { get; }
 
         public abstract SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition);
 

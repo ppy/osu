@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
             public SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => new SnapResult(screenSpacePosition, 0);
 
-            public IBindable<float> DistanceSpacingMultiplier { get; } = new BindableFloat(1);
+            public IBindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1);
 
             public float GetBeatSnapDistanceAt(HitObject referenceObject) => (float)beat_length;
 
