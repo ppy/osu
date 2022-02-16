@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Benchmarks
@@ -18,6 +19,8 @@ namespace osu.Game.Benchmarks
 
         public override void SetUp()
         {
+            Decoder.RegisterDependencies(new AssemblyRulesetStore());
+
             using (var resources = new DllResourceStore(typeof(TestResources).Assembly))
             using (var archive = resources.GetStream("Resources/Archives/241526 Soleily - Renatus.osz"))
             using (var reader = new ZipArchiveReader(archive))
