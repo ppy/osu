@@ -4,6 +4,7 @@
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -80,12 +81,18 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        public void ScheduleSwitchToNewDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo, EditorState editorState)
+        public void ScheduleSwitchToNewDifficulty(BeatmapInfo referenceBeatmapInfo, RulesetInfo rulesetInfo, bool createCopy, EditorState editorState)
             => scheduleDifficultySwitch(() =>
             {
                 try
                 {
-                    return beatmapManager.CreateNewBlankDifficulty(beatmapSetInfo, rulesetInfo);
+                    // fetch a fresh detached reference from database to avoid polluting model instances attached to cached working beatmaps.
+                    var targetBeatmapSet = beatmapManager.QueryBeatmap(b => b.ID == referenceBeatmapInfo.ID).AsNonNull().BeatmapSet.AsNonNull();
+                    var referenceWorkingBeatmap = beatmapManager.GetWorkingBeatmap(referenceBeatmapInfo);
+
+                    return createCopy
+                        ? beatmapManager.CopyExistingDifficulty(targetBeatmapSet, referenceWorkingBeatmap)
+                        : beatmapManager.CreateNewDifficulty(targetBeatmapSet, referenceWorkingBeatmap, rulesetInfo);
                 }
                 catch (Exception ex)
                 {

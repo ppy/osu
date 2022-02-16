@@ -358,14 +358,14 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
         /// </summary>
-        /// <param name="nextBeatmap">
-        /// The next beatmap to be shown, in the case of difficulty switch.
+        /// <param name="nextRuleset">
+        /// The ruleset of the next beatmap to be shown, in the case of difficulty switch.
         /// <see langword="null"/> indicates that the beatmap will not be changing.
         /// </param>
-        public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
+        public EditorState GetState([CanBeNull] RulesetInfo nextRuleset = null) => new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextBeatmap.Ruleset.ShortName ? Clipboard.Content.Value : string.Empty
+            ClipboardContent = nextRuleset == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextRuleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
 
         /// <summary>
@@ -841,7 +841,18 @@ namespace osu.Game.Screens.Edit
         }
 
         protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
-            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo.BeatmapSet, rulesetInfo, GetState());
+        {
+            if (!rulesetInfo.Equals(editorBeatmap.BeatmapInfo.Ruleset))
+            {
+                switchToNewDifficulty(rulesetInfo, false);
+                return;
+            }
+
+            dialogOverlay.Push(new CreateNewDifficultyDialog(createCopy => switchToNewDifficulty(rulesetInfo, createCopy)));
+        }
+
+        private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool createCopy)
+            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
@@ -866,7 +877,7 @@ namespace osu.Game.Screens.Edit
             return new EditorMenuItem("Change difficulty") { Items = difficultyItems };
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap));
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
 
         private void cancelExit()
         {
