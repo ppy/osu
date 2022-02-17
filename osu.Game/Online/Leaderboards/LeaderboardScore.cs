@@ -401,8 +401,10 @@ namespace osu.Game.Online.Leaderboards
                 // TODO(optional): support localisation (probably via `CommonStrings.CountHours()` etc.)
                 // requires pluralisable string support framework-side
 
-                if (difference.TotalMinutes < 1)
+                if (difference.TotalSeconds < 10)
                     return CommonStrings.TimeNow.ToString();
+                if (difference.TotalMinutes < 1)
+                    return $@"{Math.Floor(difference.TotalSeconds)}s";
                 if (difference.TotalHours < 1)
                     return $@"{Math.Floor(difference.TotalMinutes)}min";
                 if (difference.TotalDays < 1)
