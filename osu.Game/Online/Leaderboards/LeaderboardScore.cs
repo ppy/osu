@@ -160,8 +160,8 @@ namespace osu.Game.Online.Leaderboards
                                         },
                                         new FillFlowContainer
                                         {
-                                            Origin = Anchor.BottomLeft,
                                             Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
@@ -169,29 +169,32 @@ namespace osu.Game.Online.Leaderboards
                                             {
                                                 flagBadgeAndDateContainer = new FillFlowContainer
                                                 {
-                                                    Origin = Anchor.BottomLeft,
-                                                    Anchor = Anchor.BottomLeft,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    RelativeSizeAxes = Axes.Y,
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(5f, 0f),
-                                                    Size = new Vector2(87f, 20f),
+                                                    Width = 87f,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
                                                         new UpdateableFlag(user.Country)
                                                         {
-                                                            Width = 30,
-                                                            RelativeSizeAxes = Axes.Y,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Size = new Vector2(30f, 20f),
                                                         },
                                                         new DateLabel(Score.Date)
                                                         {
-                                                            RelativeSizeAxes = Axes.Y,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
                                                         },
                                                     },
                                                 },
                                                 new FillFlowContainer
                                                 {
-                                                    Origin = Anchor.BottomLeft,
-                                                    Anchor = Anchor.BottomLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    Anchor = Anchor.CentreLeft,
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Margin = new MarginPadding { Left = edge_margin },
