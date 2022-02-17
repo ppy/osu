@@ -124,9 +124,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
                         case 1: return "taiko";
 
-                        case 2: return "catch";
+                        case 2: return "fruits";
 
-                        case 3: return "fruits";
+                        case 3: return "mania";
 
                         default: throw new ArgumentOutOfRangeException();
                     }
