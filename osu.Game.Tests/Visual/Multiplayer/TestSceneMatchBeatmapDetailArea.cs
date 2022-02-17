@@ -32,10 +32,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void createNewItem()
         {
-            SelectedRoom.Value.Playlist.Add(new PlaylistItem
+            SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
             {
                 ID = SelectedRoom.Value.Playlist.Count,
-                Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                 RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                 RequiredMods = new[]
                 {

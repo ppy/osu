@@ -112,9 +112,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             try
             {
-                foreach (var pi in room.Playlist)
-                    pi.MapObjects();
-
                 var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
                 if (existing == null)
                     rooms.Add(room);

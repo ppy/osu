@@ -30,7 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         private void updateBeatmap()
         {
-            sprite.Beatmap.Value = Playlist.GetCurrentItem()?.Beatmap.Value;
+            sprite.Beatmap.Value = Playlist.GetCurrentItem()?.Beatmap;
         }
 
         protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
