@@ -77,9 +77,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         private double computeDifficultyValue()
         {
-            if (Attributes.ScoreMultiplier <= 0)
-                return 0;
-
             double difficultyValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
             difficultyValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);

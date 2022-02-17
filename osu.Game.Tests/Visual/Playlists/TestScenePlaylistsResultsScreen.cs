@@ -165,9 +165,8 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("load results", () =>
             {
-                LoadScreen(resultsScreen = new TestResultsScreen(getScore?.Invoke(), 1, new PlaylistItem
+                LoadScreen(resultsScreen = new TestResultsScreen(getScore?.Invoke(), 1, new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 }));
             });
