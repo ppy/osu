@@ -44,7 +44,6 @@ namespace osu.Game.Online.Leaderboards
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
         private const float rank_width = 35;
-        private const float date_width = 35;
 
         protected Container RankContainer { get; private set; }
 
@@ -59,7 +58,7 @@ namespace osu.Game.Online.Leaderboards
 
         public GlowingSpriteText ScoreText { get; private set; }
 
-        private Container flagBadgeContainer;
+        private FillFlowContainer flagBadgeAndDateContainer;
         private FillFlowContainer<ModIcon> modsContainer;
 
         private List<ScoreComponentLabel> statisticsLabels;
@@ -103,18 +102,10 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Y,
                     Width = rank_width,
                 },
-                new Container
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.Y,
-                    Width = date_width,
-                    Child = new DateLabel(Score.Date),
-                },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = rank_width, Right = date_width, },
+                    Padding = new MarginPadding { Left = rank_width },
                     Children = new Drawable[]
                     {
                         new Container
@@ -176,10 +167,12 @@ namespace osu.Game.Online.Leaderboards
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
                                             {
-                                                flagBadgeContainer = new Container
+                                                flagBadgeAndDateContainer = new FillFlowContainer
                                                 {
                                                     Origin = Anchor.BottomLeft,
                                                     Anchor = Anchor.BottomLeft,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(5f, 0f),
                                                     Size = new Vector2(87f, 20f),
                                                     Masking = true,
                                                     Children = new Drawable[]
@@ -187,6 +180,10 @@ namespace osu.Game.Online.Leaderboards
                                                         new UpdateableFlag(user.Country)
                                                         {
                                                             Width = 30,
+                                                            RelativeSizeAxes = Axes.Y,
+                                                        },
+                                                        new DateLabel(Score.Date)
+                                                        {
                                                             RelativeSizeAxes = Axes.Y,
                                                         },
                                                     },
@@ -254,7 +251,7 @@ namespace osu.Game.Online.Leaderboards
 
         public override void Show()
         {
-            foreach (var d in new[] { avatar, nameLabel, ScoreText, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
+            foreach (var d in new[] { avatar, nameLabel, ScoreText, scoreRank, flagBadgeAndDateContainer, modsContainer }.Concat(statisticsLabels))
                 d.FadeOut();
 
             Alpha = 0;
@@ -281,7 +278,7 @@ namespace osu.Game.Online.Leaderboards
 
                     using (BeginDelayedSequence(50))
                     {
-                        var drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
+                        var drawables = new Drawable[] { flagBadgeAndDateContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
                             drawables[i].FadeIn(100 + i * 50);
                     }
@@ -391,10 +388,9 @@ namespace osu.Game.Online.Leaderboards
         private class DateLabel : DrawableDate
         {
             public DateLabel(DateTimeOffset date)
-                : base(date, 20)
+                : base(date)
             {
-                Anchor = Anchor.Centre;
-                Origin = Anchor.Centre;
+                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true);
             }
 
             protected override string Format()
@@ -411,7 +407,7 @@ namespace osu.Game.Online.Leaderboards
                     return $@"{Math.Floor(difference.TotalMinutes)}min";
                 if (difference.TotalDays < 1)
                     return $@"{Math.Floor(difference.TotalHours)}h";
-                if (difference.TotalDays < 7)
+                if (difference.TotalDays < 3)
                     return $@"{Math.Floor(difference.TotalDays)}d";
 
                 return string.Empty;
