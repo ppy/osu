@@ -37,6 +37,9 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
+        [JsonProperty("difficulty_range")]
+        public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
+
         [Cached]
         [JsonIgnore]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
@@ -228,5 +231,15 @@ namespace osu.Game.Online.Rooms
         public bool ShouldSerializeEndDate() => false;
 
         #endregion
+
+        [JsonObject(MemberSerialization.OptIn)]
+        public class RoomDifficultyRange
+        {
+            [JsonProperty("min")]
+            public double Min;
+
+            [JsonProperty("max")]
+            public double Max;
+        }
     }
 }
