@@ -291,10 +291,14 @@ namespace osu.Game.Screens.OnlinePlay
 
             if (Item.Beatmap.Value != null)
             {
-                beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(), LinkAction.OpenBeatmap, Item.Beatmap.Value.OnlineID.ToString(), null, text =>
-                {
-                    text.Truncate = true;
-                });
+                beatmapText.AddLink(Item.Beatmap.Value.GetDisplayTitleRomanisable(includeCreator: false),
+                    LinkAction.OpenBeatmap,
+                    Item.Beatmap.Value.OnlineID.ToString(),
+                    null,
+                    text =>
+                    {
+                        text.Truncate = true;
+                    });
             }
 
             authorText.Clear();
