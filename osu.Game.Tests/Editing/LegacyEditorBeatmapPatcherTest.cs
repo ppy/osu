@@ -8,7 +8,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
@@ -29,8 +28,6 @@ namespace osu.Game.Tests.Editing
         [SetUp]
         public void Setup()
         {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-
             patcher = new LegacyEditorBeatmapPatcher(current = new EditorBeatmap(new OsuBeatmap
             {
                 BeatmapInfo =

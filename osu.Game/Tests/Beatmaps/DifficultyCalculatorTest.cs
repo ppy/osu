@@ -22,12 +22,6 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
-        [SetUp]
-        public void Setup()
-        {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-        }
-
         protected void Test(double expected, string name, params Mod[] mods)
         {
             // Platform-dependent math functions (Pow, Cbrt, Exp, etc) may result in minute differences.

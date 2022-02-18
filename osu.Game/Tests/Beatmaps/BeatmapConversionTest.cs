@@ -34,12 +34,6 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
-        [SetUp]
-        public void Setup()
-        {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-        }
-
         protected void Test(string name, params Type[] mods)
         {
             var ourResult = convert(name, mods.Select(m => (Mod)Activator.CreateInstance(m)).ToArray());

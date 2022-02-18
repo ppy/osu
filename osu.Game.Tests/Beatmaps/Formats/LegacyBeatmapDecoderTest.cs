@@ -11,7 +11,6 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -30,12 +29,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class LegacyBeatmapDecoderTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-        }
-
         [Test]
         public void TestDecodeBeatmapVersion()
         {
