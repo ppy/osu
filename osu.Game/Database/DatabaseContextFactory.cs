@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -163,7 +164,24 @@ namespace osu.Game.Database
 
                 try
                 {
-                    storage.Delete(DATABASE_NAME);
+                    int attempts = 10;
+
+                    // Retry logic taken from MigratableStorage.AttemptOperation.
+                    while (true)
+                    {
+                        try
+                        {
+                            storage.Delete(DATABASE_NAME);
+                            return;
+                        }
+                        catch (Exception)
+                        {
+                            if (attempts-- == 0)
+                                throw;
+                        }
+
+                        Thread.Sleep(250);
+                    }
                 }
                 catch
                 {
@@ -184,5 +202,11 @@ namespace osu.Game.Database
         }
 
         public static string CreateDatabaseConnectionString(string filename, Storage storage) => string.Concat("Data Source=", storage.GetFullPath($@"{filename}", true));
+
+        private readonly ManualResetEventSlim migrationComplete = new ManualResetEventSlim();
+
+        public void SetMigrationCompletion() => migrationComplete.Set();
+
+        public void WaitForMigrationCompletion() => migrationComplete.Wait();
     }
 }

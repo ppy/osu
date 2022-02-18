@@ -502,7 +502,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -619,6 +619,10 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
+            // Without this, it's possible for a transfer to happen while we are not the current screen.
+            transferRulesetValue();
+
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 

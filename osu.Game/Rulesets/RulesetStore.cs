@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets
 {
     public class RulesetStore : IDisposable, IRulesetStore
     {
-        private readonly RealmContextFactory realmFactory;
+        private readonly RealmAccess realmAccess;
 
         private const string ruleset_library_prefix = @"osu.Game.Rulesets";
 
@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets
 
         private readonly List<RulesetInfo> availableRulesets = new List<RulesetInfo>();
 
-        public RulesetStore(RealmContextFactory realmFactory, Storage? storage = null)
+        public RulesetStore(RealmAccess realm, Storage? storage = null)
         {
-            this.realmFactory = realmFactory;
+            realmAccess = realm;
 
             // On android in release configuration assemblies are loaded from the apk directly into memory.
             // We cannot read assemblies from cwd, so should check loaded assemblies instead.
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets
 
         private void addMissingRulesets()
         {
-            realmFactory.Write(realm =>
+            realmAccess.Write(realm =>
             {
                 var rulesets = realm.All<RulesetInfo>();
 
@@ -149,6 +149,10 @@ namespace osu.Game.Rulesets
                         var instanceInfo = (Activator.CreateInstance(resolvedType) as Ruleset)?.RulesetInfo
                                            ?? throw new RulesetLoadException(@"Instantiation failure");
 
+                        // If a ruleset isn't up-to-date with the API, it could cause a crash at an arbitrary point of execution.
+                        // To eagerly handle cases of missing implementations, enumerate all types here and mark as non-available on throw.
+                        resolvedType.Assembly.GetTypes();
+
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
@@ -163,7 +167,7 @@ namespace osu.Game.Rulesets
                     }
                 }
 
-                availableRulesets.AddRange(detachedRulesets);
+                availableRulesets.AddRange(detachedRulesets.OrderBy(r => r));
             });
         }
 

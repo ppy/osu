@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Models;
 using osu.Game.Users;
+using osu.Game.Utils;
 using Realms;
 
 #nullable enable
@@ -16,7 +17,7 @@ namespace osu.Game.Beatmaps
     [ExcludeFromDynamicCompile]
     [Serializable]
     [MapTo("BeatmapMetadata")]
-    public class BeatmapMetadata : RealmObject, IBeatmapMetadataInfo
+    public class BeatmapMetadata : RealmObject, IBeatmapMetadataInfo, IDeepCloneable<BeatmapMetadata>
     {
         public string Title { get; set; } = string.Empty;
 
@@ -39,14 +40,14 @@ namespace osu.Game.Beatmaps
         /// The time in milliseconds to begin playing the track for preview purposes.
         /// If -1, the track should begin playing at 40% of its length.
         /// </summary>
-        public int PreviewTime { get; set; }
+        public int PreviewTime { get; set; } = -1;
 
         public string AudioFile { get; set; } = string.Empty;
         public string BackgroundFile { get; set; } = string.Empty;
 
         public BeatmapMetadata(RealmUser? user = null)
         {
-            Author = new RealmUser();
+            Author = user ?? new RealmUser();
         }
 
         [UsedImplicitly] // Realm
@@ -57,5 +58,18 @@ namespace osu.Game.Beatmaps
         IUser IBeatmapMetadataInfo.Author => Author;
 
         public override string ToString() => this.GetDisplayTitle();
+
+        public BeatmapMetadata DeepClone() => new BeatmapMetadata(Author.DeepClone())
+        {
+            Title = Title,
+            TitleUnicode = TitleUnicode,
+            Artist = Artist,
+            ArtistUnicode = ArtistUnicode,
+            Source = Source,
+            Tags = Tags,
+            PreviewTime = PreviewTime,
+            AudioFile = AudioFile,
+            BackgroundFile = BackgroundFile
+        };
     }
 }

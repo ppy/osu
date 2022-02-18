@@ -185,7 +185,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestPauseAfterFail()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -201,7 +201,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromFailedGameplayAfterFailAnimation()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("wait for fail overlay shown", () => Player.FailOverlayVisible);
 
             confirmClockRunning(false);
@@ -213,7 +213,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitFromFailedGameplayDuringFailAnimation()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
 
             // will finish the fail animation and show the fail/pause screen.
             AddStep("attempt exit via pause key", () => Player.ExitViaPause());
@@ -227,7 +227,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickRetryFromFailedGameplay()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("quick retry", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyRetryOverlay>().First().Action?.Invoke());
 
             confirmExited();
@@ -236,7 +236,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestQuickExitFromFailedGameplay()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddStep("quick exit", () => Player.GameplayClockContainer.ChildrenOfType<HotkeyExitOverlay>().First().Action?.Invoke());
 
             confirmExited();
@@ -341,7 +341,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             confirmClockRunning(false);
             confirmNotExited();
-            AddAssert("player not failed", () => !Player.HasFailed);
+            AddAssert("player not failed", () => !Player.GameplayState.HasFailed);
             AddAssert("pause overlay shown", () => Player.PauseOverlayVisible);
         }
 

@@ -89,6 +89,12 @@ namespace osu.Game
             }
         }
 
+        /// <summary>
+        /// The <see cref="Edges"/> that the game should be drawn over at a top level.
+        /// Defaults to <see cref="Edges.None"/>.
+        /// </summary>
+        protected virtual Edges SafeAreaOverrideEdges => Edges.None;
+
         protected OsuConfigManager LocalConfig { get; private set; }
 
         protected SessionStatics SessionStatics { get; private set; }
@@ -149,7 +155,7 @@ namespace osu.Game
 
         private MultiplayerClient multiplayerClient;
 
-        private RealmContextFactory realmFactory;
+        private RealmAccess realm;
 
         protected override Container<Drawable> Content => content;
 
@@ -192,9 +198,9 @@ namespace osu.Game
             if (Storage.Exists(DatabaseContextFactory.DATABASE_NAME))
                 dependencies.Cache(EFContextFactory = new DatabaseContextFactory(Storage));
 
-            dependencies.Cache(realmFactory = new RealmContextFactory(Storage, "client", EFContextFactory));
+            dependencies.Cache(realm = new RealmAccess(Storage, "client", EFContextFactory));
 
-            dependencies.Cache(RulesetStore = new RulesetStore(realmFactory, Storage));
+            dependencies.Cache(RulesetStore = new RulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
 
             // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
@@ -202,14 +208,21 @@ namespace osu.Game
             // See https://github.com/ppy/osu/pull/16547 for more discussion.
             if (EFContextFactory != null)
             {
+                const string backup_folder = "backups";
+
                 string migration = $"before_final_migration_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
-                EFContextFactory.CreateBackup($"client.{migration}.db");
-                realmFactory.CreateBackup($"client.{migration}.realm");
+                EFContextFactory.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.db"));
+                realm.CreateBackup(Path.Combine(backup_folder, $"client.{migration}.realm"));
 
                 using (var source = Storage.GetStream("collection.db"))
-                using (var destination = Storage.GetStream($"collection.{migration}.db", FileAccess.Write, FileMode.CreateNew))
-                    source.CopyTo(destination);
+                {
+                    if (source != null)
+                    {
+                        using (var destination = Storage.GetStream(Path.Combine(backup_folder, $"collection.{migration}.db"), FileAccess.Write, FileMode.CreateNew))
+                            source.CopyTo(destination);
+                    }
+                }
             }
 
             dependencies.CacheAs(Storage);
@@ -225,7 +238,7 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, realmFactory, Host, Resources, Audio, Scheduler));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
@@ -240,8 +253,8 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realmFactory, Scheduler, Host, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realmFactory, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, () => difficultyCache, LocalConfig));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
 
             dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
             dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
@@ -259,7 +272,7 @@ namespace osu.Game
             dependencies.Cache(scorePerformanceManager);
             AddInternal(scorePerformanceManager);
 
-            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realmFactory, RulesetStore));
+            dependencies.CacheAs<IRulesetConfigCache>(rulesetConfigCache = new RulesetConfigCache(realm, RulesetStore));
 
             var powerStatus = CreateBatteryInfo();
             if (powerStatus != null)
@@ -292,18 +305,25 @@ namespace osu.Game
 
             GlobalActionContainer globalBindings;
 
-            var mainContent = new Drawable[]
+            base.Content.Add(new SafeAreaContainer
             {
-                MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
-                // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
-                globalBindings = new GlobalActionContainer(this)
-            };
+                SafeAreaOverrideEdges = SafeAreaOverrideEdges,
+                RelativeSizeAxes = Axes.Both,
+                Child = CreateScalingContainer().WithChildren(new Drawable[]
+                {
+                    (MenuCursorContainer = new MenuCursorContainer
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }).WithChild(content = new OsuTooltipContainer(MenuCursorContainer.Cursor)
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    }),
+                    // to avoid positional input being blocked by children, ensure the GlobalActionContainer is above everything.
+                    globalBindings = new GlobalActionContainer(this)
+                })
+            });
 
-            MenuCursorContainer.Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both };
-
-            base.Content.Add(CreateScalingContainer().WithChildren(mainContent));
-
-            KeyBindingStore = new RealmKeyBindingStore(realmFactory, keyCombinationProvider);
+            KeyBindingStore = new RealmKeyBindingStore(realm, keyCombinationProvider);
             KeyBindingStore.Register(globalBindings, RulesetStore.AvailableRulesets);
 
             dependencies.Cache(globalBindings);
@@ -393,7 +413,7 @@ namespace osu.Game
                 Scheduler.AddDelayed(GracefullyExit, 2000);
         }
 
-        public void Migrate(string path)
+        public bool Migrate(string path)
         {
             Logger.Log($@"Migrating osu! data from ""{Storage.GetFullPath(string.Empty)}"" to ""{path}""...");
 
@@ -405,21 +425,22 @@ namespace osu.Game
 
                 Scheduler.Add(() =>
                 {
-                    realmBlocker = realmFactory.BlockAllOperations();
+                    realmBlocker = realm.BlockAllOperations();
 
                     readyToRun.Set();
                 }, false);
 
                 readyToRun.Wait();
 
-                (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+                bool? cleanupSucceded = (Storage as OsuStorage)?.Migrate(Host.GetStorage(path));
+
+                Logger.Log(@"Migration complete!");
+                return cleanupSucceded != false;
             }
             finally
             {
                 realmBlocker?.Dispose();
             }
-
-            Logger.Log(@"Migration complete!");
         }
 
         protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
@@ -483,7 +504,7 @@ namespace osu.Game
             BeatmapManager?.Dispose();
             LocalConfig?.Dispose();
 
-            realmFactory?.Dispose();
+            realm?.Dispose();
         }
     }
 }

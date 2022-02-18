@@ -93,6 +93,9 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(next);
 
+            // ensure the background is shown, even if the TriangleIntroSequence failed to do so.
+            background.ApplyToBackground(b => b.Show());
+
             // important as there is a clock attached to a track which will likely be disposed before returning to this screen.
             intro.Expire();
         }

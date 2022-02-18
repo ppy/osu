@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
     [Table(@"RulesetInfo")]
-    public sealed class EFRulesetInfo : IEquatable<EFRulesetInfo>, IRulesetInfo
+    public sealed class EFRulesetInfo : IEquatable<EFRulesetInfo>, IComparable<EFRulesetInfo>, IRulesetInfo
     {
         public int? ID { get; set; }
 
@@ -28,25 +28,29 @@ namespace osu.Game.Rulesets
         public Ruleset CreateInstance()
         {
             if (!Available)
-                throw new RulesetLoadException(@"Ruleset not available");
+                return null;
 
             var type = Type.GetType(InstantiationInfo);
 
             if (type == null)
-                throw new RulesetLoadException(@"Type lookup failure");
+                return null;
 
             var ruleset = Activator.CreateInstance(type) as Ruleset;
-
-            if (ruleset == null)
-                throw new RulesetLoadException(@"Instantiation failure");
-
-            // overwrite the pre-populated RulesetInfo with a potentially database attached copy.
-            // ruleset.RulesetInfo = this;
 
             return ruleset;
         }
 
         public bool Equals(EFRulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
+
+        public int CompareTo(EFRulesetInfo other) => OnlineID.CompareTo(other.OnlineID);
+
+        public int CompareTo(IRulesetInfo other)
+        {
+            if (!(other is EFRulesetInfo ruleset))
+                throw new ArgumentException($@"Object is not of type {nameof(EFRulesetInfo)}.", nameof(other));
+
+            return CompareTo(ruleset);
+        }
 
         public override bool Equals(object obj) => obj is EFRulesetInfo rulesetInfo && Equals(rulesetInfo);
 
