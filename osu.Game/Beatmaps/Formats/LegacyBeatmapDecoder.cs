@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Beatmaps.Timing;
@@ -44,7 +45,10 @@ namespace osu.Game.Beatmaps.Formats
             : base(version)
         {
             if (RulesetStore == null)
-                throw new InvalidOperationException($"Call {nameof(Decoder)}.{nameof(RegisterDependencies)} before using {nameof(LegacyBeatmapDecoder)}.");
+            {
+                Logger.Log($"A {nameof(RulesetStore)} was not provided via {nameof(Decoder)}.{nameof(RegisterDependencies)}; falling back to default {nameof(AssemblyRulesetStore)}.");
+                RulesetStore = new AssemblyRulesetStore();
+            }
 
             // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
             offset = FormatVersion < 5 ? 24 : 0;
