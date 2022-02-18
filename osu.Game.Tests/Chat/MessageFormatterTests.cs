@@ -409,26 +409,26 @@ namespace osu.Game.Tests.Chat
 
             Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(2, result.Links.Count);
-            Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
-            Assert.AreEqual("osu://chan/#japanese", result.Links[1].Url);
+            Assert.AreEqual($"{OsuGameBase.OSU_PROTOCOL}chan/#english", result.Links[0].Url);
+            Assert.AreEqual($"{OsuGameBase.OSU_PROTOCOL}chan/#japanese", result.Links[1].Url);
         }
 
         [Test]
         public void TestOsuProtocol()
         {
-            Message result = MessageFormatter.FormatMessage(new Message { Content = "This is a custom protocol osu://chan/#english." });
+            Message result = MessageFormatter.FormatMessage(new Message { Content = $"This is a custom protocol {OsuGameBase.OSU_PROTOCOL}chan/#english." });
 
             Assert.AreEqual(result.Content, result.DisplayContent);
             Assert.AreEqual(1, result.Links.Count);
-            Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
+            Assert.AreEqual($"{OsuGameBase.OSU_PROTOCOL}chan/#english", result.Links[0].Url);
             Assert.AreEqual(26, result.Links[0].Index);
             Assert.AreEqual(19, result.Links[0].Length);
 
-            result = MessageFormatter.FormatMessage(new Message { Content = "This is a [custom protocol](osu://chan/#english)." });
+            result = MessageFormatter.FormatMessage(new Message { Content = $"This is a [custom protocol]({OsuGameBase.OSU_PROTOCOL}chan/#english)." });
 
             Assert.AreEqual("This is a custom protocol.", result.DisplayContent);
             Assert.AreEqual(1, result.Links.Count);
-            Assert.AreEqual("osu://chan/#english", result.Links[0].Url);
+            Assert.AreEqual($"{OsuGameBase.OSU_PROTOCOL}chan/#english", result.Links[0].Url);
             Assert.AreEqual("#english", result.Links[0].Argument);
             Assert.AreEqual(10, result.Links[0].Index);
             Assert.AreEqual(15, result.Links[0].Length);
