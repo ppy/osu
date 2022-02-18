@@ -19,7 +19,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapDecoder : LegacyDecoder<Beatmap>
     {
-        protected internal static RulesetStore RulesetStore;
+        internal static RulesetStore RulesetStore;
 
         private Beatmap beatmap;
 
