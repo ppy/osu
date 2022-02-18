@@ -52,6 +52,8 @@ namespace osu.Game
     /// </summary>
     public partial class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
+        public const string OSU_PROTOCOL = "osu://";
+
         public const string CLIENT_STREAM_NAME = @"lazer";
 
         public const int SAMPLE_CONCURRENCY = 6;
