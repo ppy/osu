@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).GetResultSafely());
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = UserLookupCache.GetUserAsync(1).GetResultSafely());
 
             AddStep("create leaderboard", () =>
             {
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 foreach (int user in users)
                 {
                     SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
-                    multiplayerUsers.Add(OnlinePlayDependencies.Client.AddUser(new APIUser { Id = user }, true));
+                    multiplayerUsers.Add(OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = user }, true));
                 }
 
                 Children = new Drawable[]
@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
-            AddUntilStep("wait for user population", () => Client.CurrentMatchPlayingUserIds.Count > 0);
+            AddUntilStep("wait for user population", () => MultiplayerClient.CurrentMatchPlayingUserIds.Count > 0);
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestUserQuit()
         {
             foreach (int user in users)
-                AddStep($"mark user {user} quit", () => Client.RemoveUser(LookupCache.GetUserAsync(user).GetResultSafely().AsNonNull()));
+                AddStep($"mark user {user} quit", () => MultiplayerClient.RemoveUser(UserLookupCache.GetUserAsync(user).GetResultSafely().AsNonNull()));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             public void RandomlyUpdateState()
             {
-                foreach (int userId in PlayingUsers)
+                foreach ((int userId, _) in WatchedUserStates)
                 {
                     if (RNG.NextBool())
                         continue;

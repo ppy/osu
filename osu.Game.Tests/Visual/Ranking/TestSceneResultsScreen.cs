@@ -36,17 +36,17 @@ namespace osu.Game.Tests.Visual.Ranking
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            realmContextFactory.Run(realm =>
+            realm.Run(r =>
             {
-                var beatmapInfo = realm.All<BeatmapInfo>()
-                                       .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
-                                       .FirstOrDefault();
+                var beatmapInfo = r.All<BeatmapInfo>()
+                                   .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
+                                   .FirstOrDefault();
 
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("click to right of panel", () =>
             {
                 var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
-                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(100, 0));
+                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(50, 0));
                 InputManager.Click(MouseButton.Left);
             });
 

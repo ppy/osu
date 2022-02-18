@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Stops gameplay.
         /// </summary>
-        public virtual void Stop() => IsPaused.Value = true;
+        public void Stop() => IsPaused.Value = true;
 
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.

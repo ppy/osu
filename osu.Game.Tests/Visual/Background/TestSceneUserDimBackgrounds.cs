@@ -47,10 +47,10 @@ namespace osu.Game.Tests.Visual.Background
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(Realm);
 
             manager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
 

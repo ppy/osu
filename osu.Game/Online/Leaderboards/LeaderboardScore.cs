@@ -32,7 +32,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu
+    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu, IHasCustomTooltip<ScoreInfo>
     {
         public const float HEIGHT = 60;
 
@@ -69,6 +69,9 @@ namespace osu.Game.Online.Leaderboards
 
         [Resolved]
         private Storage storage { get; set; }
+
+        public ITooltip<ScoreInfo> GetCustomTooltip() => new LeaderboardScoreTooltip();
+        public virtual ScoreInfo TooltipContent => Score;
 
         public LeaderboardScore(ScoreInfo score, int? rank, bool isOnlineScope = true)
         {
@@ -183,7 +186,6 @@ namespace osu.Game.Online.Leaderboards
                                                     Anchor = Anchor.BottomLeft,
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(10f, 0f),
                                                     Margin = new MarginPadding { Left = edge_margin },
                                                     Children = statisticsLabels
                                                 },
@@ -228,7 +230,6 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(1),
                                     ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
@@ -313,6 +314,7 @@ namespace osu.Game.Online.Leaderboards
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
+                    Padding = new MarginPadding { Right = 10 },
                     Children = new Drawable[]
                     {
                         new Container

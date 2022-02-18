@@ -26,7 +26,7 @@ namespace osu.Game.Tests.NonVisual
 
             const int beat_length_numerator = 2000;
             const int beat_length_denominator = 7;
-            const TimeSignatures signature = TimeSignatures.SimpleQuadruple;
+            TimeSignature signature = TimeSignature.SimpleQuadruple;
 
             var beatmap = new Beatmap
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.NonVisual
             for (int i = 0; i * beat_length_denominator < barLines.Count; i++)
             {
                 var barLine = barLines[i * beat_length_denominator];
-                int expectedTime = beat_length_numerator * (int)signature * i;
+                int expectedTime = beat_length_numerator * signature.Numerator * i;
 
                 // every seventh bar's start time should be at least greater than the whole number we expect.
                 // It cannot be less, as that can affect overlapping scroll algorithms
@@ -60,7 +60,7 @@ namespace osu.Game.Tests.NonVisual
                 Assert.IsTrue(Precision.AlmostEquals(barLine.StartTime, expectedTime));
 
                 // check major/minor lines for good measure too
-                Assert.AreEqual(i % (int)signature == 0, barLine.Major);
+                Assert.AreEqual(i % signature.Numerator == 0, barLine.Major);
             }
         }
 

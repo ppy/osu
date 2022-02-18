@@ -99,11 +99,11 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
 
-        public bool WidescreenStoryboard { get; set; }
+        public bool WidescreenStoryboard { get; set; } = true;
 
         public bool EpilepsyWarning { get; set; }
 
-        public bool SamplesMatchPlaybackRate { get; set; }
+        public bool SamplesMatchPlaybackRate { get; set; } = true;
 
         public double DistanceSpacing { get; set; }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Beatmaps
 
         public int GridSize { get; set; }
 
-        public double TimelineZoom { get; set; }
+        public double TimelineZoom { get; set; } = 1.0;
 
         [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
@@ -155,7 +155,6 @@ namespace osu.Game.Beatmaps
         [Ignored]
         public int RulesetID
         {
-            get => Ruleset.OnlineID;
             set
             {
                 if (!string.IsNullOrEmpty(Ruleset.InstantiationInfo))

@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private BeatmapInfo beatmapInfo;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         [Cached]
         private readonly DialogOverlay dialogOverlay;
@@ -87,10 +87,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
-            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
-            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, ContextFactory, Scheduler));
-            Dependencies.Cache(ContextFactory);
+            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
+            Dependencies.Cache(Realm);
 
             var imported = beatmapManager.Import(new ImportTask(TestResources.GetQuickTestBeatmapForImport())).GetResultSafely();
 
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Ruleset = new OsuRuleset().RulesetInfo,
                     };
 
-                    importedScores.Add(scoreManager.Import(score).GetResultSafely().Value);
+                    importedScores.Add(scoreManager.Import(score).Value);
                 }
             });
 
@@ -122,27 +122,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            realmFactory.Run(realm =>
+            realm.Run(r =>
             {
                 // Due to soft deletions, we can re-use deleted scores between test runs
-                scoreManager.Undelete(realm.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
+                scoreManager.Undelete(r.All<ScoreInfo>().Where(s => s.DeletePending).ToList());
             });
 
-            leaderboard.Scores = null;
-            leaderboard.FinishTransforms(true); // After setting scores, we may be waiting for transforms to expire drawables
-
             leaderboard.BeatmapInfo = beatmapInfo;
-            leaderboard.RefreshScores(); // Required in the case that the beatmap hasn't changed
+            leaderboard.RefetchScores(); // Required in the case that the beatmap hasn't changed
         });
 
         [SetUpSteps]
         public void SetupSteps()
         {
-            // Ensure the leaderboard has finished async-loading drawables
-            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
-
             // Ensure the leaderboard items have finished showing up
             AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
+            AddUntilStep("wait for drawables", () => leaderboard.ChildrenOfType<LeaderboardScore>().Any());
         }
 
         [Test]

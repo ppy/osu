@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
@@ -51,6 +52,8 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
         }
 
@@ -58,6 +61,8 @@ namespace osu.Game.Online.Spectator
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
         }
@@ -67,6 +72,8 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.SendAsync(nameof(ISpectatorServer.EndPlaySession), state);
         }
 
@@ -75,6 +82,8 @@ namespace osu.Game.Online.Spectator
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
+            Debug.Assert(connection != null);
+
             return connection.SendAsync(nameof(ISpectatorServer.StartWatchingUser), userId);
         }
 
@@ -82,6 +91,8 @@ namespace osu.Game.Online.Spectator
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
+
+            Debug.Assert(connection != null);
 
             return connection.SendAsync(nameof(ISpectatorServer.EndWatchingUser), userId);
         }

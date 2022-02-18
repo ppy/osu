@@ -47,7 +47,7 @@ namespace osu.Game.Tournament.Components
                 return;
             }
 
-            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.ID ?? 0);
+            var ruleset = rulesets.GetRuleset(ladderInfo.Ruleset.Value?.OnlineID ?? 0);
             var modIcon = ruleset?.CreateInstance().CreateModFromAcronym(modAcronym);
 
             if (modIcon == null)

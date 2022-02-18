@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("set name", () => SelectedRoom.Value.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled.Value);
 
-            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } }));
+            AddStep("set beatmap", () => SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo)));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled.Value);
 
             AddStep("clear name", () => SelectedRoom.Value.Name.Value = "");
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = r =>
                 {
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 var beatmap = CreateBeatmap(Ruleset.Value).BeatmapInfo;
 
                 SelectedRoom.Value.Name.Value = "Test Room";
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = beatmap } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmap));
 
                 errorMessage = $"{not_found_prefix} {beatmap.OnlineID}";
 
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Playlists
             AddStep("setup", () =>
             {
                 SelectedRoom.Value.Name.Value = "Test Room";
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem { Beatmap = { Value = CreateBeatmap(Ruleset.Value).BeatmapInfo } });
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(CreateBeatmap(Ruleset.Value).BeatmapInfo));
 
                 RoomManager.CreateRequested = _ => failText;
             });

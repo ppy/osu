@@ -26,18 +26,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var beatmapInfo = CreateBeatmap(rulesetInfo).BeatmapInfo;
                 var score = TestResources.CreateTestScoreInfo(beatmapInfo);
 
-                PlaylistItem playlistItem = new PlaylistItem
-                {
-                    BeatmapID = beatmapInfo.OnlineID,
-                };
-
                 SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
                 {
                     { 0, new BindableInt(team1Score) },
                     { 1, new BindableInt(team2Score) }
                 };
 
-                Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, playlistItem, teamScores));
+                Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, new PlaylistItem(beatmapInfo), teamScores));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);

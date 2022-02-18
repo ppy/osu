@@ -142,19 +142,28 @@ namespace osu.Game.Tests.NonVisual
 
                     Assert.That(osuStorage, Is.Not.Null);
 
+                    // In the following tests, realm files are ignored as
+                    // - in the case of checking the source, interacting with the pipe files (client.realm.note) may
+                    //   lead to unexpected behaviour.
+                    // - in the case of checking the destination, the files may have already been recreated by the game
+                    //   as part of the standard migration flow.
+
                     foreach (string file in osuStorage.IgnoreFiles)
                     {
-                        // avoid touching realm files which may be a pipe and break everything.
-                        // this is also done locally inside OsuStorage via the IgnoreFiles list.
-                        if (file.EndsWith(".ini", StringComparison.Ordinal))
+                        if (!file.Contains("realm", StringComparison.Ordinal))
+                        {
                             Assert.That(File.Exists(Path.Combine(originalDirectory, file)));
-                        Assert.That(storage.Exists(file), Is.False);
+                            Assert.That(storage.Exists(file), Is.False, () => $"{file} exists in destination when it was expected to be ignored");
+                        }
                     }
 
                     foreach (string dir in osuStorage.IgnoreDirectories)
                     {
-                        Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
-                        Assert.That(storage.ExistsDirectory(dir), Is.False);
+                        if (!dir.Contains("realm", StringComparison.Ordinal))
+                        {
+                            Assert.That(Directory.Exists(Path.Combine(originalDirectory, dir)));
+                            Assert.That(storage.Exists(dir), Is.False, () => $"{dir} exists in destination when it was expected to be ignored");
+                        }
                     }
 
                     Assert.That(new StreamReader(Path.Combine(originalDirectory, "storage.ini")).ReadToEnd().Contains($"FullPath = {customPath}"));

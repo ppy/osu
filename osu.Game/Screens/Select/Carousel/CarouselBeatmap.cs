@@ -28,8 +28,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool match =
                 criteria.Ruleset == null ||
-                BeatmapInfo.RulesetID == criteria.Ruleset.OnlineID ||
-                (BeatmapInfo.RulesetID == 0 && criteria.Ruleset.OnlineID > 0 && criteria.AllowConvertedBeatmaps);
+                BeatmapInfo.Ruleset.ShortName == criteria.Ruleset.ShortName ||
+                (BeatmapInfo.Ruleset.OnlineID == 0 && criteria.Ruleset.OnlineID != 0 && criteria.AllowConvertedBeatmaps);
 
             if (BeatmapInfo.BeatmapSet?.Equals(criteria.SelectedBeatmapSet) == true)
             {
@@ -89,7 +89,8 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 default:
                 case SortMode.Difficulty:
-                    int ruleset = BeatmapInfo.RulesetID.CompareTo(otherBeatmap.BeatmapInfo.RulesetID);
+                    int ruleset = BeatmapInfo.Ruleset.CompareTo(otherBeatmap.BeatmapInfo.Ruleset);
+
                     if (ruleset != 0) return ruleset;
 
                     return BeatmapInfo.StarRating.CompareTo(otherBeatmap.BeatmapInfo.StarRating);

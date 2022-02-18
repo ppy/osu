@@ -8,12 +8,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
@@ -47,9 +47,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             // These DI caches are required to ensure for interactive runs this test scene doesn't nuke all user beatmaps in the local install.
             // At a point we have isolated interactive test runs enough, this can likely be removed.
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(ContextFactory);
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(Realm);
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, defaultBeatmap = Beatmap.Default));
 
             Dependencies.Cache(music = new MusicController());
 
@@ -65,13 +65,15 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.SetUpSteps();
 
-            AddStep("delete all beatmaps", () =>
+            AddStep("reset defaults", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
-                manager?.Delete(manager.GetAllUsableBeatmapSets());
-
                 Beatmap.SetDefault();
+
+                songSelect = null;
             });
+
+            AddStep("delete all beatmaps", () => manager?.Delete());
         }
 
         [Test]
@@ -260,7 +262,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 AddStep("import multi-ruleset map", () =>
                 {
                     var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                    manager.Import(TestResources.CreateTestBeatmapSetInfo(rulesets: usableRulesets)).WaitSafely();
+                    manager.Import(TestResources.CreateTestBeatmapSetInfo(rulesets: usableRulesets));
                 });
             }
             else
@@ -326,10 +328,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(2);
             addRulesetImportStep(2);
             addRulesetImportStep(1);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 2);
 
             changeRuleset(1);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 1);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 1);
 
             changeRuleset(0);
             AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmapInfo == null);
@@ -342,7 +344,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(2);
 
             addRulesetImportStep(2);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 2);
 
             addRulesetImportStep(0);
             addRulesetImportStep(0);
@@ -353,7 +355,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select beatmap/ruleset externally", () =>
             {
                 target = manager.GetAllUsableBeatmapSets()
-                                .Last(b => b.Beatmaps.Any(bi => bi.RulesetID == 0)).Beatmaps.Last();
+                                .Last(b => b.Beatmaps.Any(bi => bi.Ruleset.OnlineID == 0)).Beatmaps.Last();
 
                 Ruleset.Value = rulesets.AvailableRulesets.First(r => r.OnlineID == 0);
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
@@ -372,7 +374,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(2);
 
             addRulesetImportStep(2);
-            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.RulesetID == 2);
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 2);
 
             addRulesetImportStep(0);
             addRulesetImportStep(0);
@@ -383,7 +385,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select beatmap/ruleset externally", () =>
             {
                 target = manager.GetAllUsableBeatmapSets()
-                                .Last(b => b.Beatmaps.Any(bi => bi.RulesetID == 0)).Beatmaps.Last();
+                                .Last(b => b.Beatmaps.Any(bi => bi.Ruleset.OnlineID == 0)).Beatmaps.Last();
 
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
                 Ruleset.Value = rulesets.AvailableRulesets.First(r => r.OnlineID == 0);
@@ -494,9 +496,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("select beatmap externally", () =>
             {
                 target = manager.GetAllUsableBeatmapSets()
-                                .First(b => b.Beatmaps.Any(bi => bi.RulesetID == targetRuleset))
+                                .First(b => b.Beatmaps.Any(bi => bi.Ruleset.OnlineID == targetRuleset))
                                 .Beatmaps
-                                .First(bi => bi.RulesetID == targetRuleset);
+                                .First(bi => bi.Ruleset.OnlineID == targetRuleset);
 
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
@@ -545,7 +547,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 target = manager
                          .GetAllUsableBeatmapSets()
-                         .First(b => b.Beatmaps.Any(bi => bi.RulesetID == 1))
+                         .First(b => b.Beatmaps.Any(bi => bi.Ruleset.OnlineID == 1))
                          .Beatmaps.First();
 
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
@@ -675,7 +677,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import multi-ruleset map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                manager.Import(TestResources.CreateTestBeatmapSetInfo(3, usableRulesets)).WaitSafely();
+                manager.Import(TestResources.CreateTestBeatmapSetInfo(3, usableRulesets));
             });
 
             int previousSetID = 0;
@@ -715,7 +717,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import multi-ruleset map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                manager.Import(TestResources.CreateTestBeatmapSetInfo(3, usableRulesets)).WaitSafely();
+                manager.Import(TestResources.CreateTestBeatmapSetInfo(3, usableRulesets));
             });
 
             DrawableCarouselBeatmapSet set = null;
@@ -764,7 +766,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("import huge difficulty count map", () =>
             {
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
-                imported = manager.Import(TestResources.CreateTestBeatmapSetInfo(50, usableRulesets)).GetResultSafely()?.Value;
+                imported = manager.Import(TestResources.CreateTestBeatmapSetInfo(50, usableRulesets))?.Value;
             });
 
             AddStep("select the first beatmap of import", () => Beatmap.Value = manager.GetWorkingBeatmap(imported.Beatmaps.First()));
@@ -800,8 +802,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestChangeRulesetWhilePresentingScore()
         {
-            BeatmapInfo getPresentBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 0);
-            BeatmapInfo getSwitchBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 1);
+            BeatmapInfo getPresentBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.Ruleset.OnlineID == 0);
+            BeatmapInfo getSwitchBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.Ruleset.OnlineID == 1);
 
             changeRuleset(0);
 
@@ -832,8 +834,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestChangeBeatmapWhilePresentingScore()
         {
-            BeatmapInfo getPresentBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 0);
-            BeatmapInfo getSwitchBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.RulesetID == 1);
+            BeatmapInfo getPresentBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.Ruleset.OnlineID == 0);
+            BeatmapInfo getSwitchBeatmap() => manager.GetAllUsableBeatmapSets().Where(s => !s.DeletePending).SelectMany(s => s.Beatmaps).First(b => b.Ruleset.OnlineID == 1);
 
             changeRuleset(0);
 
@@ -871,9 +873,16 @@ namespace osu.Game.Tests.Visual.SongSelect
             return set.ChildrenOfType<FilterableDifficultyIcon>().ToList().FindIndex(i => i == icon);
         }
 
-        private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
+        private void addRulesetImportStep(int id)
+        {
+            Live<BeatmapSetInfo> imported = null;
+            AddStep($"import test map for ruleset {id}", () => imported = importForRuleset(id));
+            // This is specifically for cases where the add is happening post song select load.
+            // For cases where song select is null, the assertions are provided by the load checks.
+            AddUntilStep("wait for imported to arrive in carousel", () => songSelect == null || songSelect.Carousel.BeatmapSets.Any(s => s.ID == imported?.ID));
+        }
 
-        private void importForRuleset(int id) => manager.Import(TestResources.CreateTestBeatmapSetInfo(3, rulesets.AvailableRulesets.Where(r => r.OnlineID == id).ToArray())).WaitSafely();
+        private Live<BeatmapSetInfo> importForRuleset(int id) => manager.Import(TestResources.CreateTestBeatmapSetInfo(3, rulesets.AvailableRulesets.Where(r => r.OnlineID == id).ToArray()));
 
         private void checkMusicPlaying(bool playing) =>
             AddUntilStep($"music {(playing ? "" : "not ")}playing", () => music.IsPlaying == playing);
@@ -903,7 +912,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 var usableRulesets = rulesets.AvailableRulesets.Where(r => r.OnlineID != 2).ToArray();
 
                 for (int i = 0; i < 10; i++)
-                    manager.Import(TestResources.CreateTestBeatmapSetInfo(difficultyCountPerSet, usableRulesets)).WaitSafely();
+                    manager.Import(TestResources.CreateTestBeatmapSetInfo(difficultyCountPerSet, usableRulesets));
             });
         }
 
