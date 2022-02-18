@@ -150,6 +150,7 @@ namespace osu.Game
         protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
+
         private OsuLogo osuLogo;
 
         private MainMenu menuScreen;
@@ -898,8 +899,41 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
+
                 if (paths.Length > 0)
-                    Task.Run(() => Import(paths));
+                {
+                    string firstPath = paths.First();
+
+                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        handleOsuProtocolUrl(firstPath);
+                    }
+                    else
+                    {
+                        Task.Run(() => Import(paths));
+                    }
+                }
+            }
+        }
+
+        private void handleOsuProtocolUrl(string url)
+        {
+            if (!url.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                throw new ArgumentException("Invalid osu URL provided.", nameof(url));
+
+            string[] pieces = url.Split('/');
+
+            switch (pieces[2])
+            {
+                case "s":
+                    if (int.TryParse(pieces[3], out int beatmapSetId))
+                        ShowBeatmapSet(beatmapSetId);
+                    break;
+
+                case "b":
+                    if (int.TryParse(pieces[3], out int beatmapId))
+                        ShowBeatmap(beatmapId);
+                    break;
             }
         }
 
