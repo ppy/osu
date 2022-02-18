@@ -18,12 +18,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class StackingTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-        }
-
         [Test]
         public void TestStacking()
         {

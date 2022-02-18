@@ -10,7 +10,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -23,12 +22,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class OsuJsonDecoderTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-        }
-
         private const string normal = "Soleily - Renatus (Gamu) [Insane].osu";
         private const string marathon = "Within Temptation - The Unforgiving (Armin) [Marathon].osu";
         private const string with_sb = "Kozato snow - Rengetsu Ouka (_Kiva) [Yuki YukI].osu";

@@ -9,19 +9,12 @@ using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
     [TestFixture]
     public class OszArchiveReaderTest
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Decoder.RegisterDependencies(new AssemblyRulesetStore());
-        }
-
         [Test]
         public void TestReadBeatmaps()
         {
