@@ -727,10 +727,9 @@ namespace osu.Game.Online.Multiplayer
             RoomUpdated?.Invoke();
         }
 
-        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem
+        private PlaylistItem createPlaylistItem(MultiplayerPlaylistItem item) => new PlaylistItem(new APIBeatmap { OnlineID = item.BeatmapID })
         {
             ID = item.ID,
-            BeatmapID = item.BeatmapID,
             OwnerID = item.OwnerID,
             RulesetID = item.RulesetID,
             Expired = item.Expired,
@@ -739,14 +738,6 @@ namespace osu.Game.Online.Multiplayer
             RequiredMods = item.RequiredMods.ToArray(),
             AllowedMods = item.AllowedMods.ToArray()
         };
-
-        /// <summary>
-        /// Retrieves a <see cref="APIBeatmap"/> from an online source.
-        /// </summary>
-        /// <param name="beatmapId">The beatmap ID.</param>
-        /// <param name="cancellationToken">A token to cancel the request.</param>
-        /// <returns>The <see cref="APIBeatmap"/> retrieval task.</returns>
-        public abstract Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// For the provided user ID, update whether the user is included in <see cref="CurrentMatchPlayingUserIds"/>.

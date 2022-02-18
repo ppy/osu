@@ -22,6 +22,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Stores;
+using osu.Game.Utils;
 
 #nullable enable
 
@@ -123,7 +124,10 @@ namespace osu.Game.Beatmaps
         {
             var playableBeatmap = referenceWorkingBeatmap.GetPlayableBeatmap(rulesetInfo);
 
-            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), playableBeatmap.Metadata.DeepClone());
+            var newBeatmapInfo = new BeatmapInfo(rulesetInfo, new BeatmapDifficulty(), playableBeatmap.Metadata.DeepClone())
+            {
+                DifficultyName = NamingUtils.GetNextBestName(targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName), "New Difficulty")
+            };
             var newBeatmap = new Beatmap { BeatmapInfo = newBeatmapInfo };
             foreach (var timingPoint in playableBeatmap.ControlPointInfo.TimingPoints)
                 newBeatmap.ControlPointInfo.Add(timingPoint.Time, timingPoint.DeepClone());
@@ -150,8 +154,10 @@ namespace osu.Game.Beatmaps
             newBeatmap.BeatmapInfo = newBeatmapInfo = referenceWorkingBeatmap.BeatmapInfo.Clone();
             // assign a new ID to the clone.
             newBeatmapInfo.ID = Guid.NewGuid();
-            // add "(copy)" suffix to difficulty name to avoid clashes on save.
-            newBeatmapInfo.DifficultyName += " (copy)";
+            // add "(copy)" suffix to difficulty name, and additionally ensure that it doesn't conflict with any other potentially pre-existing copies.
+            newBeatmapInfo.DifficultyName = NamingUtils.GetNextBestName(
+                targetBeatmapSet.Beatmaps.Select(b => b.DifficultyName),
+                $"{newBeatmapInfo.DifficultyName} (copy)");
             // clear the hash, as that's what is used to match .osu files with their corresponding realm beatmaps.
             newBeatmapInfo.Hash = string.Empty;
             // clear online properties.
