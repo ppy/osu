@@ -73,9 +73,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
@@ -90,9 +89,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new TaikoRuleset().RulesetInfo).BeatmapInfo },
                     RulesetID = new TaikoRuleset().RulesetInfo.OnlineID,
                     AllowedMods = new[] { new APIMod(new TaikoModSwap()) }
                 });
@@ -113,9 +111,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
@@ -128,9 +125,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set playlist", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo)
                 {
-                    Beatmap = { Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First()).BeatmapInfo },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
@@ -159,9 +155,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add playlist item with allowed mod", () =>
             {
-                SelectedRoom.Value.Playlist.Add(new PlaylistItem
+                SelectedRoom.Value.Playlist.Add(new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                     AllowedMods = new[] { new APIMod(new OsuModDoubleTime()) }
                 });

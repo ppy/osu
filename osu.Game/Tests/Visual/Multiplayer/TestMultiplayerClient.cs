@@ -7,14 +7,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
@@ -38,9 +35,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         [Resolved]
         private IAPIProvider api { get; set; } = null!;
-
-        [Resolved]
-        private BeatmapManager beatmaps { get; set; } = null!;
 
         private readonly TestMultiplayerRoomManager roomManager;
 
@@ -406,23 +400,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, playlistItemId);
-
-        public override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
-        {
-            IBeatmapInfo? beatmap = roomManager.ServerSideRooms.SelectMany(r => r.Playlist)
-                                               .FirstOrDefault(p => p.BeatmapID == beatmapId)?.Beatmap.Value
-                                    ?? beatmaps.QueryBeatmap(b => b.OnlineID == beatmapId);
-
-            if (beatmap == null)
-                throw new InvalidOperationException("Beatmap not found.");
-
-            return Task.FromResult(new APIBeatmap
-            {
-                BeatmapSet = new APIBeatmapSet { OnlineID = beatmap.BeatmapSet?.OnlineID ?? -1 },
-                OnlineID = beatmapId,
-                Checksum = beatmap.MD5Hash
-            });
-        }
 
         private async Task changeMatchType(MatchType type)
         {

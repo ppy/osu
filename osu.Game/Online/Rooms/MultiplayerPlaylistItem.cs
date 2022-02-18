@@ -63,8 +63,8 @@ namespace osu.Game.Online.Rooms
         {
             ID = item.ID;
             OwnerID = item.OwnerID;
-            BeatmapID = item.BeatmapID;
-            BeatmapChecksum = item.Beatmap.Value?.MD5Hash ?? string.Empty;
+            BeatmapID = item.Beatmap.OnlineID;
+            BeatmapChecksum = item.Beatmap.MD5Hash;
             RulesetID = item.RulesetID;
             RequiredMods = item.RequiredMods.ToArray();
             AllowedMods = item.AllowedMods.ToArray();
