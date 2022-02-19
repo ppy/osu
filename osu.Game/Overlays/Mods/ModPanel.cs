@@ -40,10 +40,10 @@ namespace osu.Game.Overlays.Mods
 
         protected const double TRANSITION_DURATION = 150;
 
-        protected const float SHEAR_X = 0.2f;
+        public const float SHEAR_X = 0.2f;
+        public const float CORNER_RADIUS = 7;
 
         protected const float HEIGHT = 42;
-        protected const float CORNER_RADIUS = 7;
         protected const float IDLE_SWITCH_WIDTH = 54;
         protected const float EXPANDED_SWITCH_WIDTH = 70;
 
