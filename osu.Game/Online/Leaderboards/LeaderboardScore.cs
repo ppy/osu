@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -30,7 +30,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Utils;
-using osu.Game.Resources.Localisation.Web;
+using osu.Framework.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -398,24 +398,7 @@ namespace osu.Game.Online.Leaderboards
 
             protected override string Format()
             {
-                var now = DateTime.Now;
-                var difference = now - Date;
-
-                // TODO(optional): support localisation (probably via `CommonStrings.CountHours()` etc.)
-                // requires pluralisable string support framework-side
-
-                if (difference.TotalSeconds < 10)
-                    return CommonStrings.TimeNow.ToString();
-                if (difference.TotalMinutes < 1)
-                    return $@"{Math.Floor(difference.TotalSeconds)}s";
-                if (difference.TotalHours < 1)
-                    return $@"{Math.Floor(difference.TotalMinutes)}min";
-                if (difference.TotalDays < 1)
-                    return $@"{Math.Floor(difference.TotalHours)}h";
-                if (difference.TotalDays < 3)
-                    return $@"{Math.Floor(difference.TotalDays)}d";
-
-                return string.Empty;
+                return ScoreboardTimeUtils.FormatDate(Date, TimeSpan.FromSeconds(30));
             }
         }
 
