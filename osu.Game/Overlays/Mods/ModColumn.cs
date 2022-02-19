@@ -152,7 +152,8 @@ namespace osu.Game.Overlays.Mods
 
             if (allowBulkSelection)
             {
-                controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox
+                controlContainer.Height = 50;
+                controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox(this)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -218,7 +219,70 @@ namespace osu.Game.Overlays.Mods
             LoadComponentsAsync(panels, loaded =>
             {
                 panelFlow.ChildrenEnumerable = loaded;
+                foreach (var panel in panelFlow)
+                    panel.Active.BindValueChanged(_ => updateToggleState());
+                updateToggleState();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+        }
+
+        #region Bulk select / deselect
+
+        private const double initial_multiple_selection_delay = 120;
+
+        private double selectionDelay = initial_multiple_selection_delay;
+        private double lastSelection;
+
+        private readonly Queue<Action> pendingSelectionOperations = new Queue<Action>();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (selectionDelay == initial_multiple_selection_delay || Time.Current - lastSelection >= selectionDelay)
+            {
+                if (pendingSelectionOperations.TryDequeue(out var dequeuedAction))
+                {
+                    dequeuedAction();
+
+                    // each time we play an animation, we decrease the time until the next animation (to ramp the visual and audible elements).
+                    selectionDelay = Math.Max(30, selectionDelay * 0.8f);
+                    lastSelection = Time.Current;
+                }
+                else
+                {
+                    // reset the selection delay after all animations have been completed.
+                    // this will cause the next action to be immediately performed.
+                    selectionDelay = initial_multiple_selection_delay;
+                }
+            }
+        }
+
+        private void updateToggleState()
+        {
+            if (toggleAllCheckbox != null && pendingSelectionOperations.Count == 0)
+                toggleAllCheckbox.Current.Value = panelFlow.All(panel => panel.Active.Value);
+        }
+
+        /// <summary>
+        /// Selects all mods.
+        /// </summary>
+        public void SelectAll()
+        {
+            pendingSelectionOperations.Clear();
+
+            foreach (var button in panelFlow.Where(b => !b.Active.Value))
+                pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
+        }
+
+        /// <summary>
+        /// Deselects all mods.
+        /// </summary>
+        public void DeselectAll()
+        {
+            pendingSelectionOperations.Clear();
+
+            foreach (var button in panelFlow.Where(b => b.Active.Value))
+                pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
         }
 
         private class ToggleAllCheckbox : OsuCheckbox
@@ -247,9 +311,12 @@ namespace osu.Game.Overlays.Mods
                 }
             }
 
-            public ToggleAllCheckbox()
+            private readonly ModColumn column;
+
+            public ToggleAllCheckbox(ModColumn column)
                 : base(false)
             {
+                this.column = column;
             }
 
             protected override void ApplyLabelParameters(SpriteText text)
@@ -270,6 +337,16 @@ namespace osu.Game.Overlays.Mods
                 Nub.GlowingAccentColour = AccentHoverColour;
                 Nub.GlowColour = AccentHoverColour.Opacity(0.2f);
             }
+
+            protected override void OnUserChange(bool value)
+            {
+                if (value)
+                    column.SelectAll();
+                else
+                    column.DeselectAll();
+            }
         }
+
+        #endregion
     }
 }
