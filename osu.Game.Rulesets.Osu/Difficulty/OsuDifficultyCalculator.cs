@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double sliderFactor = aimRating > 0 ? aimRatingNoSliders / aimRating : 1;
 
-            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountDifficultStrains(clockRate);
-            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains(clockRate);
+            double aimDifficultyStrainCount = ((OsuStrainSkill)skills[0]).CountDifficultStrains();
+            double speedDifficultyStrainCount = ((OsuStrainSkill)skills[2]).CountDifficultStrains();
 
             if (mods.Any(h => h is OsuModRelax))
                 speedRating = 0.0;
