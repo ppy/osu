@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(30),
-                Child = new ModColumn(modType)
+                Child = new ModColumn(modType, false)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
@@ -43,6 +43,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("change ruleset to taiko", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("change ruleset to catch", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
             AddStep("change ruleset to mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
+        }
+
+        [Test]
+        public void TestMultiSelection()
+        {
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = new ModColumn(ModType.DifficultyIncrease, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                }
+            });
         }
     }
 }
