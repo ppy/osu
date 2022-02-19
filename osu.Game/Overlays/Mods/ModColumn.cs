@@ -8,15 +8,19 @@ using System.Threading;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
+using osuTK.Graphics;
 
 #nullable enable
 
@@ -33,12 +37,13 @@ namespace osu.Game.Overlays.Mods
         private readonly Container contentContainer;
         private readonly Box contentBackground;
         private readonly FillFlowContainer<ModPanel> panelFlow;
+        private readonly ToggleAllCheckbox? toggleAllCheckbox;
 
         private Colour4 accentColour;
 
         private const float header_height = 60;
 
-        public ModColumn(ModType modType)
+        public ModColumn(ModType modType, bool allowBulkSelection)
         {
             this.modType = modType;
 
@@ -48,6 +53,7 @@ namespace osu.Game.Overlays.Mods
             CornerRadius = ModPanel.CORNER_RADIUS;
             Masking = true;
 
+            Container controlContainer;
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -108,9 +114,13 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 Content = new[]
                                 {
-                                    new[]
+                                    new Drawable[]
                                     {
-                                        Empty()
+                                        controlContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Horizontal = 20 }
+                                        }
                                     },
                                     new Drawable[]
                                     {
@@ -139,6 +149,18 @@ namespace osu.Game.Overlays.Mods
             };
 
             createHeaderText();
+
+            if (allowBulkSelection)
+            {
+                controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    RelativeSizeAxes = Axes.X,
+                    LabelText = "Enable All",
+                    Shear = new Vector2(-ModPanel.SHEAR_X, 0)
+                });
+            }
         }
 
         private void createHeaderText()
@@ -160,6 +182,12 @@ namespace osu.Game.Overlays.Mods
             availableMods.BindTo(game.AvailableMods);
 
             headerBackground.Colour = accentColour = colours.ForModType(modType);
+
+            if (toggleAllCheckbox != null)
+            {
+                toggleAllCheckbox.AccentColour = accentColour;
+                toggleAllCheckbox.AccentHoverColour = accentColour.Lighten(0.3f);
+            }
 
             contentContainer.BorderColour = ColourInfo.GradientVertical(colourProvider.Background4, colourProvider.Background3);
             contentBackground.Colour = colourProvider.Background4;
@@ -191,6 +219,57 @@ namespace osu.Game.Overlays.Mods
             {
                 panelFlow.ChildrenEnumerable = loaded;
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+        }
+
+        private class ToggleAllCheckbox : OsuCheckbox
+        {
+            private Color4 accentColour;
+
+            public Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    accentColour = value;
+                    updateState();
+                }
+            }
+
+            private Color4 accentHoverColour;
+
+            public Color4 AccentHoverColour
+            {
+                get => accentHoverColour;
+                set
+                {
+                    accentHoverColour = value;
+                    updateState();
+                }
+            }
+
+            public ToggleAllCheckbox()
+                : base(false)
+            {
+            }
+
+            protected override void ApplyLabelParameters(SpriteText text)
+            {
+                base.ApplyLabelParameters(text);
+                text.Font = text.Font.With(weight: FontWeight.SemiBold);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                updateState();
+            }
+
+            private void updateState()
+            {
+                Nub.AccentColour = AccentColour;
+                Nub.GlowingAccentColour = AccentHoverColour;
+                Nub.GlowColour = AccentHoverColour.Opacity(0.2f);
+            }
         }
     }
 }
