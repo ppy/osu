@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -390,6 +390,9 @@ namespace osu.Game.Online.Leaderboards
 
         private class DateLabel : DrawableDate
         {
+            public static readonly Colour4 COLOUR_SATURATED = Colour4.Lime;
+            public static readonly Colour4 COLOUR_UNSATURATED = Colour4.White;
+
             public DateLabel(DateTimeOffset date)
                 : base(date)
             {
@@ -398,6 +401,15 @@ namespace osu.Game.Online.Leaderboards
 
             protected override string Format()
             {
+                var now = DateTime.Now;
+                var difference = now - Date;
+
+                const double seconds_to_blank = 60*45;
+                const double tense_factor = 2.325;
+
+                double tf = Math.Pow(difference.TotalSeconds / seconds_to_blank, tense_factor);
+                Colour = Interpolation.ValueAt(tf, COLOUR_SATURATED, COLOUR_UNSATURATED, 0, 1);
+
                 return ScoreboardTimeUtils.FormatDate(Date, TimeSpan.FromSeconds(30));
             }
         }
