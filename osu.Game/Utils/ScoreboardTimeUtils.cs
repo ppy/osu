@@ -14,13 +14,12 @@ namespace osu.Game.Utils
         {
             if (quantity <= 1)
                 return $@"{quantity}{template}";
+
             return $@"{quantity}{template}s";
         }
 
         public static string FormatDate(DateTimeOffset time, TimeSpan lowerCutoff)
         {
-            // This function fails if the passed in time is something close to an epoch
-
             // web uses momentjs's custom locales to format the date for the purposes of the scoreboard.
             // this is intended to be a best-effort, more legible approximation of that.
             // compare:
@@ -57,10 +56,13 @@ namespace osu.Game.Utils
             }
 
             int years = 1;
-            // DateTime causes a crash here for epoch
-            while (time <= now.AddYears(-(years + 1)))
+            // Add upper bound to prevent a crash
+            while (years < 20 && time <= now.AddYears(-(years + 1)))
                 years += 1;
-            return FormatQuantity("yr", years);
+            if (years < 20)
+                return FormatQuantity("yr", years);
+
+            return "never";
         }
     }
 }
