@@ -64,12 +64,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// Returns the number of strains weighted against the top strain.
         /// The result is scaled by clock rate as it affects the total number of strains.
         /// </summary>
-        public double CountDifficultStrains(double clockRate)
+        public double CountDifficultStrains()
         {
             double topStrain = objectStrains.Max();
 
-            double realtimeCount = objectStrains.Sum(s => Math.Pow(s / topStrain, 4));
-            return clockRate * realtimeCount;
+            return objectStrains.Sum(s => Math.Pow(s / topStrain, 4));
         }
     }
 }
