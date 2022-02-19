@@ -404,7 +404,7 @@ namespace osu.Game.Online.Leaderboards
                 var now = DateTime.Now;
                 var difference = now - Date;
 
-                const double seconds_to_blank = 60*45;
+                const double seconds_to_blank = 60 * 45;
                 const double tense_factor = 2.325;
 
                 double tf = Math.Pow(difference.TotalSeconds / seconds_to_blank, tense_factor);
