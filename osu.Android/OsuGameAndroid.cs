@@ -5,7 +5,11 @@ using System;
 using Android.App;
 using Android.OS;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game;
+using osu.Game.Screens.Menu;
 using osu.Game.Updater;
 using osu.Game.Utils;
 using Xamarin.Essentials;
@@ -16,6 +20,8 @@ namespace osu.Android
     {
         [Cached]
         private readonly OsuGameActivity gameActivity;
+
+        private readonly BindableBool allowExiting = new BindableBool();
 
         public OsuGameAndroid(OsuGameActivity activity)
             : base(null)
@@ -67,15 +73,44 @@ namespace osu.Android
             }
         }
 
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+            host.AllowExitingAndroid.AddSource(allowExiting);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
             LoadComponentAsync(new GameplayScreenRotationLocker(), Add);
         }
 
+        protected override void ScreenChanged(IScreen current, IScreen newScreen)
+        {
+            base.ScreenChanged(current, newScreen);
+
+            switch (newScreen)
+            {
+                case MainMenu _:
+                    // allow the MainMenu to (dis)allow exiting based on its ButtonSystemState.
+                    allowExiting.Value = true;
+                    break;
+
+                default:
+                    allowExiting.Value = false;
+                    break;
+            }
+        }
+
         protected override UpdateManager CreateUpdateManager() => new SimpleUpdateManager();
 
         protected override BatteryInfo CreateBatteryInfo() => new AndroidBatteryInfo();
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Host.AllowExitingAndroid.RemoveSource(allowExiting);
+            base.Dispose(isDisposing);
+        }
 
         private class AndroidBatteryInfo : BatteryInfo
         {
