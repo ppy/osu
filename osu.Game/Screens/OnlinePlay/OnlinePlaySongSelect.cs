@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -36,6 +37,9 @@ namespace osu.Game.Screens.OnlinePlay
         [CanBeNull]
         [Resolved(CanBeNull = true)]
         protected IBindable<PlaylistItem> SelectedItem { get; private set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         protected override UserActivity InitialActivity => new UserActivity.InLobby(room);
 
@@ -78,10 +82,15 @@ namespace osu.Game.Screens.OnlinePlay
         {
             base.LoadComplete();
 
-            // At this point, Mods contains both the required and allowed mods. For selection purposes, it should only contain the required mods.
-            // Similarly, freeMods is currently empty but should only contain the allowed mods.
-            Mods.Value = SelectedItem?.Value?.RequiredMods.Select(m => m.DeepClone()).ToArray() ?? Array.Empty<Mod>();
-            FreeMods.Value = SelectedItem?.Value?.AllowedMods.Select(m => m.DeepClone()).ToArray() ?? Array.Empty<Mod>();
+            var rulesetInstance = SelectedItem?.Value?.RulesetID == null ? null : rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+
+            if (rulesetInstance != null)
+            {
+                // At this point, Mods contains both the required and allowed mods. For selection purposes, it should only contain the required mods.
+                // Similarly, freeMods is currently empty but should only contain the allowed mods.
+                Mods.Value = SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+                FreeMods.Value = SelectedItem.Value.AllowedMods.Select(m => m.ToMod(rulesetInstance)).ToArray();
+            }
 
             Mods.BindValueChanged(onModsChanged);
             Ruleset.BindValueChanged(onRulesetChanged);
@@ -104,20 +113,12 @@ namespace osu.Game.Screens.OnlinePlay
         {
             itemSelected = true;
 
-            var item = new PlaylistItem
+            var item = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
-                Beatmap =
-                {
-                    Value = Beatmap.Value.BeatmapInfo
-                },
-                Ruleset =
-                {
-                    Value = Ruleset.Value
-                }
+                RulesetID = Ruleset.Value.OnlineID,
+                RequiredMods = Mods.Value.Select(m => new APIMod(m)).ToArray(),
+                AllowedMods = FreeMods.Value.Select(m => new APIMod(m)).ToArray()
             };
-
-            item.RequiredMods.AddRange(Mods.Value.Select(m => m.DeepClone()));
-            item.AllowedMods.AddRange(FreeMods.Value.Select(m => m.DeepClone()));
 
             SelectItem(item);
             return true;
