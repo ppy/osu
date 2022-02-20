@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -82,6 +83,55 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(checkbox);
                 InputManager.Click(MouseButton.Left);
             });
+        }
+
+        [Test]
+        public void TestFiltering()
+        {
+            TestModColumn column = null;
+
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = column = new TestModColumn(ModType.Fun, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                }
+            });
+
+            AddStep("set filter", () => column.Filter = mod => mod.Name.Contains("Wind", StringComparison.CurrentCultureIgnoreCase));
+            AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => !panel.Filtered.Value) == 2);
+
+            clickToggle();
+            AddUntilStep("wait for animation", () => !column.SelectionAnimationRunning);
+            AddAssert("only visible items selected", () => column.ChildrenOfType<ModPanel>().Where(panel => panel.Active.Value).All(panel => !panel.Filtered.Value));
+
+            AddStep("unset filter", () => column.Filter = null);
+            AddUntilStep("all panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.Filtered.Value));
+            AddAssert("checkbox not selected", () => !column.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
+
+            AddStep("set filter", () => column.Filter = mod => mod.Name.Contains("Wind", StringComparison.CurrentCultureIgnoreCase));
+            AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => !panel.Filtered.Value) == 2);
+            AddAssert("checkbox selected", () => column.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
+
+            void clickToggle() => AddStep("click toggle", () =>
+            {
+                var checkbox = this.ChildrenOfType<OsuCheckbox>().Single();
+                InputManager.MoveMouseTo(checkbox);
+                InputManager.Click(MouseButton.Left);
+            });
+        }
+
+        private class TestModColumn : ModColumn
+        {
+            public new bool SelectionAnimationRunning => base.SelectionAnimationRunning;
+
+            public TestModColumn(ModType modType, bool allowBulkSelection)
+                : base(modType, allowBulkSelection)
+            {
+            }
         }
     }
 }
