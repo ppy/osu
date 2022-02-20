@@ -278,7 +278,10 @@ namespace osu.Game.Overlays.Mods
         private void updateToggleState()
         {
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
+            {
+                toggleAllCheckbox.Alpha = panelFlow.Any(panel => !panel.Filtered.Value) ? 1 : 0;
                 toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
+            }
         }
 
         /// <summary>
