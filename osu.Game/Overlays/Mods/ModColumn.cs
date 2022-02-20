@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -21,6 +22,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 #nullable enable
 
@@ -41,6 +43,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         private readonly ModType modType;
+        private readonly Key[]? toggleKeys;
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
@@ -55,9 +58,10 @@ namespace osu.Game.Overlays.Mods
 
         private const float header_height = 60;
 
-        public ModColumn(ModType modType, bool allowBulkSelection)
+        public ModColumn(ModType modType, bool allowBulkSelection, Key[]? toggleKeys = null)
         {
             this.modType = modType;
+            this.toggleKeys = toggleKeys;
 
             Width = 450;
             RelativeSizeAxes = Axes.Y;
@@ -378,6 +382,25 @@ namespace osu.Game.Overlays.Mods
                 modPanel.ApplyFilter(Filter);
 
             updateToggleState();
+        }
+
+        #endregion
+
+        #region Keyboard selection support
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ControlPressed || e.AltPressed) return false;
+            if (toggleKeys == null) return false;
+
+            int index = Array.IndexOf(toggleKeys, e.Key);
+            if (index < 0) return false;
+
+            var panel = panelFlow.ElementAtOrDefault(index);
+            if (panel == null || panel.Filtered.Value) return false;
+
+            panel.Active.Toggle();
+            return true;
         }
 
         #endregion

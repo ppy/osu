@@ -132,6 +132,43 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
+        [Test]
+        public void TestKeyboardSelection()
+        {
+            ModColumn column = null;
+            AddStep("create content", () => Child = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Padding = new MarginPadding(30),
+                Child = column = new ModColumn(ModType.DifficultyReduction, true, new Key[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P })
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                }
+            });
+
+            AddStep("press W", () => InputManager.Key(Key.W));
+            AddAssert("NF panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("press W again", () => InputManager.Key(Key.W));
+            AddAssert("NF panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("set filter to NF", () => column.Filter = mod => mod.Acronym == "NF");
+
+            AddStep("press W", () => InputManager.Key(Key.W));
+            AddAssert("NF panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("press W again", () => InputManager.Key(Key.W));
+            AddAssert("NF panel deselected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("filter out everything", () => column.Filter = _ => false);
+
+            AddStep("press W", () => InputManager.Key(Key.W));
+            AddAssert("NF panel not selected", () => !this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
+
+            AddStep("clear filter", () => column.Filter = null);
+        }
+
         private class TestModColumn : ModColumn
         {
             public new bool SelectionAnimationRunning => base.SelectionAnimationRunning;
