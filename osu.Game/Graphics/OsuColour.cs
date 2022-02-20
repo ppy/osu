@@ -268,6 +268,11 @@ namespace osu.Game.Graphics
 
         // Reference: https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Asset%2FColours?node-id=1838%3A3
 
+        // Note that the colours in this region are also defined in `OverlayColourProvider` as `Colour{0,1,2,3,4}`.
+        // The difference as to which should be used where comes down to context.
+        // If the colour in question is supposed to always match the view in which it is displayed theme-wise, use `OverlayColourProvider`.
+        // If the colour usage is special and in general differs from the surrounding view in choice of hue, use the `OsuColour` constants.
+
         public readonly Color4 Pink0 = Color4Extensions.FromHex(@"ff99c7");
         public readonly Color4 Pink1 = Color4Extensions.FromHex(@"ff66ab");
         public readonly Color4 Pink2 = Color4Extensions.FromHex(@"eb4791");
