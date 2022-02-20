@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty
+                    Difficulty = new BeatmapDifficulty
                     {
                         CircleSize = 8
                     }

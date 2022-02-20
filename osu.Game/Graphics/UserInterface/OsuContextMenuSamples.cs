@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         private Sample sampleClose;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(AudioManager audio)
         {
             sampleClick = audio.Samples.Get($@"UI/{HoverSampleSet.Default.GetDescription()}-select");
             sampleOpen = audio.Samples.Get(@"UI/dropdown-open");

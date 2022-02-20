@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,7 +16,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Menu
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
 
+        [CanBeNull]
         private OsuLogo logo;
 
         /// <summary>
@@ -123,7 +124,7 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host, LocalisationManager strings)
+        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
             buttonsPlay.Add(new Button(ButtonSystemStrings.Solo, @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(ButtonSystemStrings.Multi, @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMultiplayer, 0, Key.M));
@@ -329,9 +330,9 @@ namespace osu.Game.Screens.Menu
 
                         game?.Toolbar.Hide();
 
-                        logo.ClearTransforms(targetMember: nameof(Position));
-                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                        logo?.ClearTransforms(targetMember: nameof(Position));
+                        logo?.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo?.ScaleTo(1, 800, Easing.OutExpo);
                     }, buttonArea.Alpha * 150);
                     break;
 
@@ -355,7 +356,7 @@ namespace osu.Game.Screens.Menu
                             logoDelayedAction = Scheduler.AddDelayed(() =>
                             {
                                 if (impact)
-                                    logo.Impact();
+                                    logo?.Impact();
 
                                 game?.Toolbar.Show();
                             }, 200);

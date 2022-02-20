@@ -151,6 +151,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"scores_recent_count")]
         public int ScoresRecentCount;
 
+        [JsonProperty(@"scores_pinned_count")]
+        public int ScoresPinnedCount;
+
         [JsonProperty(@"beatmap_playcounts_count")]
         public int BeatmapPlayCountsCount;
 

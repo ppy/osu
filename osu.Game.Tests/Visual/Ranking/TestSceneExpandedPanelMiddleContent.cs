@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithKnownMapper()
         {
-            var author = new APIUser { Username = "mapper_name" };
+            var author = new RealmUser { Username = "mapper_name" };
 
             AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(author))));
         }
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             AddStep("show excess mods score", () =>
             {
-                var author = new APIUser { Username = "mapper_name" };
+                var author = new RealmUser { Username = "mapper_name" };
 
                 var score = TestResources.CreateTestScoreInfo(createTestBeatmap(author));
                 score.Mods = score.BeatmapInfo.Ruleset.CreateInstance().CreateAllMods().ToArray();
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Ranking
         [Test]
         public void TestMapWithUnknownMapper()
         {
-            AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(new APIUser()))));
+            AddStep("show example score", () => showPanel(TestResources.CreateTestScoreInfo(createTestBeatmap(new RealmUser()))));
 
             AddAssert("mapped by text not present", () =>
                 this.ChildrenOfType<OsuSpriteText>().All(spriteText => !containsAny(spriteText.Text.ToString(), "mapped", "by")));
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Ranking
                 var ruleset = new OsuRuleset();
 
                 var mods = new Mod[] { ruleset.GetAutoplayMod() };
-                var beatmap = createTestBeatmap(new APIUser());
+                var beatmap = createTestBeatmap(new RealmUser());
 
                 var score = TestResources.CreateTestScoreInfo(beatmap);
 
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual.Ranking
         private void showPanel(ScoreInfo score) =>
             Child = new ExpandedPanelMiddleContentContainer(score);
 
-        private BeatmapInfo createTestBeatmap([NotNull] APIUser author)
+        private BeatmapInfo createTestBeatmap([NotNull] RealmUser author)
         {
             var beatmap = new TestBeatmap(rulesetStore.GetRuleset(0)).BeatmapInfo;
 

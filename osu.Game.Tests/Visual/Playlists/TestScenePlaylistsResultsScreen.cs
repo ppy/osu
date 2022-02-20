@@ -44,6 +44,10 @@ namespace osu.Game.Tests.Visual.Playlists
             requestComplete = false;
             totalCount = 0;
             bindHandler();
+
+            // beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
+            // else the tests that rely on ordering will fall over.
+            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
         });
 
         [Test]
@@ -161,10 +165,9 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             AddStep("load results", () =>
             {
-                LoadScreen(resultsScreen = new TestResultsScreen(getScore?.Invoke(), 1, new PlaylistItem
+                LoadScreen(resultsScreen = new TestResultsScreen(getScore?.Invoke(), 1, new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                 {
-                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
+                    RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 }));
             });
 

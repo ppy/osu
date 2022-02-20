@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.EmptyScrolling.Replays
 
         protected override bool IsImportant(EmptyScrollingReplayFrame frame) => frame.Actions.Any();
 
-        public override void CollectPendingInputs(List<IInput> inputs)
+        protected override void CollectReplayInputs(List<IInput> inputs)
         {
             inputs.Add(new ReplayState<EmptyScrollingAction>
             {

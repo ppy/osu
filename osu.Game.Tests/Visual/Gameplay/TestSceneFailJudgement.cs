@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void AddCheckSteps()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("wait for multiple judgements", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits > 1);
             AddAssert("total number of results == 1", () =>
             {

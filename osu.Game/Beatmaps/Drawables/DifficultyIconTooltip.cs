@@ -30,6 +30,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 background = new Box
                 {
+                    Alpha = 0.9f,
                     RelativeSizeAxes = Axes.Both
                 },
                 new FillFlowContainer

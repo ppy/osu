@@ -41,6 +41,6 @@ namespace osu.Game.Online.Rooms
         }
 
         public static string GetTotalDuration(this BindableList<PlaylistItem> playlist) =>
-            playlist.Select(p => p.Beatmap.Value.Length).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);
+            playlist.Select(p => p.Beatmap.Length).Sum().Milliseconds().Humanize(minUnit: TimeUnit.Second, maxUnit: TimeUnit.Hour, precision: 2);
     }
 }

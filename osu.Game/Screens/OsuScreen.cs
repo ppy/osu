@@ -145,7 +145,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osu, AudioManager audio)
+        private void load(AudioManager audio)
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
         }

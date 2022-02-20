@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -32,8 +33,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         [SetUp]
@@ -53,12 +55,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("import beatmap", () =>
             {
-                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).Wait();
-                importedSet = beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.All).First();
-                importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
+                beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+                importedSet = beatmaps.GetAllUsableBeatmapSets().First();
+                importedBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
             });
 
-            AddStep("change to all players mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }));
+            AddStep("change to all players mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
         }
 
         [Test]
@@ -95,19 +97,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addItemStep();
             addItemStep();
 
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             assertItemInHistoryListStep(1, 0);
             assertItemInQueueListStep(2, 0);
             assertItemInQueueListStep(3, 1);
 
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             assertItemInHistoryListStep(2, 0);
             assertItemInHistoryListStep(1, 1);
             assertItemInQueueListStep(3, 0);
 
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             assertItemInHistoryListStep(3, 0);
             assertItemInHistoryListStep(2, 1);
@@ -118,7 +120,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestListsClearedWhenRoomLeft()
         {
             addItemStep();
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             AddStep("leave room", () => RoomManager.PartRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
@@ -141,15 +143,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Name = { Value = "test name" },
                     Playlist =
                     {
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                         {
-                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value }
+                            RulesetID = Ruleset.Value.OnlineID
                         },
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                         {
-                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value },
+                            RulesetID = Ruleset.Value.OnlineID,
                             Expired = true
                         }
                     }
@@ -165,10 +165,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         /// <summary>
         /// Adds a step to create a new playlist item.
         /// </summary>
-        private void addItemStep(bool expired = false) => AddStep("add item", () => Client.AddPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem
+        private void addItemStep(bool expired = false) => AddStep("add item", () => MultiplayerClient.AddPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
         {
-            Beatmap = { Value = importedBeatmap },
-            BeatmapID = importedBeatmap.OnlineID ?? -1,
             Expired = expired,
             PlayedAt = DateTimeOffset.Now
         })));
