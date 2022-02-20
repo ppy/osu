@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK;
@@ -22,14 +23,12 @@ namespace osu.Game.Graphics.UserInterface
     {
         public LocalisableString Title
         {
-            get => titleSpriteText.Text;
             set => titleSpriteText.Text = value;
         }
 
         public LocalisableString Description
         {
-            get => descriptionSpriteText.Text;
-            set => descriptionSpriteText.Text = value;
+            set => descriptionText.Text = value;
         }
 
         public Action? Close
@@ -46,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container contentContainer;
         private readonly Box contentBackground;
         private readonly OsuSpriteText titleSpriteText;
-        private readonly OsuSpriteText descriptionSpriteText;
+        private readonly OsuTextFlowContainer descriptionText;
         private readonly IconButton closeButton;
 
         public PopupScreenTitle()
@@ -112,9 +111,13 @@ namespace osu.Game.Graphics.UserInterface
                                     {
                                         Font = OsuFont.TorusAlternate.With(size: 20)
                                     },
-                                    descriptionSpriteText = new OsuSpriteText
+                                    descriptionText = new OsuTextFlowContainer(t =>
                                     {
-                                        Font = OsuFont.Default.With(size: 12)
+                                        t.Font = OsuFont.Default.With(size: 12);
+                                    })
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y
                                     }
                                 }
                             },

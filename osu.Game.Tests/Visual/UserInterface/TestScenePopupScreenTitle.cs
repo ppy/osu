@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Child = new PopupScreenTitle
                 {
                     Title = "Popup Screen Title",
-                    Description = "This is a description.",
+                    Description = string.Join(" ", Enumerable.Repeat("This is a description.", 20)),
                     Close = () => { }
                 };
             });
