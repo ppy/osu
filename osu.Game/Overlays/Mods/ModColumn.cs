@@ -108,9 +108,8 @@ namespace osu.Game.Overlays.Mods
                                 RelativeSizeAxes = Axes.Both,
                                 RowDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 50),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, 10)
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension()
                                 },
                                 Content = new[]
                                 {
@@ -118,7 +117,7 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         controlContainer = new Container
                                         {
-                                            RelativeSizeAxes = Axes.Both,
+                                            RelativeSizeAxes = Axes.X,
                                             Padding = new MarginPadding { Horizontal = 20 }
                                         }
                                     },
@@ -133,14 +132,10 @@ namespace osu.Game.Overlays.Mods
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
                                                 Spacing = new Vector2(0, 10),
-                                                Padding = new MarginPadding
-                                                {
-                                                    Horizontal = 10
-                                                },
+                                                Padding = new MarginPadding(10)
                                             }
                                         }
-                                    },
-                                    new[] { Empty() }
+                                    }
                                 }
                             }
                         }
@@ -161,6 +156,12 @@ namespace osu.Game.Overlays.Mods
                     LabelText = "Enable All",
                     Shear = new Vector2(-ModPanel.SHEAR_X, 0)
                 });
+                panelFlow.Padding = new MarginPadding
+                {
+                    Top = 0,
+                    Bottom = 10,
+                    Horizontal = 10
+                };
             }
         }
 
