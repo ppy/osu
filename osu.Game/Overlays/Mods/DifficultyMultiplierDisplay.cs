@@ -9,8 +9,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 
@@ -24,12 +26,15 @@ namespace osu.Game.Overlays.Mods
             set => current.Current = value;
         }
 
-        private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>(1);
+        private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>(1)
+        {
+            Precision = 0.1
+        };
 
         private readonly Box underlayBackground;
         private readonly Box contentBackground;
         private readonly FillFlowContainer multiplierFlow;
-        private readonly OsuSpriteText multiplierText;
+        private readonly MultiplierCounter multiplierCounter;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -107,11 +112,11 @@ namespace osu.Game.Overlays.Mods
                                     Spacing = new Vector2(2, 0),
                                     Children = new Drawable[]
                                     {
-                                        multiplierText = new OsuSpriteText
+                                        multiplierCounter = new MultiplierCounter
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
+                                            Current = { BindTarget = Current }
                                         },
                                         new SpriteIcon
                                         {
@@ -141,12 +146,11 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
             current.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
+            multiplierCounter.StopRolling();
         }
 
         private void updateState()
         {
-            multiplierText.Text = current.Value.ToLocalisableString(@"N1");
-
             if (Current.IsDefault)
             {
                 underlayBackground.FadeColour(colourProvider.Background3, transition_duration, Easing.OutQuint);
@@ -161,6 +165,18 @@ namespace osu.Game.Overlays.Mods
                 underlayBackground.FadeColour(backgroundColour, transition_duration, Easing.OutQuint);
                 multiplierFlow.FadeColour(colourProvider.Background5, transition_duration, Easing.OutQuint);
             }
+        }
+
+        private class MultiplierCounter : RollingCounter<double>
+        {
+            protected override double RollingDuration => 500;
+
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"N1");
+
+            protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
+            {
+                Font = OsuFont.Default.With(size: 17, weight: FontWeight.SemiBold)
+            };
         }
     }
 }
