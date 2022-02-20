@@ -116,6 +116,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("two panels visible", () => column.ChildrenOfType<ModPanel>().Count(panel => !panel.Filtered.Value) == 2);
             AddAssert("checkbox selected", () => column.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
 
+            AddStep("filter out everything", () => column.Filter = _ => false);
+            AddUntilStep("no panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => panel.Filtered.Value));
+            AddUntilStep("checkbox hidden", () => !column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
+
+            AddStep("inset filter", () => column.Filter = null);
+            AddUntilStep("no panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.Filtered.Value));
+            AddUntilStep("checkbox hidden", () => column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
+
             void clickToggle() => AddStep("click toggle", () =>
             {
                 var checkbox = this.ChildrenOfType<OsuCheckbox>().Single();
