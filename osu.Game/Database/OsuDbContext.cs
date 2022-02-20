@@ -12,12 +12,9 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
-<<<<<<< HEAD
-using osu.Game.Audio;
-=======
 using SQLitePCL;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
->>>>>>> master
+using osu.Game.Audio;
 
 namespace osu.Game.Database
 {
@@ -30,13 +27,10 @@ namespace osu.Game.Database
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<EFRulesetInfo> RulesetInfo { get; set; }
         public DbSet<EFSkinInfo> SkinInfo { get; set; }
-<<<<<<< HEAD
+        public DbSet<EFScoreInfo> ScoreInfo { get; set; }
         public DbSet<ScoreInfo> ScoreInfo { get; set; }
         public DbSet<ReplayGainInfo> ReplayGainInfo { get; set; }
 
-=======
-        public DbSet<EFScoreInfo> ScoreInfo { get; set; }
->>>>>>> master
 
         // migrated to realm
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
@@ -134,16 +128,9 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
 
-<<<<<<< HEAD
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
-            //modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.ReplayGainInfo).IsUnique();
-=======
             modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.MD5Hash);
             modelBuilder.Entity<EFBeatmapInfo>().HasIndex(b => b.Hash);
->>>>>>> master
 
             modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.OnlineID).IsUnique();
             modelBuilder.Entity<EFBeatmapSetInfo>().HasIndex(b => b.DeletePending);
@@ -161,12 +148,7 @@ namespace osu.Game.Database
             modelBuilder.Entity<EFRulesetInfo>().HasIndex(b => b.Available);
             modelBuilder.Entity<EFRulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
-<<<<<<< HEAD
-            modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
-            modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.ReplayGainInfo);
-=======
             modelBuilder.Entity<EFBeatmapInfo>().HasOne(b => b.BaseDifficulty);
->>>>>>> master
 
             modelBuilder.Entity<EFScoreInfo>().HasIndex(b => b.OnlineID).IsUnique();
         }

@@ -71,7 +71,6 @@ namespace osu.Game.Beatmaps
             set => StatusInt = (int)value;
         }
 
-<<<<<<< HEAD
         [JsonIgnore]
         public int ReplayGainInfoID { get; set; }
 
@@ -79,10 +78,8 @@ namespace osu.Game.Beatmaps
 
         [NotMapped]
         public APIBeatmap OnlineInfo { get; set; }
-=======
         [MapTo(nameof(Status))]
         public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
->>>>>>> master
 
         [Indexed]
         public int OnlineID { get; set; } = -1;

@@ -8,14 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-<<<<<<< HEAD
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
-=======
->>>>>>> master
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -42,142 +34,13 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-<<<<<<< HEAD
-        private ReplayGainManager replayGainManager;
-        private readonly BeatmapStore beatmaps;
-        private readonly RulesetStore rulesets;
-
-        public BeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, GameHost host = null, ReplayGainManager replayGainManager = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
-        {
-            this.rulesets = rulesets;
-            this.replayGainManager = replayGainManager;
-            beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-            beatmaps.ItemRemoved += b => WorkingBeatmapCache?.Invalidate(b);
-            beatmaps.ItemUpdated += obj => WorkingBeatmapCache?.Invalidate(obj);
-=======
         public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
             : base(realm, storage, onlineLookupQueue)
         {
->>>>>>> master
         }
 
         protected override bool ShouldDeleteArchive(string path) => Path.GetExtension(path)?.ToLowerInvariant() == ".osz";
 
-<<<<<<< HEAD
-        protected override async Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
-        {
-            if (archive != null)
-                beatmapSet.Beatmaps.AddRange(createBeatmapDifficulties(beatmapSet.Files));
-
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-            {
-                // remove metadata from difficulties where it matches the set
-                if (beatmapSet.Metadata.Equals(b.Metadata))
-                    b.Metadata = null;
-
-                b.BeatmapSet = beatmapSet;
-            }
-
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-            {
-                if (replayGainManager != null && b.ReplayGainInfo == null)
-                {
-                    ReplayGainInfo info = replayGainManager.generateReplayGainInfo(b, beatmapSet);
-                    await replayGainManager.saveReplayGainInfo(info, b).ConfigureAwait(false);
-                    beatmapSet = replayGainManager.PopulateSet(b, beatmapSet);
-                }
-            }
-
-            validateOnlineIds(beatmapSet);
-
-            bool hadOnlineIDs = beatmapSet.Beatmaps.Any(b => b.OnlineID > 0);
-
-            if (OnlineLookupQueue != null)
-                await OnlineLookupQueue.UpdateAsync(beatmapSet, cancellationToken).ConfigureAwait(false);
-
-            // ensure at least one beatmap was able to retrieve or keep an online ID, else drop the set ID.
-            if (hadOnlineIDs && !beatmapSet.Beatmaps.Any(b => b.OnlineID > 0))
-            {
-                if (beatmapSet.OnlineID != null)
-                {
-                    beatmapSet.OnlineID = null;
-                    LogForModel(beatmapSet, "Disassociating beatmap set ID due to loss of all beatmap IDs");
-                }
-            }
-        }
-
-        protected override void PreImport(BeatmapSetInfo beatmapSet)
-        {
-            if (beatmapSet.Beatmaps.Any(b => b.BaseDifficulty == null))
-                throw new InvalidOperationException($"Cannot import {nameof(BeatmapInfo)} with null {nameof(BeatmapInfo.BaseDifficulty)}.");
-
-            // check if a set already exists with the same online id, delete if it does.
-            if (beatmapSet.OnlineID != null)
-            {
-                var existingSetWithSameOnlineID = beatmaps.ConsumableItems.FirstOrDefault(b => b.OnlineID == beatmapSet.OnlineID);
-
-                if (existingSetWithSameOnlineID != null)
-                {
-                    Delete(existingSetWithSameOnlineID);
-
-                    // in order to avoid a unique key constraint, immediately remove the online ID from the previous set.
-                    existingSetWithSameOnlineID.OnlineID = null;
-                    foreach (var b in existingSetWithSameOnlineID.Beatmaps)
-                        b.OnlineID = null;
-
-                    LogForModel(beatmapSet, $"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineID}). It has been deleted.");
-                }
-            }
-        }
-
-        private void validateOnlineIds(BeatmapSetInfo beatmapSet)
-        {
-            var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineID.HasValue).Select(b => b.OnlineID).ToList();
-
-            // ensure all IDs are unique
-            if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
-            {
-                LogForModel(beatmapSet, "Found non-unique IDs, resetting...");
-                resetIds();
-                return;
-            }
-
-            // find any existing beatmaps in the database that have matching online ids
-            var existingBeatmaps = QueryBeatmaps(b => beatmapIds.Contains(b.OnlineID)).ToList();
-
-            if (existingBeatmaps.Count > 0)
-            {
-                // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
-                // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
-                var existing = CheckForExisting(beatmapSet);
-
-                if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
-                {
-                    LogForModel(beatmapSet, "Found existing import with IDs already, resetting...");
-                    resetIds();
-                }
-            }
-
-            void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineID = null);
-        }
-
-        /// <summary>
-        /// Delete a beatmap difficulty.
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmapInfo) => beatmaps.Hide(beatmapInfo);
-
-        /// <summary>
-        /// Restore a beatmap difficulty.
-        /// </summary>
-        /// <param name="beatmapInfo">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmapInfo) => beatmaps.Restore(beatmapInfo);
-
-=======
->>>>>>> master
         /// <summary>
         /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
         /// </summary>
