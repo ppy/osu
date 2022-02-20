@@ -28,6 +28,18 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModColumn : CompositeDrawable
     {
+        private Func<Mod, bool>? filter;
+
+        public Func<Mod, bool>? Filter
+        {
+            get => filter;
+            set
+            {
+                filter = value;
+                updateFilter();
+            }
+        }
+
         private readonly ModType modType;
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -220,9 +232,12 @@ namespace osu.Game.Overlays.Mods
             LoadComponentsAsync(panels, loaded =>
             {
                 panelFlow.ChildrenEnumerable = loaded;
+
                 foreach (var panel in panelFlow)
                     panel.Active.BindValueChanged(_ => updateToggleState());
                 updateToggleState();
+
+                updateFilter();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
         }
 
@@ -234,6 +249,8 @@ namespace osu.Game.Overlays.Mods
         private double lastSelection;
 
         private readonly Queue<Action> pendingSelectionOperations = new Queue<Action>();
+
+        protected bool SelectionAnimationRunning => pendingSelectionOperations.Count > 0;
 
         protected override void Update()
         {
@@ -260,8 +277,8 @@ namespace osu.Game.Overlays.Mods
 
         private void updateToggleState()
         {
-            if (toggleAllCheckbox != null && pendingSelectionOperations.Count == 0)
-                toggleAllCheckbox.Current.Value = panelFlow.All(panel => panel.Active.Value);
+            if (toggleAllCheckbox != null && !SelectionAnimationRunning)
+                toggleAllCheckbox.Current.Value = panelFlow.Where(panel => !panel.Filtered.Value).All(panel => panel.Active.Value);
         }
 
         /// <summary>
@@ -271,7 +288,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in panelFlow.Where(b => !b.Active.Value))
+            foreach (var button in panelFlow.Where(b => !b.Active.Value && !b.Filtered.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = true);
         }
 
@@ -282,7 +299,7 @@ namespace osu.Game.Overlays.Mods
         {
             pendingSelectionOperations.Clear();
 
-            foreach (var button in panelFlow.Where(b => b.Active.Value))
+            foreach (var button in panelFlow.Where(b => b.Active.Value && !b.Filtered.Value))
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
         }
 
@@ -346,6 +363,18 @@ namespace osu.Game.Overlays.Mods
                 else
                     column.DeselectAll();
             }
+        }
+
+        #endregion
+
+        #region Filtering support
+
+        private void updateFilter()
+        {
+            foreach (var modPanel in panelFlow)
+                modPanel.ApplyFilter(Filter);
+
+            updateToggleState();
         }
 
         #endregion

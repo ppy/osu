@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays.Mods
     {
         public Mod Mod { get; }
         public BindableBool Active { get; } = new BindableBool();
+        public BindableBool Filtered { get; } = new BindableBool();
 
         protected readonly Box Background;
         protected readonly Container SwitchContainer;
@@ -157,6 +159,7 @@ namespace osu.Game.Overlays.Mods
                 playStateChangeSamples();
                 UpdateState();
             });
+            Filtered.BindValueChanged(_ => updateFilterState());
 
             UpdateState();
             FinishTransforms(true);
@@ -235,5 +238,19 @@ namespace osu.Game.Overlays.Mods
             TextBackground.FadeColour(textBackgroundColour, transitionDuration, Easing.OutQuint);
             TextFlow.FadeColour(textColour, transitionDuration, Easing.OutQuint);
         }
+
+        #region Filtering support
+
+        public void ApplyFilter(Func<Mod, bool>? filter)
+        {
+            Filtered.Value = filter != null && !filter.Invoke(Mod);
+        }
+
+        private void updateFilterState()
+        {
+            this.FadeTo(Filtered.Value ? 0 : 1);
+        }
+
+        #endregion
     }
 }
