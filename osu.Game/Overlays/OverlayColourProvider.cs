@@ -25,6 +25,10 @@ namespace osu.Game.Overlays
             this.colourScheme = colourScheme;
         }
 
+        // Note that the following five colours are also defined in `OsuColour` as `{colourScheme}{0,1,2,3,4}`.
+        // The difference as to which should be used where comes down to context.
+        // If the colour in question is supposed to always match the view in which it is displayed theme-wise, use `OverlayColourProvider`.
+        // If the colour usage is special and in general differs from the surrounding view in choice of hue, use the `OsuColour` constants.
         public Color4 Colour1 => getColour(1, 0.7f);
         public Color4 Colour2 => getColour(0.8f, 0.6f);
         public Color4 Colour3 => getColour(0.6f, 0.5f);
