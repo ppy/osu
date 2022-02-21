@@ -43,6 +43,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 if (ruleset != null)
                 {
+                    room.PlaylistItemStats.Value = new Room.RoomPlaylistItemStats
+                    {
+                        RulesetIDs = new[] { ruleset.OnlineID },
+                    };
+
                     room.Playlist.Add(new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() })
                     {
                         RulesetID = ruleset.OnlineID,
