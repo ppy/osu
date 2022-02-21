@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBasicListChanges()
         {
-            AddStep("add rooms", () => RoomManager.AddRooms(5));
+            AddStep("add rooms", () => RoomManager.AddRooms(5, withSpotlightRooms: true));
 
             AddAssert("has 5 rooms", () => container.Rooms.Count == 5);
 
