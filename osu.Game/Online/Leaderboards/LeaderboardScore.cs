@@ -17,6 +17,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -395,7 +396,7 @@ namespace osu.Game.Online.Leaderboards
                 Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true);
             }
 
-            protected override string Format() => ScoreboardTimeUtils.FormatRelativeTime(Date, TimeSpan.FromSeconds(30));
+            protected override string Format() => Date.ToShortRelativeTime(TimeSpan.FromSeconds(30));
         }
 
         public class LeaderboardScoreStatistic
