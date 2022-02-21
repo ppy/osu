@@ -67,8 +67,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 var multiplayerItem = new MultiplayerPlaylistItem
                 {
                     ID = itemToEdit ?? 0,
-                    BeatmapID = item.BeatmapID,
-                    BeatmapChecksum = item.Beatmap.Value.MD5Hash,
+                    BeatmapID = item.Beatmap.OnlineID,
+                    BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
                     RequiredMods = item.RequiredMods.ToArray(),
                     AllowedMods = item.AllowedMods.ToArray()

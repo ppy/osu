@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 var mods = item.RequiredMods.Select(m => m.ToMod(ruleset)).ToArray();
 
                 drawableRuleset.FadeIn(transition_duration);
-                drawableRuleset.Child = new DifficultyIcon(item.Beatmap.Value, ruleset.RulesetInfo, mods) { Size = new Vector2(height) };
+                drawableRuleset.Child = new DifficultyIcon(item.Beatmap, ruleset.RulesetInfo, mods) { Size = new Vector2(height) };
             }
             else
                 drawableRuleset.FadeOut(transition_duration);

@@ -58,12 +58,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             RunGameplay();
 
             IBeatmapInfo firstBeatmap = null;
-            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.APIRoom?.Playlist[0].Beatmap.Value);
+            AddStep("get first playlist item beatmap", () => firstBeatmap = MultiplayerClient.APIRoom?.Playlist[0].Beatmap);
 
             selectNewItem(() => OtherBeatmap);
 
-            AddAssert("first playlist item hasn't changed", () => MultiplayerClient.APIRoom?.Playlist[0].Beatmap.Value == firstBeatmap);
-            AddAssert("second playlist item changed", () => MultiplayerClient.APIRoom?.Playlist[1].Beatmap.Value != firstBeatmap);
+            AddAssert("first playlist item hasn't changed", () => MultiplayerClient.APIRoom?.Playlist[0].Beatmap == firstBeatmap);
+            AddAssert("second playlist item changed", () => MultiplayerClient.APIRoom?.Playlist[1].Beatmap != firstBeatmap);
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("select other beatmap", () => ((Screens.Select.SongSelect)CurrentSubScreen).FinaliseSelection(otherBeatmap = beatmap()));
 
             AddUntilStep("wait for return to match", () => CurrentSubScreen is MultiplayerMatchSubScreen);
-            AddUntilStep("selected item is new beatmap", () => (CurrentSubScreen as MultiplayerMatchSubScreen)?.SelectedItem.Value?.BeatmapID == otherBeatmap.OnlineID);
+            AddUntilStep("selected item is new beatmap", () => (CurrentSubScreen as MultiplayerMatchSubScreen)?.SelectedItem.Value?.Beatmap.OnlineID == otherBeatmap.OnlineID);
         }
 
         private void addItem(Func<BeatmapInfo> beatmap)

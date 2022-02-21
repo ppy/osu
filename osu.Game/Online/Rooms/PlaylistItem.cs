@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Linq;
 using JetBrains.Annotations;
@@ -12,6 +14,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.Rooms
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class PlaylistItem : IEquatable<PlaylistItem>
     {
         [JsonProperty("id")]
@@ -19,9 +22,6 @@ namespace osu.Game.Online.Rooms
 
         [JsonProperty("owner_id")]
         public int OwnerID { get; set; }
-
-        [JsonProperty("beatmap_id")]
-        public int BeatmapID { get; set; }
 
         [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
@@ -38,34 +38,49 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("played_at")]
         public DateTimeOffset? PlayedAt { get; set; }
 
-        [JsonIgnore]
-        public IBindable<bool> Valid => valid;
-
-        private readonly Bindable<bool> valid = new BindableBool(true);
-
-        [JsonIgnore]
-        public readonly Bindable<IBeatmapInfo> Beatmap = new Bindable<IBeatmapInfo>();
-
-        [JsonProperty("beatmap")]
-        private APIBeatmap apiBeatmap { get; set; }
-
         [JsonProperty("allowed_mods")]
         public APIMod[] AllowedMods { get; set; } = Array.Empty<APIMod>();
 
         [JsonProperty("required_mods")]
         public APIMod[] RequiredMods { get; set; } = Array.Empty<APIMod>();
 
-        public PlaylistItem()
+        /// <summary>
+        /// Used for deserialising from the API.
+        /// </summary>
+        [JsonProperty("beatmap")]
+        private APIBeatmap apiBeatmap
         {
-            Beatmap.BindValueChanged(beatmap => BeatmapID = beatmap.NewValue?.OnlineID ?? -1);
+            // This getter is required/used internally by JSON.NET during deserialisation to do default-value comparisons. It is never used during serialisation (see: ShouldSerializeapiBeatmap()).
+            // It will always return a null value on deserialisation, which JSON.NET will handle gracefully.
+            get => (APIBeatmap)Beatmap;
+            set => Beatmap = value;
+        }
+
+        /// <summary>
+        /// Used for serialising to the API.
+        /// </summary>
+        [JsonProperty("beatmap_id")]
+        private int onlineBeatmapId => Beatmap.OnlineID;
+
+        [JsonIgnore]
+        public IBeatmapInfo Beatmap { get; set; } = null!;
+
+        [JsonIgnore]
+        public IBindable<bool> Valid => valid;
+
+        private readonly Bindable<bool> valid = new BindableBool(true);
+
+        [JsonConstructor]
+        private PlaylistItem()
+        {
+        }
+
+        public PlaylistItem(IBeatmapInfo beatmap)
+        {
+            Beatmap = beatmap;
         }
 
         public void MarkInvalid() => valid.Value = false;
-
-        public void MapObjects()
-        {
-            Beatmap.Value ??= apiBeatmap;
-        }
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
 
@@ -82,9 +97,22 @@ namespace osu.Game.Online.Rooms
 
         #endregion
 
-        public bool Equals(PlaylistItem other)
+        public PlaylistItem With(IBeatmapInfo beatmap) => new PlaylistItem(beatmap)
+        {
+            ID = ID,
+            OwnerID = OwnerID,
+            RulesetID = RulesetID,
+            Expired = Expired,
+            PlaylistOrder = PlaylistOrder,
+            PlayedAt = PlayedAt,
+            AllowedMods = AllowedMods,
+            RequiredMods = RequiredMods,
+            valid = { Value = Valid.Value },
+        };
+
+        public bool Equals(PlaylistItem? other)
             => ID == other?.ID
-               && BeatmapID == other.BeatmapID
+               && Beatmap.OnlineID == other.Beatmap.OnlineID
                && RulesetID == other.RulesetID
                && Expired == other.Expired
                && AllowedMods.SequenceEqual(other.AllowedMods)
