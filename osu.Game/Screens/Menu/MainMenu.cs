@@ -70,15 +70,11 @@ namespace osu.Game.Screens.Menu
         private ParallaxContainer buttonsContainer;
         private SongTicker songTicker;
 
-        private readonly BindableBool allowExitingAndroid = new BindableBool(true);
-
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
-
-            host.AllowExitingAndroid.AddSource(allowExitingAndroid);
 
             if (host.CanExit)
             {
@@ -138,8 +134,6 @@ namespace osu.Game.Screens.Menu
                         ApplyToBackground(b => b.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine));
                         break;
                 }
-
-                allowExitingAndroid.Value = state == ButtonSystemState.Initial;
             };
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
@@ -302,12 +296,6 @@ namespace osu.Game.Screens.Menu
             Ruleset.Value = ruleset;
 
             Schedule(loadSoloSongSelect);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            host.AllowExitingAndroid.RemoveSource(allowExitingAndroid);
-            base.Dispose(isDisposing);
         }
     }
 }
