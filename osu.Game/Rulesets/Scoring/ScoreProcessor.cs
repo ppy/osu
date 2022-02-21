@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private double getScore(ScoringMode mode)
         {
-            return GetScore(mode, maxAchievableCombo,
+            return GetScore(mode,
                 calculateAccuracyRatio(baseScore),
                 calculateComboRatio(HighestCombo.Value),
                 scoreResultCounts);
@@ -222,12 +222,11 @@ namespace osu.Game.Rulesets.Scoring
         /// Computes the total score.
         /// </summary>
         /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
-        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
         /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
-        /// <param name="comboRatio">The proportion of <paramref name="maxCombo"/> achieved by the player.</param>
+        /// <param name="comboRatio">The proportion of the max combo achieved by the player.</param>
         /// <param name="statistics">Any statistics to be factored in.</param>
         /// <returns>The total score.</returns>
-        public double GetScore(ScoringMode mode, int maxCombo, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics)
+        public double GetScore(ScoringMode mode, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics)
         {
             switch (mode)
             {
@@ -238,10 +237,16 @@ namespace osu.Game.Rulesets.Scoring
                     return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics)) * scoreMultiplier;
 
                 case ScoringMode.Classic:
+                    int totalHitObjects = statistics.Where(k => k.Key >= HitResult.Miss && k.Key <= HitResult.Perfect).Sum(k => k.Value);
+
+                    // If there are no hitobjects then the beatmap can be composed of only ticks or spinners, so ensure we don't multiply by 0 at all times.
+                    if (totalHitObjects == 0)
+                        totalHitObjects = 1;
+
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
-                    double scaledStandardised = GetScore(ScoringMode.Standardised, maxCombo, accuracyRatio, comboRatio, statistics) / max_score;
-                    return Math.Pow(scaledStandardised * (maxCombo + 1), 2) * 18;
+                    double scaledStandardised = GetScore(ScoringMode.Standardised, accuracyRatio, comboRatio, statistics) / max_score;
+                    return Math.Pow(scaledStandardised * totalHitObjects, 2) * 36;
             }
         }
 
@@ -265,7 +270,7 @@ namespace osu.Game.Rulesets.Scoring
                 computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
             }
 
-            return GetScore(mode, maxAchievableCombo, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
+            return GetScore(mode, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
         }
 
         /// <summary>
