@@ -58,6 +58,9 @@ namespace osu.Game.Extensions
         /// <returns>A short relative string representing the input time.</returns>
         public static string ToShortRelativeTime(this DateTimeOffset time, TimeSpan lowerCutoff)
         {
+            if (time == default)
+                return "-";
+
             var now = DateTime.Now;
             var difference = now - time;
 
