@@ -33,6 +33,12 @@ namespace osu.Game.Screens.OnlinePlay
         protected Bindable<MatchType> Type { get; private set; }
 
         [Resolved(typeof(Room))]
+        protected Bindable<PlaylistItem> CurrentPlaylistItem { get; private set; }
+
+        [Resolved(typeof(Room))]
+        protected Bindable<Room.RoomPlaylistItemStats> PlaylistItemStats { get; private set; }
+
+        [Resolved(typeof(Room))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved(typeof(Room))]
