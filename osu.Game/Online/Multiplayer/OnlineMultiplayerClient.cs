@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Database;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 
 namespace osu.Game.Online.Multiplayer
@@ -29,9 +27,6 @@ namespace osu.Game.Online.Multiplayer
         public override IBindable<bool> IsConnected { get; } = new BindableBool();
 
         private HubConnection? connection => connector?.CurrentConnection;
-
-        [Resolved]
-        private BeatmapLookupCache beatmapLookupCache { get; set; } = null!;
 
         public OnlineMultiplayerClient(EndpointConfiguration endpoints)
         {
@@ -213,11 +208,6 @@ namespace osu.Game.Online.Multiplayer
             Debug.Assert(connection != null);
 
             return connection.InvokeAsync(nameof(IMultiplayerServer.RemovePlaylistItem), playlistItemId);
-        }
-
-        public override Task<APIBeatmap> GetAPIBeatmap(int beatmapId, CancellationToken cancellationToken = default)
-        {
-            return beatmapLookupCache.GetBeatmapAsync(beatmapId, cancellationToken);
         }
 
         protected override void Dispose(bool isDisposing)

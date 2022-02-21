@@ -64,9 +64,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Host.Value = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host.Value);
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
-                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
@@ -89,9 +88,8 @@ namespace osu.Game.Tests.Visual.Playlists
                 room.Host.Value = API.LocalUser.Value;
                 room.RecentParticipants.Add(room.Host.Value);
                 room.EndDate.Value = DateTimeOffset.Now.AddMinutes(5);
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
-                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
@@ -106,9 +104,8 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 room.Name.Value = "my awesome room";
                 room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(importedBeatmap.Beatmaps.First())
                 {
-                    Beatmap = { Value = importedBeatmap.Beatmaps.First() },
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
@@ -158,21 +155,17 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 room.Name.Value = "my awesome room";
                 room.Host.Value = API.LocalUser.Value;
-                room.Playlist.Add(new PlaylistItem
+                room.Playlist.Add(new PlaylistItem(new BeatmapInfo
                 {
-                    Beatmap =
+                    MD5Hash = realHash,
+                    OnlineID = realOnlineId,
+                    Metadata = new BeatmapMetadata(),
+                    BeatmapSet = new BeatmapSetInfo
                     {
-                        Value = new BeatmapInfo
-                        {
-                            MD5Hash = realHash,
-                            OnlineID = realOnlineId,
-                            Metadata = new BeatmapMetadata(),
-                            BeatmapSet = new BeatmapSetInfo
-                            {
-                                OnlineID = realOnlineSetId,
-                            }
-                        }
-                    },
+                        OnlineID = realOnlineSetId,
+                    }
+                })
+                {
                     RulesetID = new OsuRuleset().RulesetInfo.OnlineID
                 });
             });
