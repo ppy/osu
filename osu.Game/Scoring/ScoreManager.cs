@@ -184,7 +184,7 @@ namespace osu.Game.Scoring
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = score.Mods;
 
-            return (long)Math.Round(scoreProcessor.GetScore(mode, beatmapMaxCombo, accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
+            return (long)Math.Round(scoreProcessor.GetScore(mode, accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
         }
 
         /// <summary>
