@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
-using osu.Game.Utils;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -15,6 +15,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         protected override string Format()
-            => ScoreboardTimeUtils.FormatRelativeTime(Date, TimeSpan.FromHours(1));
+            => Date.ToShortRelativeTime(TimeSpan.FromHours(1));
     }
 }
