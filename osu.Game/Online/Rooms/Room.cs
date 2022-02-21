@@ -37,6 +37,14 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("channel_id")]
         public readonly Bindable<int> ChannelId = new Bindable<int>();
 
+        [JsonProperty("current_playlist_item")]
+        [Cached]
+        public readonly Bindable<PlaylistItem> CurrentPlaylistItem = new Bindable<PlaylistItem>();
+
+        [JsonProperty("playlist_item_stats")]
+        [Cached]
+        public readonly Bindable<RoomPlaylistItemStats> PlaylistItemStats = new Bindable<RoomPlaylistItemStats>();
+
         [JsonProperty("difficulty_range")]
         public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
 
@@ -231,6 +239,19 @@ namespace osu.Game.Online.Rooms
         public bool ShouldSerializeEndDate() => false;
 
         #endregion
+
+        [JsonObject(MemberSerialization.OptIn)]
+        public class RoomPlaylistItemStats
+        {
+            [JsonProperty("count_active")]
+            public int CountActive;
+
+            [JsonProperty("count_total")]
+            public int CountTotal;
+
+            [JsonProperty("ruleset_ids")]
+            public int[] RulesetIDs;
+        }
 
         [JsonObject(MemberSerialization.OptIn)]
         public class RoomDifficultyRange

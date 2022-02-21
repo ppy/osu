@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -41,15 +42,17 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(updateCount, true);
+            PlaylistItemStats.BindValueChanged(updateCount, true);
         }
 
-        private void updateCount(object sender, NotifyCollectionChangedEventArgs e)
+        private void updateCount(ValueChangedEvent<Room.RoomPlaylistItemStats> valueChangedEvent)
         {
+            int activeItems = valueChangedEvent.NewValue.CountActive;
+
             count.Clear();
-            count.AddText(Playlist.Count.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
             count.AddText(" ");
-            count.AddText("Beatmap".ToQuantity(Playlist.Count, ShowQuantityAs.None));
+            count.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
         }
     }
 }
