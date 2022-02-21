@@ -87,7 +87,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
             StarDifficulty minDifficulty;
             StarDifficulty maxDifficulty;
 
-            if (room.DifficultyRange != null)
+            if (room.DifficultyRange.Value != null)
             {
                 minDifficulty = new StarDifficulty(room.DifficultyRange.Value.Min, 0);
                 maxDifficulty = new StarDifficulty(room.DifficultyRange.Value.Max, 0);
