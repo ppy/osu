@@ -19,6 +19,7 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
@@ -71,6 +72,9 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private readonly Func<OsuScreen> createNextScreen;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
         /// Only valid during or after <see cref="LogoArriving"/>.
@@ -117,7 +121,11 @@ namespace osu.Game.Screens.Menu
             // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
             if (initialBeatmap == null)
             {
-                if (!loadThemedIntro())
+                // Intro beatmaps are generally made using the osu! ruleset.
+                // It might not be present in test projects for other rulesets.
+                bool osuRulesetPresent = rulesets.GetRuleset(0) != null;
+
+                if (!loadThemedIntro() && osuRulesetPresent)
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
