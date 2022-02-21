@@ -15,6 +15,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         protected override string Format()
-            => ScoreboardTimeUtils.FormatDate(Date, TimeSpan.FromHours(1));
+            => ScoreboardTimeUtils.FormatRelativeTime(Date, TimeSpan.FromHours(1));
     }
 }
