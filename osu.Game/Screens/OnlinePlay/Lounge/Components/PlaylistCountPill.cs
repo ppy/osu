@@ -3,12 +3,10 @@
 
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 {
@@ -42,12 +40,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            PlaylistItemStats.BindValueChanged(updateCount, true);
+            PlaylistItemStats.BindValueChanged(_ => updateCount(), true);
+            Playlist.BindCollectionChanged((_, __) => updateCount(), true);
         }
 
-        private void updateCount(ValueChangedEvent<Room.RoomPlaylistItemStats> valueChangedEvent)
+        private void updateCount()
         {
-            int activeItems = valueChangedEvent.NewValue.CountActive;
+            int activeItems = PlaylistItemStats.Value?.CountActive ?? Playlist.Count;
 
             count.Clear();
             count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
