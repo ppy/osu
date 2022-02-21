@@ -395,7 +395,7 @@ namespace osu.Game.Online.Leaderboards
                 Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold, italics: true);
             }
 
-            protected override string Format() => ScoreboardTimeUtils.FormatDate(Date, TimeSpan.FromSeconds(30));
+            protected override string Format() => ScoreboardTimeUtils.FormatRelativeTime(Date, TimeSpan.FromSeconds(30));
         }
 
         public class LeaderboardScoreStatistic
