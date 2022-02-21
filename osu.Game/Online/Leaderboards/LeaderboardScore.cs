@@ -30,7 +30,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Utils;
-using osu.Framework.Utils;
 
 namespace osu.Game.Online.Leaderboards
 {
