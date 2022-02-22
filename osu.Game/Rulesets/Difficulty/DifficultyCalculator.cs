@@ -120,6 +120,9 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
+        /// <remarks>
+        /// This should only be used to compute difficulties for legacy mod combinations.
+        /// </remarks>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
         public IEnumerable<DifficultyAttributes> CalculateAll(CancellationToken cancellationToken = default)
         {
