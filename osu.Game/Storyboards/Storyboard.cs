@@ -78,7 +78,7 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata.BackgroundFile;
+                string backgroundPath = BeatmapInfo.Metadata.BackgroundFile;
 
                 if (string.IsNullOrEmpty(backgroundPath))
                     return false;
