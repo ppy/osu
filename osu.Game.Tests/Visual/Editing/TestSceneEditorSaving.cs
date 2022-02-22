@@ -49,6 +49,8 @@ namespace osu.Game.Tests.Visual.Editing
             double originalTimelineZoom = 0;
             double changedTimelineZoom = 0;
 
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().SingleOrDefault()?.IsLoaded == true);
+
             AddStep("Set beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
             AddStep("Set timeline zoom", () =>
             {
