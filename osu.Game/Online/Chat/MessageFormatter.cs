@@ -272,7 +272,7 @@ namespace osu.Game.Online.Chat
             handleMatches(time_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
-            handleMatches(channel_regex, "{0}", $"{OsuGameBase.OSU_PROTOCOL}chan/{0}", result, startIndex, LinkAction.OpenChannel);
+            handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
 
             string empty = "";
             while (space-- > 0)
