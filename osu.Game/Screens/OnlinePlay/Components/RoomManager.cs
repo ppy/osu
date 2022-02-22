@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.OnlinePlay.Components
 {
@@ -26,9 +25,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
         protected IBindable<Room> JoinedRoom => joinedRoom;
         private readonly Bindable<Room> joinedRoom = new Bindable<Room>();
-
-        [Resolved]
-        private IRulesetStore rulesets { get; set; }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -116,9 +112,6 @@ namespace osu.Game.Screens.OnlinePlay.Components
 
             try
             {
-                foreach (var pi in room.Playlist)
-                    pi.MapObjects(rulesets);
-
                 var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
                 if (existing == null)
                     rooms.Add(room);

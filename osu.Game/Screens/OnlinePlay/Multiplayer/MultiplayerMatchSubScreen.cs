@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -247,7 +246,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // update local mods based on room's reported status for the local user (omitting the base call implementation).
             // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
             var ruleset = Ruleset.Value.CreateInstance();
-            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
+            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset))).ToList();
         }
 
         [Resolved(canBeNull: true)]
@@ -398,38 +397,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void updateCurrentItem()
         {
             Debug.Assert(client.Room != null);
-
-            var expectedSelectedItem = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
-
-            if (expectedSelectedItem == null)
-                return;
-
-            // There's no reason to renew the selected item if its content hasn't changed.
-            if (SelectedItem.Value?.Equals(expectedSelectedItem) == true && expectedSelectedItem.Beatmap.Value != null)
-                return;
-
-            // Clear the selected item while the lookup is performed, so components like the ready button can enter their disabled states.
-            SelectedItem.Value = null;
-
-            if (expectedSelectedItem.Beatmap.Value == null)
-            {
-                Task.Run(async () =>
-                {
-                    var beatmap = await client.GetAPIBeatmap(expectedSelectedItem.BeatmapID).ConfigureAwait(false);
-
-                    Schedule(() =>
-                    {
-                        expectedSelectedItem.Beatmap.Value = beatmap;
-
-                        if (Room.Playlist.SingleOrDefault(i => i.ID == client.Room?.Settings.PlaylistItemId)?.Equals(expectedSelectedItem) == true)
-                            applyCurrentItem();
-                    });
-                });
-            }
-            else
-                applyCurrentItem();
-
-            void applyCurrentItem() => SelectedItem.Value = expectedSelectedItem;
+            SelectedItem.Value = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
         }
 
         private void handleRoomLost() => Schedule(() =>

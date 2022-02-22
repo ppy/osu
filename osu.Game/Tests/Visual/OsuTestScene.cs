@@ -225,12 +225,24 @@ namespace osu.Game.Tests.Visual
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         /// <summary>
-        /// Returns a sample API Beatmap with BeatmapSet populated.
+        /// Returns a sample API beatmap with a populated beatmap set.
         /// </summary>
         /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
-        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset = null)
+        protected APIBeatmap CreateAPIBeatmap(RulesetInfo ruleset = null) => CreateAPIBeatmap(CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo);
+
+        /// <summary>
+        /// Constructs a sample API beatmap set containing a beatmap.
+        /// </summary>
+        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
+        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset = null) => CreateAPIBeatmapSet(CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo);
+
+        /// <summary>
+        /// Constructs a sample API beatmap with a populated beatmap set from a given source beatmap.
+        /// </summary>
+        /// <param name="original">The source beatmap.</param>
+        public static APIBeatmap CreateAPIBeatmap(IBeatmapInfo original)
         {
-            var beatmapSet = CreateAPIBeatmapSet(ruleset ?? Ruleset.Value);
+            var beatmapSet = CreateAPIBeatmapSet(original);
 
             // Avoid circular reference.
             var beatmap = beatmapSet.Beatmaps.First();
@@ -243,18 +255,16 @@ namespace osu.Game.Tests.Visual
         }
 
         /// <summary>
-        /// Returns a sample API BeatmapSet with beatmaps populated.
+        /// Constructs a sample API beatmap set containing a beatmap from a given source beatmap.
         /// </summary>
-        /// <param name="ruleset">The ruleset to create the sample model using. osu! ruleset will be used if not specified.</param>
-        protected APIBeatmapSet CreateAPIBeatmapSet(RulesetInfo ruleset = null)
+        /// <param name="original">The source beatmap.</param>
+        public static APIBeatmapSet CreateAPIBeatmapSet(IBeatmapInfo original)
         {
-            var beatmap = CreateBeatmap(ruleset ?? Ruleset.Value).BeatmapInfo;
-
-            Debug.Assert(beatmap.BeatmapSet != null);
+            Debug.Assert(original.BeatmapSet != null);
 
             return new APIBeatmapSet
             {
-                OnlineID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
+                OnlineID = original.BeatmapSet.OnlineID,
                 Status = BeatmapOnlineStatus.Ranked,
                 Covers = new BeatmapSetOnlineCovers
                 {
@@ -262,29 +272,29 @@ namespace osu.Game.Tests.Visual
                     Card = "https://assets.ppy.sh/beatmaps/163112/covers/card.jpg",
                     List = "https://assets.ppy.sh/beatmaps/163112/covers/list.jpg"
                 },
-                Title = beatmap.Metadata.Title,
-                TitleUnicode = beatmap.Metadata.TitleUnicode,
-                Artist = beatmap.Metadata.Artist,
-                ArtistUnicode = beatmap.Metadata.ArtistUnicode,
+                Title = original.Metadata.Title,
+                TitleUnicode = original.Metadata.TitleUnicode,
+                Artist = original.Metadata.Artist,
+                ArtistUnicode = original.Metadata.ArtistUnicode,
                 Author = new APIUser
                 {
-                    Username = beatmap.Metadata.Author.Username,
-                    Id = beatmap.Metadata.Author.OnlineID
+                    Username = original.Metadata.Author.Username,
+                    Id = original.Metadata.Author.OnlineID
                 },
-                Source = beatmap.Metadata.Source,
-                Tags = beatmap.Metadata.Tags,
+                Source = original.Metadata.Source,
+                Tags = original.Metadata.Tags,
                 Beatmaps = new[]
                 {
                     new APIBeatmap
                     {
-                        OnlineID = ((IBeatmapInfo)beatmap).OnlineID,
-                        OnlineBeatmapSetID = ((IBeatmapSetInfo)beatmap.BeatmapSet).OnlineID,
-                        Status = beatmap.Status,
-                        Checksum = beatmap.MD5Hash,
-                        AuthorID = beatmap.Metadata.Author.OnlineID,
-                        RulesetID = beatmap.Ruleset.OnlineID,
-                        StarRating = beatmap.StarRating,
-                        DifficultyName = beatmap.DifficultyName,
+                        OnlineID = original.OnlineID,
+                        OnlineBeatmapSetID = original.BeatmapSet.OnlineID,
+                        Status = ((BeatmapInfo)original).Status,
+                        Checksum = original.MD5Hash,
+                        AuthorID = original.Metadata.Author.OnlineID,
+                        RulesetID = original.Ruleset.OnlineID,
+                        StarRating = original.StarRating,
+                        DifficultyName = original.DifficultyName,
                     }
                 }
             };

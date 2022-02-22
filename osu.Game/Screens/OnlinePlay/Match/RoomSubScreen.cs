@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -350,10 +351,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (selected == null)
                 return;
 
+            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            Debug.Assert(rulesetInstance != null);
+            var allowedMods = SelectedItem.Value.AllowedMods.Select(m => m.ToMod(rulesetInstance));
+
             // Remove any user mods that are no longer allowed.
-            UserMods.Value = UserMods.Value
-                                     .Where(m => selected.AllowedMods.Any(a => m.GetType() == a.GetType()))
-                                     .ToList();
+            UserMods.Value = UserMods.Value.Where(m => allowedMods.Any(a => m.GetType() == a.GetType())).ToList();
 
             UpdateMods();
             updateRuleset();
@@ -367,13 +370,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
             else
             {
                 UserModsSection?.Show();
-                userModsSelectOverlay.IsValidMod = m => selected.AllowedMods.Any(a => a.GetType() == m.GetType());
+                userModsSelectOverlay.IsValidMod = m => allowedMods.Any(a => a.GetType() == m.GetType());
             }
         }
 
         private void updateWorkingBeatmap()
         {
-            var beatmap = SelectedItem.Value?.Beatmap.Value;
+            var beatmap = SelectedItem.Value?.Beatmap;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineID == beatmap.OnlineID);
@@ -386,7 +389,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (SelectedItem.Value == null || !this.IsCurrentScreen())
                 return;
 
-            Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods).ToList();
+            var rulesetInstance = rulesets.GetRuleset(SelectedItem.Value.RulesetID)?.CreateInstance();
+            Debug.Assert(rulesetInstance != null);
+            Mods.Value = UserMods.Value.Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(rulesetInstance))).ToList();
         }
 
         private void updateRuleset()

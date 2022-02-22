@@ -22,12 +22,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var beatmapInfo = CreateBeatmap(rulesetInfo).BeatmapInfo;
                 var score = TestResources.CreateTestScoreInfo(beatmapInfo);
 
-                PlaylistItem playlistItem = new PlaylistItem
-                {
-                    BeatmapID = beatmapInfo.OnlineID,
-                };
-
-                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, playlistItem));
+                Stack.Push(screen = new MultiplayerResultsScreen(score, 1, new PlaylistItem(beatmapInfo)));
             });
 
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
