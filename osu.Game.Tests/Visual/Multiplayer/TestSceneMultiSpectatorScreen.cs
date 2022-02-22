@@ -60,8 +60,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players silently", () =>
             {
-                OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
-                OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
+                OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
+                OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
 
                 playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
                 playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
@@ -121,13 +121,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players", () =>
             {
-                var player1 = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
+                var player1 = OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
                 player1.MatchState = new TeamVersusUserState
                 {
                     TeamID = 0,
                 };
 
-                var player2 = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
+                var player2 = OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
                 player2.MatchState = new TeamVersusUserState
                 {
                     TeamID = 1,
@@ -396,7 +396,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         User = new APIUser { Id = id },
                     };
 
-                    OnlinePlayDependencies.Client.AddUser(user.User, true);
+                    OnlinePlayDependencies.MultiplayerClient.AddUser(user.User, true);
                     SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
 
                     playingUsers.Add(user);
@@ -410,7 +410,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var user = playingUsers.Single(u => u.UserID == userId);
 
-                OnlinePlayDependencies.Client.RemoveUser(user.User.AsNonNull());
+                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
                 SpectatorClient.EndPlay(userId);
 
                 playingUsers.Remove(user);

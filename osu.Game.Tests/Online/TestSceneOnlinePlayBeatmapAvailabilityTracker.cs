@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -12,6 +13,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -21,6 +23,8 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
@@ -53,6 +57,25 @@ namespace osu.Game.Tests.Online
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
+            ((DummyAPIAccess)API).HandleRequest = req =>
+            {
+                switch (req)
+                {
+                    case GetBeatmapsRequest beatmapsReq:
+                        var beatmap = CreateAPIBeatmap();
+                        beatmap.OnlineID = testBeatmapInfo.OnlineID;
+                        beatmap.OnlineBeatmapSetID = testBeatmapSet.OnlineID;
+                        beatmap.Checksum = testBeatmapInfo.MD5Hash;
+                        beatmap.BeatmapSet!.OnlineID = testBeatmapSet.OnlineID;
+
+                        beatmapsReq.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = new List<APIBeatmap> { beatmap } });
+                        return true;
+
+                    default:
+                        return false;
+                }
+            };
+
             beatmaps.AllowImport = new TaskCompletionSource<bool>();
 
             testBeatmapFile = TestResources.GetQuickTestBeatmapForImport();
@@ -63,17 +86,34 @@ namespace osu.Game.Tests.Online
             Realm.Write(r => r.RemoveAll<BeatmapSetInfo>());
             Realm.Write(r => r.RemoveAll<BeatmapInfo>());
 
-            selectedItem.Value = new PlaylistItem
+            selectedItem.Value = new PlaylistItem(testBeatmapInfo)
             {
-                Beatmap = { Value = testBeatmapInfo },
-                Ruleset = { Value = testBeatmapInfo.Ruleset },
+                RulesetID = testBeatmapInfo.Ruleset.OnlineID,
             };
 
-            Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
-            {
-                SelectedItem = { BindTarget = selectedItem, }
-            };
+            recreateChildren();
         });
+
+        private void recreateChildren()
+        {
+            var beatmapLookupCache = new BeatmapLookupCache();
+
+            Child = new DependencyProvidingContainer
+            {
+                CachedDependencies = new[]
+                {
+                    (typeof(BeatmapLookupCache), (object)beatmapLookupCache)
+                },
+                Children = new Drawable[]
+                {
+                    beatmapLookupCache,
+                    availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
+                    {
+                        SelectedItem = { BindTarget = selectedItem, }
+                    }
+                }
+            };
+        }
 
         [Test]
         public void TestBeatmapDownloadingFlow()
@@ -123,10 +163,7 @@ namespace osu.Game.Tests.Online
             });
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
-            AddStep("recreate tracker", () => Child = availabilityTracker = new OnlinePlayBeatmapAvailabilityTracker
-            {
-                SelectedItem = { BindTarget = selectedItem }
-            });
+            AddStep("recreate tracker", recreateChildren);
             addAvailabilityCheckStep("state not downloaded as well", BeatmapAvailability.NotDownloaded);
 
             AddStep("reimport original beatmap", () => beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely());
@@ -167,7 +204,8 @@ namespace osu.Game.Tests.Online
 
             public Live<BeatmapSetInfo> CurrentImport { get; private set; }
 
-            public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources, GameHost host = null, WorkingBeatmap defaultBeatmap = null)
+            public TestBeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider api, [NotNull] AudioManager audioManager, IResourceStore<byte[]> resources,
+                                      GameHost host = null, WorkingBeatmap defaultBeatmap = null)
                 : base(storage, realm, rulesets, api, audioManager, resources, host, defaultBeatmap)
             {
             }
