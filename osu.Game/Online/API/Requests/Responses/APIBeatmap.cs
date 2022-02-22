@@ -112,7 +112,27 @@ namespace osu.Game.Online.API.Requests.Responses
             public int OnlineID { get; set; } = -1;
 
             public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
-            public string ShortName => nameof(APIRuleset);
+
+            public string ShortName
+            {
+                get
+                {
+                    // TODO: this should really not exist.
+                    switch (OnlineID)
+                    {
+                        case 0: return "osu";
+
+                        case 1: return "taiko";
+
+                        case 2: return "fruits";
+
+                        case 3: return "mania";
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+
             public string InstantiationInfo => string.Empty;
 
             public Ruleset CreateInstance() => throw new NotImplementedException();
