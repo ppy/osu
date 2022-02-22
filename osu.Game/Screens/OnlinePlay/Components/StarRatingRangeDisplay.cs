@@ -94,6 +94,8 @@ namespace osu.Game.Screens.OnlinePlay.Components
             }
             else
             {
+                // In multiplayer rooms, the beatmaps of playlist items will not be populated to a point this can be correct.
+                // Either populating them via BeatmapLookupCache or polling the API for the room's DifficultyRange will be required.
                 var orderedDifficulties = Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
 
                 minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
