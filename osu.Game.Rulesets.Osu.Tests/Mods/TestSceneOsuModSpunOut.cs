@@ -8,13 +8,15 @@ using NUnit.Framework;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Skinning.Default;
-using osu.Game.Screens.Play;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
@@ -66,25 +68,45 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         }
 
         [Test]
-        public void TestSpinnerOnlyComplete() => CreateModTest(new ModTestData
+        public void TestSpinnerGetsNoBonusScore()
         {
-            Mod = new OsuModSpunOut(),
-            Autoplay = false,
-            Beatmap = singleSpinnerBeatmap,
-            PassCondition = () =>
+            DrawableSpinner spinner = null;
+            List<JudgementResult> results = new List<JudgementResult>();
+
+            CreateModTest(new ModTestData
             {
-                var spinner = Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault();
-                var gameplayClockContainer = Player.ChildrenOfType<GameplayClockContainer>().SingleOrDefault();
+                Mod = new OsuModSpunOut(),
+                Autoplay = false,
+                Beatmap = singleSpinnerBeatmap,
+                PassCondition = () =>
+                {
+                    // Bind to the first spinner's results for further tracking.
+                    if (spinner == null)
+                    {
+                        // We only care about the first spinner we encounter for this test.
+                        var nextSpinner = Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault();
 
-                if (spinner == null || gameplayClockContainer == null)
-                    return false;
+                        if (nextSpinner == null)
+                            return false;
 
-                if (!Precision.AlmostEquals(gameplayClockContainer.CurrentTime, spinner.HitObject.StartTime + spinner.HitObject.Duration, 200.0f))
-                    return false;
+                        spinner = nextSpinner;
+                        spinner.OnNewResult += (o, result) => results.Add(result);
 
-                return Precision.AlmostEquals(spinner.Progress, 1.0f, 0.05f) && Precision.AlmostEquals(spinner.GainedBonus.Value, 0, 1);
-            }
-        });
+                        results.Clear();
+                    }
+
+                    // we should only be checking the bonus/progress after the spinner has fully completed.
+                    if (!results.OfType<OsuSpinnerJudgementResult>().Any(r => r.TimeCompleted != null))
+                        return false;
+
+                    return
+                        results.Any(r => r.Type == HitResult.SmallTickHit)
+                        && !results.Any(r => r.Type == HitResult.LargeTickHit)
+                        && Precision.AlmostEquals(spinner.Progress, 1.0f, 0.05f)
+                        && Precision.AlmostEquals(spinner.GainedBonus.Value, 0, 1);
+                }
+            });
+        }
 
         private Beatmap singleSpinnerBeatmap => new Beatmap
         {
