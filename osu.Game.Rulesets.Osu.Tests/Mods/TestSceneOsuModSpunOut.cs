@@ -100,8 +100,8 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                         return false;
 
                     return
-                        results.Any(r => r.Type == HitResult.SmallTickHit)
-                        && !results.Any(r => r.Type == HitResult.LargeTickHit);
+                        results.Any(r => r.Type == HitResult.SmallBonus)
+                        && !results.Any(r => r.Type == HitResult.LargeBonus);
                 }
             });
         }
