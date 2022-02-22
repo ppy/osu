@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.UI
     {
         public BindableBool Active { get; } = new BindableBool();
 
+        public const float DEFAULT_HEIGHT = 30;
+
         private readonly IMod mod;
 
         private readonly Box background;
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.UI
         public ModSwitchTiny(IMod mod)
         {
             this.mod = mod;
-            Size = new Vector2(73, 30);
+            Size = new Vector2(73, DEFAULT_HEIGHT);
 
             InternalChild = new CircularContainer
             {
