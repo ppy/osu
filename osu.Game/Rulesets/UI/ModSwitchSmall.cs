@@ -21,9 +21,9 @@ namespace osu.Game.Rulesets.UI
     {
         public BindableBool Active { get; } = new BindableBool();
 
-        private readonly IMod mod;
+        public const float DEFAULT_SIZE = 60;
 
-        private const float size = 60;
+        private readonly IMod mod;
 
         private readonly SpriteIcon background;
         private readonly SpriteIcon? modIcon;
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.UI
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(size),
+                    Size = new Vector2(DEFAULT_SIZE),
                     Icon = OsuIcon.ModBg
                 },
                 contentFlow = new FillFlowContainer
