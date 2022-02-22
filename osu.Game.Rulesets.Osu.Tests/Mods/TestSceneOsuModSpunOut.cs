@@ -101,9 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
 
                     return
                         results.Any(r => r.Type == HitResult.SmallTickHit)
-                        && !results.Any(r => r.Type == HitResult.LargeTickHit)
-                        && Precision.AlmostEquals(spinner.Progress, 1.0f, 0.05f)
-                        && Precision.AlmostEquals(spinner.GainedBonus.Value, 0, 1);
+                        && !results.Any(r => r.Type == HitResult.LargeTickHit);
                 }
             });
         }
