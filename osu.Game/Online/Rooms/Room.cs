@@ -194,6 +194,8 @@ namespace osu.Game.Online.Rooms
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
             QueueMode.Value = other.QueueMode.Value;
+            DifficultyRange.Value = other.DifficultyRange.Value;
+            PlaylistItemStats.Value = other.PlaylistItemStats.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
