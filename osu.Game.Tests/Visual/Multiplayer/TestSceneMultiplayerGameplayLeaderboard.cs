@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
+                    SpectatorClient.SendStartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
                     multiplayerUsers.Add(OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = user }, true));
                 }
 

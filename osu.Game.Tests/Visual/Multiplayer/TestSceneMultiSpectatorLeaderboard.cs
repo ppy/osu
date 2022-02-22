@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach ((int userId, var _) in clocks)
                 {
-                    SpectatorClient.StartPlay(userId, 0);
+                    SpectatorClient.SendStartPlay(userId, 0);
                     OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = userId });
                 }
             });
