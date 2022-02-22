@@ -3,7 +3,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -47,7 +46,7 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to start play for.</param>
         /// <param name="beatmapId">The playing beatmap id.</param>
-        public void StartPlay(int userId, int beatmapId)
+        public void SendStartPlay(int userId, int beatmapId)
         {
             userBeatmapDictionary[userId] = beatmapId;
             userNextFrameDictionary[userId] = 0;
@@ -59,7 +58,7 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to end play for.</param>
         /// <param name="state">The spectator state to end play with.</param>
-        public void EndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
+        public void SendEndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
         {
             if (!userBeatmapDictionary.ContainsKey(userId))
                 return;
@@ -73,8 +72,6 @@ namespace osu.Game.Tests.Visual.Spectator
 
             userBeatmapDictionary.Remove(userId);
         }
-
-        public new void Schedule(Action action) => base.Schedule(action);
 
         /// <summary>
         /// Sends frames for an arbitrary user, in bundles containing 10 frames each.

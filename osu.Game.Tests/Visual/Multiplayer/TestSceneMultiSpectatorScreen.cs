@@ -70,11 +70,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen(false);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player first_player_id", () => SpectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId));
+            AddStep("load player first_player_id", () => SpectatorClient.SendStartPlay(PLAYER_1_ID, importedBeatmapId));
             AddUntilStep("one player added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 1);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player second_player_id", () => SpectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId));
+            AddStep("load player second_player_id", () => SpectatorClient.SendStartPlay(PLAYER_2_ID, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
         }
 
@@ -133,8 +133,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     TeamID = 1,
                 };
 
-                SpectatorClient.StartPlay(player1.UserID, importedBeatmapId);
-                SpectatorClient.StartPlay(player2.UserID, importedBeatmapId);
+                SpectatorClient.SendStartPlay(player1.UserID, importedBeatmapId);
+                SpectatorClient.SendStartPlay(player2.UserID, importedBeatmapId);
 
                 playingUsers.Add(player1);
                 playingUsers.Add(player2);
@@ -397,7 +397,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     };
 
                     OnlinePlayDependencies.MultiplayerClient.AddUser(user.User, true);
-                    SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
+                    SpectatorClient.SendStartPlay(id, beatmapId ?? importedBeatmapId);
 
                     playingUsers.Add(user);
                 }
@@ -411,7 +411,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var user = playingUsers.Single(u => u.UserID == userId);
 
                 OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
-                SpectatorClient.EndPlay(userId);
+                SpectatorClient.SendEndPlay(userId);
 
                 playingUsers.Remove(user);
             });
