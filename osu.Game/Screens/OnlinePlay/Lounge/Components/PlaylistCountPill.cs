@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -46,7 +47,11 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private void updateCount()
         {
-            int activeItems = PlaylistItemStats.Value?.CountActive ?? Playlist.Count;
+            int activeItems = Playlist.Count > 0 || PlaylistItemStats.Value == null
+                // For now, use the playlist as the source of truth if it has any items.
+                // This allows the count to display correctly on the room screen (after joining a room).
+                ? Playlist.Count(i => !i.Expired)
+                : PlaylistItemStats.Value.CountActive;
 
             count.Clear();
             count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
