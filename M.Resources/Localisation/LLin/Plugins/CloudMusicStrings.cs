@@ -23,9 +23,7 @@ namespace M.Resources.Localisation.LLin.Plugins
 
         public static LocalisableString DisableShader => new TranslatableString(getKey(@"disable_shader"), @"禁用额外阴影");
 
-        public static LocalisableString GlobalOffsetMain => new TranslatableString(getKey(@"global_offset_main"), @"全局偏移");
-
-        public static LocalisableString GlobalOffsetSub => new TranslatableString(getKey(@"global_offset_sub"), @"如果当前歌曲歌词太早或太晚，拖动这里的滑条试试");
+        public static LocalisableString LocalOffset => new TranslatableString(getKey(@"global_offset_main"), @"歌词本地偏移");
 
         public static LocalisableString LyricFadeInDuration => new TranslatableString(getKey(@"lyric_fade_in_duration"), @"歌词淡入时间");
 

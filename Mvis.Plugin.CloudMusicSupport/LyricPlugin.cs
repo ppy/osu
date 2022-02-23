@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using M.DBus.Tray;
-using M.Resources.Localisation.LLin.Plugins;
 using Mvis.Plugin.CloudMusicSupport.Config;
 using Mvis.Plugin.CloudMusicSupport.DBus;
 using Mvis.Plugin.CloudMusicSupport.Helper;
@@ -19,14 +17,10 @@ using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Types;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Audio;
-using osu.Game;
-using osu.Game.Configuration;
-using osu.Game.Overlays;
 
 namespace Mvis.Plugin.CloudMusicSupport
 {
-    public class LyricPlugin : BindableControlledPlugin, IProvideAudioControlPlugin
+    public class LyricPlugin : BindableControlledPlugin
     {
         /// <summary>
         /// 请参阅 <see cref="LLinPlugin.TargetLayer"/>
@@ -57,8 +51,20 @@ namespace Mvis.Plugin.CloudMusicSupport
 
         private readonly LyricProcessor processor = new LyricProcessor();
 
+        [CanBeNull]
+        private List<Lyric> cachedLyrics;
+
+        public readonly List<Lyric> EmptyLyricList = new List<Lyric>();
+
+        [CanBeNull]
+        private APILyricResponseRoot currentResponseRoot;
+
         [NotNull]
-        public List<Lyric> Lyrics { get; private set; } = new List<Lyric>();
+        public List<Lyric> Lyrics
+        {
+            get => cachedLyrics ?? EmptyLyricList;
+            private set => cachedLyrics = value;
+        }
 
         public void ReplaceLyricWith(List<Lyric> newList, bool saveToDisk)
         {
@@ -72,37 +78,20 @@ namespace Mvis.Plugin.CloudMusicSupport
             CurrentStatus.Value = Status.Finish;
         }
 
-        [Resolved]
-        private MusicController controller { get; set; }
-
-        [Resolved]
-        private MConfigManager mConfig { get; set; }
-
-        public void RequestControl(Action onAllow)
-        {
-            LLin.RequestAudioControl(this,
-                CloudMusicStrings.AudioControlRequest,
-                () => IsEditing = false,
-                onAllow);
-        }
-
         public void GetLyricFor(int id)
         {
             CurrentStatus.Value = Status.Working;
             processor.StartFetchById(id, onLyricRequestFinished, onLyricRequestFail);
         }
 
-        public bool IsEditing
-        {
-            set
-            {
-                if (!value)
-                    LLin.ReleaseAudioControlFrom(this);
-            }
-        }
-
         private Track track;
-        private readonly BindableDouble offset = new BindableDouble();
+
+        public readonly BindableDouble Offset = new BindableDouble
+        {
+            MaxValue = 3000,
+            MinValue = -3000
+        };
+
         private Bindable<bool> autoSave;
 
         public readonly Bindable<Status> CurrentStatus = new Bindable<Status>();
@@ -129,9 +118,6 @@ namespace Mvis.Plugin.CloudMusicSupport
         /// </summary>
         protected override bool OnContentLoaded(Drawable content) => true;
 
-        [Resolved]
-        private OsuGame game { get; set; }
-
         private readonly SimpleEntry lyricEntry = new SimpleEntry
         {
             Enabled = false
@@ -143,7 +129,6 @@ namespace Mvis.Plugin.CloudMusicSupport
             var config = (LyricConfigManager)Dependencies.Get<LLinPluginManager>().GetConfigManager(this);
 
             config.BindWith(LyricSettings.EnablePlugin, Value);
-            config.BindWith(LyricSettings.LyricOffset, offset);
             autoSave = config.GetBindable<bool>(LyricSettings.SaveLrcWhenFetchFinish);
 
             AddInternal(processor);
@@ -151,9 +136,13 @@ namespace Mvis.Plugin.CloudMusicSupport
             PluginManager.RegisterDBusObject(dbusObject = new LyricDBusObject());
 
             if (LLin != null)
-            {
                 LLin.Exiting += onMvisExiting;
-            }
+
+            Offset.BindValueChanged(v =>
+            {
+                if (currentResponseRoot != null)
+                    currentResponseRoot.LocalOffset = v.NewValue;
+            });
         }
 
         private void onMvisExiting()
@@ -165,9 +154,10 @@ namespace Mvis.Plugin.CloudMusicSupport
                 PluginManager.RemoveDBusMenuEntry(lyricEntry);
         }
 
-        public void WriteLyricToDisk()
+        public void WriteLyricToDisk(WorkingBeatmap currentBeatmap = null)
         {
-            processor.WriteLrcToFile(Lyrics, currentWorkingBeatmap);
+            currentBeatmap ??= currentWorkingBeatmap;
+            processor.WriteLrcToFile(currentResponseRoot, currentBeatmap);
         }
 
         public void RefreshLyric(bool noLocalFile = false)
@@ -181,16 +171,18 @@ namespace Mvis.Plugin.CloudMusicSupport
             }
 
             Lyrics.Clear();
+            currentResponseRoot = null;
             CurrentLine = null;
-
             processor.StartFetchByBeatmap(currentWorkingBeatmap, noLocalFile, onLyricRequestFinished, onLyricRequestFail);
         }
 
-        private double targetTime => track.CurrentTime + offset.Value;
+        private double targetTime => track.CurrentTime + Offset.Value;
 
         private void onBeatmapChanged(WorkingBeatmap working)
         {
             if (Disabled.Value) return;
+
+            if (currentWorkingBeatmap != null) WriteLyricToDisk(currentWorkingBeatmap);
 
             currentWorkingBeatmap = working;
             track = working.Track;
@@ -210,11 +202,14 @@ namespace Mvis.Plugin.CloudMusicSupport
             });
         }
 
-        private void onLyricRequestFinished(List<Lyric> lyrics)
+        private void onLyricRequestFinished(APILyricResponseRoot responseRoot)
         {
             Schedule(() =>
             {
-                Lyrics = lyrics;
+                Offset.Value = responseRoot.LocalOffset;
+                currentResponseRoot = responseRoot;
+
+                Lyrics = responseRoot.ToLyricList();
 
                 if (autoSave.Value)
                     WriteLyricToDisk();
@@ -314,21 +309,5 @@ namespace Mvis.Plugin.CloudMusicSupport
             Failed,
             Finish
         }
-
-        public void NextTrack()
-        {
-        }
-
-        public void PrevTrack()
-        {
-        }
-
-        public void TogglePause() => controller.TogglePause();
-
-        public void Seek(double position) => currentWorkingBeatmap?.Track.Seek(position);
-
-        public DrawableTrack GetCurrentTrack() => controller.CurrentTrack;
-
-        public bool IsCurrent { get; set; }
     }
 }

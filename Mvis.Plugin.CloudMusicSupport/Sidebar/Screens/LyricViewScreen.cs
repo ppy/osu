@@ -8,7 +8,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.LLin;
@@ -23,19 +22,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
         private IImplementLLin llin { get; set; }
 
         [Resolved]
-        private CustomColourProvider colourProvider { get; set; }
-
-        [Resolved]
         private LyricPlugin plugin { get; set; }
-
-        [Resolved]
-        private GameHost host { get; set; }
-
-        [Resolved]
-        private Storage storage { get; set; }
-
-        [Resolved]
-        private LyricSidebarSectionContainer sectionContainer { get; set; }
 
         protected override LyricPiece CreatePiece(Lyric lyric)
             => new LyricPiece(lyric);
@@ -99,7 +86,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
 
         protected override void LoadComplete()
         {
-            saveButton.Action = plugin.WriteLyricToDisk;
+            saveButton.Action = () => plugin.WriteLyricToDisk();
 
             plugin.CurrentStatus.BindValueChanged(v =>
             {

@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 
 namespace Mvis.Plugin.CloudMusicSupport.Misc
 {
-    public class ResultInfo
+    public class APISearchResultInfo
     {
         [JsonProperty("songs")]
-        public IList<SongInfo> Songs { get; set; }
+        public IList<APISongInfo> Songs { get; set; }
 
         [JsonProperty("songCount")]
         public int SongCount { get; set; }
