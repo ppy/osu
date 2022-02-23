@@ -221,8 +221,7 @@ namespace osu.Game.Online.Spectator
 
         protected abstract Task BeginPlayingInternal(SpectatorState state);
 
-        protected abstract Task SendFramesInternal(FrameDataBundle data);
-
+        protected abstract Task SendFramesInternal(FrameDataBundle bundle);
         protected abstract Task EndPlayingInternal(SpectatorState state);
 
         protected abstract Task WatchUserInternal(int userId);
@@ -281,19 +280,27 @@ namespace osu.Game.Online.Spectator
 
         private void sendNextBundleIfRequired()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             if (lastSend?.IsCompleted == false)
                 return;
 
             if (!pendingFrameBundles.TryPeek(out var bundle))
                 return;
 
-            lastSend = SendFramesInternal(bundle);
-            lastSend.ContinueWith(t => Schedule(() =>
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+            lastSend = tcs.Task;
+
+            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
             {
+                bool wasSuccessful = t.Exception == null;
+
                 // If the last bundle send wasn't successful, try again without dequeuing.
-                if (t.IsCompletedSuccessfully)
+                if (wasSuccessful)
                     pendingFrameBundles.Dequeue();
 
+                tcs.SetResult(wasSuccessful);
                 sendNextBundleIfRequired();
             }));
         }
