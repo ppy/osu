@@ -96,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
                     }
 
                     // we should only be checking the bonus/progress after the spinner has fully completed.
-                    if (!results.OfType<OsuSpinnerJudgementResult>().Any(r => r.TimeCompleted != null))
+                    if (results.OfType<OsuSpinnerJudgementResult>().All(r => r.TimeCompleted == null))
                         return false;
 
                     return
                         results.Any(r => r.Type == HitResult.SmallBonus)
-                        && !results.Any(r => r.Type == HitResult.LargeBonus);
+                        && results.All(r => r.Type != HitResult.LargeBonus);
                 }
             });
         }
