@@ -3,7 +3,6 @@
 
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 
@@ -41,28 +40,6 @@ namespace osu.Game.Screens.Menu
                 if (!Fired)
                     AbortConfirm();
             }
-        }
-    }
-
-    /// <summary>
-    /// An <see cref="ExitConfirmOverlay"/> that behaves as if the <see cref="OsuSetting.UIHoldActivationDelay"/> is always <c>0</c>.
-    /// </summary>
-    /// <remarks>This is useful for mobile devices using gesture navigation, where holding to confirm is not possible.</remarks>
-    public class NoHoldExitConfirmOverlay : ExitConfirmOverlay, IKeyBindingHandler<GlobalAction>
-    {
-        public new bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
-        {
-            if (e.Repeat)
-                return false;
-
-            if (e.Action == GlobalAction.Back)
-            {
-                Progress.Value = 1;
-                Confirm();
-                return true;
-            }
-
-            return false;
         }
     }
 }
