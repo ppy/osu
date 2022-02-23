@@ -6,12 +6,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -26,7 +29,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MainMenu : OsuScreen, IHandlePresentBeatmap
+    public class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_IN_DURATION = 300;
 
@@ -90,14 +93,6 @@ namespace osu.Game.Screens.Menu
                     }
                 });
             }
-            else if (host.CanSuspendToBackground)
-            {
-                AddInternal(exitConfirmOverlay = new NoHoldExitConfirmOverlay
-                {
-                    // treat as if the UIHoldActivationDelay is always 0. see NoHoldExitConfirmOverlay xmldoc for more info.
-                    Action = this.Exit
-                });
-            }
 
             AddRangeInternal(new[]
             {
@@ -157,24 +152,6 @@ namespace osu.Game.Screens.Menu
 
         private void confirmAndExit()
         {
-            if (host.CanSuspendToBackground)
-            {
-                // cancel the overlay as we're not actually exiting.
-                // this is the same action as 'onCancel' in `ConfirmExitDialog`.
-                exitConfirmOverlay.Abort();
-
-                // fade the track so the Bass.Pause() on suspend isn't as jarring.
-                const double fade_time = 500;
-                musicController.CurrentTrack
-                               .VolumeTo(0, fade_time, Easing.Out).Then()
-                               .VolumeTo(1, fade_time, Easing.In);
-
-                host.SuspendToBackground();
-
-                // on hosts that can only suspend, we don't ever want to exit the game.
-                return;
-            }
-
             if (exitConfirmed) return;
 
             exitConfirmed = true;
@@ -323,6 +300,34 @@ namespace osu.Game.Screens.Menu
             Ruleset.Value = ruleset;
 
             Schedule(loadSoloSongSelect);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            if (e.Action == GlobalAction.Back && host.CanSuspendToBackground)
+            {
+                bool didSuspend = host.SuspendToBackground();
+
+                if (didSuspend)
+                {
+                    // fade the track so the Bass.Pause() on suspend isn't as jarring.
+                    const double fade_time = 500;
+                    musicController.CurrentTrack
+                                   .VolumeTo(0, fade_time, Easing.Out).Then()
+                                   .VolumeTo(1, fade_time, Easing.In);
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }
