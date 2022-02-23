@@ -321,7 +321,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void sendFrames(int count = 10)
         {
-            AddStep("send frames", () => spectatorClient.SendFrames(streamingUser.Id, count));
+            AddStep("send frames", () => spectatorClient.SendFramesFromUser(streamingUser.Id, count));
         }
 
         private void loadSpectatingScreen()

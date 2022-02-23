@@ -360,7 +360,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             // to ensure negative gameplay start time does not affect spectator, send frames exactly after StartGameplay().
             // (similar to real spectating sessions in which the first frames get sent between StartGameplay() and player load complete)
-            AddStep("send frames at gameplay start", () => getInstance(PLAYER_1_ID).OnGameplayStarted += () => SpectatorClient.SendFrames(PLAYER_1_ID, 100));
+            AddStep("send frames at gameplay start", () => getInstance(PLAYER_1_ID).OnGameplayStarted += () => SpectatorClient.SendFramesFromUser(PLAYER_1_ID, 100));
 
             AddUntilStep("wait for player load", () => spectatorScreen.AllPlayersLoaded);
 
@@ -424,7 +424,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("send frames", () =>
             {
                 foreach (int id in userIds)
-                    SpectatorClient.SendFrames(id, count);
+                    SpectatorClient.SendFramesFromUser(id, count);
             });
         }
 
