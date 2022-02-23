@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
@@ -156,6 +157,8 @@ namespace osu.Game.Online.Spectator
 
                 IsPlaying = true;
 
+                totalBundledFrames = 0;
+
                 // transfer state at point of beginning play
                 currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
                 currentState.RulesetID = score.ScoreInfo.RulesetID;
@@ -168,6 +171,21 @@ namespace osu.Game.Online.Spectator
                 BeginPlayingInternal(currentState);
             });
         }
+
+        public void HandleFrame(ReplayFrame frame) => Schedule(() =>
+        {
+            if (!IsPlaying)
+            {
+                Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
+                return;
+            }
+
+            if (frame is IConvertibleReplayFrame convertible)
+                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+
+            if (pendingFrames.Count > max_pending_frames)
+                purgePendingFrames();
+        });
 
         public void EndPlaying(GameplayState state)
         {
@@ -236,6 +254,8 @@ namespace osu.Game.Online.Spectator
 
         private Task? lastSend;
 
+        private int totalBundledFrames;
+
         private const int max_pending_frames = 30;
 
         protected override void Update()
@@ -243,20 +263,6 @@ namespace osu.Game.Online.Spectator
             base.Update();
 
             if (pendingFrames.Count > 0 && Time.Current - lastPurgeTime > TIME_BETWEEN_SENDS)
-                purgePendingFrames();
-        }
-
-        public void HandleFrame(ReplayFrame frame)
-        {
-            Debug.Assert(ThreadSafety.IsUpdateThread);
-
-            if (!IsPlaying)
-                return;
-
-            if (frame is IConvertibleReplayFrame convertible)
-                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
-
-            if (pendingFrames.Count > max_pending_frames)
                 purgePendingFrames();
         }
 
@@ -269,6 +275,10 @@ namespace osu.Game.Online.Spectator
 
             var frames = pendingFrames.ToArray();
             var bundle = new FrameDataBundle(currentScore.ScoreInfo, frames);
+
+            totalBundledFrames += frames.Length;
+
+            Console.WriteLine($"Purging {pendingFrames.Count} frames (total {totalBundledFrames})");
 
             pendingFrames.Clear();
             lastPurgeTime = Time.Current;
