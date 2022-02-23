@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -218,17 +217,6 @@ namespace osu.Game.Online.Rooms
             if (!(Status.Value is RoomStatusEnded))
                 Playlist.RemoveAll(i => i.Expired);
         }
-
-        #region Newtonsoft.Json implicit ShouldSerialize() methods
-
-        // The properties in this region are used implicitly by Newtonsoft.Json to not serialise certain fields in some cases.
-        // They rely on being named exactly the same as the corresponding fields (casing included) and as such should NOT be renamed
-        // unless the fields are also renamed.
-
-        [UsedImplicitly]
-        public bool ShouldSerializeHost() => false;
-
-        #endregion
 
         [JsonObject(MemberSerialization.OptIn)]
         public class RoomPlaylistItemStats
