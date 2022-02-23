@@ -308,7 +308,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Helper
         {
             try
             {
-                string target = $"custom/lyrics/{working.BeatmapSetInfo.ID}.json";
+                string target = $"custom/lyrics/beatmap-{working.BeatmapSetInfo.ID}.json";
 
                 string content = File.ReadAllText(storage.GetFullPath(target, true));
 
