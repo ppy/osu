@@ -91,9 +91,15 @@ namespace osu.Game.Screens.OnlinePlay
             Playlist.BindCollectionChanged((_, __) => UpdateSelectedItem(), true);
         }
 
-        protected virtual void UpdateSelectedItem()
-            => SelectedItem.Value = RoomID.Value == null || subScreenSelectedItem == null
-                ? Playlist.GetCurrentItem()
-                : subScreenSelectedItem.Value;
+        protected void UpdateSelectedItem()
+        {
+            if (RoomID.Value == null || subScreenSelectedItem == null)
+            {
+                SelectedItem.Value = CurrentPlaylistItem.Value ?? Playlist.GetCurrentItem();
+                return;
+            }
+
+            SelectedItem.Value = subScreenSelectedItem.Value;
+        }
     }
 }
