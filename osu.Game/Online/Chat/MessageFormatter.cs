@@ -236,8 +236,7 @@ namespace osu.Game.Online.Chat
                             break;
 
                         default:
-                            linkType = LinkAction.External;
-                            break;
+                            return new LinkDetails(LinkAction.External, url);
                     }
 
                     return new LinkDetails(linkType, args[2]);
