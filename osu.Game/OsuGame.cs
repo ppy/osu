@@ -906,37 +906,13 @@ namespace osu.Game
 
                     if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
                     {
-                        handleOsuProtocolUrl(firstPath);
+                        HandleLink(firstPath);
                     }
                     else
                     {
                         Task.Run(() => Import(paths));
                     }
                 }
-            }
-        }
-
-        private void handleOsuProtocolUrl(string url)
-        {
-            if (!url.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
-                throw new ArgumentException("Invalid osu URL provided.", nameof(url));
-
-            // note that `StringSplitOptions.RemoveEmptyEntries` is not explicitly specified here
-            // in order to ensure that the protocol URL is valid (i.e. it has two slashes in the `osu://` part,
-            // causing the link content to be stored to the 2nd index rather than the 1st).
-            string[] pieces = url.Split('/');
-
-            switch (pieces[2])
-            {
-                case "s":
-                    if (int.TryParse(pieces[3], out int beatmapSetId))
-                        ShowBeatmapSet(beatmapSetId);
-                    break;
-
-                case "b":
-                    if (int.TryParse(pieces[3], out int beatmapId))
-                        ShowBeatmap(beatmapId);
-                    break;
             }
         }
 
