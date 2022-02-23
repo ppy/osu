@@ -26,13 +26,37 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
         protected override bool AllowFail => true;
 
         [Test]
-        public void TestSpinnerAutoCompleted() => CreateModTest(new ModTestData
+        public void TestSpinnerAutoCompleted()
         {
-            Mod = new OsuModSpunOut(),
-            Autoplay = false,
-            Beatmap = singleSpinnerBeatmap,
-            PassCondition = () => Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault()?.Progress >= 1
-        });
+            DrawableSpinner spinner = null;
+            JudgementResult lastResult = null;
+
+            CreateModTest(new ModTestData
+            {
+                Mod = new OsuModSpunOut(),
+                Autoplay = false,
+                Beatmap = singleSpinnerBeatmap,
+                PassCondition = () =>
+                {
+                    // Bind to the first spinner's results for further tracking.
+                    if (spinner == null)
+                    {
+                        // We only care about the first spinner we encounter for this test.
+                        var nextSpinner = Player.ChildrenOfType<DrawableSpinner>().SingleOrDefault();
+
+                        if (nextSpinner == null)
+                            return false;
+
+                        lastResult = null;
+
+                        spinner = nextSpinner;
+                        spinner.OnNewResult += (o, result) => lastResult = result;
+                    }
+
+                    return lastResult?.Type == HitResult.Great;
+                }
+            });
+        }
 
         [TestCase(null)]
         [TestCase(typeof(OsuModDoubleTime))]
