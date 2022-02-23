@@ -57,14 +57,14 @@ namespace osu.Game.Online.Spectator
             return connection.SendAsync(nameof(ISpectatorServer.BeginPlaySession), state);
         }
 
-        protected override Task SendFramesInternal(FrameDataBundle data)
+        protected override Task SendFramesInternal(FrameDataBundle bundle)
         {
             if (!IsConnected.Value)
                 return Task.CompletedTask;
 
             Debug.Assert(connection != null);
 
-            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), data);
+            return connection.SendAsync(nameof(ISpectatorServer.SendFrameData), bundle);
         }
 
         protected override Task EndPlayingInternal(SpectatorState state)
