@@ -47,18 +47,6 @@ namespace osu.Game.Online.Spectator
         public IBindableList<int> PlayingUsers => playingUsers;
 
         /// <summary>
-        /// All users currently being watched.
-        /// </summary>
-        private readonly List<int> watchedUsers = new List<int>();
-
-        private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
-        private readonly BindableList<int> playingUsers = new BindableList<int>();
-        private readonly SpectatorState currentState = new SpectatorState();
-
-        private IBeatmap? currentBeatmap;
-        private Score? currentScore;
-
-        /// <summary>
         /// Whether the local user is playing.
         /// </summary>
         protected bool IsPlaying { get; private set; }
@@ -77,6 +65,30 @@ namespace osu.Game.Online.Spectator
         /// Called whenever a user finishes a play session.
         /// </summary>
         public event Action<int, SpectatorState>? OnUserFinishedPlaying;
+
+        /// <summary>
+        /// All users currently being watched.
+        /// </summary>
+        private readonly List<int> watchedUsers = new List<int>();
+
+        private readonly BindableDictionary<int, SpectatorState> watchedUserStates = new BindableDictionary<int, SpectatorState>();
+        private readonly BindableList<int> playingUsers = new BindableList<int>();
+        private readonly SpectatorState currentState = new SpectatorState();
+
+        private IBeatmap? currentBeatmap;
+        private Score? currentScore;
+
+        private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
+
+        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
+
+        private double lastPurgeTime;
+
+        private Task? lastSend;
+
+        private int totalBundledFrames;
+
+        private const int max_pending_frames = 30;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -240,23 +252,12 @@ namespace osu.Game.Online.Spectator
         protected abstract Task BeginPlayingInternal(SpectatorState state);
 
         protected abstract Task SendFramesInternal(FrameDataBundle bundle);
+
         protected abstract Task EndPlayingInternal(SpectatorState state);
 
         protected abstract Task WatchUserInternal(int userId);
 
         protected abstract Task StopWatchingUserInternal(int userId);
-
-        private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
-
-        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
-
-        private double lastPurgeTime;
-
-        private Task? lastSend;
-
-        private int totalBundledFrames;
-
-        private const int max_pending_frames = 30;
 
         protected override void Update()
         {
