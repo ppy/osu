@@ -15,6 +15,7 @@ using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class Room : IDeepCloneable<Room>
     {
         [Cached]
@@ -49,7 +50,6 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<RoomCategory> Category = new Bindable<RoomCategory>();
 
         // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
@@ -62,19 +62,15 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>(new RoomStatusOpen());
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<MatchType> Type = new Bindable<MatchType>();
 
         // Todo: osu-framework bug (https://github.com/ppy/osu-framework/issues/4106)
@@ -87,7 +83,6 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<QueueMode> QueueMode = new Bindable<QueueMode>();
 
         [JsonConverter(typeof(SnakeCaseStringEnumConverter))]
@@ -99,7 +94,6 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
         [Cached]
@@ -124,7 +118,6 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<string> Password = new Bindable<string>();
 
         [Cached]
-        [JsonIgnore]
         public readonly Bindable<TimeSpan?> Duration = new Bindable<TimeSpan?>();
 
         [JsonProperty("duration")]
