@@ -162,6 +162,8 @@ namespace osu.Game.Online.Rooms
             var copy = new Room();
 
             copy.CopyFrom(this);
+
+            // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
             copy.RoomID.Value = null;
 
             return copy;
