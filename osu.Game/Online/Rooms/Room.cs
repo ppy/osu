@@ -231,13 +231,7 @@ namespace osu.Game.Online.Rooms
         // unless the fields are also renamed.
 
         [UsedImplicitly]
-        public bool ShouldSerializeRoomID() => false;
-
-        [UsedImplicitly]
         public bool ShouldSerializeHost() => false;
-
-        [UsedImplicitly]
-        public bool ShouldSerializeEndDate() => false;
 
         #endregion
 
