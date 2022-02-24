@@ -32,6 +32,10 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(typeof(Room))]
         protected Bindable<MatchType> Type { get; private set; }
 
+        /// <summary>
+        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the current item from <see cref="Playlist"/>
+        /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
+        /// </summary>
         [Resolved(typeof(Room))]
         protected Bindable<PlaylistItem> CurrentPlaylistItem { get; private set; }
 
@@ -80,12 +84,6 @@ namespace osu.Game.Screens.OnlinePlay
         [Resolved(CanBeNull = true)]
         private IBindable<PlaylistItem> subScreenSelectedItem { get; set; }
 
-        /// <summary>
-        /// The currently selected item in the <see cref="RoomSubScreen"/>, or the current item from <see cref="Playlist"/>
-        /// if this <see cref="OnlinePlayComposite"/> is not within a <see cref="RoomSubScreen"/>.
-        /// </summary>
-        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -96,13 +94,11 @@ namespace osu.Game.Screens.OnlinePlay
 
         protected void UpdateSelectedItem()
         {
-            if (RoomID.Value == null || subScreenSelectedItem == null)
-            {
-                SelectedItem.Value = CurrentPlaylistItem.Value ?? Playlist.GetCurrentItem();
-                return;
-            }
-
-            SelectedItem.Value = subScreenSelectedItem.Value;
+            // null room ID means this is a room in the process of being created.
+            if (RoomID.Value == null)
+                CurrentPlaylistItem.Value = Playlist.GetCurrentItem();
+            else if (subScreenSelectedItem != null)
+                CurrentPlaylistItem.Value = subScreenSelectedItem.Value;
         }
     }
 }
