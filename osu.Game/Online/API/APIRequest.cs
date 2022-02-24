@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
@@ -112,6 +113,9 @@ namespace osu.Game.Online.API
             WebRequest = CreateWebRequest();
             WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
+
+            WebRequest.AddHeader("x-api-version", API.APIVersion.ToString(CultureInfo.InvariantCulture));
+
             if (!string.IsNullOrEmpty(API.AccessToken))
                 WebRequest.AddHeader("Authorization", $"Bearer {API.AccessToken}");
 

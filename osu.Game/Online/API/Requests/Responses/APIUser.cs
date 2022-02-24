@@ -12,6 +12,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class APIUser : IEquatable<APIUser>, IUser
     {
         [JsonProperty(@"id")]

@@ -388,7 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                SelectedItem.BindValueChanged(onSelectedItemChanged, true);
+                CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
             }
 
             private CancellationTokenSource beatmapLookupCancellation;
