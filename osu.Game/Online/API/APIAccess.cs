@@ -36,6 +36,8 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
+        public int APIVersion => 20220217; // We may want to pull this from the game version eventually.
+
         public Exception LastLoginError { get; private set; }
 
         public string ProvidedUsername { get; private set; }

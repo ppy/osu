@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -75,15 +74,29 @@ namespace osu.Game.Screens.OnlinePlay.Components
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(updateRange, true);
+            DifficultyRange.BindValueChanged(_ => updateRange());
+            Playlist.BindCollectionChanged((_, __) => updateRange(), true);
         }
 
-        private void updateRange(object sender, NotifyCollectionChangedEventArgs e)
+        private void updateRange()
         {
-            var orderedDifficulties = Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
+            StarDifficulty minDifficulty;
+            StarDifficulty maxDifficulty;
 
-            StarDifficulty minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
-            StarDifficulty maxDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[^1].StarRating : 0, 0);
+            if (DifficultyRange.Value != null)
+            {
+                minDifficulty = new StarDifficulty(DifficultyRange.Value.Min, 0);
+                maxDifficulty = new StarDifficulty(DifficultyRange.Value.Max, 0);
+            }
+            else
+            {
+                // In multiplayer rooms, the beatmaps of playlist items will not be populated to a point this can be correct.
+                // Either populating them via BeatmapLookupCache or polling the API for the room's DifficultyRange will be required.
+                var orderedDifficulties = Playlist.Select(p => p.Beatmap).OrderBy(b => b.StarRating).ToArray();
+
+                minDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[0].StarRating : 0, 0);
+                maxDifficulty = new StarDifficulty(orderedDifficulties.Length > 0 ? orderedDifficulties[^1].StarRating : 0, 0);
+            }
 
             minDisplay.Current.Value = minDifficulty;
             maxDisplay.Current.Value = maxDifficulty;
