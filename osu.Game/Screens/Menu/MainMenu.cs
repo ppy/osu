@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -306,10 +307,13 @@ namespace osu.Game.Screens.Menu
             if (e.Repeat)
                 return false;
 
-            if (e.Action == GlobalAction.Back && host.CanSuspendToBackground)
+            switch (e.Action)
             {
-                if (host.SuspendToBackground())
-                    return true;
+                case GlobalAction.Back:
+                    // In the case of a host being able to exit, the back action is handled by ExitConfirmOverlay.
+                    Debug.Assert(!host.CanExit);
+
+                    return host.SuspendToBackground();
             }
 
             return false;
