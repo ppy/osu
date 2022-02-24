@@ -121,6 +121,17 @@ namespace osu.Game.Tests.Online
             Assert.That((deserialised?.Mods[0])?.Settings["speed_change"], Is.EqualTo(2));
         }
 
+        [Test]
+        public void TestAPIModDetachedFromSource()
+        {
+            var mod = new OsuModDoubleTime { SpeedChange = { Value = 1.01 } };
+            var apiMod = new APIMod(mod);
+
+            mod.SpeedChange.Value = 1.5;
+
+            Assert.That(apiMod.Settings["speed_change"], Is.EqualTo(1.01d));
+        }
+
         private class TestRuleset : Ruleset
         {
             public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[]
