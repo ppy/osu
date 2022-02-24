@@ -40,6 +40,7 @@ namespace osu.Game.Overlays.Mods
         protected OverlayColourProvider ColourProvider { get; private set; } = null!;
 
         protected const double TRANSITION_DURATION = 150;
+
         protected const float SHEAR_X = 0.2f;
 
         protected const float HEIGHT = 42;
@@ -48,7 +49,6 @@ namespace osu.Game.Overlays.Mods
         protected const float EXPANDED_SWITCH_WIDTH = 70;
 
         private Colour4 activeColour;
-        private Colour4 activeHoverColour;
 
         private Sample? sampleOff;
         private Sample? sampleOn;
@@ -146,7 +146,6 @@ namespace osu.Game.Overlays.Mods
             sampleOff = audio.Samples.Get(@"UI/check-off");
 
             activeColour = colours.ForModType(Mod.Type);
-            activeHoverColour = activeColour.Lighten(0.3f);
         }
 
         protected override HoverSounds CreateHoverSounds(HoverSampleSet sampleSet) => new HoverSounds(sampleSet);
@@ -184,89 +183,58 @@ namespace osu.Game.Overlays.Mods
             base.OnHoverLost(e);
         }
 
-        private double? mouseDownTime;
+        private bool mouseDown;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (e.Button == MouseButton.Left)
-                mouseDownTime = Time.Current;
+                mouseDown = true;
+
+            UpdateState();
             return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            mouseDownTime = null;
+            mouseDown = false;
+
+            UpdateState();
             base.OnMouseUp(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            mouseDownTime = null;
-            return true;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (mouseDownTime != null)
-            {
-                double startTime = mouseDownTime.Value;
-                double endTime = startTime + 600;
-
-                float startValue = Active.Value ? EXPANDED_SWITCH_WIDTH : IDLE_SWITCH_WIDTH;
-                float endValue = IDLE_SWITCH_WIDTH + (EXPANDED_SWITCH_WIDTH - IDLE_SWITCH_WIDTH) * (Active.Value ? 0.2f : 0.8f);
-
-                float targetWidth = Interpolation.ValueAt<float>(Math.Clamp(Time.Current, startTime, endTime), startValue, endValue, startTime, endTime, Easing.OutQuint);
-
-                SwitchContainer.Width = targetWidth;
-                MainContentContainer.Padding = new MarginPadding
-                {
-                    Left = targetWidth,
-                    Right = CORNER_RADIUS
-                };
-            }
         }
 
         protected virtual void UpdateState()
         {
-            if (Active.Value)
+            float targetWidth = Active.Value ? EXPANDED_SWITCH_WIDTH : IDLE_SWITCH_WIDTH;
+            double transitionDuration = TRANSITION_DURATION;
+
+            Colour4 textBackgroundColour = Active.Value ? activeColour : (Colour4)ColourProvider.Background2;
+            Colour4 mainBackgroundColour = Active.Value ? activeColour.Darken(0.3f) : (Colour4)ColourProvider.Background3;
+            Colour4 textColour = Active.Value ? (Colour4)ColourProvider.Background6 : Colour4.White;
+
+            // Hover affects colour of button background
+            if (IsHovered)
             {
-                Colour4 backgroundTextColour = IsHovered ? activeHoverColour : activeColour;
-                Colour4 backgroundColour = Interpolation.ValueAt<Colour4>(0.7f, Colour4.Black, backgroundTextColour, 0, 1);
-
-                Content.TransformTo(nameof(BorderColour), (ColourInfo)backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-                Background.FadeColour(backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-                SwitchContainer.ResizeWidthTo(EXPANDED_SWITCH_WIDTH, TRANSITION_DURATION, Easing.OutQuint);
-                MainContentContainer.TransformTo(nameof(Padding), new MarginPadding
-                {
-                    Left = EXPANDED_SWITCH_WIDTH,
-                    Right = CORNER_RADIUS
-                }, TRANSITION_DURATION, Easing.OutQuint);
-                TextBackground.FadeColour(backgroundTextColour, TRANSITION_DURATION, Easing.OutQuint);
-                TextFlow.FadeColour(ColourProvider.Background6, TRANSITION_DURATION, Easing.OutQuint);
+                textBackgroundColour = textBackgroundColour.Lighten(0.1f);
+                mainBackgroundColour = mainBackgroundColour.Lighten(0.1f);
             }
-            else
+
+            // Mouse down adds a halfway tween of the movement
+            if (mouseDown)
             {
-                Colour4 backgroundColour = ColourProvider.Background3;
-                if (IsHovered)
-                    backgroundColour = Interpolation.ValueAt<Colour4>(0.25f, backgroundColour, activeColour, 0, 1);
-
-                Colour4 textBackgroundColour = ColourProvider.Background2;
-                if (IsHovered)
-                    textBackgroundColour = Interpolation.ValueAt<Colour4>(0.25f, textBackgroundColour, activeColour, 0, 1);
-
-                Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(backgroundColour, textBackgroundColour), TRANSITION_DURATION, Easing.OutQuint);
-                Background.FadeColour(backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-                SwitchContainer.ResizeWidthTo(IDLE_SWITCH_WIDTH, TRANSITION_DURATION, Easing.OutQuint);
-                MainContentContainer.TransformTo(nameof(Padding), new MarginPadding
-                {
-                    Left = IDLE_SWITCH_WIDTH,
-                    Right = CORNER_RADIUS
-                }, TRANSITION_DURATION, Easing.OutQuint);
-                TextBackground.FadeColour(textBackgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-                TextFlow.FadeColour(Colour4.White, TRANSITION_DURATION, Easing.OutQuint);
+                targetWidth = (float)Interpolation.Lerp(IDLE_SWITCH_WIDTH, EXPANDED_SWITCH_WIDTH, 0.5f);
+                transitionDuration *= 4;
             }
+
+            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(mainBackgroundColour, textBackgroundColour), transitionDuration, Easing.OutQuint);
+            Background.FadeColour(mainBackgroundColour, transitionDuration, Easing.OutQuint);
+            SwitchContainer.ResizeWidthTo(targetWidth, transitionDuration, Easing.OutQuint);
+            MainContentContainer.TransformTo(nameof(Padding), new MarginPadding
+            {
+                Left = targetWidth,
+                Right = CORNER_RADIUS
+            }, transitionDuration, Easing.OutQuint);
+            TextBackground.FadeColour(textBackgroundColour, transitionDuration, Easing.OutQuint);
+            TextFlow.FadeColour(textColour, transitionDuration, Easing.OutQuint);
         }
     }
 }
