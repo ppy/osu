@@ -309,18 +309,8 @@ namespace osu.Game.Screens.Menu
 
             if (e.Action == GlobalAction.Back && host.CanSuspendToBackground)
             {
-                bool didSuspend = host.SuspendToBackground();
-
-                if (didSuspend)
-                {
-                    // fade the track so the Bass.Pause() on suspend isn't as jarring.
-                    const double fade_time = 500;
-                    musicController.CurrentTrack
-                                   .VolumeTo(0, fade_time, Easing.Out).Then()
-                                   .VolumeTo(1, fade_time, Easing.In);
-
+                if (host.SuspendToBackground())
                     return true;
-                }
             }
 
             return false;
