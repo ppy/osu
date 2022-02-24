@@ -46,6 +46,7 @@ namespace osu.Game.Online.Rooms
         public readonly Bindable<RoomPlaylistItemStats> PlaylistItemStats = new Bindable<RoomPlaylistItemStats>();
 
         [JsonProperty("difficulty_range")]
+        [Cached]
         public readonly Bindable<RoomDifficultyRange> DifficultyRange = new Bindable<RoomDifficultyRange>();
 
         [Cached]
@@ -190,6 +191,7 @@ namespace osu.Game.Online.Rooms
             QueueMode.Value = other.QueueMode.Value;
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
+            CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;
 
             if (EndDate.Value != null && DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
