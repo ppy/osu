@@ -124,7 +124,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, -(room.Room.RoomID.Value ?? 0));
+            {
+                roomFlow.SetLayoutPosition(room, room.Room.Category.Value == RoomCategory.Spotlight
+                    // Always show spotlight playlists at the top of the listing.
+                    ? float.MinValue
+                    : -(room.Room.RoomID.Value ?? 0));
+            }
         }
 
         protected override bool OnClick(ClickEvent e)

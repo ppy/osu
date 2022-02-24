@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Utils;
@@ -158,6 +159,36 @@ namespace osu.Game.Graphics
         }
 
         /// <summary>
+        /// Retrieves the main accent colour for a <see cref="ModType"/>.
+        /// </summary>
+        public Color4 ForModType(ModType modType)
+        {
+            switch (modType)
+            {
+                case ModType.Automation:
+                    return Blue1;
+
+                case ModType.DifficultyIncrease:
+                    return Red1;
+
+                case ModType.DifficultyReduction:
+                    return Lime1;
+
+                case ModType.Conversion:
+                    return Purple1;
+
+                case ModType.Fun:
+                    return Pink1;
+
+                case ModType.System:
+                    return Gray7;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modType), modType, "Unknown mod type");
+            }
+        }
+
+        /// <summary>
         /// Returns a foreground text colour that is supposed to contrast well with
         /// the supplied <paramref name="backgroundColour"/>.
         /// </summary>
@@ -264,32 +295,58 @@ namespace osu.Game.Graphics
         public readonly Color4 GrayE = Color4Extensions.FromHex(@"eee");
         public readonly Color4 GrayF = Color4Extensions.FromHex(@"fff");
 
-        /// <summary>
-        /// Equivalent to <see cref="OverlayColourProvider.Pink"/>'s <see cref="OverlayColourProvider.Colour3"/>.
-        /// </summary>
-        public readonly Color4 Pink3 = Color4Extensions.FromHex(@"cc3378");
+        #region "Basic" colour theme
 
-        /// <summary>
-        /// Equivalent to <see cref="OverlayColourProvider.Blue"/>'s <see cref="OverlayColourProvider.Colour3"/>.
-        /// </summary>
+        // Reference: https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Asset%2FColours?node-id=1838%3A3
+
+        // Note that the colours in this region are also defined in `OverlayColourProvider` as `Colour{0,1,2,3,4}`.
+        // The difference as to which should be used where comes down to context.
+        // If the colour in question is supposed to always match the view in which it is displayed theme-wise, use `OverlayColourProvider`.
+        // If the colour usage is special and in general differs from the surrounding view in choice of hue, use the `OsuColour` constants.
+
+        public readonly Color4 Pink0 = Color4Extensions.FromHex(@"ff99c7");
+        public readonly Color4 Pink1 = Color4Extensions.FromHex(@"ff66ab");
+        public readonly Color4 Pink2 = Color4Extensions.FromHex(@"eb4791");
+        public readonly Color4 Pink3 = Color4Extensions.FromHex(@"cc3378");
+        public readonly Color4 Pink4 = Color4Extensions.FromHex(@"6b2e49");
+
+        public readonly Color4 Purple0 = Color4Extensions.FromHex(@"b299ff");
+        public readonly Color4 Purple1 = Color4Extensions.FromHex(@"8c66ff");
+        public readonly Color4 Purple2 = Color4Extensions.FromHex(@"7047eb");
+        public readonly Color4 Purple3 = Color4Extensions.FromHex(@"5933cc");
+        public readonly Color4 Purple4 = Color4Extensions.FromHex(@"3d2e6b");
+
+        public readonly Color4 Blue0 = Color4Extensions.FromHex(@"99ddff");
+        public readonly Color4 Blue1 = Color4Extensions.FromHex(@"66ccff");
+        public readonly Color4 Blue2 = Color4Extensions.FromHex(@"47b4eb");
         public readonly Color4 Blue3 = Color4Extensions.FromHex(@"3399cc");
+        public readonly Color4 Blue4 = Color4Extensions.FromHex(@"2e576b");
+
+        public readonly Color4 Green0 = Color4Extensions.FromHex(@"99ffa2");
+        public readonly Color4 Green1 = Color4Extensions.FromHex(@"66ff73");
+        public readonly Color4 Green2 = Color4Extensions.FromHex(@"47eb55");
+        public readonly Color4 Green3 = Color4Extensions.FromHex(@"33cc40");
+        public readonly Color4 Green4 = Color4Extensions.FromHex(@"2e6b33");
 
         public readonly Color4 Lime0 = Color4Extensions.FromHex(@"ccff99");
-
-        /// <summary>
-        /// Equivalent to <see cref="OverlayColourProvider.Lime"/>'s <see cref="OverlayColourProvider.Colour1"/>.
-        /// </summary>
         public readonly Color4 Lime1 = Color4Extensions.FromHex(@"b2ff66");
-
-        /// <summary>
-        /// Equivalent to <see cref="OverlayColourProvider.Lime"/>'s <see cref="OverlayColourProvider.Colour3"/>.
-        /// </summary>
+        public readonly Color4 Lime2 = Color4Extensions.FromHex(@"99eb47");
         public readonly Color4 Lime3 = Color4Extensions.FromHex(@"7fcc33");
+        public readonly Color4 Lime4 = Color4Extensions.FromHex(@"4c6b2e");
 
-        /// <summary>
-        /// Equivalent to <see cref="OverlayColourProvider.Orange"/>'s <see cref="OverlayColourProvider.Colour1"/>.
-        /// </summary>
+        public readonly Color4 Orange0 = Color4Extensions.FromHex(@"ffe699");
         public readonly Color4 Orange1 = Color4Extensions.FromHex(@"ffd966");
+        public readonly Color4 Orange2 = Color4Extensions.FromHex(@"ebc247");
+        public readonly Color4 Orange3 = Color4Extensions.FromHex(@"cca633");
+        public readonly Color4 Orange4 = Color4Extensions.FromHex(@"6b5c2e");
+
+        public readonly Color4 Red0 = Color4Extensions.FromHex(@"ff9b9b");
+        public readonly Color4 Red1 = Color4Extensions.FromHex(@"ff6666");
+        public readonly Color4 Red2 = Color4Extensions.FromHex(@"eb4747");
+        public readonly Color4 Red3 = Color4Extensions.FromHex(@"cc3333");
+        public readonly Color4 Red4 = Color4Extensions.FromHex(@"6b2e2e");
+
+        #endregion
 
         // Content Background
         public readonly Color4 B5 = Color4Extensions.FromHex(@"222a28");
