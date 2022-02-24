@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +11,6 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Components
@@ -72,25 +70,23 @@ namespace osu.Game.Screens.OnlinePlay.Components
             };
         }
 
-        [Resolved]
-        private Room room { get; set; }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(updateRange, true);
+            DifficultyRange.BindValueChanged(_ => updateRange());
+            Playlist.BindCollectionChanged((_, __) => updateRange(), true);
         }
 
-        private void updateRange(object sender, NotifyCollectionChangedEventArgs e)
+        private void updateRange()
         {
             StarDifficulty minDifficulty;
             StarDifficulty maxDifficulty;
 
-            if (room.DifficultyRange.Value != null)
+            if (DifficultyRange.Value != null)
             {
-                minDifficulty = new StarDifficulty(room.DifficultyRange.Value.Min, 0);
-                maxDifficulty = new StarDifficulty(room.DifficultyRange.Value.Max, 0);
+                minDifficulty = new StarDifficulty(DifficultyRange.Value.Min, 0);
+                maxDifficulty = new StarDifficulty(DifficultyRange.Value.Max, 0);
             }
             else
             {
