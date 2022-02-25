@@ -15,6 +15,7 @@ using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
@@ -377,7 +378,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(playingUsers.ToArray(), gameplayStartTime));
+                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray(), gameplayStartTime));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
@@ -465,8 +466,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             private readonly double? gameplayStartTime;
 
-            public TestMultiSpectatorScreen(MultiplayerRoomUser[] users, double? gameplayStartTime = null)
-                : base(users)
+            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? gameplayStartTime = null)
+                : base(room, users)
             {
                 this.gameplayStartTime = gameplayStartTime;
             }

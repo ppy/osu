@@ -62,6 +62,10 @@ namespace osu.Game.Online.Rooms
         [JsonProperty("beatmap_id")]
         private int onlineBeatmapId => Beatmap.OnlineID;
 
+        /// <summary>
+        /// A beatmap representing this playlist item.
+        /// In many cases, this will *not* contain any usable information apart from OnlineID.
+        /// </summary>
         [JsonIgnore]
         public IBeatmapInfo Beatmap { get; set; } = null!;
 

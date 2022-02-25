@@ -618,7 +618,7 @@ namespace osu.Game.Online.Chat
             var req = new MarkChannelAsReadRequest(channel, message);
 
             req.Success += () => channel.LastReadId = message.Id;
-            req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel} up to '{message}' as read");
+            req.Failure += e => Logger.Log($"Failed to mark channel {channel} up to '{message}' as read ({e.Message})", LoggingTarget.Network);
 
             api.Queue(req);
         }
