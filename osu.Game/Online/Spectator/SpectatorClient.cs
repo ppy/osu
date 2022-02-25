@@ -86,8 +86,6 @@ namespace osu.Game.Online.Spectator
 
         private Task? lastSend;
 
-        private int totalBundledFrames;
-
         private const int max_pending_frames = 30;
 
         [BackgroundDependencyLoader]
@@ -168,8 +166,6 @@ namespace osu.Game.Online.Spectator
                     throw new InvalidOperationException($"Cannot invoke {nameof(BeginPlaying)} when already playing");
 
                 IsPlaying = true;
-
-                totalBundledFrames = 0;
 
                 // transfer state at point of beginning play
                 currentState.BeatmapID = score.ScoreInfo.BeatmapInfo.OnlineID;
@@ -276,10 +272,6 @@ namespace osu.Game.Online.Spectator
 
             var frames = pendingFrames.ToArray();
             var bundle = new FrameDataBundle(currentScore.ScoreInfo, frames);
-
-            totalBundledFrames += frames.Length;
-
-            Logger.Log($"Purging {pendingFrames.Count} frames (total {totalBundledFrames})");
 
             pendingFrames.Clear();
             lastPurgeTime = Time.Current;
