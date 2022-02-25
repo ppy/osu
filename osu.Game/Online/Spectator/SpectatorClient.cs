@@ -279,7 +279,7 @@ namespace osu.Game.Online.Spectator
 
             totalBundledFrames += frames.Length;
 
-            Console.WriteLine($"Purging {pendingFrames.Count} frames (total {totalBundledFrames})");
+            Logger.Log($"Purging {pendingFrames.Count} frames (total {totalBundledFrames})");
 
             pendingFrames.Clear();
             lastPurgeTime = Time.Current;
