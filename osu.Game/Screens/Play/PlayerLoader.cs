@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using ManagedBass.Fx;
@@ -21,6 +22,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Menu;
@@ -94,7 +96,9 @@ namespace osu.Game.Screens.Play
             // don't push if the user is dragging a slider or otherwise.
             && inputManager?.DraggedDrawable == null
             // don't push if a focused overlay is visible, like settings.
-            && inputManager?.FocusedDrawable == null;
+            && inputManager?.FocusedDrawable == null
+            // don't push if the quick retry key is still held.
+            && !globalActionContainer.PressedActions.Contains(GlobalAction.QuickRetry);
 
         private readonly Func<Player> createPlayer;
 
@@ -129,6 +133,9 @@ namespace osu.Game.Screens.Play
 
         [Resolved(CanBeNull = true)]
         private BatteryInfo batteryInfo { get; set; }
+
+        [Resolved]
+        private GlobalActionContainer globalActionContainer { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
