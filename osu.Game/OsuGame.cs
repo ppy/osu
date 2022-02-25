@@ -838,7 +838,8 @@ namespace osu.Game
                 channelManager.HighPollRate.Value =
                     chatOverlay.State.Value == Visibility.Visible
                     || API.Activity.Value is UserActivity.InLobby
-                    || API.Activity.Value is UserActivity.InMultiplayerGame;
+                    || API.Activity.Value is UserActivity.InMultiplayerGame
+                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
             }
 
             Add(difficultyRecommender);
