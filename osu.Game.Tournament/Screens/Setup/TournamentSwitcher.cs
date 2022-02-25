@@ -35,15 +35,15 @@ namespace osu.Game.Tournament.Screens.Setup
         {
             var drawable = base.CreateComponent();
 
-            FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
-            {
-                Width = 510
-            });
-
-            FlowContainer.Insert(-2, folderButton = new TriangleButton
+            FlowContainer.Insert(-1, folderButton = new TriangleButton
             {
                 Text = "Open folder",
                 Width = 100
+            });
+
+            FlowContainer.Insert(-2, dropdown = new OsuDropdown<string>
+            {
+                Width = 510
             });
 
             return drawable;
