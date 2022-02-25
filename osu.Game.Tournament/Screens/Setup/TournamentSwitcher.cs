@@ -11,6 +11,7 @@ namespace osu.Game.Tournament.Screens.Setup
     internal class TournamentSwitcher : ActionableInfo
     {
         private OsuDropdown<string> dropdown;
+        private OsuButton folderButton;
 
         [Resolved]
         private TournamentGameBase game { get; set; }
@@ -25,6 +26,7 @@ namespace osu.Game.Tournament.Screens.Setup
             dropdown.Current.BindValueChanged(v => Button.Enabled.Value = v.NewValue != startupTournament, true);
 
             Action = () => game.GracefullyExit();
+            folderButton.Action = storage.PresentExternally;
 
             ButtonText = "Close osu!";
         }
@@ -36,6 +38,12 @@ namespace osu.Game.Tournament.Screens.Setup
             FlowContainer.Insert(-1, dropdown = new OsuDropdown<string>
             {
                 Width = 510
+            });
+
+            FlowContainer.Insert(-2, folderButton = new TriangleButton
+            {
+                Text = "Open folder",
+                Width = 100
             });
 
             return drawable;
