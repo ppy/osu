@@ -16,6 +16,7 @@ using osu.Game.Online.Spectator;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Spectate;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
         /// Whether all spectating players have finished loading.
         /// </summary>
         public bool AllPlayersLoaded => instances.All(p => p?.PlayerLoaded == true);
+
+        protected override UserActivity InitialActivity => new UserActivity.SpectatingMultiplayerGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         [Resolved]
         private OsuColour colours { get; set; }
