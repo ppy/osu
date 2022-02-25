@@ -153,18 +153,6 @@ namespace osu.Game.Beatmaps
         #region Compatibility properties
 
         [Ignored]
-        public int RulesetID
-        {
-            set
-            {
-                if (!string.IsNullOrEmpty(Ruleset.InstantiationInfo))
-                    throw new InvalidOperationException($"Cannot set a {nameof(RulesetID)} when {nameof(Ruleset)} is already set to an actual ruleset.");
-
-                Ruleset.OnlineID = value;
-            }
-        }
-
-        [Ignored]
         [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
         public BeatmapDifficulty BaseDifficulty
         {

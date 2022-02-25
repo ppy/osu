@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual.Collections
         [BackgroundDependencyLoader]
         private void load(GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesets, null, Audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
