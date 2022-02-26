@@ -84,6 +84,8 @@ If you are not interested in debugging *osu!*, you can add `-c Release` to gain 
 
 If the build fails, try to restore NuGet packages with `dotnet restore`.
 
+If you are getting an `NuGet.Config is not valid XML.` error, try to manually delete `/home/you/.nuget/NuGet/NuGet.Config` or `C:\Users\you\AppData\Roaming\NuGet\NuGet.Config`.
+
 _Due to a historical feature gap between .NET Core and Xamarin, running `dotnet` CLI from the root directory will not work for most commands. This can be resolved by specifying a target `.csproj` or the helper project at `build/Desktop.proj`. Configurations have been provided to work around this issue for all supported IDEs mentioned above._
 
 ### Testing with resource/framework modifications
