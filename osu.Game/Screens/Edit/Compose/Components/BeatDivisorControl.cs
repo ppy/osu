@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class DivisorDisplay : OsuAnimatedButton, IHasPopover
+        internal class DivisorDisplay : OsuAnimatedButton, IHasPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        private class CustomDivisorPopover : OsuPopover
+        internal class CustomDivisorPopover : OsuPopover
         {
             public BindableBeatDivisor BeatDivisor { get; } = new BindableBeatDivisor();
 
@@ -347,7 +347,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class ChevronButton : IconButton
+        internal class ChevronButton : IconButton
         {
             public ChevronButton()
             {

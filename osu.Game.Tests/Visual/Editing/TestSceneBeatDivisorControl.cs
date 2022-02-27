@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
@@ -80,6 +81,120 @@ namespace osu.Game.Tests.Visual.Editing
                 sliderDrawQuad.TopLeft.X + sliderDrawQuad.Width * relativePosition,
                 sliderDrawQuad.Centre.Y
             );
+        }
+
+        [Test]
+        public void TestBeatChevronNavigation()
+        {
+            switchBeatSnap(1);
+            assertBeatSnap(1);
+
+            switchBeatSnap(3);
+            assertBeatSnap(8);
+
+            switchBeatSnap(-1);
+            assertBeatSnap(4);
+
+            switchBeatSnap(-3);
+            assertBeatSnap(16);
+        }
+
+        [Test]
+        public void TestBeatPresetNavigation()
+        {
+            assertPreset(BeatDivisorType.Common);
+
+            switchPresets(1);
+            assertPreset(BeatDivisorType.Triplets);
+
+            switchPresets(1);
+            assertPreset(BeatDivisorType.Common);
+
+            switchPresets(-1);
+            assertPreset(BeatDivisorType.Triplets);
+
+            switchPresets(-1);
+            assertPreset(BeatDivisorType.Common);
+
+            setDivisorViaInput(3);
+            assertPreset(BeatDivisorType.Triplets);
+
+            setDivisorViaInput(8);
+            assertPreset(BeatDivisorType.Common);
+
+            setDivisorViaInput(15);
+            assertPreset(BeatDivisorType.Custom, 15);
+
+            switchBeatSnap(-1);
+            assertBeatSnap(5);
+
+            switchBeatSnap(-1);
+            assertBeatSnap(3);
+
+            setDivisorViaInput(5);
+            assertPreset(BeatDivisorType.Custom, 15);
+
+            switchPresets(1);
+            assertPreset(BeatDivisorType.Common);
+
+            switchPresets(-1);
+            assertPreset(BeatDivisorType.Triplets);
+        }
+
+        private void switchBeatSnap(int direction) => AddRepeatStep($"move snap {(direction > 0 ? "forward" : "backward")}", () =>
+        {
+            int chevronIndex = direction > 0 ? 1 : 0;
+            var chevronButton = beatDivisorControl.ChildrenOfType<BeatDivisorControl.ChevronButton>().ElementAt(chevronIndex);
+            InputManager.MoveMouseTo(chevronButton);
+            InputManager.Click(MouseButton.Left);
+        }, Math.Abs(direction));
+
+        private void assertBeatSnap(int expected) => AddAssert($"beat snap is {expected}",
+            () => bindableBeatDivisor.Value == expected);
+
+        private void switchPresets(int direction) => AddRepeatStep($"move presets {(direction > 0 ? "forward" : "backward")}", () =>
+        {
+            int chevronIndex = direction > 0 ? 3 : 2;
+            var chevronButton = beatDivisorControl.ChildrenOfType<BeatDivisorControl.ChevronButton>().ElementAt(chevronIndex);
+            InputManager.MoveMouseTo(chevronButton);
+            InputManager.Click(MouseButton.Left);
+        }, Math.Abs(direction));
+
+        private void assertPreset(BeatDivisorType type, int? maxDivisor = null)
+        {
+            AddAssert($"preset is {type}", () => bindableBeatDivisor.ValidDivisors.Value.Type == type);
+
+            if (type == BeatDivisorType.Custom)
+            {
+                Debug.Assert(maxDivisor != null);
+                AddAssert($"max divisor is {maxDivisor}", () => bindableBeatDivisor.ValidDivisors.Value.Presets.Max() == maxDivisor.Value);
+            }
+        }
+
+        private void setDivisorViaInput(int divisor)
+        {
+            AddStep("open divisor input popover", () =>
+            {
+                var button = beatDivisorControl.ChildrenOfType<BeatDivisorControl.DivisorDisplay>().Single();
+                InputManager.MoveMouseTo(button);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            BeatDivisorControl.CustomDivisorPopover popover = null;
+            AddUntilStep("wait for popover", () => (popover = this.ChildrenOfType<BeatDivisorControl.CustomDivisorPopover>().SingleOrDefault()) != null && popover.IsLoaded);
+            AddStep($"set divisor to {divisor}", () =>
+            {
+                var textBox = popover.ChildrenOfType<TextBox>().Single();
+                InputManager.MoveMouseTo(textBox);
+                InputManager.Click(MouseButton.Left);
+                textBox.Text = divisor.ToString();
+                InputManager.Key(Key.Enter);
+            });
+            AddStep("dismiss popover", () =>
+            {
+                InputManager.Key(Key.Escape);
+            });
+            AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<BeatDivisorControl.CustomDivisorPopover>().Any());
         }
     }
 }
