@@ -43,10 +43,10 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestBindableBeatDivisor()
         {
-            AddRepeatStep("move previous", () => bindableBeatDivisor.Previous(), 4);
+            AddRepeatStep("move previous", () => bindableBeatDivisor.Previous(), 2);
             AddAssert("divisor is 4", () => bindableBeatDivisor.Value == 4);
-            AddRepeatStep("move next", () => bindableBeatDivisor.Next(), 3);
-            AddAssert("divisor is 12", () => bindableBeatDivisor.Value == 12);
+            AddRepeatStep("move next", () => bindableBeatDivisor.Next(), 1);
+            AddAssert("divisor is 12", () => bindableBeatDivisor.Value == 8);
         }
 
         [Test]
