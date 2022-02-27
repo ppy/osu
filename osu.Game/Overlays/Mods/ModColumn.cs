@@ -56,14 +56,14 @@ namespace osu.Game.Overlays.Mods
 
         private Colour4 accentColour;
 
-        private const float header_height = 60;
+        private const float header_height = 42;
 
         public ModColumn(ModType modType, bool allowBulkSelection, Key[]? toggleKeys = null)
         {
             this.modType = modType;
             this.toggleKeys = toggleKeys;
 
-            Width = 450;
+            Width = 320;
             RelativeSizeAxes = Axes.Y;
             Shear = new Vector2(ModPanel.SHEAR_X, 0);
             CornerRadius = ModPanel.CORNER_RADIUS;
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Mods
                         },
                         headerText = new OsuTextFlowContainer(t =>
                         {
-                            t.Font = OsuFont.TorusAlternate.With(size: 24);
+                            t.Font = OsuFont.TorusAlternate.With(size: 17);
                             t.Shadow = false;
                             t.Colour = Colour4.Black;
                         })
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Mods
                             Shear = new Vector2(-ModPanel.SHEAR_X, 0),
                             Padding = new MarginPadding
                             {
-                                Horizontal = 15,
+                                Horizontal = 17,
                                 Bottom = ModPanel.CORNER_RADIUS
                             }
                         }
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Mods
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         CornerRadius = ModPanel.CORNER_RADIUS,
-                        BorderThickness = 4,
+                        BorderThickness = 3,
                         Children = new Drawable[]
                         {
                             contentBackground = new Box
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Mods
                                         controlContainer = new Container
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Padding = new MarginPadding { Horizontal = 20 }
+                                            Padding = new MarginPadding { Horizontal = 14 }
                                         }
                                     },
                                     new Drawable[]
@@ -147,8 +147,8 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Spacing = new Vector2(0, 10),
-                                                Padding = new MarginPadding(10)
+                                                Spacing = new Vector2(0, 7),
+                                                Padding = new MarginPadding(7)
                                             }
                                         }
                                     }
@@ -163,11 +163,12 @@ namespace osu.Game.Overlays.Mods
 
             if (allowBulkSelection)
             {
-                controlContainer.Height = 50;
+                controlContainer.Height = 35;
                 controlContainer.Add(toggleAllCheckbox = new ToggleAllCheckbox(this)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    Scale = new Vector2(0.8f),
                     RelativeSizeAxes = Axes.X,
                     LabelText = "Enable All",
                     Shear = new Vector2(-ModPanel.SHEAR_X, 0)
@@ -175,8 +176,8 @@ namespace osu.Game.Overlays.Mods
                 panelFlow.Padding = new MarginPadding
                 {
                     Top = 0,
-                    Bottom = 10,
-                    Horizontal = 10
+                    Bottom = 7,
+                    Horizontal = 7
                 };
             }
         }
