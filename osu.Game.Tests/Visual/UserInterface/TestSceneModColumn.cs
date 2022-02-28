@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("checkbox selected", () => this.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
 
             AddStep("deselect first panel", () => this.ChildrenOfType<ModPanel>().First().Active.Value = false);
-            AddUntilStep("checkbox selected", () => !this.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
+            AddUntilStep("checkbox not selected", () => !this.ChildrenOfType<OsuCheckbox>().Single().Current.Value);
 
             void clickToggle() => AddStep("click toggle", () =>
             {
@@ -121,8 +121,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("checkbox hidden", () => !column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
 
             AddStep("inset filter", () => column.Filter = null);
-            AddUntilStep("no panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.Filtered.Value));
-            AddUntilStep("checkbox hidden", () => column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
+            AddUntilStep("all panels visible", () => column.ChildrenOfType<ModPanel>().All(panel => !panel.Filtered.Value));
+            AddUntilStep("checkbox visible", () => column.ChildrenOfType<OsuCheckbox>().Single().IsPresent);
 
             void clickToggle() => AddStep("click toggle", () =>
             {
