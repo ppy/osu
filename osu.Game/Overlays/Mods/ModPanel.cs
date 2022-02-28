@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Mods
                 mouseDown = true;
 
             UpdateState();
-            return true;
+            return false;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
