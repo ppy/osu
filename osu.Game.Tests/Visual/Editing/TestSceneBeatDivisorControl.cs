@@ -190,10 +190,6 @@ namespace osu.Game.Tests.Visual.Editing
                 textBox.Text = divisor.ToString();
                 InputManager.Key(Key.Enter);
             });
-            AddStep("dismiss popover", () =>
-            {
-                InputManager.Key(Key.Escape);
-            });
             AddUntilStep("wait for dismiss", () => !this.ChildrenOfType<BeatDivisorControl.CustomDivisorPopover>().Any());
         }
     }

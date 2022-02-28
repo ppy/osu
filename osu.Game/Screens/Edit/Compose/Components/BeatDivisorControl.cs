@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -299,6 +300,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 base.LoadComplete();
                 BeatDivisor.BindValueChanged(_ => updateState(), true);
                 divisorTextBox.OnCommit += (_, __) => setPresets();
+
+                Schedule(() => GetContainingInputManager().ChangeFocus(divisorTextBox));
             }
 
             private void setPresets()
@@ -320,6 +323,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
 
                 BeatDivisor.Value = divisor;
+
+                this.HidePopover();
             }
 
             private void updateState()
