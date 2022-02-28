@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Scoring
             return 10 * standardDeviation(timeOffsets);
         }
 
+        public static double? CalculateAverageHitError(this IEnumerable<HitEvent> hitEvents) =>
+            hitEvents.Where(affectsUnstableRate).Select(ev => ev.TimeOffset).Average();
+
         private static bool affectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
 
         private static double? standardDeviation(double[] timeOffsets)
