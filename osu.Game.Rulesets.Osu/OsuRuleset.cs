@@ -314,6 +314,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
                         }), true)
                     }
