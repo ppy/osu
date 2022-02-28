@@ -10,6 +10,7 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
 using osu.Game.Replays.Legacy;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
 
@@ -112,11 +113,16 @@ namespace osu.Game.Scoring.Legacy
                 {
                     int lastTime = 0;
 
-                    foreach (var f in score.Replay.Frames.OfType<IConvertibleReplayFrame>().Select(f => f.ToLegacy(beatmap)))
+                    foreach (var f in score.Replay.Frames)
                     {
+                        var legacyFrame = getLegacyFrame(f);
+
+                        if (legacyFrame == null)
+                            throw new ArgumentException("One or more frames could not be converted to legacy frames");
+
                         // Rounding because stable could only parse integral values
-                        int time = (int)Math.Round(f.Time);
-                        replayData.Append(FormattableString.Invariant($"{time - lastTime}|{f.MouseX ?? 0}|{f.MouseY ?? 0}|{(int)f.ButtonState},"));
+                        int time = (int)Math.Round(legacyFrame.Time);
+                        replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
                         lastTime = time;
                     }
                 }
@@ -126,6 +132,14 @@ namespace osu.Game.Scoring.Legacy
                 replayData.Append(@"-12345|0|0|0");
                 return replayData.ToString();
             }
+        }
+
+        private LegacyReplayFrame getLegacyFrame(ReplayFrame replayFrame)
+        {
+            if (replayFrame is LegacyReplayFrame legacyFrame)
+                return legacyFrame;
+
+            return (replayFrame as IConvertibleReplayFrame)?.ToLegacy(beatmap);
         }
 
         private string getHpGraphFormatted()
