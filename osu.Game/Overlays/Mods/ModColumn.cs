@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -55,6 +56,9 @@ namespace osu.Game.Overlays.Mods
         private readonly ToggleAllCheckbox? toggleAllCheckbox;
 
         private Colour4 accentColour;
+
+        private Task? latestLoadTask;
+        internal bool ItemsLoaded => latestLoadTask == null;
 
         private const float header_height = 42;
 
@@ -234,7 +238,9 @@ namespace osu.Game.Overlays.Mods
                 Shear = new Vector2(-ModPanel.SHEAR_X, 0)
             });
 
-            LoadComponentsAsync(panels, loaded =>
+            Task? loadTask;
+
+            latestLoadTask = loadTask = LoadComponentsAsync(panels, loaded =>
             {
                 panelFlow.ChildrenEnumerable = loaded;
 
@@ -244,6 +250,11 @@ namespace osu.Game.Overlays.Mods
 
                 updateFilter();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+            loadTask.ContinueWith(_ =>
+            {
+                if (loadTask == latestLoadTask)
+                    latestLoadTask = null;
+            });
         }
 
         #region Bulk select / deselect
