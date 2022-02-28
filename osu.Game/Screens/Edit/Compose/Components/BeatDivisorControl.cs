@@ -288,7 +288,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Text = "All other applicable smaller divisors will be automatically added to the list of presets."
+                            Text = "Related divisors will be added to the list of presets."
                         }
                     }
                 };
