@@ -54,16 +54,19 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestMultiSelection()
         {
+            ModColumn column = null;
             AddStep("create content", () => Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(30),
-                Child = new ModColumn(ModType.DifficultyIncrease, true)
+                Child = column = new ModColumn(ModType.DifficultyIncrease, true)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 }
             });
+
+            AddUntilStep("wait for panel load", () => column.IsLoaded && column.ItemsLoaded);
 
             clickToggle();
             AddUntilStep("all panels selected", () => this.ChildrenOfType<ModPanel>().All(panel => panel.Active.Value));
@@ -140,12 +143,14 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(30),
-                Child = column = new ModColumn(ModType.DifficultyReduction, true, new Key[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P })
+                Child = column = new ModColumn(ModType.DifficultyReduction, true, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 }
             });
+
+            AddUntilStep("wait for panel load", () => column.IsLoaded && column.ItemsLoaded);
 
             AddStep("press W", () => InputManager.Key(Key.W));
             AddAssert("NF panel selected", () => this.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.Acronym == "NF").Active.Value);
