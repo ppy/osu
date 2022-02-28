@@ -2,16 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Models;
 
 namespace osu.Game.Tournament.Tests.Components
 {
     [TestFixture]
     public class TestSceneSongBar : OsuTestScene
     {
+        [Cached]
+        private readonly LadderInfo ladder = new LadderInfo();
+
         [Test]
         public void TestSongBar()
         {
