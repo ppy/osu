@@ -224,7 +224,8 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            availableMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods), true);
+            availableMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods));
+            updateMods();
         }
 
         private CancellationTokenSource? cancellationTokenSource;
