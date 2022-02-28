@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using JetBrains.Annotations;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.IO.Legacy;
@@ -13,6 +12,8 @@ using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
+
+#nullable enable
 
 namespace osu.Game.Scoring.Legacy
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Scoring.Legacy
         public const int FIRST_LAZER_VERSION = 30000000;
 
         private readonly Score score;
-        private readonly IBeatmap beatmap;
+        private readonly IBeatmap? beatmap;
 
         /// <summary>
         /// Create a new score encoder for a specific score.
@@ -38,16 +39,16 @@ namespace osu.Game.Scoring.Legacy
         /// <param name="score">The score to be encoded.</param>
         /// <param name="beatmap">The beatmap used to convert frames for the score. May be null if the frames are already <see cref="LegacyReplayFrame"/>s.</param>
         /// <exception cref="ArgumentException"></exception>
-        public LegacyScoreEncoder(Score score, [CanBeNull] IBeatmap beatmap)
+        public LegacyScoreEncoder(Score score, IBeatmap? beatmap)
         {
             this.score = score;
             this.beatmap = beatmap;
 
             if (beatmap == null && !score.Replay.Frames.All(f => f is LegacyReplayFrame))
-                throw new ArgumentException("Beatmap must be provided if frames are not already legacy frames.", nameof(beatmap));
+                throw new ArgumentException(@"Beatmap must be provided if frames are not already legacy frames.", nameof(beatmap));
 
             if (score.ScoreInfo.Ruleset.OnlineID < 0 || score.ScoreInfo.Ruleset.OnlineID > 3)
-                throw new ArgumentException("Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
+                throw new ArgumentException(@"Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 
         public void Encode(Stream stream)
@@ -117,9 +118,6 @@ namespace osu.Game.Scoring.Legacy
                     {
                         var legacyFrame = getLegacyFrame(f);
 
-                        if (legacyFrame == null)
-                            throw new ArgumentException("One or more frames could not be converted to legacy frames");
-
                         // Rounding because stable could only parse integral values
                         int time = (int)Math.Round(legacyFrame.Time);
                         replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
@@ -136,10 +134,17 @@ namespace osu.Game.Scoring.Legacy
 
         private LegacyReplayFrame getLegacyFrame(ReplayFrame replayFrame)
         {
-            if (replayFrame is LegacyReplayFrame legacyFrame)
-                return legacyFrame;
+            switch (replayFrame)
+            {
+                case LegacyReplayFrame legacyFrame:
+                    return legacyFrame;
 
-            return (replayFrame as IConvertibleReplayFrame)?.ToLegacy(beatmap);
+                case IConvertibleReplayFrame convertibleFrame:
+                    return convertibleFrame.ToLegacy(beatmap);
+
+                default:
+                    throw new ArgumentException(@"Frame could not be converted to legacy frames", nameof(replayFrame));
+            }
         }
 
         private string getHpGraphFormatted()
