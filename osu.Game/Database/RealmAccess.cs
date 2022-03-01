@@ -565,6 +565,11 @@ namespace osu.Game.Database
                     }
 
                     break;
+
+                case 14:
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.UserSettings = new BeatmapUserSettings();
+                    break;
             }
         }
 

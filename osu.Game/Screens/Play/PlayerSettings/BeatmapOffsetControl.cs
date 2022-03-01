@@ -1,9 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
@@ -60,16 +63,37 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
+        }
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             ReferenceScore.BindValueChanged(scoreChanged, true);
 
-            Current.BindValueChanged(offset =>
+            Current.BindValueChanged(currentChanged);
+            Current.Value = realm.Run(r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings?.Offset) ?? 0;
+        }
+
+        private void currentChanged(ValueChangedEvent<double> offset)
+        {
+            if (useAverageButton != null)
             {
-                if (useAverageButton != null)
-                {
-                    useAverageButton.Enabled.Value = offset.NewValue != lastPlayAverage;
-                }
-            }, true);
+                useAverageButton.Enabled.Value = offset.NewValue != lastPlayAverage;
+            }
+
+            realm.Write(r =>
+            {
+                var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
+
+                settings.Offset = offset.NewValue;
+            });
         }
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
