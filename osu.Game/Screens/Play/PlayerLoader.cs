@@ -167,6 +167,7 @@ namespace osu.Game.Screens.Play
                         Children = new PlayerSettingsGroup[]
                         {
                             VisualSettings = new VisualSettings(),
+                            new AudioSettings(),
                             new InputSettings()
                         }
                     },
