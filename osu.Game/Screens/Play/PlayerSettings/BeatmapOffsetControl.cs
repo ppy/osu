@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     new PlayerSliderBar<double>
                     {
                         KeyboardStep = 5,
-                        LabelText = "Beatmap offset",
+                        LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
                         Current = Current,
                     },
                     referenceScoreContainer = new FillFlowContainer
@@ -156,7 +157,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 new OsuSpriteText
                 {
-                    Text = "Previous play:"
+                    Text = BeatmapOffsetControlStrings.PreviousPlay
                 },
             };
 
@@ -169,7 +170,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Colour = colours.Red1,
-                        Text = "Previous play too short to use for calibration"
+                        Text = BeatmapOffsetControlStrings.PreviousPlayTooShortToUseForCalibration
                     },
                 });
 
@@ -188,7 +189,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 new AverageHitError(hitEvents),
                 useAverageButton = new SettingsButton
                 {
-                    Text = "Calibrate using last play",
+                    Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
                     Action = () => Current.Value = lastPlayAverage
                 },
             });
