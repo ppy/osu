@@ -1,12 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
@@ -22,7 +24,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
 
-        public Bindable<double> Current { get; } = new BindableDouble
+        public BindableDouble Current { get; } = new BindableDouble
         {
             Default = 0,
             Value = 0,
@@ -73,42 +75,59 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
 
+        private IDisposable beatmapOffsetSubscription;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             ReferenceScore.BindValueChanged(scoreChanged, true);
 
+            beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
+            {
+                var userSettings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
+
+                Current.Value = userSettings.Offset;
+                userSettings.PropertyChanged += onUserSettingsOnPropertyChanged;
+
+                return new InvokeOnDisposal(() => userSettings.PropertyChanged -= onUserSettingsOnPropertyChanged);
+
+                void onUserSettingsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+                {
+                    if (args.PropertyName == nameof(BeatmapUserSettings.Offset))
+                        Current.Value = userSettings.Offset;
+                }
+            });
+
             Current.BindValueChanged(currentChanged);
-            Current.Value = realm.Run(r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings.Offset);
         }
 
         private Task realmWrite;
 
         private void currentChanged(ValueChangedEvent<double> offset)
         {
-            if (useAverageButton != null)
-            {
-                useAverageButton.Enabled.Value = offset.NewValue != lastPlayAverage;
-            }
-
             Scheduler.AddOnce(updateOffset);
 
             void updateOffset()
             {
-                // ensure the previous write has completed.
+                // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
                 if (realmWrite?.IsCompleted == false)
                 {
                     Scheduler.AddOnce(updateOffset);
                     return;
                 }
 
-                realmWrite?.WaitSafely();
+                if (useAverageButton != null)
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, Current.Value, Current.Precision);
+
                 realmWrite = realm.WriteAsync(r =>
                 {
                     var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
 
-                    settings.Offset = offset.NewValue;
+                    if (Precision.AlmostEquals(settings.Offset, Current.Value))
+                        return;
+
+                    settings.Offset = Current.Value;
                 });
             }
         }
@@ -141,6 +160,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Action = () => Current.Value = lastPlayAverage
                 },
             };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapOffsetSubscription?.Dispose();
         }
     }
 }
