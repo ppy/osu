@@ -23,6 +23,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Users;
@@ -225,6 +226,14 @@ namespace osu.Game.Screens.Play
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            var lastScore = player.Score;
+
+            if (lastScore != null)
+            {
+                // TODO: use this
+                double? lastPlayHitError = lastScore.ScoreInfo.HitEvents.CalculateAverageHitError();
+            }
 
             // prepare for a retry.
             player = null;
