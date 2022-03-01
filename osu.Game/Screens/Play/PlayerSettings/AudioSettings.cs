@@ -2,13 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class AudioSettings : PlayerSettingsGroup
     {
+        public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
+
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public AudioSettings()
@@ -16,7 +20,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             Children = new Drawable[]
             {
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" },
+                new BeatmapOffsetControl
+                {
+                    ReferenceScore = { BindTarget = ReferenceScore },
+                },
             };
         }
 

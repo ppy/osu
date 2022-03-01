@@ -1,13 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 
@@ -15,9 +15,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class BeatmapOffsetControl : CompositeDrawable
     {
-        private readonly SettingsButton useAverageButton;
-
-        private readonly double lastPlayAverage;
+        public Bindable<ScoreInfo> ReferenceScore { get; } = new Bindable<ScoreInfo>();
 
         public Bindable<double> Current { get; } = new BindableDouble
         {
@@ -28,14 +26,18 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Precision = 0.1,
         };
 
-        public BeatmapOffsetControl(IReadOnlyList<HitEvent> hitEvents)
+        private SettingsButton useAverageButton;
+
+        private double lastPlayAverage;
+
+        private readonly FillFlowContainer referenceScoreContainer;
+
+        public BeatmapOffsetControl()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            FillFlowContainer flow;
-
-            InternalChild = flow = new FillFlowContainer
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -49,32 +51,17 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         LabelText = "Beatmap offset",
                         Current = Current,
                     },
+                    referenceScoreContainer = new FillFlowContainer
+                    {
+                        Spacing = new Vector2(10),
+                        Direction = FillDirection.Vertical,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                    },
                 }
             };
 
-            if (hitEvents.CalculateAverageHitError() is double average)
-            {
-                lastPlayAverage = average;
-
-                flow.AddRange(new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = "Last play:"
-                    },
-                    new HitEventTimingDistributionGraph(hitEvents)
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 50,
-                    },
-                    new AverageHitError(hitEvents),
-                    useAverageButton = new SettingsButton
-                    {
-                        Text = "Calibrate using last play",
-                        Action = () => Current.Value = lastPlayAverage
-                    },
-                });
-            }
+            ReferenceScore.BindValueChanged(scoreChanged, true);
 
             Current.BindValueChanged(offset =>
             {
@@ -83,6 +70,36 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     useAverageButton.Enabled.Value = offset.NewValue != lastPlayAverage;
                 }
             }, true);
+        }
+
+        private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
+        {
+            if (!(score.NewValue?.HitEvents.CalculateAverageHitError() is double average))
+            {
+                referenceScoreContainer.Clear();
+                return;
+            }
+
+            lastPlayAverage = average;
+
+            referenceScoreContainer.Children = new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = "Last play:"
+                },
+                new HitEventTimingDistributionGraph(score.NewValue.HitEvents)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 50,
+                },
+                new AverageHitError(score.NewValue.HitEvents),
+                useAverageButton = new SettingsButton
+                {
+                    Text = "Calibrate using last play",
+                    Action = () => Current.Value = lastPlayAverage
+                },
+            };
         }
     }
 }
