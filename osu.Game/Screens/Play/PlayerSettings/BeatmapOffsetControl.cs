@@ -44,6 +44,17 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private readonly FillFlowContainer referenceScoreContainer;
 
+        private IDisposable beatmapOffsetSubscription;
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         public BeatmapOffsetControl()
         {
             RelativeSizeAxes = Axes.X;
@@ -73,17 +84,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
             };
         }
-
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        private IDisposable beatmapOffsetSubscription;
 
         protected override void LoadComplete()
         {
