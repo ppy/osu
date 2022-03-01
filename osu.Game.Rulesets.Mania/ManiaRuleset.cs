@@ -258,6 +258,7 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new ManiaModMuted(),
+                        new ModAdaptiveSpeed()
                     };
 
                 default:
