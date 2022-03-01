@@ -34,6 +34,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestTooShortToDisplay()
+        {
+            AddStep("Set short reference score", () =>
+            {
+                offsetControl.ReferenceScore.Value = new ScoreInfo
+                {
+                    HitEvents = TestSceneHitEventTimingDistributionGraph.CreateDistributedHitEvents(0, 2)
+                };
+            });
+
+            AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());
+        }
+
+        [Test]
         public void TestDisplay()
         {
             const double average_error = -4.5;

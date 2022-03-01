@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Scoring;
@@ -74,6 +76,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         private IDisposable beatmapOffsetSubscription;
 
@@ -140,32 +145,53 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
-            if (!(score.NewValue?.HitEvents.CalculateAverageHitError() is double average))
-            {
-                referenceScoreContainer.Clear();
-                return;
-            }
+            var hitEvents = score.NewValue?.HitEvents;
 
-            lastPlayAverage = average;
+            referenceScoreContainer.Clear();
+
+            if (!(hitEvents?.CalculateAverageHitError() is double average))
+                return;
 
             referenceScoreContainer.Children = new Drawable[]
             {
                 new OsuSpriteText
                 {
-                    Text = "Last play:"
+                    Text = "Previous play:"
                 },
-                new HitEventTimingDistributionGraph(score.NewValue.HitEvents)
+            };
+
+            if (hitEvents.Count < 10)
+            {
+                referenceScoreContainer.AddRange(new Drawable[]
+                {
+                    new OsuTextFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Colour = colours.Red1,
+                        Text = "Previous play too short to use for calibration"
+                    },
+                });
+
+                return;
+            }
+
+            lastPlayAverage = average;
+
+            referenceScoreContainer.AddRange(new Drawable[]
+            {
+                new HitEventTimingDistributionGraph(hitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 50,
                 },
-                new AverageHitError(score.NewValue.HitEvents),
+                new AverageHitError(hitEvents),
                 useAverageButton = new SettingsButton
                 {
                     Text = "Calibrate using last play",
                     Action = () => Current.Value = lastPlayAverage
                 },
-            };
+            });
         }
 
         protected override void Dispose(bool isDisposing)
