@@ -1,8 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -78,8 +80,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
             ReferenceScore.BindValueChanged(scoreChanged, true);
 
             Current.BindValueChanged(currentChanged);
-            Current.Value = realm.Run(r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings?.Offset) ?? 0;
+            Current.Value = realm.Run(r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings.Offset);
         }
+
+        private Task realmWrite;
 
         private void currentChanged(ValueChangedEvent<double> offset)
         {
@@ -88,12 +92,25 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton.Enabled.Value = offset.NewValue != lastPlayAverage;
             }
 
-            realm.Write(r =>
-            {
-                var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
+            Scheduler.AddOnce(updateOffset);
 
-                settings.Offset = offset.NewValue;
-            });
+            void updateOffset()
+            {
+                // ensure the previous write has completed.
+                if (realmWrite?.IsCompleted == false)
+                {
+                    Scheduler.AddOnce(updateOffset);
+                    return;
+                }
+
+                realmWrite?.WaitSafely();
+                realmWrite = realm.WriteAsync(r =>
+                {
+                    var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
+
+                    settings.Offset = offset.NewValue;
+                });
+            }
         }
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
