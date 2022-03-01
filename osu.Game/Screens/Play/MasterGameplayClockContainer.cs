@@ -61,6 +61,14 @@ namespace osu.Game.Screens.Play
         private Bindable<double> userAudioOffset;
         private double startOffset;
 
+        private IDisposable beatmapOffsetSubscription;
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
             : base(beatmap.Track)
         {
@@ -70,14 +78,6 @@ namespace osu.Game.Screens.Play
 
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
         }
-
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        private IDisposable beatmapOffsetSubscription;
 
         protected override void LoadComplete()
         {
