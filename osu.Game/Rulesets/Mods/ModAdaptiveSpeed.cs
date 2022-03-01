@@ -38,6 +38,16 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
 
+        [SettingSource("Initial rate", "The starting speed of the track")]
+        public BindableNumber<double> InitialRate { get; } = new BindableDouble
+        {
+            MinValue = 0.5,
+            MaxValue = 2,
+            Default = 1,
+            Value = 1,
+            Precision = 0.01,
+        };
+
         [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
         public BindableBool AdjustPitch { get; } = new BindableBool
         {
@@ -54,7 +64,7 @@ namespace osu.Game.Rulesets.Mods
 
         private ITrack track;
 
-        private readonly List<double> recentRates = Enumerable.Range(0, average_count).Select(x => 1d).ToList();
+        private readonly List<double> recentRates = Enumerable.Range(0, average_count).Select(_ => 1d).ToList();
 
         // rates are calculated using the end time of the previous hit object
         // caching them here for easy access
@@ -62,6 +72,7 @@ namespace osu.Game.Rulesets.Mods
 
         public ModAdaptiveSpeed()
         {
+            InitialRate.BindValueChanged(val => SpeedChange.Value = val.NewValue);
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
         }
 
@@ -69,7 +80,10 @@ namespace osu.Game.Rulesets.Mods
         {
             this.track = track;
 
+            InitialRate.TriggerChange();
             AdjustPitch.TriggerChange();
+            recentRates.Clear();
+            recentRates.AddRange(Enumerable.Range(0, average_count).Select(_ => InitialRate.Value));
         }
 
         public void ApplyToSample(DrawableSample sample)
