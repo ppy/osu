@@ -3,6 +3,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,6 +21,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
 using osu.Game.Localisation;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -146,11 +148,17 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private void scoreChanged(ValueChangedEvent<ScoreInfo> score)
         {
-            var hitEvents = score.NewValue?.HitEvents;
-
             referenceScoreContainer.Clear();
 
-            if (!(hitEvents?.CalculateAverageHitError() is double average))
+            if (score.NewValue == null)
+                return;
+
+            if (score.NewValue.Mods.Any(m => m is ModAutoplay))
+                return;
+
+            var hitEvents = score.NewValue.HitEvents;
+
+            if (!(hitEvents.CalculateAverageHitError() is double average))
                 return;
 
             referenceScoreContainer.Children = new Drawable[]
