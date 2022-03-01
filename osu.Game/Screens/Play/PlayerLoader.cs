@@ -23,7 +23,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Users;
@@ -61,6 +60,8 @@ namespace osu.Game.Screens.Play
         protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; }
 
         protected VisualSettings VisualSettings { get; private set; }
+
+        protected AudioSettings AudioSettings { get; private set; }
 
         protected Task LoadTask { get; private set; }
 
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.Play
                         Children = new PlayerSettingsGroup[]
                         {
                             VisualSettings = new VisualSettings(),
-                            new AudioSettings(),
+                            AudioSettings = new AudioSettings(),
                             new InputSettings()
                         }
                     },
@@ -229,11 +230,7 @@ namespace osu.Game.Screens.Play
 
             var lastScore = player.Score;
 
-            if (lastScore != null)
-            {
-                // TODO: use this
-                double? lastPlayHitError = lastScore.ScoreInfo.HitEvents.CalculateAverageHitError();
-            }
+            AudioSettings.ReferenceScore.Value = lastScore?.ScoreInfo;
 
             // prepare for a retry.
             player = null;
