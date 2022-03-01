@@ -106,10 +106,10 @@ Note that while we already have certain standards in place, nothing is set in st
 
 For those interested, we love to reward quality contributions via [bounties](https://docs.google.com/spreadsheets/d/1jNXfj_S3Pb5PErA-czDdC9DUu4IgUbe1Lt8E7CYUJuE/view?&rm=minimal#gid=523803337), paid out via PayPal or osu!supporter tags. Don't hesitate to [request a bounty](https://docs.google.com/forms/d/e/1FAIpQLSet_8iFAgPMG526pBZ2Kic6HSh7XPM3fE8xPcnWNkMzINDdYg/viewform) for your work on this project.
 
-## Liscense
+## License
 
-*osu!*'s code and framework are licensed under the [MIT Liscense](https://opensource.org/licenses/MIT). Please see [the liscense file](Liscense) for more information. [tl;dr](https://tldrlegal.com/license/mit-license) you can do whatever you want as long as you include the original copyright and license notice in any copy of the software/source.
+*osu!*'s code and framework are licensed under the [MIT License](https://opensource.org/licenses/MIT). Please see [the license file](License) for more information. [tl;dr](https://tldrlegal.com/license/mit-license) you can do whatever you want as long as you include the original copyright and license notice in any copy of the software/source.
 
 Please note that this *does not cover* the usage of the "osu!" or "ppy" branding in any software, resources, advertising or promotion, as this is protected by trademark law.
 
-Please also note that game resources are covered by a separate liscense. Please see the [ppy/osu-resources](https://github.com/ppy/osu-resources) repository for clarifications.
+Please also note that game resources are covered by a separate license. Please see the [ppy/osu-resources](https://github.com/ppy/osu-resources) repository for clarifications.
