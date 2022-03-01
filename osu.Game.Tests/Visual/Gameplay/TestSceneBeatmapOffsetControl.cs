@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddAssert("Has calibration button", () => offsetControl.ChildrenOfType<SettingsButton>().Any());
             AddStep("Press button", () => offsetControl.ChildrenOfType<SettingsButton>().Single().TriggerClick());
-            AddAssert("Offset is adjusted", () => offsetControl.Current.Value == average_error);
+            AddAssert("Offset is adjusted", () => offsetControl.Current.Value == -average_error);
 
             AddStep("Remove reference score", () => offsetControl.ReferenceScore.Value = null);
             AddAssert("No calibration button", () => !offsetControl.ChildrenOfType<SettingsButton>().Any());

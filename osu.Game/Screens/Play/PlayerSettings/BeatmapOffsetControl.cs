@@ -198,7 +198,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = lastPlayAverage
+                    Action = () => Current.Value = -lastPlayAverage
                 },
             });
         }
