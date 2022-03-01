@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -70,13 +71,38 @@ namespace osu.Game.Screens.Play
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, RealmAccess realm)
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private IDisposable beatmapOffsetSubscription;
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
 
-            userBeatmapOffsetClock.Offset = realm.Run(r => r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID).UserSettings?.Offset) ?? 0;
+            beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
+            {
+                var userSettings = r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID).UserSettings;
+
+                void onUserSettingsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+                {
+                    if (args.PropertyName == nameof(BeatmapUserSettings.Offset))
+                        updateOffset();
+                }
+
+                updateOffset();
+                userSettings.PropertyChanged += onUserSettingsOnPropertyChanged;
+
+                return new InvokeOnDisposal(() => userSettings.PropertyChanged -= onUserSettingsOnPropertyChanged);
+
+                void updateOffset() => userBeatmapOffsetClock.Offset = userSettings.Offset;
+            });
 
             // sane default provided by ruleset.
             startOffset = gameplayStartTime;
@@ -214,6 +240,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+            beatmapOffsetSubscription?.Dispose();
             removeSourceClockAdjustments();
         }
 
