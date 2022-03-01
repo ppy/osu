@@ -88,7 +88,10 @@ namespace osu.Game.Screens.Play
 
             beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
             {
-                var userSettings = r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID).UserSettings;
+                var userSettings = r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings;
+
+                if (userSettings == null) // only the case for tests.
+                    return null;
 
                 void onUserSettingsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
                 {

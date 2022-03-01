@@ -85,7 +85,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
             {
-                var userSettings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
+                var userSettings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
+
+                if (userSettings == null) // only the case for tests.
+                    return null;
 
                 Current.Value = userSettings.Offset;
                 userSettings.PropertyChanged += onUserSettingsOnPropertyChanged;
@@ -122,7 +125,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
                 realmWrite = realm.WriteAsync(r =>
                 {
-                    var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID).UserSettings;
+                    var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
+
+                    if (settings == null) // only the case for tests.
+                        return;
 
                     if (Precision.AlmostEquals(settings.Offset, Current.Value))
                         return;
