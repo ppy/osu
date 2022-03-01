@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Input.Bindings;
@@ -268,6 +269,17 @@ namespace osu.Game.Database
                 using (var realm = getRealmInstance())
                     realm.Write(action);
             }
+        }
+
+        /// <summary>
+        /// Write changes to realm asynchronously, guaranteeing order of execution.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
+        public async Task WriteAsync(Action<Realm> action)
+        {
+            total_writes_async.Value++;
+            using (var realm = getRealmInstance())
+                await realm.WriteAsync(action);
         }
 
         /// <summary>
