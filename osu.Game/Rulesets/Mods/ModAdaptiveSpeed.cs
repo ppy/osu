@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -14,10 +15,11 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap
+    public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IApplicableToHUD
     {
         // use a wider range so there's still room for adjustment when the initial rate is extreme
         private const double fastest_rate = 2.5f;
@@ -65,6 +67,7 @@ namespace osu.Game.Rulesets.Mods
         };
 
         private ITrack track;
+        private HUDOverlay overlay;
 
         private readonly List<double> recentRates = Enumerable.Range(0, average_count).Select(_ => 1d).ToList();
 
@@ -80,6 +83,12 @@ namespace osu.Game.Rulesets.Mods
         {
             InitialRate.BindValueChanged(val => SpeedChange.Value = val.NewValue);
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
+        }
+
+        public void ApplyToHUD(HUDOverlay overlay)
+        {
+            // this is only used to transform the SpeedChange bindable
+            this.overlay = overlay;
         }
 
         public void ApplyToTrack(ITrack track)
@@ -127,7 +136,7 @@ namespace osu.Game.Rulesets.Mods
                     recentRates.RemoveAt(0);
                 }
 
-                SpeedChange.Value = recentRates.Average();
+                overlay.TransformBindableTo(SpeedChange, recentRates.Average(), 100);
             };
             drawable.OnRevertResult += (o, result) =>
             {
@@ -146,7 +155,7 @@ namespace osu.Game.Rulesets.Mods
                     recentRates.RemoveAt(recentRates.Count - 1);
                 }
 
-                SpeedChange.Value = recentRates.Average();
+                overlay.TransformBindableTo(SpeedChange, recentRates.Average(), 100);
             };
         }
 
