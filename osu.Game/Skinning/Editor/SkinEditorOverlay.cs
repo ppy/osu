@@ -101,11 +101,11 @@ namespace osu.Game.Skinning.Editor
         {
             if (visibility.NewValue == Visibility.Visible)
             {
-                target.SetCustomScale(new RectangleF(0.18f, 0.1f, VISIBLE_TARGET_SCALE, VISIBLE_TARGET_SCALE), true);
+                target.SetCustomRect(new RectangleF(0.18f, 0.1f, VISIBLE_TARGET_SCALE, VISIBLE_TARGET_SCALE), true);
             }
             else
             {
-                target.SetCustomScale(null);
+                target.SetCustomRect(null);
             }
         }
 
