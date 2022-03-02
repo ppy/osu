@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 if (useAverageButton != null)
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, Current.Value, Current.Precision);
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value, Current.Precision);
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
