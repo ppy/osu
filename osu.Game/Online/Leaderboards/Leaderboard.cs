@@ -319,7 +319,10 @@ namespace osu.Game.Online.Leaderboards
                 case LeaderboardState.NoneSelected:
                     return new MessagePlaceholder(@"Please select a beatmap!");
 
-                case LeaderboardState.Unavailable:
+                case LeaderboardState.RulesetUnavailable:
+                    return new MessagePlaceholder(@"Leaderboards are not available for this ruleset!");
+
+                case LeaderboardState.BeatmapUnavailable:
                     return new MessagePlaceholder(@"Leaderboards are not available for this beatmap!");
 
                 case LeaderboardState.NoScores:
