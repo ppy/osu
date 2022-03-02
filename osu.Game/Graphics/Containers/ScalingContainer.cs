@@ -56,6 +56,8 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        private const float corner_radius = 10;
+
         /// <summary>
         /// Create a new instance.
         /// </summary>
@@ -69,7 +71,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
-                CornerRadius = 10,
+                CornerRadius = corner_radius,
                 Child = content = new ScalingDrawSizePreservingFillContainer(targetMode != ScalingMode.Gameplay)
             };
         }
@@ -176,6 +178,7 @@ namespace osu.Game.Graphics.Containers
 
             sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
             sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, 500, requiresMasking ? Easing.OutQuart : Easing.None);
         }
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault
