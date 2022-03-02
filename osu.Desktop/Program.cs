@@ -116,6 +116,7 @@ namespace osu.Desktop
             SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
             {
                 tools.CreateShortcutForThisExe();
+                tools.CreateUninstallerRegistryEntry();
             }, onAppUninstall: (version, tools) =>
             {
                 tools.RemoveShortcutForThisExe();
@@ -123,9 +124,6 @@ namespace osu.Desktop
             }, onEveryRun: (version, tools, firstRun) =>
             {
                 tools.SetProcessAppUserModelId();
-
-                if (firstRun)
-                    tools.CreateUninstallerRegistryEntry();
             });
         }
 
