@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("player paused", () => Player.Pause());
             AddAssert("player is currently paused", () => Player.GameplayClockContainer.IsPaused.Value);
-            allStoryobardSamplesStopped();
+            allStoryboardSamplesStopped();
 
             AddStep("player resume", () => Player.Resume());
             waitUntilStoryboardSamplesPlay();
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest();
 
             skipIntro();
-            allStoryobardSamplesStopped();
+            allStoryboardSamplesStopped();
 
             waitUntilStoryboardSamplesPlay();
         }
@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void waitUntilStoryboardSamplesPlay() => AddUntilStep("any storyboard samples playing", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
 
-        private void allStoryobardSamplesStopped() => AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsPlaying));
+        private void allStoryboardSamplesStopped() => AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsPlaying));
 
         private void skipIntro() => AddStep("skip intro", () => InputManager.Key(Key.Space));
 
