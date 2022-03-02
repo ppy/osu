@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Adjust track rate using the average speed of the last x hits
         /// </summary>
-        private const int average_count = 10;
+        private const int average_count = 6;
 
         public override string Name => "Adaptive Speed";
 
