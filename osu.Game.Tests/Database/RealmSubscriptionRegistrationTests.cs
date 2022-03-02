@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
@@ -18,6 +20,33 @@ namespace osu.Game.Tests.Database
     [TestFixture]
     public class RealmSubscriptionRegistrationTests : RealmTest
     {
+        [Test]
+        public void TestSubscriptionWithAsyncWrite()
+        {
+            ChangeSet? lastChanges = null;
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
+
+                realm.Run(r => r.Refresh());
+
+                // Without forcing the write onto its own thread, realm will internally run the operation synchronously, which can cause a deadlock with `WaitSafely`.
+                Task.Run(async () =>
+                {
+                    await realm.WriteAsync(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+                }).WaitSafely();
+
+                realm.Run(r => r.Refresh());
+
+                Assert.That(lastChanges?.InsertedIndices, Has.One.Items);
+
+                registration.Dispose();
+            });
+
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error) => lastChanges = changes;
+        }
+
         [Test]
         public void TestSubscriptionWithContextLoss()
         {
