@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.Containers
 
         private void updateSize()
         {
-            const float fade_time = 500;
+            const float duration = 500;
 
             if (targetMode == ScalingMode.Everything)
             {
@@ -155,10 +155,10 @@ namespace osu.Game.Graphics.Containers
                         backgroundStack.Push(new ScalingBackgroundScreen());
                     }
 
-                    backgroundStack.FadeIn(fade_time);
+                    backgroundStack.FadeIn(duration);
                 }
                 else
-                    backgroundStack?.FadeOut(fade_time);
+                    backgroundStack?.FadeOut(duration);
             }
 
             RectangleF targetSize = new RectangleF(Vector2.Zero, Vector2.One);
@@ -187,9 +187,14 @@ namespace osu.Game.Graphics.Containers
             if (requiresMasking)
                 sizableContainer.Masking = true;
 
-            sizableContainer.MoveTo(targetSize.Location, 500, Easing.OutQuart);
-            sizableContainer.ResizeTo(targetSize.Size, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
-            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, 500, requiresMasking ? Easing.OutQuart : Easing.None);
+            sizableContainer.MoveTo(targetSize.Location, duration, Easing.OutQuart);
+            sizableContainer.ResizeTo(targetSize.Size, duration, Easing.OutQuart);
+
+            // Of note, this will not working great in the case of nested ScalingContainers where multiple are applying corner radius.
+            // There should likely only be masking and corner radius applied at one point in the full game stack to fix this.
+            // An example of how this can occur is it the skin editor is visible and the game screen scaling is set to "Everything".
+            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, duration, requiresMasking ? Easing.OutQuart : Easing.None)
+                            .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault
