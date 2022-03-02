@@ -123,37 +123,32 @@ namespace osu.Game.Rulesets.Mods
         {
             drawable.OnNewResult += (o, result) =>
             {
+                if (dequeuedRates.ContainsKey(result.HitObject)) return;
+
                 if (!result.IsHit) return;
+                if (!result.Type.AffectsAccuracy()) return;
                 if (!previousEndTimes.ContainsKey(result.HitObject)) return;
 
                 double prevEndTime = previousEndTimes[result.HitObject];
 
                 recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, slowest_rate, fastest_rate));
 
-                if (recentRates.Count > average_count)
-                {
-                    dequeuedRates.Add(result.HitObject, recentRates[0]);
-                    recentRates.RemoveAt(0);
-                }
+                dequeuedRates.Add(result.HitObject, recentRates[0]);
+                recentRates.RemoveAt(0);
 
                 overlay.TransformBindableTo(SpeedChange, recentRates.Average(), 100);
             };
             drawable.OnRevertResult += (o, result) =>
             {
+                if (!dequeuedRates.ContainsKey(result.HitObject)) return;
+
                 if (!result.IsHit) return;
+                if (!result.Type.AffectsAccuracy()) return;
                 if (!previousEndTimes.ContainsKey(result.HitObject)) return;
 
-                if (dequeuedRates.ContainsKey(result.HitObject))
-                {
-                    recentRates.Insert(0, dequeuedRates[result.HitObject]);
-                    recentRates.RemoveAt(recentRates.Count - 1);
-                    dequeuedRates.Remove(result.HitObject);
-                }
-                else
-                {
-                    recentRates.Insert(0, InitialRate.Value);
-                    recentRates.RemoveAt(recentRates.Count - 1);
-                }
+                recentRates.Insert(0, dequeuedRates[result.HitObject]);
+                recentRates.RemoveAt(recentRates.Count - 1);
+                dequeuedRates.Remove(result.HitObject);
 
                 overlay.TransformBindableTo(SpeedChange, recentRates.Average(), 100);
             };
@@ -161,11 +156,11 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            var endTimes = getEndTimes(beatmap.HitObjects).OrderBy(x => x).ToList();
+            var hitObjects = getAllApplicableHitObjects(beatmap.HitObjects).ToList();
+            var endTimes = hitObjects.Select(x => x.GetEndTime()).OrderBy(x => x).ToList();
 
-            for (int i = 1; i < beatmap.HitObjects.Count; i++)
+            foreach (HitObject hitObject in hitObjects)
             {
-                var hitObject = beatmap.HitObjects[i];
                 double prevEndTime = endTimes.LastOrDefault(ht => !Precision.AlmostBigger(ht, hitObject.GetEndTime()));
 
                 if (prevEndTime != default)
@@ -173,15 +168,15 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        private IEnumerable<double> getEndTimes(IEnumerable<HitObject> hitObjects)
+        private IEnumerable<HitObject> getAllApplicableHitObjects(IEnumerable<HitObject> hitObjects)
         {
             foreach (var hitObject in hitObjects)
             {
                 if (!(hitObject.HitWindows is HitWindows.EmptyHitWindows))
-                    yield return hitObject.GetEndTime();
+                    yield return hitObject;
 
-                foreach (double hitTime in getEndTimes(hitObject.NestedHitObjects))
-                    yield return hitTime;
+                foreach (HitObject nested in getAllApplicableHitObjects(hitObject.NestedHitObjects))
+                    yield return nested;
             }
         }
     }
