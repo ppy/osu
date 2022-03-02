@@ -23,6 +23,8 @@ using osuTK;
 using osu.Game.Localisation;
 using osu.Game.Rulesets.Mods;
 
+#nullable enable
+
 namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class BeatmapOffsetControl : CompositeDrawable
@@ -38,22 +40,24 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Precision = 0.1,
         };
 
-        private SettingsButton useAverageButton;
+        private readonly FillFlowContainer referenceScoreContainer;
+
+        [Resolved]
+        private RealmAccess realm { get; set; } = null!;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; } = null!;
+
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         private double lastPlayAverage;
 
-        private readonly FillFlowContainer referenceScoreContainer;
+        private SettingsButton? useAverageButton;
 
-        private IDisposable beatmapOffsetSubscription;
+        private IDisposable? beatmapOffsetSubscription;
 
-        [Resolved]
-        private RealmAccess realm { get; set; }
-
-        [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
+        private Task? realmWriteTask;
 
         public BeatmapOffsetControl()
         {
@@ -113,8 +117,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             Current.BindValueChanged(currentChanged);
         }
 
-        private Task realmWrite;
-
         private void currentChanged(ValueChangedEvent<double> offset)
         {
             Scheduler.AddOnce(updateOffset);
@@ -122,7 +124,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             void updateOffset()
             {
                 // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
-                if (realmWrite?.IsCompleted == false)
+                if (realmWriteTask?.IsCompleted == false)
                 {
                     Scheduler.AddOnce(updateOffset);
                     return;
@@ -131,7 +133,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 if (useAverageButton != null)
                     useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, Current.Value, Current.Precision);
 
-                realmWrite = realm.WriteAsync(r =>
+                realmWriteTask = realm.WriteAsync(r =>
                 {
                     var settings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
 
