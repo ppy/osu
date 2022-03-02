@@ -51,20 +51,21 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("player paused", () => Player.Pause());
             AddAssert("player is currently paused", () => Player.GameplayClockContainer.IsPaused.Value);
-            AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsPlaying));
+            allStoryobardSamplesStopped();
 
             AddStep("player resume", () => Player.Resume());
-            AddUntilStep("any storyboard samples playing after resume", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
+            waitUntilStoryboardSamplesPlay();
         }
 
         [Test]
         public void TestStoryboardSamplesStopOnSkip()
         {
-            createPlayerTest(true);
+            createPlayerTest();
 
-            AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsPlaying));
+            skipIntro();
+            allStoryobardSamplesStopped();
 
-            AddUntilStep("any storyboard samples playing after skip", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
+            waitUntilStoryboardSamplesPlay();
         }
 
         [TestCase(typeof(OsuModDoubleTime), 1.5)]
@@ -80,7 +81,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 storyboardMods = new[] { testedMod };
             });
 
-            createPlayerTest(true);
+            createPlayerTest();
+            skipIntro();
 
             AddAssert("sample playback rate matches mod rates", () => allStoryboardSamples.All(sound =>
                 sound.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value == expectedRate));
@@ -100,7 +102,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 storyboardMods = new[] { testedMod };
             });
 
-            createPlayerTest(true);
+            createPlayerTest();
+            skipIntro();
 
             ModTimeRamp gameplayMod = null;
 
@@ -114,16 +117,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sound.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value == gameplayMod.SpeedChange.Value));
         }
 
-        private void createPlayerTest(bool skipIntro = false)
+        private void createPlayerTest()
         {
             CreateTest(null);
 
             AddAssert("storyboard loaded", () => Player.Beatmap.Value.Storyboard != null);
-            AddUntilStep("any storyboard samples playing", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
-
-            if (skipIntro)
-                AddStep("skip intro", () => InputManager.Key(Key.Space));
+            waitUntilStoryboardSamplesPlay();
         }
+
+        private void waitUntilStoryboardSamplesPlay() => AddUntilStep("any storyboard samples playing", () => allStoryboardSamples.Any(sound => sound.IsPlaying));
+
+        private void allStoryobardSamplesStopped() => AddAssert("all storyboard samples stopped immediately", () => allStoryboardSamples.All(sound => !sound.IsPlaying));
+
+        private void skipIntro() => AddStep("skip intro", () => InputManager.Key(Key.Space));
 
         private IEnumerable<DrawableStoryboardSample> allStoryboardSamples => Player.ChildrenOfType<DrawableStoryboardSample>();
 
