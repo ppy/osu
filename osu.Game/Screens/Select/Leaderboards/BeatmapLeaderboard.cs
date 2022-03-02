@@ -98,6 +98,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         protected override APIRequest FetchScores(CancellationToken cancellationToken)
         {
             var fetchBeatmapInfo = BeatmapInfo;
+            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
             if (fetchBeatmapInfo == null)
             {
@@ -117,9 +118,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
+            if (fetchRuleset.OnlineID <= 0 || fetchRuleset.OnlineID > ILegacyRuleset.MAX_LEGACY_RULESET_ID)
+            {
+                SetErrorState(LeaderboardState.RulesetUnavailable);
+                return null;
+            }
+
             if (fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
-                SetErrorState(LeaderboardState.Unavailable);
+                SetErrorState(LeaderboardState.BeatmapUnavailable);
                 return null;
             }
 
@@ -137,7 +144,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(fetchBeatmapInfo, ruleset.Value ?? fetchBeatmapInfo.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
             req.Success += r =>
             {
