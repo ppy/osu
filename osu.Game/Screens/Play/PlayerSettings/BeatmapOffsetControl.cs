@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (settings == null) // only the case for tests.
                         return;
 
-                    if (Precision.AlmostEquals(settings.Offset, Current.Value))
+                    if (settings.Offset == Current.Value)
                         return;
 
                     settings.Offset = Current.Value;
