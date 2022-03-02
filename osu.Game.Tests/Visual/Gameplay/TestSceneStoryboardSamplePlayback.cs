@@ -83,9 +83,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createPlayerTest(true);
 
             AddAssert("sample playback rate matches mod rates", () => allStoryboardSamples.All(sound =>
-            {
-                return sound.ChildrenOfType<DrawableSample>().All(s => s.AggregateFrequency.Value == expectedRate);
-            }));
+                sound.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value == expectedRate));
         }
 
         [TestCase(typeof(ModWindUp), 0.5, 2)]
@@ -113,9 +111,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("sample playback rate matches mod rates", () => allStoryboardSamples.All(sound =>
-            {
-                return sound.ChildrenOfType<DrawableSample>().All(s => s.AggregateFrequency.Value == gameplayMod.SpeedChange.Value);
-            }));
+                sound.ChildrenOfType<DrawableSample>().First().AggregateFrequency.Value == gameplayMod.SpeedChange.Value));
         }
 
         private void createPlayerTest(bool skipIntro = false)
