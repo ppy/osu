@@ -8,20 +8,21 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
-using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
+using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -84,6 +85,14 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> realm_instances_created = GlobalStatistics.Get<int>(@"Realm", @"Instances (Created)");
 
         private static readonly GlobalStatistic<int> total_subscriptions = GlobalStatistics.Get<int>(@"Realm", @"Subscriptions");
+
+        private static readonly GlobalStatistic<int> total_reads_update = GlobalStatistics.Get<int>(@"Realm", @"Reads (Update)");
+
+        private static readonly GlobalStatistic<int> total_reads_async = GlobalStatistics.Get<int>(@"Realm", @"Reads (Async)");
+
+        private static readonly GlobalStatistic<int> total_writes_update = GlobalStatistics.Get<int>(@"Realm", @"Writes (Update)");
+
+        private static readonly GlobalStatistic<int> total_writes_async = GlobalStatistics.Get<int>(@"Realm", @"Writes (Async)");
 
         private readonly object realmLock = new object();
 
@@ -213,8 +222,12 @@ namespace osu.Game.Database
         public T Run<T>(Func<Realm, T> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_reads_update.Value++;
                 return action(Realm);
+            }
 
+            total_reads_async.Value++;
             using (var realm = getRealmInstance())
                 return action(realm);
         }
@@ -226,9 +239,13 @@ namespace osu.Game.Database
         public void Run(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_reads_update.Value++;
                 action(Realm);
+            }
             else
             {
+                total_reads_async.Value++;
                 using (var realm = getRealmInstance())
                     action(realm);
             }
@@ -241,12 +258,28 @@ namespace osu.Game.Database
         public void Write(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_writes_update.Value++;
                 Realm.Write(action);
+            }
             else
             {
+                total_writes_async.Value++;
+
                 using (var realm = getRealmInstance())
                     realm.Write(action);
             }
+        }
+
+        /// <summary>
+        /// Write changes to realm asynchronously, guaranteeing order of execution.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
+        public async Task WriteAsync(Action<Realm> action)
+        {
+            total_writes_async.Value++;
+            using (var realm = getRealmInstance())
+                await realm.WriteAsync(action);
         }
 
         /// <summary>
