@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -124,10 +125,7 @@ namespace osu.Game.Rulesets.Mods
             drawable.OnNewResult += (o, result) =>
             {
                 if (dequeuedRates.ContainsKey(result.HitObject)) return;
-
-                if (!result.IsHit) return;
-                if (!result.Type.AffectsAccuracy()) return;
-                if (!previousEndTimes.ContainsKey(result.HitObject)) return;
+                if (!shouldProcessResult(result)) return;
 
                 double prevEndTime = previousEndTimes[result.HitObject];
 
@@ -141,10 +139,7 @@ namespace osu.Game.Rulesets.Mods
             drawable.OnRevertResult += (o, result) =>
             {
                 if (!dequeuedRates.ContainsKey(result.HitObject)) return;
-
-                if (!result.IsHit) return;
-                if (!result.Type.AffectsAccuracy()) return;
-                if (!previousEndTimes.ContainsKey(result.HitObject)) return;
+                if (!shouldProcessResult(result)) return;
 
                 recentRates.Insert(0, dequeuedRates[result.HitObject]);
                 recentRates.RemoveAt(recentRates.Count - 1);
@@ -178,6 +173,15 @@ namespace osu.Game.Rulesets.Mods
                 foreach (HitObject nested in getAllApplicableHitObjects(hitObject.NestedHitObjects))
                     yield return nested;
             }
+        }
+
+        private bool shouldProcessResult(JudgementResult result)
+        {
+            if (!result.IsHit) return false;
+            if (!result.Type.AffectsAccuracy()) return false;
+            if (!previousEndTimes.ContainsKey(result.HitObject)) return false;
+
+            return true;
         }
     }
 }
