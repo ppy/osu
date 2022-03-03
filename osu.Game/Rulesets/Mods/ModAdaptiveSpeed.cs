@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mods
                 SpeedChange.Value = val.NewValue;
                 targetRate = val.NewValue;
             });
-            AdjustPitch.BindValueChanged(applyPitchAdjustment);
+            AdjustPitch.BindValueChanged(adjustPitchChanged);
         }
 
         public void ApplyToTrack(ITrack track)
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Mods
 
         public double ApplyToRate(double time, double rate = 1) => rate * InitialRate.Value;
 
-        private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
+        private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
         {
             track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
 
