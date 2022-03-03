@@ -14,6 +14,8 @@ namespace osu.Game.Configuration
         public DevelopmentOsuConfigManager(Storage storage)
             : base(storage)
         {
+            LookupKeyBindings = _ => "unknown";
+            LookupSkinName = _ => "unknown";
         }
     }
 }
