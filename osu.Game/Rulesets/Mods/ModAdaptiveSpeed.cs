@@ -73,13 +73,13 @@ namespace osu.Game.Rulesets.Mods
 
         /// <summary>
         /// The number of most recent track rates (approximated from how early/late each object was hit relative to the previous object)
-        /// which should be averaged to calculate the instantaneous value of <see cref="SpeedChange"/>.
+        /// which should be averaged to calculate <see cref="targetRate"/>.
         /// </summary>
         private const int recent_rate_count = 6;
 
         /// <summary>
         /// Stores the most recent <see cref="recent_rate_count"/> approximated track rates
-        /// which are averaged to calculate the instantaneous value of <see cref="SpeedChange"/>.
+        /// which are averaged to calculate the value of <see cref="targetRate"/>.
         /// </summary>
         /// <remarks>
         /// This list is used as a double-ended queue with fixed capacity
