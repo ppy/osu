@@ -112,6 +112,8 @@ namespace osu.Game.Graphics
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
 
+                host.GetClipboard()?.SetImage(image);
+
                 string filename = getFilename();
 
                 if (filename == null) return;

@@ -42,7 +42,7 @@ namespace osu.Game.Online.API
                 var bindable = (IBindable)property.GetValue(mod);
 
                 if (!bindable.IsDefault)
-                    Settings.Add(property.Name.Underscore(), bindable);
+                    Settings.Add(property.Name.Underscore(), ModUtils.GetSettingUnderlyingValue(bindable));
             }
         }
 

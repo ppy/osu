@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Difficulty
         public Mod[] Mods { get; set; }
 
         /// <summary>
-        /// The combined star rating of all skill.
+        /// The combined star rating of all skills.
         /// </summary>
         [JsonProperty("star_rating", Order = -3)]
         public double StarRating { get; set; }
