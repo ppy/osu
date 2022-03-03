@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Leaderboards;
@@ -118,7 +119,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (!fetchRuleset.IsLegacyRuleset)
+            if (!fetchRuleset.IsLegacyRuleset())
             {
                 SetErrorState(LeaderboardState.RulesetUnavailable);
                 return null;
