@@ -1,25 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IApplicableToHUD
+    public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IUpdatableByPlayfield
     {
         // use a wider range so there's still room for adjustment when the initial rate is extreme
         private const double fastest_rate = 2.5f;
@@ -62,12 +61,11 @@ namespace osu.Game.Rulesets.Mods
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             Default = 1,
-            Value = 1,
-            Precision = 0.01
+            Value = 1
         };
 
         private ITrack track;
-        private HUDOverlay overlay;
+        private double targetRate = 1d;
 
         private readonly List<double> recentRates = Enumerable.Repeat(1d, average_count).ToList();
 
@@ -81,14 +79,12 @@ namespace osu.Game.Rulesets.Mods
 
         public ModAdaptiveSpeed()
         {
-            InitialRate.BindValueChanged(val => SpeedChange.Value = val.NewValue);
+            InitialRate.BindValueChanged(val =>
+            {
+                SpeedChange.Value = val.NewValue;
+                targetRate = val.NewValue;
+            });
             AdjustPitch.BindValueChanged(applyPitchAdjustment);
-        }
-
-        public void ApplyToHUD(HUDOverlay overlay)
-        {
-            // this is only used to transform the SpeedChange bindable
-            this.overlay = overlay;
         }
 
         public void ApplyToTrack(ITrack track)
@@ -104,6 +100,11 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToSample(DrawableSample sample)
         {
             sample.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
+        }
+
+        public void Update(Playfield playfield)
+        {
+            SpeedChange.Value = Interpolation.DampContinuously(SpeedChange.Value, targetRate, 50, playfield.Clock.ElapsedFrameTime);
         }
 
         public double ApplyToRate(double time, double rate = 1) => rate * InitialRate.Value;
@@ -132,7 +133,7 @@ namespace osu.Game.Rulesets.Mods
                 dequeuedRates.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
 
-                overlay.TransformBindableTo(SpeedChange, recentRates.Average(), 100);
+                targetRate = recentRates.Average();
             };
             drawable.OnRevertResult += (o, result) =>
             {
@@ -143,7 +144,7 @@ namespace osu.Game.Rulesets.Mods
                 recentRates.RemoveAt(recentRates.Count - 1);
                 dequeuedRates.Remove(result.HitObject);
 
-                overlay.TransformBindableTo(SpeedChange, recentRates.Average(), 100);
+                targetRate = recentRates.Average();
             };
         }
 
