@@ -190,9 +190,9 @@ namespace osu.Game.Graphics.Containers
             sizableContainer.MoveTo(targetRect.Location, duration, Easing.OutQuart);
             sizableContainer.ResizeTo(targetRect.Size, duration, Easing.OutQuart);
 
-            // Of note, this will not working great in the case of nested ScalingContainers where multiple are applying corner radius.
-            // There should likely only be masking and corner radius applied at one point in the full game stack to fix this.
-            // An example of how this can occur is it the skin editor is visible and the game screen scaling is set to "Everything".
+            // Of note, this will not work great in the case of nested ScalingContainers where multiple are applying corner radius.
+            // Masking and corner radius should likely only be applied at one point in the full game stack to fix this.
+            // An example of how this can occur is when the skin editor is visible and the game screen scaling is set to "Everything".
             sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, duration, requiresMasking ? Easing.OutQuart : Easing.None)
                             .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
