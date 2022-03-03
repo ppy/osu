@@ -69,12 +69,15 @@ namespace osu.Game.Rulesets.Mods
 
         private readonly List<double> recentRates = Enumerable.Repeat(1d, average_count).ToList();
 
-        // rate for a hit is calculated using the end time of another hit object earlier in time
-        // caching them here for easy access
+        /// <summary>
+        /// Rate for a hit is calculated using the end time of another hit object earlier in time,
+        /// caching them here for easy access
+        /// </summary>
         private readonly Dictionary<HitObject, double> previousEndTimes = new Dictionary<HitObject, double>();
 
-        // record the value removed from recentRates when an object is hit
-        // for rewind support
+        /// <summary>
+        /// Record the value removed from <see cref="recentRates"/> when an object is hit for rewind support
+        /// </summary>
         private readonly Dictionary<HitObject, double> dequeuedRates = new Dictionary<HitObject, double>();
 
         public ModAdaptiveSpeed()
