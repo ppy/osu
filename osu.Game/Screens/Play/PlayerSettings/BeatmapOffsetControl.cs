@@ -3,12 +3,14 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -71,7 +73,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 Spacing = new Vector2(10),
                 Children = new Drawable[]
                 {
-                    new PlayerSliderBar<double>
+                    new OffsetSliderBar
                     {
                         KeyboardStep = 5,
                         LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
@@ -86,6 +88,30 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
+        }
+
+        public class OffsetSliderBar : PlayerSliderBar<double>
+        {
+            protected override Drawable CreateControl() => new CustomSliderBar();
+
+            protected class CustomSliderBar : SliderBar
+            {
+                protected override LocalisableString GetTooltipText(double value)
+                {
+                    return value == 0
+                        ? new TranslatableString("_", @"{0} ms", base.GetTooltipText(value))
+                        : new TranslatableString("_", @"{0} ms {1}", base.GetTooltipText(value), getEarlyLateText(value));
+                }
+
+                private LocalisableString getEarlyLateText(double value)
+                {
+                    Debug.Assert(value != 0);
+
+                    return value > 0
+                        ? BeatmapOffsetControlStrings.HitObjectsAppearLater
+                        : BeatmapOffsetControlStrings.HitObjectsAppearEarlier;
+                }
+            }
         }
 
         protected override void LoadComplete()
