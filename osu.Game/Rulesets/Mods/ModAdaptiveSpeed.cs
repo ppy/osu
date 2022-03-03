@@ -111,7 +111,6 @@ namespace osu.Game.Rulesets.Mods
 
         private void applyPitchAdjustment(ValueChangedEvent<bool> adjustPitchSetting)
         {
-            // remove existing old adjustment
             track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
 
             track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
