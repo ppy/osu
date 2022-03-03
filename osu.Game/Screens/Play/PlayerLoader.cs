@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Play
 
         protected VisualSettings VisualSettings { get; private set; }
 
+        protected AudioSettings AudioSettings { get; private set; }
+
         protected Task LoadTask { get; private set; }
 
         protected Task DisposalTask { get; private set; }
@@ -167,6 +169,7 @@ namespace osu.Game.Screens.Play
                         Children = new PlayerSettingsGroup[]
                         {
                             VisualSettings = new VisualSettings(),
+                            AudioSettings = new AudioSettings(),
                             new InputSettings()
                         }
                     },
@@ -224,6 +227,10 @@ namespace osu.Game.Screens.Play
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            var lastScore = player.Score;
+
+            AudioSettings.ReferenceScore.Value = lastScore?.ScoreInfo;
 
             // prepare for a retry.
             player = null;
