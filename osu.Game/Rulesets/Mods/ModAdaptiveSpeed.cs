@@ -21,11 +21,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IUpdatableByPlayfield
     {
-        /// <summary>
-        /// Adjust track rate using the average speed of the last x hits
-        /// </summary>
-        private const int average_count = 6;
-
         public override string Name => "Adaptive Speed";
 
         public override string Acronym => "AS";
@@ -55,6 +50,10 @@ namespace osu.Game.Rulesets.Mods
             Value = true
         };
 
+        /// <summary>
+        /// The instantaneous rate of the track.
+        /// Every frame this mod will attempt to smoothly adjust this to meet <see cref="targetRate"/>.
+        /// </summary>
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             MinValue = min_allowable_rate,
@@ -72,18 +71,52 @@ namespace osu.Game.Rulesets.Mods
         private ITrack track;
         private double targetRate = 1d;
 
-        private readonly List<double> recentRates = Enumerable.Repeat(1d, average_count).ToList();
+        /// <summary>
+        /// The number of most recent track rates (approximated from how early/late each object was hit relative to the previous object)
+        /// which should be averaged to calculate the instantaneous value of <see cref="SpeedChange"/>.
+        /// </summary>
+        private const int recent_rate_count = 6;
 
         /// <summary>
-        /// Rate for a hit is calculated using the end time of another hit object earlier in time,
-        /// caching them here for easy access
+        /// Stores the most recent <see cref="recent_rate_count"/> approximated track rates
+        /// which are averaged to calculate the instantaneous value of <see cref="SpeedChange"/>.
         /// </summary>
-        private readonly Dictionary<HitObject, double> previousEndTimes = new Dictionary<HitObject, double>();
+        /// <remarks>
+        /// This list is used as a double-ended queue with fixed capacity
+        /// (items can be enqueued/dequeued at either end of the list).
+        /// When time is elapsing forward, items are dequeued from the start and enqueued onto the end of the list.
+        /// When time is being rewound, items are dequeued from the end and enqueued onto the start of the list.
+        /// </remarks>
+        private readonly List<double> recentRates = Enumerable.Repeat(1d, recent_rate_count).ToList();
 
         /// <summary>
-        /// Record the value removed from <see cref="recentRates"/> when an object is hit for rewind support
+        /// For each given <see cref="HitObject"/> in the map, this dictionary maps the object onto the latest end time of any other object
+        /// that precedes the end time of the given object.
+        /// This can be loosely interpreted as the end time of the preceding hit object in rulesets that do not have overlapping hit objects.
         /// </summary>
-        private readonly Dictionary<HitObject, double> dequeuedRates = new Dictionary<HitObject, double>();
+        private readonly Dictionary<HitObject, double> precedingEndTimes = new Dictionary<HitObject, double>();
+
+        /// <summary>
+        /// For each given <see cref="HitObject"/> in the map, this dictionary maps the object onto the approximated track rate with which the user hit it.
+        /// </summary>
+        /// <example>
+        /// <para>
+        /// The approximation is calculated as follows:
+        /// </para>
+        /// <para>
+        /// Consider a hitobject which ends at 1000ms, and assume that its preceding hitobject ends at 500ms.
+        /// This gives a time difference of 1000 - 500 = 500ms.
+        /// </para>
+        /// <para>
+        /// Now assume that the user hit this object at 980ms rather than 1000ms.
+        /// When compared to the preceding hitobject, this gives 980 - 500 = 480ms.
+        /// </para>
+        /// <para>
+        /// With the above assumptions, the player is rushing / hitting early, which means that the track should speed up to match.
+        /// Therefore, the approximated target rate for this object would be equal to 500 / 480 * <see cref="InitialRate"/>.
+        /// </para>
+        /// </example>
+        private readonly Dictionary<HitObject, double> approximatedRates = new Dictionary<HitObject, double>();
 
         public ModAdaptiveSpeed()
         {
@@ -102,7 +135,7 @@ namespace osu.Game.Rulesets.Mods
             InitialRate.TriggerChange();
             AdjustPitch.TriggerChange();
             recentRates.Clear();
-            recentRates.AddRange(Enumerable.Repeat(InitialRate.Value, average_count));
+            recentRates.AddRange(Enumerable.Repeat(InitialRate.Value, recent_rate_count));
         }
 
         public void ApplyToSample(DrawableSample sample)
@@ -121,26 +154,26 @@ namespace osu.Game.Rulesets.Mods
         {
             drawable.OnNewResult += (o, result) =>
             {
-                if (dequeuedRates.ContainsKey(result.HitObject)) return;
+                if (approximatedRates.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
 
-                double prevEndTime = previousEndTimes[result.HitObject];
+                double prevEndTime = precedingEndTimes[result.HitObject];
 
                 recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
 
-                dequeuedRates.Add(result.HitObject, recentRates[0]);
+                approximatedRates.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
 
                 targetRate = recentRates.Average();
             };
             drawable.OnRevertResult += (o, result) =>
             {
-                if (!dequeuedRates.ContainsKey(result.HitObject)) return;
+                if (!approximatedRates.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
 
-                recentRates.Insert(0, dequeuedRates[result.HitObject]);
+                recentRates.Insert(0, approximatedRates[result.HitObject]);
                 recentRates.RemoveAt(recentRates.Count - 1);
-                dequeuedRates.Remove(result.HitObject);
+                approximatedRates.Remove(result.HitObject);
 
                 targetRate = recentRates.Average();
             };
@@ -158,7 +191,7 @@ namespace osu.Game.Rulesets.Mods
                 index -= 1;
 
                 if (index >= 0)
-                    previousEndTimes.Add(hitObject, endTimes[index]);
+                    precedingEndTimes.Add(hitObject, endTimes[index]);
             }
         }
 
@@ -188,7 +221,7 @@ namespace osu.Game.Rulesets.Mods
         {
             if (!result.IsHit) return false;
             if (!result.Type.AffectsAccuracy()) return false;
-            if (!previousEndTimes.ContainsKey(result.HitObject)) return false;
+            if (!precedingEndTimes.ContainsKey(result.HitObject)) return false;
 
             return true;
         }
