@@ -29,5 +29,10 @@ namespace osu.Game.Rulesets
         string InstantiationInfo { get; }
 
         Ruleset CreateInstance();
+
+        /// <summary>
+        /// Whether this ruleset's online ID is within the range that defines it as a legacy ruleset (ie. either osu!, osu!taiko, osu!catch or osu!mania).
+        /// </summary>
+        public bool IsLegacyRuleset => OnlineID >= 0 && OnlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID;
     }
 }

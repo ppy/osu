@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
-            if (fetchRuleset.OnlineID <= 0 || fetchRuleset.OnlineID > ILegacyRuleset.MAX_LEGACY_RULESET_ID)
+            if (!fetchRuleset.IsLegacyRuleset)
             {
                 SetErrorState(LeaderboardState.RulesetUnavailable);
                 return null;
