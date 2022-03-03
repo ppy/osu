@@ -21,10 +21,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IUpdatableByPlayfield
     {
-        // use a wider range so there's still room for adjustment when the initial rate is extreme
-        private const double fastest_rate = 2.5f;
-        private const double slowest_rate = 0.4f;
-
         /// <summary>
         /// Adjust track rate using the average speed of the last x hits
         /// </summary>
@@ -61,9 +57,17 @@ namespace osu.Game.Rulesets.Mods
 
         public BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
+            MinValue = min_allowable_rate,
+            MaxValue = max_allowable_rate,
             Default = 1,
             Value = 1
         };
+
+        // The two constants below denote the maximum allowable range of rates that `SpeedChange` can take.
+        // The range is purposefully wider than the range of values that `InitialRate` allows
+        // in order to give some leeway for change even when extreme initial rates are chosen.
+        private const double min_allowable_rate = 0.4f;
+        private const double max_allowable_rate = 2.5f;
 
         private ITrack track;
         private double targetRate = 1d;
@@ -122,7 +126,7 @@ namespace osu.Game.Rulesets.Mods
 
                 double prevEndTime = previousEndTimes[result.HitObject];
 
-                recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, slowest_rate, fastest_rate));
+                recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
 
                 dequeuedRates.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
