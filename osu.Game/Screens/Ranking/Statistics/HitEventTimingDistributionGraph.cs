@@ -64,10 +64,22 @@ namespace osu.Game.Screens.Ranking.Statistics
             // Prevent div-by-0 by enforcing a minimum bin size
             binSize = Math.Max(1, binSize);
 
+            bool roundUp = true;
+
             foreach (var e in hitEvents)
             {
-                int binOffset = (int)Math.Round(e.TimeOffset / binSize, MidpointRounding.AwayFromZero);
-                bins[timing_distribution_centre_bin_index + binOffset]++;
+                double binOffset = e.TimeOffset / binSize;
+
+                // .NET's round midpoint handling doesn't provide a behaviour that works amazingly for display
+                // purposes here. We want midpoint rounding to roughly distribute evenly to each adjacent bucket
+                // so the easiest way is to cycle between downwards and upwards rounding as we process events.
+                if (Math.Abs(binOffset - (int)binOffset) == 0.5)
+                {
+                    binOffset += Math.Sign(binOffset) * (roundUp ? 1 : 0);
+                    roundUp = !roundUp;
+                }
+
+                bins[timing_distribution_centre_bin_index + (int)binOffset]++;
             }
 
             int maxCount = bins.Max();
