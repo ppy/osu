@@ -366,15 +366,15 @@ namespace osu.Game.Database
             static string getMemberName(Expression<Func<TModel, TProperty>> expression)
             {
                 if (!(expression is LambdaExpression lambda))
-                    throw new ArgumentException($"Outermost expression must be a lambda expression", nameof(expression));
+                    throw new ArgumentException("Outermost expression must be a lambda expression", nameof(expression));
 
                 if (!(lambda.Body is MemberExpression memberExpression))
-                    throw new ArgumentException($"Lambda body must be a member access expression", nameof(expression));
+                    throw new ArgumentException("Lambda body must be a member access expression", nameof(expression));
 
                 // TODO: nested access can be supported, with more iteration here
                 // (need to iteratively soft-cast `memberExpression.Expression` into `MemberExpression`s until `lambda.Parameters[0]` is hit)
                 if (memberExpression.Expression != lambda.Parameters[0])
-                    throw new ArgumentException($"Nested access expressions are not supported", nameof(expression));
+                    throw new ArgumentException("Nested access expressions are not supported", nameof(expression));
 
                 return memberExpression.Member.Name;
             }
