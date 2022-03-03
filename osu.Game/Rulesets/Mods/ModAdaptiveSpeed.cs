@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mods
         private ITrack track;
         private HUDOverlay overlay;
 
-        private readonly List<double> recentRates = Enumerable.Range(0, average_count).Select(_ => 1d).ToList();
+        private readonly List<double> recentRates = Enumerable.Repeat(1d, average_count).ToList();
 
         // rate for a hit is calculated using the end time of another hit object earlier in time
         // caching them here for easy access
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Mods
             InitialRate.TriggerChange();
             AdjustPitch.TriggerChange();
             recentRates.Clear();
-            recentRates.AddRange(Enumerable.Range(0, average_count).Select(_ => InitialRate.Value));
+            recentRates.AddRange(Enumerable.Repeat(InitialRate.Value, average_count));
         }
 
         public void ApplyToSample(DrawableSample sample)
