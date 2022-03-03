@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(dependencies.Get<RulesetStore>(), () => beatmapManager, LocalStorage, Realm, Scheduler));
             Dependencies.Cache(Realm);

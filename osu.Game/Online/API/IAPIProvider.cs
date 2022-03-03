@@ -58,6 +58,11 @@ namespace osu.Game.Online.API
         string WebsiteRootUrl { get; }
 
         /// <summary>
+        /// The version of the API.
+        /// </summary>
+        int APIVersion { get; }
+
+        /// <summary>
         /// The last login error that occurred, if any.
         /// </summary>
         Exception? LastLoginError { get; }
