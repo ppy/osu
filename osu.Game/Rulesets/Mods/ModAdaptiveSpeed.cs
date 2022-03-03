@@ -9,7 +9,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
@@ -151,14 +150,16 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             var hitObjects = getAllApplicableHitObjects(beatmap.HitObjects).ToList();
-            var endTimes = hitObjects.Select(x => x.GetEndTime()).OrderBy(x => x).ToList();
+            var endTimes = hitObjects.Select(x => x.GetEndTime()).OrderBy(x => x).Distinct().ToList();
 
             foreach (HitObject hitObject in hitObjects)
             {
-                double prevEndTime = endTimes.LastOrDefault(ht => !Precision.AlmostBigger(ht, hitObject.GetEndTime()));
+                int index = endTimes.BinarySearch(hitObject.GetEndTime());
+                if (index < 0) index = ~index; // BinarySearch returns the next larger element in bitwise complement if there's no exact match
+                index -= 1;
 
-                if (prevEndTime != default)
-                    previousEndTimes.Add(hitObject, prevEndTime);
+                if (index >= 0)
+                    previousEndTimes.Add(hitObject, endTimes[index]);
             }
         }
 
