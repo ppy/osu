@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -315,6 +317,66 @@ namespace osu.Game.Database
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
                 notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
                 return RegisterCustomSubscription(action);
+            }
+        }
+
+        /// <summary>
+        /// Subscribe to the property of a realm object to watch for changes.
+        /// </summary>
+        /// <remarks>
+        /// On subscribing, unless the <paramref name="modelAccessor"/> does not match an object, an initial invocation of <paramref name="onChanged"/> will occur immediately.
+        /// Further invocations will occur when the value changes, but may also fire on a realm recycle with no actual value change.
+        /// </remarks>
+        /// <param name="modelAccessor">A function to retrieve the relevant model from realm.</param>
+        /// <param name="propertyLookup">A function to traverse to the relevant property from the model.</param>
+        /// <param name="onChanged">A function to be invoked when a change of value occurs.</param>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <typeparam name="TProperty">The type of the property to be watched.</typeparam>
+        /// <returns>
+        /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
+        /// To stop receiving notifications, call <see cref="IDisposable.Dispose"/>.
+        /// </returns>
+        public IDisposable SubscribeToPropertyChanged<TModel, TProperty>(Func<Realm, TModel?> modelAccessor, Expression<Func<TModel, TProperty>> propertyLookup, Action<TProperty> onChanged)
+            where TModel : RealmObjectBase
+        {
+            return RegisterCustomSubscription(r =>
+            {
+                string propertyName = getMemberName(propertyLookup);
+
+                var model = Run(modelAccessor);
+                var propLookupCompiled = propertyLookup.Compile();
+
+                if (model == null)
+                    return null;
+
+                model.PropertyChanged += onPropertyChanged;
+
+                // Update initial value immediately.
+                onChanged(propLookupCompiled(model));
+
+                return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
+
+                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                {
+                    if (args.PropertyName == propertyName)
+                        onChanged(propLookupCompiled(model));
+                }
+            });
+
+            static string getMemberName(Expression<Func<TModel, TProperty>> expression)
+            {
+                if (!(expression is LambdaExpression lambda))
+                    throw new ArgumentException($"Outermost expression must be a lambda expression", nameof(expression));
+
+                if (!(lambda.Body is MemberExpression memberExpression))
+                    throw new ArgumentException($"Lambda body must be a member access expression", nameof(expression));
+
+                // TODO: nested access can be supported, with more iteration here
+                // (need to iteratively soft-cast `memberExpression.Expression` into `MemberExpression`s until `lambda.Parameters[0]` is hit)
+                if (memberExpression.Expression != lambda.Parameters[0])
+                    throw new ArgumentException($"Nested access expressions are not supported", nameof(expression));
+
+                return memberExpression.Member.Name;
             }
         }
 
