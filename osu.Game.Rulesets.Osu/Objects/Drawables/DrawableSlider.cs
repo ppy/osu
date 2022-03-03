@@ -29,7 +29,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
 
-        public DrawableSliderBall Ball { get; private set; }
+        public DrawableSliderBall Ball => ball;
+        [Cached]
+        private readonly DrawableSliderBall ball;
+
         public SkinnableDrawable Body { get; private set; }
 
         /// <summary>
@@ -60,6 +63,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSlider([CanBeNull] Slider s = null)
             : base(s)
         {
+            ball = new DrawableSliderBall
+            {
+                GetInitialHitAction = () => HeadCircle.HitAction,
+                BypassAutoSizeAxes = Axes.Both,
+                AlwaysPresent = true,
+                Alpha = 0
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -73,13 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 repeatContainer = new Container<DrawableSliderRepeat> { RelativeSizeAxes = Axes.Both },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
                 OverlayElementContainer = new Container { RelativeSizeAxes = Axes.Both, },
-                Ball = new DrawableSliderBall(this)
-                {
-                    GetInitialHitAction = () => HeadCircle.HitAction,
-                    BypassAutoSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Alpha = 0
-                },
+                ball,
                 slidingSample = new PausableSkinnableSound { Looping = true }
             };
 

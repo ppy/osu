@@ -38,18 +38,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         public bool InputTracksVisualSize = true;
 
-        private readonly DrawableSlider drawableSlider;
-        private readonly SkinnableDrawable followCircle;
-        private readonly SkinnableDrawable ball;
+        private DrawableSlider drawableSlider;
+        private SkinnableDrawable ball;
+        private FollowReceptor followArea;
 
-        private readonly FollowReceptor followArea;
-
-        public DrawableSliderBall(DrawableSlider drawableSlider)
+        [BackgroundDependencyLoader]
+        private void load(DrawableHitObject drawableObject)
         {
-            this.drawableSlider = drawableSlider;
+            drawableSlider = (DrawableSlider)drawableObject;
 
             Origin = Anchor.Centre;
-
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Children = new Drawable[]
@@ -59,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                followCircle = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
+                new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -196,13 +194,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             private DrawableSliderBall sliderBall;
 
             [BackgroundDependencyLoader]
-            private void load(DrawableHitObject drawableObject)
+            private void load(DrawableHitObject drawableObject, DrawableSliderBall sliderBall)
             {
-                var slider = (DrawableSlider)drawableObject;
-                sliderBall = slider.Ball;
-
+                this.sliderBall = sliderBall;
                 RelativeSizeAxes = Axes.Both;
 
+                var slider = (DrawableSlider)drawableObject;
                 slider.Tracking.BindValueChanged(trackingChanged, true);
             }
 
