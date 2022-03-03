@@ -45,6 +45,8 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Set a custom position and scale which overrides any user specification.
         /// </summary>
+        /// <param name="rect">A rectangle with positional and sizing information for this container to conform to. <c>null</c> will clear the custom rect and revert to user settings.</param>
+        /// <param name="relativePosition">Whether the position portion of the provided rect is in relative coordinate space or not.</param>
         public void SetCustomRect(RectangleF? rect, bool relativePosition = false)
         {
             customRect = rect;
