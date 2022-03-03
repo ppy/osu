@@ -1,5 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,16 +113,6 @@ namespace osu.Game.Rulesets.Mods
 
         public double ApplyToRate(double time, double rate = 1) => rate * InitialRate.Value;
 
-        private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
-        {
-            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
-
-            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
-        }
-
-        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
-            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
-
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
             drawable.OnNewResult += (o, result) =>
@@ -166,6 +157,16 @@ namespace osu.Game.Rulesets.Mods
                     previousEndTimes.Add(hitObject, endTimes[index]);
             }
         }
+
+        private void adjustPitchChanged(ValueChangedEvent<bool> adjustPitchSetting)
+        {
+            track?.RemoveAdjustment(adjustmentForPitchSetting(adjustPitchSetting.OldValue), SpeedChange);
+
+            track?.AddAdjustment(adjustmentForPitchSetting(adjustPitchSetting.NewValue), SpeedChange);
+        }
+
+        private AdjustableProperty adjustmentForPitchSetting(bool adjustPitchSettingValue)
+            => adjustPitchSettingValue ? AdjustableProperty.Frequency : AdjustableProperty.Tempo;
 
         private IEnumerable<HitObject> getAllApplicableHitObjects(IEnumerable<HitObject> hitObjects)
         {
