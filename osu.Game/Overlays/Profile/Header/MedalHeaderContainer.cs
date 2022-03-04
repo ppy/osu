@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -63,10 +64,14 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
+        private CancellationTokenSource cancellationTokenSource;
+
         private void updateDisplay(APIUser user)
         {
             var badges = user.Badges;
             badgeFlowContainer.Clear();
+
+            cancellationTokenSource?.Cancel();
 
             if (badges?.Length > 0)
             {
@@ -79,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         // load in stable order regardless of async load order.
                         badgeFlowContainer.Insert(displayIndex, asyncBadge);
-                    });
+                    }, (cancellationTokenSource = new CancellationTokenSource()).Token);
                 }
             }
             else
