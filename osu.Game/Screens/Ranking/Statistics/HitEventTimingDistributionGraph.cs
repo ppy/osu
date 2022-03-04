@@ -40,6 +40,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private const float axis_points = 5;
 
+        /// <summary>
+        /// The currently displayed hit events.
+        /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
         /// <summary>
@@ -51,24 +54,43 @@ namespace osu.Game.Screens.Ranking.Statistics
             this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
         }
 
+        private int[] bins;
+        private double binSize;
+        private double hitOffset;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             if (hitEvents == null || hitEvents.Count == 0)
                 return;
 
-            int[] bins = new int[total_timing_distribution_bins];
+            bins = new int[total_timing_distribution_bins];
 
-            double binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
+            binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
 
             // Prevent div-by-0 by enforcing a minimum bin size
             binSize = Math.Max(1, binSize);
 
+            Scheduler.AddOnce(updateDisplay);
+        }
+
+        public void UpdateOffset(double hitOffset)
+        {
+            this.hitOffset = hitOffset;
+            Scheduler.AddOnce(updateDisplay);
+        }
+
+        private void updateDisplay()
+        {
             bool roundUp = true;
+
+            Array.Clear(bins, 0, bins.Length);
 
             foreach (var e in hitEvents)
             {
-                double binOffset = e.TimeOffset / binSize;
+                double time = e.TimeOffset + hitOffset;
+
+                double binOffset = time / binSize;
 
                 // .NET's round midpoint handling doesn't provide a behaviour that works amazingly for display
                 // purposes here. We want midpoint rounding to roughly distribute evenly to each adjacent bucket
@@ -79,13 +101,23 @@ namespace osu.Game.Screens.Ranking.Statistics
                     roundUp = !roundUp;
                 }
 
-                bins[timing_distribution_centre_bin_index + (int)Math.Round(binOffset, MidpointRounding.AwayFromZero)]++;
+                int index = timing_distribution_centre_bin_index + (int)Math.Round(binOffset, MidpointRounding.AwayFromZero);
+
+                // may be out of range when applying an offset. for such cases we can just drop the results.
+                if (index >= 0 && index < bins.Length)
+                    bins[index]++;
             }
 
             int maxCount = bins.Max();
             var bars = new Drawable[total_timing_distribution_bins];
+
             for (int i = 0; i < bars.Length; i++)
-                bars[i] = new Bar { Height = Math.Max(0.05f, (float)bins[i] / maxCount) };
+            {
+                bars[i] = new Bar
+                {
+                    Height = Math.Max(0.05f, (float)bins[i] / maxCount)
+                };
+            }
 
             Container axisFlow;
 
