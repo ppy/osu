@@ -412,6 +412,59 @@ namespace osu.Game.Tests.Visual.Online
             AddAssert("channel left", () => !channelManager.JoinedChannels.Contains(multiplayerChannel));
         }
 
+        [Test]
+        public void TestHighlightOnCurrentChannel()
+        {
+            Message message = null;
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Send message in channel 1", () =>
+            {
+                channel1.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel1.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message));
+        }
+
+        [Test]
+        public void TestHighlightOnAnotherChannel()
+        {
+            Message message = null;
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+            AddStep("Send message in channel 2", () =>
+            {
+                channel2.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel2.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message));
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
