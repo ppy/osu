@@ -87,21 +87,9 @@ namespace osu.Game.Rulesets.Mods
         /// When time is elapsing forward, items are dequeued from the start and enqueued onto the end of the list.
         /// When time is being rewound, items are dequeued from the end and enqueued onto the start of the list.
         /// </remarks>
-        private readonly List<double> recentRates = Enumerable.Repeat(1d, recent_rate_count).ToList();
-
-        /// <summary>
-        /// For each given <see cref="HitObject"/> in the map, this dictionary maps the object onto the latest end time of any other object
-        /// that precedes the end time of the given object.
-        /// This can be loosely interpreted as the end time of the preceding hit object in rulesets that do not have overlapping hit objects.
-        /// </summary>
-        private readonly Dictionary<HitObject, double> precedingEndTimes = new Dictionary<HitObject, double>();
-
-        /// <summary>
-        /// For each given <see cref="HitObject"/> in the map, this dictionary maps the object onto the approximated track rate with which the user hit it.
-        /// </summary>
         /// <example>
         /// <para>
-        /// The approximation is calculated as follows:
+        /// The track rate approximation is calculated as follows:
         /// </para>
         /// <para>
         /// Consider a hitobject which ends at 1000ms, and assume that its preceding hitobject ends at 500ms.
@@ -116,7 +104,21 @@ namespace osu.Game.Rulesets.Mods
         /// Therefore, the approximated target rate for this object would be equal to 500 / 480 * <see cref="InitialRate"/>.
         /// </para>
         /// </example>
-        private readonly Dictionary<HitObject, double> approximatedRates = new Dictionary<HitObject, double>();
+        private readonly List<double> recentRates = Enumerable.Repeat(1d, recent_rate_count).ToList();
+
+        /// <summary>
+        /// For each given <see cref="HitObject"/> in the map, this dictionary maps the object onto the latest end time of any other object
+        /// that precedes the end time of the given object.
+        /// This can be loosely interpreted as the end time of the preceding hit object in rulesets that do not have overlapping hit objects.
+        /// </summary>
+        private readonly Dictionary<HitObject, double> precedingEndTimes = new Dictionary<HitObject, double>();
+
+        /// <summary>
+        /// For each given <see cref="HitObject"/> in the map, this dictionary maps the object onto the track rate dequeued from
+        /// <see cref="recentRates"/> (i.e. the oldest value in the queue) when the object is hit. If the hit is then reverted,
+        /// the mapped value can be re-introduced to <see cref="recentRates"/> to properly rewind the queue.
+        /// </summary>
+        private readonly Dictionary<HitObject, double> ratesForRewinding = new Dictionary<HitObject, double>();
 
         public ModAdaptiveSpeed()
         {
@@ -154,26 +156,27 @@ namespace osu.Game.Rulesets.Mods
         {
             drawable.OnNewResult += (o, result) =>
             {
-                if (approximatedRates.ContainsKey(result.HitObject)) return;
+                if (ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
 
                 double prevEndTime = precedingEndTimes[result.HitObject];
 
-                recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
-
-                approximatedRates.Add(result.HitObject, recentRates[0]);
+                ratesForRewinding.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
+
+                recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
 
                 targetRate = recentRates.Average();
             };
             drawable.OnRevertResult += (o, result) =>
             {
-                if (!approximatedRates.ContainsKey(result.HitObject)) return;
+                if (!ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
 
-                recentRates.Insert(0, approximatedRates[result.HitObject]);
+                recentRates.Insert(0, ratesForRewinding[result.HitObject]);
+                ratesForRewinding.Remove(result.HitObject);
+
                 recentRates.RemoveAt(recentRates.Count - 1);
-                approximatedRates.Remove(result.HitObject);
 
                 targetRate = recentRates.Average();
             };
