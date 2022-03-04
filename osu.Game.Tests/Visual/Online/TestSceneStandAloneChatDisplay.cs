@@ -207,7 +207,28 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestUserScrollOverride()
+        public void TestOverrideChatScrolling()
+        {
+            fillChat();
+
+            sendMessage();
+            checkScrolledToBottom();
+
+            AddStep("Scroll to start", () => chatDisplay.ScrollContainer.ScrollToStart());
+
+            checkNotScrolledToBottom();
+            sendMessage();
+            checkNotScrolledToBottom();
+
+            AddStep("Scroll to bottom", () => chatDisplay.ScrollContainer.ScrollToEnd());
+
+            checkScrolledToBottom();
+            sendMessage();
+            checkScrolledToBottom();
+        }
+
+        [Test]
+        public void TestOverrideChatScrollingByUser()
         {
             fillChat();
 
@@ -314,9 +335,9 @@ namespace osu.Game.Tests.Visual.Online
             {
             }
 
-            protected DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
+            public DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
 
-            protected UserTrackingScrollContainer ScrollContainer => (UserTrackingScrollContainer)((Container)DrawableChannel.Child).Child;
+            public UserTrackingScrollContainer ScrollContainer => (UserTrackingScrollContainer)((Container)DrawableChannel.Child).Child;
 
             public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
 
