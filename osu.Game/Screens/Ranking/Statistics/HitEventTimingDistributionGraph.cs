@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             for (int i = 0; i < bars.Length; i++)
             {
-                bars[i] = new Bar
+                bars[i] = new Bar(i == timing_distribution_centre_bin_index)
                 {
                     Height = Math.Max(0.05f, (float)bins[i] / maxCount)
                 };
@@ -199,17 +199,22 @@ namespace osu.Game.Screens.Ranking.Statistics
 
         private class Bar : CompositeDrawable
         {
-            public Bar()
+            public Bar(bool isCentre)
             {
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
 
                 RelativeSizeAxes = Axes.Both;
 
+                var colour = Color4Extensions.FromHex("#66FFCC");
+
+                if (isCentre)
+                    colour = colour.Lighten(1);
+
                 InternalChild = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#66FFCC")
+                    Colour = colour
                 };
             }
         }
