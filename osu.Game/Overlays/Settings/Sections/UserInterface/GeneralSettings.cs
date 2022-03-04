@@ -43,10 +43,5 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
             };
         }
-
-        private class TimeSlider : OsuSliderBar<double>
-        {
-            protected override LocalisableString GetTooltipText(double value) => $"{value:N0} ms";
-        }
     }
 }
