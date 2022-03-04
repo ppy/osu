@@ -75,11 +75,11 @@ namespace osu.Game.Screens.Ranking.Statistics
                 // so the easiest way is to cycle between downwards and upwards rounding as we process events.
                 if (Math.Abs(binOffset - (int)binOffset) == 0.5)
                 {
-                    binOffset += Math.Sign(binOffset) * (roundUp ? 1 : 0);
+                    binOffset = (int)binOffset + Math.Sign(binOffset) * (roundUp ? 1 : 0);
                     roundUp = !roundUp;
                 }
 
-                bins[timing_distribution_centre_bin_index + (int)binOffset]++;
+                bins[timing_distribution_centre_bin_index + (int)Math.Round(binOffset, MidpointRounding.AwayFromZero)]++;
             }
 
             int maxCount = bins.Max();
