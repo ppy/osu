@@ -7,6 +7,7 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -100,7 +101,16 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             request?.Cancel();
 
-            request = new GetWikiRequest(e.NewValue);
+            string[] values = e.NewValue.Split('/', 2);
+
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out _))
+            {
+                request = new GetWikiRequest(values[1], values[0]);
+            }
+            else
+            {
+                request = new GetWikiRequest(e.NewValue);
+            }
 
             Loading.Show();
 
