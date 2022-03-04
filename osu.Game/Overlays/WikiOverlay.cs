@@ -103,9 +103,9 @@ namespace osu.Game.Overlays
 
             string[] values = e.NewValue.Split('/', 2);
 
-            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out _))
+            if (values.Length > 1 && LanguageExtensions.TryParseCultureCode(values[0], out var language))
             {
-                request = new GetWikiRequest(values[1], values[0]);
+                request = new GetWikiRequest(values[1], language);
             }
             else
             {
