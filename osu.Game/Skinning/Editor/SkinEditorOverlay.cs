@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -100,28 +101,12 @@ namespace osu.Game.Skinning.Editor
         {
             if (visibility.NewValue == Visibility.Visible)
             {
-                updateMasking();
-                target.AllowScaling = false;
-                target.RelativePositionAxes = Axes.Both;
-
-                target.ScaleTo(VISIBLE_TARGET_SCALE, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
-                target.MoveToX(0.095f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
+                target.SetCustomRect(new RectangleF(0.18f, 0.1f, VISIBLE_TARGET_SCALE, VISIBLE_TARGET_SCALE), true);
             }
             else
             {
-                target.AllowScaling = true;
-
-                target.ScaleTo(1, SkinEditor.TRANSITION_DURATION, Easing.OutQuint).OnComplete(_ => updateMasking());
-                target.MoveToX(0f, SkinEditor.TRANSITION_DURATION, Easing.OutQuint);
+                target.SetCustomRect(null);
             }
-        }
-
-        private void updateMasking()
-        {
-            if (skinEditor == null)
-                return;
-
-            target.Masking = skinEditor.State.Value == Visibility.Visible;
         }
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
