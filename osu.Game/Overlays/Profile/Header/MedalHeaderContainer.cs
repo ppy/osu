@@ -94,5 +94,11 @@ namespace osu.Game.Overlays.Profile.Header
                 Hide();
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationTokenSource?.Cancel();
+            base.Dispose(isDisposing);
+        }
     }
 }
