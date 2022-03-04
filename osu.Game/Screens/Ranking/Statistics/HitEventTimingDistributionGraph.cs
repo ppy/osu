@@ -250,8 +250,13 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             public void UpdateOffset(float adjustment)
             {
+                bool hasAdjustment = adjustment != value;
+
                 if (boxAdjustment == null)
                 {
+                    if (!hasAdjustment)
+                        return;
+
                     AddInternal(boxAdjustment = new Circle
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -265,6 +270,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                 }
 
                 boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, 0.05f, 1), duration, Easing.OutQuint);
+                boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }
     }
