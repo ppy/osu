@@ -71,16 +71,16 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        public static List<HitEvent> CreateDistributedHitEvents()
+        public static List<HitEvent> CreateDistributedHitEvents(double centre = 0, double range = 25)
         {
             var hitEvents = new List<HitEvent>();
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < range * 2; i++)
             {
-                int count = (int)(Math.Pow(25 - Math.Abs(i - 25), 2));
+                int count = (int)(Math.Pow(range - Math.Abs(i - range), 2));
 
                 for (int j = 0; j < count; j++)
-                    hitEvents.Add(new HitEvent(i - 25, HitResult.Perfect, new HitCircle(), new HitCircle(), null));
+                    hitEvents.Add(new HitEvent(centre + i - range, HitResult.Perfect, new HitCircle(), new HitCircle(), null));
             }
 
             return hitEvents;

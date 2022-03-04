@@ -8,14 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Resources.Localisation.Web;
-using osuTK;
+using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -57,13 +57,43 @@ namespace osu.Game.Skinning.Editor
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    headerText = new OsuTextFlowContainer
+                    new Container
                     {
-                        TextAnchor = Anchor.TopCentre,
-                        Padding = new MarginPadding(20),
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        RelativeSizeAxes = Axes.X
+                        Name = "Top bar",
+                        RelativeSizeAxes = Axes.X,
+                        Depth = float.MinValue,
+                        Height = 40,
+                        Children = new Drawable[]
+                        {
+                            new EditorMenuBar
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.Both,
+                                Items = new[]
+                                {
+                                    new MenuItem("File")
+                                    {
+                                        Items = new[]
+                                        {
+                                            new EditorMenuItem("Save", MenuItemType.Standard, Save),
+                                            new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                            new EditorMenuItemSpacer(),
+                                            new EditorMenuItem("Exit", MenuItemType.Standard, Hide),
+                                        },
+                                    },
+                                }
+                            },
+                            headerText = new OsuTextFlowContainer
+                            {
+                                TextAnchor = Anchor.TopRight,
+                                Padding = new MarginPadding(5),
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Y,
+                            },
+                        },
                     },
                     new GridContainer
                     {
@@ -89,46 +119,6 @@ namespace osu.Game.Skinning.Editor
                                     Children = new Drawable[]
                                     {
                                         new SkinBlueprintContainer(targetScreen),
-                                        new TriangleButton
-                                        {
-                                            Margin = new MarginPadding(10),
-                                            Text = CommonStrings.ButtonsClose,
-                                            Width = 100,
-                                            Action = Hide,
-                                        },
-                                        new FillFlowContainer
-                                        {
-                                            Direction = FillDirection.Horizontal,
-                                            AutoSizeAxes = Axes.Both,
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
-                                            Spacing = new Vector2(5),
-                                            Padding = new MarginPadding
-                                            {
-                                                Top = 10,
-                                                Left = 10,
-                                            },
-                                            Margin = new MarginPadding
-                                            {
-                                                Right = 10,
-                                                Bottom = 10,
-                                            },
-                                            Children = new Drawable[]
-                                            {
-                                                new TriangleButton
-                                                {
-                                                    Text = "Save Changes",
-                                                    Width = 140,
-                                                    Action = Save,
-                                                },
-                                                new DangerousTriangleButton
-                                                {
-                                                    Text = "Revert to default",
-                                                    Width = 140,
-                                                    Action = revert,
-                                                },
-                                            }
-                                        },
                                     }
                                 },
                             }
@@ -161,7 +151,7 @@ namespace osu.Game.Skinning.Editor
         {
             headerText.Clear();
 
-            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 24));
+            headerText.AddParagraph("Skin editor", cp => cp.Font = OsuFont.Default.With(size: 16));
             headerText.NewParagraph();
             headerText.AddText("Currently editing ", cp =>
             {

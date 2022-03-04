@@ -136,7 +136,11 @@ namespace osu.Game.Screens.Play
 
         public readonly PlayerConfiguration Configuration;
 
-        protected Score Score { get; private set; }
+        /// <summary>
+        /// The score for the current play session.
+        /// Available only after the player is loaded.
+        /// </summary>
+        public Score Score { get; private set; }
 
         /// <summary>
         /// Create a new player instance.
