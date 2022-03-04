@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private double lastPlayAverage;
         private double lastPlayBeatmapOffset;
+        private HitEventTimingDistributionGraph? lastPlayGraph;
 
         private SettingsButton? useAverageButton;
 
@@ -109,8 +110,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Debug.Assert(value != 0);
 
                     return value > 0
-                        ? BeatmapOffsetControlStrings.HitObjectsAppearLater
-                        : BeatmapOffsetControlStrings.HitObjectsAppearEarlier;
+                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
                 }
             }
         }
@@ -149,6 +150,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             void updateOffset()
             {
+                // the last play graph is relative to the offset at the point of the last play, so we need to factor that out.
+                double adjustmentSinceLastPlay = lastPlayBeatmapOffset - Current.Value;
+
+                // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
+                lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
+
                 // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
                 if (realmWriteTask?.IsCompleted == false)
                 {
@@ -157,7 +164,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 if (useAverageButton != null)
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value + lastPlayBeatmapOffset, Current.Precision / 2);
+                {
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
+                }
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
@@ -218,7 +227,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             referenceScoreContainer.AddRange(new Drawable[]
             {
-                new HitEventTimingDistributionGraph(hitEvents)
+                lastPlayGraph = new HitEventTimingDistributionGraph(hitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 50,
