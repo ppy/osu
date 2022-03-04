@@ -8,20 +8,21 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
-using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
+using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -53,8 +54,9 @@ namespace osu.Game.Database
         /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
+        /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 13;
+        private const int schema_version = 14;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -84,6 +86,14 @@ namespace osu.Game.Database
         private static readonly GlobalStatistic<int> realm_instances_created = GlobalStatistics.Get<int>(@"Realm", @"Instances (Created)");
 
         private static readonly GlobalStatistic<int> total_subscriptions = GlobalStatistics.Get<int>(@"Realm", @"Subscriptions");
+
+        private static readonly GlobalStatistic<int> total_reads_update = GlobalStatistics.Get<int>(@"Realm", @"Reads (Update)");
+
+        private static readonly GlobalStatistic<int> total_reads_async = GlobalStatistics.Get<int>(@"Realm", @"Reads (Async)");
+
+        private static readonly GlobalStatistic<int> total_writes_update = GlobalStatistics.Get<int>(@"Realm", @"Writes (Update)");
+
+        private static readonly GlobalStatistic<int> total_writes_async = GlobalStatistics.Get<int>(@"Realm", @"Writes (Async)");
 
         private readonly object realmLock = new object();
 
@@ -213,8 +223,12 @@ namespace osu.Game.Database
         public T Run<T>(Func<Realm, T> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_reads_update.Value++;
                 return action(Realm);
+            }
 
+            total_reads_async.Value++;
             using (var realm = getRealmInstance())
                 return action(realm);
         }
@@ -226,9 +240,13 @@ namespace osu.Game.Database
         public void Run(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_reads_update.Value++;
                 action(Realm);
+            }
             else
             {
+                total_reads_async.Value++;
                 using (var realm = getRealmInstance())
                     action(realm);
             }
@@ -241,12 +259,28 @@ namespace osu.Game.Database
         public void Write(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_writes_update.Value++;
                 Realm.Write(action);
+            }
             else
             {
+                total_writes_async.Value++;
+
                 using (var realm = getRealmInstance())
                     realm.Write(action);
             }
+        }
+
+        /// <summary>
+        /// Write changes to realm asynchronously, guaranteeing order of execution.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
+        public async Task WriteAsync(Action<Realm> action)
+        {
+            total_writes_async.Value++;
+            using (var realm = getRealmInstance())
+                await realm.WriteAsync(action);
         }
 
         /// <summary>
@@ -530,6 +564,11 @@ namespace osu.Game.Database
                             newItem.RulesetName = rulesetName;
                     }
 
+                    break;
+
+                case 14:
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.UserSettings = new BeatmapUserSettings();
                     break;
             }
         }
