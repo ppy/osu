@@ -135,7 +135,9 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => Current.Disabled ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust : $"{base.TooltipText}x";
+            protected override LocalisableString GetTooltipText(double value) => Current.Disabled
+                ? MouseSettingsStrings.EnableHighPrecisionForSensitivityAdjust
+                : $"{base.GetTooltipText(value)}x";
         }
     }
 }

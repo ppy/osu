@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private class OffsetSlider : OsuSliderBar<double>
         {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"0ms");
+            protected override LocalisableString GetTooltipText(double value) => value.ToString(@"0ms");
         }
     }
 }

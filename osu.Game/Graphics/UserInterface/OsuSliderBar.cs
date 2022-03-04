@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box rightBox;
         private readonly Container nubContainer;
 
-        public virtual LocalisableString TooltipText { get; private set; }
+        public LocalisableString TooltipText { get; private set; }
 
         /// <summary>
         /// Whether to format the tooltip as a percentage or the actual value.
