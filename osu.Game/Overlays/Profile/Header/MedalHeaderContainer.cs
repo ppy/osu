@@ -68,10 +68,12 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(APIUser user)
         {
-            var badges = user.Badges;
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
             badgeFlowContainer.Clear();
 
-            cancellationTokenSource?.Cancel();
+            var badges = user.Badges;
 
             if (badges?.Length > 0)
             {
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         // load in stable order regardless of async load order.
                         badgeFlowContainer.Insert(displayIndex, asyncBadge);
-                    }, (cancellationTokenSource = new CancellationTokenSource()).Token);
+                    }, cancellationTokenSource.Token);
                 }
             }
             else
