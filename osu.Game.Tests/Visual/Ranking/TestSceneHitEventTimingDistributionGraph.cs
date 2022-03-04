@@ -24,6 +24,12 @@ namespace osu.Game.Tests.Visual.Ranking
         }
 
         [Test]
+        public void TestManyDistributedEventsOffset()
+        {
+            createTest(CreateDistributedHitEvents(-3.5));
+        }
+
+        [Test]
         public void TestAroundCentre()
         {
             createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
