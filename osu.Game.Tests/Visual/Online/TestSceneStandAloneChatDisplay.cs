@@ -9,6 +9,8 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat;
 using osuTK.Input;
@@ -107,49 +109,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestManyMessages()
         {
-            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = admin,
-                Content = "I am a wang!"
-            }));
-
-            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = redUser,
-                Content = "I am team red."
-            }));
-
-            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = redUser,
-                Content = "I plan to win!"
-            }));
-
-            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = blueUser,
-                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
-            }));
-
-            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = admin,
-                Content = "Okay okay, calm down guys. Let's do this!"
-            }));
-
-            AddStep("message from long username", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = longUsernameUser,
-                Content = "Hi guys, my new username is lit!"
-            }));
-
-            AddStep("message with new date", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
-            {
-                Sender = longUsernameUser,
-                Content = "Message from the future!",
-                Timestamp = DateTimeOffset.Now
-            }));
-
+            sendRegularMessages();
             checkScrolledToBottom();
 
             const int messages_per_call = 10;
@@ -180,6 +140,61 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             checkScrolledToBottom();
+        }
+
+        [Test]
+        public void TestMessageHighlighting()
+        {
+            Message highlighted = null;
+
+            sendRegularMessages();
+
+            AddStep("highlight first message", () =>
+            {
+                highlighted = testChannel.Messages[0];
+                chatDisplay.DrawableChannel.HighlightMessage(highlighted);
+            });
+
+            AddUntilStep("chat scrolled to first message", () =>
+            {
+                var line = chatDisplay.ChildrenOfType<ChatLine>().Single(c => c.Message == highlighted);
+                return chatDisplay.ScrollContainer.ScreenSpaceDrawQuad.Contains(line.ScreenSpaceDrawQuad.Centre);
+            });
+
+            sendMessage();
+            checkNotScrolledToBottom();
+
+            AddStep("highlight last message", () =>
+            {
+                highlighted = testChannel.Messages[^1];
+                chatDisplay.DrawableChannel.HighlightMessage(highlighted);
+            });
+
+            AddUntilStep("chat scrolled to last message", () =>
+            {
+                var line = chatDisplay.ChildrenOfType<ChatLine>().Single(c => c.Message == highlighted);
+                return chatDisplay.ScrollContainer.ScreenSpaceDrawQuad.Contains(line.ScreenSpaceDrawQuad.Centre);
+            });
+
+            sendMessage();
+            checkScrolledToBottom();
+
+            AddRepeatStep("highlight other random messages", () =>
+            {
+                highlighted = testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)];
+                chatDisplay.DrawableChannel.HighlightMessage(highlighted);
+            }, 10);
+        }
+
+        [Test]
+        public void TestMessageHighlightingOnFilledChat()
+        {
+            fillChat();
+
+            AddRepeatStep("highlight random messages", () =>
+            {
+                chatDisplay.DrawableChannel.HighlightMessage(testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)]);
+            }, 10);
         }
 
         /// <summary>
@@ -318,6 +333,52 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Sender = longUsernameUser,
                 Content = "This is a local echo message.",
+            }));
+        }
+
+        private void sendRegularMessages()
+        {
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = admin,
+                Content = "I am a wang!"
+            }));
+
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = redUser,
+                Content = "I am team red."
+            }));
+
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = redUser,
+                Content = "I plan to win!"
+            }));
+
+            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = blueUser,
+                Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
+            }));
+
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = admin,
+                Content = "Okay okay, calm down guys. Let's do this!"
+            }));
+
+            AddStep("message from long username", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = longUsernameUser,
+                Content = "Hi guys, my new username is lit!"
+            }));
+
+            AddStep("message with new date", () => testChannel.AddNewMessages(new Message(messageIdSequence++)
+            {
+                Sender = longUsernameUser,
+                Content = "Message from the future!",
+                Timestamp = DateTimeOffset.Now
             }));
         }
 
