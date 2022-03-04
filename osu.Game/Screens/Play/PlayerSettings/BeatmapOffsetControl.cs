@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private OsuColour colours { get; set; } = null!;
 
         private double lastPlayAverage;
+        private double lastPlayBeatmapOffset;
 
         private SettingsButton? useAverageButton;
 
@@ -130,7 +131,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 if (useAverageButton != null)
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value, Current.Precision / 2);
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value + lastPlayBeatmapOffset, Current.Precision / 2);
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
@@ -187,6 +188,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             lastPlayAverage = average;
+            lastPlayBeatmapOffset = Current.Value;
 
             referenceScoreContainer.AddRange(new Drawable[]
             {
@@ -199,7 +201,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = -lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
                 },
             });
         }
