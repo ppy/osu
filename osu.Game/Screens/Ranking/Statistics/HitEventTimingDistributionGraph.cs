@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly float maxValue;
 
             private readonly Circle boxOriginal;
-            private readonly Circle boxAdjustment;
+            private Circle boxAdjustment;
 
             private const float minimum_height = 0.05f;
 
@@ -233,16 +233,6 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Colour = isCentre ? Color4.White : Color4Extensions.FromHex("#66FFCC"),
                         Height = minimum_height,
                     },
-                    boxAdjustment = new Circle
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Colour = Color4.Yellow,
-                        Blending = BlendingParameters.Additive,
-                        Alpha = 0.6f,
-                        Height = 0,
-                    },
                 };
             }
 
@@ -260,6 +250,20 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             public void UpdateOffset(float adjustment)
             {
+                if (boxAdjustment == null)
+                {
+                    AddInternal(boxAdjustment = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = Color4.Yellow,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0.6f,
+                        Height = 0,
+                    });
+                }
+
                 boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, 0.05f, 1), duration, Easing.OutQuint);
             }
         }
