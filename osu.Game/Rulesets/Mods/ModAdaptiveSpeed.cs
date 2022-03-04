@@ -65,8 +65,16 @@ namespace osu.Game.Rulesets.Mods
         // The two constants below denote the maximum allowable range of rates that `SpeedChange` can take.
         // The range is purposefully wider than the range of values that `InitialRate` allows
         // in order to give some leeway for change even when extreme initial rates are chosen.
-        private const double min_allowable_rate = 0.4f;
-        private const double max_allowable_rate = 2.5f;
+        private const double min_allowable_rate = 0.4d;
+        private const double max_allowable_rate = 2.5d;
+
+        // The two constants below denote the maximum allowable change in rate caused by a single hit
+        // This prevents sudden jolts caused by a badly-timed hit.
+        private const double min_allowable_rate_change = 0.8d;
+        private const double max_allowable_rate_change = 1.25d;
+
+        // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
+        private const double rate_change_on_miss = 0.95d;
 
         private ITrack track;
         private double targetRate = 1d;
@@ -159,12 +167,10 @@ namespace osu.Game.Rulesets.Mods
                 if (ratesForRewinding.ContainsKey(result.HitObject)) return;
                 if (!shouldProcessResult(result)) return;
 
-                double prevEndTime = precedingEndTimes[result.HitObject];
-
                 ratesForRewinding.Add(result.HitObject, recentRates[0]);
                 recentRates.RemoveAt(0);
 
-                recentRates.Add(Math.Clamp((result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
+                recentRates.Add(Math.Clamp(getRelativeRateChange(result) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
 
                 targetRate = recentRates.Average();
             };
@@ -222,11 +228,23 @@ namespace osu.Game.Rulesets.Mods
 
         private bool shouldProcessResult(JudgementResult result)
         {
-            if (!result.IsHit) return false;
             if (!result.Type.AffectsAccuracy()) return false;
             if (!precedingEndTimes.ContainsKey(result.HitObject)) return false;
 
             return true;
+        }
+
+        private double getRelativeRateChange(JudgementResult result)
+        {
+            if (!result.IsHit)
+                return rate_change_on_miss;
+
+            double prevEndTime = precedingEndTimes[result.HitObject];
+            return Math.Clamp(
+                (result.HitObject.GetEndTime() - prevEndTime) / (result.TimeAbsolute - prevEndTime),
+                min_allowable_rate_change,
+                max_allowable_rate_change
+            );
         }
     }
 }
