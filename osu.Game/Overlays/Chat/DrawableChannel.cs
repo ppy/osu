@@ -79,6 +79,28 @@ namespace osu.Game.Overlays.Chat
             Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
+        /// <summary>
+        /// Highlights a specific message in this drawable channel.
+        /// </summary>
+        /// <param name="message">The message to highlight.</param>
+        public void HighlightMessage(Message message)
+        {
+            if (IsLoaded)
+                highlightMessage(message);
+            else
+                Schedule(highlightMessage, message);
+        }
+
+        private void highlightMessage(Message message)
+        {
+            var chatLine = chatLines.SingleOrDefault(c => c.Message == message);
+            if (chatLine == null)
+                return;
+
+            scroll.ScrollIntoView(chatLine);
+            chatLine.ScheduleHighlight();
+        }
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
