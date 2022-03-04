@@ -99,7 +99,7 @@ namespace osu.Game.Online.Chat
                 if (checkForPMs(channel, message))
                     continue;
 
-                checkForMentions(channel, message);
+                checkForMentions(message);
             }
         }
 
@@ -114,15 +114,15 @@ namespace osu.Game.Online.Chat
             if (!notifyOnPrivateMessage.Value || channel.Type != ChannelType.PM)
                 return false;
 
-            notifications.Post(new PrivateMessageNotification(message.Sender.Username, channel));
+            notifications.Post(new PrivateMessageNotification(message));
             return true;
         }
 
-        private void checkForMentions(Channel channel, Message message)
+        private void checkForMentions(Message message)
         {
             if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
 
-            notifications.Post(new MentionNotification(message.Sender.Username, channel));
+            notifications.Post(new MentionNotification(message));
         }
 
         /// <summary>
@@ -138,32 +138,32 @@ namespace osu.Game.Online.Chat
 
         public class PrivateMessageNotification : OpenChannelNotification
         {
-            public PrivateMessageNotification(string username, Channel channel)
-                : base(channel)
+            public PrivateMessageNotification(Message message)
+                : base(message)
             {
                 Icon = FontAwesome.Solid.Envelope;
-                Text = $"You received a private message from '{username}'. Click to read it!";
+                Text = $"You received a private message from '{message.Sender.Username}'. Click to read it!";
             }
         }
 
         public class MentionNotification : OpenChannelNotification
         {
-            public MentionNotification(string username, Channel channel)
-                : base(channel)
+            public MentionNotification(Message message)
+                : base(message)
             {
                 Icon = FontAwesome.Solid.At;
-                Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
+                Text = $"Your name was mentioned in chat by '{message.Sender.Username}'. Click to find out why!";
             }
         }
 
         public abstract class OpenChannelNotification : SimpleNotification
         {
-            protected OpenChannelNotification(Channel channel)
+            protected OpenChannelNotification(Message message)
             {
-                this.channel = channel;
+                this.message = message;
             }
 
-            private readonly Channel channel;
+            private readonly Message message;
 
             public override bool IsImportant => false;
 
@@ -175,8 +175,8 @@ namespace osu.Game.Online.Chat
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
+                    chatOverlay.HighlightMessage(message);
                     chatOverlay.Show();
-                    channelManager.CurrentChannel.Value = channel;
 
                     return true;
                 };
