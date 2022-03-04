@@ -91,7 +91,7 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods) =>
+        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null) =>
             new DrawableStoryboard(this, mods);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
