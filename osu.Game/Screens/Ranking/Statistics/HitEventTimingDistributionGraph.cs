@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -57,6 +58,8 @@ namespace osu.Game.Screens.Ranking.Statistics
         private int[] bins;
         private double binSize;
         private double hitOffset;
+
+        private Bar[] barDrawables;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -108,114 +111,150 @@ namespace osu.Game.Screens.Ranking.Statistics
                     bins[index]++;
             }
 
-            int maxCount = bins.Max();
-            var bars = new Drawable[total_timing_distribution_bins];
-
-            for (int i = 0; i < bars.Length; i++)
+            if (barDrawables != null)
             {
-                bars[i] = new Bar(i == timing_distribution_centre_bin_index)
+                for (int i = 0; i < barDrawables.Length; i++)
                 {
-                    Height = Math.Max(0.05f, (float)bins[i] / maxCount)
-                };
-            }
-
-            Container axisFlow;
-
-            const float axis_font_size = 12;
-
-            InternalChild = new GridContainer
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Width = 0.8f,
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Content = new[] { bars }
-                        }
-                    },
-                    new Drawable[]
-                    {
-                        axisFlow = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = axis_font_size,
-                        }
-                    },
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize),
+                    barDrawables[i].UpdateOffset(bins[i]);
                 }
-            };
-
-            // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
-            double maxValue = timing_distribution_bins * binSize;
-            double axisValueStep = maxValue / axis_points;
-
-            axisFlow.Add(new OsuSpriteText
+            }
+            else
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = "0",
-                Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
-            });
+                int maxCount = bins.Max();
+                barDrawables = new Bar[total_timing_distribution_bins];
 
-            for (int i = 1; i <= axis_points; i++)
-            {
-                double axisValue = i * axisValueStep;
-                float position = (float)(axisValue / maxValue);
-                float alpha = 1f - position * 0.8f;
+                for (int i = 0; i < barDrawables.Length; i++)
+                    barDrawables[i] = new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index);
+
+                Container axisFlow;
+
+                const float axis_font_size = 12;
+
+                InternalChild = new GridContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.8f,
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Content = new[] { barDrawables }
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            axisFlow = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = axis_font_size,
+                            }
+                        },
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    }
+                };
+
+                // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
+                double maxValue = timing_distribution_bins * binSize;
+                double axisValueStep = maxValue / axis_points;
 
                 axisFlow.Add(new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = -position / 2,
-                    Alpha = alpha,
-                    Text = axisValue.ToString("-0"),
+                    Text = "0",
                     Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
                 });
 
-                axisFlow.Add(new OsuSpriteText
+                for (int i = 1; i <= axis_points; i++)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = position / 2,
-                    Alpha = alpha,
-                    Text = axisValue.ToString("+0"),
-                    Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
-                });
+                    double axisValue = i * axisValueStep;
+                    float position = (float)(axisValue / maxValue);
+                    float alpha = 1f - position * 0.8f;
+
+                    axisFlow.Add(new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = -position / 2,
+                        Alpha = alpha,
+                        Text = axisValue.ToString("-0"),
+                        Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
+                    });
+
+                    axisFlow.Add(new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = position / 2,
+                        Alpha = alpha,
+                        Text = axisValue.ToString("+0"),
+                        Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
+                    });
+                }
             }
         }
 
         private class Bar : CompositeDrawable
         {
-            public Bar(bool isCentre)
+            private readonly float value;
+            private readonly float maxValue;
+
+            private readonly Circle boxOriginal;
+            private readonly Circle boxAdjustment;
+
+            public Bar(float value, float maxValue, bool isCentre)
             {
-                Anchor = Anchor.BottomCentre;
-                Origin = Anchor.BottomCentre;
+                this.value = value;
+                this.maxValue = maxValue;
 
                 RelativeSizeAxes = Axes.Both;
+                Masking = true;
 
-                var colour = Color4Extensions.FromHex("#66FFCC");
-
-                if (isCentre)
-                    colour = colour.Lighten(1);
-
-                InternalChild = new Circle
+                InternalChildren = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colour
+                    boxOriginal = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = isCentre ? Color4.White : Color4Extensions.FromHex("#66FFCC"),
+                        Height = 0,
+                    },
+                    boxAdjustment = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = Color4.Yellow,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0.6f,
+                        Height = 0,
+                    },
                 };
+            }
+
+            private const double duration = 300;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                boxOriginal.ResizeHeightTo(Math.Clamp(value / maxValue, 0.05f, 1), duration, Easing.OutQuint);
+            }
+
+            public void UpdateOffset(float adjustment)
+            {
+                boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, 0.05f, 1), duration, Easing.OutQuint);
             }
         }
     }

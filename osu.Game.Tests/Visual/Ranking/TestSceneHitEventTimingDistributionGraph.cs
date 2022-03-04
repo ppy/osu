@@ -17,10 +17,13 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
+        private HitEventTimingDistributionGraph graph;
+
         [Test]
         public void TestManyDistributedEvents()
         {
             createTest(CreateDistributedHitEvents());
+            AddStep("add adjustment", () => graph.UpdateOffset(10));
         }
 
         [Test]
@@ -68,7 +71,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new HitEventTimingDistributionGraph(events)
+                graph = new HitEventTimingDistributionGraph(events)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
