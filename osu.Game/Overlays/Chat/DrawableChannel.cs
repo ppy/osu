@@ -249,31 +249,32 @@ namespace osu.Game.Overlays.Chat
             /// </summary>
             private const float auto_scroll_leniency = 10f;
 
+            private bool trackNewContent = true;
             private float? lastExtent;
 
-            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
+            protected override void OnScrollChange(bool byUser)
             {
-                base.OnUserScroll(value, animated, distanceDecay);
-                lastExtent = null;
+                base.OnScrollChange(byUser);
+
+                if (byUser)
+                    lastExtent = null;
+
+                trackNewContent = IsScrolledToEnd(auto_scroll_leniency);
             }
 
             protected override void Update()
             {
                 base.Update();
 
-                // If the user has scrolled to the bottom of the container, we should resume tracking new content.
-                if (UserScrolling && IsScrolledToEnd(auto_scroll_leniency))
-                    CancelUserScroll();
-
                 // If the user hasn't overridden our behaviour and there has been new content added to the container, we should update our scroll position to track it.
-                bool requiresScrollUpdate = !UserScrolling && (lastExtent == null || Precision.AlmostBigger(ScrollableExtent, lastExtent.Value));
+                bool requiresScrollUpdate = trackNewContent && (lastExtent == null || Precision.AlmostBigger(ScrollableExtent, lastExtent.Value));
 
                 if (requiresScrollUpdate)
                 {
                     // Schedule required to allow FillFlow to be the correct size.
                     Schedule(() =>
                     {
-                        if (!UserScrolling)
+                        if (trackNewContent)
                         {
                             if (Current < ScrollableExtent)
                                 ScrollToEnd();
