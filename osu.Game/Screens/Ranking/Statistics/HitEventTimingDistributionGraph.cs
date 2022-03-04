@@ -213,6 +213,8 @@ namespace osu.Game.Screens.Ranking.Statistics
             private readonly Circle boxOriginal;
             private readonly Circle boxAdjustment;
 
+            private const float minimum_height = 0.05f;
+
             public Bar(float value, float maxValue, bool isCentre)
             {
                 this.value = value;
@@ -229,7 +231,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Colour = isCentre ? Color4.White : Color4Extensions.FromHex("#66FFCC"),
-                        Height = 0,
+                        Height = minimum_height,
                     },
                     boxAdjustment = new Circle
                     {
@@ -249,7 +251,11 @@ namespace osu.Game.Screens.Ranking.Statistics
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                boxOriginal.ResizeHeightTo(Math.Clamp(value / maxValue, 0.05f, 1), duration, Easing.OutQuint);
+
+                float height = Math.Clamp(value / maxValue, minimum_height, 1);
+
+                if (height > minimum_height)
+                    boxOriginal.ResizeHeightTo(height, duration, Easing.OutQuint);
             }
 
             public void UpdateOffset(float adjustment)
