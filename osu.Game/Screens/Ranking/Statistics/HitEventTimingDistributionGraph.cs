@@ -172,8 +172,6 @@ namespace osu.Game.Screens.Ranking.Statistics
 
                 RelativeSizeAxes = Axes.Both;
 
-                Padding = new MarginPadding { Horizontal = 1 };
-
                 InternalChild = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
