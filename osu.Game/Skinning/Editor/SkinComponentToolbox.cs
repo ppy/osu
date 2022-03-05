@@ -23,6 +23,8 @@ namespace osu.Game.Skinning.Editor
 {
     public class SkinComponentToolbox : ScrollingToolboxGroup
     {
+        public const float WIDTH = 200;
+
         public Action<Type> RequestPlacement;
 
         private const float component_display_scale = 0.8f;
@@ -41,7 +43,7 @@ namespace osu.Game.Skinning.Editor
             : base("Components", height)
         {
             RelativeSizeAxes = Axes.None;
-            Width = 200;
+            Width = WIDTH;
         }
 
         [BackgroundDependencyLoader]

@@ -64,14 +64,12 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
         private class MaximumStarsSlider : StarsSlider
         {
-            protected override LocalisableString GetTooltipText(double value) => Current.IsDefault
-                ? UserInterfaceStrings.NoLimit
-                : base.GetTooltipText(value);
+            public override LocalisableString TooltipText => Current.IsDefault ? UserInterfaceStrings.NoLimit : base.TooltipText;
         }
 
         private class StarsSlider : OsuSliderBar<double>
         {
-            protected override LocalisableString GetTooltipText(double value) => $"{value:0.##} stars";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"0.## stars");
         }
     }
 }

@@ -53,6 +53,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private OsuColour colours { get; set; } = null!;
 
         private double lastPlayAverage;
+        private double lastPlayBeatmapOffset;
 
         private SettingsButton? useAverageButton;
 
@@ -96,12 +97,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             protected class CustomSliderBar : SliderBar
             {
-                protected override LocalisableString GetTooltipText(double value)
-                {
-                    return value == 0
-                        ? new TranslatableString("_", @"{0} ms", base.GetTooltipText(value))
-                        : new TranslatableString("_", @"{0} ms {1}", base.GetTooltipText(value), getEarlyLateText(value));
-                }
+                public override LocalisableString TooltipText =>
+                    Current.Value == 0
+                        ? new TranslatableString("_", @"{0} ms", base.TooltipText)
+                        : new TranslatableString("_", @"{0} ms {1}", base.TooltipText, getEarlyLateText(Current.Value));
 
                 private LocalisableString getEarlyLateText(double value)
                 {
@@ -156,7 +155,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 if (useAverageButton != null)
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value, Current.Precision / 2);
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(Current.Value, lastPlayBeatmapOffset - lastPlayAverage, Current.Precision / 2);
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
@@ -213,6 +212,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             lastPlayAverage = average;
+            lastPlayBeatmapOffset = Current.Value;
 
             referenceScoreContainer.AddRange(new Drawable[]
             {
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = -lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
                 },
             });
         }

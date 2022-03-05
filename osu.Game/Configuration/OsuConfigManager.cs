@@ -240,9 +240,9 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<Guid, string> LookupSkinName { private get; set; }
+        public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
 
-        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; }
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
     }
 
     // IMPORTANT: These are used in user configuration files.
