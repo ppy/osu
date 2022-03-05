@@ -45,10 +45,5 @@ namespace osu.Game.Rulesets.Mania
                 }
             };
         }
-
-        private class TimeSlider : OsuSliderBar<double>
-        {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
-        }
     }
 }

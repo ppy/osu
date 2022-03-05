@@ -98,12 +98,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             protected class CustomSliderBar : SliderBar
             {
-                protected override LocalisableString GetTooltipText(double value)
-                {
-                    return value == 0
-                        ? new TranslatableString("_", @"{0} ms", base.GetTooltipText(value))
-                        : new TranslatableString("_", @"{0} ms {1}", base.GetTooltipText(value), getEarlyLateText(value));
-                }
+                public override LocalisableString TooltipText =>
+                    Current.Value == 0
+                        ? new TranslatableString("_", @"{0} ms", base.TooltipText)
+                        : new TranslatableString("_", @"{0} ms {1}", base.TooltipText, getEarlyLateText(Current.Value));
 
                 private LocalisableString getEarlyLateText(double value)
                 {
