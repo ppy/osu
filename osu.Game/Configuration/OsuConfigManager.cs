@@ -270,7 +270,13 @@ namespace osu.Game.Configuration
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
+
+        /// <summary>
+        /// Globally applied audio offset.
+        /// This is added to the audio track's current time. Higher values will cause gameplay to occur earlier, relative to the audio track.
+        /// </summary>
         AudioOffset,
+
         VolumeInactive,
         MenuMusic,
         MenuVoice,
