@@ -111,6 +111,6 @@ namespace osu.Game.Rulesets.Mods
 
     public class MuteComboSlider : OsuSliderBar<int>
     {
-        protected override LocalisableString GetTooltipText(int value) => value == 0 ? "always muted" : base.GetTooltipText(value);
+        public override LocalisableString TooltipText => Current.Value == 0 ? "always muted" : base.TooltipText;
     }
 }
