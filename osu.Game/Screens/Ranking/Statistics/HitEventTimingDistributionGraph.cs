@@ -269,7 +269,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                     });
                 }
 
-                boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, 0.05f, 1), duration, Easing.OutQuint);
+                boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, minimum_height, 1), duration, Easing.OutQuint);
                 boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }
