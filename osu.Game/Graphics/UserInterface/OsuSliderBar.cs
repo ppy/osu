@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(current => TooltipText = GetTooltipText(current.NewValue), true);
+            CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -178,7 +178,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnUserChange(value);
             playSample(value);
-            TooltipText = GetTooltipText(value);
+            TooltipText = getTooltipText(value);
         }
 
         private void playSample(T value)
@@ -203,7 +203,7 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        protected virtual LocalisableString GetTooltipText(T value)
+        private LocalisableString getTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
                 return value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
