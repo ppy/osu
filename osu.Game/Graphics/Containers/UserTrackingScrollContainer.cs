@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         /// <summary>
-        /// Invoked when any scroll has been performed either automatically or by user.
+        /// Invoked when any scroll has been performed either programmatically or by user.
         /// </summary>
         protected virtual void OnScrollChange(bool byUser) => UserScrolling = byUser;
     }
