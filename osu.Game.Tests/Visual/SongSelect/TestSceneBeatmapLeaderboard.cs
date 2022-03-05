@@ -119,7 +119,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
             AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
-            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardState.Unavailable));
+            AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));
+            AddStep(@"Beatmap unavailable", () => leaderboard.SetErrorState(LeaderboardState.BeatmapUnavailable));
             AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
         }
 

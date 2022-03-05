@@ -143,6 +143,8 @@ namespace osu.Game.Screens.Play
             muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
+            const float padding = 25;
+
             InternalChildren = new Drawable[]
             {
                 (content = new LogoTrackingContainer
@@ -158,20 +160,27 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    new OsuScrollContainer
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Margin = new MarginPadding(25),
-                        Children = new PlayerSettingsGroup[]
+                        RelativeSizeAxes = Axes.Y,
+                        Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
+                        Padding = new MarginPadding { Vertical = padding },
+                        Masking = false,
+                        Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
                         {
-                            VisualSettings = new VisualSettings(),
-                            AudioSettings = new AudioSettings(),
-                            new InputSettings()
-                        }
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 20),
+                            Padding = new MarginPadding { Horizontal = padding },
+                            Children = new PlayerSettingsGroup[]
+                            {
+                                VisualSettings = new VisualSettings(),
+                                AudioSettings = new AudioSettings(),
+                                new InputSettings()
+                            }
+                        },
                     },
                     idleTracker = new IdleTracker(750),
                 }),
