@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Ranking.Statistics
 
             public void UpdateOffset(float adjustment)
             {
-                bool hasAdjustment = adjustment != value;
+                bool hasAdjustment = adjustment != value && adjustment / maxValue >= minimum_height;
 
                 if (boxAdjustment == null)
                 {
