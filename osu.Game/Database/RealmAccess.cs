@@ -54,8 +54,9 @@ namespace osu.Game.Database
         /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
+        /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 13;
+        private const int schema_version = 14;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -563,6 +564,11 @@ namespace osu.Game.Database
                             newItem.RulesetName = rulesetName;
                     }
 
+                    break;
+
+                case 14:
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.UserSettings = new BeatmapUserSettings();
                     break;
             }
         }
