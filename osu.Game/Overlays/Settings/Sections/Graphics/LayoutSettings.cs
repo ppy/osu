@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             windowModeDropdown.Current.BindValueChanged(mode =>
             {
-                updateFullscreenDropdowns();
+                updateDisplayModeDropdowns();
 
                 windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : default;
             }, true);
@@ -175,7 +175,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                                                 .Distinct());
                 }
 
-                updateFullscreenDropdowns();
+                updateDisplayModeDropdowns();
             }), true);
 
             scalingMode.BindValueChanged(mode =>
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             // initial update bypasses transforms
             updateScalingModeVisibility();
 
-            void updateFullscreenDropdowns()
+            void updateDisplayModeDropdowns()
             {
                 if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
                     resolutionDropdown.Show();
