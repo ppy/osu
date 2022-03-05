@@ -70,8 +70,8 @@ namespace osu.Game.Rulesets.Mods
 
         // The two constants below denote the maximum allowable change in rate caused by a single hit
         // This prevents sudden jolts caused by a badly-timed hit.
-        private const double min_allowable_rate_change = 0.8d;
-        private const double max_allowable_rate_change = 1.25d;
+        private const double min_allowable_rate_change = 0.9d;
+        private const double max_allowable_rate_change = 1.11d;
 
         // Apply a fixed rate change when missing, allowing the player to catch up when the rate is too fast.
         private const double rate_change_on_miss = 0.95d;
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Mods
         /// The number of most recent track rates (approximated from how early/late each object was hit relative to the previous object)
         /// which should be averaged to calculate <see cref="targetRate"/>.
         /// </summary>
-        private const int recent_rate_count = 6;
+        private const int recent_rate_count = 8;
 
         /// <summary>
         /// Stores the most recent <see cref="recent_rate_count"/> approximated track rates
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Mods
 
                 recentRates.Add(Math.Clamp(getRelativeRateChange(result) * SpeedChange.Value, min_allowable_rate, max_allowable_rate));
 
-                targetRate = recentRates.Average();
+                updateTargetRate();
             };
             drawable.OnRevertResult += (o, result) =>
             {
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Mods
 
                 recentRates.RemoveAt(recentRates.Count - 1);
 
-                targetRate = recentRates.Average();
+                updateTargetRate();
             };
         }
 
@@ -245,6 +245,25 @@ namespace osu.Game.Rulesets.Mods
                 min_allowable_rate_change,
                 max_allowable_rate_change
             );
+        }
+
+        /// <summary>
+        /// Update <see cref="targetRate"/> based on the values in <see cref="recentRates"/>.
+        /// </summary>
+        private void updateTargetRate()
+        {
+            // Compare values in recentRates to see how consistent the player's speed is
+            // If the player hits half of the notes too fast and the other half too slow:  Abs(consistency) = 0
+            // If the player hits all their notes too fast or too slow:                    Abs(consistency) = recent_rate_count - 1
+            int consistency = 0;
+
+            for (int i = 1; i < recentRates.Count; i++)
+            {
+                consistency += Math.Sign(recentRates[i] - recentRates[i - 1]);
+            }
+
+            // Scale the rate adjustment based on consistency
+            targetRate = Interpolation.Lerp(targetRate, recentRates.Average(), Math.Abs(consistency) / (recent_rate_count - 1d));
         }
     }
 }
