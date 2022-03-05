@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania
 
         private class TimeSlider : OsuSliderBar<double>
         {
-            protected override LocalisableString GetTooltipText(double value) => $"{value:N0} ms";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

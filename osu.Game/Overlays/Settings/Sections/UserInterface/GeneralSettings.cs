@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
 
         private class TimeSlider : OsuSliderBar<float>
         {
-            protected override LocalisableString GetTooltipText(float value) => $"{value:N0} ms";
+            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }
