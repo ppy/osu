@@ -10,6 +10,6 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class TimeSlider : OsuSliderBar<double>
     {
-        protected override LocalisableString GetTooltipText(double value) => $"{value:N0} ms";
+        public override LocalisableString TooltipText => $"{Current.Value:N0} ms";
     }
 }

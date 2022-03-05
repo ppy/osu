@@ -11,6 +11,6 @@ namespace osu.Game.Overlays.Settings.Sections
     /// </summary>
     internal class SizeSlider : OsuSliderBar<float>
     {
-        protected override LocalisableString GetTooltipText(float value) => value.ToString(@"0.##x");
+        public override LocalisableString TooltipText => Current.Value.ToString(@"0.##x");
     }
 }

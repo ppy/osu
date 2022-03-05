@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Replays.Legacy;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
@@ -48,7 +48,7 @@ namespace osu.Game.Scoring.Legacy
             if (beatmap == null && !score.Replay.Frames.All(f => f is LegacyReplayFrame))
                 throw new ArgumentException(@"Beatmap must be provided if frames are not already legacy frames.", nameof(beatmap));
 
-            if (score.ScoreInfo.Ruleset.OnlineID < 0 || score.ScoreInfo.Ruleset.OnlineID > ILegacyRuleset.MAX_LEGACY_RULESET_ID)
+            if (!score.ScoreInfo.Ruleset.IsLegacyRuleset())
                 throw new ArgumentException(@"Only scores in the osu, taiko, catch, or mania rulesets can be encoded to the legacy score format.", nameof(score));
         }
 

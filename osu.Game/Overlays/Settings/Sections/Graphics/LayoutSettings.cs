@@ -240,7 +240,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private class UIScaleSlider : OsuSliderBar<float>
         {
-            protected override LocalisableString GetTooltipText(float value) => $"{base.GetTooltipText(value)}x";
+            public override LocalisableString TooltipText => base.TooltipText + "x";
         }
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>

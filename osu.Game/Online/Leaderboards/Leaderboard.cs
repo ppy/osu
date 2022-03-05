@@ -22,6 +22,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -311,25 +312,28 @@ namespace osu.Game.Online.Leaderboards
             switch (state)
             {
                 case LeaderboardState.NetworkFailure:
-                    return new ClickablePlaceholder(@"Couldn't fetch scores!", FontAwesome.Solid.Sync)
+                    return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
                         Action = RefetchScores
                     };
 
                 case LeaderboardState.NoneSelected:
-                    return new MessagePlaceholder(@"Please select a beatmap!");
+                    return new MessagePlaceholder(LeaderboardStrings.PleaseSelectABeatmap);
 
-                case LeaderboardState.Unavailable:
-                    return new MessagePlaceholder(@"Leaderboards are not available for this beatmap!");
+                case LeaderboardState.RulesetUnavailable:
+                    return new MessagePlaceholder(LeaderboardStrings.LeaderboardsAreNotAvailableForThisRuleset);
+
+                case LeaderboardState.BeatmapUnavailable:
+                    return new MessagePlaceholder(LeaderboardStrings.LeaderboardsAreNotAvailableForThisBeatmap);
 
                 case LeaderboardState.NoScores:
-                    return new MessagePlaceholder(@"No records yet!");
+                    return new MessagePlaceholder(LeaderboardStrings.NoRecordsYet);
 
                 case LeaderboardState.NotLoggedIn:
-                    return new LoginPlaceholder(@"Please sign in to view online leaderboards!");
+                    return new LoginPlaceholder(LeaderboardStrings.PleaseSignInToViewOnlineLeaderboards);
 
                 case LeaderboardState.NotSupporter:
-                    return new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!");
+                    return new MessagePlaceholder(LeaderboardStrings.PleaseInvestInAnOsuSupporterTagToViewThisLeaderboard);
 
                 case LeaderboardState.Retrieving:
                     return null;
