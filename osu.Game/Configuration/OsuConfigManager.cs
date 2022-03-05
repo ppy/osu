@@ -140,7 +140,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
-            SetDefault(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
+            SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
 
             SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
@@ -240,9 +240,9 @@ namespace osu.Game.Configuration
             };
         }
 
-        public Func<Guid, string> LookupSkinName { private get; set; }
+        public Func<Guid, string> LookupSkinName { private get; set; } = _ => @"unknown";
 
-        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; }
+        public Func<GlobalAction, LocalisableString> LookupKeyBindings { get; set; } = _ => @"unknown";
     }
 
     // IMPORTANT: These are used in user configuration files.
