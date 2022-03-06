@@ -18,6 +18,12 @@ namespace osu.Game.Overlays.Chat
         /// </summary>
         private const float auto_scroll_leniency = 10f;
 
+        /// <summary>
+        /// Whether to keep this container scrolled to end on new content.
+        /// </summary>
+        /// <remarks>
+        /// This is specifically controlled by whether the latest scroll operation made the container scrolled to end.
+        /// </remarks>
         private bool trackNewContent = true;
 
         protected override void UpdateAfterChildren()
