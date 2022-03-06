@@ -25,6 +25,8 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool UserScrolling { get; private set; }
 
+        public void CancelUserScroll() => UserScrolling = false;
+
         public UserTrackingScrollContainer()
         {
         }
@@ -36,37 +38,26 @@ namespace osu.Game.Graphics.Containers
 
         protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
         {
+            UserScrolling = true;
             base.OnUserScroll(value, animated, distanceDecay);
-            OnScrollChange(true);
         }
 
         public new void ScrollIntoView(Drawable target, bool animated = true)
         {
+            UserScrolling = false;
             base.ScrollIntoView(target, animated);
-            OnScrollChange(false);
         }
 
         public new void ScrollTo(float value, bool animated = true, double? distanceDecay = null)
         {
+            UserScrolling = false;
             base.ScrollTo(value, animated, distanceDecay);
-            OnScrollChange(false);
-        }
-
-        public new void ScrollToStart(bool animated = true, bool allowDuringDrag = false)
-        {
-            base.ScrollToStart(animated, allowDuringDrag);
-            OnScrollChange(false);
         }
 
         public new void ScrollToEnd(bool animated = true, bool allowDuringDrag = false)
         {
+            UserScrolling = false;
             base.ScrollToEnd(animated, allowDuringDrag);
-            OnScrollChange(false);
         }
-
-        /// <summary>
-        /// Invoked when any scroll has been performed either programmatically or by user.
-        /// </summary>
-        protected virtual void OnScrollChange(bool byUser) => UserScrolling = byUser;
     }
 }
