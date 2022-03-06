@@ -32,6 +32,11 @@ namespace osu.Game.Screens.Edit.Timing
             set => slider.KeyboardStep = value;
         }
 
+        public CompositeDrawable TabbableContentContainer
+        {
+            set => textBox.TabbableContentContainer = value;
+        }
+
         private readonly BindableWithCurrent<T?> current = new BindableWithCurrent<T?>();
 
         public Bindable<T?> Current
