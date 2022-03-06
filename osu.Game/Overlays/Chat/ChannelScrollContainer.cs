@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
@@ -21,25 +20,12 @@ namespace osu.Game.Overlays.Chat
 
         private bool trackNewContent = true;
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
-            // If our behaviour hasn't been overriden and there has been new content added to the container, we should update our scroll position to track it.
-            bool requiresScrollUpdate = trackNewContent && !IsScrolledToEnd();
-
-            if (requiresScrollUpdate)
-            {
-                // Schedule required to allow FillFlow to be the correct size.
-                Schedule(() =>
-                {
-                    if (trackNewContent)
-                    {
-                        if (Current < ScrollableExtent)
-                            ScrollToEnd();
-                    }
-                });
-            }
+            if (trackNewContent && !IsScrolledToEnd())
+                ScrollToEnd();
         }
 
         private void updateTrackState() => trackNewContent = IsScrolledToEnd(auto_scroll_leniency);
