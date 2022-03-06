@@ -9,7 +9,6 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Chat;
 using osuTK.Input;
@@ -337,7 +336,7 @@ namespace osu.Game.Tests.Visual.Online
 
             public DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
 
-            public UserTrackingScrollContainer ScrollContainer => (UserTrackingScrollContainer)((Container)DrawableChannel.Child).Child;
+            public ChannelScrollContainer ScrollContainer => (ChannelScrollContainer)((Container)DrawableChannel.Child).Child;
 
             public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
 
