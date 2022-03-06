@@ -75,9 +75,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [BackgroundDependencyLoader]
             private void load()
             {
+                FillFlowContainer flow;
+
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    flow = new FillFlowContainer
                     {
                         Width = 200,
                         Direction = FillDirection.Vertical,
@@ -93,6 +95,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         }
                     }
                 };
+
+                bank.TabbableContentContainer = flow;
+                volume.TabbableContentContainer = flow;
 
                 // if the piece belongs to a currently selected object, assume that the user wants to change all selected objects.
                 // if the piece belongs to an unselected object, operate on that object alone, independently of the selection.
