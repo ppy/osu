@@ -11,9 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Utils;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
@@ -234,53 +232,6 @@ namespace osu.Game.Overlays.Chat
                         }
                     }
                 };
-            }
-        }
-
-        /// <summary>
-        /// An <see cref="OsuScrollContainer"/> with functionality to automatically scroll whenever the maximum scrollable distance increases.
-        /// </summary>
-        private class ChannelScrollContainer : UserTrackingScrollContainer
-        {
-            /// <summary>
-            /// The chat will be automatically scrolled to end if and only if
-            /// the distance between the current scroll position and the end of the scroll
-            /// is less than this value.
-            /// </summary>
-            private const float auto_scroll_leniency = 10f;
-
-            private float? lastExtent;
-
-            protected override void OnUserScroll(float value, bool animated = true, double? distanceDecay = default)
-            {
-                base.OnUserScroll(value, animated, distanceDecay);
-                lastExtent = null;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                // If the user has scrolled to the bottom of the container, we should resume tracking new content.
-                if (UserScrolling && IsScrolledToEnd(auto_scroll_leniency))
-                    CancelUserScroll();
-
-                // If the user hasn't overridden our behaviour and there has been new content added to the container, we should update our scroll position to track it.
-                bool requiresScrollUpdate = !UserScrolling && (lastExtent == null || Precision.AlmostBigger(ScrollableExtent, lastExtent.Value));
-
-                if (requiresScrollUpdate)
-                {
-                    // Schedule required to allow FillFlow to be the correct size.
-                    Schedule(() =>
-                    {
-                        if (!UserScrolling)
-                        {
-                            if (Current < ScrollableExtent)
-                                ScrollToEnd();
-                            lastExtent = ScrollableExtent;
-                        }
-                    });
-                }
             }
         }
     }
