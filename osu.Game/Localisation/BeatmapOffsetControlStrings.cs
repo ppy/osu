@@ -29,6 +29,16 @@ namespace osu.Game.Localisation
         /// </summary>
         public static LocalisableString CalibrateUsingLastPlay => new TranslatableString(getKey(@"calibrate_using_last_play"), @"Calibrate using last play");
 
+        /// <summary>
+        /// "(hit objects appear later)"
+        /// </summary>
+        public static LocalisableString HitObjectsAppearLater => new TranslatableString(getKey(@"hit_objects_appear_later"), @"(hit objects appear later)");
+
+        /// <summary>
+        /// "(hit objects appear earlier)"
+        /// </summary>
+        public static LocalisableString HitObjectsAppearEarlier => new TranslatableString(getKey(@"hit_objects_appear_earlier"), @"(hit objects appear earlier)");
+
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

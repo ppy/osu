@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
             set => Component.Text = value;
         }
 
-        public Container TabbableContentContainer
+        public CompositeDrawable TabbableContentContainer
         {
             set => Component.TabbableContentContainer = value;
         }

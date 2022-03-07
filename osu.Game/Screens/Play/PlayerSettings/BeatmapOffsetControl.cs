@@ -3,12 +3,14 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -51,6 +53,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private OsuColour colours { get; set; } = null!;
 
         private double lastPlayAverage;
+        private double lastPlayBeatmapOffset;
+        private HitEventTimingDistributionGraph? lastPlayGraph;
 
         private SettingsButton? useAverageButton;
 
@@ -71,7 +75,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 Spacing = new Vector2(10),
                 Children = new Drawable[]
                 {
-                    new PlayerSliderBar<double>
+                    new OffsetSliderBar
                     {
                         KeyboardStep = 5,
                         LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
@@ -86,6 +90,28 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
+        }
+
+        public class OffsetSliderBar : PlayerSliderBar<double>
+        {
+            protected override Drawable CreateControl() => new CustomSliderBar();
+
+            protected class CustomSliderBar : SliderBar
+            {
+                public override LocalisableString TooltipText =>
+                    Current.Value == 0
+                        ? new TranslatableString("_", @"{0} ms", base.TooltipText)
+                        : new TranslatableString("_", @"{0} ms {1}", base.TooltipText, getEarlyLateText(Current.Value));
+
+                private LocalisableString getEarlyLateText(double value)
+                {
+                    Debug.Assert(value != 0);
+
+                    return value > 0
+                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
+                }
+            }
         }
 
         protected override void LoadComplete()
@@ -122,6 +148,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             void updateOffset()
             {
+                // the last play graph is relative to the offset at the point of the last play, so we need to factor that out.
+                double adjustmentSinceLastPlay = lastPlayBeatmapOffset - Current.Value;
+
+                // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
+                lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
+
                 // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
                 if (realmWriteTask?.IsCompleted == false)
                 {
@@ -130,7 +162,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 if (useAverageButton != null)
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value, Current.Precision / 2);
+                {
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
+                }
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
@@ -187,10 +221,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             lastPlayAverage = average;
+            lastPlayBeatmapOffset = Current.Value;
 
             referenceScoreContainer.AddRange(new Drawable[]
             {
-                new HitEventTimingDistributionGraph(hitEvents)
+                lastPlayGraph = new HitEventTimingDistributionGraph(hitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 50,
@@ -199,7 +234,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = -lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
                 },
             });
         }
