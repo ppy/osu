@@ -48,6 +48,28 @@ namespace osu.Game.Tests.Database
         }
 
         [Test]
+        public void TestPropertyChangedSubscription()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                bool? receivedValue = null;
+
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+
+                using (realm.SubscribeToPropertyChanged(r => r.All<BeatmapSetInfo>().First(), setInfo => setInfo.Protected, val => receivedValue = val))
+                {
+                    Assert.That(receivedValue, Is.False);
+
+                    realm.Write(r => r.All<BeatmapSetInfo>().First().Protected = true);
+
+                    realm.Run(r => r.Refresh());
+
+                    Assert.That(receivedValue, Is.True);
+                }
+            });
+        }
+
+        [Test]
         public void TestSubscriptionWithContextLoss()
         {
             IEnumerable<BeatmapSetInfo>? resolvedItems = null;
@@ -161,6 +183,42 @@ namespace osu.Game.Tests.Database
 
                 realm.Run(r => r.Refresh());
                 Assert.That(beatmapSetInfo, Is.Null);
+            });
+        }
+
+        [Test]
+        public void TestPropertyChangedSubscriptionWithContextLoss()
+        {
+            RunTestWithRealm((realm, _) =>
+            {
+                bool? receivedValue = null;
+
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+
+                var subscription = realm.SubscribeToPropertyChanged(
+                    r => r.All<BeatmapSetInfo>().First(),
+                    setInfo => setInfo.Protected,
+                    val => receivedValue = val);
+
+                Assert.That(receivedValue, Is.Not.Null);
+                receivedValue = null;
+
+                using (realm.BlockAllOperations())
+                {
+                }
+
+                // re-registration after context restore.
+                realm.Run(r => r.Refresh());
+                Assert.That(receivedValue, Is.Not.Null);
+
+                subscription.Dispose();
+                receivedValue = null;
+
+                using (realm.BlockAllOperations())
+                    Assert.That(receivedValue, Is.Null);
+
+                realm.Run(r => r.Refresh());
+                Assert.That(receivedValue, Is.Null);
             });
         }
     }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -120,24 +119,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             ReferenceScore.BindValueChanged(scoreChanged, true);
 
-            beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
-            {
-                var userSettings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
-
-                if (userSettings == null) // only the case for tests.
-                    return null;
-
-                Current.Value = userSettings.Offset;
-                userSettings.PropertyChanged += onUserSettingsOnPropertyChanged;
-
-                return new InvokeOnDisposal(() => userSettings.PropertyChanged -= onUserSettingsOnPropertyChanged);
-
-                void onUserSettingsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-                {
-                    if (args.PropertyName == nameof(BeatmapUserSettings.Offset))
-                        Current.Value = userSettings.Offset;
-                }
-            });
+            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
+                r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
+                settings => settings.Offset,
+                val => Current.Value = val);
 
             Current.BindValueChanged(currentChanged);
         }
