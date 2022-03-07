@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private const int preceding_hitobjects_to_shift = 10;
 
+        private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE / 2;
+
         private readonly List<OsuHitObject> hitObjects;
 
         private readonly List<HitObjectPositionInfo> hitObjectPositions = new List<HitObjectPositionInfo>();
@@ -40,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void populateHitObjectPositions()
         {
-            Vector2 lastPosition = Vector2.Zero;
+            Vector2 lastPosition = playfield_centre;
             float lastAngle = 0;
 
             foreach (OsuHitObject hitObject in hitObjects)
@@ -142,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 current.Distance * (float)Math.Sin(absoluteAngle)
             );
 
-            Vector2 lastEndPosition = previous?.EndPositionModified ?? Vector2.Zero;
+            Vector2 lastEndPosition = previous?.EndPositionModified ?? playfield_centre;
 
             posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
