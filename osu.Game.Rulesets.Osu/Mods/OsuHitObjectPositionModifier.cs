@@ -158,10 +158,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private Vector2 clampHitCircleToPlayfield(HitCircle circle, HitObjectPositionInfo objectInfo)
         {
             var previousPosition = objectInfo.PositionModified;
-            objectInfo.EndPositionModified = objectInfo.PositionModified = clampToPlayfieldWithPadding(
-                objectInfo.PositionModified,
-                (float)circle.Radius
-            );
+            objectInfo.EndPositionModified = objectInfo.PositionModified = clampToPlayfield(objectInfo.PositionModified);
 
             circle.Position = objectInfo.PositionModified;
 
@@ -211,7 +208,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 // The last object is shifted by a vector slightly larger than zero
                 Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
 
-                hitObject.Position = clampToPlayfieldWithPadding(position, (float)hitObject.Radius);
+                hitObject.Position = clampToPlayfield(position);
             }
         }
 
@@ -281,16 +278,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Clamp a position to playfield, keeping a specified distance from the edges.
+        /// Clamp a position to playfield.
         /// </summary>
         /// <param name="position">The position to be clamped.</param>
-        /// <param name="padding">The minimum distance allowed from playfield edges.</param>
         /// <returns>The clamped position.</returns>
-        private Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
+        private Vector2 clampToPlayfield(Vector2 position)
         {
             return new Vector2(
-                Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
-                Math.Clamp(position.Y, padding, OsuPlayfield.BASE_SIZE.Y - padding)
+                Math.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X),
+                Math.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y)
             );
         }
 
