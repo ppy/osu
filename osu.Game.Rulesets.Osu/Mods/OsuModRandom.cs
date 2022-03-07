@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
 
-            positionModifier.RepositionHitObjects();
+            positionModifier.ApplyModifications();
         }
     }
 }

@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void populateHitObjectPositions()
         {
-            Vector2 lastPosition = playfield_centre;
-            float lastAngle = 0;
+            Vector2 prevPosition = playfield_centre;
+            float prevAngle = 0;
 
             foreach (OsuHitObject hitObject in hitObjects)
             {
-                Vector2 relativePosition = hitObject.Position - lastPosition;
+                Vector2 relativePosition = hitObject.Position - prevPosition;
                 float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
-                float relativeAngle = normaliseAngle(absoluteAngle - lastAngle);
+                float relativeAngle = normaliseAngle(absoluteAngle - prevAngle);
 
                 hitObjectPositions.Add(new HitObjectPositionInfo(hitObject)
                 {
@@ -57,15 +57,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                     Distance = relativePosition.Length
                 });
 
-                lastPosition = hitObject.EndPosition;
-                lastAngle = absoluteAngle;
+                prevPosition = hitObject.EndPosition;
+                prevAngle = absoluteAngle;
             }
         }
 
         /// <summary>
         /// Reposition all hit objects according to information in <see cref="HitObjectPositions"/>.
         /// </summary>
-        public void RepositionHitObjects()
+        public void ApplyModifications()
         {
             HitObjectPositionInfo previous = null;
 
