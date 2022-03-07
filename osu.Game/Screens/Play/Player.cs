@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Play
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
         private Drawable createUnderlayComponents() =>
-            DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
+            DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard, GameplayState.Mods) { RelativeSizeAxes = Axes.Both };
 
         private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
         {
