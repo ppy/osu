@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -24,6 +26,7 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -47,12 +50,6 @@ namespace osu.Game.Skinning.Editor
 
         [Resolved]
         private OsuColour colours { get; set; }
-
-        [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
-
-        [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
 
         private bool hasBegunMutating;
 
@@ -117,47 +114,12 @@ namespace osu.Game.Skinning.Editor
                             },
                         },
                     },
-                    new FillFlowContainer
+                    new SceneLibrary
                     {
                         RelativeSizeAxes = Axes.X,
                         Y = 45,
-                        Height = 30,
-                        Name = "Scene library",
-                        Spacing = new Vector2(10),
-                        Padding = new MarginPadding(10),
-                        Direction = FillDirection.Horizontal,
-                        Children = new Drawable[]
-                        {
-                            new PurpleTriangleButton
-                            {
-                                Text = "Song Select",
-                                Width = 100,
-                                Height = 30,
-                                Action = () => game?.PerformFromScreen(screen =>
-                                {
-                                    if (screen is SongSelect)
-                                        return;
-
-                                    screen.Push(new PlaySongSelect());
-                                }, new[] { typeof(SongSelect) })
-                            },
-                            new PurpleTriangleButton
-                            {
-                                Text = "Gameplay",
-                                Width = 100,
-                                Height = 30,
-                                Action = () => game?.PerformFromScreen(screen =>
-                                {
-                                    if (screen is Player)
-                                        return;
-
-                                    var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
-                                    if (replayGeneratingMod != null)
-                                        screen.Push(new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods)));
-                                }, new[] { typeof(Player) })
-                            },
-                        }
                     },
+
                     new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -226,7 +188,10 @@ namespace osu.Game.Skinning.Editor
             {
                 content.Children = new Drawable[]
                 {
-                    new SkinBlueprintContainer(targetScreen),
+                    new SkinBlueprintContainer(targetScreen)
+                    {
+                        Margin = new MarginPadding { Top = 100 },
+                    }
                 };
             }
         }
@@ -344,6 +309,79 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
+        }
+
+        private class SceneLibrary : CompositeDrawable
+        {
+            public const float HEIGHT = 30;
+            private const float padding = 10;
+
+            [Resolved(canBeNull: true)]
+            private OsuGame game { get; set; }
+
+            [Resolved]
+            private IBindable<RulesetInfo> ruleset { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChildren = new Drawable[]
+                {
+                    new OsuScrollContainer(Direction.Horizontal)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = HEIGHT + padding * 2,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black.Opacity(0.5f)
+                            },
+                            new FillFlowContainer
+                            {
+                                Name = "Scene library",
+                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Y,
+                                Spacing = new Vector2(padding),
+                                Padding = new MarginPadding(padding),
+                                Direction = FillDirection.Horizontal,
+                                Children = new Drawable[]
+                                {
+                                    new PurpleTriangleButton
+                                    {
+                                        Text = "Song Select",
+                                        Width = 100,
+                                        Height = HEIGHT,
+                                        Action = () => game?.PerformFromScreen(screen =>
+                                        {
+                                            if (screen is SongSelect)
+                                                return;
+
+                                            screen.Push(new PlaySongSelect());
+                                        }, new[] { typeof(SongSelect) })
+                                    },
+                                    new PurpleTriangleButton
+                                    {
+                                        Text = "Gameplay",
+                                        Width = 100,
+                                        Height = HEIGHT,
+                                        Action = () => game?.PerformFromScreen(screen =>
+                                        {
+                                            if (screen is Player)
+                                                return;
+
+                                            var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+                                            if (replayGeneratingMod != null)
+                                                screen.Push(new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods)));
+                                        }, new[] { typeof(Player), typeof(SongSelect) })
+                                    },
+                                }
+                            },
+                        }
+                    }
+                };
+            }
         }
     }
 }
