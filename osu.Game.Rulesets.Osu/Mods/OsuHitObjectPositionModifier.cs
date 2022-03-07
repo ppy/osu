@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 Vector2 relativePosition = hitObject.Position - lastPosition;
                 float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
-                float relativeAngle = absoluteAngle - lastAngle;
+                float relativeAngle = normaliseAngle(absoluteAngle - lastAngle);
 
                 hitObjectPositions.Add(new HitObjectPositionInfo(hitObject)
                 {
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="current">Info for the hit object to be processed.</param>
         private void applyModification(float prevAngleAbsolute, HitObjectPositionInfo previous, HitObjectPositionInfo current)
         {
-            double absoluteAngle = prevAngleAbsolute + current.RelativeAngle;
+            double absoluteAngle = normaliseAngle(prevAngleAbsolute + current.RelativeAngle);
 
             var posRelativeToPrev = new Vector2(
                 current.Distance * (float)Math.Cos(absoluteAngle),
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
-            current.RelativeAngle = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X) - prevAngleAbsolute;
+            current.RelativeAngle = normaliseAngle((float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X) - prevAngleAbsolute);
 
             current.PositionModified = lastEndPosition + posRelativeToPrev;
         }
@@ -290,6 +290,21 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Math.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X),
                 Math.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y)
             );
+        }
+
+        /// <summary>
+        /// Normalise an angle between -<see cref="Math.PI"/> and <see cref="Math.PI"/>.
+        /// </summary>
+        /// <param name="angle">The angle to be normalised.</param>
+        /// <returns>Normalised result.</returns>
+        private float normaliseAngle(float angle)
+        {
+            const float pi = (float)Math.PI;
+            const float two_pi = pi * 2;
+
+            angle = (angle + pi) % two_pi;
+            if (angle < 0) angle += two_pi;
+            return angle - pi;
         }
 
         public interface IHitObjectPositionInfo
