@@ -140,7 +140,7 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
-            SetDefault(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
+            SetDefault(OsuSetting.UIHoldActivationDelay, 200.0, 0.0, 500.0, 50.0);
 
             SetDefault(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
@@ -270,7 +270,13 @@ namespace osu.Game.Configuration
         MouseDisableButtons,
         MouseDisableWheel,
         ConfineMouseMode,
+
+        /// <summary>
+        /// Globally applied audio offset.
+        /// This is added to the audio track's current time. Higher values will cause gameplay to occur earlier, relative to the audio track.
+        /// </summary>
         AudioOffset,
+
         VolumeInactive,
         MenuMusic,
         MenuVoice,
