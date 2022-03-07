@@ -338,7 +338,7 @@ namespace osu.Game.Overlays
 
         private void tryHighlightMessage(Message message)
         {
-            if (message.ChannelId != currentChannel.Value.Id)
+            if (message.ChannelId != currentDrawableChannel.Channel.Id)
                 return;
 
             currentDrawableChannel.HighlightMessage(message);
