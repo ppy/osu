@@ -70,6 +70,14 @@ namespace osu.Game.Skinning
                 case SkinnableTargetComponent target:
                     switch (target.Target)
                     {
+                        case SkinnableTarget.SongSelect:
+                            var songSelectComponents = new SkinnableTargetComponentsContainer(container =>
+                            {
+                                // do stuff when we need to.
+                            });
+
+                            return songSelectComponents;
+
                         case SkinnableTarget.MainHUDComponents:
                             var skinnableTargetWrapper = new SkinnableTargetComponentsContainer(container =>
                             {
