@@ -38,10 +38,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Vector2 lastPosition = Vector2.Zero;
             float lastAngle = 0;
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            foreach (OsuHitObject hitObject in hitObjects)
             {
-                var hitObject = hitObjects[i];
-
                 Vector2 relativePosition = hitObject.Position - lastPosition;
                 float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
                 float relativeAngle = absoluteAngle - lastAngle;
@@ -64,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var hitObject = hitObjects[i];
-
                 var current = hitObjectPositions[i];
 
                 if (hitObject is Spinner)
@@ -76,7 +73,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 float lastAngleAbsolute = 0;
 
                 if (i == 1)
+                {
                     lastAngleAbsolute = previous!.AngleRad;
+                }
                 else if (i > 1)
                 {
                     Vector2 lastPositionRelative = hitObjects[i - 1].Position - hitObjects[i - 2].EndPosition;
@@ -98,10 +97,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         shift = clampSliderToPlayfield(slider, current);
                         break;
                 }
-
-                // Vector2 relativePosition = current.PositionModified - previous?.EndPositionModified ?? Vector2.Zero;
-                // current.Distance = relativePosition.Length;
-                // current.AngleRad = (float)Math.Atan2(relativePosition.Y, relativePosition.X) - lastAngleAbsolute;
 
                 if (shift != Vector2.Zero)
                 {
@@ -303,14 +298,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
-
-            public Vector2 EndPositionOriginal { get; }
             public Vector2 EndPositionModified { get; set; }
 
             public HitObjectPositionInfo(OsuHitObject hitObject)
             {
                 PositionOriginal = PositionModified = hitObject.Position;
-                EndPositionOriginal = EndPositionModified = hitObject.EndPosition;
+                EndPositionModified = hitObject.EndPosition;
             }
         }
     }
