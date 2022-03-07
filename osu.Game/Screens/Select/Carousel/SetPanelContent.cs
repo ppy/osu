@@ -16,6 +16,9 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class SetPanelContent : CompositeDrawable
     {
+        // Disallow interacting with difficulty icons on a panel until the panel has been selected.
+        public override bool PropagatePositionalInputSubTree => carouselSet.State.Value == CarouselItemState.Selected;
+
         private readonly CarouselBeatmapSet carouselSet;
 
         public SetPanelContent(CarouselBeatmapSet carouselSet)
