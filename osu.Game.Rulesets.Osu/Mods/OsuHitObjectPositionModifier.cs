@@ -1,5 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     /// <summary>
-    /// Places hit objects
+    /// Places hit objects according to information in <see cref="HitObjectPositions"/> while keeping objects inside the playfield.
     /// </summary>
     public class OsuHitObjectPositionModifier
     {
@@ -25,6 +26,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly List<HitObjectPositionInfo> hitObjectPositions = new List<HitObjectPositionInfo>();
 
+        /// <summary>
+        /// Contains information specifying how each hit object should be placed.
+        /// <para>The default values correspond to how objects are originally placed in the beatmap.</para>
+        /// </summary>
         public IReadOnlyList<IHitObjectPositionInfo> HitObjectPositions => hitObjectPositions;
 
         public OsuHitObjectPositionModifier(List<OsuHitObject> hitObjects)
@@ -46,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 hitObjectPositions.Add(new HitObjectPositionInfo(hitObject)
                 {
-                    AngleRad = relativeAngle,
+                    RelativeAngle = relativeAngle,
                     Distance = relativePosition.Length
                 });
 
@@ -55,6 +60,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        /// <summary>
+        /// Reposition all hit objects according to information in <see cref="HitObjectPositions"/>.
+        /// </summary>
         public void RepositionHitObjects()
         {
             HitObjectPositionInfo previous = null;
@@ -64,6 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var hitObject = hitObjects[i];
                 var current = hitObjectPositions[i];
 
+                // Spinners are not moved, but their positions are still considered by subsequent hit objects
                 if (hitObject is Spinner)
                 {
                     previous = current;
@@ -74,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (i == 1)
                 {
-                    lastAngleAbsolute = previous!.AngleRad;
+                    lastAngleAbsolute = previous!.RelativeAngle;
                 }
                 else if (i > 1)
                 {
@@ -119,12 +128,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Returns the final position of the hit object
+        /// Calculate the modified position of a hit object, trying to keep it inside the playfield in the process.
         /// </summary>
-        /// <returns>Final position of the hit object</returns>
-        private void applyModification(float lastAngleAbsolute, HitObjectPositionInfo previous, HitObjectPositionInfo current)
+        /// <param name="prevAngleAbsolute">The absolute jump angle of the previous object, used for resolving the relative angle of the current object.</param>
+        /// <param name="previous">Info for the previous hit object.</param>
+        /// <param name="current">Info for the hit object to be processed.</param>
+        private void applyModification(float prevAngleAbsolute, HitObjectPositionInfo previous, HitObjectPositionInfo current)
         {
-            double absoluteAngle = lastAngleAbsolute + current.AngleRad;
+            double absoluteAngle = prevAngleAbsolute + current.RelativeAngle;
 
             var posRelativeToPrev = new Vector2(
                 current.Distance * (float)Math.Cos(absoluteAngle),
@@ -135,15 +146,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
-            current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X) - lastAngleAbsolute;
+            current.RelativeAngle = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X) - prevAngleAbsolute;
 
             current.PositionModified = lastEndPosition + posRelativeToPrev;
         }
 
         /// <summary>
-        /// Move the randomised position of a hit circle so that it fits inside the playfield.
+        /// Move the modified position of a hit circle so that it fits inside the playfield.
         /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
         private Vector2 clampHitCircleToPlayfield(HitCircle circle, HitObjectPositionInfo objectInfo)
         {
             var previousPosition = objectInfo.PositionModified;
@@ -160,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
+        /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
         private Vector2 clampSliderToPlayfield(Slider slider, HitObjectPositionInfo objectInfo)
         {
             var possibleMovementBounds = calculatePossibleMovementBounds(slider);
@@ -285,16 +296,36 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public interface IHitObjectPositionInfo
         {
-            public float AngleRad { get; set; }
+            /// <summary>
+            /// The jump angle from the previous hit object to this one, relative to the previous hit object's jump angle.
+            /// </summary>
+            /// <remarks>
+            /// <see cref="RelativeAngle"/> of the first hit object in a beatmap represents the absolute angle from playfield center to the object.
+            /// </remarks>
+            /// <example>
+            /// If <see cref="RelativeAngle"/> is 0, the player's cursor doesn't need to change its direction of movement when passing
+            /// the previous object to reach this one.
+            /// </example>
+            public float RelativeAngle { get; set; }
 
+            /// <summary>
+            /// The jump distance from the previous hit object to this one.
+            /// </summary>
+            /// <remarks>
+            /// <see cref="Distance"/> of the first hit object in a beatmap is relative to the playfield center.
+            /// </remarks>
             public float Distance { get; set; }
+
+            public OsuHitObject HitObject { get; }
         }
 
         private class HitObjectPositionInfo : IHitObjectPositionInfo
         {
-            public float AngleRad { get; set; }
+            public float RelativeAngle { get; set; }
 
             public float Distance { get; set; }
+
+            public OsuHitObject HitObject { get; }
 
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
@@ -302,6 +333,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public HitObjectPositionInfo(OsuHitObject hitObject)
             {
+                HitObject = hitObject;
                 PositionOriginal = PositionModified = hitObject.Position;
                 EndPositionModified = hitObject.EndPosition;
             }
