@@ -136,7 +136,7 @@ namespace osu.Game.Online.Chat
             return Regex.IsMatch(message, $@"(^|\W)({fullName}|{underscoreName})($|\W)", RegexOptions.IgnoreCase);
         }
 
-        public class PrivateMessageNotification : OpenChannelNotification
+        public class PrivateMessageNotification : HighlightMessageNotification
         {
             public PrivateMessageNotification(Message message)
                 : base(message)
@@ -146,7 +146,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public class MentionNotification : OpenChannelNotification
+        public class MentionNotification : HighlightMessageNotification
         {
             public MentionNotification(Message message)
                 : base(message)
@@ -156,9 +156,9 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public abstract class OpenChannelNotification : SimpleNotification
+        public abstract class HighlightMessageNotification : SimpleNotification
         {
-            protected OpenChannelNotification(Message message)
+            protected HighlightMessageNotification(Message message)
             {
                 this.message = message;
             }
@@ -168,7 +168,7 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay)
             {
                 IconBackground.Colour = colours.PurpleDark;
 
