@@ -147,7 +147,9 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
             current.BindValueChanged(_ => updateState(), true);
             FinishTransforms(true);
-            multiplierCounter.StopRolling();
+            // required to prevent the counter initially rolling up from 0 to 1
+            // due to `Current.Value` having a nonstandard default value of 1.
+            multiplierCounter.SetCountWithoutRolling(Current.Value);
         }
 
         private void updateState()
