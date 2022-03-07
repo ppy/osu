@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Mods
 
         private readonly BindableNumberWithCurrent<double> current = new BindableNumberWithCurrent<double>(1)
         {
-            Precision = 0.1
+            Precision = 0.01
         };
 
         private readonly Box underlayBackground;
@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Mods
         private OverlayColourProvider colourProvider { get; set; }
 
         private const float height = 42;
+        private const float multiplier_value_area_width = 56;
         private const float transition_duration = 200;
 
         public DifficultyMultiplierDisplay()
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         RelativeSizeAxes = Axes.Y,
-                        Width = height + ModPanel.CORNER_RADIUS
+                        Width = multiplier_value_area_width + ModPanel.CORNER_RADIUS
                     },
                     new GridContainer
                     {
@@ -73,7 +74,7 @@ namespace osu.Game.Overlays.Mods
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(GridSizeMode.Absolute, height)
+                            new Dimension(GridSizeMode.Absolute, multiplier_value_area_width)
                         },
                         Content = new[]
                         {
@@ -171,7 +172,7 @@ namespace osu.Game.Overlays.Mods
         {
             protected override double RollingDuration => 500;
 
-            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"N1");
+            protected override LocalisableString FormatCount(double count) => count.ToLocalisableString(@"N2");
 
             protected override OsuSpriteText CreateSpriteText() => new OsuSpriteText
             {
