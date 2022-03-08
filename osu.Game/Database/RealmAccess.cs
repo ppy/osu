@@ -218,7 +218,7 @@ namespace osu.Game.Database
             // Then check that the database we are about to attempt recovery can actually be recovered on this version..
             try
             {
-                using (var realm = Realm.GetInstance(getConfiguration(recoveryFilename)))
+                using (Realm.GetInstance(getConfiguration(recoveryFilename)))
                 {
                     // Don't need to do anything, just check that opening the realm works correctly.
                 }
