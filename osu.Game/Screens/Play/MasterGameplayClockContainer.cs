@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
@@ -86,26 +85,10 @@ namespace osu.Game.Screens.Play
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
 
-            beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
-            {
-                var userSettings = r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings;
-
-                if (userSettings == null) // only the case for tests.
-                    return null;
-
-                void onUserSettingsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-                {
-                    if (args.PropertyName == nameof(BeatmapUserSettings.Offset))
-                        updateOffset();
-                }
-
-                updateOffset();
-                userSettings.PropertyChanged += onUserSettingsOnPropertyChanged;
-
-                return new InvokeOnDisposal(() => userSettings.PropertyChanged -= onUserSettingsOnPropertyChanged);
-
-                void updateOffset() => userBeatmapOffsetClock.Offset = userSettings.Offset;
-            });
+            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
+                r => r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings,
+                settings => settings.Offset,
+                val => userBeatmapOffsetClock.Offset = val);
 
             // sane default provided by ruleset.
             startOffset = gameplayStartTime;

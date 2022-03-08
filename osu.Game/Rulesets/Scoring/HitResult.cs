@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Serialization;
 using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Scoring
@@ -16,6 +17,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates that the object has not been judged yet.
         /// </summary>
         [Description(@"")]
+        [EnumMember(Value = "none")]
         [Order(14)]
         None,
 
@@ -27,32 +29,39 @@ namespace osu.Game.Rulesets.Scoring
         /// "too far in the future). It should also define when a forced miss should be triggered (as a result of no user input in time).
         /// </remarks>
         [Description(@"Miss")]
+        [EnumMember(Value = "miss")]
         [Order(5)]
         Miss,
 
         [Description(@"Meh")]
+        [EnumMember(Value = "meh")]
         [Order(4)]
         Meh,
 
         [Description(@"OK")]
+        [EnumMember(Value = "ok")]
         [Order(3)]
         Ok,
 
         [Description(@"Good")]
+        [EnumMember(Value = "good")]
         [Order(2)]
         Good,
 
         [Description(@"Great")]
+        [EnumMember(Value = "great")]
         [Order(1)]
         Great,
 
         [Description(@"Perfect")]
+        [EnumMember(Value = "perfect")]
         [Order(0)]
         Perfect,
 
         /// <summary>
         /// Indicates small tick miss.
         /// </summary>
+        [EnumMember(Value = "small_tick_miss")]
         [Order(11)]
         SmallTickMiss,
 
@@ -60,12 +69,14 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a small tick hit.
         /// </summary>
         [Description(@"S Tick")]
+        [EnumMember(Value = "small_tick_hit")]
         [Order(7)]
         SmallTickHit,
 
         /// <summary>
         /// Indicates a large tick miss.
         /// </summary>
+        [EnumMember(Value = "large_tick_miss")]
         [Order(10)]
         LargeTickMiss,
 
@@ -73,6 +84,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large tick hit.
         /// </summary>
         [Description(@"L Tick")]
+        [EnumMember(Value = "large_tick_hit")]
         [Order(6)]
         LargeTickHit,
 
@@ -80,6 +92,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a small bonus.
         /// </summary>
         [Description("S Bonus")]
+        [EnumMember(Value = "small_bonus")]
         [Order(9)]
         SmallBonus,
 
@@ -87,18 +100,21 @@ namespace osu.Game.Rulesets.Scoring
         /// Indicates a large bonus.
         /// </summary>
         [Description("L Bonus")]
+        [EnumMember(Value = "large_bonus")]
         [Order(8)]
         LargeBonus,
 
         /// <summary>
         /// Indicates a miss that should be ignored for scoring purposes.
         /// </summary>
+        [EnumMember(Value = "ignore_miss")]
         [Order(13)]
         IgnoreMiss,
 
         /// <summary>
         /// Indicates a hit that should be ignored for scoring purposes.
         /// </summary>
+        [EnumMember(Value = "ignore_hit")]
         [Order(12)]
         IgnoreHit,
     }
@@ -132,6 +148,30 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public static bool AffectsAccuracy(this HitResult result)
             => IsScorable(result) && !IsBonus(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> is a non-tick and non-bonus result.
+        /// </summary>
+        public static bool IsBasic(this HitResult result)
+            => IsScorable(result) && !IsTick(result) && !IsBonus(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> should be counted as a tick.
+        /// </summary>
+        public static bool IsTick(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                case HitResult.LargeTickMiss:
+                case HitResult.SmallTickHit:
+                case HitResult.SmallTickMiss:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> should be counted as bonus score.
