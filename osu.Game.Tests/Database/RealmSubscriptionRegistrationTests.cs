@@ -1,25 +1,80 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Tests.Resources;
 using Realms;
-
-#nullable enable
 
 namespace osu.Game.Tests.Database
 {
     [TestFixture]
     public class RealmSubscriptionRegistrationTests : RealmTest
     {
+        [Test]
+        public void TestSubscriptionCollectionAndPropertyChanges()
+        {
+            int collectionChanges = 0;
+            int propertyChanges = 0;
+
+            ChangeSet? lastChanges = null;
+
+            RunTestWithRealm((realm, _) =>
+            {
+                var registration = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>(), onChanged);
+
+                realm.Run(r => r.Refresh());
+
+                realm.Write(r => r.Add(TestResources.CreateTestBeatmapSetInfo()));
+                realm.Run(r => r.Refresh());
+
+                Assert.That(collectionChanges, Is.EqualTo(1));
+                Assert.That(propertyChanges, Is.EqualTo(0));
+                Assert.That(lastChanges?.InsertedIndices, Has.One.Items);
+                Assert.That(lastChanges?.ModifiedIndices, Is.Empty);
+                Assert.That(lastChanges?.NewModifiedIndices, Is.Empty);
+
+                realm.Write(r => r.All<BeatmapSetInfo>().First().Beatmaps.First().CountdownOffset = 5);
+                realm.Run(r => r.Refresh());
+
+                Assert.That(collectionChanges, Is.EqualTo(1));
+                Assert.That(propertyChanges, Is.EqualTo(1));
+                Assert.That(lastChanges?.InsertedIndices, Is.Empty);
+                Assert.That(lastChanges?.ModifiedIndices, Has.One.Items);
+                Assert.That(lastChanges?.NewModifiedIndices, Has.One.Items);
+
+                registration.Dispose();
+            });
+
+            void onChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+            {
+                lastChanges = changes;
+
+                if (changes == null)
+                    return;
+
+                if (changes.HasCollectionChanges())
+                {
+                    Interlocked.Increment(ref collectionChanges);
+                }
+                else
+                {
+                    Interlocked.Increment(ref propertyChanges);
+                }
+            }
+        }
+
         [Test]
         public void TestSubscriptionWithAsyncWrite()
         {
