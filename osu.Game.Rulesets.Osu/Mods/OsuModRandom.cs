@@ -47,54 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var randomObjects = randomiseObjects(hitObjects);
 
-            RandomObjectInfo previous = null;
-
-            for (int i = 0; i < hitObjects.Count; i++)
-            {
-                var hitObject = hitObjects[i];
-
-                var current = randomObjects[i];
-
-                if (hitObject is Spinner)
-                {
-                    previous = null;
-                    continue;
-                }
-
-                applyRandomisation(getAbsoluteAngle(hitObjects, i - 1), previous, current);
-
-                // Move hit objects back into the playfield if they are outside of it
-                Vector2 shift = Vector2.Zero;
-
-                switch (hitObject)
-                {
-                    case HitCircle circle:
-                        shift = clampHitCircleToPlayfield(circle, current);
-                        break;
-
-                    case Slider slider:
-                        shift = clampSliderToPlayfield(slider, current);
-                        break;
-                }
-
-                if (shift != Vector2.Zero)
-                {
-                    var toBeShifted = new List<OsuHitObject>();
-
-                    for (int j = i - 1; j >= i - preceding_hitobjects_to_shift && j >= 0; j--)
-                    {
-                        // only shift hit circles
-                        if (!(hitObjects[j] is HitCircle)) break;
-
-                        toBeShifted.Add(hitObjects[j]);
-                    }
-
-                    if (toBeShifted.Count > 0)
-                        applyDecreasingShift(toBeShifted, shift);
-                }
-
-                previous = current;
-            }
+            applyRandomisation(hitObjects, randomObjects);
         }
 
         private List<RandomObjectInfo> randomiseObjects(IEnumerable<OsuHitObject> hitObjects)
@@ -136,6 +89,58 @@ namespace osu.Game.Rulesets.Osu.Mods
             return randomObjects;
         }
 
+        private void applyRandomisation(IReadOnlyList<OsuHitObject> hitObjects, IReadOnlyList<RandomObjectInfo> randomObjects)
+        {
+            RandomObjectInfo previous = null;
+
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                var hitObject = hitObjects[i];
+
+                var current = randomObjects[i];
+
+                if (hitObject is Spinner)
+                {
+                    previous = null;
+                    continue;
+                }
+
+                computeRandomisedPosition(getAbsoluteAngle(hitObjects, i - 1), previous, current);
+
+                // Move hit objects back into the playfield if they are outside of it
+                Vector2 shift = Vector2.Zero;
+
+                switch (hitObject)
+                {
+                    case HitCircle circle:
+                        shift = clampHitCircleToPlayfield(circle, current);
+                        break;
+
+                    case Slider slider:
+                        shift = clampSliderToPlayfield(slider, current);
+                        break;
+                }
+
+                if (shift != Vector2.Zero)
+                {
+                    var toBeShifted = new List<OsuHitObject>();
+
+                    for (int j = i - 1; j >= i - preceding_hitobjects_to_shift && j >= 0; j--)
+                    {
+                        // only shift hit circles
+                        if (!(hitObjects[j] is HitCircle)) break;
+
+                        toBeShifted.Add(hitObjects[j]);
+                    }
+
+                    if (toBeShifted.Count > 0)
+                        applyDecreasingShift(toBeShifted, shift);
+                }
+
+                previous = current;
+            }
+        }
+
         private float getAbsoluteAngle(IReadOnlyList<OsuHitObject> hitObjects, int hitObjectIndex)
         {
             if (hitObjectIndex < 0) return 0;
@@ -149,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void applyRandomisation(float previousAbsoluteAngle, RandomObjectInfo previous, RandomObjectInfo current)
+        private void computeRandomisedPosition(float previousAbsoluteAngle, RandomObjectInfo previous, RandomObjectInfo current)
         {
             float absoluteAngle = previousAbsoluteAngle + current.RelativeAngle;
 
