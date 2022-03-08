@@ -92,16 +92,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             OsuButton readyButton = null;
 
-            AddAssert("ensure ready button enabled", () =>
+            AddUntilStep("ensure ready button enabled", () =>
             {
                 readyButton = button.ChildrenOfType<OsuButton>().Single();
                 return readyButton.Enabled.Value;
             });
 
             AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
-            AddAssert("ready button disabled", () => !readyButton.Enabled.Value);
+            AddUntilStep("ready button disabled", () => !readyButton.Enabled.Value);
             AddStep("undelete beatmap", () => beatmaps.Undelete(importedSet));
-            AddAssert("ready button enabled back", () => readyButton.Enabled.Value);
+            AddUntilStep("ready button enabled back", () => readyButton.Enabled.Value);
         }
 
         [Test]
