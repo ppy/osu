@@ -219,6 +219,29 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
+        /// Given a minimal set of inputs, return the computed score for the tracked beatmap / mods combination, at the current point in time.
+        /// </summary>
+        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
+        /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
+        /// <returns>The computed score for provided inputs.</returns>
+        public double GetScore(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
+        {
+            // calculate base score from statistics pairs
+            int computedBaseScore = 0;
+
+            foreach (var pair in statistics)
+            {
+                if (!pair.Key.AffectsAccuracy())
+                    continue;
+
+                computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
+            }
+
+            return GetScore(mode, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
+        }
+
+        /// <summary>
         /// Computes the total score.
         /// </summary>
         /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
@@ -248,29 +271,6 @@ namespace osu.Game.Rulesets.Scoring
                     double scaledStandardised = GetScore(ScoringMode.Standardised, accuracyRatio, comboRatio, statistics) / max_score;
                     return Math.Pow(scaledStandardised * totalHitObjects, 2) * 36;
             }
-        }
-
-        /// <summary>
-        /// Given a minimal set of inputs, return the computed score for the tracked beatmap / mods combination, at the current point in time.
-        /// </summary>
-        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
-        /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
-        /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
-        /// <returns>The computed score for provided inputs.</returns>
-        public double GetImmediateScore(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
-        {
-            // calculate base score from statistics pairs
-            int computedBaseScore = 0;
-
-            foreach (var pair in statistics)
-            {
-                if (!pair.Key.AffectsAccuracy())
-                    continue;
-
-                computedBaseScore += Judgement.ToNumericResult(pair.Key) * pair.Value;
-            }
-
-            return GetScore(mode, calculateAccuracyRatio(computedBaseScore), calculateComboRatio(maxCombo), statistics);
         }
 
         /// <summary>

@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var header = frame.Header;
 
-                Score.Value = ScoreProcessor.GetImmediateScore(ScoringMode.Value, header.MaxCombo, header.Statistics);
+                Score.Value = ScoreProcessor.GetScore(ScoringMode.Value, header.MaxCombo, header.Statistics);
                 Accuracy.Value = header.Accuracy;
                 CurrentCombo.Value = header.Combo;
             }
