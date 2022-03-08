@@ -50,6 +50,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             applyRandomisation(hitObjects, randomObjects);
         }
 
+        /// <summary>
+        /// Randomise the position of each hit object and return a list of <see cref="RandomObjectInfo"/>s describing how each hit object should be placed.
+        /// </summary>
+        /// <param name="hitObjects">A list of <see cref="OsuHitObject"/>s to have their positions randomised.</param>
+        /// <returns>A list of <see cref="RandomObjectInfo"/>s describing how each hit object should be placed.</returns>
         private List<RandomObjectInfo> randomiseObjects(IEnumerable<OsuHitObject> hitObjects)
         {
             var randomObjects = new List<RandomObjectInfo>();
@@ -89,6 +94,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             return randomObjects;
         }
 
+        /// <summary>
+        /// Reposition the hit objects according to the information in <paramref name="randomObjects"/>.
+        /// </summary>
+        /// <param name="hitObjects">The hit objects to be repositioned.</param>
+        /// <param name="randomObjects">A list of <see cref="RandomObjectInfo"/> describing how each hit object should be placed.</param>
         private void applyRandomisation(IReadOnlyList<OsuHitObject> hitObjects, IReadOnlyList<RandomObjectInfo> randomObjects)
         {
             RandomObjectInfo previous = null;
@@ -141,6 +151,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        /// <summary>
+        /// Get the absolute angle of a vector pointing from the previous hit object to the one denoted by <paramref name="hitObjectIndex"/>.
+        /// </summary>
+        /// <param name="hitObjects">A list of all hit objects in the beatmap.</param>
+        /// <param name="hitObjectIndex">The hit object that the vector should point to.</param>
+        /// <returns>The absolute angle of the aforementioned vector.</returns>
         private float getAbsoluteAngle(IReadOnlyList<OsuHitObject> hitObjects, int hitObjectIndex)
         {
             if (hitObjectIndex < 0) return 0;
@@ -151,9 +167,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Returns the final position of the hit object
+        /// Compute the randomised position of a hit object while attempting to keep it inside the playfield.
         /// </summary>
-        /// <returns>Final position of the hit object</returns>
+        /// <param name="previousAbsoluteAngle">The direction of movement of the player's cursor before it starts to approach the current hit object.</param>
+        /// <param name="previous">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the current one.</param>
+        /// <param name="current">The <see cref="RandomObjectInfo"/> representing the hit object to have the randomised position computed for.</param>
         private void computeRandomisedPosition(float previousAbsoluteAngle, RandomObjectInfo previous, RandomObjectInfo current)
         {
             float absoluteAngle = previousAbsoluteAngle + current.RelativeAngle;
@@ -315,7 +333,24 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class RandomObjectInfo
         {
+            /// <summary>
+            /// The jump angle from the previous hit object to this one, relative to the previous hit object's jump angle.
+            /// </summary>
+            /// <remarks>
+            /// <see cref="RelativeAngle"/> of the first hit object in a beatmap represents the absolute angle from playfield center to the object.
+            /// </remarks>
+            /// <example>
+            /// If <see cref="RelativeAngle"/> is 0, the player's cursor doesn't need to change its direction of movement when passing
+            /// the previous object to reach this one.
+            /// </example>
             public float RelativeAngle { get; set; }
+
+            /// <summary>
+            /// The jump distance from the previous hit object to this one.
+            /// </summary>
+            /// <remarks>
+            /// <see cref="Distance"/> of the first hit object in a beatmap is relative to the playfield center.
+            /// </remarks>
             public float Distance { get; set; }
 
             public Vector2 PositionOriginal { get; }
