@@ -171,7 +171,12 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            var targetContainer = getTarget(SkinnableTarget.MainHUDComponents);
+            var target = availableTargets.FirstOrDefault()?.Target;
+
+            if (target == null)
+                return;
+
+            var targetContainer = getTarget(target.Value);
 
             if (targetContainer == null)
                 return;
