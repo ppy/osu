@@ -309,10 +309,10 @@ namespace osu.Game.Overlays
         /// <param name="message">The message to highlight.</param>
         public void HighlightMessage(Message message)
         {
-            if (currentChannel.Value.Id != message.ChannelId)
-                currentChannel.Value = channelManager.JoinedChannels.Single(c => c.Id == message.ChannelId);
+            if (channelManager.CurrentChannel.Value.Id != message.ChannelId)
+                channelManager.CurrentChannel.Value = channelManager.JoinedChannels.Single(c => c.Id == message.ChannelId);
 
-            currentChannel.Value.HighlightedMessage.Value = message;
+            channelManager.CurrentChannel.Value.HighlightedMessage.Value = message;
         }
 
         private float startDragChatHeight;
