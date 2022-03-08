@@ -167,10 +167,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (settings == null) // only the case for tests.
                         return;
 
-                    if (settings.Offset == Current.Value)
+                    double val = Current.Value;
+
+                    if (settings.Offset == val)
                         return;
 
-                    settings.Offset = Current.Value;
+                    settings.Offset = val;
                 });
             }
         }
