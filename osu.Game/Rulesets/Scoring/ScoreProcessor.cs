@@ -251,6 +251,17 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score.</returns>
         public double GetScore(ScoringMode mode, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics)
         {
+            int totalHitObjects = statistics.Where(k => k.Key >= HitResult.Miss && k.Key <= HitResult.Perfect).Sum(k => k.Value);
+
+            // If there are no hitobjects then the beatmap can be composed of only ticks or spinners, so ensure we don't multiply by 0 at all times.
+            if (totalHitObjects == 0)
+                totalHitObjects = 1;
+
+            return GetScore(mode, accuracyRatio, comboRatio, statistics, totalHitObjects);
+        }
+
+        public double GetScore(ScoringMode mode, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics, int totalHitObjects)
+        {
             switch (mode)
             {
                 default:
@@ -260,12 +271,6 @@ namespace osu.Game.Rulesets.Scoring
                     return (max_score * (accuracyScore + comboScore) + getBonusScore(statistics)) * scoreMultiplier;
 
                 case ScoringMode.Classic:
-                    int totalHitObjects = statistics.Where(k => k.Key >= HitResult.Miss && k.Key <= HitResult.Perfect).Sum(k => k.Value);
-
-                    // If there are no hitobjects then the beatmap can be composed of only ticks or spinners, so ensure we don't multiply by 0 at all times.
-                    if (totalHitObjects == 0)
-                        totalHitObjects = 1;
-
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
                     double scaledStandardised = GetScore(ScoringMode.Standardised, accuracyRatio, comboRatio, statistics) / max_score;
