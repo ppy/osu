@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 HitObjects = { new TestHitObject(result) }
             });
 
-            Assert.That(scoreProcessor.GetImmediateScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));
+            Assert.That(scoreProcessor.GetScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));
         }
 
         private class TestJudgement : Judgement
