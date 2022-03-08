@@ -74,17 +74,17 @@ namespace osu.Game.Overlays.Chat
                     }
                 },
             };
+
+            newMessagesArrived(Channel.Messages);
+
+            Channel.NewMessagesArrived += newMessagesArrived;
+            Channel.MessageRemoved += messageRemoved;
+            Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            addChatLines(Channel.Messages);
-
-            Channel.NewMessagesArrived += newMessagesArrived;
-            Channel.MessageRemoved += messageRemoved;
-            Channel.PendingMessageResolved += pendingMessageResolved;
 
             highlightedMessage = Channel.HighlightedMessage.GetBoundCopy();
             highlightedMessage.BindValueChanged(m =>
@@ -92,15 +92,19 @@ namespace osu.Game.Overlays.Chat
                 if (m.NewValue == null)
                     return;
 
-                var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(m.NewValue));
-
-                if (chatLine != null)
+                // schedule highlight to ensure it performs after any pending "newMessagesArrived" calls.
+                Schedule(() =>
                 {
-                    scroll.ScrollIntoView(chatLine);
-                    chatLine.ScheduleHighlight();
-                }
+                    var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(m.NewValue));
 
-                highlightedMessage.Value = null;
+                    if (chatLine != null)
+                    {
+                        scroll.ScrollIntoView(chatLine);
+                        chatLine.ScheduleHighlight();
+                    }
+
+                    highlightedMessage.Value = null;
+                });
             }, true);
         }
 
@@ -121,39 +125,18 @@ namespace osu.Game.Overlays.Chat
             Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
-        private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(addChatLines, newMessages);
-
-        private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
+        private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(() =>
         {
-            var found = chatLines.LastOrDefault(c => c.Message == existing);
-
-            if (found != null)
-            {
-                Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
-
-                ChatLineFlow.Remove(found);
-                found.Message = updated;
-                ChatLineFlow.Add(found);
-            }
-        });
-
-        private void messageRemoved(Message removed) => Schedule(() =>
-        {
-            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
-        });
-
-        private void addChatLines(IEnumerable<Message> messages)
-        {
-            if (messages.Min(m => m.Id) < chatLines.Max(c => c.Message.Id))
+            if (newMessages.Min(m => m.Id) < chatLines.Max(c => c.Message.Id))
             {
                 // there is a case (on initial population) that we may receive past messages and need to reorder.
                 // easiest way is to just combine messages and recreate drawables (less worrying about day separators etc.)
-                messages = messages.Concat(chatLines.Select(c => c.Message)).OrderBy(m => m.Id).ToList();
+                newMessages = newMessages.Concat(chatLines.Select(c => c.Message)).OrderBy(m => m.Id).ToList();
                 ChatLineFlow.Clear();
             }
 
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = messages.Skip(Math.Max(0, messages.Count() - Channel.MAX_HISTORY));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
             Message lastMessage = chatLines.LastOrDefault()?.Message;
 
@@ -192,9 +175,28 @@ namespace osu.Game.Overlays.Chat
 
             // due to the scroll adjusts from old messages removal above, a scroll-to-end must be enforced,
             // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
-            if (messages.Any(m => m is LocalMessage))
+            if (newMessages.Any(m => m is LocalMessage))
                 scroll.ScrollToEnd();
-        }
+        });
+
+        private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
+        {
+            var found = chatLines.LastOrDefault(c => c.Message == existing);
+
+            if (found != null)
+            {
+                Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
+
+                ChatLineFlow.Remove(found);
+                found.Message = updated;
+                ChatLineFlow.Add(found);
+            }
+        });
+
+        private void messageRemoved(Message removed) => Schedule(() =>
+        {
+            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+        });
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 
