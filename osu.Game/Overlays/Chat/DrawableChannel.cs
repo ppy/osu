@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -48,6 +49,8 @@ namespace osu.Game.Overlays.Chat
             RelativeSizeAxes = Axes.Both;
         }
 
+        private Bindable<Message> highlightedMessage;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -71,34 +74,34 @@ namespace osu.Game.Overlays.Chat
                     }
                 },
             };
+        }
 
-            newMessagesArrived(Channel.Messages);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            addChatLines(Channel.Messages);
 
             Channel.NewMessagesArrived += newMessagesArrived;
             Channel.MessageRemoved += messageRemoved;
             Channel.PendingMessageResolved += pendingMessageResolved;
-        }
 
-        /// <summary>
-        /// Highlights a specific message in this drawable channel.
-        /// </summary>
-        /// <param name="message">The message to highlight.</param>
-        public void HighlightMessage(Message message)
-        {
-            if (IsLoaded)
-                highlightMessage(message);
-            else
-                Schedule(highlightMessage, message);
-        }
+            highlightedMessage = Channel.HighlightedMessage.GetBoundCopy();
+            highlightedMessage.BindValueChanged(m =>
+            {
+                if (m.NewValue == null)
+                    return;
 
-        private void highlightMessage(Message message)
-        {
-            var chatLine = chatLines.SingleOrDefault(c => c.Message == message);
-            if (chatLine == null)
-                return;
+                var chatLine = chatLines.SingleOrDefault(c => c.Message == m.NewValue);
 
-            scroll.ScrollIntoView(chatLine);
-            chatLine.ScheduleHighlight();
+                if (chatLine != null)
+                {
+                    scroll.ScrollIntoView(chatLine);
+                    chatLine.ScheduleHighlight();
+                }
+
+                highlightedMessage.Value = null;
+            }, true);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -118,18 +121,39 @@ namespace osu.Game.Overlays.Chat
             Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
-        private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(() =>
+        private void newMessagesArrived(IEnumerable<Message> newMessages) => Schedule(addChatLines, newMessages);
+
+        private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
         {
-            if (newMessages.Min(m => m.Id) < chatLines.Max(c => c.Message.Id))
+            var found = chatLines.LastOrDefault(c => c.Message == existing);
+
+            if (found != null)
+            {
+                Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
+
+                ChatLineFlow.Remove(found);
+                found.Message = updated;
+                ChatLineFlow.Add(found);
+            }
+        });
+
+        private void messageRemoved(Message removed) => Schedule(() =>
+        {
+            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+        });
+
+        private void addChatLines(IEnumerable<Message> messages)
+        {
+            if (messages.Min(m => m.Id) < chatLines.Max(c => c.Message.Id))
             {
                 // there is a case (on initial population) that we may receive past messages and need to reorder.
                 // easiest way is to just combine messages and recreate drawables (less worrying about day separators etc.)
-                newMessages = newMessages.Concat(chatLines.Select(c => c.Message)).OrderBy(m => m.Id).ToList();
+                messages = messages.Concat(chatLines.Select(c => c.Message)).OrderBy(m => m.Id).ToList();
                 ChatLineFlow.Clear();
             }
 
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
+            var displayMessages = messages.Skip(Math.Max(0, messages.Count() - Channel.MAX_HISTORY));
 
             Message lastMessage = chatLines.LastOrDefault()?.Message;
 
@@ -168,28 +192,9 @@ namespace osu.Game.Overlays.Chat
 
             // due to the scroll adjusts from old messages removal above, a scroll-to-end must be enforced,
             // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
-            if (newMessages.Any(m => m is LocalMessage))
+            if (messages.Any(m => m is LocalMessage))
                 scroll.ScrollToEnd();
-        });
-
-        private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
-        {
-            var found = chatLines.LastOrDefault(c => c.Message == existing);
-
-            if (found != null)
-            {
-                Trace.Assert(updated.Id.HasValue, "An updated message was returned with no ID.");
-
-                ChatLineFlow.Remove(found);
-                found.Message = updated;
-                ChatLineFlow.Add(found);
-            }
-        });
-
-        private void messageRemoved(Message removed) => Schedule(() =>
-        {
-            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
-        });
+        }
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 

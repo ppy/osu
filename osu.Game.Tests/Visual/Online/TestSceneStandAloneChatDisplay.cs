@@ -152,7 +152,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("highlight first message", () =>
             {
                 highlighted = testChannel.Messages[0];
-                chatDisplay.DrawableChannel.HighlightMessage(highlighted);
+                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = highlighted;
             });
 
             AddUntilStep("chat scrolled to first message", () =>
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("highlight last message", () =>
             {
                 highlighted = testChannel.Messages[^1];
-                chatDisplay.DrawableChannel.HighlightMessage(highlighted);
+                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = highlighted;
             });
 
             AddUntilStep("chat scrolled to last message", () =>
@@ -182,7 +182,7 @@ namespace osu.Game.Tests.Visual.Online
             AddRepeatStep("highlight other random messages", () =>
             {
                 highlighted = testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)];
-                chatDisplay.DrawableChannel.HighlightMessage(highlighted);
+                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = highlighted;
             }, 10);
         }
 
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddRepeatStep("highlight random messages", () =>
             {
-                chatDisplay.DrawableChannel.HighlightMessage(testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)]);
+                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)];
             }, 10);
         }
 

@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -46,8 +45,6 @@ namespace osu.Game.Overlays
         private ChannelManager channelManager { get; set; }
 
         private Container<DrawableChannel> currentChannelContainer;
-
-        private DrawableChannel currentDrawableChannel => currentChannelContainer.SingleOrDefault();
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
@@ -252,9 +249,6 @@ namespace osu.Game.Overlays
 
         private Bindable<Channel> currentChannel;
 
-        [CanBeNull]
-        private Message messagePendingHighlight;
-
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
             if (e.NewValue == null)
@@ -296,24 +290,12 @@ namespace osu.Game.Overlays
                     currentChannelContainer.Clear(false);
                     currentChannelContainer.Add(loaded);
                     currentChannelContainer.FadeIn(500, Easing.OutQuint);
-
-                    if (messagePendingHighlight != null)
-                    {
-                        tryHighlightMessage(messagePendingHighlight);
-                        messagePendingHighlight = null;
-                    }
                 });
             }
             else
             {
                 currentChannelContainer.Clear(false);
                 currentChannelContainer.Add(loaded);
-
-                if (messagePendingHighlight != null)
-                {
-                    tryHighlightMessage(messagePendingHighlight);
-                    messagePendingHighlight = null;
-                }
             }
 
             // mark channel as read when channel switched
@@ -327,21 +309,10 @@ namespace osu.Game.Overlays
         /// <param name="message">The message to highlight.</param>
         public void HighlightMessage(Message message)
         {
-            if (currentDrawableChannel?.Channel.Id == message.ChannelId)
-                tryHighlightMessage(message);
-            else
-            {
-                messagePendingHighlight = message;
+            if (currentChannel.Value.Id != message.ChannelId)
                 currentChannel.Value = channelManager.JoinedChannels.Single(c => c.Id == message.ChannelId);
-            }
-        }
 
-        private void tryHighlightMessage(Message message)
-        {
-            if (message.ChannelId != currentDrawableChannel.Channel.Id)
-                return;
-
-            currentDrawableChannel.HighlightMessage(message);
+            currentChannel.Value.HighlightedMessage.Value = message;
         }
 
         private float startDragChatHeight;
