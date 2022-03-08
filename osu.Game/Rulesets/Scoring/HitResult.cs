@@ -134,6 +134,30 @@ namespace osu.Game.Rulesets.Scoring
             => IsScorable(result) && !IsBonus(result);
 
         /// <summary>
+        /// Whether a <see cref="HitResult"/> is a non-tick and non-bonus result.
+        /// </summary>
+        public static bool IsBasic(this HitResult result)
+            => IsScorable(result) && !IsTick(result) && !IsBonus(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> should be counted as a tick.
+        /// </summary>
+        public static bool IsTick(this HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.LargeTickHit:
+                case HitResult.LargeTickMiss:
+                case HitResult.SmallTickHit:
+                case HitResult.SmallTickMiss:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Whether a <see cref="HitResult"/> should be counted as bonus score.
         /// </summary>
         public static bool IsBonus(this HitResult result)
