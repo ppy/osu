@@ -207,16 +207,10 @@ namespace osu.Game.Rulesets.Scoring
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = calculateAccuracyRatio(baseScore, true);
 
-            TotalScore.Value = getScore(Mode.Value);
+            TotalScore.Value = GetScore(Mode.Value);
         }
 
-        private double getScore(ScoringMode mode)
-        {
-            return GetScore(mode,
-                calculateAccuracyRatio(baseScore),
-                calculateComboRatio(HighestCombo.Value),
-                scoreResultCounts);
-        }
+        public double GetScore(ScoringMode mode) => GetScore(mode, calculateAccuracyRatio(baseScore), calculateComboRatio(HighestCombo.Value), scoreResultCounts);
 
         /// <summary>
         /// Given a minimal set of inputs, return the computed score for the tracked beatmap / mods combination, at the current point in time.
@@ -316,8 +310,6 @@ namespace osu.Game.Rulesets.Scoring
 
         public int GetStatistic(HitResult result) => scoreResultCounts.GetValueOrDefault(result);
 
-        public double GetStandardisedScore() => getScore(ScoringMode.Standardised);
-
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
@@ -351,7 +343,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public virtual void PopulateScore(ScoreInfo score)
         {
-            score.TotalScore = (long)Math.Round(GetStandardisedScore());
+            score.TotalScore = (long)Math.Round(GetScore(ScoringMode.Standardised));
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Accuracy.Value;
