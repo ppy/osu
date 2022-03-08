@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "It never gets boring!";
 
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
+        private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE / 2;
 
         /// <summary>
         /// Number of previous hitobjects to be shifted together when another object is being moved.
@@ -44,20 +45,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             rng = new Random((int)Seed.Value);
 
-            RandomObjectInfo previous = null;
+            var randomObjects = randomiseObjects(hitObjects);
 
-            float rateOfChangeMultiplier = 0;
+            RandomObjectInfo previous = null;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var hitObject = hitObjects[i];
 
-                var current = new RandomObjectInfo(hitObject);
-
-                // rateOfChangeMultiplier only changes every 5 iterations in a combo
-                // to prevent shaky-line-shaped streams
-                if (hitObject.IndexInCurrentCombo % 5 == 0)
-                    rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
+                var current = randomObjects[i];
 
                 if (hitObject is Spinner)
                 {
@@ -65,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
                 }
 
-                applyRandomisation(rateOfChangeMultiplier, previous, current);
+                applyRandomisation(getAbsoluteAngle(hitObjects, i - 1), previous, current);
 
                 // Move hit objects back into the playfield if they are outside of it
                 Vector2 shift = Vector2.Zero;
@@ -101,45 +97,72 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
+        private List<RandomObjectInfo> randomiseObjects(IEnumerable<OsuHitObject> hitObjects)
+        {
+            var randomObjects = new List<RandomObjectInfo>();
+            RandomObjectInfo previous = null;
+            float rateOfChangeMultiplier = 0;
+
+            foreach (OsuHitObject hitObject in hitObjects)
+            {
+                var current = new RandomObjectInfo(hitObject);
+                randomObjects.Add(current);
+
+                // rateOfChangeMultiplier only changes every 5 iterations in a combo
+                // to prevent shaky-line-shaped streams
+                if (hitObject.IndexInCurrentCombo % 5 == 0)
+                    rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
+
+                if (previous == null)
+                {
+                    current.Distance = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.X / 2);
+                    current.RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
+                }
+                else
+                {
+                    current.Distance = Vector2.Distance(previous.EndPositionOriginal, current.PositionOriginal);
+
+                    // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
+                    // is proportional to the distance between the last and the current hit object
+                    // to allow jumps and prevent too sharp turns during streams.
+
+                    // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
+                    current.RelativeAngle = rateOfChangeMultiplier * 2 * (float)Math.PI * Math.Min(1f, current.Distance / (playfield_diagonal * 0.5f));
+                }
+
+                previous = current;
+            }
+
+            return randomObjects;
+        }
+
+        private float getAbsoluteAngle(IReadOnlyList<OsuHitObject> hitObjects, int hitObjectIndex)
+        {
+            if (hitObjectIndex < 0) return 0;
+
+            Vector2 previousPosition = hitObjectIndex == 0 ? playfield_centre : hitObjects[hitObjectIndex - 1].EndPosition;
+            Vector2 relativePosition = hitObjects[hitObjectIndex].Position - previousPosition;
+            return (float)Math.Atan2(relativePosition.Y, relativePosition.X);
+        }
+
         /// <summary>
         /// Returns the final position of the hit object
         /// </summary>
         /// <returns>Final position of the hit object</returns>
-        private void applyRandomisation(float rateOfChangeMultiplier, RandomObjectInfo previous, RandomObjectInfo current)
+        private void applyRandomisation(float previousAbsoluteAngle, RandomObjectInfo previous, RandomObjectInfo current)
         {
-            if (previous == null)
-            {
-                var playfieldSize = OsuPlayfield.BASE_SIZE;
-
-                current.AngleRad = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
-                current.PositionRandomised = new Vector2((float)rng.NextDouble() * playfieldSize.X, (float)rng.NextDouble() * playfieldSize.Y);
-
-                return;
-            }
-
-            float distanceToPrev = Vector2.Distance(previous.EndPositionOriginal, current.PositionOriginal);
-
-            // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
-            // is proportional to the distance between the last and the current hit object
-            // to allow jumps and prevent too sharp turns during streams.
-
-            // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
-            double randomAngleRad = rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, distanceToPrev / (playfield_diagonal * 0.5f));
-
-            current.AngleRad = (float)randomAngleRad + previous.AngleRad;
-            if (current.AngleRad < 0)
-                current.AngleRad += 2 * (float)Math.PI;
+            float absoluteAngle = previousAbsoluteAngle + current.RelativeAngle;
 
             var posRelativeToPrev = new Vector2(
-                distanceToPrev * (float)Math.Cos(current.AngleRad),
-                distanceToPrev * (float)Math.Sin(current.AngleRad)
+                current.Distance * (float)Math.Cos(absoluteAngle),
+                current.Distance * (float)Math.Sin(absoluteAngle)
             );
 
-            posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(previous.EndPositionRandomised, posRelativeToPrev);
+            Vector2 lastEndPosition = previous?.EndPositionRandomised ?? playfield_centre;
 
-            current.AngleRad = (float)Math.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
+            posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
-            current.PositionRandomised = previous.EndPositionRandomised + posRelativeToPrev;
+            current.PositionRandomised = lastEndPosition + posRelativeToPrev;
         }
 
         /// <summary>
@@ -287,7 +310,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class RandomObjectInfo
         {
-            public float AngleRad { get; set; }
+            public float RelativeAngle { get; set; }
+            public float Distance { get; set; }
 
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionRandomised { get; set; }
@@ -299,7 +323,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 PositionRandomised = PositionOriginal = hitObject.Position;
                 EndPositionRandomised = EndPositionOriginal = hitObject.EndPosition;
-                AngleRad = 0;
             }
         }
     }
