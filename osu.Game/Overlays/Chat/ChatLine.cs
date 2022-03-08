@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float TextSize => 20;
 
-        private Container lineBackground;
+        private Container lineHighlightBackground;
 
         private Color4 usernameColour;
 
@@ -146,10 +146,11 @@ namespace osu.Game.Overlays.Chat
 
             InternalChildren = new Drawable[]
             {
-                lineBackground = new Container
+                lineHighlightBackground = new Container
                 {
+                    Alpha = 0f,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.0f),
+                    Colour = usernameColour.Darken(1f),
                     CornerRadius = 2f,
                     Masking = true,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
@@ -219,7 +220,7 @@ namespace osu.Game.Overlays.Chat
         /// <remarks>
         /// Scheduling is required to ensure the animation doesn't play until the chat line is in view and not scrolled away.
         /// </remarks>
-        public void ScheduleHighlight() => Schedule(() => lineBackground.FlashColour(usernameColour.Darken(1f).Opacity(0.5f), 1000, Easing.InQuint));
+        public void ScheduleHighlight() => Schedule(() => lineHighlightBackground.FadeTo(0.5f).FadeOut(1000, Easing.InQuint));
 
         private void updateMessageContent()
         {
