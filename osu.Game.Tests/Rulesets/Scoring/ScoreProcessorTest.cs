@@ -322,8 +322,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
 
             public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
 
-            public override string Description { get; }
-            public override string ShortName { get; }
+            public override string Description => string.Empty;
+            public override string ShortName => string.Empty;
         }
 
         private class TestJudgement : Judgement
