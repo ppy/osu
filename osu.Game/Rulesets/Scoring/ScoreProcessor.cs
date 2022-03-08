@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -86,9 +87,22 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         private double maxBaseScore;
 
+        /// <summary>
+        /// The maximum number of basic (non-tick and non-bonus) hitobjects.
+        /// </summary>
+        private int maxBasicHitObjects;
+
+        /// <summary>
+        /// Maximum <see cref="HitResult"/> for a normal hit (i.e. not tick/bonus) for this ruleset.
+        /// Only populated via <see cref="ResetFromReplayFrame"/>.
+        /// </summary>
+        private HitResult? maxBasicHitResult;
+
         private double rollingMaxBaseScore;
         private double baseScore;
+        private int basicHitObjects;
 
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
         private HitObject lastHitObject;
 
@@ -121,8 +135,6 @@ namespace osu.Game.Rulesets.Scoring
                 updateScore();
             };
         }
-
-        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
 
         protected sealed override void ApplyResultInternal(JudgementResult result)
         {
@@ -160,6 +172,9 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
+            if (result.Type.IsBasic())
+                basicHitObjects++;
+
             hitEvents.Add(CreateHitEvent(result));
             lastHitObject = result.HitObject;
 
@@ -195,6 +210,9 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
 
+            if (result.Type.IsBasic())
+                basicHitObjects--;
+
             Debug.Assert(hitEvents.Count > 0);
             lastHitObject = hitEvents[^1].LastHitObject;
             hitEvents.RemoveAt(hitEvents.Count - 1);
@@ -210,15 +228,30 @@ namespace osu.Game.Rulesets.Scoring
             TotalScore.Value = GetScore(Mode.Value);
         }
 
-        public double GetScore(ScoringMode mode) => GetScore(mode, calculateAccuracyRatio(baseScore), calculateComboRatio(HighestCombo.Value), scoreResultCounts);
+        /// <summary>
+        /// Computes the total score from judgements that have been applied to this <see cref="ScoreProcessor"/>
+        /// through <see cref="JudgementProcessor.ApplyResult"/> and <see cref="JudgementProcessor.RevertResult"/>.
+        /// </summary>
+        /// <remarks>
+        /// Requires an <see cref="IBeatmap"/> to have been applied via <see cref="JudgementProcessor.ApplyBeatmap"/> before use.
+        /// </remarks>
+        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
+        /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
+        public double GetScore(ScoringMode mode)
+        {
+            return GetScore(mode, calculateAccuracyRatio(baseScore), calculateComboRatio(HighestCombo.Value), scoreResultCounts);
+        }
 
         /// <summary>
-        /// Given a minimal set of inputs, return the computed score for the tracked beatmap / mods combination, at the current point in time.
+        /// Computes the total score from judgements counts in a statistics dictionary.
         /// </summary>
-        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <remarks>
+        /// Requires an <see cref="IBeatmap"/> to have been applied via <see cref="JudgementProcessor.ApplyBeatmap"/> before use.
+        /// </remarks>
+        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="maxCombo">The maximum combo achievable in the beatmap.</param>
-        /// <param name="statistics">Statistics to be used for calculating accuracy, bonus score, etc.</param>
-        /// <returns>The computed score for provided inputs.</returns>
+        /// <param name="statistics">The statistics to compute the score for.</param>
+        /// <returns>The total score computed from judgements in the statistics dictionary.</returns>
         public double GetScore(ScoringMode mode, int maxCombo, Dictionary<HitResult, int> statistics)
         {
             // calculate base score from statistics pairs
@@ -236,25 +269,34 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Computes the total score.
+        /// Computes the total score from given scoring component ratios.
         /// </summary>
-        /// <param name="mode">The <see cref="ScoringMode"/> to compute the total score in.</param>
+        /// <remarks>
+        /// Requires an <see cref="IBeatmap"/> to have been applied via <see cref="JudgementProcessor.ApplyBeatmap"/> before use.
+        /// </remarks>
+        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
-        /// <param name="comboRatio">The proportion of the max combo achieved by the player.</param>
-        /// <param name="statistics">Any statistics to be factored in.</param>
-        /// <returns>The total score.</returns>
+        /// <param name="comboRatio">The portion of the max combo achieved by the player.</param>
+        /// <param name="statistics">Any additional statistics to be factored in.</param>
+        /// <returns>The total score computed from the given scoring component ratios.</returns>
         public double GetScore(ScoringMode mode, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics)
         {
-            int totalHitObjects = statistics.Where(k => k.Key >= HitResult.Miss && k.Key <= HitResult.Perfect).Sum(k => k.Value);
-
-            // If there are no hitobjects then the beatmap can be composed of only ticks or spinners, so ensure we don't multiply by 0 at all times.
-            if (totalHitObjects == 0)
-                totalHitObjects = 1;
-
-            return GetScore(mode, accuracyRatio, comboRatio, statistics, totalHitObjects);
+            return GetScore(mode, accuracyRatio, comboRatio, maxBasicHitObjects, statistics);
         }
 
-        public double GetScore(ScoringMode mode, double accuracyRatio, double comboRatio, Dictionary<HitResult, int> statistics, int totalHitObjects)
+        /// <summary>
+        /// Computes the total score from given scoring component ratios.
+        /// </summary>
+        /// <remarks>
+        /// Does not require an <see cref="IBeatmap"/> to have been applied via <see cref="JudgementProcessor.ApplyBeatmap"/> before use.
+        /// </remarks>
+        /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
+        /// <param name="accuracyRatio">The accuracy percentage achieved by the player.</param>
+        /// <param name="comboRatio">The portion of the max combo achieved by the player.</param>
+        /// <param name="statistics">Any additional statistics to be factored in.</param>
+        /// <param name="totalBasicHitObjects">The total number of basic (non-tick and non-bonus) hitobjects in the beatmap.</param>
+        /// <returns>The total score computed from the given scoring component ratios.</returns>
+        public double GetScore(ScoringMode mode, double accuracyRatio, double comboRatio, int totalBasicHitObjects, Dictionary<HitResult, int> statistics)
         {
             switch (mode)
             {
@@ -268,7 +310,7 @@ namespace osu.Game.Rulesets.Scoring
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
                     double scaledStandardised = GetScore(ScoringMode.Standardised, accuracyRatio, comboRatio, statistics) / max_score;
-                    return Math.Pow(scaledStandardised * totalHitObjects, 2) * 36;
+                    return Math.Pow(scaledStandardised * totalBasicHitObjects, 2) * 36;
             }
         }
 
@@ -326,10 +368,12 @@ namespace osu.Game.Rulesets.Scoring
             {
                 maxAchievableCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
+                maxBasicHitObjects = basicHitObjects;
             }
 
             baseScore = 0;
             rollingMaxBaseScore = 0;
+            basicHitObjects = 0;
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
@@ -354,11 +398,6 @@ namespace osu.Game.Rulesets.Scoring
 
             score.HitEvents = hitEvents;
         }
-
-        /// <summary>
-        /// Maximum <see cref="HitResult"/> for a normal hit (i.e. not tick/bonus) for this ruleset. Only populated via <see cref="ResetFromReplayFrame"/>.
-        /// </summary>
-        private HitResult? maxNormalResult;
 
         public override void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
         {
@@ -394,7 +433,7 @@ namespace osu.Game.Rulesets.Scoring
                         break;
 
                     default:
-                        maxResult = maxNormalResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
+                        maxResult = maxBasicHitResult ??= ruleset.GetHitResults().OrderByDescending(kvp => Judgement.ToNumericResult(kvp.result)).First().result;
                         break;
                 }
 
