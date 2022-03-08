@@ -26,9 +26,6 @@ namespace osu.Game.Tests.Visual
 
         public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
 
-        /// <summary>
-        /// Mods from *player* (not OsuScreen).
-        /// </summary>
         public new Bindable<IReadOnlyList<Mod>> Mods => base.Mods;
 
         public new HUDOverlay HUDOverlay => base.HUDOverlay;
