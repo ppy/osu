@@ -1,0 +1,85 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
+using osu.Game.Online.Chat;
+using osuTK;
+
+namespace osu.Game.Overlays.NewChat
+{
+    public class ChannelListing : VisibilityContainer
+    {
+        public event Action<Channel>? OnRequestJoin;
+        public event Action<Channel>? OnRequestLeave;
+
+        public string SearchTerm
+        {
+            get => flow.SearchTerm;
+            set => flow.SearchTerm = value;
+        }
+
+        private SearchContainer<ChannelListingItem> flow = null!;
+
+        [Resolved]
+        private OverlayColourProvider overlayColours { get; set; } = null!;
+
+        public ChannelListing()
+        {
+            Masking = true;
+        }
+
+        protected override void PopIn() => this.FadeIn();
+        protected override void PopOut() => this.FadeOut();
+
+        public void UpdateAvailableChannels(IEnumerable<Channel> newChannels)
+        {
+            flow.ChildrenEnumerable = newChannels.Where(c => c.Type == ChannelType.Public)
+                                                 .Select(c => new ChannelListingItem(c));
+
+            foreach (var item in flow.Children)
+            {
+                item.OnRequestJoin += channel => OnRequestJoin?.Invoke(channel);
+                item.OnRequestLeave += channel => OnRequestLeave?.Invoke(channel);
+            }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = overlayColours.Background4,
+                },
+                new OsuScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ScrollbarAnchor = Anchor.TopRight,
+                    Child = flow = new SearchContainer<ChannelListingItem>
+                    {
+                        Direction = FillDirection.Vertical,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Spacing = new Vector2(3),
+                        Padding = new MarginPadding
+                        {
+                            Vertical = 13,
+                            Horizontal = 15,
+                        },
+                    },
+                },
+            };
+        }
+    }
+}
