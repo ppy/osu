@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -100,6 +101,7 @@ namespace osu.Game.Rulesets.Scoring
         private double rollingMaxBaseScore;
         private double baseScore;
         private int basicHitObjects;
+        private bool beatmapApplied;
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
@@ -133,6 +135,12 @@ namespace osu.Game.Rulesets.Scoring
 
                 updateScore();
             };
+        }
+
+        public override void ApplyBeatmap(IBeatmap beatmap)
+        {
+            base.ApplyBeatmap(beatmap);
+            beatmapApplied = true;
         }
 
         protected sealed override void ApplyResultInternal(JudgementResult result)
@@ -264,6 +272,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputePartialScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
+            if (!beatmapApplied)
+                throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
+
             extractFromStatistics(scoreInfo.Ruleset.CreateInstance(),
                 scoreInfo.Statistics,
                 out double extractedBaseScore,
