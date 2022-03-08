@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
                 if (m.NewValue == null)
                     return;
 
-                var chatLine = chatLines.SingleOrDefault(c => c.Message == m.NewValue);
+                var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(m.NewValue));
 
                 if (chatLine != null)
                 {
