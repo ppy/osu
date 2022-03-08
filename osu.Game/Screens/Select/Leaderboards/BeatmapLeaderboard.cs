@@ -191,6 +191,11 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
+                // This subscription may fire from changes to linked beatmaps, which we don't care about.
+                // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+                if (changes?.HasCollectionChanges() == false)
+                    return;
+
                 var scores = sender.AsEnumerable();
 
                 if (filterMods && !mods.Value.Any())
