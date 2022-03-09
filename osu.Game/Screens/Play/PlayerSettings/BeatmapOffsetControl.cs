@@ -129,8 +129,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (realmWriteTask == null)
                         Current.Value = val;
 
-                    // we can also mark any in-flight write that is managed locally as "seen" and start handling any incoming changes again.
-                    realmWriteTask = null;
+                    if (realmWriteTask?.IsCompleted == true)
+                    {
+                        // we can also mark any in-flight write that is managed locally as "seen" and start handling any incoming changes again.
+                        realmWriteTask = null;
+                    }
                 });
 
             Current.BindValueChanged(currentChanged);
