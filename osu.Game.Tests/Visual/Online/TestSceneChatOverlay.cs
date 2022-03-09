@@ -465,6 +465,38 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Highlight message", () => chatOverlay.HighlightMessage(message));
         }
 
+        [Test]
+        public void TestHighlightWhileChatHidden()
+        {
+            Message message = null;
+
+            AddStep("hide chat", () => chatOverlay.Hide());
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Send message in channel 1", () =>
+            {
+                channel1.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel1.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+
+            AddStep("Highlight message and show chat", () =>
+            {
+                chatOverlay.HighlightMessage(message);
+                chatOverlay.Show();
+            });
+        }
+
         private void pressChannelHotkey(int number)
         {
             var channelKey = Key.Number0 + number;
