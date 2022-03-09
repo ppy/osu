@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -115,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
                 }
 
-                computeRandomisedPosition(getAbsoluteAngle(hitObjects, i - 1), previous, current);
+                computeRandomisedPosition(current, previous, i > 1 ? randomObjects[i - 2] : null);
 
                 // Move hit objects back into the playfield if they are outside of it
                 Vector2 shift = Vector2.Zero;
@@ -152,28 +153,22 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Get the absolute angle of a vector pointing from the previous hit object to the one denoted by <paramref name="hitObjectIndex"/>.
-        /// </summary>
-        /// <param name="hitObjects">A list of all hit objects in the beatmap.</param>
-        /// <param name="hitObjectIndex">The hit object that the vector should point to.</param>
-        /// <returns>The absolute angle of the aforementioned vector.</returns>
-        private float getAbsoluteAngle(IReadOnlyList<OsuHitObject> hitObjects, int hitObjectIndex)
-        {
-            if (hitObjectIndex < 0) return 0;
-
-            Vector2 previousPosition = hitObjectIndex == 0 ? playfield_centre : hitObjects[hitObjectIndex - 1].EndPosition;
-            Vector2 relativePosition = hitObjects[hitObjectIndex].Position - previousPosition;
-            return (float)Math.Atan2(relativePosition.Y, relativePosition.X);
-        }
-
-        /// <summary>
         /// Compute the randomised position of a hit object while attempting to keep it inside the playfield.
         /// </summary>
-        /// <param name="previousAbsoluteAngle">The direction of movement of the player's cursor before it starts to approach the current hit object.</param>
-        /// <param name="previous">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the current one.</param>
         /// <param name="current">The <see cref="RandomObjectInfo"/> representing the hit object to have the randomised position computed for.</param>
-        private void computeRandomisedPosition(float previousAbsoluteAngle, RandomObjectInfo previous, RandomObjectInfo current)
+        /// <param name="previous">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the current one.</param>
+        /// <param name="beforePrevious">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
+        private void computeRandomisedPosition(RandomObjectInfo current, [CanBeNull] RandomObjectInfo previous, [CanBeNull] RandomObjectInfo beforePrevious)
         {
+            float previousAbsoluteAngle = 0f;
+
+            if (previous != null)
+            {
+                Vector2 earliestPosition = beforePrevious == null ? playfield_centre : beforePrevious.HitObject.EndPosition;
+                Vector2 relativePosition = previous.HitObject.Position - earliestPosition;
+                previousAbsoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
+            }
+
             float absoluteAngle = previousAbsoluteAngle + current.RelativeAngle;
 
             var posRelativeToPrev = new Vector2(
@@ -359,10 +354,13 @@ namespace osu.Game.Rulesets.Osu.Mods
             public Vector2 EndPositionOriginal { get; }
             public Vector2 EndPositionRandomised { get; set; }
 
+            public OsuHitObject HitObject { get; }
+
             public RandomObjectInfo(OsuHitObject hitObject)
             {
                 PositionRandomised = PositionOriginal = hitObject.Position;
                 EndPositionRandomised = EndPositionOriginal = hitObject.EndPosition;
+                HitObject = hitObject;
             }
         }
     }
