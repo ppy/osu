@@ -1,10 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
@@ -33,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private const int preceding_hitobjects_to_shift = 10;
 
-        private Random rng;
+        private Random? rng;
 
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
@@ -58,8 +60,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <returns>A list of <see cref="RandomObjectInfo"/>s describing how each hit object should be placed.</returns>
         private List<RandomObjectInfo> randomiseObjects(IEnumerable<OsuHitObject> hitObjects)
         {
+            Debug.Assert(rng != null, $"{nameof(ApplyToBeatmap)} was not called before randomising objects");
+
             var randomObjects = new List<RandomObjectInfo>();
-            RandomObjectInfo previous = null;
+            RandomObjectInfo? previous = null;
             float rateOfChangeMultiplier = 0;
 
             foreach (OsuHitObject hitObject in hitObjects)
@@ -102,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="randomObjects">A list of <see cref="RandomObjectInfo"/> describing how each hit object should be placed.</param>
         private void applyRandomisation(IReadOnlyList<OsuHitObject> hitObjects, IReadOnlyList<RandomObjectInfo> randomObjects)
         {
-            RandomObjectInfo previous = null;
+            RandomObjectInfo? previous = null;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -158,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// <param name="current">The <see cref="RandomObjectInfo"/> representing the hit object to have the randomised position computed for.</param>
         /// <param name="previous">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the current one.</param>
         /// <param name="beforePrevious">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
-        private void computeRandomisedPosition(RandomObjectInfo current, [CanBeNull] RandomObjectInfo previous, [CanBeNull] RandomObjectInfo beforePrevious)
+        private void computeRandomisedPosition(RandomObjectInfo current, RandomObjectInfo? previous, RandomObjectInfo? beforePrevious)
         {
             float previousAbsoluteAngle = 0f;
 
