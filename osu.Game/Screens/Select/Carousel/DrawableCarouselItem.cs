@@ -17,6 +17,9 @@ namespace osu.Game.Screens.Select.Carousel
 
         public override bool IsPresent => base.IsPresent || Item?.Visible == true;
 
+        public override bool HandlePositionalInput => Item?.Visible == true;
+        public override bool PropagatePositionalInputSubTree => Item?.Visible == true;
+
         public readonly CarouselHeader Header;
 
         /// <summary>
