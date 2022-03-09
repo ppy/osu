@@ -994,24 +994,27 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            if (!GameplayState.HasPassed && !GameplayState.HasFailed)
-                GameplayState.HasQuit = true;
-
             screenSuspension?.RemoveAndDisposeImmediately();
             failAnimationLayer?.RemoveFilters();
 
-            // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
-            if (prepareScoreForDisplayTask == null)
+            if (LoadedBeatmapSuccessfully)
             {
-                Score.ScoreInfo.Passed = false;
-                // potentially should be ScoreRank.F instead? this is the best alternative for now.
-                Score.ScoreInfo.Rank = ScoreRank.D;
-            }
+                if (!GameplayState.HasPassed && !GameplayState.HasFailed)
+                    GameplayState.HasQuit = true;
 
-            // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
-            // To resolve test failures, forcefully end playing synchronously when this screen exits.
-            // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
-            spectatorClient.EndPlaying(GameplayState);
+                // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
+                if (prepareScoreForDisplayTask == null)
+                {
+                    Score.ScoreInfo.Passed = false;
+                    // potentially should be ScoreRank.F instead? this is the best alternative for now.
+                    Score.ScoreInfo.Rank = ScoreRank.D;
+                }
+
+                // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
+                // To resolve test failures, forcefully end playing synchronously when this screen exits.
+                // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
+                spectatorClient.EndPlaying(GameplayState);
+            }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.

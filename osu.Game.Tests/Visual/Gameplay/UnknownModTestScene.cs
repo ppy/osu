@@ -12,6 +12,9 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override Ruleset CreatePlayerRuleset() => new OsuRuleset();
 
+        /// <summary>
+        /// This test also covers the scenario of exiting Player after an unsuccessful beatmap load.
+        /// </summary>
         [Test]
         public void TestUnknownModDoesntEnterGameplay()
         {
