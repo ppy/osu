@@ -93,7 +93,8 @@ namespace osu.Game.Overlays.Chat
                     return;
 
                 // schedule highlight to ensure it performs after any pending "newMessagesArrived" calls.
-                Schedule(() =>
+                // also schedule after children to ensure the scroll flow is updated with any new chat lines.
+                ScheduleAfterChildren(() =>
                 {
                     var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(m.NewValue));
 
