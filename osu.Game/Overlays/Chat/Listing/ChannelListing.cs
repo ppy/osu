@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osuTK;
 
-namespace osu.Game.Overlays.NewChat
+namespace osu.Game.Overlays.Chat.Listing
 {
     public class ChannelListing : VisibilityContainer
     {

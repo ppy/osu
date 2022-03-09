@@ -18,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
 
-namespace osu.Game.Overlays.NewChat
+namespace osu.Game.Overlays.Chat.Listing
 {
     public class ChannelListingItem : OsuClickableContainer, IFilterable
     {
