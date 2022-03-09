@@ -38,14 +38,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             float rateOfChangeMultiplier = 0;
 
-            foreach (var positionInfo in positionModifier.RandomObjects)
+            foreach (var positionInfo in positionModifier.ObjectPositionInfos)
             {
                 // rateOfChangeMultiplier only changes every 5 iterations in a combo
                 // to prevent shaky-line-shaped streams
                 if (positionInfo.HitObject.IndexInCurrentCombo % 5 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
-                if (positionInfo == positionModifier.RandomObjects.First())
+                if (positionInfo == positionModifier.ObjectPositionInfos.First())
                 {
                     positionInfo.DistanceFromPrevious = (float)rng.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2;
                     positionInfo.RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
 
-            positionModifier.ApplyRandomisation();
+            positionModifier.ApplyModifications();
         }
     }
 }

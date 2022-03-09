@@ -15,7 +15,7 @@ using osuTK;
 namespace osu.Game.Rulesets.Osu.Mods
 {
     /// <summary>
-    /// Places hit objects according to information in <see cref="RandomObjects"/> while keeping objects inside the playfield.
+    /// Places hit objects according to information in <see cref="ObjectPositionInfos"/> while keeping objects inside the playfield.
     /// </summary>
     public class OsuHitObjectPositionModifier
     {
@@ -28,21 +28,21 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private readonly List<OsuHitObject> hitObjects;
 
-        private readonly List<RandomObjectInfo> randomObjects = new List<RandomObjectInfo>();
+        private readonly List<ObjectPositionInfo> objectPositionInfos = new List<ObjectPositionInfo>();
 
         /// <summary>
         /// Contains information specifying how each hit object should be placed.
         /// <para>The default values correspond to how objects are originally placed in the beatmap.</para>
         /// </summary>
-        public IReadOnlyList<IRandomObjectInfo> RandomObjects => randomObjects;
+        public IReadOnlyList<IObjectPositionInfo> ObjectPositionInfos => objectPositionInfos;
 
         public OsuHitObjectPositionModifier(List<OsuHitObject> hitObjects)
         {
             this.hitObjects = hitObjects;
-            populateHitObjectPositions();
+            populateObjectPositionInfos();
         }
 
-        private void populateHitObjectPositions()
+        private void populateObjectPositionInfos()
         {
             Vector2 previousPosition = playfield_centre;
             float previousAngle = 0;
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
                 float relativeAngle = absoluteAngle - previousAngle;
 
-                randomObjects.Add(new RandomObjectInfo(hitObject)
+                objectPositionInfos.Add(new ObjectPositionInfo(hitObject)
                 {
                     RelativeAngle = relativeAngle,
                     DistanceFromPrevious = relativePosition.Length
@@ -65,17 +65,17 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Reposition the hit objects according to the information in <see cref="RandomObjects"/>.
+        /// Reposition the hit objects according to the information in <see cref="ObjectPositionInfos"/>.
         /// </summary>
-        public void ApplyRandomisation()
+        public void ApplyModifications()
         {
-            RandomObjectInfo? previous = null;
+            ObjectPositionInfo? previous = null;
 
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 var hitObject = hitObjects[i];
 
-                var current = randomObjects[i];
+                var current = objectPositionInfos[i];
 
                 if (hitObject is Spinner)
                 {
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
                 }
 
-                computeRandomisedPosition(current, previous, i > 1 ? randomObjects[i - 2] : null);
+                computeModifiedPosition(current, previous, i > 1 ? objectPositionInfos[i - 2] : null);
 
                 // Move hit objects back into the playfield if they are outside of it
                 Vector2 shift = Vector2.Zero;
@@ -120,12 +120,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /// <summary>
-        /// Compute the randomised position of a hit object while attempting to keep it inside the playfield.
+        /// Compute the modified position of a hit object while attempting to keep it inside the playfield.
         /// </summary>
-        /// <param name="current">The <see cref="RandomObjectInfo"/> representing the hit object to have the randomised position computed for.</param>
-        /// <param name="previous">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the current one.</param>
-        /// <param name="beforePrevious">The <see cref="RandomObjectInfo"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
-        private void computeRandomisedPosition(RandomObjectInfo current, RandomObjectInfo? previous, RandomObjectInfo? beforePrevious)
+        /// <param name="current">The <see cref="ObjectPositionInfo"/> representing the hit object to have the modified position computed for.</param>
+        /// <param name="previous">The <see cref="ObjectPositionInfo"/> representing the hit object immediately preceding the current one.</param>
+        /// <param name="beforePrevious">The <see cref="ObjectPositionInfo"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
+        private void computeModifiedPosition(ObjectPositionInfo current, ObjectPositionInfo? previous, ObjectPositionInfo? beforePrevious)
         {
             float previousAbsoluteAngle = 0f;
 
@@ -143,56 +143,56 @@ namespace osu.Game.Rulesets.Osu.Mods
                 current.DistanceFromPrevious * (float)Math.Sin(absoluteAngle)
             );
 
-            Vector2 lastEndPosition = previous?.EndPositionRandomised ?? playfield_centre;
+            Vector2 lastEndPosition = previous?.EndPositionModified ?? playfield_centre;
 
             posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
-            current.PositionRandomised = lastEndPosition + posRelativeToPrev;
+            current.PositionModified = lastEndPosition + posRelativeToPrev;
         }
 
         /// <summary>
-        /// Move the randomised position of a hit circle so that it fits inside the playfield.
+        /// Move the modified position of a hit circle so that it fits inside the playfield.
         /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
-        private Vector2 clampHitCircleToPlayfield(HitCircle circle, RandomObjectInfo objectInfo)
+        /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
+        private Vector2 clampHitCircleToPlayfield(HitCircle circle, ObjectPositionInfo objectPositionInfo)
         {
-            var previousPosition = objectInfo.PositionRandomised;
-            objectInfo.EndPositionRandomised = objectInfo.PositionRandomised = clampToPlayfieldWithPadding(
-                objectInfo.PositionRandomised,
+            var previousPosition = objectPositionInfo.PositionModified;
+            objectPositionInfo.EndPositionModified = objectPositionInfo.PositionModified = clampToPlayfieldWithPadding(
+                objectPositionInfo.PositionModified,
                 (float)circle.Radius
             );
 
-            circle.Position = objectInfo.PositionRandomised;
+            circle.Position = objectPositionInfo.PositionModified;
 
-            return objectInfo.PositionRandomised - previousPosition;
+            return objectPositionInfo.PositionModified - previousPosition;
         }
 
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
-        /// <returns>The deviation from the original randomised position in order to fit within the playfield.</returns>
-        private Vector2 clampSliderToPlayfield(Slider slider, RandomObjectInfo objectInfo)
+        /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
+        private Vector2 clampSliderToPlayfield(Slider slider, ObjectPositionInfo objectPositionInfo)
         {
             var possibleMovementBounds = calculatePossibleMovementBounds(slider);
 
-            var previousPosition = objectInfo.PositionRandomised;
+            var previousPosition = objectPositionInfo.PositionModified;
 
             // Clamp slider position to the placement area
             // If the slider is larger than the playfield, force it to stay at the original position
             float newX = possibleMovementBounds.Width < 0
-                ? objectInfo.PositionOriginal.X
+                ? objectPositionInfo.PositionOriginal.X
                 : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
 
             float newY = possibleMovementBounds.Height < 0
-                ? objectInfo.PositionOriginal.Y
+                ? objectPositionInfo.PositionOriginal.Y
                 : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
 
-            slider.Position = objectInfo.PositionRandomised = new Vector2(newX, newY);
-            objectInfo.EndPositionRandomised = slider.EndPosition;
+            slider.Position = objectPositionInfo.PositionModified = new Vector2(newX, newY);
+            objectPositionInfo.EndPositionModified = slider.EndPosition;
 
-            shiftNestedObjects(slider, objectInfo.PositionRandomised - objectInfo.PositionOriginal);
+            shiftNestedObjects(slider, objectPositionInfo.PositionModified - objectPositionInfo.PositionOriginal);
 
-            return objectInfo.PositionRandomised - previousPosition;
+            return objectPositionInfo.PositionModified - previousPosition;
         }
 
         /// <summary>
@@ -293,7 +293,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             );
         }
 
-        public interface IRandomObjectInfo
+        public interface IObjectPositionInfo
         {
             /// <summary>
             /// The jump angle from the previous hit object to this one, relative to the previous hit object's jump angle.
@@ -316,29 +316,29 @@ namespace osu.Game.Rulesets.Osu.Mods
             float DistanceFromPrevious { get; set; }
 
             /// <summary>
-            /// The hit object associated with this <see cref="IRandomObjectInfo"/>.
+            /// The hit object associated with this <see cref="IObjectPositionInfo"/>.
             /// </summary>
             OsuHitObject HitObject { get; }
         }
 
-        private class RandomObjectInfo : IRandomObjectInfo
+        private class ObjectPositionInfo : IObjectPositionInfo
         {
             public float RelativeAngle { get; set; }
 
             public float DistanceFromPrevious { get; set; }
 
             public Vector2 PositionOriginal { get; }
-            public Vector2 PositionRandomised { get; set; }
+            public Vector2 PositionModified { get; set; }
 
             public Vector2 EndPositionOriginal { get; }
-            public Vector2 EndPositionRandomised { get; set; }
+            public Vector2 EndPositionModified { get; set; }
 
             public OsuHitObject HitObject { get; }
 
-            public RandomObjectInfo(OsuHitObject hitObject)
+            public ObjectPositionInfo(OsuHitObject hitObject)
             {
-                PositionRandomised = PositionOriginal = hitObject.Position;
-                EndPositionRandomised = EndPositionOriginal = hitObject.EndPosition;
+                PositionModified = PositionOriginal = hitObject.Position;
+                EndPositionModified = EndPositionOriginal = hitObject.EndPosition;
                 HitObject = hitObject;
             }
         }
