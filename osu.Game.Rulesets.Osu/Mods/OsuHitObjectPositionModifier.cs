@@ -329,8 +329,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
-
-            public Vector2 EndPositionOriginal { get; }
             public Vector2 EndPositionModified { get; set; }
 
             public OsuHitObject HitObject { get; }
@@ -338,7 +336,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             public ObjectPositionInfo(OsuHitObject hitObject)
             {
                 PositionModified = PositionOriginal = hitObject.Position;
-                EndPositionModified = EndPositionOriginal = hitObject.EndPosition;
+                EndPositionModified = hitObject.EndPosition;
                 HitObject = hitObject;
             }
         }
