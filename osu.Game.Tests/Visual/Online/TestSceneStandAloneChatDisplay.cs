@@ -152,7 +152,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("highlight first message", () =>
             {
                 highlighted = testChannel.Messages[0];
-                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = highlighted;
+                testChannel.HighlightedMessage.Value = highlighted;
             });
 
             AddUntilStep("chat scrolled to first message", () =>
@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("highlight last message", () =>
             {
                 highlighted = testChannel.Messages[^1];
-                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = highlighted;
+                testChannel.HighlightedMessage.Value = highlighted;
             });
 
             AddUntilStep("chat scrolled to last message", () =>
@@ -182,19 +182,22 @@ namespace osu.Game.Tests.Visual.Online
             AddRepeatStep("highlight other random messages", () =>
             {
                 highlighted = testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)];
-                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = highlighted;
+                testChannel.HighlightedMessage.Value = highlighted;
             }, 10);
         }
 
         [Test]
         public void TestMessageHighlightingOnFilledChat()
         {
+            int index = 0;
+
             fillChat();
 
-            AddRepeatStep("highlight random messages", () =>
-            {
-                chatDisplay.DrawableChannel.Channel.HighlightedMessage.Value = testChannel.Messages[RNG.Next(0, testChannel.Messages.Count - 1)];
-            }, 10);
+            AddStep("highlight first message", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = 0]);
+            AddStep("highlight next message", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = Math.Min(index + 1, testChannel.Messages.Count - 1)]);
+            AddStep("highlight last message", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = testChannel.Messages.Count - 1]);
+            AddStep("highlight previous message", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = Math.Max(index - 1, 0)]);
+            AddRepeatStep("highlight random messages", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = RNG.Next(0, testChannel.Messages.Count - 1)], 10);
         }
 
         /// <summary>
