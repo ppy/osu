@@ -46,9 +46,6 @@ namespace osu.Game.Online.Solo
         [JsonProperty("mods")]
         public APIMod[] Mods { get; set; }
 
-        [JsonProperty("user")]
-        public APIUser User { get; set; }
-
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics { get; set; }
 
@@ -67,7 +64,6 @@ namespace osu.Game.Online.Solo
             RulesetID = score.RulesetID;
             Passed = score.Passed;
             Mods = score.APIMods;
-            User = score.User;
             Statistics = score.Statistics;
         }
     }
