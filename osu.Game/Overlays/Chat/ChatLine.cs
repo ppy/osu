@@ -220,7 +220,7 @@ namespace osu.Game.Overlays.Chat
         /// <remarks>
         /// Scheduling is required to ensure the animation doesn't play until the chat line is in view and not scrolled away.
         /// </remarks>
-        public void ScheduleHighlight() => Schedule(() => lineHighlightBackground.FadeTo(0.5f).FadeOut(1000, Easing.InQuint));
+        public void ScheduleHighlight() => Schedule(() => lineHighlightBackground.FadeTo(0.5f).FadeOut(1500, Easing.InQuint));
 
         private void updateMessageContent()
         {
