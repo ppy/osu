@@ -284,14 +284,13 @@ namespace osu.Game.Tests.Visual.SongSelect
         public void TestDummy()
         {
             createSongSelect();
-            AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
+            AddUntilStep("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
             AddUntilStep("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
             addManyTestMaps();
-            AddWaitStep("wait for select", 3);
 
-            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+            AddUntilStep("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
         }
 
         [Test]
@@ -299,9 +298,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             createSongSelect();
             addManyTestMaps();
-            AddWaitStep("wait for add", 3);
 
-            AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+            AddUntilStep("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Artist));
             AddStep(@"Sort by Title", () => config.SetValue(OsuSetting.SongSelectSortingMode, SortMode.Title));
@@ -571,6 +569,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
             AddStep("press ctrl+enter", () =>
             {
                 InputManager.PressKey(Key.ControlLeft);
@@ -604,6 +604,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             addRulesetImportStep(0);
             createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
 
             DrawableCarouselBeatmapSet set = null;
             AddStep("Find the DrawableCarouselBeatmapSet", () =>
@@ -843,6 +845,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             addRulesetImportStep(1);
 
             createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
 
             AddStep("present score", () =>
             {
