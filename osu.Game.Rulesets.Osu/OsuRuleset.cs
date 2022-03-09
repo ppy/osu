@@ -195,6 +195,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModMuted(),
                         new OsuModNoScope(),
                         new OsuModAimAssist(),
+                        new ModAdaptiveSpeed()
                     };
 
                 case ModType.System:
