@@ -185,6 +185,12 @@ namespace osu.Game.Screens.Play
         {
             var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
 
+            if (gameplayMods.Any(m => m is UnknownMod))
+            {
+                Logger.Log("Gameplay was started with an unknown mod applied.", level: LogLevel.Important);
+                return;
+            }
+
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
 
