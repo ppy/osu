@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Online.NewChat
 
         private Channel createRandomChannel()
         {
-            var id = RNG.Next(0, 10000);
+            int id = RNG.Next(0, 10000);
             return new Channel
             {
                 Name = $"#channel-{id}",
