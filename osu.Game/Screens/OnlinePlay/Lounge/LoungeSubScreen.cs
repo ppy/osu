@@ -340,8 +340,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 joiningRoomOperation = null;
             };
 
-            req.Failure += _ =>
+            req.Failure += exception =>
             {
+                Logger.Error(exception, "Couldn't create a copy of this room.");
                 joiningRoomOperation?.Dispose();
                 joiningRoomOperation = null;
             };
