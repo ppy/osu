@@ -30,27 +30,7 @@ namespace osu.Game.Overlays.NewChat
         private SearchContainer<ChannelListingItem> flow = null!;
 
         [Resolved]
-        private OverlayColourProvider overlayColours { get; set; } = null!;
-
-        public ChannelListing()
-        {
-            Masking = true;
-        }
-
-        protected override void PopIn() => this.FadeIn();
-        protected override void PopOut() => this.FadeOut();
-
-        public void UpdateAvailableChannels(IEnumerable<Channel> newChannels)
-        {
-            flow.ChildrenEnumerable = newChannels.Where(c => c.Type == ChannelType.Public)
-                                                 .Select(c => new ChannelListingItem(c));
-
-            foreach (var item in flow.Children)
-            {
-                item.OnRequestJoin += channel => OnRequestJoin?.Invoke(channel);
-                item.OnRequestLeave += channel => OnRequestLeave?.Invoke(channel);
-            }
-        }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -60,7 +40,7 @@ namespace osu.Game.Overlays.NewChat
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = overlayColours.Background4,
+                    Colour = colourProvider.Background4,
                 },
                 new OsuScrollContainer
                 {
@@ -81,5 +61,21 @@ namespace osu.Game.Overlays.NewChat
                 },
             };
         }
+
+        public void UpdateAvailableChannels(IEnumerable<Channel> newChannels)
+        {
+            flow.ChildrenEnumerable = newChannels.Where(c => c.Type == ChannelType.Public)
+                                                 .Select(c => new ChannelListingItem(c));
+
+            foreach (var item in flow.Children)
+            {
+                item.OnRequestJoin += channel => OnRequestJoin?.Invoke(channel);
+                item.OnRequestLeave += channel => OnRequestLeave?.Invoke(channel);
+            }
+        }
+
+        protected override void PopIn() => this.FadeIn();
+
+        protected override void PopOut() => this.FadeOut();
     }
 }
