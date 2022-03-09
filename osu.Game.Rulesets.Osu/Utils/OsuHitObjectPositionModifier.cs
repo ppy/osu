@@ -7,12 +7,11 @@ using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Osu.Utils;
 using osuTK;
 
 #nullable enable
 
-namespace osu.Game.Rulesets.Osu.Mods
+namespace osu.Game.Rulesets.Osu.Utils
 {
     /// <summary>
     /// Places hit objects according to information in <see cref="ObjectPositionInfos"/> while keeping objects inside the playfield.
