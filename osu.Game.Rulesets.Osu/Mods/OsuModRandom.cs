@@ -73,19 +73,19 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (previous == null)
                 {
-                    current.Distance = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.X / 2);
+                    current.DistanceFromPrevious = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.X / 2);
                     current.RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
                 }
                 else
                 {
-                    current.Distance = Vector2.Distance(previous.EndPositionOriginal, current.PositionOriginal);
+                    current.DistanceFromPrevious = Vector2.Distance(previous.EndPositionOriginal, current.PositionOriginal);
 
                     // The max. angle (relative to the angle of the vector pointing from the 2nd last to the last hit object)
                     // is proportional to the distance between the last and the current hit object
                     // to allow jumps and prevent too sharp turns during streams.
 
                     // Allow maximum jump angle when jump distance is more than half of playfield diagonal length
-                    current.RelativeAngle = rateOfChangeMultiplier * 2 * (float)Math.PI * Math.Min(1f, current.Distance / (playfield_diagonal * 0.5f));
+                    current.RelativeAngle = rateOfChangeMultiplier * 2 * (float)Math.PI * Math.Min(1f, current.DistanceFromPrevious / (playfield_diagonal * 0.5f));
                 }
 
                 previous = current;
@@ -177,8 +177,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             float absoluteAngle = previousAbsoluteAngle + current.RelativeAngle;
 
             var posRelativeToPrev = new Vector2(
-                current.Distance * (float)Math.Cos(absoluteAngle),
-                current.Distance * (float)Math.Sin(absoluteAngle)
+                current.DistanceFromPrevious * (float)Math.Cos(absoluteAngle),
+                current.DistanceFromPrevious * (float)Math.Sin(absoluteAngle)
             );
 
             Vector2 lastEndPosition = previous?.EndPositionRandomised ?? playfield_centre;
@@ -349,9 +349,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// The jump distance from the previous hit object to this one.
             /// </summary>
             /// <remarks>
-            /// <see cref="Distance"/> of the first hit object in a beatmap is relative to the playfield center.
+            /// <see cref="DistanceFromPrevious"/> of the first hit object in a beatmap is relative to the playfield center.
             /// </remarks>
-            public float Distance { get; set; }
+            public float DistanceFromPrevious { get; set; }
 
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionRandomised { get; set; }
