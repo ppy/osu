@@ -27,14 +27,12 @@ namespace osu.Game.Overlays.NewChat
 
         public bool FilteringActive { get; set; }
         public IEnumerable<string> FilterTerms => new[] { channel.Name, channel.Topic ?? string.Empty };
-        public bool MatchingFilter
-        {
-            set => this.FadeTo(value ? 1f : 0f, 100);
-        }
+        public bool MatchingFilter { set => this.FadeTo(value ? 1f : 0f, 100); }
 
-        private readonly float TEXT_SIZE = 18;
-        private readonly float ICON_SIZE = 14;
         private readonly Channel channel;
+
+        private const float TEXT_SIZE = 18;
+        private const float ICON_SIZE = 14;
 
         private Colour4 selectedColour;
         private Colour4 normalColour;
@@ -45,73 +43,33 @@ namespace osu.Game.Overlays.NewChat
         private IBindable<bool> channelJoined = null!;
 
         [Resolved]
-        private OverlayColourProvider overlayColours { get; set; } = null!;
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public ChannelListingItem(Channel channel)
         {
             this.channel = channel;
-
-            Masking = true;
-            CornerRadius = 5;
-            RelativeSizeAxes = Axes.X;
-            Height = 20;
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            hoverBox.Show();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            hoverBox.Hide();
-            base.OnHoverLost(e);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // Set colours
-            normalColour = overlayColours.Light3;
-            selectedColour = Colour4.White;
-
-            // Set handlers for state display
-            channelJoined = channel.Joined.GetBoundCopy();
-            channelJoined.BindValueChanged(change =>
-            {
-                if (change.NewValue)
-                {
-                    checkbox.Show();
-                    channelText.Colour = selectedColour;
-                }
-                else
-                {
-                    checkbox.Hide();
-                    channelText.Colour = normalColour;
-                }
-            }, true);
-
-            // Set action on click
-            Action = () => (channelJoined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Masking = true;
+            CornerRadius = 5;
+            RelativeSizeAxes = Axes.X;
+            Height = 20;
+
             Children = new Drawable[]
             {
                 hoverBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = overlayColours.Background3,
+                    Colour = colourProvider.Background3,
                     Alpha = 0f,
                 },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new Dimension[]
+                    ColumnDimensions = new[]
                     {
                         new Dimension(GridSizeMode.Absolute, 40),
                         new Dimension(GridSizeMode.Absolute, 200),
@@ -155,7 +113,7 @@ namespace osu.Game.Overlays.NewChat
                                 Icon = FontAwesome.Solid.User,
                                 Size = new Vector2(ICON_SIZE),
                                 Margin = new MarginPadding { Right = 5 },
-                                Colour = overlayColours.Light3,
+                                Colour = colourProvider.Light3,
                             },
                             new OsuSpriteText
                             {
@@ -164,12 +122,52 @@ namespace osu.Game.Overlays.NewChat
                                 Text = "0",
                                 Font = OsuFont.Numeric.With(size: TEXT_SIZE, weight: FontWeight.Medium),
                                 Margin = new MarginPadding { Bottom = 2 },
-                                Colour = overlayColours.Light3,
+                                Colour = colourProvider.Light3,
                             },
                         },
                     },
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Set colours
+            normalColour = colourProvider.Light3;
+            selectedColour = Colour4.White;
+
+            // Set handlers for state display
+            channelJoined = channel.Joined.GetBoundCopy();
+            channelJoined.BindValueChanged(change =>
+            {
+                if (change.NewValue)
+                {
+                    checkbox.Show();
+                    channelText.Colour = selectedColour;
+                }
+                else
+                {
+                    checkbox.Hide();
+                    channelText.Colour = normalColour;
+                }
+            }, true);
+
+            // Set action on click
+            Action = () => (channelJoined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            hoverBox.Show();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            hoverBox.Hide();
+            base.OnHoverLost(e);
         }
     }
 }
