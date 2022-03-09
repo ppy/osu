@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (previous != null)
             {
-                Vector2 earliestPosition = beforePrevious == null ? playfield_centre : beforePrevious.HitObject.EndPosition;
+                Vector2 earliestPosition = beforePrevious?.HitObject.EndPosition ?? playfield_centre;
                 Vector2 relativePosition = previous.HitObject.Position - earliestPosition;
                 previousAbsoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
             }
