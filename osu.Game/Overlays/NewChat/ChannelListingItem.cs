@@ -31,19 +31,17 @@ namespace osu.Game.Overlays.NewChat
 
         private readonly Channel channel;
 
-        private const float TEXT_SIZE = 18;
-        private const float ICON_SIZE = 14;
-
-        private Colour4 selectedColour;
-        private Colour4 normalColour;
-
         private Box hoverBox = null!;
         private SpriteIcon checkbox = null!;
         private OsuSpriteText channelText = null!;
+        private OsuSpriteText topicText = null!;
         private IBindable<bool> channelJoined = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
+
+        private const float text_size = 18;
+        private const float icon_size = 14;
 
         public ChannelListingItem(Channel channel)
         {
@@ -87,31 +85,30 @@ namespace osu.Game.Overlays.NewChat
                                 Origin = Anchor.CentreLeft,
                                 Margin = new MarginPadding { Left = 15 },
                                 Icon = FontAwesome.Solid.Check,
-                                Size = new Vector2(ICON_SIZE),
+                                Size = new Vector2(icon_size),
                             },
                             channelText = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Text = $"# {channel.Name.Substring(1)}",
-                                Font = OsuFont.Torus.With(size: TEXT_SIZE, weight: FontWeight.Medium),
+                                Text = channel.Name,
+                                Font = OsuFont.Torus.With(size: text_size, weight: FontWeight.SemiBold),
                                 Margin = new MarginPadding { Bottom = 2 },
                             },
-                            new OsuSpriteText
+                            topicText = new OsuSpriteText
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = channel.Topic,
-                                Font = OsuFont.Torus.With(size: TEXT_SIZE),
+                                Font = OsuFont.Torus.With(size: text_size),
                                 Margin = new MarginPadding { Bottom = 2 },
-                                Colour = Colour4.White,
                             },
                             new SpriteIcon
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Icon = FontAwesome.Solid.User,
-                                Size = new Vector2(ICON_SIZE),
+                                Size = new Vector2(icon_size),
                                 Margin = new MarginPadding { Right = 5 },
                                 Colour = colourProvider.Light3,
                             },
@@ -120,7 +117,7 @@ namespace osu.Game.Overlays.NewChat
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Text = "0",
-                                Font = OsuFont.Numeric.With(size: TEXT_SIZE, weight: FontWeight.Medium),
+                                Font = OsuFont.Torus.With(size: text_size),
                                 Margin = new MarginPadding { Bottom = 2 },
                                 Colour = colourProvider.Light3,
                             },
@@ -134,27 +131,23 @@ namespace osu.Game.Overlays.NewChat
         {
             base.LoadComplete();
 
-            // Set colours
-            normalColour = colourProvider.Light3;
-            selectedColour = Colour4.White;
-
-            // Set handlers for state display
             channelJoined = channel.Joined.GetBoundCopy();
             channelJoined.BindValueChanged(change =>
             {
                 if (change.NewValue)
                 {
                     checkbox.Show();
-                    channelText.Colour = selectedColour;
+                    channelText.Colour = Colour4.White;
+                    topicText.Colour = Colour4.White;
                 }
                 else
                 {
                     checkbox.Hide();
-                    channelText.Colour = normalColour;
+                    channelText.Colour = colourProvider.Light3;
+                    topicText.Colour = colourProvider.Content2;
                 }
             }, true);
 
-            // Set action on click
             Action = () => (channelJoined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel);
         }
 
