@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "This mod could not be resolved by the game.";
         public override double ScoreMultiplier => 0;
 
+        public override bool UserPlayable => false;
+
         public override ModType Type => ModType.System;
 
         public UnknownMod(string acronym)
