@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
-using osuTK;
 
 namespace osu.Game.Overlays.Chat.Listing
 {
@@ -51,7 +50,6 @@ namespace osu.Game.Overlays.Chat.Listing
                         Direction = FillDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Spacing = new Vector2(3),
                         Padding = new MarginPadding
                         {
                             Vertical = 13,
