@@ -435,7 +435,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
         }
 
         [Test]
@@ -462,7 +462,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel2));
             AddAssert("Switched to channel 2", () => channelManager.CurrentChannel.Value == channel2);
         }
 
@@ -491,7 +491,7 @@ namespace osu.Game.Tests.Visual.Online
             });
             AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
 
-            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message));
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel2));
             AddAssert("Switched to channel 2", () => channelManager.CurrentChannel.Value == channel2);
         }
 
@@ -522,7 +522,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("Highlight message and show chat", () =>
             {
-                chatOverlay.HighlightMessage(message);
+                chatOverlay.HighlightMessage(message, channel1);
                 chatOverlay.Show();
             });
         }

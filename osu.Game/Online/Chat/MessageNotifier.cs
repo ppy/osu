@@ -99,7 +99,7 @@ namespace osu.Game.Online.Chat
                 if (checkForPMs(channel, message))
                     continue;
 
-                checkForMentions(message);
+                checkForMentions(channel, message);
             }
         }
 
@@ -114,15 +114,15 @@ namespace osu.Game.Online.Chat
             if (!notifyOnPrivateMessage.Value || channel.Type != ChannelType.PM)
                 return false;
 
-            notifications.Post(new PrivateMessageNotification(message));
+            notifications.Post(new PrivateMessageNotification(message, channel));
             return true;
         }
 
-        private void checkForMentions(Message message)
+        private void checkForMentions(Channel channel, Message message)
         {
             if (!notifyOnUsername.Value || !CheckContainsUsername(message.Content, localUser.Value.Username)) return;
 
-            notifications.Post(new MentionNotification(message));
+            notifications.Post(new MentionNotification(message, channel));
         }
 
         /// <summary>
@@ -138,8 +138,8 @@ namespace osu.Game.Online.Chat
 
         public class PrivateMessageNotification : HighlightMessageNotification
         {
-            public PrivateMessageNotification(Message message)
-                : base(message)
+            public PrivateMessageNotification(Message message, Channel channel)
+                : base(message, channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
                 Text = $"You received a private message from '{message.Sender.Username}'. Click to read it!";
@@ -148,8 +148,8 @@ namespace osu.Game.Online.Chat
 
         public class MentionNotification : HighlightMessageNotification
         {
-            public MentionNotification(Message message)
-                : base(message)
+            public MentionNotification(Message message, Channel channel)
+                : base(message, channel)
             {
                 Icon = FontAwesome.Solid.At;
                 Text = $"Your name was mentioned in chat by '{message.Sender.Username}'. Click to find out why!";
@@ -158,12 +158,14 @@ namespace osu.Game.Online.Chat
 
         public abstract class HighlightMessageNotification : SimpleNotification
         {
-            protected HighlightMessageNotification(Message message)
+            protected HighlightMessageNotification(Message message, Channel channel)
             {
                 this.message = message;
+                this.channel = channel;
             }
 
             private readonly Message message;
+            private readonly Channel channel;
 
             public override bool IsImportant => false;
 
@@ -175,7 +177,7 @@ namespace osu.Game.Online.Chat
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
-                    chatOverlay.HighlightMessage(message);
+                    chatOverlay.HighlightMessage(message, channel);
                     chatOverlay.Show();
 
                     return true;
