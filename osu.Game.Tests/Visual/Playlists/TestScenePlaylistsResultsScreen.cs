@@ -33,16 +33,25 @@ namespace osu.Game.Tests.Visual.Playlists
 
         private TestResultsScreen resultsScreen;
 
-        private int currentScoreId;
+        private int lowestScoreId; // Score ID of the lowest score in the list.
+        private int highestScoreId; // Score ID of the highest score in the list.
+
         private bool requestComplete;
         private int totalCount;
+        private ScoreInfo userScore;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            currentScoreId = 1;
+            lowestScoreId = 1;
+            highestScoreId = 1;
             requestComplete = false;
             totalCount = 0;
+
+            userScore = TestResources.CreateTestScoreInfo();
+            userScore.TotalScore = 0;
+            userScore.Statistics = new Dictionary<HitResult, int>();
+
             bindHandler();
 
             // beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
@@ -53,15 +62,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowWithUserScore()
         {
-            ScoreInfo userScore = null;
-
-            AddStep("bind user score info handler", () =>
-            {
-                userScore = TestResources.CreateTestScoreInfo();
-                userScore.OnlineID = currentScoreId++;
-
-                bindHandler(userScore: userScore);
-            });
+            AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
 
@@ -81,15 +82,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestShowUserScoreWithDelay()
         {
-            ScoreInfo userScore = null;
-
-            AddStep("bind user score info handler", () =>
-            {
-                userScore = TestResources.CreateTestScoreInfo();
-                userScore.OnlineID = currentScoreId++;
-
-                bindHandler(true, userScore);
-            });
+            AddStep("bind user score info handler", () => bindHandler(true, userScore));
 
             createResults(() => userScore);
 
@@ -124,7 +117,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddAssert("right loading spinner shown", () => resultsScreen.RightSpinner.State.Value == Visibility.Visible);
                 waitForDisplay();
 
-                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
+                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
                 AddAssert("right loading spinner hidden", () => resultsScreen.RightSpinner.State.Value == Visibility.Hidden);
             }
         }
@@ -132,15 +125,7 @@ namespace osu.Game.Tests.Visual.Playlists
         [Test]
         public void TestFetchWhenScrolledToTheLeft()
         {
-            ScoreInfo userScore = null;
-
-            AddStep("bind user score info handler", () =>
-            {
-                userScore = TestResources.CreateTestScoreInfo();
-                userScore.OnlineID = currentScoreId++;
-
-                bindHandler(userScore: userScore);
-            });
+            AddStep("bind user score info handler", () => bindHandler(userScore: userScore));
 
             createResults(() => userScore);
 
@@ -156,7 +141,7 @@ namespace osu.Game.Tests.Visual.Playlists
                 AddAssert("left loading spinner shown", () => resultsScreen.LeftSpinner.State.Value == Visibility.Visible);
                 waitForDisplay();
 
-                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() == beforePanelCount + scores_per_result);
+                AddAssert($"count increased by {scores_per_result}", () => this.ChildrenOfType<ScorePanel>().Count() >= beforePanelCount + scores_per_result);
                 AddAssert("left loading spinner hidden", () => resultsScreen.LeftSpinner.State.Value == Visibility.Hidden);
             }
         }
@@ -245,16 +230,13 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             var multiplayerUserScore = new MultiplayerScore
             {
-                ID = (int)(userScore.OnlineID > 0 ? userScore.OnlineID : currentScoreId++),
+                ID = highestScoreId,
                 Accuracy = userScore.Accuracy,
-                EndedAt = userScore.Date,
                 Passed = userScore.Passed,
                 Rank = userScore.Rank,
                 Position = real_user_position,
                 MaxCombo = userScore.MaxCombo,
-                TotalScore = userScore.TotalScore,
                 User = userScore.User,
-                Statistics = userScore.Statistics,
                 ScoresAround = new MultiplayerScoresAround
                 {
                     Higher = new MultiplayerScores(),
@@ -268,38 +250,32 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 multiplayerUserScore.ScoresAround.Lower.Scores.Add(new MultiplayerScore
                 {
-                    ID = currentScoreId++,
+                    ID = --highestScoreId,
                     Accuracy = userScore.Accuracy,
-                    EndedAt = userScore.Date,
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
-                    TotalScore = userScore.TotalScore - i,
                     User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
                         CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     },
-                    Statistics = userScore.Statistics
                 });
 
                 multiplayerUserScore.ScoresAround.Higher.Scores.Add(new MultiplayerScore
                 {
-                    ID = currentScoreId++,
+                    ID = ++lowestScoreId,
                     Accuracy = userScore.Accuracy,
-                    EndedAt = userScore.Date,
                     Passed = true,
                     Rank = userScore.Rank,
                     MaxCombo = userScore.MaxCombo,
-                    TotalScore = userScore.TotalScore + i,
                     User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
                         CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     },
-                    Statistics = userScore.Statistics
                 });
 
                 totalCount += 2;
@@ -315,33 +291,23 @@ namespace osu.Game.Tests.Visual.Playlists
         {
             var result = new IndexedMultiplayerScores();
 
-            long startTotalScore = req.Cursor?.Properties["total_score"].ToObject<long>() ?? 1000000;
             string sort = req.IndexParams?.Properties["sort"].ToObject<string>() ?? "score_desc";
 
             for (int i = 1; i <= scores_per_result; i++)
             {
                 result.Scores.Add(new MultiplayerScore
                 {
-                    ID = currentScoreId++,
+                    ID = sort == "score_asc" ? --highestScoreId : ++lowestScoreId,
                     Accuracy = 1,
-                    EndedAt = DateTimeOffset.Now,
                     Passed = true,
                     Rank = ScoreRank.X,
                     MaxCombo = 1000,
-                    TotalScore = startTotalScore + (sort == "score_asc" ? i : -i),
                     User = new APIUser
                     {
                         Id = 2,
                         Username = $"peppy{i}",
                         CoverUrl = "https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
                     },
-                    Statistics = new Dictionary<HitResult, int>
-                    {
-                        { HitResult.Miss, 1 },
-                        { HitResult.Meh, 50 },
-                        { HitResult.Good, 100 },
-                        { HitResult.Great, 300 }
-                    }
                 });
 
                 totalCount++;
@@ -367,7 +333,7 @@ namespace osu.Game.Tests.Visual.Playlists
             {
                 Properties = new Dictionary<string, JToken>
                 {
-                    { "sort", JToken.FromObject(scores.Scores[^1].TotalScore > scores.Scores[^2].TotalScore ? "score_asc" : "score_desc") }
+                    { "sort", JToken.FromObject(scores.Scores[^1].ID > scores.Scores[^2].ID ? "score_asc" : "score_desc") }
                 }
             };
         }

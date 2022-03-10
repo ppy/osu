@@ -76,6 +76,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual double DefaultComboPortion => 0.7;
 
+        /// <summary>
+        /// An arbitrary multiplier to scale scores in the <see cref="ScoringMode.Classic"/> scoring mode.
+        /// </summary>
+        protected virtual double ClassicScoreMultiplier => 36;
+
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
@@ -246,7 +251,7 @@ namespace osu.Game.Rulesets.Scoring
                     // This gives a similar feeling to osu!stable scoring (ScoreV1) while keeping classic scoring as only a constant multiple of standardised scoring.
                     // The invariant is important to ensure that scores don't get re-ordered on leaderboards between the two scoring modes.
                     double scaledStandardised = GetScore(ScoringMode.Standardised, accuracyRatio, comboRatio, statistics) / max_score;
-                    return Math.Pow(scaledStandardised * totalHitObjects, 2) * 36;
+                    return Math.Pow(scaledStandardised * totalHitObjects, 2) * ClassicScoreMultiplier;
             }
         }
 
