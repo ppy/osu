@@ -295,24 +295,23 @@ namespace osu.Game.Overlays
             {
                 if(!CurrentTrack.IsDummyDevice)
                 {
-                    if (current.BeatmapInfo.ReplayGainInfoID != 0 && current.BeatmapInfo.ReplayGainInfo == null)
-                    {
-                        current.BeatmapInfo.ReplayGainInfo = beatmaps.ReplayGainManager.GetInfo(current.BeatmapInfo.ReplayGainInfoID);
-                    }
-
                     if(current.BeatmapInfo.ReplayGainInfo != null)
+                    {
                         beatmaps.ReplayGainManager.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
+                    }
+                    else
+                    {
+                        beatmaps.ReplayGainManager.AddReplayGain(new ReplayGainInfo()
+                        {
+                            TrackGain = 0.8f,
+                            PeakAmplitude = 1f,
+                        });
+                    }
                 }
-
                 changeTrack();
             }
             else
             {
-                if (current.BeatmapInfo.ReplayGainInfo == null || current.BeatmapInfo.ReplayGainInfo.Version < ReplayGainManager.CURR_REPLAYGAIN_VER)
-                {
-                    current.BeatmapInfo.ReplayGainInfo = lastWorking.BeatmapInfo.ReplayGainInfo;
-                    current.BeatmapInfo.ReplayGainInfoID = lastWorking.BeatmapInfo.ReplayGainInfoID;
-                }
                 // transfer still valid track to new working beatmap
                 current.TransferTrack(lastWorking.Track);
             }

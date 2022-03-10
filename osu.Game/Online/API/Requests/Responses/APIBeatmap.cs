@@ -104,8 +104,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
 
-        [JsonIgnore]
-        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
+        IReplayGainInfo? IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
 
         #endregion
 

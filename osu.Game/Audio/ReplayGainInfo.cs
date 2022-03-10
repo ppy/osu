@@ -2,27 +2,35 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using JetBrains.Annotations;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using Realms;
 
 namespace osu.Game.Audio
 {
-    public class ReplayGainInfo :  IReplayGainInfo, IEquatable<ReplayGainInfo>, IHasPrimaryKey, ISoftDelete
+    [ExcludeFromDynamicCompile]
+    public class ReplayGainInfo : RealmObject, IReplayGainInfo, IEquatable<ReplayGainInfo>, IHasGuidPrimaryKey
     {
-        public int ID { get; set; }
-
-        /*[Column("Beatmap")]
-        public BeatmapInfo BeatmapInfo { get; set; }*/
+        [PrimaryKey]
+        public Guid ID { get; set; }
 
         public float TrackGain { get; set; }
         public float PeakAmplitude { get; set; }
-        public float Version { get; set; }
         public bool DeletePending { get; set; }
 
-        bool IHasPrimaryKey.IsManaged => ID > 0;
-
+        [UsedImplicitly]
         public ReplayGainInfo()
         { }
+
+        public ReplayGainInfo(float peakAmp, float gain)
+        {
+            ID = Guid.NewGuid();
+            TrackGain = gain;
+            PeakAmplitude = peakAmp;
+        }
+
         public bool Equals(ReplayGainInfo other)
         {
             if (TrackGain == other.TrackGain && PeakAmplitude == other.PeakAmplitude)
@@ -32,5 +40,17 @@ namespace osu.Game.Audio
         }
 
         public bool Equals(IReplayGainInfo other) => other is ReplayGainInfo b && Equals(b);
+
+        //public ReplayGainInfo Clone() => (ReplayGainInfo)this.Detach().MemberwiseClone();
+
+        public ReplayGainInfo Clone()
+        {
+            return new ReplayGainInfo()
+            {
+                ID  = ID,
+                TrackGain = TrackGain,
+                PeakAmplitude = PeakAmplitude,
+            };
+        }
     }
 }

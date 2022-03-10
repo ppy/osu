@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, RealmNamedFileUsage>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
-        public ReplayGainManager ReplayGainManager { get;}
+        public ReplayGainManager? ReplayGainManager { get;}
 
         private readonly BeatmapModelManager beatmapModelManager;
 
@@ -59,12 +59,11 @@ namespace osu.Game.Beatmaps
 
             var userResources = new RealmFileStore(realm, storage).Store;
 
-            ReplayGainStore replayGainStore = new ReplayGainStore(contextFactory, audioManager, storage);
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue);
-            ReplayGainManager = new ReplayGainManager(replayGainStore, BeatmapTrackStore);
-            //beatmapModelManager = CreateBeatmapModelManager(storage, contextFactory, rulesets, api, host, ReplayGainManager);
+            ReplayGainManager = new ReplayGainManager(BeatmapTrackStore, audioManager);
+            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue, ReplayGainManager);
+
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
@@ -75,13 +74,11 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host, ReplayGainManager replayGainManager) =>
-            new BeatmapModelManager(storage, contextFactory, rulesets, host, replayGainManager);
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue, ReplayGainManager replayGainManager) =>
+            new BeatmapModelManager(realm, storage, onlineBeatmapLookupQueue, replayGainManager);
 
-        /*protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, GameHost host) =>
-            new BeatmapModelManager(storage, contextFactory, rulesets, host);
         protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapModelManager(realm, storage, onlineLookupQueue);*/
+            new BeatmapModelManager(realm, storage, onlineLookupQueue);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
@@ -105,16 +102,6 @@ namespace osu.Game.Beatmaps
                 {
                     new BeatmapInfo(ruleset, new BeatmapDifficulty(), metadata)
                 }
-                    /*new BeatmapInfo
-                    {
-                        BaseDifficulty = new BeatmapDifficulty(),
-                        Ruleset = ruleset,
-                        Metadata = metadata,
-                        WidescreenStoryboard = true,
-                        SamplesMatchPlaybackRate = true,
-                        ReplayGainInfo = new ReplayGainInfo(),
-                    }
-                }*/
             };
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)

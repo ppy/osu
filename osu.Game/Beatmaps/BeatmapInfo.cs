@@ -71,13 +71,8 @@ namespace osu.Game.Beatmaps
             set => StatusInt = (int)value;
         }
 
-        [JsonIgnore]
-        public int ReplayGainInfoID { get; set; }
+        public ReplayGainInfo? ReplayGainInfo { get; set; }
 
-        public ReplayGainInfo ReplayGainInfo { get; set; }
-
-        [NotMapped]
-        public APIBeatmap OnlineInfo { get; set; }
         [MapTo(nameof(Status))]
         public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
@@ -157,6 +152,7 @@ namespace osu.Game.Beatmaps
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
+        IReplayGainInfo? IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
 
         #region Compatibility properties
 
@@ -198,8 +194,8 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => this.GetDisplayTitle();
 
-        [JsonIgnore]
-        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
+        //[JsonIgnore]
+        //IReplayGainInfo IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
 
         #endregion
     }

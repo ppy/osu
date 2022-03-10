@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
@@ -44,9 +45,12 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+        private ReplayGainManager? replayGainManager;
+
+        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, ReplayGainManager? manager = null)
             : base(storage, realm)
         {
+            replayGainManager = manager;
             this.onlineLookupQueue = onlineLookupQueue;
         }
 
@@ -65,6 +69,16 @@ namespace osu.Game.Stores
                 // this can happen in tests, mostly
                 if (!b.Ruleset.IsManaged)
                     b.Ruleset = realm.Find<RulesetInfo>(b.Ruleset.ShortName) ?? throw new ArgumentNullException(nameof(b.Ruleset));
+            }
+
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+            {
+                if (replayGainManager != null && b.ReplayGainInfo == null)
+                {
+                    ReplayGainInfo info = replayGainManager.generateReplayGainInfo(b, beatmapSet);
+                    b.ReplayGainInfo = info;
+                    beatmapSet = replayGainManager.PopulateSet(b, beatmapSet);
+                }
             }
 
             validateOnlineIds(beatmapSet, realm);

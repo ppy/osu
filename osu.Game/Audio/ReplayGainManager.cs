@@ -10,32 +10,20 @@ using osu.Framework.Audio.Callbacks;
 using System.Threading.Tasks;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Mixing;
 
 namespace osu.Game.Audio
 {
     public class ReplayGainManager
     {
-        public const float CURR_REPLAYGAIN_VER = 0.1f;
         private ITrackStore trackStore;
-        private ReplayGainStore replayGainStore;
+        private AudioMixer audioMixer;
 
-        public ReplayGainManager(ReplayGainStore replayGainStore, ITrackStore trackStore)
+        public ReplayGainManager(ITrackStore trackStore, AudioManager audioManager)
         {
             this.trackStore = trackStore;
-            this.replayGainStore = replayGainStore;
-        }
-
-        public ReplayGainInfo GetInfo(int ID)
-        {
-            ReplayGainInfo replayGainInfo = replayGainStore.ConsumableItems.Where(s => s.ID == ID).FirstOrDefault();
-
-            return replayGainInfo;
-        }
-
-        public Task saveReplayGainInfo(ReplayGainInfo replayGainInfo, BeatmapInfo beatmap)
-        {
-            replayGainStore.Add(replayGainInfo, beatmap);
-            return Task.CompletedTask;
+            audioMixer = audioManager.TrackMixer;
         }
 
         public void AddReplayGain(ReplayGainInfo info)
@@ -50,7 +38,7 @@ namespace osu.Game.Audio
                     fRelease = 200,
                     fThreshold = -20
                 };
-                replayGainStore.AddFx(compParams);
+                AddFx(compParams);
             }
 
             GainParameters gainParameters = new GainParameters
@@ -59,12 +47,26 @@ namespace osu.Game.Audio
                 fTarget = (float)Math.Pow(10, (info.TrackGain / 20)), //inverse of the loudness calculation as per ReplayGain 1.0 specs
                 fTime = 0,
             };
-            replayGainStore.AddFx(gainParameters);
+            AddFx(gainParameters);
+        }
+
+        public void AddFx(IEffectParameter effectParameter)
+        {
+            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+            if (effect != null)
+            {
+                int i = audioMixer.Effects.IndexOf(effect);
+                audioMixer.Effects[i] = effectParameter;
+            }
+            else
+            {
+                audioMixer.Effects.Add(effectParameter);
+            }
+
         }
 
         public ReplayGainInfo generateReplayGainInfo(BeatmapInfo info, BeatmapSetInfo setInfo)
         {
-            ReplayGainInfo replayGain = new ReplayGainInfo();
             string filePath = "";
             try
             {
@@ -78,9 +80,8 @@ namespace osu.Game.Audio
             }
 
             ReplayGainImplementation replayGainImplementation = new ReplayGainImplementation(trackStore, filePath);
-            replayGain.PeakAmplitude = (float)replayGainImplementation.PeakAmp;
-            replayGain.TrackGain = (float)replayGainImplementation.Gain;
-            replayGain.Version = CURR_REPLAYGAIN_VER;
+            ReplayGainInfo replayGain = new ReplayGainInfo((float)replayGainImplementation.PeakAmp, (float)replayGainImplementation.Gain);
+
             return replayGain;
         }
 
@@ -90,9 +91,8 @@ namespace osu.Game.Audio
             {
                 foreach (BeatmapInfo beatmap in bSetInfo.Beatmaps)
                 {
-                    if (beatmap.ReplayGainInfoID == 0 && beatmap.AudioEquals(beatmapInfo))
+                    if (beatmap.ReplayGainInfo == null && beatmap.AudioEquals(beatmapInfo))
                     {
-                        beatmap.ReplayGainInfoID = beatmapInfo.ReplayGainInfoID;
                         beatmap.ReplayGainInfo = beatmapInfo.ReplayGainInfo;
                     }
                 }

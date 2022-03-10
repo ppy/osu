@@ -28,7 +28,6 @@ namespace osu.Game.Database
         public DbSet<EFRulesetInfo> RulesetInfo { get; set; }
         public DbSet<EFSkinInfo> SkinInfo { get; set; }
         public DbSet<EFScoreInfo> ScoreInfo { get; set; }
-        public DbSet<ScoreInfo> ScoreInfo { get; set; }
         public DbSet<ReplayGainInfo> ReplayGainInfo { get; set; }
 
 

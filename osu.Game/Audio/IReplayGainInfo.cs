@@ -3,10 +3,9 @@ using osu.Game.Database;
 
 namespace osu.Game.Audio
 {
-    public interface IReplayGainInfo : IEquatable<IReplayGainInfo>
+    public interface IReplayGainInfo : IEquatable<IReplayGainInfo>, ISoftDelete
     {
-        public float PeakAmplitude { get; set; }
-        public float TrackGain { get; set; }
-        public float Version { get; set; }
+        public float PeakAmplitude { get;  }
+        public float TrackGain { get;  }
     }
 }

@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
@@ -178,6 +179,8 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => RulesetInfo;
+        [JsonIgnore]
+        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
 
         #endregion
     }
