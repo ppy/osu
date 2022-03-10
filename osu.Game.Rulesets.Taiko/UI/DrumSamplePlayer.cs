@@ -1,0 +1,55 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.UI;
+
+namespace osu.Game.Rulesets.Taiko.UI
+{
+    internal class DrumSamplePlayer : Container, IKeyBindingHandler<TaikoAction> {
+        private DrumSampleTriggerSource leftRimSampleTriggerSource;
+        private DrumSampleTriggerSource leftCentreSampleTriggerSource;
+        private DrumSampleTriggerSource rightCentreSampleTriggerSource;
+        private DrumSampleTriggerSource rightRimSampleTriggerSource;
+
+        public DrumSamplePlayer(HitObjectContainer hitObjectContainer) {
+            Children = new Drawable[]
+            {
+                leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
+                leftCentreSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
+                rightCentreSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
+                rightRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
+            };
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
+        {
+            if (e.Action == TaikoAction.LeftRim)
+            {
+                leftRimSampleTriggerSource.Play(HitType.Rim);
+            }
+            else if (e.Action == TaikoAction.LeftCentre)
+            {
+                leftCentreSampleTriggerSource.Play(HitType.Centre);
+            }
+            else if (e.Action == TaikoAction.RightCentre)
+            {
+                rightCentreSampleTriggerSource.Play(HitType.Centre);
+            }
+            else if (e.Action == TaikoAction.RightRim)
+            {
+                rightRimSampleTriggerSource.Play(HitType.Rim);
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<TaikoAction> e)
+        {
+        }
+    }
+}

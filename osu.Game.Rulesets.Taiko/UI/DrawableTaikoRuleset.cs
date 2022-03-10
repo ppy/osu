@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -35,6 +36,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private SkinnableDrawable scroller;
 
+        private DrumTouchInputArea drumTouchInputArea;
+
         public DrawableTaikoRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
@@ -53,11 +56,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Depth = float.MaxValue
             });
 
-            DrumTouchInputArea touchInput = new DrumTouchInputArea(Playfield) {
-                RelativePositionAxes = Axes.Both,
-                RelativeSizeAxes = Axes.Both,
-            };
-            Overlays.Add(touchInput);
+            if ((drumTouchInputArea = CreateDrumTouchInputArea()) != null)
+                KeyBindingInputManager.Add(drumTouchInputArea);
         }
 
         protected override void UpdateAfterChildren()
@@ -75,6 +75,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                 result = Math.Clamp(~result - 1, 0, ControlPoints.Count);
             return ControlPoints[result];
         }
+
+        public DrumTouchInputArea CreateDrumTouchInputArea() => new DrumTouchInputArea();
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 
