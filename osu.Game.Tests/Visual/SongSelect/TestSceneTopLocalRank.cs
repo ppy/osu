@@ -124,7 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("Became present", () => topLocalRank.IsPresent);
-            AddAssert("Correct rank", () => topLocalRank.Rank == ScoreRank.B);
+            AddUntilStep("Correct rank", () => topLocalRank.Rank == ScoreRank.B);
 
             AddStep("Add higher score for current user", () =>
             {
@@ -137,7 +137,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 scoreManager.Import(testScoreInfo2);
             });
 
-            AddAssert("Correct rank", () => topLocalRank.Rank == ScoreRank.S);
+            AddUntilStep("Correct rank", () => topLocalRank.Rank == ScoreRank.S);
         }
     }
 }

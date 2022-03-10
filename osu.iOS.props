@@ -79,7 +79,7 @@
   </ItemGroup>
   <!-- Xamarin.iOS does not automatically handle transitive dependencies from NuGet packages. -->
   <ItemGroup Label="Transitive Dependencies">
-    <PackageReference Include="DiffPlex" Version="1.7.0" />
+    <PackageReference Include="DiffPlex" Version="1.7.1" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="5.0.14" />
@@ -89,6 +89,6 @@
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2021.1221.0" ExcludeAssets="all" />
-    <PackageReference Include="Realm" Version="10.9.0" />
+    <PackageReference Include="Realm" Version="10.10.0" />
   </ItemGroup>
 </Project>
