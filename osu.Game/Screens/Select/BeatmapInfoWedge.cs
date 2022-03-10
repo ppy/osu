@@ -332,8 +332,13 @@ namespace osu.Game.Screens.Select
                 starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
                 starDifficulty.BindValueChanged(s =>
                 {
-                    starRatingDisplay.FadeIn(transition_duration);
                     starRatingDisplay.Current.Value = s.NewValue ?? default;
+
+                    // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
+                    if (!starRatingDisplay.IsPresent)
+                        starRatingDisplay.FinishTransforms(true);
+
+                    starRatingDisplay.FadeIn(transition_duration);
                 });
 
                 mods.BindValueChanged(m =>
