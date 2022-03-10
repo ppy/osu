@@ -133,7 +133,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             var scoreProcessor = Ruleset.Value.CreateInstance().CreateScoreProcessor();
             scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, users)
+            LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, users)
             {
                 Expanded = { Value = true },
             }, l =>

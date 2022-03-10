@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, multiplayerUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(Ruleset.Value, scoreProcessor, multiplayerUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

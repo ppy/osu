@@ -6,11 +6,15 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Rulesets.Scoring
@@ -300,7 +304,26 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 HitObjects = { new TestHitObject(result) }
             });
 
-            Assert.That(scoreProcessor.GetImmediateScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));
+            Assert.That(scoreProcessor.ComputeFinalScore(ScoringMode.Standardised, new ScoreInfo
+            {
+                Ruleset = new TestRuleset().RulesetInfo,
+                MaxCombo = result.AffectsCombo() ? 1 : 0,
+                Statistics = statistic
+            }), Is.EqualTo(expectedScore).Within(0.5d));
+        }
+
+        private class TestRuleset : Ruleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new System.NotImplementedException();
+
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
+
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
+
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
+
+            public override string Description => string.Empty;
+            public override string ShortName => string.Empty;
         }
 
         private class TestJudgement : Judgement
