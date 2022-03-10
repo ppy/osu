@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Chat
                     {
                         float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
                         scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
-                        chatLine.ScheduleHighlight();
+                        chatLine.Highlight();
                     }
 
                     highlightedMessage.Value = null;
