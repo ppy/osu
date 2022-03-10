@@ -175,10 +175,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.StartGameplay();
         });
 
-        private void onResultsReady() => Scheduler.Add(() =>
+        private void onResultsReady()
         {
-            resultsReady.SetResult(true);
-        });
+            // Schedule is required to ensure that `TaskCompletionSource.SetResult` is not called more than once.
+            // A scenario where this can occur is if this instance is not immediately disposed (ie. async disposal queue).
+            Schedule(() => resultsReady.SetResult(true));
+        }
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
