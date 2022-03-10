@@ -43,6 +43,8 @@ namespace osu.Game.Overlays.Chat.Listing
         private const float text_size = 18;
         private const float icon_size = 14;
 
+        private const float vertical_margin = 1.5f;
+
         public ChannelListingItem(Channel channel)
         {
             this.channel = channel;
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays.Chat.Listing
             Masking = true;
             CornerRadius = 5;
             RelativeSizeAxes = Axes.X;
-            Height = 20;
+            Height = 20 + (vertical_margin * 2);
 
             Children = new Drawable[]
             {
@@ -62,6 +64,7 @@ namespace osu.Game.Overlays.Chat.Listing
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3,
+                    Margin = new MarginPadding { Vertical = vertical_margin },
                     Alpha = 0f,
                 },
                 new GridContainer
