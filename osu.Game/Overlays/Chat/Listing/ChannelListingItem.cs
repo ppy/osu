@@ -81,9 +81,9 @@ namespace osu.Game.Overlays.Chat.Listing
                         {
                             checkbox = new SpriteIcon
                             {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Margin = new MarginPadding { Left = 15 },
+                                Alpha = 0,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
                                 Icon = FontAwesome.Solid.Check,
                                 Size = new Vector2(icon_size),
                             },
@@ -134,15 +134,19 @@ namespace osu.Game.Overlays.Chat.Listing
             channelJoined = channel.Joined.GetBoundCopy();
             channelJoined.BindValueChanged(change =>
             {
+                const double duration = 500;
+
                 if (change.NewValue)
                 {
-                    checkbox.Show();
+                    checkbox.FadeIn(duration, Easing.OutQuint);
+                    checkbox.ScaleTo(1f, duration, Easing.OutElastic);
                     channelText.Colour = Colour4.White;
                     topicText.Colour = Colour4.White;
                 }
                 else
                 {
-                    checkbox.Hide();
+                    checkbox.FadeOut(duration, Easing.OutQuint);
+                    checkbox.ScaleTo(0.8f, duration, Easing.OutQuint);
                     channelText.Colour = colourProvider.Light3;
                     topicText.Colour = colourProvider.Content2;
                 }
@@ -159,7 +163,7 @@ namespace osu.Game.Overlays.Chat.Listing
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverBox.Hide();
+            hoverBox.FadeOut(300, Easing.OutQuint);
             base.OnHoverLost(e);
         }
     }
