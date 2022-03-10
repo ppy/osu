@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private static readonly int highest_divisor = BindableBeatDivisor.VALID_DIVISORS.Last();
+        private static readonly int highest_divisor = BindableBeatDivisor.PREDEFINED_DIVISORS.Last();
 
         public TimelineTickDisplay()
         {

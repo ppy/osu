@@ -76,7 +76,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             });
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, users), l =>
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(GameplayState.Ruleset.RulesetInfo, ScoreProcessor, users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;

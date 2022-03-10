@@ -195,6 +195,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModMuted(),
                         new OsuModNoScope(),
                         new OsuModAimAssist(),
+                        new ModAdaptiveSpeed()
                     };
 
                 case ModType.System:
@@ -314,6 +315,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
                         }), true)
                     }
