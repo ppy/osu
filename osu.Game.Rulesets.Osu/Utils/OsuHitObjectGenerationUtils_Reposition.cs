@@ -13,10 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Utils
 {
-    /// <summary>
-    /// Places hit objects according to information in <see cref="ObjectPositionInfos"/> while keeping objects inside the playfield.
-    /// </summary>
-    public class OsuHitObjectPositionModifier
+    public static partial class OsuHitObjectGenerationUtils
     {
         /// <summary>
         /// Number of previous hitobjects to be shifted together when an object is being moved.
@@ -25,24 +22,15 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE / 2;
 
-        private readonly List<OsuHitObject> hitObjects;
-
-        private readonly List<ObjectPositionInfo> objectPositionInfos = new List<ObjectPositionInfo>();
-
         /// <summary>
-        /// Contains information specifying how each hit object should be placed.
-        /// <para>The default values correspond to how objects are originally placed in the beatmap.</para>
+        /// Generate a list of <see cref="IObjectPositionInfo"/>s containing information for how the given list of
+        /// <see cref="OsuHitObject"/>s are positioned.
         /// </summary>
-        public IReadOnlyList<IObjectPositionInfo> ObjectPositionInfos => objectPositionInfos;
-
-        public OsuHitObjectPositionModifier(List<OsuHitObject> hitObjects)
+        /// <param name="hitObjects">A list of <see cref="OsuHitObject"/>s to process.</param>
+        /// <returns>A list of <see cref="IObjectPositionInfo"/>s describing how each hit object is positioned relative to the previous one.</returns>
+        public static List<IObjectPositionInfo> GeneratePositionInfos(IEnumerable<OsuHitObject> hitObjects)
         {
-            this.hitObjects = hitObjects;
-            populateObjectPositionInfos();
-        }
-
-        private void populateObjectPositionInfos()
-        {
+            var positionInfos = new List<IObjectPositionInfo>();
             Vector2 previousPosition = playfield_centre;
             float previousAngle = 0;
 
@@ -52,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                 float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
                 float relativeAngle = absoluteAngle - previousAngle;
 
-                objectPositionInfos.Add(new ObjectPositionInfo(hitObject)
+                positionInfos.Add(new ObjectPositionInfo(hitObject)
                 {
                     RelativeAngle = relativeAngle,
                     DistanceFromPrevious = relativePosition.Length
@@ -61,18 +49,23 @@ namespace osu.Game.Rulesets.Osu.Utils
                 previousPosition = hitObject.EndPosition;
                 previousAngle = absoluteAngle;
             }
+
+            return positionInfos;
         }
 
         /// <summary>
-        /// Reposition the hit objects according to the information in <see cref="ObjectPositionInfos"/>.
+        /// Reposition the hit objects according to the information in <paramref name="objectPositionInfos"/>.
         /// </summary>
-        public void ApplyModifications()
+        /// <param name="objectPositionInfos"></param>
+        /// <returns>The repositioned hit objects.</returns>
+        public static List<OsuHitObject> RepositionHitObjects(IEnumerable<IObjectPositionInfo> objectPositionInfos)
         {
+            List<ObjectPositionInfo> positionInfos = objectPositionInfos.Cast<ObjectPositionInfo>().ToList();
             ObjectPositionInfo? previous = null;
 
-            for (int i = 0; i < objectPositionInfos.Count; i++)
+            for (int i = 0; i < positionInfos.Count; i++)
             {
-                var current = objectPositionInfos[i];
+                var current = positionInfos[i];
                 var hitObject = current.HitObject;
 
                 if (hitObject is Spinner)
@@ -81,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                     continue;
                 }
 
-                computeModifiedPosition(current, previous, i > 1 ? objectPositionInfos[i - 2] : null);
+                computeModifiedPosition(current, previous, i > 1 ? positionInfos[i - 2] : null);
 
                 // Move hit objects back into the playfield if they are outside of it
                 Vector2 shift = Vector2.Zero;
@@ -104,9 +97,9 @@ namespace osu.Game.Rulesets.Osu.Utils
                     for (int j = i - 1; j >= i - preceding_hitobjects_to_shift && j >= 0; j--)
                     {
                         // only shift hit circles
-                        if (!(hitObjects[j] is HitCircle)) break;
+                        if (!(positionInfos[j].HitObject is HitCircle)) break;
 
-                        toBeShifted.Add(hitObjects[j]);
+                        toBeShifted.Add(positionInfos[j].HitObject);
                     }
 
                     if (toBeShifted.Count > 0)
@@ -115,6 +108,8 @@ namespace osu.Game.Rulesets.Osu.Utils
 
                 previous = current;
             }
+
+            return positionInfos.Select(p => p.HitObject).ToList();
         }
 
         /// <summary>
@@ -123,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="current">The <see cref="ObjectPositionInfo"/> representing the hit object to have the modified position computed for.</param>
         /// <param name="previous">The <see cref="ObjectPositionInfo"/> representing the hit object immediately preceding the current one.</param>
         /// <param name="beforePrevious">The <see cref="ObjectPositionInfo"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
-        private void computeModifiedPosition(ObjectPositionInfo current, ObjectPositionInfo? previous, ObjectPositionInfo? beforePrevious)
+        private static void computeModifiedPosition(ObjectPositionInfo current, ObjectPositionInfo? previous, ObjectPositionInfo? beforePrevious)
         {
             float previousAbsoluteAngle = 0f;
 
@@ -143,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Utils
 
             Vector2 lastEndPosition = previous?.EndPositionModified ?? playfield_centre;
 
-            posRelativeToPrev = OsuHitObjectGenerationUtils.RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
+            posRelativeToPrev = RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
             current.PositionModified = lastEndPosition + posRelativeToPrev;
         }
@@ -152,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Move the modified position of a hit circle so that it fits inside the playfield.
         /// </summary>
         /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
-        private Vector2 clampHitCircleToPlayfield(HitCircle circle, ObjectPositionInfo objectPositionInfo)
+        private static Vector2 clampHitCircleToPlayfield(HitCircle circle, ObjectPositionInfo objectPositionInfo)
         {
             var previousPosition = objectPositionInfo.PositionModified;
             objectPositionInfo.EndPositionModified = objectPositionInfo.PositionModified = clampToPlayfieldWithPadding(
@@ -169,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
         /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
-        private Vector2 clampSliderToPlayfield(Slider slider, ObjectPositionInfo objectPositionInfo)
+        private static Vector2 clampSliderToPlayfield(Slider slider, ObjectPositionInfo objectPositionInfo)
         {
             var possibleMovementBounds = calculatePossibleMovementBounds(slider);
 
@@ -199,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// </summary>
         /// <param name="hitObjects">The list of hit objects to be shifted.</param>
         /// <param name="shift">The amount to be shifted.</param>
-        private void applyDecreasingShift(IList<OsuHitObject> hitObjects, Vector2 shift)
+        private static void applyDecreasingShift(IList<OsuHitObject> hitObjects, Vector2 shift)
         {
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -219,7 +214,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <remarks>
         /// If the slider is larger than the playfield, the returned <see cref="RectangleF"/> may have negative width/height.
         /// </remarks>
-        private RectangleF calculatePossibleMovementBounds(Slider slider)
+        private static RectangleF calculatePossibleMovementBounds(Slider slider)
         {
             var pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
@@ -266,7 +261,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// </summary>
         /// <param name="slider"><see cref="Slider"/> whose nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted</param>
         /// <param name="shift">The <see cref="Vector2"/> the <see cref="Slider"/>'s nested <see cref="SliderTick"/>s and <see cref="SliderRepeat"/>s should be shifted by</param>
-        private void shiftNestedObjects(Slider slider, Vector2 shift)
+        private static void shiftNestedObjects(Slider slider, Vector2 shift)
         {
             foreach (var hitObject in slider.NestedHitObjects.Where(o => o is SliderTick || o is SliderRepeat))
             {
@@ -283,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <param name="position">The position to be clamped.</param>
         /// <param name="padding">The minimum distance allowed from playfield edges.</param>
         /// <returns>The clamped position.</returns>
-        private Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
+        private static Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
         {
             return new Vector2(
                 Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
