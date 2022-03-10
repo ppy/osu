@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Default
             Child
                 .FadeTo(flash_opacity, EarlyActivationMilliseconds, Easing.OutQuint)
                 .Then()
-                .FadeOut(Math.Max(0, timingPoint.BeatLength - fade_length), Easing.OutSine);
+                .FadeOut(Math.Max(fade_length, timingPoint.BeatLength - fade_length), Easing.OutSine);
         }
     }
 }
