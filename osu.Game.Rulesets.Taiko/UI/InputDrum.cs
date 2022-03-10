@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class InputDrum : Container
     {
+        public const float centre_size = 0.7f;
         private const float middle_split = 0.025f;
 
         [Cached]
@@ -122,14 +123,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.7f)
+                        Size = new Vector2(centre_size)
                     },
                     centreHit = new Sprite
                     {
                         Anchor = flipped ? Anchor.CentreLeft : Anchor.CentreRight,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.7f),
+                        Size = new Vector2(centre_size),
                         Alpha = 0,
                         Blending = BlendingParameters.Additive
                     }

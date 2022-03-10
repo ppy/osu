@@ -52,6 +52,12 @@ namespace osu.Game.Rulesets.Taiko.UI
                 RelativeSizeAxes = Axes.X,
                 Depth = float.MaxValue
             });
+
+            DrumTouchInputArea touchInput = new DrumTouchInputArea(Playfield) {
+                RelativePositionAxes = Axes.Both,
+                RelativeSizeAxes = Axes.Both,
+            };
+            Overlays.Add(touchInput);
         }
 
         protected override void UpdateAfterChildren()
