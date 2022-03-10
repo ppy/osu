@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -22,8 +24,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
-
-#nullable enable
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -122,7 +122,19 @@ namespace osu.Game.Screens.Play.PlayerSettings
             beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
                 r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
                 settings => settings.Offset,
-                val => Current.Value = val);
+                val =>
+                {
+                    // At the point we reach here, it's not guaranteed that all realm writes have taken place (there may be some in-flight).
+                    // We are only aware of writes that originated from our own flow, so if we do see one that's active we can avoid handling the feedback value arriving.
+                    if (realmWriteTask == null)
+                        Current.Value = val;
+
+                    if (realmWriteTask?.IsCompleted == true)
+                    {
+                        // we can also mark any in-flight write that is managed locally as "seen" and start handling any incoming changes again.
+                        realmWriteTask = null;
+                    }
+                });
 
             Current.BindValueChanged(currentChanged);
         }
@@ -158,10 +170,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (settings == null) // only the case for tests.
                         return;
 
-                    if (settings.Offset == Current.Value)
+                    double val = Current.Value;
+
+                    if (settings.Offset == val)
                         return;
 
-                    settings.Offset = Current.Value;
+                    settings.Offset = val;
                 });
             }
         }
