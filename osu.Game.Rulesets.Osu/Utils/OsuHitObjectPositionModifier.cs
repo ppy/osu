@@ -70,11 +70,10 @@ namespace osu.Game.Rulesets.Osu.Utils
         {
             ObjectPositionInfo? previous = null;
 
-            for (int i = 0; i < hitObjects.Count; i++)
+            for (int i = 0; i < objectPositionInfos.Count; i++)
             {
-                var hitObject = hitObjects[i];
-
                 var current = objectPositionInfos[i];
+                var hitObject = current.HitObject;
 
                 if (hitObject is Spinner)
                 {
