@@ -87,28 +87,30 @@ namespace osu.Game.Overlays.Chat
             base.LoadComplete();
 
             highlightedMessage = Channel.HighlightedMessage.GetBoundCopy();
-            highlightedMessage.BindValueChanged(m =>
-            {
-                if (m.NewValue == null)
-                    return;
-
-                // schedule highlight to ensure it performs after any pending "newMessagesArrived" calls.
-                // also schedule after children to ensure the scroll flow is updated with any new chat lines.
-                ScheduleAfterChildren(() =>
-                {
-                    var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(m.NewValue));
-
-                    if (chatLine != null)
-                    {
-                        float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
-                        scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
-                        chatLine.Highlight();
-                    }
-
-                    highlightedMessage.Value = null;
-                });
-            }, true);
+            highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
         }
+
+        /// <summary>
+        /// Processes any pending message in <see cref="highlightedMessage"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="CompositeDrawable.ScheduleAfterChildren"/> is for ensuring the scroll flow has updated with any new chat lines.
+        /// </remarks>
+        private void processMessageHighlighting() => ScheduleAfterChildren(() =>
+        {
+            if (highlightedMessage.Value == null)
+                return;
+
+            var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(highlightedMessage.Value));
+            if (chatLine == null)
+                return;
+
+            float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
+            scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
+            chatLine.Highlight();
+
+            highlightedMessage.Value = null;
+        });
 
         protected override void Dispose(bool isDisposing)
         {
@@ -179,6 +181,8 @@ namespace osu.Game.Overlays.Chat
             // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
             if (newMessages.Any(m => m is LocalMessage))
                 scroll.ScrollToEnd();
+
+            processMessageHighlighting();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
