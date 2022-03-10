@@ -33,6 +33,7 @@ namespace osu.Game.Database
                  copyChangesToRealm(s.Author, d.Author);
              });
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
+            c.CreateMap<ReplayGainInfo, ReplayGainInfo>();
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();

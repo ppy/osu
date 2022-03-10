@@ -73,7 +73,7 @@ namespace osu.Game.Stores
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
-                if (replayGainManager != null && b.ReplayGainInfo == null)
+                if (replayGainManager != null && (b.ReplayGainInfo == null || b.ReplayGainInfo.isDefault()))
                 {
                     ReplayGainInfo info = replayGainManager.generateReplayGainInfo(b, beatmapSet);
                     b.ReplayGainInfo = info;

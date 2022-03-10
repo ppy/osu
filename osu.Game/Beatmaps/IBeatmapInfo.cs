@@ -40,7 +40,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The info required to apply replay gain to the audio
         /// </summary>
-        IReplayGainInfo? ReplayGainInfo { get; }
+        IReplayGainInfo ReplayGainInfo { get; }
 
         /// <summary>
         /// The playable length in milliseconds of this beatmap.

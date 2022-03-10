@@ -6,23 +6,27 @@ using JetBrains.Annotations;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Utils;
 using Realms;
 
 namespace osu.Game.Audio
 {
     [ExcludeFromDynamicCompile]
-    public class ReplayGainInfo : RealmObject, IReplayGainInfo, IEquatable<ReplayGainInfo>, IHasGuidPrimaryKey
+    public class ReplayGainInfo : RealmObject, IReplayGainInfo, IHasGuidPrimaryKey, IEquatable<ReplayGainInfo>, IDeepCloneable<ReplayGainInfo>
     {
         [PrimaryKey]
         public Guid ID { get; set; }
 
         public float TrackGain { get; set; }
         public float PeakAmplitude { get; set; }
-        public bool DeletePending { get; set; }
 
         [UsedImplicitly]
         public ReplayGainInfo()
-        { }
+        {
+            ID = Guid.NewGuid();
+            TrackGain = 0;
+            PeakAmplitude = 0;
+        }
 
         public ReplayGainInfo(float peakAmp, float gain)
         {
@@ -39,11 +43,16 @@ namespace osu.Game.Audio
                 return false;
         }
 
+        public bool isDefault()
+        {
+            if(TrackGain == 0 && PeakAmplitude == 0)
+                return true;
+            return false;
+        }
+
         public bool Equals(IReplayGainInfo other) => other is ReplayGainInfo b && Equals(b);
 
-        //public ReplayGainInfo Clone() => (ReplayGainInfo)this.Detach().MemberwiseClone();
-
-        public ReplayGainInfo Clone()
+        public ReplayGainInfo DeepClone()
         {
             return new ReplayGainInfo()
             {

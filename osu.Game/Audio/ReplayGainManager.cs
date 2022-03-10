@@ -26,7 +26,7 @@ namespace osu.Game.Audio
             audioMixer = audioManager.TrackMixer;
         }
 
-        public void AddReplayGain(ReplayGainInfo info)
+        public void AddReplayGain(IReplayGainInfo info)
         {
             if (Math.Pow(10, (info.TrackGain / 20)) * info.PeakAmplitude >= 1)
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Audio
             {
                 foreach (BeatmapInfo beatmap in bSetInfo.Beatmaps)
                 {
-                    if (beatmap.ReplayGainInfo == null && beatmap.AudioEquals(beatmapInfo))
+                    if ((beatmap.ReplayGainInfo == null || beatmap.ReplayGainInfo.isDefault()) && beatmap.AudioEquals(beatmapInfo))
                     {
                         beatmap.ReplayGainInfo = beatmapInfo.ReplayGainInfo;
                     }

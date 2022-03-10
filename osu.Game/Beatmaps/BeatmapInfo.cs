@@ -37,11 +37,13 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; } = null!;
 
+        public ReplayGainInfo ReplayGainInfo { get; set; }  =  null!;
+
         [JsonIgnore]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
-        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null)
+        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null,  ReplayGainInfo? replayGainInfo = null)
         {
             ID = Guid.NewGuid();
             Ruleset = ruleset ?? new RulesetInfo
@@ -52,6 +54,7 @@ namespace osu.Game.Beatmaps
             };
             Difficulty = difficulty ?? new BeatmapDifficulty();
             Metadata = metadata ?? new BeatmapMetadata();
+            ReplayGainInfo = replayGainInfo ?? new ReplayGainInfo();
         }
 
         [UsedImplicitly]
@@ -71,7 +74,7 @@ namespace osu.Game.Beatmaps
             set => StatusInt = (int)value;
         }
 
-        public ReplayGainInfo? ReplayGainInfo { get; set; }
+        
 
         [MapTo(nameof(Status))]
         public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
@@ -152,7 +155,7 @@ namespace osu.Game.Beatmaps
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
-        IReplayGainInfo? IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
+        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
 
         #region Compatibility properties
 
