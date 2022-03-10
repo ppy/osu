@@ -104,14 +104,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBeatmapRevertedOnExitIfNoSelection()
         {
-            BeatmapInfo selectedBeatmap = null;
+            BeatmapInfo initialBeatmap = null;
 
-            AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.Where(beatmap => beatmap.Ruleset.OnlineID == new OsuRuleset().LegacyID).ElementAt(1)));
-            AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
+            AddStep("get current beatmap", () => initialBeatmap = songSelect.Beatmap.Value.BeatmapInfo);
+
+            AddStep("select next and enter", () => InputManager.Key(Key.Down));
+            AddUntilStep("ensure selection changed", () => !songSelect.Beatmap.Value.BeatmapInfo.Equals(initialBeatmap));
 
             AddStep("exit song select", () => songSelect.Exit());
-            AddAssert("beatmap reverted", () => Beatmap.IsDefault);
+            AddUntilStep("beatmap reverted", () => songSelect.Beatmap.Value.BeatmapInfo.Equals(initialBeatmap));
         }
 
         [Test]
