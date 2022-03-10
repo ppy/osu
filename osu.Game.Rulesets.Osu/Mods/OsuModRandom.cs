@@ -35,18 +35,18 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             rng = new Random((int)Seed.Value);
 
-            var positionModifier = new OsuHitObjectPositionModifier(osuBeatmap.HitObjects);
+            var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
 
             float rateOfChangeMultiplier = 0;
 
-            foreach (var positionInfo in positionModifier.ObjectPositionInfos)
+            foreach (var positionInfo in positionInfos)
             {
                 // rateOfChangeMultiplier only changes every 5 iterations in a combo
                 // to prevent shaky-line-shaped streams
                 if (positionInfo.HitObject.IndexInCurrentCombo % 5 == 0)
                     rateOfChangeMultiplier = (float)rng.NextDouble() * 2 - 1;
 
-                if (positionInfo == positionModifier.ObjectPositionInfos.First())
+                if (positionInfo == positionInfos.First())
                 {
                     positionInfo.DistanceFromPrevious = (float)rng.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2;
                     positionInfo.RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 }
             }
 
-            positionModifier.ApplyModifications();
+            osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
         }
     }
 }
