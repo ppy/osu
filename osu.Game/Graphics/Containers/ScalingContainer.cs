@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Screens;
@@ -38,23 +39,23 @@ namespace osu.Game.Graphics.Containers
 
         private BackgroundScreenStack backgroundStack;
 
-        private bool allowScaling = true;
+        private RectangleF? customRect;
+        private bool customRectIsRelativePosition;
 
         /// <summary>
-        /// Whether user scaling preferences should be applied. Enabled by default.
+        /// Set a custom position and scale which overrides any user specification.
         /// </summary>
-        public bool AllowScaling
+        /// <param name="rect">A rectangle with positional and sizing information for this container to conform to. <c>null</c> will clear the custom rect and revert to user settings.</param>
+        /// <param name="relativePosition">Whether the position portion of the provided rect is in relative coordinate space or not.</param>
+        public void SetCustomRect(RectangleF? rect, bool relativePosition = false)
         {
-            get => allowScaling;
-            set
-            {
-                if (value == allowScaling)
-                    return;
+            customRect = rect;
+            customRectIsRelativePosition = relativePosition;
 
-                allowScaling = value;
-                if (IsLoaded) Scheduler.AddOnce(updateSize);
-            }
+            if (IsLoaded) Scheduler.AddOnce(updateSize);
         }
+
+        private const float corner_radius = 10;
 
         /// <summary>
         /// Create a new instance.
@@ -69,7 +70,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
-                CornerRadius = 10,
+                CornerRadius = corner_radius,
                 Child = content = new ScalingDrawSizePreservingFillContainer(targetMode != ScalingMode.Gameplay)
             };
         }
@@ -137,7 +138,7 @@ namespace osu.Game.Graphics.Containers
 
         private void updateSize()
         {
-            const float fade_time = 500;
+            const float duration = 500;
 
             if (targetMode == ScalingMode.Everything)
             {
@@ -156,17 +157,31 @@ namespace osu.Game.Graphics.Containers
                         backgroundStack.Push(new ScalingBackgroundScreen());
                     }
 
-                    backgroundStack.FadeIn(fade_time);
+                    backgroundStack.FadeIn(duration);
                 }
                 else
-                    backgroundStack?.FadeOut(fade_time);
+                    backgroundStack?.FadeOut(duration);
             }
 
-            bool scaling = AllowScaling && (targetMode == null || scalingMode.Value == targetMode);
+            RectangleF targetRect = new RectangleF(Vector2.Zero, Vector2.One);
 
-            var targetSize = scaling ? new Vector2(sizeX.Value, sizeY.Value) : Vector2.One;
-            var targetPosition = scaling ? new Vector2(posX.Value, posY.Value) * (Vector2.One - targetSize) : Vector2.Zero;
-            bool requiresMasking = (scaling && targetSize != Vector2.One)
+            if (customRect != null)
+            {
+                sizableContainer.RelativePositionAxes = customRectIsRelativePosition ? Axes.Both : Axes.None;
+
+                targetRect = customRect.Value;
+            }
+            else if (targetMode == null || scalingMode.Value == targetMode)
+            {
+                sizableContainer.RelativePositionAxes = Axes.Both;
+
+                Vector2 scale = new Vector2(sizeX.Value, sizeY.Value);
+                Vector2 pos = new Vector2(posX.Value, posY.Value) * (Vector2.One - scale);
+
+                targetRect = new RectangleF(pos, scale);
+            }
+
+            bool requiresMasking = targetRect.Size != Vector2.One
                                    // For the top level scaling container, for now we apply masking if safe areas are in use.
                                    // In the future this can likely be removed as more of the actual UI supports overflowing into the safe areas.
                                    || (targetMode == ScalingMode.Everything && safeAreaPadding.Value.Total != Vector2.Zero);
@@ -174,8 +189,14 @@ namespace osu.Game.Graphics.Containers
             if (requiresMasking)
                 sizableContainer.Masking = true;
 
-            sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
-            sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+            sizableContainer.MoveTo(targetRect.Location, duration, Easing.OutQuart);
+            sizableContainer.ResizeTo(targetRect.Size, duration, Easing.OutQuart);
+
+            // Of note, this will not work great in the case of nested ScalingContainers where multiple are applying corner radius.
+            // Masking and corner radius should likely only be applied at one point in the full game stack to fix this.
+            // An example of how this can occur is when the skin editor is visible and the game screen scaling is set to "Everything".
+            sizableContainer.TransformTo(nameof(CornerRadius), requiresMasking ? corner_radius : 0, duration, requiresMasking ? Easing.OutQuart : Easing.None)
+                            .OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault

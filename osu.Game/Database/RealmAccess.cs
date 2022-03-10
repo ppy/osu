@@ -3,25 +3,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
-using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
+using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -53,8 +56,9 @@ namespace osu.Game.Database
         /// 11   2021-11-22    Use ShortName instead of RulesetID for ruleset key bindings.
         /// 12   2021-11-24    Add Status to RealmBeatmapSet.
         /// 13   2022-01-13    Final migration of beatmaps and scores to realm (multiple new storage fields).
+        /// 14   2022-03-01    Added BeatmapUserSettings to BeatmapInfo.
         /// </summary>
-        private const int schema_version = 13;
+        private const int schema_version = 14;
 
         /// <summary>
         /// Lock object which is held during <see cref="BlockAllOperations"/> sections, blocking realm retrieval during blocking periods.
@@ -85,6 +89,14 @@ namespace osu.Game.Database
 
         private static readonly GlobalStatistic<int> total_subscriptions = GlobalStatistics.Get<int>(@"Realm", @"Subscriptions");
 
+        private static readonly GlobalStatistic<int> total_reads_update = GlobalStatistics.Get<int>(@"Realm", @"Reads (Update)");
+
+        private static readonly GlobalStatistic<int> total_reads_async = GlobalStatistics.Get<int>(@"Realm", @"Reads (Async)");
+
+        private static readonly GlobalStatistic<int> total_writes_update = GlobalStatistics.Get<int>(@"Realm", @"Writes (Update)");
+
+        private static readonly GlobalStatistic<int> total_writes_async = GlobalStatistics.Get<int>(@"Realm", @"Writes (Async)");
+
         private readonly object realmLock = new object();
 
         private Realm? updateRealm;
@@ -92,6 +104,8 @@ namespace osu.Game.Database
         private bool isSendingNotificationResetEvents;
 
         public Realm Realm => ensureUpdateRealm();
+
+        private const string realm_extension = @".realm";
 
         private Realm ensureUpdateRealm()
         {
@@ -137,10 +151,17 @@ namespace osu.Game.Database
 
             Filename = filename;
 
-            const string realm_extension = @".realm";
-
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
+
+            string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
+
+            // Attempt to recover a newer database version if available.
+            if (storage.Exists(newerVersionFilename))
+            {
+                Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
+                attemptRecoverFromFile(newerVersionFilename);
+            }
 
             try
             {
@@ -149,13 +170,76 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+                // See https://github.com/realm/realm-core/blob/master/src%2Frealm%2Fobject-store%2Fobject_store.cpp#L1016-L1022
+                // This is the best way we can detect a schema version downgrade.
+                if (e.Message.StartsWith(@"Provided schema version", StringComparison.Ordinal))
+                {
+                    Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
-                storage.Delete(Filename);
+                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    if (!storage.Exists(newerVersionFilename))
+                        CreateBackup(newerVersionFilename);
+
+                    storage.Delete(Filename);
+                }
+                else
+                {
+                    Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+                    CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                    storage.Delete(Filename);
+                }
 
                 cleanupPendingDeletions();
             }
+        }
+
+        private void attemptRecoverFromFile(string recoveryFilename)
+        {
+            Logger.Log($@"Performing recovery from {recoveryFilename}", LoggingTarget.Database);
+
+            // First check the user hasn't started to use the database that is in place..
+            try
+            {
+                using (var realm = Realm.GetInstance(getConfiguration()))
+                {
+                    if (realm.All<ScoreInfo>().Any())
+                    {
+                        Logger.Log(@"Recovery aborted as the existing database has scores set already.", LoggingTarget.Database);
+                        Logger.Log(@"To perform recovery, delete client.realm while osu! is not running.", LoggingTarget.Database);
+                        return;
+                    }
+                }
+            }
+            catch
+            {
+                // Even if reading the in place database fails, still attempt to recover.
+            }
+
+            // Then check that the database we are about to attempt recovery can actually be recovered on this version..
+            try
+            {
+                using (Realm.GetInstance(getConfiguration(recoveryFilename)))
+                {
+                    // Don't need to do anything, just check that opening the realm works correctly.
+                }
+            }
+            catch
+            {
+                Logger.Log(@"Recovery aborted as the newer version could not be loaded by this osu! version.", LoggingTarget.Database);
+                return;
+            }
+
+            // For extra safety, also store the temporarily-used database which we are about to replace.
+            CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
+
+            storage.Delete(Filename);
+
+            using (var inputStream = storage.GetStream(recoveryFilename))
+            using (var outputStream = storage.GetStream(Filename, FileAccess.Write, FileMode.Create))
+                inputStream.CopyTo(outputStream);
+
+            storage.Delete(recoveryFilename);
+            Logger.Log(@"Recovery complete!", LoggingTarget.Database);
         }
 
         private void cleanupPendingDeletions()
@@ -213,8 +297,12 @@ namespace osu.Game.Database
         public T Run<T>(Func<Realm, T> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_reads_update.Value++;
                 return action(Realm);
+            }
 
+            total_reads_async.Value++;
             using (var realm = getRealmInstance())
                 return action(realm);
         }
@@ -226,9 +314,13 @@ namespace osu.Game.Database
         public void Run(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_reads_update.Value++;
                 action(Realm);
+            }
             else
             {
+                total_reads_async.Value++;
                 using (var realm = getRealmInstance())
                     action(realm);
             }
@@ -241,12 +333,28 @@ namespace osu.Game.Database
         public void Write(Action<Realm> action)
         {
             if (ThreadSafety.IsUpdateThread)
+            {
+                total_writes_update.Value++;
                 Realm.Write(action);
+            }
             else
             {
+                total_writes_async.Value++;
+
                 using (var realm = getRealmInstance())
                     realm.Write(action);
             }
+        }
+
+        /// <summary>
+        /// Write changes to realm asynchronously, guaranteeing order of execution.
+        /// </summary>
+        /// <param name="action">The work to run.</param>
+        public async Task WriteAsync(Action<Realm> action)
+        {
+            total_writes_async.Value++;
+            using (var realm = getRealmInstance())
+                await realm.WriteAsync(action);
         }
 
         /// <summary>
@@ -281,6 +389,66 @@ namespace osu.Game.Database
                 // Store an action which is used when blocking to ensure consumers don't use results of a stale changeset firing.
                 notificationsResetMap.Add(action, () => callback(new EmptyRealmSet<T>(), null, null));
                 return RegisterCustomSubscription(action);
+            }
+        }
+
+        /// <summary>
+        /// Subscribe to the property of a realm object to watch for changes.
+        /// </summary>
+        /// <remarks>
+        /// On subscribing, unless the <paramref name="modelAccessor"/> does not match an object, an initial invocation of <paramref name="onChanged"/> will occur immediately.
+        /// Further invocations will occur when the value changes, but may also fire on a realm recycle with no actual value change.
+        /// </remarks>
+        /// <param name="modelAccessor">A function to retrieve the relevant model from realm.</param>
+        /// <param name="propertyLookup">A function to traverse to the relevant property from the model.</param>
+        /// <param name="onChanged">A function to be invoked when a change of value occurs.</param>
+        /// <typeparam name="TModel">The type of the model.</typeparam>
+        /// <typeparam name="TProperty">The type of the property to be watched.</typeparam>
+        /// <returns>
+        /// A subscription token. It must be kept alive for as long as you want to receive change notifications.
+        /// To stop receiving notifications, call <see cref="IDisposable.Dispose"/>.
+        /// </returns>
+        public IDisposable SubscribeToPropertyChanged<TModel, TProperty>(Func<Realm, TModel?> modelAccessor, Expression<Func<TModel, TProperty>> propertyLookup, Action<TProperty> onChanged)
+            where TModel : RealmObjectBase
+        {
+            return RegisterCustomSubscription(r =>
+            {
+                string propertyName = getMemberName(propertyLookup);
+
+                var model = Run(modelAccessor);
+                var propLookupCompiled = propertyLookup.Compile();
+
+                if (model == null)
+                    return null;
+
+                model.PropertyChanged += onPropertyChanged;
+
+                // Update initial value immediately.
+                onChanged(propLookupCompiled(model));
+
+                return new InvokeOnDisposal(() => model.PropertyChanged -= onPropertyChanged);
+
+                void onPropertyChanged(object sender, PropertyChangedEventArgs args)
+                {
+                    if (args.PropertyName == propertyName)
+                        onChanged(propLookupCompiled(model));
+                }
+            });
+
+            static string getMemberName(Expression<Func<TModel, TProperty>> expression)
+            {
+                if (!(expression is LambdaExpression lambda))
+                    throw new ArgumentException("Outermost expression must be a lambda expression", nameof(expression));
+
+                if (!(lambda.Body is MemberExpression memberExpression))
+                    throw new ArgumentException("Lambda body must be a member access expression", nameof(expression));
+
+                // TODO: nested access can be supported, with more iteration here
+                // (need to iteratively soft-cast `memberExpression.Expression` into `MemberExpression`s until `lambda.Parameters[0]` is hit)
+                if (memberExpression.Expression != lambda.Parameters[0])
+                    throw new ArgumentException("Nested access expressions are not supported", nameof(expression));
+
+                return memberExpression.Member.Name;
             }
         }
 
@@ -380,7 +548,7 @@ namespace osu.Game.Database
             }
         }
 
-        private RealmConfiguration getConfiguration()
+        private RealmConfiguration getConfiguration(string? filename = null)
         {
             // This is currently the only usage of temporary files at the osu! side.
             // If we use the temporary folder in more situations in the future, this should be moved to a higher level (helper method or OsuGameBase).
@@ -388,7 +556,7 @@ namespace osu.Game.Database
             if (!Directory.Exists(tempPathLocation))
                 Directory.CreateDirectory(tempPathLocation);
 
-            return new RealmConfiguration(storage.GetFullPath(Filename, true))
+            return new RealmConfiguration(storage.GetFullPath(filename ?? Filename, true))
             {
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
@@ -530,6 +698,11 @@ namespace osu.Game.Database
                             newItem.RulesetName = rulesetName;
                     }
 
+                    break;
+
+                case 14:
+                    foreach (var beatmap in migration.NewRealm.All<BeatmapInfo>())
+                        beatmap.UserSettings = new BeatmapUserSettings();
                     break;
             }
         }

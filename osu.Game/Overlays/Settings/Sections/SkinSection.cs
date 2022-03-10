@@ -134,6 +134,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateSelectedSkinFromConfig()
         {
+            if (!skinDropdown.Items.Any())
+                return;
+
             Live<SkinInfo> skin = null;
 
             if (Guid.TryParse(configBindable.Value, out var configId))
