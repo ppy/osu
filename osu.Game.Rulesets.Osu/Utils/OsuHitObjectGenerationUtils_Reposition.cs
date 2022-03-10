@@ -23,14 +23,14 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE / 2;
 
         /// <summary>
-        /// Generate a list of <see cref="IObjectPositionInfo"/>s containing information for how the given list of
+        /// Generate a list of <see cref="ObjectPositionInfo"/>s containing information for how the given list of
         /// <see cref="OsuHitObject"/>s are positioned.
         /// </summary>
         /// <param name="hitObjects">A list of <see cref="OsuHitObject"/>s to process.</param>
-        /// <returns>A list of <see cref="IObjectPositionInfo"/>s describing how each hit object is positioned relative to the previous one.</returns>
-        public static List<IObjectPositionInfo> GeneratePositionInfos(IEnumerable<OsuHitObject> hitObjects)
+        /// <returns>A list of <see cref="ObjectPositionInfo"/>s describing how each hit object is positioned relative to the previous one.</returns>
+        public static List<ObjectPositionInfo> GeneratePositionInfos(IEnumerable<OsuHitObject> hitObjects)
         {
-            var positionInfos = new List<IObjectPositionInfo>();
+            var positionInfos = new List<ObjectPositionInfo>();
             Vector2 previousPosition = playfield_centre;
             float previousAngle = 0;
 
@@ -56,12 +56,12 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <summary>
         /// Reposition the hit objects according to the information in <paramref name="objectPositionInfos"/>.
         /// </summary>
-        /// <param name="objectPositionInfos"></param>
+        /// <param name="objectPositionInfos">Position information for each hit object.</param>
         /// <returns>The repositioned hit objects.</returns>
-        public static List<OsuHitObject> RepositionHitObjects(IEnumerable<IObjectPositionInfo> objectPositionInfos)
+        public static List<OsuHitObject> RepositionHitObjects(IEnumerable<ObjectPositionInfo> objectPositionInfos)
         {
-            List<ObjectPositionInfo> positionInfos = objectPositionInfos.Cast<ObjectPositionInfo>().ToList();
-            ObjectPositionInfo? previous = null;
+            List<ObjectPositionInfoInternal> positionInfos = objectPositionInfos.Select(o => new ObjectPositionInfoInternal(o)).ToList();
+            ObjectPositionInfoInternal? previous = null;
 
             for (int i = 0; i < positionInfos.Count; i++)
             {
@@ -115,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <summary>
         /// Compute the modified position of a hit object while attempting to keep it inside the playfield.
         /// </summary>
-        /// <param name="current">The <see cref="ObjectPositionInfo"/> representing the hit object to have the modified position computed for.</param>
-        /// <param name="previous">The <see cref="ObjectPositionInfo"/> representing the hit object immediately preceding the current one.</param>
-        /// <param name="beforePrevious">The <see cref="ObjectPositionInfo"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
-        private static void computeModifiedPosition(ObjectPositionInfo current, ObjectPositionInfo? previous, ObjectPositionInfo? beforePrevious)
+        /// <param name="current">The <see cref="ObjectPositionInfoInternal"/> representing the hit object to have the modified position computed for.</param>
+        /// <param name="previous">The <see cref="ObjectPositionInfoInternal"/> representing the hit object immediately preceding the current one.</param>
+        /// <param name="beforePrevious">The <see cref="ObjectPositionInfoInternal"/> representing the hit object immediately preceding the <paramref name="previous"/> one.</param>
+        private static void computeModifiedPosition(ObjectPositionInfoInternal current, ObjectPositionInfoInternal? previous, ObjectPositionInfoInternal? beforePrevious)
         {
             float previousAbsoluteAngle = 0f;
 
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Move the modified position of a hit circle so that it fits inside the playfield.
         /// </summary>
         /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
-        private static Vector2 clampHitCircleToPlayfield(HitCircle circle, ObjectPositionInfo objectPositionInfo)
+        private static Vector2 clampHitCircleToPlayfield(HitCircle circle, ObjectPositionInfoInternal objectPositionInfo)
         {
             var previousPosition = objectPositionInfo.PositionModified;
             objectPositionInfo.EndPositionModified = objectPositionInfo.PositionModified = clampToPlayfieldWithPadding(
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
         /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
-        private static Vector2 clampSliderToPlayfield(Slider slider, ObjectPositionInfo objectPositionInfo)
+        private static Vector2 clampSliderToPlayfield(Slider slider, ObjectPositionInfoInternal objectPositionInfo)
         {
             var possibleMovementBounds = calculatePossibleMovementBounds(slider);
 
@@ -286,7 +286,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             );
         }
 
-        public interface IObjectPositionInfo
+        public class ObjectPositionInfo
         {
             /// <summary>
             /// The jump angle from the previous hit object to this one, relative to the previous hit object's jump angle.
@@ -298,7 +298,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             /// If <see cref="RelativeAngle"/> is 0, the player's cursor doesn't need to change its direction of movement when passing
             /// the previous object to reach this one.
             /// </example>
-            float RelativeAngle { get; set; }
+            public float RelativeAngle { get; set; }
 
             /// <summary>
             /// The jump distance from the previous hit object to this one.
@@ -306,31 +306,32 @@ namespace osu.Game.Rulesets.Osu.Utils
             /// <remarks>
             /// <see cref="DistanceFromPrevious"/> of the first hit object in a beatmap is relative to the playfield center.
             /// </remarks>
-            float DistanceFromPrevious { get; set; }
-
-            /// <summary>
-            /// The hit object associated with this <see cref="IObjectPositionInfo"/>.
-            /// </summary>
-            OsuHitObject HitObject { get; }
-        }
-
-        private class ObjectPositionInfo : IObjectPositionInfo
-        {
-            public float RelativeAngle { get; set; }
-
             public float DistanceFromPrevious { get; set; }
 
-            public Vector2 PositionOriginal { get; }
-            public Vector2 PositionModified { get; set; }
-            public Vector2 EndPositionModified { get; set; }
-
+            /// <summary>
+            /// The hit object associated with this <see cref="ObjectPositionInfo"/>.
+            /// </summary>
             public OsuHitObject HitObject { get; }
 
             public ObjectPositionInfo(OsuHitObject hitObject)
             {
-                PositionModified = PositionOriginal = hitObject.Position;
-                EndPositionModified = hitObject.EndPosition;
                 HitObject = hitObject;
+            }
+        }
+
+        private class ObjectPositionInfoInternal : ObjectPositionInfo
+        {
+            public Vector2 PositionOriginal { get; }
+            public Vector2 PositionModified { get; set; }
+            public Vector2 EndPositionModified { get; set; }
+
+            public ObjectPositionInfoInternal(ObjectPositionInfo original)
+                : base(original.HitObject)
+            {
+                RelativeAngle = original.RelativeAngle;
+                DistanceFromPrevious = original.DistanceFromPrevious;
+                PositionModified = PositionOriginal = HitObject.Position;
+                EndPositionModified = HitObject.EndPosition;
             }
         }
     }
