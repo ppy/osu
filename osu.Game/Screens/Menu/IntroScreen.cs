@@ -209,14 +209,15 @@ namespace osu.Game.Screens.Menu
             // we also handle the exit transition.
             if (MenuVoice.Value)
             {
-                // ensure samples have been updated after resume before playing.
-                ScheduleAfterChildren(() =>
+                if (skinnableSeeya != null)
                 {
-                    if (skinnableSeeya != null)
-                        skinnableSeeya.Play();
-                    else
-                        seeya.Play();
-                });
+                    // resuming a screen (i.e. calling OnResume) happens before the screen itself becomes alive,
+                    // therefore skinnable samples may not be updated yet with the recently selected skin.
+                    // schedule after children to ensure skinnable samples have processed skin changes before playing.
+                    ScheduleAfterChildren(() => skinnableSeeya.Play());
+                }
+                else
+                    seeya.Play();
 
                 // if playing the outro voice, we have more time to have fun with the background track.
                 // initially fade to almost silent then ramp out over the remaining time.
