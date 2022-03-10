@@ -102,5 +102,4 @@ namespace osu.Game.Online.API
             public int GetHashCode(KeyValuePair<string, object> obj) => HashCode.Combine(obj.Key, ModUtils.GetSettingUnderlyingValue(obj.Value));
         }
     }
-
 }
