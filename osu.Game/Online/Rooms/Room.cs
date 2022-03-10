@@ -10,12 +10,11 @@ using osu.Game.IO.Serialization.Converters;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms.RoomStatuses;
-using osu.Game.Utils;
 
 namespace osu.Game.Online.Rooms
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class Room : IDeepCloneable<Room>
+    public class Room
     {
         [Cached]
         [JsonProperty("id")]
@@ -151,22 +150,6 @@ namespace osu.Game.Online.Rooms
         public Room()
         {
             Password.BindValueChanged(p => HasPassword.Value = !string.IsNullOrEmpty(p.NewValue));
-        }
-
-        /// <summary>
-        /// Create a copy of this room without online information.
-        /// Should be used to create a local copy of a room for submitting in the future.
-        /// </summary>
-        public Room DeepClone()
-        {
-            var copy = new Room();
-
-            copy.CopyFrom(this);
-
-            // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
-            copy.RoomID.Value = null;
-
-            return copy;
         }
 
         public void CopyFrom(Room other)

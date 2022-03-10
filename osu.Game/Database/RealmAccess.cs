@@ -105,6 +105,8 @@ namespace osu.Game.Database
 
         public Realm Realm => ensureUpdateRealm();
 
+        private const string realm_extension = @".realm";
+
         private Realm ensureUpdateRealm()
         {
             if (isSendingNotificationResetEvents)
@@ -149,10 +151,17 @@ namespace osu.Game.Database
 
             Filename = filename;
 
-            const string realm_extension = @".realm";
-
             if (!Filename.EndsWith(realm_extension, StringComparison.Ordinal))
                 Filename += realm_extension;
+
+            string newerVersionFilename = $"{Filename.Replace(realm_extension, string.Empty)}_newer_version{realm_extension}";
+
+            // Attempt to recover a newer database version if available.
+            if (storage.Exists(newerVersionFilename))
+            {
+                Logger.Log(@"A newer realm database has been found, attempting recovery...", LoggingTarget.Database);
+                attemptRecoverFromFile(newerVersionFilename);
+            }
 
             try
             {
@@ -161,13 +170,76 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+                // See https://github.com/realm/realm-core/blob/master/src%2Frealm%2Fobject-store%2Fobject_store.cpp#L1016-L1022
+                // This is the best way we can detect a schema version downgrade.
+                if (e.Message.StartsWith(@"Provided schema version", StringComparison.Ordinal))
+                {
+                    Logger.Error(e, "Your local database is too new to work with this version of osu!. Please close osu! and install the latest release to recover your data.");
 
-                CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
-                storage.Delete(Filename);
+                    // If a newer version database already exists, don't backup again. We can presume that the first backup is the one we care about.
+                    if (!storage.Exists(newerVersionFilename))
+                        CreateBackup(newerVersionFilename);
+
+                    storage.Delete(Filename);
+                }
+                else
+                {
+                    Logger.Error(e, "Realm startup failed with unrecoverable error; starting with a fresh database. A backup of your database has been made.");
+                    CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_corrupt{realm_extension}");
+                    storage.Delete(Filename);
+                }
 
                 cleanupPendingDeletions();
             }
+        }
+
+        private void attemptRecoverFromFile(string recoveryFilename)
+        {
+            Logger.Log($@"Performing recovery from {recoveryFilename}", LoggingTarget.Database);
+
+            // First check the user hasn't started to use the database that is in place..
+            try
+            {
+                using (var realm = Realm.GetInstance(getConfiguration()))
+                {
+                    if (realm.All<ScoreInfo>().Any())
+                    {
+                        Logger.Log(@"Recovery aborted as the existing database has scores set already.", LoggingTarget.Database);
+                        Logger.Log(@"To perform recovery, delete client.realm while osu! is not running.", LoggingTarget.Database);
+                        return;
+                    }
+                }
+            }
+            catch
+            {
+                // Even if reading the in place database fails, still attempt to recover.
+            }
+
+            // Then check that the database we are about to attempt recovery can actually be recovered on this version..
+            try
+            {
+                using (Realm.GetInstance(getConfiguration(recoveryFilename)))
+                {
+                    // Don't need to do anything, just check that opening the realm works correctly.
+                }
+            }
+            catch
+            {
+                Logger.Log(@"Recovery aborted as the newer version could not be loaded by this osu! version.", LoggingTarget.Database);
+                return;
+            }
+
+            // For extra safety, also store the temporarily-used database which we are about to replace.
+            CreateBackup($"{Filename.Replace(realm_extension, string.Empty)}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}_newer_version_before_recovery{realm_extension}");
+
+            storage.Delete(Filename);
+
+            using (var inputStream = storage.GetStream(recoveryFilename))
+            using (var outputStream = storage.GetStream(Filename, FileAccess.Write, FileMode.Create))
+                inputStream.CopyTo(outputStream);
+
+            storage.Delete(recoveryFilename);
+            Logger.Log(@"Recovery complete!", LoggingTarget.Database);
         }
 
         private void cleanupPendingDeletions()
@@ -476,7 +548,7 @@ namespace osu.Game.Database
             }
         }
 
-        private RealmConfiguration getConfiguration()
+        private RealmConfiguration getConfiguration(string? filename = null)
         {
             // This is currently the only usage of temporary files at the osu! side.
             // If we use the temporary folder in more situations in the future, this should be moved to a higher level (helper method or OsuGameBase).
@@ -484,7 +556,7 @@ namespace osu.Game.Database
             if (!Directory.Exists(tempPathLocation))
                 Directory.CreateDirectory(tempPathLocation);
 
-            return new RealmConfiguration(storage.GetFullPath(Filename, true))
+            return new RealmConfiguration(storage.GetFullPath(filename ?? Filename, true))
             {
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
