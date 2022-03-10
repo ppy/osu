@@ -42,8 +42,6 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float TextSize => 20;
 
-        private Container lineHighlightBackground;
-
         private Color4 usernameColour;
 
         private OsuSpriteText timestamp;
@@ -146,15 +144,6 @@ namespace osu.Game.Overlays.Chat
 
             InternalChildren = new Drawable[]
             {
-                lineHighlightBackground = new Container
-                {
-                    Alpha = 0f,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = usernameColour.Darken(1f),
-                    CornerRadius = 2f,
-                    Masking = true,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                },
                 new Container
                 {
                     Size = new Vector2(MessagePadding, TextSize),
@@ -214,13 +203,29 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
+        private Container highlight;
+
         /// <summary>
-        /// Schedules a message highlight animation.
+        /// Performs a highlight animation on this <see cref="ChatLine"/>.
         /// </summary>
-        /// <remarks>
-        /// Scheduling is required to ensure the animation doesn't play until the chat line is in view and not scrolled away.
-        /// </remarks>
-        public void ScheduleHighlight() => Schedule(() => lineHighlightBackground.FadeTo(0.5f).FadeOut(1500, Easing.InQuint));
+        public void Highlight()
+        {
+            if (highlight?.IsAlive != true)
+            {
+                AddInternal(highlight = new Container
+                {
+                    CornerRadius = 2f,
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = usernameColour.Darken(1f),
+                    Depth = float.MaxValue,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                });
+            }
+
+            highlight.FadeTo(0.5f).FadeOut(1500, Easing.InQuint);
+            highlight.Expire();
+        }
 
         private void updateMessageContent()
         {
