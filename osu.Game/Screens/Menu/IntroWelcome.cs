@@ -100,13 +100,13 @@ namespace osu.Game.Screens.Menu
 
         private class WelcomeIntroSequence : Container
         {
-            private Sprite welcomeText;
+            private Drawable welcomeText;
             private Container scaleContainer;
 
             public LogoVisualisation LogoVisualisation { get; private set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(TextureStore textures, IAPIProvider api)
             {
                 Origin = Anchor.Centre;
                 Anchor = Anchor.Centre;
@@ -135,15 +135,17 @@ namespace osu.Game.Screens.Menu
                                 Size = new Vector2(480),
                                 Colour = Color4.Black
                             },
-                            welcomeText = new Sprite
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Texture = textures.Get(@"Intro/Welcome/welcome_text")
-                            },
                         }
                     },
                 };
+
+                if (api.LocalUser.Value.IsSupporter)
+                    scaleContainer.Add(welcomeText = new SkinnableSprite(@"Intro/Welcome/welcome_text"));
+                else
+                    scaleContainer.Add(welcomeText = new Sprite { Texture = textures.Get(@"Intro/Welcome/welcome_text") });
+
+                welcomeText.Anchor = Anchor.Centre;
+                welcomeText.Origin = Anchor.Centre;
             }
 
             protected override void LoadComplete()
