@@ -175,7 +175,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.StartGameplay();
         });
 
-        private void onResultsReady() => resultsReady.SetResult(true);
+        private void onResultsReady() => Scheduler.Add(() =>
+        {
+            resultsReady.SetResult(true);
+        });
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {
