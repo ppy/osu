@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
-                        new InputDrum(HitObjectContainer)
+                        new InputDrum()
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
-                // new DrumTouchInputArea(this),
+                new DrumSamplePlayer(HitObjectContainer),
             };
 
             RegisterPool<Hit, DrawableHit>(50);

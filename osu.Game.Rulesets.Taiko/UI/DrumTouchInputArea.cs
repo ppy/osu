@@ -10,9 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -25,11 +23,9 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class DrumTouchInputArea : Container
     {
         // The percent of the drum that extends past the bottom of the screen (set to 0.0f to show the full drum)
-        private const float overhangPercent = 0.33f;
-        private readonly InputDrum touchInputDrum;
-
-        [Resolved(canBeNull: true)]
-        private TaikoInputManager taikoInputManager { get; set; }
+        private const float overhangPercent = 0.35f;
+        private InputDrum touchInputDrum;
+        private Circle  drumBackground;
 
         private KeyBindingContainer<TaikoAction> keyBindingContainer;
 
@@ -39,55 +35,55 @@ namespace osu.Game.Rulesets.Taiko.UI
         // A map of (Finger Index OnTouchDown -> Which Taiko action was pressed), so that the corresponding action can be released OnTouchUp is released even if the touch position moved
         private Dictionary<TouchSource, TaikoAction> touchActions = new Dictionary<TouchSource, TaikoAction>(Enum.GetNames(typeof(TouchSource)).Length);
 
-        private Playfield playfield;
-
-        public DrumTouchInputArea(Playfield playfield) {
-            this.playfield = playfield;
-
+        public DrumTouchInputArea() {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Children = new Drawable[]
             {
-                new Box() {
-                    Alpha = 0.0f,
-                    Colour = new OsuColour().Blue,
-
-                    RelativeSizeAxes = Axes.Both,
-                    RelativePositionAxes = Axes.Both,
-                },
                 new Container() {
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
-
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-
                     Children = new Drawable[]
                     {
-                        touchInputDrum = new InputDrum(playfield.HitObjectContainer) {
+                        drumBackground = new Circle() {
+                            RelativeSizeAxes = Axes.Both,
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            FillMode = FillMode.Fit,
+                            Alpha = 0.9f,
+                        },
+                        touchInputDrum = new InputDrum() {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                     }
                 },
             };
-
         }
+
         protected override void LoadComplete()
         {
-            keyBindingContainer = taikoInputManager?.KeyBindingContainer;
-
             Padding = new MarginPadding {
-                Top =  playfield.ScreenSpaceDrawQuad.BottomLeft.Y,
-                Bottom = -DrawHeight * overhangPercent,
+                Top = TaikoPlayfield.DEFAULT_HEIGHT * 2f, // Visual elements should start right below the playfield
+                Bottom = -touchInputDrum.DrawHeight * overhangPercent, // The drum should go past the bottom of the screen so that it can be wider
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TaikoInputManager taikoInputManager, OsuColour colours)
+        {
+            keyBindingContainer = taikoInputManager?.KeyBindingContainer;
+            drumBackground.Colour = colours.Gray0;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             mouseAction = getTaikoActionFromInput(e.ScreenSpaceMouseDownPosition);
             keyBindingContainer?.TriggerPressed(mouseAction);
-            return base.OnMouseDown(e);
+            return true;
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
@@ -99,20 +95,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             TaikoAction taikoAction = getTaikoActionFromInput(e.ScreenSpaceTouchDownPosition);
-            if (touchActions.ContainsKey(e.Touch.Source)) {
-                touchActions[e.Touch.Source] = taikoAction;
-            }
-            else {
-                touchActions.Add(e.Touch.Source, taikoAction);
-            }
+            touchActions.Add(e.Touch.Source, taikoAction);
             keyBindingContainer?.TriggerPressed(touchActions[e.Touch.Source]);
 
-            return base.OnTouchDown(e);
+            return true;
         }
 
         protected override void OnTouchUp(TouchUpEvent e)
         {
             keyBindingContainer?.TriggerReleased(touchActions[e.Touch.Source]);
+            touchActions.Remove(e.Touch.Source);
             base.OnTouchUp(e);
         }
 
