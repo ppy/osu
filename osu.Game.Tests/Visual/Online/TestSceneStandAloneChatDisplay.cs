@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             int index = 0;
 
-            fillChat();
+            fillChat(100);
 
             AddStep("highlight first message", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = 0]);
             AddStep("highlight next message", () => testChannel.HighlightedMessage.Value = testChannel.Messages[index = Math.Min(index + 1, testChannel.Messages.Count - 1)]);
@@ -304,11 +304,11 @@ namespace osu.Game.Tests.Visual.Online
             checkScrolledToBottom();
         }
 
-        private void fillChat()
+        private void fillChat(int count = 10)
         {
             AddStep("fill chat", () =>
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < count; i++)
                 {
                     testChannel.AddNewMessages(new Message(messageIdSequence++)
                     {
