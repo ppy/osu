@@ -27,6 +27,7 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Select;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -34,8 +35,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
     {
         private BeatmapManager manager;
         private RulesetStore rulesets;
-
-        private List<BeatmapInfo> beatmaps;
 
         private TestMultiplayerMatchSongSelect songSelect;
 
@@ -45,8 +44,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
-
-            beatmaps = new List<BeatmapInfo>();
 
             var metadata = new BeatmapMetadata
             {
@@ -79,7 +76,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Difficulty = new BeatmapDifficulty()
                 };
 
-                beatmaps.Add(beatmap);
                 beatmapSetInfo.Beatmaps.Add(beatmap);
             }
 
@@ -140,7 +136,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddStep("change ruleset", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
             AddStep("select beatmap",
-                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
+                () => songSelect.Carousel.SelectBeatmap(selectedBeatmap = manager.GetAllUsableBeatmapSets().First().Beatmaps.First(beatmap => beatmap.Ruleset.OnlineID == new TaikoRuleset().LegacyID)));
             AddUntilStep("wait for selection", () => Beatmap.Value.BeatmapInfo.Equals(selectedBeatmap));
             AddStep("set mods", () => SelectedMods.Value = new[] { new TaikoModDoubleTime() });
 
