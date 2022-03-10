@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -307,23 +308,20 @@ namespace osu.Game.Overlays
         /// Highlights a certain message in the specified channel.
         /// </summary>
         /// <param name="message">The message to highlight.</param>
-        public void HighlightMessage(Message message)
+        /// <param name="channel">The channel containing the message.</param>
+        public void HighlightMessage(Message message, Channel channel)
         {
-            Channel targetChannel;
+            Debug.Assert(channel.Id == message.ChannelId);
 
-            if (channelManager.CurrentChannel.Value.Id == message.ChannelId)
-                targetChannel = channelManager.CurrentChannel.Value;
-            else
+            if (currentChannel.Value.Id != channel.Id)
             {
-                targetChannel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == message.ChannelId);
+                if (!channel.Joined.Value)
+                    channel = channelManager.JoinChannel(channel);
 
-                if (targetChannel != null)
-                    channelManager.CurrentChannel.Value = targetChannel;
-                else
-                    targetChannel = channelManager.JoinChannel(channelManager.AvailableChannels.SingleOrDefault(c => c.Id == message.ChannelId), true);
+                channelManager.CurrentChannel.Value = channel;
             }
 
-            targetChannel.HighlightedMessage.Value = message;
+            channel.HighlightedMessage.Value = message;
         }
 
         private float startDragChatHeight;
