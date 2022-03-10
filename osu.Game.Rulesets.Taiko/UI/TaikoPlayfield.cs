@@ -144,6 +144,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
+                // new DrumTouchInputArea(this),
             };
 
             RegisterPool<Hit, DrawableHit>(50);
