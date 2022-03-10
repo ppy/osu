@@ -109,12 +109,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition) {
-            bool leftSide = inputIsOnLeftSide(inputPosition);
             bool centreHit = inputIsCenterHit(inputPosition);
+            bool leftSide = inputIsOnLeftSide(inputPosition);
 
-            return leftSide ?
-                (centreHit ? TaikoAction.LeftCentre : TaikoAction.LeftRim) :
-                (centreHit ? TaikoAction.RightCentre : TaikoAction.RightRim);
+            return centreHit ?
+                (leftSide ? TaikoAction.LeftCentre : TaikoAction.RightCentre) :
+                (leftSide ? TaikoAction.LeftRim : TaikoAction.RightRim);
         }
 
         private bool inputIsOnLeftSide(Vector2 inputPosition) {
