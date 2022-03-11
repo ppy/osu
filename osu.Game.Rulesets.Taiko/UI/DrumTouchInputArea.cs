@@ -119,7 +119,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             return false;
         }
 
-
         public void ShowTouchControls() {
             visibleComponents.Animate(components => components.FadeIn(500, Easing.OutQuint));
         }
