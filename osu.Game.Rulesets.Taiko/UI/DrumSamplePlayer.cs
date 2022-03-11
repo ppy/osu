@@ -10,13 +10,15 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    internal class DrumSamplePlayer : Container, IKeyBindingHandler<TaikoAction> {
+    internal class DrumSamplePlayer : Container, IKeyBindingHandler<TaikoAction>
+    {
         private DrumSampleTriggerSource leftRimSampleTriggerSource;
         private DrumSampleTriggerSource leftCentreSampleTriggerSource;
         private DrumSampleTriggerSource rightCentreSampleTriggerSource;
         private DrumSampleTriggerSource rightRimSampleTriggerSource;
 
-        public DrumSamplePlayer(HitObjectContainer hitObjectContainer) {
+        public DrumSamplePlayer(HitObjectContainer hitObjectContainer)
+        {
             Children = new Drawable[]
             {
                 leftRimSampleTriggerSource = new DrumSampleTriggerSource(hitObjectContainer),
