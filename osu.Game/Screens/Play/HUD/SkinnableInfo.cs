@@ -4,11 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -34,6 +38,8 @@ namespace osu.Game.Screens.Play.HUD
         /// <inheritdoc cref="ISkinnableDrawable.UsesFixedAnchor"/>
         public bool UsesFixedAnchor { get; set; }
 
+        public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
+
         public List<SkinnableInfo> Children { get; } = new List<SkinnableInfo>();
 
         [JsonConstructor]
@@ -57,6 +63,14 @@ namespace osu.Game.Screens.Play.HUD
 
             if (component is ISkinnableDrawable skinnable)
                 UsesFixedAnchor = skinnable.UsesFixedAnchor;
+
+            foreach (var (_, property) in component.GetSettingsSourceProperties())
+            {
+                var bindable = (IBindable)property.GetValue(component);
+
+                if (!bindable.IsDefault)
+                    Settings.Add(property.Name.Underscore(), ModUtils.GetSettingUnderlyingValue(bindable));
+            }
 
             if (component is Container<Drawable> container)
             {
