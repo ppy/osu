@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -76,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             });
 
             // todo: this should be implemented via a custom HUD implementation, and correctly masked to the main content area.
-            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(ScoreProcessor, users), l =>
+            LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(GameplayState.Ruleset.RulesetInfo, ScoreProcessor, users), l =>
             {
                 if (!LoadedBeatmapSuccessfully)
                     return;
@@ -171,11 +172,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         private void onMatchStarted() => Scheduler.Add(() =>
         {
+            if (!this.IsCurrentScreen())
+                return;
+
             loadingDisplay.Hide();
             base.StartGameplay();
         });
 
-        private void onResultsReady() => resultsReady.SetResult(true);
+        private void onResultsReady()
+        {
+            // Schedule is required to ensure that `TaskCompletionSource.SetResult` is not called more than once.
+            // A scenario where this can occur is if this instance is not immediately disposed (ie. async disposal queue).
+            Schedule(() =>
+            {
+                if (!this.IsCurrentScreen())
+                    return;
+
+                resultsReady.SetResult(true);
+            });
+        }
 
         protected override async Task PrepareScoreForResultsAsync(Score score)
         {

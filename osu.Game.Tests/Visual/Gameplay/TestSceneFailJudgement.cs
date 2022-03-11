@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for multiple judgements", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits > 1);
             AddAssert("total number of results == 1", () =>
             {
-                var score = new ScoreInfo();
+                var score = new ScoreInfo { Ruleset = Ruleset.Value };
 
                 ((FailPlayer)Player).ScoreProcessor.PopulateScore(score);
 
