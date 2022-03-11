@@ -10,14 +10,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.OnlinePlay.Match.Components;
+using osu.Game.Screens.Play;
+using osu.Game.Screens.Select;
+using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -41,6 +47,12 @@ namespace osu.Game.Skinning.Editor
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
         private bool hasBegunMutating;
 
@@ -104,6 +116,47 @@ namespace osu.Game.Skinning.Editor
                                 RelativeSizeAxes = Axes.Y,
                             },
                         },
+                    },
+                    new FillFlowContainer
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Y = 45,
+                        Height = 30,
+                        Name = "Scene library",
+                        Spacing = new Vector2(10),
+                        Padding = new MarginPadding(10),
+                        Direction = FillDirection.Horizontal,
+                        Children = new Drawable[]
+                        {
+                            new PurpleTriangleButton
+                            {
+                                Text = "Song Select",
+                                Width = 100,
+                                Height = 30,
+                                Action = () => game?.PerformFromScreen(screen =>
+                                {
+                                    if (screen is SongSelect)
+                                        return;
+
+                                    screen.Push(new PlaySongSelect());
+                                }, new[] { typeof(SongSelect) })
+                            },
+                            new PurpleTriangleButton
+                            {
+                                Text = "Gameplay",
+                                Width = 100,
+                                Height = 30,
+                                Action = () => game?.PerformFromScreen(screen =>
+                                {
+                                    if (screen is Player)
+                                        return;
+
+                                    var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+                                    if (replayGeneratingMod != null)
+                                        screen.Push(new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods)));
+                                }, new[] { typeof(Player) })
+                            },
+                        }
                     },
                     new GridContainer
                     {
