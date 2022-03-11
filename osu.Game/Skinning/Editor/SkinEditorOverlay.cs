@@ -101,9 +101,11 @@ namespace osu.Game.Skinning.Editor
 
         private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)
         {
+            const float toolbar_padding_requirement = 0.18f;
+
             if (visibility.NewValue == Visibility.Visible)
             {
-                target.SetCustomRect(new RectangleF(0.18f, 0.1f, VISIBLE_TARGET_SCALE, VISIBLE_TARGET_SCALE), true);
+                target.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
             }
             else
             {
