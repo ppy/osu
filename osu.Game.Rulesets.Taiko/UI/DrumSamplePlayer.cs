@@ -28,21 +28,20 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public bool OnPressed(KeyBindingPressEvent<TaikoAction> e)
         {
-            if (e.Action == TaikoAction.LeftRim)
+            switch (e.Action)
             {
-                leftRimSampleTriggerSource.Play(HitType.Rim);
-            }
-            else if (e.Action == TaikoAction.LeftCentre)
-            {
-                leftCentreSampleTriggerSource.Play(HitType.Centre);
-            }
-            else if (e.Action == TaikoAction.RightCentre)
-            {
-                rightCentreSampleTriggerSource.Play(HitType.Centre);
-            }
-            else if (e.Action == TaikoAction.RightRim)
-            {
-                rightRimSampleTriggerSource.Play(HitType.Rim);
+                case TaikoAction.LeftRim:
+                    leftRimSampleTriggerSource.Play(HitType.Rim);
+                    break;
+                case TaikoAction.LeftCentre:
+                    leftCentreSampleTriggerSource.Play(HitType.Centre);
+                    break;
+                case TaikoAction.RightCentre:
+                    rightCentreSampleTriggerSource.Play(HitType.Centre);
+                    break;
+                case TaikoAction.RightRim:
+                    rightRimSampleTriggerSource.Play(HitType.Rim);
+                    break;
             }
 
             return false;
