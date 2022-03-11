@@ -23,9 +23,6 @@ namespace osu.Game.Audio
         [UsedImplicitly]
         public ReplayGainInfo()
         {
-            ID = Guid.NewGuid();
-            TrackGain = 0;
-            PeakAmplitude = 0;
         }
 
         public ReplayGainInfo(float peakAmp, float gain)

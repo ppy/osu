@@ -65,7 +65,8 @@ namespace osu.Game.Database
                          {
                              ID = beatmap.ID,
                              BeatmapSet = d,
-                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)
+                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName),
+                             ReplayGainInfo = d.Realm.Find<ReplayGainInfo>(beatmap.ReplayGainInfo.ID)
                          };
                          d.Beatmaps.Add(newBeatmap);
                          copyChangesToRealm(beatmap, newBeatmap);

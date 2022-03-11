@@ -18,11 +18,19 @@ namespace osu.Game.Audio
         public double Gain { get; private set; }
         public ReplayGainImplementation(ITrackStore storeParameter, string filePath)
         {
-            using (Stream fileData = storeParameter.GetStream(filePath))
+            if(filePath != null)
             {
-                fileData.Seek(0, SeekOrigin.Begin);
-                FileCallbacks fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(fileData));
-                calculateValues(fileCallbacks);
+                using (Stream fileData = storeParameter.GetStream(filePath))
+                {
+                    fileData.Seek(0, SeekOrigin.Begin);
+                    FileCallbacks fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(fileData));
+                    calculateValues(fileCallbacks);
+                }
+            }
+            else
+            {
+                PeakAmp = 0;
+                Gain = 0;
             }
         }
 
@@ -179,25 +187,32 @@ namespace osu.Game.Audio
             }
 
             Bass.StreamFree(decodeStream);
-
-            //peak to peak range and peak amplitude
-            double range = max - min;
-            PeakAmp = max > Math.Abs(min) ? max : Math.Abs(min);
-
-            double[] dbRms = new double[listRms.Count];
-
-            //db conversion for the loudness selection (ReplayGain 1.0)
-            for (int i = 0; i < listRms.Count; i++)
+            if(listRms.Count != 0)
             {
-                dbRms[i] = 20 * Math.Log10(2 * listRms[i] / range);
+                //peak to peak range and peak amplitude
+                double range = max - min;
+                PeakAmp = max > Math.Abs(min) ? max : Math.Abs(min);
+
+                double[] dbRms = new double[listRms.Count];
+
+                //db conversion for the loudness selection (ReplayGain 1.0)
+                for (int i = 0; i < listRms.Count; i++)
+                {
+                    dbRms[i] = 20 * Math.Log10(2 * listRms[i] / range);
+                }
+
+                //find the 95th percentile as perceived loudness (ReplayGain 1.0)
+                Array.Sort(dbRms);
+                int index = (int)(0.95f * dbRms.Length);
+                double loudness = dbRms[index];
+
+                Gain = reference_loudness - loudness;
             }
-
-            //find the 95th percentile as perceived loudness (ReplayGain 1.0)
-            Array.Sort(dbRms);
-            int index = (int)(0.95f * dbRms.Length);
-            double loudness = dbRms[index];
-
-            Gain = reference_loudness - loudness;
+            else
+            {
+                PeakAmp = 0;
+                Gain = 0;
+            }
         }
     }
 }

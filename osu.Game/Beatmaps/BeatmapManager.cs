@@ -61,7 +61,7 @@ namespace osu.Game.Beatmaps
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            ReplayGainManager = new ReplayGainManager(BeatmapTrackStore, audioManager);
+            ReplayGainManager = new ReplayGainManager(BeatmapTrackStore, audioManager, new RealmFileStore(realm, storage));
             beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue, ReplayGainManager);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);

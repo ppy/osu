@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             };
             Difficulty = difficulty ?? new BeatmapDifficulty();
             Metadata = metadata ?? new BeatmapMetadata();
-            ReplayGainInfo = replayGainInfo ?? new ReplayGainInfo();
+            ReplayGainInfo = replayGainInfo ?? new ReplayGainInfo() { ID = Guid.NewGuid(), PeakAmplitude = 0, TrackGain = 0};
         }
 
         [UsedImplicitly]

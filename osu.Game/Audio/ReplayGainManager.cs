@@ -12,6 +12,8 @@ using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Mixing;
+using osu.Framework.Platform;
+using osu.Game.Stores;
 
 namespace osu.Game.Audio
 {
@@ -19,11 +21,13 @@ namespace osu.Game.Audio
     {
         private ITrackStore trackStore;
         private AudioMixer audioMixer;
+        private RealmFileStore storage;
 
-        public ReplayGainManager(ITrackStore trackStore, AudioManager audioManager)
+        public ReplayGainManager(ITrackStore trackStore, AudioManager audioManager, RealmFileStore storage)
         {
             this.trackStore = trackStore;
             audioMixer = audioManager.TrackMixer;
+            this.storage = storage;
         }
 
         public void AddReplayGain(IReplayGainInfo info)
@@ -67,22 +71,35 @@ namespace osu.Game.Audio
 
         public ReplayGainInfo generateReplayGainInfo(BeatmapInfo info, BeatmapSetInfo setInfo)
         {
-            string filePath = "";
-            try
+            string audiofile = info?.Metadata?.AudioFile;
+            if (audiofile != null && audiofile != "")
             {
-                filePath = setInfo.GetPathForFile(info?.Metadata?.AudioFile);
-                string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"osu", @"files");
-                filePath = Path.Combine(folderPath, filePath);
+                string filePath = "";
+                try
+                {
+                    filePath = setInfo.GetPathForFile(info?.Metadata?.AudioFile);
+                    if (filePath != null)
+                        filePath = storage.Storage.GetFullPath(filePath);
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+
+                ReplayGainImplementation replayGainImplementation = new ReplayGainImplementation(trackStore, filePath);
+                ReplayGainInfo replayGain = new ReplayGainInfo((float)replayGainImplementation.PeakAmp, (float)replayGainImplementation.Gain);
+
+                return replayGain;
             }
-            catch (Exception e)
+            else
             {
-                Debug.WriteLine(e);
+                return new ReplayGainInfo()
+                {
+                    ID = Guid.NewGuid(),
+                    TrackGain = 0,
+                    PeakAmplitude = 0,
+                };
             }
-
-            ReplayGainImplementation replayGainImplementation = new ReplayGainImplementation(trackStore, filePath);
-            ReplayGainInfo replayGain = new ReplayGainInfo((float)replayGainImplementation.PeakAmp, (float)replayGainImplementation.Gain);
-
-            return replayGain;
         }
 
         internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo bSetInfo)

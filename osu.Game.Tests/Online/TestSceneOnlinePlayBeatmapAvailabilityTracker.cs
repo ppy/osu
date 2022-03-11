@@ -130,8 +130,12 @@ namespace osu.Game.Tests.Online
             AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
-            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
-            AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
+            AddStep("allow importing", () =>
+            beatmaps.AllowImport.SetResult(true)
+            );
+            AddUntilStep("wait for import", () =>
+            beatmaps.CurrentImport != null
+            );
             AddAssert("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
         }
