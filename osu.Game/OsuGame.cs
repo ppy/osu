@@ -1142,8 +1142,6 @@ namespace osu.Game
 
         private void screenChanged(IScreen current, IScreen newScreen)
         {
-            skinEditor.Reset();
-
             switch (newScreen)
             {
                 case IntroScreen intro:
@@ -1185,6 +1183,8 @@ namespace osu.Game
                 else
                     BackButton.Hide();
             }
+
+            skinEditor.SetTarget((Screen)newScreen);
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
