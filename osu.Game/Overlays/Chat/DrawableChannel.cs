@@ -93,9 +93,7 @@ namespace osu.Game.Overlays.Chat
         /// <summary>
         /// Processes any pending message in <see cref="highlightedMessage"/>.
         /// </summary>
-        /// <remarks>
-        /// <see cref="CompositeDrawable.ScheduleAfterChildren"/> is for ensuring the scroll flow has updated with any new chat lines.
-        /// </remarks>
+        // ScheduleAfterChildren is for ensuring the scroll flow has updated with any new chat lines.
         private void processMessageHighlighting() => SchedulerAfterChildren.AddOnce(() =>
         {
             if (highlightedMessage.Value == null)
