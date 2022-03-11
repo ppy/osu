@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reload skin editor", () =>
             {
                 skinEditor?.Expire();
-                Player.ScaleTo(SkinEditorOverlay.VISIBLE_TARGET_SCALE);
+                Player.ScaleTo(0.8f);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
         }

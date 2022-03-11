@@ -114,7 +114,7 @@ namespace osu.Game.Skinning.Editor
 
             if (skinEditor.State.Value == Visibility.Visible)
             {
-                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.2f, 0.8f - toolbar_padding_requirement, 0.7f), true);
 
                 game?.Toolbar.Hide();
                 game?.CloseAllOverlays();
