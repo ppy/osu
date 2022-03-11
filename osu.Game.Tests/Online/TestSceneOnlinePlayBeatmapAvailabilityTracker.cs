@@ -17,6 +17,7 @@ using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
@@ -214,17 +215,17 @@ namespace osu.Game.Tests.Online
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue, ReplayGainManager manager)
             {
-                return new TestBeatmapModelManager(this, storage, realm, onlineLookupQueue);
+                return new TestBeatmapModelManager(this, storage, realm, onlineLookupQueue, manager);
             }
 
             internal class TestBeatmapModelManager : BeatmapModelManager
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
-                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue, ReplayGainManager  manager)
+                    : base(databaseAccess, storage, beatmapOnlineLookupQueue, manager)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }

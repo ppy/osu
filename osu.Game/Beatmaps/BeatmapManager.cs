@@ -77,9 +77,6 @@ namespace osu.Game.Beatmaps
         protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue, ReplayGainManager replayGainManager) =>
             new BeatmapModelManager(realm, storage, onlineBeatmapLookupQueue, replayGainManager);
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapModelManager(realm, storage, onlineLookupQueue);
-
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
         /// with a single difficulty which is backed by a <see cref="BeatmapInfo"/> model
