@@ -35,12 +35,15 @@ namespace osu.Game.Rulesets.Taiko.UI
         // A map of (Finger Index OnTouchDown -> Which Taiko action was pressed), so that the corresponding action can be released OnTouchUp is released even if the touch position moved
         private Dictionary<TouchSource, TaikoAction> touchActions = new Dictionary<TouchSource, TaikoAction>(Enum.GetNames(typeof(TouchSource)).Length);
 
+        private Container visibleComponents;
+
         public DrumTouchInputArea() {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Children = new Drawable[]
             {
-                new Container() {
+                visibleComponents = new Container() {
+                    Alpha = 0.0f,
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
                     Anchor = Anchor.BottomCentre,
@@ -81,6 +84,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            ShowTouchControls();
             mouseAction = getTaikoActionFromInput(e.ScreenSpaceMouseDownPosition);
             keyBindingContainer?.TriggerPressed(mouseAction);
             return true;
@@ -94,6 +98,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool OnTouchDown(TouchDownEvent e)
         {
+            ShowTouchControls();
             TaikoAction taikoAction = getTaikoActionFromInput(e.ScreenSpaceTouchDownPosition);
             touchActions.Add(e.Touch.Source, taikoAction);
             keyBindingContainer?.TriggerPressed(touchActions[e.Touch.Source]);
@@ -106,6 +111,21 @@ namespace osu.Game.Rulesets.Taiko.UI
             keyBindingContainer?.TriggerReleased(touchActions[e.Touch.Source]);
             touchActions.Remove(e.Touch.Source);
             base.OnTouchUp(e);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            HideTouchControls();
+            return false;
+        }
+
+
+        public void ShowTouchControls() {
+            visibleComponents.Animate(components => components.FadeIn(500, Easing.OutQuint));
+        }
+
+        public void HideTouchControls() {
+            visibleComponents.Animate(components => components.FadeOut(2000, Easing.OutQuint));
         }
 
         private TaikoAction getTaikoActionFromInput(Vector2 inputPosition) {
