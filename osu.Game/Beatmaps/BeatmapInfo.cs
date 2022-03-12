@@ -197,9 +197,6 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => this.GetDisplayTitle();
 
-        //[JsonIgnore]
-        //IReplayGainInfo IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
-
         #endregion
     }
 }

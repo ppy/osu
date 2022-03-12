@@ -30,15 +30,13 @@ namespace osu.Game.Beatmaps
         /// </summary>
         IBeatmapDifficultyInfo Difficulty { get; }
 
-        //IReplayGainInfo ReplayGainInfo { get; }
-
         /// <summary>
         /// The beatmap set this beatmap is part of.
         /// </summary>
         IBeatmapSetInfo? BeatmapSet { get; }
 
         /// <summary>
-        /// The info required to apply replay gain to the audio
+        /// The info required to apply loudness correction to the audio
         /// </summary>
         IReplayGainInfo ReplayGainInfo { get; }
 
