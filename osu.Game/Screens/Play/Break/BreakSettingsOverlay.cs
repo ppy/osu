@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.Break
                 Margin = new MarginPadding { Top = 100, Right = 10 },
                 Children = new PlayerSettingsGroup[]
                 {
-                    new VisualSettings { Expanded = false }
+                    new VisualSettings()// { Expanded = false }
                 }
             };
         }
