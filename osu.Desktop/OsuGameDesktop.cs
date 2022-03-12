@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -104,6 +105,11 @@ namespace osu.Desktop
 
             switch (RuntimeInfo.OS)
             {
+                //case RuntimeInfo.Platform.Windows:
+                //    Debug.Assert(OperatingSystem.IsWindows());
+
+                //    return new SquirrelUpdateManager();
+
                 default:
                     return new SimpleUpdateManager();
             }

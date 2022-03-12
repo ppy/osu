@@ -17,7 +17,9 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Spectator;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
@@ -41,6 +43,7 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private UserLookupCache userLookupCache { get; set; }
 
+        private readonly RulesetInfo ruleset;
         private readonly ScoreProcessor scoreProcessor;
         private readonly MultiplayerRoomUser[] playingUsers;
         private Bindable<ScoringMode> scoringMode;
@@ -52,11 +55,13 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Construct a new leaderboard.
         /// </summary>
+        /// <param name="ruleset">The ruleset.</param>
         /// <param name="scoreProcessor">A score processor instance to handle score calculation for scores of users in the match.</param>
         /// <param name="users">IDs of all users in this match.</param>
-        public MultiplayerGameplayLeaderboard(ScoreProcessor scoreProcessor, MultiplayerRoomUser[] users)
+        public MultiplayerGameplayLeaderboard(RulesetInfo ruleset, ScoreProcessor scoreProcessor, MultiplayerRoomUser[] users)
         {
             // todo: this will eventually need to be created per user to support different mod combinations.
+            this.ruleset = ruleset;
             this.scoreProcessor = scoreProcessor;
 
             playingUsers = users;
@@ -69,7 +74,7 @@ namespace osu.Game.Screens.Play.HUD
 
             foreach (var user in playingUsers)
             {
-                var trackedUser = CreateUserData(user, scoreProcessor);
+                var trackedUser = CreateUserData(user, ruleset, scoreProcessor);
                 trackedUser.ScoringMode.BindTo(scoringMode);
                 UserScores[user.UserID] = trackedUser;
 
@@ -119,7 +124,7 @@ namespace osu.Game.Screens.Play.HUD
             spectatorClient.OnNewFrames += handleIncomingFrames;
         }
 
-        protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor) => new TrackedUserData(user, scoreProcessor);
+        protected virtual TrackedUserData CreateUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor) => new TrackedUserData(user, ruleset, scoreProcessor);
 
         protected override GameplayLeaderboardScore CreateLeaderboardScoreDrawable(APIUser user, bool isTracked)
         {
@@ -222,8 +227,12 @@ namespace osu.Game.Screens.Play.HUD
 
             public int? Team => (User.MatchState as TeamVersusUserState)?.TeamID;
 
-            public TrackedUserData(MultiplayerRoomUser user, ScoreProcessor scoreProcessor)
+            private readonly RulesetInfo ruleset;
+
+            public TrackedUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor)
             {
+                this.ruleset = ruleset;
+
                 User = user;
                 ScoreProcessor = scoreProcessor;
 
@@ -244,7 +253,13 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var header = frame.Header;
 
-                Score.Value = ScoreProcessor.GetImmediateScore(ScoringMode.Value, header.MaxCombo, header.Statistics);
+                Score.Value = ScoreProcessor.ComputePartialScore(ScoringMode.Value, new ScoreInfo
+                {
+                    Ruleset = ruleset,
+                    MaxCombo = header.MaxCombo,
+                    Statistics = header.Statistics
+                });
+
                 Accuracy.Value = header.Accuracy;
                 CurrentCombo.Value = header.Combo;
             }

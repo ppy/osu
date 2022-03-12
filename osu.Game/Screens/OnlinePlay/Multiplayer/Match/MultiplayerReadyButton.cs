@@ -67,7 +67,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(_ => updateState());
+            CurrentPlaylistItem.BindValueChanged(_ => updateState());
         }
 
         protected override void OnRoomUpdated()
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             bool enableButton =
                 Room?.State == MultiplayerRoomState.Open
-                && SelectedItem.Value?.ID == Room.Settings.PlaylistItemId
+                && CurrentPlaylistItem.Value?.ID == Room.Settings.PlaylistItemId
                 && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
                 && !operationInProgress.Value;
 

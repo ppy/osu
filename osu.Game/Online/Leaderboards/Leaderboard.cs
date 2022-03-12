@@ -22,6 +22,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Localisation;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -311,25 +312,28 @@ namespace osu.Game.Online.Leaderboards
             switch (state)
             {
                 case LeaderboardState.NetworkFailure:
-                    return new ClickablePlaceholder(@"无法获取分数！", FontAwesome.Solid.Sync)
+                    return new ClickablePlaceholder(LeaderboardStrings.CouldntFetchScores, FontAwesome.Solid.Sync)
                     {
                         Action = RefetchScores
                     };
 
                 case LeaderboardState.NoneSelected:
-                    return new MessagePlaceholder(@"请先选择一张地图！");
+                    return new MessagePlaceholder(LeaderboardStrings.PleaseSelectABeatmap);
 
-                case LeaderboardState.Unavailable:
-                    return new MessagePlaceholder(@"排行榜不可用！");
+                case LeaderboardState.RulesetUnavailable:
+                    return new MessagePlaceholder(LeaderboardStrings.LeaderboardsAreNotAvailableForThisRuleset);
+
+                case LeaderboardState.BeatmapUnavailable:
+                    return new MessagePlaceholder(LeaderboardStrings.LeaderboardsAreNotAvailableForThisBeatmap);
 
                 case LeaderboardState.NoScores:
-                    return new MessagePlaceholder(@"暂无记录！");
+                    return new MessagePlaceholder(LeaderboardStrings.NoRecordsYet);
 
                 case LeaderboardState.NotLoggedIn:
-                    return new LoginPlaceholder(@"请先登录再查看排行榜！");
+                    return new LoginPlaceholder(LeaderboardStrings.PleaseSignInToViewOnlineLeaderboards);
 
                 case LeaderboardState.NotSupporter:
-                    return new MessagePlaceholder(@"你需要成为osu!supporter才能查看此排行！");
+                    return new MessagePlaceholder(LeaderboardStrings.PleaseInvestInAnOsuSupporterTagToViewThisLeaderboard);
 
                 case LeaderboardState.Retrieving:
                     return null;

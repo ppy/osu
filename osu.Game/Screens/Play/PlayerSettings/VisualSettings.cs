@@ -15,7 +15,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox showStoryboardToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapColorsToggle;
-        private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public VisualSettings()
             : base("视觉效果设置")
@@ -44,8 +43,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "故事版 / 背景视频" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "谱面皮肤" },
-                beatmapColorsToggle = new PlayerCheckbox { LabelText = "谱面颜色" },
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "谱面击打音效" }
+                beatmapColorsToggle = new PlayerCheckbox { LabelText = "谱面颜色" }
             };
         }
 
@@ -57,7 +55,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
             showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
             beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
             beatmapColorsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapColours);
-            beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
         }
     }
 }

@@ -197,6 +197,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModNoScope(),
                         new ModNoDrain(),
                         new OsuModAimAssist(),
+                        new ModAdaptiveSpeed()
                     };
 
                 case ModType.System:
@@ -281,6 +282,17 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
                         new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
@@ -305,6 +317,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
                         }), true)
                     }

@@ -8,6 +8,7 @@ using Humanizer;
 using MessagePack;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -42,7 +43,7 @@ namespace osu.Game.Online.API
                 var bindable = (IBindable)property.GetValue(mod);
 
                 if (!bindable.IsDefault)
-                    Settings.Add(property.Name.Underscore(), bindable);
+                    Settings.Add(property.Name.Underscore(), ModUtils.GetSettingUnderlyingValue(bindable));
             }
         }
 
@@ -51,7 +52,10 @@ namespace osu.Game.Online.API
             Mod resultMod = ruleset.CreateModFromAcronym(Acronym);
 
             if (resultMod == null)
-                throw new InvalidOperationException($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
+            {
+                Logger.Log($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
+                return new UnknownMod(Acronym);
+            }
 
             if (Settings.Count > 0)
             {

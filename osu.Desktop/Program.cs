@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Desktop.LegacyIpc;
@@ -12,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Game.Tournament;
+using Squirrel;
 
 namespace osu.Desktop
 {
@@ -24,6 +26,10 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            // run Squirrel first, as the app may exit after these run
+            if (OperatingSystem.IsWindows())
+                setupSquirrel();
+
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
 
@@ -102,6 +108,23 @@ namespace osu.Desktop
                 else
                     host.Run(new OsuGameDesktop(args));
             }
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void setupSquirrel()
+        {
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
+            {
+                tools.CreateShortcutForThisExe();
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUninstall: (version, tools) =>
+            {
+                tools.RemoveShortcutForThisExe();
+                tools.RemoveUninstallerRegistryEntry();
+            }, onEveryRun: (version, tools, firstRun) =>
+            {
+                tools.SetProcessAppUserModelId();
+            });
         }
 
         private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;

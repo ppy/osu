@@ -73,6 +73,8 @@ namespace osu.Game.Screens.Play
 
         protected VisualSettings VisualSettings { get; private set; }
 
+        protected AudioSettings AudioSettings { get; private set; }
+
         protected Task LoadTask { get; private set; }
 
         protected Task DisposalTask { get; private set; }
@@ -154,6 +156,8 @@ namespace osu.Game.Screens.Play
             config.BindWith(MSetting.OptUI, optui);
             batteryWarningShownOnce = sessionStatics.GetBindable<bool>(Static.LowBatteryNotificationShownOnce);
 
+            const float padding = 25;
+
             InternalChildren = new Drawable[]
             {
                 (content = new LogoTrackingContainer
@@ -169,19 +173,27 @@ namespace osu.Game.Screens.Play
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
+                    new OsuScrollContainer
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Margin = new MarginPadding(25),
-                        Children = new PlayerSettingsGroup[]
+                        RelativeSizeAxes = Axes.Y,
+                        Width = SettingsToolboxGroup.CONTAINER_WIDTH + padding * 2,
+                        Padding = new MarginPadding { Vertical = padding },
+                        Masking = false,
+                        Child = PlayerSettings = new FillFlowContainer<PlayerSettingsGroup>
                         {
-                            VisualSettings = new VisualSettings(),
-                            new InputSettings()
-                        }
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 20),
+                            Padding = new MarginPadding { Horizontal = padding },
+                            Children = new PlayerSettingsGroup[]
+                            {
+                                VisualSettings = new VisualSettings(),
+                                AudioSettings = new AudioSettings(),
+                                new InputSettings()
+                            }
+                        },
                     },
                     idleTracker = new IdleTracker(750),
                 }),
@@ -253,6 +265,10 @@ namespace osu.Game.Screens.Play
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            var lastScore = player.Score;
+
+            AudioSettings.ReferenceScore.Value = lastScore?.ScoreInfo;
 
             // prepare for a retry.
             player = null;

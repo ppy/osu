@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
@@ -17,22 +18,33 @@ namespace osu.Game.Tests.Visual.Ranking
 {
     public class TestSceneHitEventTimingDistributionGraph : OsuTestScene
     {
+        private HitEventTimingDistributionGraph graph;
+
+        private static readonly HitObject placeholder_object = new HitCircle();
+
         [Test]
         public void TestManyDistributedEvents()
         {
             createTest(CreateDistributedHitEvents());
+            AddStep("add adjustment", () => graph.UpdateOffset(10));
+        }
+
+        [Test]
+        public void TestManyDistributedEventsOffset()
+        {
+            createTest(CreateDistributedHitEvents(-3.5));
         }
 
         [Test]
         public void TestAroundCentre()
         {
-            createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
+            createTest(Enumerable.Range(-150, 300).Select(i => new HitEvent(i / 50f, HitResult.Perfect, placeholder_object, placeholder_object, null)).ToList());
         }
 
         [Test]
         public void TestZeroTimeOffset()
         {
-            createTest(Enumerable.Range(0, 100).Select(_ => new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null)).ToList());
+            createTest(Enumerable.Range(0, 100).Select(_ => new HitEvent(0, HitResult.Perfect, placeholder_object, placeholder_object, null)).ToList());
         }
 
         [Test]
@@ -47,9 +59,9 @@ namespace osu.Game.Tests.Visual.Ranking
             createTest(Enumerable.Range(0, 100).Select(i =>
             {
                 if (i % 2 == 0)
-                    return new HitEvent(0, HitResult.Perfect, new HitCircle(), new HitCircle(), null);
+                    return new HitEvent(0, HitResult.Perfect, placeholder_object, placeholder_object, null);
 
-                return new HitEvent(30, HitResult.Miss, new HitCircle(), new HitCircle(), null);
+                return new HitEvent(30, HitResult.Miss, placeholder_object, placeholder_object, null);
             }).ToList());
         }
 
@@ -62,7 +74,7 @@ namespace osu.Game.Tests.Visual.Ranking
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4Extensions.FromHex("#333")
                 },
-                new HitEventTimingDistributionGraph(events)
+                graph = new HitEventTimingDistributionGraph(events)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -71,16 +83,16 @@ namespace osu.Game.Tests.Visual.Ranking
             };
         });
 
-        public static List<HitEvent> CreateDistributedHitEvents()
+        public static List<HitEvent> CreateDistributedHitEvents(double centre = 0, double range = 25)
         {
             var hitEvents = new List<HitEvent>();
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < range * 2; i++)
             {
-                int count = (int)(Math.Pow(25 - Math.Abs(i - 25), 2));
+                int count = (int)(Math.Pow(range - Math.Abs(i - range), 2)) / 10;
 
                 for (int j = 0; j < count; j++)
-                    hitEvents.Add(new HitEvent(i - 25, HitResult.Perfect, new HitCircle(), new HitCircle(), null));
+                    hitEvents.Add(new HitEvent(centre + i - range, HitResult.Perfect, placeholder_object, placeholder_object, null));
             }
 
             return hitEvents;

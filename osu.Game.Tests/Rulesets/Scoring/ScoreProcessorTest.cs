@@ -6,11 +6,15 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Rulesets.Scoring
@@ -36,9 +40,9 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.Meh, 750_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Ok, 800_000)]
         [TestCase(ScoringMode.Standardised, HitResult.Great, 1_000_000)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, 41)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, 46)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, 72)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, 20)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, 23)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, 36)]
         public void TestSingleOsuHit(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             scoreProcessor.Mode.Value = scoringMode;
@@ -86,17 +90,17 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [TestCase(ScoringMode.Standardised, HitResult.SmallBonus, HitResult.SmallBonus, 1_000_030)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 10 (bonus points)
         [TestCase(ScoringMode.Standardised, HitResult.LargeBonus, HitResult.LargeBonus, 1_000_150)] // 1 * 300_000 + 700_000 (max combo 0) + 3 * 50 (bonus points)
         [TestCase(ScoringMode.Classic, HitResult.Miss, HitResult.Great, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 68)]
-        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 81)]
-        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 109)]
-        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 149)]
-        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 149)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 9)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 15)]
+        [TestCase(ScoringMode.Classic, HitResult.Meh, HitResult.Great, 86)]
+        [TestCase(ScoringMode.Classic, HitResult.Ok, HitResult.Great, 104)]
+        [TestCase(ScoringMode.Classic, HitResult.Good, HitResult.Perfect, 140)]
+        [TestCase(ScoringMode.Classic, HitResult.Great, HitResult.Great, 190)]
+        [TestCase(ScoringMode.Classic, HitResult.Perfect, HitResult.Perfect, 190)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, HitResult.SmallTickHit, 18)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, HitResult.SmallTickHit, 31)]
         [TestCase(ScoringMode.Classic, HitResult.LargeTickMiss, HitResult.LargeTickHit, 0)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 149)]
-        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 18)]
-        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 18)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeTickHit, HitResult.LargeTickHit, 12)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallBonus, HitResult.SmallBonus, 36)]
+        [TestCase(ScoringMode.Classic, HitResult.LargeBonus, HitResult.LargeBonus, 36)]
         public void TestFourVariousResultsOneMiss(ScoringMode scoringMode, HitResult hitResult, HitResult maxResult, int expectedScore)
         {
             var minResult = new TestJudgement(hitResult).MinResult;
@@ -128,8 +132,8 @@ namespace osu.Game.Tests.Rulesets.Scoring
         /// </remarks>
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickHit, 978_571)] // (3 * 10 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
         [TestCase(ScoringMode.Standardised, HitResult.SmallTickMiss, 914_286)] // (3 * 0 + 100) / (4 * 10 + 100) * 300_000 + (1 / 1) * 700_000
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 69)] // (((3 * 10 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
-        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 60)] // (((3 * 0 + 100) / (4 * 10 + 100)) * 1 * 300) * (1 + 0 / 25)
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickHit, 34)]
+        [TestCase(ScoringMode.Classic, HitResult.SmallTickMiss, 30)]
         public void TestSmallTicksAccuracy(ScoringMode scoringMode, HitResult hitResult, int expectedScore)
         {
             IEnumerable<HitObject> hitObjects = Enumerable
@@ -300,7 +304,26 @@ namespace osu.Game.Tests.Rulesets.Scoring
                 HitObjects = { new TestHitObject(result) }
             });
 
-            Assert.That(scoreProcessor.GetImmediateScore(ScoringMode.Standardised, result.AffectsCombo() ? 1 : 0, statistic), Is.EqualTo(expectedScore).Within(0.5d));
+            Assert.That(scoreProcessor.ComputeFinalScore(ScoringMode.Standardised, new ScoreInfo
+            {
+                Ruleset = new TestRuleset().RulesetInfo,
+                MaxCombo = result.AffectsCombo() ? 1 : 0,
+                Statistics = statistic
+            }), Is.EqualTo(expectedScore).Within(0.5d));
+        }
+
+        private class TestRuleset : Ruleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new System.NotImplementedException();
+
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new System.NotImplementedException();
+
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new System.NotImplementedException();
+
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new System.NotImplementedException();
+
+            public override string Description => string.Empty;
+            public override string ShortName => string.Empty;
         }
 
         private class TestJudgement : Judgement
