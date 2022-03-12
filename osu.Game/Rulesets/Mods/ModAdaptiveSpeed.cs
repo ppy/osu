@@ -21,11 +21,11 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ModAdaptiveSpeed : Mod, IApplicableToRate, IApplicableToDrawableHitObject, IApplicableToBeatmap, IUpdatableByPlayfield
     {
-        public override string Name => "Adaptive Speed";
+        public override string Name => "动态速率";
 
         public override string Acronym => "AS";
 
-        public override string Description => "Let track speed adapt to you.";
+        public override string Description => "让歌曲主动适应你的节奏";
 
         public override ModType Type => ModType.Fun;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
 
-        [SettingSource("Initial rate", "The starting speed of the track")]
+        [SettingSource("初始速度", "歌曲的初始速度")]
         public BindableNumber<double> InitialRate { get; } = new BindableDouble
         {
             MinValue = 0.5,
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.01
         };
 
-        [SettingSource("Adjust pitch", "Should pitch be adjusted with speed")]
+        [SettingSource("启用变调", "是否跟随速度调整音调")]
         public BindableBool AdjustPitch { get; } = new BindableBool
         {
             Default = true,

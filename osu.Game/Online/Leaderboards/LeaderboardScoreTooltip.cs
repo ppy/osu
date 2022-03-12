@@ -101,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
 
             displayedScore = score;
 
-            timestampLabel.Text = $"Played on {score.Date.ToLocalTime():d MMMM yyyy HH:mm}";
+            timestampLabel.Text = $"游玩于 {score.Date.ToLocalTime():yyyy MMMM d HH:mm}";
 
             modStatistics.Clear();
             topScoreStatistics.Clear();
@@ -154,13 +154,13 @@ namespace osu.Game.Online.Leaderboards
                     {
                         new OsuSpriteText
                         {
-                            Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
+                            Font = OsuFont.Torus.With(size: 14, weight: FontWeight.SemiBold),
                             Text = displayName.ToUpperInvariant(),
                             Colour = colours.ForHitResult(result),
                         },
                         new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                             Text = count.ToString(),
                         },
                     }
@@ -206,7 +206,7 @@ namespace osu.Game.Online.Leaderboards
                     container.Add(new OsuSpriteText
                     {
                         RelativeSizeAxes = Axes.Y,
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                         Text = mod.SettingDescription,
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,

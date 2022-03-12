@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -93,6 +94,13 @@ namespace osu.Game.Scoring
         public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score)
         {
             var bindable = new TotalScoreBindable(score, this);
+            configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
+            return bindable;
+        }
+
+        public Bindable<double> GetBindableTotalScoreDouble([NotNull] ScoreInfo score)
+        {
+            var bindable = new TotalScoreBindableDouble(score, this);
             configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
             return bindable;
         }
@@ -205,6 +213,40 @@ namespace osu.Game.Scoring
                 difficultyCalculationCancellationSource = new CancellationTokenSource();
 
                 scoreManager.GetTotalScore(score, s => Value = s, mode.NewValue, difficultyCalculationCancellationSource.Token);
+            }
+        }
+
+        /// <summary>
+        /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </summary>
+        public class TotalScoreBindableDouble : Bindable<double>
+        {
+            public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
+
+            private readonly ScoreInfo score;
+            private readonly ScoreManager scoreManager;
+
+            private CancellationTokenSource difficultyCalculationCancellationSource;
+
+            /// <summary>
+            /// Creates a new <see cref="TotalScoreBindable"/>.
+            /// </summary>
+            /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
+            /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
+            public TotalScoreBindableDouble(ScoreInfo score, ScoreManager scoreManager)
+            {
+                this.score = score;
+                this.scoreManager = scoreManager;
+
+                ScoringMode.BindValueChanged(onScoringModeChanged, true);
+            }
+
+            private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
+            {
+                difficultyCalculationCancellationSource?.Cancel();
+                difficultyCalculationCancellationSource = new CancellationTokenSource();
+
+                scoreManager.GetTotalScore(score, s => Value = (double)s, mode.NewValue, difficultyCalculationCancellationSource.Token);
             }
         }
 

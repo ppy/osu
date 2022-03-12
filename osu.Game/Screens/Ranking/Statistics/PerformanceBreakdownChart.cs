@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
-                                        Text = "Achieved PP",
+                                        Text = "达成PP",
                                         Colour = Color4Extensions.FromHex("#66FFCC")
                                     },
                                     achievedPerformance = new OsuSpriteText
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Ranking.Statistics
                                         Origin = Anchor.CentreLeft,
                                         Anchor = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 18),
-                                        Text = "Maximum",
+                                        Text = "最大PP",
                                         Colour = OsuColour.Gray(0.7f)
                                     },
                                     maximumPerformance = new OsuSpriteText

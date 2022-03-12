@@ -74,32 +74,32 @@ namespace osu.Game.Extensions
             // requires pluralisable string support framework-side
 
             if (difference < lowerCutoff)
-                return CommonStrings.TimeNow.ToString();
+                return "刚刚"; //CommonStrings.TimeNow.ToString();
 
             if (difference.TotalMinutes < 1)
-                return "sec".ToQuantity((int)difference.TotalSeconds);
+                return $"{(int)difference.TotalSeconds}秒前";
             if (difference.TotalHours < 1)
-                return "min".ToQuantity((int)difference.TotalMinutes);
+                return $"{(int)difference.TotalMinutes}分钟前";
             if (difference.TotalDays < 1)
-                return "hr".ToQuantity((int)difference.TotalHours);
+                return $"{(int)difference.TotalHours}小时前";
 
             // this is where this gets more complicated because of how the calendar works.
             // since there's no `TotalMonths` / `TotalYears`, we have to iteratively add months/years
             // and test against cutoff dates to determine how many months/years to show.
 
             if (time > now.AddMonths(-1))
-                return difference.TotalDays < 2 ? "1dy" : $"{(int)difference.TotalDays}dys";
+                return $"{(int)difference.TotalDays}天前";
 
             for (int months = 1; months <= 11; ++months)
             {
                 if (time > now.AddMonths(-(months + 1)))
-                    return months == 1 ? "1mo" : $"{months}mos";
+                    return $"{months}月前";
             }
 
             int years = 1;
             while (time <= now.AddYears(-(years + 1)))
                 years += 1;
-            return years == 1 ? "1yr" : $"{years}yrs";
+            return $"{years}年前";
         }
     }
 }

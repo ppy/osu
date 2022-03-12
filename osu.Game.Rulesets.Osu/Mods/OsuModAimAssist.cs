@@ -18,17 +18,17 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModAimAssist : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "Aim Assist";
+        public override string Name => "自瞄";
         public override string Acronym => "AA";
         public override IconUsage? Icon => FontAwesome.Solid.MousePointer;
         public override ModType Type => ModType.Fun;
-        public override string Description => "No need to chase the circle – the circle chases you!";
+        public override string Description => "不必追赶泡泡 - 因为他们会来追赶你！";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
 
         private IFrameStableClock gameplayClock;
 
-        [SettingSource("Assist strength", "How much this mod will assist you.", 0)]
+        [SettingSource("强度", "是否圆圈会完全靠近光标", 0)]
         public BindableFloat AssistStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,

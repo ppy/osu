@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
         protected override bool IsValidDirectory(DirectoryInfo info) => info?.GetFiles("osu!.*.cfg").Any() ?? false;
 
-        public override LocalisableString HeaderText => "Please select your osu!stable install location";
+        public override LocalisableString HeaderText => "请选择osu!stable安装路径";
 
         public StableDirectorySelectScreen(TaskCompletionSource<string> taskCompletionSource)
         {
