@@ -133,7 +133,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("confirm deletion", () => InputManager.Key(Key.Number1));
             AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
 
-            AddAssert("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
+            AddUntilStep("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 
             AddUntilStep("wait for score panel removal", () => scorePanel.Parent == null);
         }
@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("confirm deletion", () => InputManager.Key(Key.Number1));
             AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
 
-            AddAssert("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
+            AddUntilStep("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 
             AddUntilStep("wait for score panel removal", () => scorePanel.Parent == null);
         }
