@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         // The percent of the drum that extends past the bottom of the screen (set to 0.0f to show the full drum)
         private const float offscreenPercent = 0.35f;
         private InputDrum touchInputDrum;
-        private Circle  drumBackground;
+        private Circle drumBackground;
 
         private KeyBindingContainer<TaikoAction> keyBindingContainer;
 
@@ -70,7 +70,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override void LoadComplete()
         {
-            Padding = new MarginPadding {
+            Padding = new MarginPadding
+            {
                 Top = TaikoPlayfield.DEFAULT_HEIGHT * 2f, // Visual elements should start right below the playfield
                 Bottom = -touchInputDrum.DrawHeight * offscreenPercent, // The drum should go past the bottom of the screen so that it can be wider
             };
