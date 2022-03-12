@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 new SettingsEnumDropdown<GamemodeActivateCondition>
                 {
                     LabelText = "Gamemode启用条件",
-                    TooltipText = "依赖libgamemode",
+                    TooltipText = "需要安装库：libgamemode0",
                     Current = config.GetBindable<GamemodeActivateCondition>(MSetting.Gamemode)
                 },
                 trayCheckbox = new SettingsCheckbox
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
             };
 
-            trayCheckbox.WarningText = "由于未知原因, 启用再禁用托盘功能可能不会使托盘图标消失。\n具体原因正在调查中。";
+            trayCheckbox.WarningText = "由于未知原因, 启用再禁用托盘功能可能不会使托盘图标消失。";
         }
     }
 }
