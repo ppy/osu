@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -96,12 +97,12 @@ namespace Mvis.Plugin.Yasp
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
-                            Text = currentWorkingBeatmap.Metadata.TitleUnicode
+                            Text = new RomanisableString(currentWorkingBeatmap.Metadata.TitleUnicode, currentWorkingBeatmap.Metadata.Title)
                         },
                         new OsuSpriteText
                         {
                             Font = OsuFont.GetFont(size: 25),
-                            Text = currentWorkingBeatmap.Metadata.ArtistUnicode
+                            Text = new RomanisableString(currentWorkingBeatmap.Metadata.ArtistUnicode, currentWorkingBeatmap.Metadata.Artist)
                         },
                         new OsuSpriteText
                         {
