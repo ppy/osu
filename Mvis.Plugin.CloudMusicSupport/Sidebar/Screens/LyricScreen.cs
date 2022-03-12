@@ -158,7 +158,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Screens
                     break;
 
                 default:
-                    visibleLyrics.Clear();
+                    RefreshLrcInfo(plugin.EmptyLyricList);
                     break;
             }
         }

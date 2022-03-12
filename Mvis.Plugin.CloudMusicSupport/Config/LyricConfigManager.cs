@@ -18,7 +18,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
         protected override void InitialiseDefaults()
         {
             SetDefault(LyricSettings.EnablePlugin, true);
-            SetDefault(LyricSettings.LyricOffset, 0, -3000d, 3000d);
             SetDefault(LyricSettings.LyricFadeInDuration, 200f, 0, 1000);
             SetDefault(LyricSettings.LyricFadeOutDuration, 200f, 0, 1000);
             SetDefault(LyricSettings.SaveLrcWhenFetchFinish, true);
@@ -37,7 +36,6 @@ namespace Mvis.Plugin.CloudMusicSupport.Config
     public enum LyricSettings
     {
         EnablePlugin,
-        LyricOffset,
         LyricFadeInDuration,
         LyricFadeOutDuration,
         SaveLrcWhenFetchFinish,

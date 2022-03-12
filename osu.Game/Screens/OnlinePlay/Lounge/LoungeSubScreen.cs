@@ -20,6 +20,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -62,6 +63,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         [CanBeNull]
         private IDisposable joiningRoomOperation { get; set; }
@@ -309,6 +313,42 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 onFailure?.Invoke(error);
             });
         });
+
+        /// <summary>
+        /// Copies a room and opens it as a fresh (not-yet-created) one.
+        /// </summary>
+        /// <param name="room">The room to copy.</param>
+        public void OpenCopy(Room room)
+        {
+            Debug.Assert(room.RoomID.Value != null);
+
+            if (joiningRoomOperation != null)
+                return;
+
+            joiningRoomOperation = ongoingOperationTracker?.BeginOperation();
+
+            var req = new GetRoomRequest(room.RoomID.Value.Value);
+
+            req.Success += r =>
+            {
+                // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
+                r.RoomID.Value = null;
+
+                Open(r);
+
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
+            };
+
+            req.Failure += exception =>
+            {
+                Logger.Error(exception, "Couldn't create a copy of this room.");
+                joiningRoomOperation?.Dispose();
+                joiningRoomOperation = null;
+            };
+
+            api.Queue(req);
+        }
 
         /// <summary>
         /// Push a room as a new subscreen.

@@ -259,7 +259,8 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new ManiaModBeatCore(),
                         new ManiaModMuted(),
-                        new ModNoDrain()
+                        new ModNoDrain(),
+                        new ModAdaptiveSpeed()
                     };
 
                 default:
@@ -372,6 +373,17 @@ namespace osu.Game.Rulesets.Mania
             {
                 Columns = new[]
                 {
+                    new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y
+                    }),
+                }
+            },
+            new StatisticRow
+            {
+                Columns = new[]
+                {
                     new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(score.HitEvents)
                     {
                         RelativeSizeAxes = Axes.X,
@@ -385,6 +397,7 @@ namespace osu.Game.Rulesets.Mania
                 {
                     new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                     {
+                        new AverageHitError(score.HitEvents),
                         new UnstableRate(score.HitEvents)
                     }), true)
                 }

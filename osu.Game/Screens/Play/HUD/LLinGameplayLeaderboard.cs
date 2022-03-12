@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -95,12 +97,26 @@ namespace osu.Game.Screens.Play.HUD
             }, true);
 
             player.IsBreakTime.BindValueChanged(_ => updateDisplayState());
+
+            if (songSelect.CurrentScope.Value != BeatmapLeaderboardScope.Local)
+                loadScoreForLeaderboard();
+            else
+                Schedule(loadScoreForLeaderboard);
         }
 
-        protected override void LoadComplete()
+        private void loadScoreForLeaderboard()
         {
-            loadScore(infos => Schedule(() => onScoreLoaded(infos)));
-            base.LoadComplete();
+            try
+            {
+                loadScore(infos => Schedule(() => onScoreLoaded(infos)));
+            }
+            catch (Exception e)
+            {
+                notificationOverlay.Post(new SimpleNotification
+                {
+                    Text = "载入成绩时出现了网络错误: " + e.Message
+                });
+            }
         }
 
         private void updateDisplayState()
@@ -148,14 +164,38 @@ namespace osu.Game.Screens.Play.HUD
             updateHint = false;
         }
 
+        [Resolved]
+        private OsuConfigManager osuConfig { get; set; }
+
+        private Bindable<ScoringMode> configScoringMode;
+
         private void onScoreLoaded(IEnumerable<ScoreInfo> scoreInfos)
         {
+            configScoringMode ??= osuConfig.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+
             foreach (var info in scoreInfos)
             {
                 var loadedScore = Add(info.User, false);
+                var btsd = (ScoreManager.TotalScoreBindableDouble)scoreManager.GetBindableTotalScoreDouble(info);
+
+                //btsd.ScoringMode.BindValueChanged(v =>
+                //{
+                //    Logger.Log($"模式变更：{v.NewValue}");
+                //});
+
+                //bug: 从scoreManager获取的TotalScoreBindableDouble中ScoringMode永远不会变更，即使它绑定到了osuConfig
+                //我明明什么都没变，为什么会这样？
+                configScoringMode.BindValueChanged(v =>
+                {
+                    //Logger.Log($"全局模式变更：{v.NewValue}");
+                    btsd.ScoringMode.Value = v.NewValue;
+                });
+
+                btsd.UnbindBindings();
+
                 loadedScore.Accuracy.Value = info.Accuracy;
                 loadedScore.Combo.Value = info.Combo;
-                loadedScore.TotalScore.Value = info.TotalScore;
+                loadedScore.TotalScore.BindTo(btsd);
             }
         }
 

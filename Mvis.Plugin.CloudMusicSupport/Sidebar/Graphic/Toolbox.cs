@@ -127,8 +127,8 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Current = config.GetBindable<double>(LyricSettings.LyricOffset),
-                    LabelText = CloudMusicStrings.GlobalOffsetMain,
+                    Current = plugin.Offset,
+                    LabelText = CloudMusicStrings.LocalOffset,
                     RelativeSizeAxes = Axes.X,
                     Padding = new MarginPadding { Right = 10 },
                     Colour = Color4.Black

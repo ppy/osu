@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("启用变调", "是否要更随速度调整音调")]
         public abstract BindableBool AdjustPitch { get; }
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModAdaptiveSpeed) };
 
         public override string SettingDescription => $"从 {InitialRate.Value:N2}x 到 {FinalRate.Value:N2}x";
 

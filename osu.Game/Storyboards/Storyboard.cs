@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
@@ -78,7 +79,7 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata.BackgroundFile;
+                string backgroundPath = BeatmapInfo.Metadata.BackgroundFile;
 
                 if (string.IsNullOrEmpty(backgroundPath))
                     return false;
@@ -90,8 +91,8 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(IWorkingBeatmap working = null) =>
-            new DrawableStoryboard(this);
+        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null) =>
+            new DrawableStoryboard(this, mods);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {

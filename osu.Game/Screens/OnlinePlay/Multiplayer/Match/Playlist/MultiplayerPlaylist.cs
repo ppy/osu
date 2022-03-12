@@ -52,14 +52,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                         queueList = new MultiplayerQueueList
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = { BindTarget = SelectedItem },
+                            SelectedItem = { BindTarget = CurrentPlaylistItem },
                             RequestEdit = item => RequestEdit?.Invoke(item)
                         },
                         historyList = new MultiplayerHistoryList
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            SelectedItem = { BindTarget = SelectedItem }
+                            SelectedItem = { BindTarget = CurrentPlaylistItem }
                         }
                     }
                 }

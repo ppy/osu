@@ -20,6 +20,9 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         [Resolved]
         private LyricSidebarSectionContainer sidebarPage { get; set; }
 
+        [Resolved]
+        private LyricPlugin plugin { get; set; }
+
         private readonly Bindable<double> globalOffset = new Bindable<double>();
 
         private OsuSpriteText timer;
@@ -67,7 +70,7 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
                 }
             };
 
-            config.BindWith(LyricSettings.LyricOffset, globalOffset);
+            globalOffset.BindTo(plugin.Offset);
         }
 
         private double totalOffset => globalOffset.Value + mvisScreen?.CurrentTrack.CurrentTime ?? 0;

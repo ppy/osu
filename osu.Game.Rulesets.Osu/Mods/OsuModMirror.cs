@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -42,8 +43,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public enum MirrorType
         {
+            [Description("水平")]
             Horizontal,
+
+            [Description("垂直")]
             Vertical,
+
+            [Description("水平和垂直")]
             Both
         }
     }

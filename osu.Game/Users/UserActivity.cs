@@ -60,6 +60,16 @@ namespace osu.Game.Users
             public override string Status => $@"正和别人一起{base.Status}";
         }
 
+        public class SpectatingMultiplayerGame : InGame
+        {
+            public SpectatingMultiplayerGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)
+                : base(beatmapInfo, ruleset)
+            {
+            }
+
+            public override string Status => $"Watching others {base.Status.ToLowerInvariant()}";
+        }
+
         public class InPlaylistGame : InGame
         {
             public InPlaylistGame(IBeatmapInfo beatmapInfo, IRulesetInfo ruleset)

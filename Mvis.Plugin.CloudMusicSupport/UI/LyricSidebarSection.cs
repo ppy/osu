@@ -37,12 +37,6 @@ namespace Mvis.Plugin.CloudMusicSupport.UI
                     Description = CloudMusicStrings.DisableShader,
                     Bindable = config.GetBindable<bool>(LyricSettings.NoExtraShadow)
                 },
-                new SettingsSliderPiece<double>
-                {
-                    Description = CloudMusicStrings.GlobalOffsetMain,
-                    Bindable = config.GetBindable<double>(LyricSettings.LyricOffset),
-                    TooltipText = CloudMusicStrings.GlobalOffsetSub,
-                },
                 new SettingsSliderPiece<float>
                 {
                     Description = CloudMusicStrings.LyricFadeInDuration,

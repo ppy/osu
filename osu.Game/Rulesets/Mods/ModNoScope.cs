@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModNoScope : Mod, IApplicableToScoreProcessor, IApplicableToPlayer
     {
-        public override string Name => "No Scope";
+        public override string Name => "半盲";
         public override string Acronym => "NS";
         public override ModType Type => ModType.Fun;
         public override IconUsage? Icon => FontAwesome.Solid.EyeSlash;

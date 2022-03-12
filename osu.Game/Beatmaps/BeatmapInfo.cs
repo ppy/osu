@@ -40,6 +40,8 @@ namespace osu.Game.Beatmaps
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
+        public BeatmapUserSettings UserSettings { get; set; } = null!;
+
         public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null)
         {
             ID = Guid.NewGuid();
@@ -51,6 +53,7 @@ namespace osu.Game.Beatmaps
             };
             Difficulty = difficulty ?? new BeatmapDifficulty();
             Metadata = metadata ?? new BeatmapMetadata();
+            UserSettings = new BeatmapUserSettings();
         }
 
         [UsedImplicitly]
@@ -151,18 +154,6 @@ namespace osu.Game.Beatmaps
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
 
         #region Compatibility properties
-
-        [Ignored]
-        public int RulesetID
-        {
-            set
-            {
-                if (!string.IsNullOrEmpty(Ruleset.InstantiationInfo))
-                    throw new InvalidOperationException($"Cannot set a {nameof(RulesetID)} when {nameof(Ruleset)} is already set to an actual ruleset.");
-
-                Ruleset.OnlineID = value;
-            }
-        }
 
         [Ignored]
         [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719

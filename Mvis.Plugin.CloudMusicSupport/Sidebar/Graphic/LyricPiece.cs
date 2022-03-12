@@ -26,12 +26,15 @@ namespace Mvis.Plugin.CloudMusicSupport.Sidebar.Graphic
         [Resolved]
         private LyricConfigManager config { get; set; }
 
+        [Resolved]
+        private LyricPlugin plugin { get; set; }
+
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem(
                 CloudMusicStrings.AdjustOffsetToLyric.ToString(),
                 MenuItemType.Standard,
-                () => config.SetValue(LyricSettings.LyricOffset, Value.Time - mvisScreen.CurrentTrack.CurrentTime))
+                () => plugin.Offset.Value = Value.Time - mvisScreen.CurrentTrack.CurrentTime)
         };
 
         private Box hoverBox;

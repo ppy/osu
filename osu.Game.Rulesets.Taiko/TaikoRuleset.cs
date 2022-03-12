@@ -152,7 +152,8 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new ModWindUp(), new ModWindDown()),
                         new TaikoModBeatCore(),
                         new TaikoModMuted(),
-                        new ModNoDrain()
+                        new ModNoDrain(),
+                        new ModAdaptiveSpeed()
                     };
 
                 default:
@@ -215,6 +216,18 @@ namespace osu.Game.Rulesets.Taiko
                 {
                     Columns = new[]
                     {
+                        new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(timedHitEvents)),
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
                         new StatisticItem("Timing分布", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
                             RelativeSizeAxes = Axes.X,
@@ -228,6 +241,7 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
                         }), true)
                     }

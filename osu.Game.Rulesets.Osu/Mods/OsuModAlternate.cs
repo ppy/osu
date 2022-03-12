@@ -18,9 +18,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModAlternate : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
-        public override string Name => @"Alternate";
+        public override string Name => @"双指";
         public override string Acronym => @"AL";
-        public override string Description => @"Don't use the same key twice in a row!";
+        public override string Description => @"强双练习器";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
         public override ModType Type => ModType.Conversion;

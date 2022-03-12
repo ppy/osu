@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Mvis.Plugin.CloudMusicSupport.Misc
 {
-    public class ArtistInfo
+    public class APIArtistInfo
     {
         public int id { get; set; }
         public string name { get; set; }

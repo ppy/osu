@@ -79,7 +79,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 var beatmapInfo = new BeatmapInfo
                 {
                     MaxCombo = apiBeatmap.MaxCombo,
-                    Status = apiBeatmap.Status
+                    Status = apiBeatmap.Status,
+                    MD5Hash = apiBeatmap.MD5Hash
                 };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)

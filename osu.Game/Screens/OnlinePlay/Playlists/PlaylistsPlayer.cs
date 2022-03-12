@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Extensions;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -33,13 +34,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(IBindable<RulesetInfo> ruleset)
         {
             // Sanity checks to ensure that PlaylistsPlayer matches the settings for the current PlaylistItem
-            if (!Beatmap.Value.BeatmapInfo.MatchesOnlineID(PlaylistItem.Beatmap.Value))
+            if (!Beatmap.Value.BeatmapInfo.MatchesOnlineID(PlaylistItem.Beatmap))
                 throw new InvalidOperationException("当前谱面与游玩列表不匹配");
 
-            if (!ruleset.Value.MatchesOnlineID(PlaylistItem.Ruleset.Value))
+            if (ruleset.Value.OnlineID != PlaylistItem.RulesetID)
                 throw new InvalidOperationException("当前游戏模式与游玩列表不匹配");
 
-            if (!PlaylistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
+            var requiredLocalMods = PlaylistItem.RequiredMods.Select(m => m.ToMod(GameplayState.Ruleset));
+            if (!requiredLocalMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("当前Mods与游玩列表所需要的不匹配");
         }
 
@@ -63,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
+            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeFinalScore(ScoringMode.Standardised, Score.ScoreInfo));
         }
 
         protected override void Dispose(bool isDisposing)

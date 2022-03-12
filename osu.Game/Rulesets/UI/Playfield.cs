@@ -80,6 +80,11 @@ namespace osu.Game.Rulesets.UI
         private readonly List<Playfield> nestedPlayfields = new List<Playfield>();
 
         /// <summary>
+        /// Whether this <see cref="Playfield"/> is nested in another <see cref="Playfield"/>.
+        /// </summary>
+        public bool IsNested { get; private set; }
+
+        /// <summary>
         /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
         /// </summary>
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
@@ -206,6 +211,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
         protected void AddNested(Playfield otherPlayfield)
         {
+            otherPlayfield.IsNested = true;
+
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
 
             otherPlayfield.NewResult += (d, r) => NewResult?.Invoke(d, r);
@@ -229,7 +236,7 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (mods != null)
+            if (!IsNested && mods != null)
             {
                 foreach (var mod in mods)
                 {

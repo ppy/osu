@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -18,7 +19,6 @@ using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
@@ -98,6 +98,13 @@ namespace osu.Game.Scoring
             return bindable;
         }
 
+        public Bindable<double> GetBindableTotalScoreDouble([NotNull] ScoreInfo score)
+        {
+            var bindable = new TotalScoreBindableDouble(score, this);
+            configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
+            return bindable;
+        }
+
         /// <summary>
         /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
         /// </summary>
@@ -132,25 +139,13 @@ namespace osu.Game.Scoring
         public async Task<long> GetTotalScoreAsync([NotNull] ScoreInfo score, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             // TODO: This is required for playlist aggregate scores. They should likely not be getting here in the first place.
-            if (string.IsNullOrEmpty(score.BeatmapInfo.Hash))
+            if (string.IsNullOrEmpty(score.BeatmapInfo.MD5Hash))
                 return score.TotalScore;
 
             int beatmapMaxCombo;
-            double accuracy = score.Accuracy;
 
             if (score.IsLegacyScore)
             {
-                if (score.RulesetID == 3)
-                {
-                    // In osu!stable, a full-GREAT score has 100% accuracy in mania. Along with a full combo, the score becomes indistinguishable from a full-PERFECT score.
-                    // To get around this, recalculate accuracy based on the hit statistics.
-                    // Note: This cannot be applied universally to all legacy scores, as some rulesets (e.g. catch) group multiple judgements together.
-                    double maxBaseScore = score.Statistics.Select(kvp => kvp.Value).Sum() * Judgement.ToNumericResult(HitResult.Perfect);
-                    double baseScore = score.Statistics.Select(kvp => Judgement.ToNumericResult(kvp.Key) * kvp.Value).Sum();
-                    if (maxBaseScore > 0)
-                        accuracy = baseScore / maxBaseScore;
-                }
-
                 // This score is guaranteed to be an osu!stable score.
                 // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
                 if (score.BeatmapInfo.MaxCombo != null)
@@ -184,7 +179,7 @@ namespace osu.Game.Scoring
             var scoreProcessor = ruleset.CreateScoreProcessor();
             scoreProcessor.Mods.Value = score.Mods;
 
-            return (long)Math.Round(scoreProcessor.GetScore(mode, beatmapMaxCombo, accuracy, (double)score.MaxCombo / beatmapMaxCombo, score.Statistics));
+            return (long)Math.Round(scoreProcessor.ComputeFinalLegacyScore(mode, score, beatmapMaxCombo));
         }
 
         /// <summary>
@@ -218,6 +213,40 @@ namespace osu.Game.Scoring
                 difficultyCalculationCancellationSource = new CancellationTokenSource();
 
                 scoreManager.GetTotalScore(score, s => Value = s, mode.NewValue, difficultyCalculationCancellationSource.Token);
+            }
+        }
+
+        /// <summary>
+        /// Provides the total score of a <see cref="ScoreInfo"/>. Responds to changes in the currently-selected <see cref="ScoringMode"/>.
+        /// </summary>
+        public class TotalScoreBindableDouble : Bindable<double>
+        {
+            public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
+
+            private readonly ScoreInfo score;
+            private readonly ScoreManager scoreManager;
+
+            private CancellationTokenSource difficultyCalculationCancellationSource;
+
+            /// <summary>
+            /// Creates a new <see cref="TotalScoreBindable"/>.
+            /// </summary>
+            /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
+            /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
+            public TotalScoreBindableDouble(ScoreInfo score, ScoreManager scoreManager)
+            {
+                this.score = score;
+                this.scoreManager = scoreManager;
+
+                ScoringMode.BindValueChanged(onScoringModeChanged, true);
+            }
+
+            private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)
+            {
+                difficultyCalculationCancellationSource?.Cancel();
+                difficultyCalculationCancellationSource = new CancellationTokenSource();
+
+                scoreManager.GetTotalScore(score, s => Value = (double)s, mode.NewValue, difficultyCalculationCancellationSource.Token);
             }
         }
 

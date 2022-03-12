@@ -136,7 +136,13 @@ namespace osu.Game.Tests.Visual
                 return new TestWorkingBeatmapCache(this, audioManager, resources, storage, defaultBeatmap, host);
             }
 
-            public override WorkingBeatmap CreateNewBlankDifficulty(BeatmapSetInfo beatmapSetInfo, RulesetInfo rulesetInfo)
+            public override WorkingBeatmap CreateNewDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap, RulesetInfo rulesetInfo)
+            {
+                // don't actually care about properly creating a difficulty for this context.
+                return TestBeatmap;
+            }
+
+            public override WorkingBeatmap CopyExistingDifficulty(BeatmapSetInfo targetBeatmapSet, WorkingBeatmap referenceWorkingBeatmap)
             {
                 // don't actually care about properly creating a difficulty for this context.
                 return TestBeatmap;

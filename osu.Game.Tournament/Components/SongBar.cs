@@ -186,7 +186,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("难度星级", $"{beatmap.StarRating:0.#}{srExtra}"))
+                                            new DiffPiece(("难度星级", $"{beatmap.StarRating:0.##}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer
