@@ -131,12 +131,8 @@ namespace osu.Game.Tests.Online
             AddStep("finish download", () => ((TestDownloadRequest)beatmapDownloader.GetExistingDownload(testBeatmapSet)).TriggerSuccess(testBeatmapFile));
             addAvailabilityCheckStep("state importing", BeatmapAvailability.Importing);
 
-            AddStep("allow importing", () =>
-            beatmaps.AllowImport.SetResult(true)
-            );
-            AddUntilStep("wait for import", () =>
-            beatmaps.CurrentImport != null
-            );
+            AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
+            AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
             AddAssert("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
         }
@@ -224,7 +220,7 @@ namespace osu.Game.Tests.Online
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue, ReplayGainManager  manager)
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue, ReplayGainManager manager)
                     : base(databaseAccess, storage, beatmapOnlineLookupQueue, manager)
                 {
                     this.testBeatmapManager = testBeatmapManager;

@@ -1,27 +1,24 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using System;
-using System.IO;
-using osu.Game.Beatmaps;
-using ManagedBass;
-using osu.Framework.Audio.Track;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Audio.Callbacks;
-using System.Threading.Tasks;
+using ManagedBass;
 using ManagedBass.Fx;
-using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Mixing;
-using osu.Framework.Platform;
+using osu.Framework.Audio.Track;
+using osu.Game.Beatmaps;
 using osu.Game.Stores;
 
 namespace osu.Game.Audio
 {
     public class ReplayGainManager
     {
-        private ITrackStore trackStore;
-        private AudioMixer audioMixer;
-        private RealmFileStore storage;
+        private readonly ITrackStore trackStore;
+        private readonly AudioMixer audioMixer;
+        private readonly RealmFileStore storage;
 
         public ReplayGainManager(ITrackStore trackStore, AudioManager audioManager, RealmFileStore storage)
         {
@@ -57,6 +54,7 @@ namespace osu.Game.Audio
         public void AddFx(IEffectParameter effectParameter)
         {
             IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+
             if (effect != null)
             {
                 int i = audioMixer.Effects.IndexOf(effect);
@@ -66,19 +64,20 @@ namespace osu.Game.Audio
             {
                 audioMixer.Effects.Add(effectParameter);
             }
-
         }
 
-        public ReplayGainInfo generateReplayGainInfo(BeatmapInfo info, BeatmapSetInfo setInfo)
+        public ReplayGainInfo GenerateReplayGainInfo(BeatmapInfo info, BeatmapSetInfo setInfo)
         {
-            string audiofile = info?.Metadata?.AudioFile;
-            if (audiofile != null && audiofile != "")
+            string audiofile = info.Metadata.AudioFile;
+
+            if (!string.IsNullOrEmpty(audiofile))
             {
                 string filePath = "";
+
                 try
                 {
-                    filePath = setInfo.GetPathForFile(info?.Metadata?.AudioFile);
-                    if (filePath != null)
+                    filePath = setInfo.GetPathForFile(info.Metadata.AudioFile);
+                    if (!string.IsNullOrEmpty(audiofile))
                         filePath = storage.Storage.GetFullPath(filePath);
                 }
                 catch (Exception e)
@@ -93,7 +92,7 @@ namespace osu.Game.Audio
             }
             else
             {
-                return new ReplayGainInfo()
+                return new ReplayGainInfo
                 {
                     ID = Guid.NewGuid(),
                     TrackGain = 0,
@@ -104,11 +103,11 @@ namespace osu.Game.Audio
 
         internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo bSetInfo)
         {
-            if(bSetInfo != null)
+            if (bSetInfo != null)
             {
                 foreach (BeatmapInfo beatmap in bSetInfo.Beatmaps)
                 {
-                    if ((beatmap.ReplayGainInfo == null || beatmap.ReplayGainInfo.isDefault()) && beatmap.AudioEquals(beatmapInfo))
+                    if (beatmap.ReplayGainInfo.IsDefault() && beatmap.AudioEquals(beatmapInfo))
                     {
                         beatmap.ReplayGainInfo = beatmapInfo.ReplayGainInfo;
                     }

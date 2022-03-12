@@ -14,14 +14,14 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osu.Game.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
-using osu.Game.Skinning;
-using osu.Game.Stores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
+using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
 
@@ -178,8 +178,7 @@ namespace osu.Game.Database
                         foreach (var score in beatmap.Scores)
                             realm.Remove(score);
 
-                        if(beatmap.ReplayGainInfo != null)
-                            realm.Remove(beatmap.ReplayGainInfo);
+                        realm.Remove(beatmap.ReplayGainInfo);
 
                         realm.Remove(beatmap.Metadata);
 

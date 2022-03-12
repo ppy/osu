@@ -179,6 +179,7 @@ namespace osu.Game.Beatmaps
 
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => RulesetInfo;
+
         [JsonIgnore]
         IReplayGainInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
 

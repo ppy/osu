@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Utils;
 using Realms;
@@ -34,26 +33,27 @@ namespace osu.Game.Audio
 
         public bool Equals(ReplayGainInfo other)
         {
-            if (TrackGain == other.TrackGain && PeakAmplitude == other.PeakAmplitude)
+            if (TrackGain == other?.TrackGain && PeakAmplitude == other.PeakAmplitude)
                 return true;
             else
                 return false;
         }
 
-        public bool isDefault()
+        public bool IsDefault()
         {
-            if(TrackGain == 0 && PeakAmplitude == 0)
+            if (TrackGain == 0 && PeakAmplitude == 0)
                 return true;
-            return false;
+            else
+                return false;
         }
 
         public bool Equals(IReplayGainInfo other) => other is ReplayGainInfo b && Equals(b);
 
         public ReplayGainInfo DeepClone()
         {
-            return new ReplayGainInfo()
+            return new ReplayGainInfo
             {
-                ID  = ID,
+                ID = ID,
                 TrackGain = TrackGain,
                 PeakAmplitude = PeakAmplitude,
             };

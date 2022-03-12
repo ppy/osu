@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Game.Audio;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -293,21 +292,11 @@ namespace osu.Game.Overlays
 
             if (!audioEquals || CurrentTrack.IsDummyDevice)
             {
-                if(!CurrentTrack.IsDummyDevice)
+                if (!CurrentTrack.IsDummyDevice)
                 {
-                    if(current.BeatmapInfo.ReplayGainInfo != null)
-                    {
-                        beatmaps.ReplayGainManager.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
-                    }
-                    else
-                    {
-                        beatmaps.ReplayGainManager.AddReplayGain(new ReplayGainInfo()
-                        {
-                            TrackGain = 0.8f,
-                            PeakAmplitude = 1f,
-                        });
-                    }
+                    beatmaps.ReplayGainManager?.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
                 }
+
                 changeTrack();
             }
             else

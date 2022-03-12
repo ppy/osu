@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, RealmNamedFileUsage>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
-        public ReplayGainManager? ReplayGainManager { get;}
+        public ReplayGainManager? ReplayGainManager { get; }
 
         private readonly BeatmapModelManager beatmapModelManager;
 

@@ -30,7 +30,6 @@ namespace osu.Game.Database
         public DbSet<EFScoreInfo> ScoreInfo { get; set; }
         public DbSet<ReplayGainInfo> ReplayGainInfo { get; set; }
 
-
         // migrated to realm
         public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
 
