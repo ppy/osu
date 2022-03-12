@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class DrumTouchInputArea : Container
     {
         // The percent of the drum that extends past the bottom of the screen (set to 0.0f to show the full drum)
-        private const float offscreenPercent = 0.4f;
+        private const float offscreenPercent = 0.35f;
         private InputDrum touchInputDrum;
         private Circle drumBackground;
 
@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                         touchInputDrum = new InputDrum() {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            centre_size = 0.8f,
                         },
                     }
                 },
