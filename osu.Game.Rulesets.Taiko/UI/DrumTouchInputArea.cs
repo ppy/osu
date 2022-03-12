@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Vector2 inputPositionToDrumCentreDelta = touchInputDrum.ToLocalSpace(inputPosition) - touchInputDrum.OriginPosition;
 
             float inputDrumRadius = Math.Max(touchInputDrum.Width, touchInputDrum.DrawHeight) / 2f;
-            float centreRadius = (inputDrumRadius * InputDrum.centre_size);
+            float centreRadius = (inputDrumRadius * touchInputDrum.centre_size);
             return inputPositionToDrumCentreDelta.Length <= centreRadius;
         }
     }
