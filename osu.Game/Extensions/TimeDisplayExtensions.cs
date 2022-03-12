@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using Humanizer;
 using osu.Framework.Localisation;
-using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Extensions
 {
