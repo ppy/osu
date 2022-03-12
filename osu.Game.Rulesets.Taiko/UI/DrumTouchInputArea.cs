@@ -37,7 +37,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private Container visibleComponents;
 
-        public DrumTouchInputArea() {
+        public DrumTouchInputArea()
+        {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Children = new Drawable[]
@@ -102,7 +103,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             TaikoAction taikoAction = getTaikoActionFromInput(e.ScreenSpaceTouchDownPosition);
             touchActions.Add(e.Touch.Source, taikoAction);
             keyBindingContainer?.TriggerPressed(touchActions[e.Touch.Source]);
-
             return true;
         }
 
@@ -119,15 +119,18 @@ namespace osu.Game.Rulesets.Taiko.UI
             return false;
         }
 
-        public void ShowTouchControls() {
+        public void ShowTouchControls()
+        {
             visibleComponents.Animate(components => components.FadeIn(500, Easing.OutQuint));
         }
 
-        public void HideTouchControls() {
+        public void HideTouchControls()
+        {
             visibleComponents.Animate(components => components.FadeOut(2000, Easing.OutQuint));
         }
 
-        private TaikoAction getTaikoActionFromInput(Vector2 inputPosition) {
+        private TaikoAction getTaikoActionFromInput(Vector2 inputPosition)
+        {
             bool centreHit = inputIsCenterHit(inputPosition);
             bool leftSide = inputIsOnLeftSide(inputPosition);
 
@@ -136,12 +139,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                 (leftSide ? TaikoAction.LeftRim : TaikoAction.RightRim);
         }
 
-        private bool inputIsOnLeftSide(Vector2 inputPosition) {
+        private bool inputIsOnLeftSide(Vector2 inputPosition)
+        {
             Vector2 inputPositionToDrumCentreDelta = touchInputDrum.ToLocalSpace(inputPosition) - touchInputDrum.OriginPosition;
             return inputPositionToDrumCentreDelta.X < 0f;
         }
 
-        private bool inputIsCenterHit(Vector2 inputPosition) {
+        private bool inputIsCenterHit(Vector2 inputPosition)
+        {
             Vector2 inputPositionToDrumCentreDelta = touchInputDrum.ToLocalSpace(inputPosition) - touchInputDrum.OriginPosition;
 
             float inputDrumRadius = Math.Max(touchInputDrum.Width, touchInputDrum.DrawHeight) / 2f;
