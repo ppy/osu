@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -48,6 +49,8 @@ namespace osu.Game.Overlays.Chat
             RelativeSizeAxes = Axes.Both;
         }
 
+        private Bindable<Message> highlightedMessage;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -78,6 +81,34 @@ namespace osu.Game.Overlays.Chat
             Channel.MessageRemoved += messageRemoved;
             Channel.PendingMessageResolved += pendingMessageResolved;
         }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            highlightedMessage = Channel.HighlightedMessage.GetBoundCopy();
+            highlightedMessage.BindValueChanged(_ => processMessageHighlighting(), true);
+        }
+
+        /// <summary>
+        /// Processes any pending message in <see cref="highlightedMessage"/>.
+        /// </summary>
+        // ScheduleAfterChildren is for ensuring the scroll flow has updated with any new chat lines.
+        private void processMessageHighlighting() => SchedulerAfterChildren.AddOnce(() =>
+        {
+            if (highlightedMessage.Value == null)
+                return;
+
+            var chatLine = chatLines.SingleOrDefault(c => c.Message.Equals(highlightedMessage.Value));
+            if (chatLine == null)
+                return;
+
+            float center = scroll.GetChildPosInContent(chatLine, chatLine.DrawSize / 2) - scroll.DisplayableContent / 2;
+            scroll.ScrollTo(Math.Clamp(center, 0, scroll.ScrollableExtent));
+            chatLine.Highlight();
+
+            highlightedMessage.Value = null;
+        });
 
         protected override void Dispose(bool isDisposing)
         {
@@ -148,6 +179,8 @@ namespace osu.Game.Overlays.Chat
             // to avoid making the container think the user has scrolled back up and unwantedly disable auto-scrolling.
             if (newMessages.Any(m => m is LocalMessage))
                 scroll.ScrollToEnd();
+
+            processMessageHighlighting();
         });
 
         private void pendingMessageResolved(Message existing, Message updated) => Schedule(() =>
