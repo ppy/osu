@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -21,7 +23,7 @@ namespace osu.Game.Skinning.Components
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Spin", "Should the text spin")]
+        [SettingSource("Spining text", "Whether the big text should spin")]
         public Bindable<bool> TextSpin { get; } = new BindableBool();
 
         [SettingSource("Alpha", "The alpha value of this box")]
@@ -29,14 +31,16 @@ namespace osu.Game.Skinning.Components
         {
             MinValue = 0,
             MaxValue = 1,
+            Precision = 0.01f,
         };
 
         private readonly Box box;
         private readonly OsuSpriteText text;
+        private readonly OsuTextFlowContainer disclaimer;
 
         public BigBlackBox()
         {
-            Size = new Vector2(150);
+            Size = new Vector2(250);
 
             Masking = true;
             CornerRadius = 20;
@@ -54,6 +58,17 @@ namespace osu.Game.Skinning.Components
                     Text = "Big Black Box",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    Font = OsuFont.Default.With(size: 40)
+                },
+                disclaimer = new OsuTextFlowContainer(st => st.Font = OsuFont.Default.With(size: 10))
+                {
+                    Text = "This is intended to be a test component and may disappear in the future!",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Margin = new MarginPadding(10),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    TextAnchor = Anchor.TopCentre,
                 }
             };
         }
@@ -70,6 +85,8 @@ namespace osu.Game.Skinning.Components
                 else
                     text.ClearTransforms();
             }, true);
+
+            disclaimer.FadeOutFromOne(5000, Easing.InQuint);
         }
     }
 }
