@@ -42,7 +42,7 @@ namespace osu.Game.Skinning.Editor
 
         private bool hasBegunMutating;
 
-        private Container blueprintContainerContainer;
+        private Container content;
 
         public SkinEditor(Drawable targetScreen)
         {
@@ -115,7 +115,7 @@ namespace osu.Game.Skinning.Editor
                                     Origin = Anchor.CentreLeft,
                                     RequestPlacement = placeComponent
                                 },
-                                blueprintContainerContainer = new Container
+                                content = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
@@ -153,7 +153,7 @@ namespace osu.Game.Skinning.Editor
 
             void loadBlueprintContainer()
             {
-                blueprintContainerContainer.Children = new Drawable[]
+                content.Children = new Drawable[]
                 {
                     new SkinBlueprintContainer(targetScreen),
                 };
