@@ -124,7 +124,7 @@ namespace osu.Game.Skinning.Editor
 
             skinEditor.Save();
 
-            // AddOnce with paramter will ensure the newest target is loaded if there is any overlap.
+            // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
             Scheduler.AddOnce(setTarget, screen);
         }
 
