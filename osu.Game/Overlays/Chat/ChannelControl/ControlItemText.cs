@@ -14,6 +14,8 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemText : Container
     {
+        private bool hasUnread;
+
         public bool HasUnread
         {
             get => hasUnread;
@@ -27,7 +29,6 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             }
         }
 
-        private bool hasUnread = false;
         private OsuSpriteText? text;
 
         [Resolved]

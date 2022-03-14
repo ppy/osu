@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                         },
                         Content = new[]
                         {
-                            new Drawable[]
+                            new[]
                             {
                                 createAvatar(),
                                 text = new ControlItemText(channel)
