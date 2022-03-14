@@ -81,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Utils
 
                 switch (hitObject)
                 {
-                    case HitCircle circle:
-                        shift = clampHitCircleToPlayfield(circle, current);
+                    case HitCircle _:
+                        shift = clampHitCircleToPlayfield(current);
                         break;
 
-                    case Slider slider:
-                        shift = clampSliderToPlayfield(slider, current);
+                    case Slider _:
+                        shift = clampSliderToPlayfield(current);
                         break;
                 }
 
@@ -144,48 +144,49 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Move the modified position of a hit circle so that it fits inside the playfield.
+        /// Move the modified position of a <see cref="HitCircle"/> so that it fits inside the playfield.
         /// </summary>
         /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
-        private static Vector2 clampHitCircleToPlayfield(HitCircle circle, WorkingObject objectPositionInfo)
+        private static Vector2 clampHitCircleToPlayfield(WorkingObject workingObject)
         {
-            var previousPosition = objectPositionInfo.PositionModified;
-            objectPositionInfo.EndPositionModified = objectPositionInfo.PositionModified = clampToPlayfieldWithPadding(
-                objectPositionInfo.PositionModified,
-                (float)circle.Radius
+            var previousPosition = workingObject.PositionModified;
+            workingObject.EndPositionModified = workingObject.PositionModified = clampToPlayfieldWithPadding(
+                workingObject.PositionModified,
+                (float)workingObject.HitObject.Radius
             );
 
-            circle.Position = objectPositionInfo.PositionModified;
+            workingObject.HitObject.Position = workingObject.PositionModified;
 
-            return objectPositionInfo.PositionModified - previousPosition;
+            return workingObject.PositionModified - previousPosition;
         }
 
         /// <summary>
         /// Moves the <see cref="Slider"/> and all necessary nested <see cref="OsuHitObject"/>s into the <see cref="OsuPlayfield"/> if they aren't already.
         /// </summary>
         /// <returns>The deviation from the original modified position in order to fit within the playfield.</returns>
-        private static Vector2 clampSliderToPlayfield(Slider slider, WorkingObject objectPositionInfo)
+        private static Vector2 clampSliderToPlayfield(WorkingObject workingObject)
         {
+            var slider = (Slider)workingObject.HitObject;
             var possibleMovementBounds = calculatePossibleMovementBounds(slider);
 
-            var previousPosition = objectPositionInfo.PositionModified;
+            var previousPosition = workingObject.PositionModified;
 
             // Clamp slider position to the placement area
             // If the slider is larger than the playfield, force it to stay at the original position
             float newX = possibleMovementBounds.Width < 0
-                ? objectPositionInfo.PositionOriginal.X
+                ? workingObject.PositionOriginal.X
                 : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
 
             float newY = possibleMovementBounds.Height < 0
-                ? objectPositionInfo.PositionOriginal.Y
+                ? workingObject.PositionOriginal.Y
                 : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
 
-            slider.Position = objectPositionInfo.PositionModified = new Vector2(newX, newY);
-            objectPositionInfo.EndPositionModified = slider.EndPosition;
+            slider.Position = workingObject.PositionModified = new Vector2(newX, newY);
+            workingObject.EndPositionModified = slider.EndPosition;
 
-            shiftNestedObjects(slider, objectPositionInfo.PositionModified - objectPositionInfo.PositionOriginal);
+            shiftNestedObjects(slider, workingObject.PositionModified - workingObject.PositionOriginal);
 
-            return objectPositionInfo.PositionModified - previousPosition;
+            return workingObject.PositionModified - previousPosition;
         }
 
         /// <summary>
