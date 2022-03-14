@@ -1,11 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning;
@@ -21,6 +23,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         private Storyboard storyboard { get; set; } = new Storyboard();
+
+        private IEnumerable<DrawableStoryboardSprite> sprites => this.ChildrenOfType<DrawableStoryboardSprite>();
 
         [Test]
         public void TestSkinSpriteDisallowedByDefault()
@@ -41,9 +45,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
 
-            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.Centre, Vector2.Zero)));
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
 
             assertSpritesFromSkin(true);
+
+            AddAssert("skinnable sprite has correct size", () => sprites.Any(s => Precision.AlmostEquals(s.ChildrenOfType<SkinnableSprite>().Single().Size, new Vector2(128, 128))));
         }
 
         private DrawableStoryboardSprite createSprite(string lookupName, Anchor origin, Vector2 initialPosition)
@@ -57,7 +63,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void assertSpritesFromSkin(bool fromSkin) =>
             AddAssert($"sprites are {(fromSkin ? "from skin" : "from storyboard")}",
-                () => this.ChildrenOfType<DrawableStoryboardSprite>()
-                          .All(sprite => sprite.ChildrenOfType<SkinnableSprite>().Any() == fromSkin));
+                () => sprites.All(sprite => sprite.ChildrenOfType<SkinnableSprite>().Any() == fromSkin));
     }
 }
