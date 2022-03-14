@@ -49,6 +49,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             Schedule(() =>
             {
+                foreach (var item in channelMap.Values)
+                    item.Expire();
+
+                channelMap.Clear();
+
                 Child = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
