@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         private OsuSpriteText? countText;
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider!.Colour1,
+                    Colour = colourProvider.Colour1,
                 },
                 countText = new OsuSpriteText
                 {

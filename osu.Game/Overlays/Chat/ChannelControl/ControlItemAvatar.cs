@@ -16,8 +16,9 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemAvatar : CircularContainer
     {
-        private DrawableAvatar? avatar;
         private readonly Channel channel;
+
+        private DrawableAvatar? avatar;
 
         public ControlItemAvatar(Channel channel)
         {

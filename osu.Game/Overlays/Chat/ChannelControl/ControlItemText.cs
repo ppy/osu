@@ -29,12 +29,12 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             }
         }
 
+        private readonly Channel channel;
+
         private OsuSpriteText? text;
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
-
-        private readonly Channel channel;
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public ControlItemText(Channel channel)
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 Origin = Anchor.CentreLeft,
                 Text = channel.Type == ChannelType.Public ? $"# {channel.Name.Substring(1)}" : channel.Name,
                 Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
-                Colour = colourProvider!.Light3,
+                Colour = colourProvider.Light3,
                 Margin = new MarginPadding { Bottom = 2 },
                 RelativeSizeAxes = Axes.X,
                 Truncate = true,

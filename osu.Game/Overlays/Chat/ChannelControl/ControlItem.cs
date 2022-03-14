@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             }
         }
 
+        private readonly Channel channel;
+
         private Box? hoverBox;
         private Box? selectBox;
         private ControlItemText? text;
@@ -47,12 +49,10 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         private ControlItemClose? close;
 
         [Resolved]
-        private Bindable<Channel>? selectedChannel { get; set; }
+        private Bindable<Channel> selectedChannel { get; set; } = null!;
 
         [Resolved]
-        private OverlayColourProvider? colourProvider { get; set; }
-
-        private readonly Channel channel;
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public ControlItem(Channel channel)
         {
@@ -70,13 +70,13 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 hoverBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider!.Background3,
+                    Colour = colourProvider.Background3,
                     Alpha = 0f,
                 },
                 selectBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider!.Background4,
+                    Colour = colourProvider.Background4,
                     Alpha = 0f,
                 },
                 new Container
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         {
             base.LoadComplete();
 
-            selectedChannel?.BindValueChanged(change =>
+            selectedChannel.BindValueChanged(change =>
             {
                 if (change.NewValue == channel)
                     selectBox?.Show();
