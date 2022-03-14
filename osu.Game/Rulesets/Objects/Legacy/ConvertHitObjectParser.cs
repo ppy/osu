@@ -505,7 +505,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public override bool Equals(object? obj)
                 => obj is LegacyHitSampleInfo other && Equals(other);
 
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank);
         }
 
         private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
