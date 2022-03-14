@@ -68,6 +68,5 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                     Hide();
             }, true);
         }
-
     }
 }
