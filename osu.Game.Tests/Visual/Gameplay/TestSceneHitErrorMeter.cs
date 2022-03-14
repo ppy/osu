@@ -273,6 +273,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScoreProcessor : ScoreProcessor
         {
+            public TestScoreProcessor()
+                : base(new OsuRuleset())
+            {
+            }
+
             public void Reset() => base.Reset(false);
         }
     }

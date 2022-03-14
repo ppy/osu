@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-                var scoreProcessor = new OsuScoreProcessor();
+                var scoreProcessor = new OsuScoreProcessor(Ruleset.Value.CreateInstance());
                 scoreProcessor.ApplyBeatmap(playable);
 
                 LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray())

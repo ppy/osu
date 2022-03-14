@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,11 +12,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,7 +36,7 @@ namespace osu.Game.Skinning.Editor
         private const float component_display_scale = 0.8f;
 
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new DummyRuleset())
         {
             Combo = { Value = RNG.Next(1, 1000) },
             TotalScore = { Value = RNG.Next(1000, 10000000) }
@@ -170,6 +176,16 @@ namespace osu.Game.Skinning.Editor
                 RequestPlacement?.Invoke(component.GetType());
                 return true;
             }
+        }
+
+        private class DummyRuleset : Ruleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
+            public override string Description { get; }
+            public override string ShortName { get; }
         }
     }
 }

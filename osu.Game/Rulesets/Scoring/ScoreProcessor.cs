@@ -84,6 +84,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual double ClassicScoreMultiplier => 36;
 
+        private readonly Ruleset ruleset;
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
@@ -116,8 +117,10 @@ namespace osu.Game.Rulesets.Scoring
 
         private double scoreMultiplier = 1;
 
-        public ScoreProcessor()
+        public ScoreProcessor(Ruleset ruleset)
         {
+            this.ruleset = ruleset;
+
             accuracyPortion = DefaultAccuracyPortion;
             comboPortion = DefaultComboPortion;
 
@@ -255,7 +258,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
-            extractFromStatistics(scoreInfo.Ruleset.CreateInstance(),
+            extractFromStatistics(ruleset,
                 scoreInfo.Statistics,
                 out double extractedBaseScore,
                 out double extractedMaxBaseScore,
@@ -282,7 +285,7 @@ namespace osu.Game.Rulesets.Scoring
             if (!beatmapApplied)
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
-            extractFromStatistics(scoreInfo.Ruleset.CreateInstance(),
+            extractFromStatistics(ruleset,
                 scoreInfo.Statistics,
                 out double extractedBaseScore,
                 out _,
@@ -317,7 +320,7 @@ namespace osu.Game.Rulesets.Scoring
             if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3)
             {
                 extractFromStatistics(
-                    scoreInfo.Ruleset.CreateInstance(),
+                    ruleset,
                     scoreInfo.Statistics,
                     out double computedBaseScore,
                     out double computedMaxBaseScore,

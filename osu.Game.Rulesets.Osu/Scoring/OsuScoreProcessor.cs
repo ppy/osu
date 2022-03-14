@@ -11,6 +11,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuScoreProcessor : ScoreProcessor
     {
+        public OsuScoreProcessor(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
         protected override double ClassicScoreMultiplier => 36;
 
         protected override HitEvent CreateHitEvent(JudgementResult result)
