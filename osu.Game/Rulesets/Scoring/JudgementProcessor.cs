@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
@@ -17,12 +19,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by this <see cref="JudgementProcessor"/>.
         /// </summary>
-        public event Action<JudgementResult> NewJudgement;
+        public event Action<JudgementResult>? NewJudgement;
 
         /// <summary>
         /// Invoked when a judgement is reverted, usually due to rewinding gameplay.
         /// </summary>
-        public event Action<JudgementResult> JudgementReverted;
+        public event Action<JudgementResult>? JudgementReverted;
 
         /// <summary>
         /// The maximum number of hits that can be judged.
@@ -34,7 +36,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public int JudgedHits { get; private set; }
 
-        private JudgementResult lastAppliedResult;
+        private JudgementResult? lastAppliedResult;
 
         private readonly BindableBool hasCompleted = new BindableBool();
 
@@ -163,7 +165,7 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Update()
         {
             base.Update();
-            hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult.TimeAbsolute < Clock.CurrentTime);
+            hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult?.TimeAbsolute < Clock.CurrentTime);
         }
 
         /// <summary>
