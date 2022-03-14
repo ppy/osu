@@ -18,18 +18,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class BarHitErrorMeter : HitErrorMeter
     {
-        private const int arrow_move_duration = 400;
-
         private const int judgement_line_width = 10;
         private const int judgement_line_height = 3;
-
-        private const int centre_marker_size = 6;
-
-        private const int bar_height = 200;
-
-        private const int bar_width = 2;
-
-        private const float chevron_size = 8;
 
         private SpriteIcon arrow;
         private SpriteIcon iconEarly;
@@ -50,6 +40,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [BackgroundDependencyLoader]
         private void load()
         {
+            const int centre_marker_size = 6;
+            const int bar_height = 200;
+            const int bar_width = 2;
+            const float chevron_size = 8;
+            const float icon_size = 14;
+
             var hitWindows = HitWindows.GetAllAvailableWindows().ToArray();
 
             InternalChild = new Container
@@ -72,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             iconEarly = new SpriteIcon
                             {
                                 Y = -10,
-                                Size = new Vector2(10),
+                                Size = new Vector2(icon_size),
                                 Icon = FontAwesome.Solid.ShippingFast,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.Centre,
@@ -80,7 +76,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             iconLate = new SpriteIcon
                             {
                                 Y = 10,
-                                Size = new Vector2(10),
+                                Size = new Vector2(icon_size),
                                 Icon = FontAwesome.Solid.Bicycle,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.Centre,
@@ -235,6 +231,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected override void OnNewJudgement(JudgementResult judgement)
         {
+            const int arrow_move_duration = 400;
+
             if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
                 return;
 
