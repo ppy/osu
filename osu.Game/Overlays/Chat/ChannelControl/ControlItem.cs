@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 18, Right = 5 },
+                    Padding = new MarginPadding { Left = 18, Right = 10 },
                     Child = new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
