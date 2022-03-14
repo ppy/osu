@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
     {
         private readonly Channel channel;
 
+        private SpriteIcon? placeholder;
         private DrawableAvatar? avatar;
 
         public ControlItemAvatar(Channel channel)
@@ -34,14 +35,14 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 
             Children = new Drawable[]
             {
-                new SpriteIcon
+                placeholder = new SpriteIcon
                 {
                     Icon = FontAwesome.Solid.At,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = Colour4.Black,
+                    Colour = Colour4.White,
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.2f,
+                    Alpha = 0.5f,
                 },
                 new DelayedLoadWrapper(avatar = new DrawableAvatar(channel.Users.First())
                 {
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            avatar!.OnLoadComplete += d => d.FadeInFromZero(300, Easing.OutQuint);
+            avatar!.OnLoadComplete += _ => placeholder!.FadeOut(250);
         }
     }
 }
