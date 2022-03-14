@@ -18,8 +18,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
     public class BarHitErrorMeter : HitErrorMeter
     {
-        private const int judgement_line_width = 10;
-        private const int judgement_line_height = 3;
+        private const int judgement_line_width = 14;
+        private const int judgement_line_height = 4;
 
         private SpriteIcon arrow;
         private SpriteIcon iconEarly;
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [BackgroundDependencyLoader]
         private void load()
         {
-            const int centre_marker_size = 6;
+            const int centre_marker_size = 8;
             const int bar_height = 200;
             const int bar_width = 2;
             const float chevron_size = 8;
@@ -98,6 +98,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 0.5f,
                             },
+                            new Circle
+                            {
+                                Name = "middle marker behind",
+                                Colour = GetColourForHitResult(hitWindows.Last().result),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(centre_marker_size),
+                            },
                             judgementsContainer = new Container
                             {
                                 Name = "judgements",
@@ -108,16 +116,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             },
                             new Circle
                             {
-                                Name = "middle marker behind",
-                                Colour = GetColourForHitResult(hitWindows.Last().result),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(centre_marker_size),
-                            },
-                            new Circle
-                            {
                                 Name = "middle marker in front",
-                                Colour = GetColourForHitResult(hitWindows.Last().result).Darken(0.5f),
+                                Colour = GetColourForHitResult(hitWindows.Last().result).Darken(0.3f),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Size = new Vector2(centre_marker_size),
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         protected override void OnNewJudgement(JudgementResult judgement)
         {
-            const int arrow_move_duration = 400;
+            const int arrow_move_duration = 800;
 
             if (!judgement.IsHit || judgement.HitObject.HitWindows?.WindowFor(HitResult.Miss) == 0)
                 return;
@@ -261,7 +261,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             arrow.MoveToY(
                 getRelativeJudgementPosition(floatingAverage = floatingAverage * 0.9 + judgement.TimeOffset * 0.1)
-                , arrow_move_duration, Easing.Out);
+                , arrow_move_duration, Easing.OutQuint);
         }
 
         private float getRelativeJudgementPosition(double value) => Math.Clamp((float)((value / maxHitWindow) + 1) / 2, 0, 1);
@@ -296,11 +296,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Width = 0;
 
                 this
-                    .FadeTo(0.8f, judgement_fade_in_duration, Easing.OutQuint)
+                    .FadeTo(0.6f, judgement_fade_in_duration, Easing.OutQuint)
                     .ResizeWidthTo(1, judgement_fade_in_duration, Easing.OutQuint)
                     .Then()
-                    .FadeOut(judgement_fade_out_duration, Easing.In)
-                    .ResizeWidthTo(0, judgement_fade_out_duration, Easing.In)
+                    .FadeOut(judgement_fade_out_duration)
+                    .ResizeWidthTo(0, judgement_fade_out_duration, Easing.InQuint)
                     .Expire();
             }
         }
