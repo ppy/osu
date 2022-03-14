@@ -28,7 +28,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool StartHidden => true;
 
-        private readonly Drawable targetScreen;
+        private Drawable targetScreen;
 
         private OsuTextFlowContainer headerText;
 
@@ -42,11 +42,13 @@ namespace osu.Game.Skinning.Editor
 
         private bool hasBegunMutating;
 
+        private Container content;
+
         public SkinEditor(Drawable targetScreen)
         {
-            this.targetScreen = targetScreen;
-
             RelativeSizeAxes = Axes.Both;
+
+            UpdateTargetScreen(targetScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -113,13 +115,9 @@ namespace osu.Game.Skinning.Editor
                                     Origin = Anchor.CentreLeft,
                                     RequestPlacement = placeComponent
                                 },
-                                new Container
+                                content = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new SkinBlueprintContainer(targetScreen),
-                                    }
                                 },
                             }
                         }
@@ -145,6 +143,21 @@ namespace osu.Game.Skinning.Editor
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
+        }
+
+        public void UpdateTargetScreen(Drawable targetScreen)
+        {
+            this.targetScreen = targetScreen;
+
+            Scheduler.AddOnce(loadBlueprintContainer);
+
+            void loadBlueprintContainer()
+            {
+                content.Children = new Drawable[]
+                {
+                    new SkinBlueprintContainer(targetScreen),
+                };
+            }
         }
 
         private void skinChanged()
