@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
         /// </summary>
-        public event Action OnResetFromReplayFrame;
+        public event Action? OnResetFromReplayFrame;
 
         /// <summary>
         /// The current total score.
@@ -110,7 +112,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
-        private HitObject lastHitObject;
+        private HitObject? lastHitObject;
 
         private double scoreMultiplier = 1;
 
