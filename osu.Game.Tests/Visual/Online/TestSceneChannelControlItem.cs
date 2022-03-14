@@ -45,36 +45,47 @@ namespace osu.Game.Tests.Visual.Online
         {
             Schedule(() =>
             {
-                Children = new Drawable[]
+                Child = new FillFlowContainer
                 {
-                    selectedText = new OsuSpriteText
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(10),
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Y = -140,
-                    },
-                    leaveText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Y = -120,
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(190, 200),
-                        Children = new Drawable[]
+                        selectedText = new OsuSpriteText
                         {
-                            new Box
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        leaveText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Height = 16,
+                            AlwaysPresent = true,
+                        },
+                        new Container
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 190,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colourProvider.Background6,
-                            },
-                            flow = new FillFlowContainer
-                            {
-                                Spacing = new Vector2(20),
-                                RelativeSizeAxes = Axes.Both,
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background6,
+                                },
+                                flow = new FillFlowContainer
+                                {
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(20),
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                },
                             },
                         },
                     },
