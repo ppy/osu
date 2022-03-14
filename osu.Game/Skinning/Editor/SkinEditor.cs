@@ -28,7 +28,7 @@ namespace osu.Game.Skinning.Editor
 
         protected override bool StartHidden => true;
 
-        private readonly Drawable targetScreen;
+        private Drawable targetScreen;
 
         private OsuTextFlowContainer headerText;
 
@@ -42,11 +42,13 @@ namespace osu.Game.Skinning.Editor
 
         private bool hasBegunMutating;
 
+        private Container content;
+
         public SkinEditor(Drawable targetScreen)
         {
-            this.targetScreen = targetScreen;
-
             RelativeSizeAxes = Axes.Both;
+
+            UpdateTargetScreen(targetScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -113,13 +115,9 @@ namespace osu.Game.Skinning.Editor
                                     Origin = Anchor.CentreLeft,
                                     RequestPlacement = placeComponent
                                 },
-                                new Container
+                                content = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Children = new Drawable[]
-                                    {
-                                        new SkinBlueprintContainer(targetScreen),
-                                    }
                                 },
                             }
                         }
@@ -147,6 +145,21 @@ namespace osu.Game.Skinning.Editor
             }, true);
         }
 
+        public void UpdateTargetScreen(Drawable targetScreen)
+        {
+            this.targetScreen = targetScreen;
+
+            Scheduler.AddOnce(loadBlueprintContainer);
+
+            void loadBlueprintContainer()
+            {
+                content.Children = new Drawable[]
+                {
+                    new SkinBlueprintContainer(targetScreen),
+                };
+            }
+        }
+
         private void skinChanged()
         {
             headerText.Clear();
@@ -171,7 +184,12 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            var targetContainer = getTarget(SkinnableTarget.MainHUDComponents);
+            var target = availableTargets.FirstOrDefault()?.Target;
+
+            if (target == null)
+                return;
+
+            var targetContainer = getTarget(target.Value);
 
             if (targetContainer == null)
                 return;
