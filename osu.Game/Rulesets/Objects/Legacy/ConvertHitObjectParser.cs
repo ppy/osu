@@ -500,12 +500,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 => new LegacyHitSampleInfo(newName.GetOr(Name), newBank.GetOr(Bank), newVolume.GetOr(Volume), newCustomSampleBank.GetOr(CustomSampleBank), newIsLayered.GetOr(IsLayered));
 
             public bool Equals(LegacyHitSampleInfo? other)
-                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank && IsLayered == other.IsLayered;
+                => base.Equals(other) && CustomSampleBank == other.CustomSampleBank;
 
             public override bool Equals(object? obj)
                 => obj is LegacyHitSampleInfo other && Equals(other);
 
-            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank, IsLayered);
+            public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), CustomSampleBank);
         }
 
         private class FileHitSampleInfo : LegacyHitSampleInfo, IEquatable<FileHitSampleInfo>
