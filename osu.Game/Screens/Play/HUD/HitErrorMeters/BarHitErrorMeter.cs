@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
@@ -21,13 +20,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     {
         private const int arrow_move_duration = 400;
 
-        private const int judgement_line_width = 6;
+        private const int judgement_line_width = 10;
+        private const int judgement_line_height = 3;
+
+        private const int centre_marker_size = 6;
 
         private const int bar_height = 200;
 
         private const int bar_width = 2;
-
-        private const int spacing = 2;
 
         private const float chevron_size = 8;
 
@@ -50,54 +50,25 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new FillFlowContainer
+            var hitWindows = HitWindows.GetAllAvailableWindows().ToArray();
+
+            InternalChild = new Container
             {
                 AutoSizeAxes = Axes.X,
                 Height = bar_height,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(spacing, 0),
                 Margin = new MarginPadding(2),
                 Children = new Drawable[]
                 {
-                    new Container
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Width = chevron_size,
-                        RelativeSizeAxes = Axes.Y,
-                        Child = arrow = new SpriteIcon
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.Y,
-                            Y = 0.5f,
-                            Icon = FontAwesome.Solid.ChevronRight,
-                            Size = new Vector2(chevron_size),
-                        }
-                    },
                     colourBars = new Container
                     {
-                        Width = bar_width,
-                        RelativeSizeAxes = Axes.Y,
+                        Name = "colour axis",
+                        X = chevron_size,
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
+                        Width = judgement_line_width,
+                        RelativeSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            colourBarsEarly = new Container
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Both,
-                                Height = 0.5f,
-                                Scale = new Vector2(1, -1),
-                            },
-                            colourBarsLate = new Container
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Both,
-                                Height = 0.5f,
-                            },
                             iconEarly = new SpriteIcon
                             {
                                 Y = -10,
@@ -113,20 +84,72 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Icon = FontAwesome.Solid.Bicycle,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.Centre,
-                            }
+                            },
+                            colourBarsEarly = new Container
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.TopCentre,
+                                Width = bar_width,
+                                RelativeSizeAxes = Axes.Y,
+                                Height = 0.5f,
+                                Scale = new Vector2(1, -1),
+                            },
+                            colourBarsLate = new Container
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.TopCentre,
+                                Width = bar_width,
+                                RelativeSizeAxes = Axes.Y,
+                                Height = 0.5f,
+                            },
+                            judgementsContainer = new Container
+                            {
+                                Name = "judgements",
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Y,
+                                Width = judgement_line_width,
+                            },
+                            new Circle
+                            {
+                                Name = "middle marker behind",
+                                Colour = GetColourForHitResult(hitWindows.Last().result),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(centre_marker_size),
+                            },
+                            new Circle
+                            {
+                                Name = "middle marker in front",
+                                Colour = GetColourForHitResult(hitWindows.Last().result).Darken(0.5f),
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(centre_marker_size),
+                                Scale = new Vector2(0.5f),
+                            },
                         }
                     },
-                    judgementsContainer = new Container
+                    new Container
                     {
+                        Name = "average chevron",
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Width = judgement_line_width,
+                        Width = chevron_size,
                         RelativeSizeAxes = Axes.Y,
+                        Child = arrow = new SpriteIcon
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            RelativePositionAxes = Axes.Y,
+                            Y = 0.5f,
+                            Icon = FontAwesome.Solid.ChevronRight,
+                            Size = new Vector2(chevron_size),
+                        }
                     },
                 }
             };
 
-            createColourBars();
+            createColourBars(hitWindows);
         }
 
         protected override void LoadComplete()
@@ -149,10 +172,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             iconLate.Rotation = -Rotation;
         }
 
-        private void createColourBars()
+        private void createColourBars((HitResult result, double length)[] windows)
         {
-            var windows = HitWindows.GetAllAvailableWindows().ToArray();
-
             // max to avoid div-by-zero.
             maxHitWindow = Math.Max(1, windows.First().length);
 
@@ -166,17 +187,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 colourBarsLate.Add(createColourBar(result, hitWindow, i == 0));
             }
 
-            // a little nub to mark the centre point.
-            var centre = createColourBar(windows.Last().result, 0.01f);
-            centre.Anchor = centre.Origin = Anchor.CentreLeft;
-            centre.Width = 2.5f;
-            colourBars.Add(centre);
-
-            Drawable createColourBar(HitResult result, float height, bool first = false)
+            Drawable createColourBar(HitResult result, float height, bool requireGradient = false)
             {
                 var colour = GetColourForHitResult(result);
 
-                if (first)
+                if (requireGradient)
                 {
                     // the first bar needs gradient rendering.
                     const float gradient_start = 0.8f;
@@ -243,7 +258,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             judgementsContainer.Add(new JudgementLine
             {
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
-                Origin = Anchor.CentreLeft,
+                Colour = GetColourForHitResult(judgement.Type),
             });
 
             arrow.MoveToY(
@@ -255,34 +270,40 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         internal class JudgementLine : CompositeDrawable
         {
-            private const int judgement_fade_duration = 5000;
-
             public JudgementLine()
             {
                 RelativeSizeAxes = Axes.X;
                 RelativePositionAxes = Axes.Y;
-                Height = 3;
+                Height = judgement_line_height;
 
-                InternalChild = new CircularContainer
+                Blending = BlendingParameters.Additive;
+
+                Origin = Anchor.Centre;
+                Anchor = Anchor.TopCentre;
+
+                InternalChild = new Circle
                 {
-                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    }
                 };
             }
 
             protected override void LoadComplete()
             {
+                const int judgement_fade_in_duration = 100;
+                const int judgement_fade_out_duration = 5000;
+
                 base.LoadComplete();
 
+                Alpha = 0;
                 Width = 0;
 
-                this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
-                this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration).Expire();
+                this
+                    .FadeTo(0.8f, judgement_fade_in_duration, Easing.OutQuint)
+                    .ResizeWidthTo(1, judgement_fade_in_duration, Easing.OutQuint)
+                    .Then()
+                    .FadeOut(judgement_fade_out_duration, Easing.In)
+                    .ResizeWidthTo(0, judgement_fade_out_duration, Easing.In)
+                    .Expire();
             }
         }
 
