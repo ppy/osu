@@ -15,7 +15,8 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemMention : CircularContainer
     {
-        private int mentionCount = 0;
+        private int mentionCount;
+
         public int MentionCount
         {
             get => mentionCount;
@@ -63,15 +64,12 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 
         private void updateText()
         {
-            if (mentionCount > 99)
-                countText!.Text = "99+";
-            else
-                countText!.Text = mentionCount.ToString();
+            countText!.Text = MentionCount > 99 ? "99+" : MentionCount.ToString();
 
             if (mentionCount > 0)
-                this.Show();
+                Show();
             else
-                this.Hide();
+                Hide();
         }
     }
 }

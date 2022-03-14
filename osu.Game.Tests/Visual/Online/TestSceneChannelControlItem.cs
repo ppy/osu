@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
-        private static List<Channel> channels = new List<Channel>
+        private static readonly List<Channel> channels = new List<Channel>
         {
             createPublicChannel("#public-channel"),
             createPublicChannel("#public-channel-long-name"),
@@ -90,7 +90,7 @@ namespace osu.Game.Tests.Visual.Online
                     var item = new ControlItem(channel);
                     flow.Add(item);
                     channelMap.Add(channel, item);
-                    item.OnRequestSelect += channel => selected.Value = channel;
+                    item.OnRequestSelect += c => selected.Value = c;
                     item.OnRequestLeave += leaveChannel;
                 }
             });
