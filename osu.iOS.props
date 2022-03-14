@@ -61,7 +61,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="ppy.osu.Framework.iOS" Version="2022.308.0" />
+    <PackageReference Include="ppy.osu.Framework.iOS" Version="2022.314.0" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2022.304.0" />
   </ItemGroup>
   <!-- See https://github.com/dotnet/runtime/issues/35988 (can be removed after Xamarin uses net6.0) -->
@@ -84,7 +84,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="5.0.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="ppy.osu.Framework" Version="2022.308.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2022.314.0" />
     <PackageReference Include="SharpCompress" Version="0.30.1" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
