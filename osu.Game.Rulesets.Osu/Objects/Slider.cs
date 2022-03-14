@@ -29,6 +29,23 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
+        public override IList<HitSampleInfo> AuxiliarySamples => CreateSlidingSamples().Concat(TailSamples).ToArray();
+
+        public IList<HitSampleInfo> CreateSlidingSamples()
+        {
+            var slidingSamples = new List<HitSampleInfo>();
+
+            var normalSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL);
+            if (normalSample != null)
+                slidingSamples.Add(normalSample.With("sliderslide"));
+
+            var whistleSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            if (whistleSample != null)
+                slidingSamples.Add(whistleSample.With("sliderwhistle"));
+
+            return slidingSamples;
+        }
+
         private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
         public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
