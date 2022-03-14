@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -50,6 +51,49 @@ namespace osu.Game.Tests.Visual.Gameplay
             assertSpritesFromSkin(true);
 
             AddAssert("skinnable sprite has correct size", () => sprites.Any(s => Precision.AlmostEquals(s.ChildrenOfType<SkinnableSprite>().Single().Size, new Vector2(128, 128))));
+        }
+
+        [Test]
+        public void TestFlippedSprite()
+        {
+            const string lookup_name = "hitcircleoverlay";
+
+            AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddStep("flip sprites", () => sprites.ForEach(s =>
+            {
+                s.FlipH = true;
+                s.FlipV = true;
+            }));
+            AddAssert("origin flipped", () => sprites.All(s => s.Origin == Anchor.BottomRight));
+        }
+
+        [Test]
+        public void TestNegativeScale()
+        {
+            const string lookup_name = "hitcircleoverlay";
+
+            AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddStep("scale sprite", () => sprites.ForEach(s => s.VectorScale = new Vector2(-1)));
+            AddAssert("origin flipped", () => sprites.All(s => s.Origin == Anchor.BottomRight));
+        }
+
+        [Test]
+        public void TestNegativeScaleWithFlippedSprite()
+        {
+            const string lookup_name = "hitcircleoverlay";
+
+            AddStep("allow skin lookup", () => storyboard.UseSkinSprites = true);
+            AddStep("create sprites", () => SetContents(_ => createSprite(lookup_name, Anchor.TopLeft, Vector2.Zero)));
+            AddStep("scale sprite", () => sprites.ForEach(s => s.VectorScale = new Vector2(-1)));
+            AddAssert("origin flipped", () => sprites.All(s => s.Origin == Anchor.BottomRight));
+            AddStep("flip sprites", () => sprites.ForEach(s =>
+            {
+                s.FlipH = true;
+                s.FlipV = true;
+            }));
+            AddAssert("origin back", () => sprites.All(s => s.Origin == Anchor.TopLeft));
         }
 
         private DrawableStoryboardSprite createSprite(string lookupName, Anchor origin, Vector2 initialPosition)
