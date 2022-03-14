@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
-        public override IList<HitSampleInfo> AuxiliarySamples => CreateSlidingSamples();
+        public override IList<HitSampleInfo> AuxiliarySamples => CreateSlidingSamples().Concat(TailSamples).ToArray();
 
         public IList<HitSampleInfo> CreateSlidingSamples()
         {
