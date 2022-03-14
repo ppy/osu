@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
@@ -22,6 +23,9 @@ namespace osu.Game.Tests.Visual.Online
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
+
+        [Cached]
+        private readonly OsuColour osuColour = new OsuColour();
 
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
