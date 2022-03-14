@@ -79,7 +79,7 @@ namespace osu.Game.Storyboards.Drawables
             {
                 var origin = base.Origin;
 
-                if (FlipH)
+                if ((FlipH || VectorScale.X < 0) && !(FlipH && VectorScale.X < 0))
                 {
                     if (origin.HasFlagFast(Anchor.x0))
                         origin = Anchor.x2 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
@@ -87,7 +87,7 @@ namespace osu.Game.Storyboards.Drawables
                         origin = Anchor.x0 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
                 }
 
-                if (FlipV)
+                if ((FlipV || VectorScale.Y < 0) && !(FlipV && VectorScale.Y < 0))
                 {
                     if (origin.HasFlagFast(Anchor.y0))
                         origin = Anchor.y2 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
