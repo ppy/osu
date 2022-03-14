@@ -5,6 +5,7 @@
 
 using System;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -165,7 +166,12 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Update()
         {
             base.Update();
-            hasCompleted.Value = JudgedHits == MaxHits && (JudgedHits == 0 || lastAppliedResult?.TimeAbsolute < Clock.CurrentTime);
+
+            hasCompleted.Value =
+                JudgedHits == MaxHits
+                && (JudgedHits == 0
+                    // Last applied result is guaranteed to be non-null when JudgedHits > 0.
+                    || lastAppliedResult.AsNonNull().TimeAbsolute < Clock.CurrentTime);
         }
 
         /// <summary>
