@@ -23,15 +23,8 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         [Cached]
         public readonly BindableInt Mentions = new BindableInt();
 
-        public bool HasUnread
-        {
-            get => text?.HasUnread ?? false;
-            set
-            {
-                if (text != null)
-                    text.HasUnread = value;
-            }
-        }
+        [Cached]
+        public readonly BindableBool Unread = new BindableBool();
 
         private readonly Channel channel;
 

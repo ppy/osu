@@ -117,13 +117,13 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Unread Selected", () =>
             {
                 if (selected.Value != null)
-                    channelMap[selected.Value].HasUnread = true;
+                    channelMap[selected.Value].Unread.Value = true;
             });
 
             AddStep("Read Selected", () =>
             {
                 if (selected.Value != null)
-                    channelMap[selected.Value].HasUnread = false;
+                    channelMap[selected.Value].Unread.Value = false;
             });
 
             AddStep("Add Mention Selected", () =>

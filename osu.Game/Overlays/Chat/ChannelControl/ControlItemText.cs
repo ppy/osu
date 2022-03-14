@@ -4,6 +4,7 @@
 #nullable enable
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -14,24 +15,12 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemText : Container
     {
-        private bool hasUnread;
-
-        public bool HasUnread
-        {
-            get => hasUnread;
-            set
-            {
-                if (hasUnread == value)
-                    return;
-
-                hasUnread = value;
-                updateText();
-            }
-        }
-
         private readonly Channel channel;
 
         private OsuSpriteText? text;
+
+        [Resolved]
+        private BindableBool unread { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -58,15 +47,17 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             };
         }
 
-        private void updateText()
+        protected override void LoadComplete()
         {
-            if (!IsLoaded)
-                return;
+            base.LoadComplete();
 
-            if (HasUnread)
-                text!.Colour = colourProvider.Content1;
-            else
-                text!.Colour = colourProvider.Light3;
+            unread.BindValueChanged(change =>
+            {
+                if (change.NewValue)
+                    text!.Colour = colourProvider.Content1;
+                else
+                    text!.Colour = colourProvider.Light3;
+            }, true);
         }
     }
 }
