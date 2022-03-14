@@ -20,15 +20,8 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;
 
-        public int MentionCount
-        {
-            get => mention?.MentionCount ?? 0;
-            set
-            {
-                if (mention != null)
-                    mention.MentionCount = value;
-            }
-        }
+        [Cached]
+        public readonly BindableInt Mentions = new BindableInt();
 
         public bool HasUnread
         {

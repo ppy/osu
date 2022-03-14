@@ -129,19 +129,19 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Add Mention Selected", () =>
             {
                 if (selected.Value != null)
-                    channelMap[selected.Value].MentionCount++;
+                    channelMap[selected.Value].Mentions.Value++;
             });
 
             AddStep("Add 98 Mentions Selected", () =>
             {
                 if (selected.Value != null)
-                    channelMap[selected.Value].MentionCount += 98;
+                    channelMap[selected.Value].Mentions.Value += 98;
             });
 
             AddStep("Clear Mentions Selected", () =>
             {
                 if (selected.Value != null)
-                    channelMap[selected.Value].MentionCount = 0;
+                    channelMap[selected.Value].Mentions.Value = 0;
             });
         }
 
