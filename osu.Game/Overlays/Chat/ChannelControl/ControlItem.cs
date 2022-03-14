@@ -30,8 +30,6 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 
         private Box? hoverBox;
         private Box? selectBox;
-        private ControlItemText? text;
-        private ControlItemMention? mention;
         private ControlItemClose? close;
 
         [Resolved]
@@ -84,12 +82,12 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                             new[]
                             {
                                 createAvatar(),
-                                text = new ControlItemText(channel)
+                                new ControlItemText(channel)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                 },
-                                mention = new ControlItemMention
+                                new ControlItemMention
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
