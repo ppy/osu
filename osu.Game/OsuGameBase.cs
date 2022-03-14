@@ -69,7 +69,7 @@ namespace osu.Game
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
-        public bool UseDevelopmentServer { get; }
+        public virtual bool UseDevelopmentServer { get; }
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
