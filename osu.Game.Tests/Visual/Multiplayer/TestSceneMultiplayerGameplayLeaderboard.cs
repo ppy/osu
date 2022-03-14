@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 Children = new Drawable[]
                 {
-                    scoreProcessor = new OsuScoreProcessor(),
+                    scoreProcessor = new OsuScoreProcessor(Ruleset.Value.CreateInstance()),
                 };
 
                 scoreProcessor.ApplyBeatmap(playableBeatmap);

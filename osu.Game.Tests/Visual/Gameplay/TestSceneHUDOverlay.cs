@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private HUDOverlay hudOverlay;
 
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);

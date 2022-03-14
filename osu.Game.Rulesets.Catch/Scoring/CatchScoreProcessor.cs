@@ -7,6 +7,11 @@ namespace osu.Game.Rulesets.Catch.Scoring
 {
     public class CatchScoreProcessor : ScoreProcessor
     {
+        public CatchScoreProcessor(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
         protected override double ClassicScoreMultiplier => 28;
     }
 }
