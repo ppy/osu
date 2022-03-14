@@ -4,6 +4,7 @@
 #nullable enable
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -15,22 +16,10 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemMention : CircularContainer
     {
-        private int mentionCount;
-
-        public int MentionCount
-        {
-            get => mentionCount;
-            set
-            {
-                if (value == mentionCount)
-                    return;
-
-                mentionCount = value;
-                updateText();
-            }
-        }
-
         private OsuSpriteText? countText;
+
+        [Resolved]
+        private BindableInt mentions { get; set; } = null!;
 
         [Resolved]
         private OsuColour osuColour { get; set; } = null!;
@@ -61,18 +50,24 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                     Colour = colourProvider.Background5,
                 },
             };
-
-            updateText();
         }
 
-        private void updateText()
+        protected override void LoadComplete()
         {
-            countText!.Text = MentionCount > 99 ? "99+" : MentionCount.ToString();
+            base.LoadComplete();
 
-            if (mentionCount > 0)
-                Show();
-            else
-                Hide();
+            mentions.BindValueChanged(change =>
+            {
+                int mentionCount = change.NewValue;
+
+                countText!.Text = mentionCount > 99 ? "99+" : mentionCount.ToString();
+
+                if (mentionCount > 0)
+                    Show();
+                else
+                    Hide();
+            }, true);
         }
+
     }
 }
