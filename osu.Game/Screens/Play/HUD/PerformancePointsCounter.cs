@@ -130,9 +130,9 @@ namespace osu.Game.Screens.Play.HUD
             var scoreInfo = gameplayState.Score.ScoreInfo.DeepClone();
             scoreInfo.Mods = clonedMods;
 
-            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, scoreInfo);
+            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator();
 
-            Current.Value = (int)Math.Round(calculator?.Calculate().Total ?? 0, MidpointRounding.AwayFromZero);
+            Current.Value = (int)Math.Round(calculator?.Calculate(scoreInfo, attrib).Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
 
