@@ -134,6 +134,9 @@ namespace osu.Game.Skinning.Editor
         {
             Debug.Assert(skinEditor != null);
 
+            if (!target.IsCurrentScreen())
+                return;
+
             if (!target.IsLoaded)
             {
                 Scheduler.AddOnce(setTarget, target);
