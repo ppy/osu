@@ -104,7 +104,13 @@ namespace osu.Game.Storyboards
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
             // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
             else if (UseSkinSprites)
-                drawable = new SkinnableSprite(path);
+            {
+                drawable = new SkinnableSprite(path)
+                {
+                    RelativeSizeAxes = Axes.None,
+                    AutoSizeAxes = Axes.Both,
+                };
+            }
 
             return drawable;
         }
