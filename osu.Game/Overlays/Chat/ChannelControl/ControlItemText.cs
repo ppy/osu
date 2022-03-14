@@ -64,9 +64,9 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 return;
 
             if (HasUnread)
-                text!.Colour = Colour4.White;
+                text!.Colour = colourProvider.Content1;
             else
-                text!.Colour = colourProvider!.Light3;
+                text!.Colour = colourProvider.Light3;
         }
     }
 }
