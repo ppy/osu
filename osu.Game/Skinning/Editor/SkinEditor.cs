@@ -18,6 +18,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Skinning.Editor
@@ -130,21 +131,31 @@ namespace osu.Game.Skinning.Editor
                         {
                             new Drawable[]
                             {
-                                new SkinComponentToolbox(600)
+                                new EditorSidebar
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    RequestPlacement = placeComponent
+                                    Children = new[]
+                                    {
+                                        new SkinComponentToolbox
+                                        {
+                                            RequestPlacement = placeComponent
+                                        },
+                                    }
                                 },
                                 content = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                settingsToolbox = new SkinSettingsToolbox
+                                new EditorSidebar
                                 {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                }
+                                    Children = new[]
+                                    {
+                                        settingsToolbox = new SkinSettingsToolbox
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                        }
+                                    }
+                                },
                             }
                         }
                     }
