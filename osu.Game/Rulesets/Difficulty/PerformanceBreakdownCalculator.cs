@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Difficulty
                 ).ConfigureAwait(false);
 
                 // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
-                return difficulty == null ? null : ruleset.CreatePerformanceCalculator(difficulty.Value.Attributes, perfectPlay)?.Calculate();
+                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(perfectPlay, difficulty.Value.Attributes);
             }, cancellationToken);
         }
 
