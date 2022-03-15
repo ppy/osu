@@ -26,7 +26,6 @@ using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -71,6 +70,8 @@ namespace osu.Game.Skinning.Editor
         {
             RelativeSizeAxes = Axes.Both;
 
+            const float menu_height = 40;
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -78,10 +79,10 @@ namespace osu.Game.Skinning.Editor
                 {
                     new Container
                     {
-                        Name = "Top bar",
+                        Name = "Menu container",
                         RelativeSizeAxes = Axes.X,
                         Depth = float.MinValue,
-                        Height = 40,
+                        Height = menu_height,
                         Children = new Drawable[]
                         {
                             new EditorMenuBar
@@ -117,7 +118,7 @@ namespace osu.Game.Skinning.Editor
                     new SceneLibrary
                     {
                         RelativeSizeAxes = Axes.X,
-                        Y = 45,
+                        Y = menu_height,
                     },
 
                     new GridContainer
@@ -322,22 +323,26 @@ namespace osu.Game.Skinning.Editor
             [Resolved]
             private IBindable<RulesetInfo> ruleset { get; set; }
 
+            public SceneLibrary()
+            {
+                Height = HEIGHT + padding * 2;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
                 InternalChildren = new Drawable[]
                 {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4Extensions.FromHex("222")
+                    },
                     new OsuScrollContainer(Direction.Horizontal)
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = HEIGHT + padding * 2,
+                        RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black.Opacity(0.5f)
-                            },
                             new FillFlowContainer
                             {
                                 Name = "Scene library",
