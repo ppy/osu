@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Taiko.Tests.Skinning
         [SetUp]
         public void SetUp()
         {
-            scoreProcessor = new TaikoScoreProcessor(new TaikoRuleset());
+            scoreProcessor = new TaikoScoreProcessor();
         }
 
         [Test]

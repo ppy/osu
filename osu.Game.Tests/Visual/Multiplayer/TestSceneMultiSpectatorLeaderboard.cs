@@ -8,7 +8,6 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play.HUD;
@@ -44,7 +43,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
                 var playable = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-                var scoreProcessor = new OsuScoreProcessor(new OsuRuleset());
+                var scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playable);
 
                 LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray())
