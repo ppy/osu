@@ -98,12 +98,15 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 3 },
+                                    Action = () => OnRequestLeave?.Invoke(channel),
                                 }
                             }
                         },
                     },
                 },
             };
+
+            Action = () => OnRequestSelect?.Invoke(channel);
         }
 
         protected override void LoadComplete()
@@ -117,9 +120,6 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 else
                     selectBox?.Hide();
             }, true);
-
-            Action = () => OnRequestSelect?.Invoke(channel);
-            close!.Action = () => OnRequestLeave?.Invoke(channel);
         }
 
         protected override bool OnHover(HoverEvent e)
