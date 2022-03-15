@@ -109,6 +109,9 @@ namespace osu.Game.Skinning.Editor
 
             private Container innerContainer;
 
+            private const float contracted_size = 60;
+            private const float expanded_size = 120;
+
             public ToolboxComponentButton(Drawable component)
             {
                 this.component = component;
@@ -116,7 +119,19 @@ namespace osu.Game.Skinning.Editor
                 Enabled.Value = true;
 
                 RelativeSizeAxes = Axes.X;
-                Height = 60;
+                Height = contracted_size;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.Delay(300).ResizeHeightTo(expanded_size, 500, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+                this.ResizeHeightTo(contracted_size, 500, Easing.OutQuint);
             }
 
             [BackgroundDependencyLoader]
