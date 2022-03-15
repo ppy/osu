@@ -15,12 +15,11 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemText : Container
     {
+        public readonly BindableBool Unread = new BindableBool();
+
         private readonly Channel channel;
 
         private OsuSpriteText? text;
-
-        [Resolved]
-        private BindableBool unread { get; set; } = null!;
 
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
@@ -51,7 +50,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         {
             base.LoadComplete();
 
-            unread.BindValueChanged(change =>
+            Unread.BindValueChanged(change =>
             {
                 text!.Colour = change.NewValue ? colourProvider.Content1 : colourProvider.Light3;
             }, true);

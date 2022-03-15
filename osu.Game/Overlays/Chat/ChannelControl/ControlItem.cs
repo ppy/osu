@@ -22,7 +22,6 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 
         public readonly BindableInt Mentions = new BindableInt();
 
-        [Cached]
         public readonly BindableBool Unread = new BindableBool();
 
         private readonly Channel channel;
@@ -85,6 +84,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
+                                    Unread = { BindTarget = Unread },
                                 },
                                 new ControlItemMention
                                 {
