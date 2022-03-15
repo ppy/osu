@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double effectiveMissCount;
 
-        public OsuPerformanceCalculator(Ruleset ruleset)
-            : base(ruleset)
+        public OsuPerformanceCalculator()
+            : base(new OsuRuleset())
         {
         }
 
