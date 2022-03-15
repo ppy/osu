@@ -23,7 +23,7 @@ namespace osu.Game.Skinning.Components
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Spining text", "Whether the big text should spin")]
+        [SettingSource("Spinning text", "Whether the big text should spin")]
         public Bindable<bool> TextSpin { get; } = new BindableBool();
 
         [SettingSource("Alpha", "The alpha value of this box")]
