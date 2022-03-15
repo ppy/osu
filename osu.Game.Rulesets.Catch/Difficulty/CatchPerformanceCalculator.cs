@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private int tinyTicksMissed;
         private int misses;
 
-        public CatchPerformanceCalculator(Ruleset ruleset)
-            : base(ruleset)
+        public CatchPerformanceCalculator()
+            : base(new CatchRuleset())
         {
         }
 

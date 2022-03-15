@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset)
-            : base(ruleset)
+        public ManiaPerformanceCalculator()
+            : base(new ManiaRuleset())
         {
         }
 
