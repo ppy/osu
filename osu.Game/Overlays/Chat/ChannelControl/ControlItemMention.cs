@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = osuColour.YellowLight,
+                    Colour = osuColour.Orange1,
                 },
                 countText = new OsuSpriteText
                 {
