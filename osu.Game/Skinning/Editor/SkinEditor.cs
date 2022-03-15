@@ -51,6 +51,7 @@ namespace osu.Game.Skinning.Editor
         private Container content;
 
         private EditorSidebarSection settingsToolbox;
+        private EditorSidebar componentsSidebar;
 
         public SkinEditor()
         {
@@ -146,16 +147,7 @@ namespace osu.Game.Skinning.Editor
                                 {
                                     new Drawable[]
                                     {
-                                        new EditorSidebar
-                                        {
-                                            Children = new[]
-                                            {
-                                                new SkinComponentToolbox
-                                                {
-                                                    RequestPlacement = placeComponent
-                                                },
-                                            }
-                                        },
+                                        componentsSidebar = new EditorSidebar(),
                                         content = new Container
                                         {
                                             Depth = float.MaxValue,
@@ -211,7 +203,15 @@ namespace osu.Game.Skinning.Editor
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
 
-            void loadBlueprintContainer() => content.Child = new SkinBlueprintContainer(targetScreen);
+            void loadBlueprintContainer()
+            {
+                content.Child = new SkinBlueprintContainer(targetScreen);
+
+                componentsSidebar.Child = new SkinComponentToolbox(getFirstTarget() as CompositeDrawable)
+                {
+                    RequestPlacement = placeComponent
+                };
+            }
         }
 
         private void skinChanged()
@@ -238,12 +238,7 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
-            var target = availableTargets.FirstOrDefault()?.Target;
-
-            if (target == null)
-                return;
-
-            var targetContainer = getTarget(target.Value);
+            var targetContainer = getFirstTarget();
 
             if (targetContainer == null)
                 return;
@@ -277,6 +272,8 @@ namespace osu.Game.Skinning.Editor
         }
 
         private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
+
+        private ISkinnableTarget getFirstTarget() => availableTargets.FirstOrDefault();
 
         private ISkinnableTarget getTarget(SkinnableTarget target)
         {
