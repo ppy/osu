@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 {
     internal class TaikoScoreProcessor : ScoreProcessor
     {
-        public TaikoScoreProcessor(Ruleset ruleset)
+        public TaikoScoreProcessor(TaikoRuleset ruleset)
             : base(ruleset)
         {
         }
