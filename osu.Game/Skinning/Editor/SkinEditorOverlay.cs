@@ -3,15 +3,16 @@
 
 using System.Diagnostics;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -28,7 +29,10 @@ namespace osu.Game.Skinning.Editor
 
         public const float VISIBLE_TARGET_SCALE = 0.8f;
 
-        private Screen lastTargetScreen;
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
+
+        private OsuScreen lastTargetScreen;
 
         public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
@@ -105,15 +109,23 @@ namespace osu.Game.Skinning.Editor
 
         private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)
         {
+            Debug.Assert(skinEditor != null);
+
             const float toolbar_padding_requirement = 0.18f;
 
             if (visibility.NewValue == Visibility.Visible)
             {
                 scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+
+                game?.Toolbar.Hide();
+                game?.CloseAllOverlays();
             }
             else
             {
                 scalingContainer.SetCustomRect(null);
+
+                if (lastTargetScreen?.HideOverlaysOnEnter != true)
+                    game?.Toolbar.Show();
             }
         }
 
@@ -124,7 +136,7 @@ namespace osu.Game.Skinning.Editor
         /// <summary>
         /// Set a new target screen which will be used to find skinnable components.
         /// </summary>
-        public void SetTarget(Screen screen)
+        public void SetTarget(OsuScreen screen)
         {
             lastTargetScreen = screen;
 
@@ -136,7 +148,7 @@ namespace osu.Game.Skinning.Editor
             Scheduler.AddOnce(setTarget, screen);
         }
 
-        private void setTarget(Screen target)
+        private void setTarget(OsuScreen target)
         {
             Debug.Assert(skinEditor != null);
 
