@@ -16,10 +16,9 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 {
     public class ControlItemMention : CircularContainer
     {
-        private OsuSpriteText? countText;
+        public readonly BindableInt Mentions = new BindableInt();
 
-        [Resolved]
-        private BindableInt mentions { get; set; } = null!;
+        private OsuSpriteText? countText;
 
         [Resolved]
         private OsuColour osuColour { get; set; } = null!;
@@ -56,7 +55,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         {
             base.LoadComplete();
 
-            mentions.BindValueChanged(change =>
+            Mentions.BindValueChanged(change =>
             {
                 int mentionCount = change.NewValue;
 

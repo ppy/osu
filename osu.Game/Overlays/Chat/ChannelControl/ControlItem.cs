@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;
 
-        [Cached]
         public readonly BindableInt Mentions = new BindableInt();
 
         [Cached]
@@ -92,6 +91,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 3 },
+                                    Mentions = { BindTarget = Mentions },
                                 },
                                 close = new ControlItemClose
                                 {
