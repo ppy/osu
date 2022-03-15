@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>
-        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
+        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
 
         /// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.

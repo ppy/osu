@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Invoked when this <see cref="ScoreProcessor"/> was reset from a replay frame.
         /// </summary>
-        public event Action OnResetFromReplayFrame;
+        public event Action? OnResetFromReplayFrame;
 
         /// <summary>
         /// The current total score.
@@ -82,6 +84,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected virtual double ClassicScoreMultiplier => 36;
 
+        private readonly Ruleset ruleset;
         private readonly double accuracyPortion;
         private readonly double comboPortion;
 
@@ -110,12 +113,14 @@ namespace osu.Game.Rulesets.Scoring
 
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly List<HitEvent> hitEvents = new List<HitEvent>();
-        private HitObject lastHitObject;
+        private HitObject? lastHitObject;
 
         private double scoreMultiplier = 1;
 
-        public ScoreProcessor()
+        public ScoreProcessor(Ruleset ruleset)
         {
+            this.ruleset = ruleset;
+
             accuracyPortion = DefaultAccuracyPortion;
             comboPortion = DefaultComboPortion;
 
@@ -253,7 +258,10 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
-            extractFromStatistics(scoreInfo.Ruleset.CreateInstance(),
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
+            extractFromStatistics(ruleset,
                 scoreInfo.Statistics,
                 out double extractedBaseScore,
                 out double extractedMaxBaseScore,
@@ -277,10 +285,13 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputePartialScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
             if (!beatmapApplied)
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
-            extractFromStatistics(scoreInfo.Ruleset.CreateInstance(),
+            extractFromStatistics(ruleset,
                 scoreInfo.Statistics,
                 out double extractedBaseScore,
                 out _,
@@ -306,6 +317,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputeFinalLegacyScore(ScoringMode mode, ScoreInfo scoreInfo, int maxAchievableCombo)
         {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
@@ -315,7 +329,7 @@ namespace osu.Game.Rulesets.Scoring
             if (scoreInfo.IsLegacyScore && scoreInfo.Ruleset.OnlineID == 3)
             {
                 extractFromStatistics(
-                    scoreInfo.Ruleset.CreateInstance(),
+                    ruleset,
                     scoreInfo.Statistics,
                     out double computedBaseScore,
                     out double computedMaxBaseScore,

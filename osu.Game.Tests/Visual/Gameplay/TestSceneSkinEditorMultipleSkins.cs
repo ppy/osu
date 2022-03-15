@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class TestSceneSkinEditorMultipleSkins : SkinnableTestScene
     {
         [Cached]
-        private readonly ScoreProcessor scoreProcessor = new ScoreProcessor();
+        private readonly ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
