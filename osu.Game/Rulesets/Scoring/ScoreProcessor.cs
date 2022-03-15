@@ -258,6 +258,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
             extractFromStatistics(ruleset,
                 scoreInfo.Statistics,
                 out double extractedBaseScore,
@@ -282,6 +285,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputePartialScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
             if (!beatmapApplied)
                 throw new InvalidOperationException($"Cannot compute partial score without calling {nameof(ApplyBeatmap)}.");
 
@@ -311,6 +317,9 @@ namespace osu.Game.Rulesets.Scoring
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
         public double ComputeFinalLegacyScore(ScoringMode mode, ScoreInfo scoreInfo, int maxAchievableCombo)
         {
+            if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
+                throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
+
             double accuracyRatio = scoreInfo.Accuracy;
             double comboRatio = maxAchievableCombo > 0 ? (double)scoreInfo.MaxCombo / maxAchievableCombo : 1;
 
