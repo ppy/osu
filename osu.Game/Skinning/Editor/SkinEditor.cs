@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,11 +18,12 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK;
@@ -49,6 +50,9 @@ namespace osu.Game.Skinning.Editor
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private bool hasBegunMutating;
 
@@ -314,7 +318,8 @@ namespace osu.Game.Skinning.Editor
 
         private class SceneLibrary : CompositeDrawable
         {
-            public const float HEIGHT = 30;
+            public const float BUTTON_HEIGHT = 40;
+
             private const float padding = 10;
 
             [Resolved(canBeNull: true)]
@@ -325,18 +330,18 @@ namespace osu.Game.Skinning.Editor
 
             public SceneLibrary()
             {
-                Height = HEIGHT + padding * 2;
+                Height = BUTTON_HEIGHT + padding * 2;
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OverlayColourProvider overlayColourProvider)
             {
                 InternalChildren = new Drawable[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4Extensions.FromHex("222")
+                        Colour = overlayColourProvider.Background5,
                     },
                     new OsuScrollContainer(Direction.Horizontal)
                     {
@@ -353,11 +358,18 @@ namespace osu.Game.Skinning.Editor
                                 Direction = FillDirection.Horizontal,
                                 Children = new Drawable[]
                                 {
-                                    new PurpleTriangleButton
+                                    new OsuSpriteText
+                                    {
+                                        Text = "Scene library",
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Margin = new MarginPadding(10),
+                                    },
+                                    new SceneButton
                                     {
                                         Text = "Song Select",
-                                        Width = 100,
-                                        Height = HEIGHT,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
                                         Action = () => game?.PerformFromScreen(screen =>
                                         {
                                             if (screen is SongSelect)
@@ -366,11 +378,11 @@ namespace osu.Game.Skinning.Editor
                                             screen.Push(new PlaySongSelect());
                                         }, new[] { typeof(SongSelect) })
                                     },
-                                    new PurpleTriangleButton
+                                    new SceneButton
                                     {
                                         Text = "Gameplay",
-                                        Width = 100,
-                                        Height = HEIGHT,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
                                         Action = () => game?.PerformFromScreen(screen =>
                                         {
                                             if (screen is Player)
@@ -386,6 +398,22 @@ namespace osu.Game.Skinning.Editor
                         }
                     }
                 };
+            }
+
+            private class SceneButton : OsuButton
+            {
+                public SceneButton()
+                {
+                    Width = 100;
+                    Height = BUTTON_HEIGHT;
+                }
+
+                [BackgroundDependencyLoader(true)]
+                private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
+                {
+                    BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
+                    Content.CornerRadius = 5;
+                }
             }
         }
     }
