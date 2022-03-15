@@ -7,8 +7,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
 {
     internal class ManiaScoreProcessor : ScoreProcessor
     {
-        public ManiaScoreProcessor(ManiaRuleset ruleset)
-            : base(ruleset)
+        public ManiaScoreProcessor()
+            : base(new ManiaRuleset())
         {
         }
 

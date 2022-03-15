@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     public class OsuScoreProcessor : ScoreProcessor
     {
-        public OsuScoreProcessor(OsuRuleset ruleset)
-            : base(ruleset)
+        public OsuScoreProcessor()
+            : base(new OsuRuleset())
         {
         }
 

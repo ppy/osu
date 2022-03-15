@@ -16,7 +16,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Spectator;
 using osu.Game.Replays.Legacy;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -65,7 +64,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 Children = new Drawable[]
                 {
-                    scoreProcessor = new OsuScoreProcessor(new OsuRuleset()),
+                    scoreProcessor = new OsuScoreProcessor(),
                 };
 
                 scoreProcessor.ApplyBeatmap(playableBeatmap);

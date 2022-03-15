@@ -7,8 +7,8 @@ namespace osu.Game.Rulesets.Catch.Scoring
 {
     public class CatchScoreProcessor : ScoreProcessor
     {
-        public CatchScoreProcessor(CatchRuleset ruleset)
-            : base(ruleset)
+        public CatchScoreProcessor()
+            : base(new CatchRuleset())
         {
         }
 
