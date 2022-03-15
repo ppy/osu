@@ -55,6 +55,7 @@ namespace osu.Game.Screens.Play.HUD
         private readonly CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
 
         private JudgementResult lastJudgement;
+        private PerformanceCalculator performanceCalculator;
 
         public PerformancePointsCounter()
         {
@@ -70,6 +71,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (gameplayState != null)
             {
+                performanceCalculator = gameplayState.Ruleset.CreatePerformanceCalculator();
+
                 clonedMods = gameplayState.Mods.Select(m => m.DeepClone()).ToArray();
 
                 var gameplayWorkingBeatmap = new GameplayWorkingBeatmap(gameplayState.Beatmap);
@@ -130,9 +133,7 @@ namespace osu.Game.Screens.Play.HUD
             var scoreInfo = gameplayState.Score.ScoreInfo.DeepClone();
             scoreInfo.Mods = clonedMods;
 
-            var calculator = gameplayState.Ruleset.CreatePerformanceCalculator(attrib, scoreInfo);
-
-            Current.Value = (int)Math.Round(calculator?.Calculate().Total ?? 0, MidpointRounding.AwayFromZero);
+            Current.Value = (int)Math.Round(performanceCalculator?.Calculate(scoreInfo, attrib).Total ?? 0, MidpointRounding.AwayFromZero);
             IsValid = true;
         }
 
