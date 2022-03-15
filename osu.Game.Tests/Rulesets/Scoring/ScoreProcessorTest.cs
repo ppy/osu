@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -28,7 +27,7 @@ namespace osu.Game.Tests.Rulesets.Scoring
         [SetUp]
         public void SetUp()
         {
-            scoreProcessor = new ScoreProcessor(new OsuRuleset());
+            scoreProcessor = new ScoreProcessor(new TestRuleset());
             beatmap = new TestBeatmap(new RulesetInfo())
             {
                 HitObjects = new List<HitObject>
