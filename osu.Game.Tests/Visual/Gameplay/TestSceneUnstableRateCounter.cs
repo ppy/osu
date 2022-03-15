@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
@@ -102,6 +103,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScoreProcessor : ScoreProcessor
         {
+            public TestScoreProcessor()
+                : base(new OsuRuleset())
+            {
+            }
+
             public void Reset() => base.Reset(false);
         }
     }
