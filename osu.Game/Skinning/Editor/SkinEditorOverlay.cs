@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 
@@ -114,15 +116,39 @@ namespace osu.Game.Skinning.Editor
         }
 
         /// <summary>
-        /// Exit any existing skin editor due to the game state changing.
+        /// Set a new target screen which will be used to find skinnable components.
         /// </summary>
-        public void Reset()
+        public void SetTarget(Screen screen)
         {
-            skinEditor?.Save();
-            skinEditor?.Hide();
-            skinEditor?.Expire();
+            if (skinEditor == null) return;
 
-            skinEditor = null;
+            skinEditor.Save();
+
+            // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
+            Scheduler.AddOnce(setTarget, screen);
+        }
+
+        private void setTarget(Screen target)
+        {
+            Debug.Assert(skinEditor != null);
+
+            if (!target.IsCurrentScreen())
+                return;
+
+            if (!target.IsLoaded)
+            {
+                Scheduler.AddOnce(setTarget, target);
+                return;
+            }
+
+            if (skinEditor.State.Value == Visibility.Visible)
+                skinEditor.UpdateTargetScreen(target);
+            else
+            {
+                skinEditor.Hide();
+                skinEditor.Expire();
+                skinEditor = null;
+            }
         }
     }
 }

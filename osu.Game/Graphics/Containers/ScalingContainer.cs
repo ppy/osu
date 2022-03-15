@@ -6,6 +6,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Layout;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Screens;
@@ -66,7 +68,7 @@ namespace osu.Game.Graphics.Containers
             this.targetMode = targetMode;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = sizableContainer = new AlwaysInputContainer
+            InternalChild = sizableContainer = new SizeableAlwaysInputContainer(targetMode == ScalingMode.Everything)
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
@@ -209,13 +211,50 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        private class AlwaysInputContainer : Container
+        private class SizeableAlwaysInputContainer : Container
         {
+            [Resolved]
+            private GameHost host { get; set; }
+
+            [Resolved]
+            private ISafeArea safeArea { get; set; }
+
+            private readonly bool confineHostCursor;
+            private readonly LayoutValue cursorRectCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
+
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            public AlwaysInputContainer()
+            /// <summary>
+            /// Container used for sizing/positioning purposes in <see cref="ScalingContainer"/>. Always receives mouse input.
+            /// </summary>
+            /// <param name="confineHostCursor">Whether to confine the host cursor to the draw area of this container.</param>
+            /// <remarks>Cursor confinement will abide by the <see cref="OsuSetting.ConfineMouseMode"/> setting.</remarks>
+            public SizeableAlwaysInputContainer(bool confineHostCursor)
             {
                 RelativeSizeAxes = Axes.Both;
+                this.confineHostCursor = confineHostCursor;
+
+                if (confineHostCursor)
+                    AddLayout(cursorRectCache);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (confineHostCursor && !cursorRectCache.IsValid)
+                {
+                    updateHostCursorConfineRect();
+                    cursorRectCache.Validate();
+                }
+            }
+
+            private void updateHostCursorConfineRect()
+            {
+                if (host.Window == null) return;
+
+                bool coversWholeScreen = Size == Vector2.One && safeArea.SafeAreaPadding.Value.Total == Vector2.Zero;
+                host.Window.CursorConfineRect = coversWholeScreen ? (RectangleF?)null : ToScreenSpace(DrawRectangle).AABBFloat;
             }
         }
     }

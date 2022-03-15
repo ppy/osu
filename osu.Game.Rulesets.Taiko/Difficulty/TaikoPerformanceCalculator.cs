@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset)
-            : base(ruleset)
+        public TaikoPerformanceCalculator()
+            : base(new TaikoRuleset())
         {
         }
 
