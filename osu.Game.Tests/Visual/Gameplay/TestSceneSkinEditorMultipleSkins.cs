@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning.Editor;
+using osu.Game.Tests.Beatmaps;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -21,6 +22,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        [Cached]
+        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
 
         [SetUpSteps]
         public void SetUpSteps()
