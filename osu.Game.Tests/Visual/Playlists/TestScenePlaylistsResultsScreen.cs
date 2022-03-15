@@ -40,32 +40,30 @@ namespace osu.Game.Tests.Visual.Playlists
         private int totalCount;
         private ScoreInfo userScore;
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            lowestScoreId = 1;
-            highestScoreId = 1;
-            requestComplete = false;
-            totalCount = 0;
-
-            userScore = TestResources.CreateTestScoreInfo();
-            userScore.TotalScore = 0;
-            userScore.Statistics = new Dictionary<HitResult, int>();
-
-            bindHandler();
-        });
-
         [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
 
-            // Existing test instances of the results screen hold a leased bindable of the beatmap,
-            // so wait for those screens to be cleaned up by the base SetUpSteps before re-assigning
-            AddStep("Create Working Beatmap", () =>
+            // Previous test instances of the results screen may still exist at this point so wait for
+            // those screens to be cleaned up by the base SetUpSteps before re-initialising test state.
+            // The the screen also holds a leased Beatmap bindable so reassigning it must happen after
+            // the screen as been exited.
+            AddStep("initialise user scores and beatmap", () =>
             {
-                // Beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
-                // else the tests that rely on ordering will fall over.
+                lowestScoreId = 1;
+                highestScoreId = 1;
+                requestComplete = false;
+                totalCount = 0;
+
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.TotalScore = 0;
+                userScore.Statistics = new Dictionary<HitResult, int>();
+
+                bindHandler();
+
+                // Beatmap is required to be an actual beatmap so the scores can get their scores correctly
+                // calculated for standardised scoring, else the tests that rely on ordering will fall over.
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
             });
         }
