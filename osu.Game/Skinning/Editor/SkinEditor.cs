@@ -4,29 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Play;
-using osu.Game.Screens.Select;
-using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -119,7 +111,7 @@ namespace osu.Game.Skinning.Editor
                             },
                         },
                     },
-                    new SceneLibrary
+                    new SkinEditorSceneLibrary
                     {
                         RelativeSizeAxes = Axes.X,
                         Y = menu_height,
@@ -314,107 +306,6 @@ namespace osu.Game.Skinning.Editor
         {
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
-        }
-
-        private class SceneLibrary : CompositeDrawable
-        {
-            public const float BUTTON_HEIGHT = 40;
-
-            private const float padding = 10;
-
-            [Resolved(canBeNull: true)]
-            private OsuGame game { get; set; }
-
-            [Resolved]
-            private IBindable<RulesetInfo> ruleset { get; set; }
-
-            public SceneLibrary()
-            {
-                Height = BUTTON_HEIGHT + padding * 2;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider overlayColourProvider)
-            {
-                InternalChildren = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = overlayColourProvider.Background5,
-                    },
-                    new OsuScrollContainer(Direction.Horizontal)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new FillFlowContainer
-                            {
-                                Name = "Scene library",
-                                AutoSizeAxes = Axes.X,
-                                RelativeSizeAxes = Axes.Y,
-                                Spacing = new Vector2(padding),
-                                Padding = new MarginPadding(padding),
-                                Direction = FillDirection.Horizontal,
-                                Children = new Drawable[]
-                                {
-                                    new OsuSpriteText
-                                    {
-                                        Text = "Scene library",
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Margin = new MarginPadding(10),
-                                    },
-                                    new SceneButton
-                                    {
-                                        Text = "Song Select",
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Action = () => game?.PerformFromScreen(screen =>
-                                        {
-                                            if (screen is SongSelect)
-                                                return;
-
-                                            screen.Push(new PlaySongSelect());
-                                        }, new[] { typeof(SongSelect) })
-                                    },
-                                    new SceneButton
-                                    {
-                                        Text = "Gameplay",
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Action = () => game?.PerformFromScreen(screen =>
-                                        {
-                                            if (screen is Player)
-                                                return;
-
-                                            var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
-                                            if (replayGeneratingMod != null)
-                                                screen.Push(new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods)));
-                                        }, new[] { typeof(Player), typeof(SongSelect) })
-                                    },
-                                }
-                            },
-                        }
-                    }
-                };
-            }
-
-            private class SceneButton : OsuButton
-            {
-                public SceneButton()
-                {
-                    Width = 100;
-                    Height = BUTTON_HEIGHT;
-                }
-
-                [BackgroundDependencyLoader(true)]
-                private void load([CanBeNull] OverlayColourProvider overlayColourProvider, OsuColour colours)
-                {
-                    BackgroundColour = overlayColourProvider?.Background3 ?? colours.Blue3;
-                    Content.CornerRadius = 5;
-                }
-            }
         }
     }
 }
