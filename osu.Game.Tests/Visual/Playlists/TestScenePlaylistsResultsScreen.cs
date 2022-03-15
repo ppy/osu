@@ -53,11 +53,22 @@ namespace osu.Game.Tests.Visual.Playlists
             userScore.Statistics = new Dictionary<HitResult, int>();
 
             bindHandler();
-
-            // beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
-            // else the tests that rely on ordering will fall over.
-            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
         });
+
+        [SetUpSteps]
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            // Existing test instances of the results screen hold a leased bindable of the beatmap,
+            // so wait for those screens to be cleaned up by the base SetUpSteps before re-assigning
+            AddStep("Create Working Beatmap", () =>
+            {
+                // Beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
+                // else the tests that rely on ordering will fall over.
+                Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
+            });
+        }
 
         [Test]
         public void TestShowWithUserScore()
