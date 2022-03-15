@@ -21,16 +21,18 @@ namespace osu.Game.Skinning.Editor
     /// </summary>
     public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        private readonly ScalingContainer target;
+        private readonly ScalingContainer scalingContainer;
 
         [CanBeNull]
         private SkinEditor skinEditor;
 
         public const float VISIBLE_TARGET_SCALE = 0.8f;
 
-        public SkinEditorOverlay(ScalingContainer target)
+        private Screen lastTargetScreen;
+
+        public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
-            this.target = target;
+            this.scalingContainer = scalingContainer;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -77,7 +79,7 @@ namespace osu.Game.Skinning.Editor
                 return;
             }
 
-            var editor = new SkinEditor(target);
+            var editor = new SkinEditor();
             editor.State.BindValueChanged(editorVisibilityChanged);
 
             skinEditor = editor;
@@ -95,6 +97,8 @@ namespace osu.Game.Skinning.Editor
                         return;
 
                     AddInternal(editor);
+
+                    SetTarget(lastTargetScreen);
                 });
             });
         }
@@ -105,11 +109,11 @@ namespace osu.Game.Skinning.Editor
 
             if (visibility.NewValue == Visibility.Visible)
             {
-                target.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
             }
             else
             {
-                target.SetCustomRect(null);
+                scalingContainer.SetCustomRect(null);
             }
         }
 
@@ -122,6 +126,8 @@ namespace osu.Game.Skinning.Editor
         /// </summary>
         public void SetTarget(Screen screen)
         {
+            lastTargetScreen = screen;
+
             if (skinEditor == null) return;
 
             skinEditor.Save();

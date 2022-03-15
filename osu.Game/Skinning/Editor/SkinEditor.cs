@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -49,16 +48,20 @@ namespace osu.Game.Skinning.Editor
 
         private EditorToolboxGroup settingsToolbox;
 
+        public SkinEditor()
+        {
+        }
+
         public SkinEditor(Drawable targetScreen)
         {
-            RelativeSizeAxes = Axes.Both;
-
             UpdateTargetScreen(targetScreen);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            RelativeSizeAxes = Axes.Both;
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -155,7 +158,7 @@ namespace osu.Game.Skinning.Editor
                 Scheduler.AddOnce(skinChanged);
             }, true);
 
-            SelectedComponents.BindCollectionChanged(selectionChanged);
+            SelectedComponents.BindCollectionChanged((_, __) => Scheduler.AddOnce(populateSettings), true);
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
@@ -163,6 +166,7 @@ namespace osu.Game.Skinning.Editor
             this.targetScreen = targetScreen;
 
             SelectedComponents.Clear();
+
             Scheduler.AddOnce(loadBlueprintContainer);
 
             void loadBlueprintContainer()
@@ -224,7 +228,7 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.Add(component);
         }
 
-        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void populateSettings()
         {
             settingsToolbox.Clear();
 
