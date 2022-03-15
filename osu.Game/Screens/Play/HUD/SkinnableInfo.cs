@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
-using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -69,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
                 var bindable = (IBindable)property.GetValue(component);
 
                 if (!bindable.IsDefault)
-                    Settings.Add(property.Name.Underscore(), ModUtils.GetSettingUnderlyingValue(bindable));
+                    Settings.Add(property.Name.Underscore(), bindable.GetUnderlyingSettingValue());
             }
 
             if (component is Container<Drawable> container)
