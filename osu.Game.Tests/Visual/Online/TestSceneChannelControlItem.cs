@@ -91,7 +91,6 @@ namespace osu.Game.Tests.Visual.Online
                                 flow = new FillFlowContainer
                                 {
                                     Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(20),
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                 },
