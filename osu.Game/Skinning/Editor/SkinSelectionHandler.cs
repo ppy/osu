@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.EnumExtensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -198,6 +199,12 @@ namespace osu.Game.Skinning.Editor
             {
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
+
+            yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Position = Vector2.Zero;
+            });
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
