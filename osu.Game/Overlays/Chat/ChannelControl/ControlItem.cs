@@ -33,16 +33,13 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
 
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
         public ControlItem(Channel channel)
         {
             this.channel = channel;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
             Height = 30;
             RelativeSizeAxes = Axes.X;

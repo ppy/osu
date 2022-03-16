@@ -20,14 +20,8 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 
         private OsuSpriteText? countText;
 
-        [Resolved]
-        private OsuColour osuColour { get; set; } = null!;
-
-        [Resolved]
-        private OverlayColourProvider colourProvider { get; set; } = null!;
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour osuColour, OverlayColourProvider colourProvider)
         {
             Masking = true;
             Size = new Vector2(20, 12);
