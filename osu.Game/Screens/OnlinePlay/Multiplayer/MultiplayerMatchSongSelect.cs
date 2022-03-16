@@ -117,6 +117,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea();
 
+        protected override bool IsValidMod(Mod mod) => base.IsValidMod(mod) && !(mod is ModAdaptiveSpeed);
+
         protected override bool IsValidFreeMod(Mod mod) => base.IsValidFreeMod(mod) && !(mod is ModTimeRamp) && !(mod is ModRateAdjust);
     }
 }
