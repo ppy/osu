@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                                                 })
                                             },
                                         },
-                                        new EditorSidebarSection("Section 2")
+                                        new EditorSidebarSection("Section with a really long section header")
                                         {
                                             Child = new FillFlowContainer
                                             {
