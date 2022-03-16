@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,10 +12,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Skinning.Editor
@@ -43,6 +46,8 @@ namespace osu.Game.Skinning.Editor
         private bool hasBegunMutating;
 
         private Container content;
+
+        private EditorToolboxGroup settingsToolbox;
 
         public SkinEditor(Drawable targetScreen)
         {
@@ -103,7 +108,8 @@ namespace osu.Game.Skinning.Editor
                         ColumnDimensions = new[]
                         {
                             new Dimension(GridSizeMode.AutoSize),
-                            new Dimension()
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize),
                         },
                         Content = new[]
                         {
@@ -119,6 +125,11 @@ namespace osu.Game.Skinning.Editor
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
+                                settingsToolbox = new SkinSettingsToolbox
+                                {
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                }
                             }
                         }
                     }
@@ -143,12 +154,15 @@ namespace osu.Game.Skinning.Editor
                 hasBegunMutating = false;
                 Scheduler.AddOnce(skinChanged);
             }, true);
+
+            SelectedComponents.BindCollectionChanged(selectionChanged);
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
         {
             this.targetScreen = targetScreen;
 
+            SelectedComponents.Clear();
             Scheduler.AddOnce(loadBlueprintContainer);
 
             void loadBlueprintContainer()
@@ -208,6 +222,18 @@ namespace osu.Game.Skinning.Editor
 
             SelectedComponents.Clear();
             SelectedComponents.Add(component);
+        }
+
+        private void selectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            settingsToolbox.Clear();
+
+            var first = SelectedComponents.OfType<Drawable>().FirstOrDefault();
+
+            if (first != null)
+            {
+                settingsToolbox.Children = first.CreateSettingsControls().ToArray();
+            }
         }
 
         private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
