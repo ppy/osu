@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Skinning.Editor;
@@ -15,6 +17,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         private SkinEditor skinEditor;
 
         protected override bool Autoplay => true;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         [SetUpSteps]
         public override void SetUpSteps()
