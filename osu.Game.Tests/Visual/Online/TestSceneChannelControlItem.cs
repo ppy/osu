@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual.Online
         private void leaveChannel(Channel channel)
         {
             leaveText.Text = $"OnRequestLeave: {channel.Name}";
-            leaveText.FadeIn().Then().FadeOut(1000, Easing.InQuint);
+            leaveText.FadeOutFromOne(1000, Easing.InQuint);
         }
 
         private static Channel createPublicChannel(string name) =>
