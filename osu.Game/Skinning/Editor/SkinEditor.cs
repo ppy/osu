@@ -16,6 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components.Menus;
 
@@ -42,6 +43,9 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         private bool hasBegunMutating;
 
         private Container content;
@@ -62,6 +66,8 @@ namespace osu.Game.Skinning.Editor
         {
             RelativeSizeAxes = Axes.Both;
 
+            const float menu_height = 40;
+
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -69,10 +75,10 @@ namespace osu.Game.Skinning.Editor
                 {
                     new Container
                     {
-                        Name = "Top bar",
+                        Name = "Menu container",
                         RelativeSizeAxes = Axes.X,
                         Depth = float.MinValue,
-                        Height = 40,
+                        Height = menu_height,
                         Children = new Drawable[]
                         {
                             new EditorMenuBar
@@ -105,6 +111,12 @@ namespace osu.Game.Skinning.Editor
                             },
                         },
                     },
+                    new SkinEditorSceneLibrary
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Y = menu_height,
+                    },
+
                     new GridContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -173,7 +185,10 @@ namespace osu.Game.Skinning.Editor
             {
                 content.Children = new Drawable[]
                 {
-                    new SkinBlueprintContainer(targetScreen),
+                    new SkinBlueprintContainer(targetScreen)
+                    {
+                        Margin = new MarginPadding { Top = 100 },
+                    }
                 };
             }
         }
