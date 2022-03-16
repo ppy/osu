@@ -17,18 +17,16 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Components;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : ScrollingToolboxGroup
+    public class SkinComponentToolbox : EditorSidebarSection
     {
-        public const float WIDTH = 200;
-
         public Action<Type> RequestPlacement;
 
         [Cached]
@@ -41,11 +39,9 @@ namespace osu.Game.Skinning.Editor
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
-        public SkinComponentToolbox(float height)
-            : base("Components", height)
+        public SkinComponentToolbox()
+            : base("Components")
         {
-            RelativeSizeAxes = Axes.None;
-            Width = WIDTH;
         }
 
         [BackgroundDependencyLoader]
