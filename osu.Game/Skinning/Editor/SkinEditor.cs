@@ -17,7 +17,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets.Edit;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Skinning.Editor
@@ -50,7 +50,7 @@ namespace osu.Game.Skinning.Editor
 
         private Container content;
 
-        private EditorToolboxGroup settingsToolbox;
+        private EditorSidebarSection settingsToolbox;
 
         public SkinEditor()
         {
@@ -71,82 +71,111 @@ namespace osu.Game.Skinning.Editor
             InternalChild = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Child = new GridContainer
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
                     {
-                        Name = "Menu container",
-                        RelativeSizeAxes = Axes.X,
-                        Depth = float.MinValue,
-                        Height = menu_height,
-                        Children = new Drawable[]
-                        {
-                            new EditorMenuBar
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                RelativeSizeAxes = Axes.Both,
-                                Items = new[]
-                                {
-                                    new MenuItem("File")
-                                    {
-                                        Items = new[]
-                                        {
-                                            new EditorMenuItem("Save", MenuItemType.Standard, Save),
-                                            new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
-                                            new EditorMenuItemSpacer(),
-                                            new EditorMenuItem("Exit", MenuItemType.Standard, Hide),
-                                        },
-                                    },
-                                }
-                            },
-                            headerText = new OsuTextFlowContainer
-                            {
-                                TextAnchor = Anchor.TopRight,
-                                Padding = new MarginPadding(5),
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                AutoSizeAxes = Axes.X,
-                                RelativeSizeAxes = Axes.Y,
-                            },
-                        },
-                    },
-                    new SkinEditorSceneLibrary
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Y = menu_height,
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
                     },
 
-                    new GridContainer
+                    Content = new[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        ColumnDimensions = new[]
+                        new Drawable[]
                         {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize),
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            new Container
                             {
-                                new SkinComponentToolbox(600)
+                                Name = "Menu container",
+                                RelativeSizeAxes = Axes.X,
+                                Depth = float.MinValue,
+                                Height = menu_height,
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    RequestPlacement = placeComponent
+                                    new EditorMenuBar
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Items = new[]
+                                        {
+                                            new MenuItem("File")
+                                            {
+                                                Items = new[]
+                                                {
+                                                    new EditorMenuItem("Save", MenuItemType.Standard, Save),
+                                                    new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
+                                                    new EditorMenuItemSpacer(),
+                                                    new EditorMenuItem("Exit", MenuItemType.Standard, Hide),
+                                                },
+                                            },
+                                        }
+                                    },
+                                    headerText = new OsuTextFlowContainer
+                                    {
+                                        TextAnchor = Anchor.TopRight,
+                                        Padding = new MarginPadding(5),
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                    },
                                 },
-                                content = new Container
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            new SkinEditorSceneLibrary
+                            {
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.AutoSize),
                                 },
-                                settingsToolbox = new SkinSettingsToolbox
+                                Content = new[]
                                 {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
+                                    new Drawable[]
+                                    {
+                                        new EditorSidebar
+                                        {
+                                            Children = new[]
+                                            {
+                                                new SkinComponentToolbox
+                                                {
+                                                    RequestPlacement = placeComponent
+                                                },
+                                            }
+                                        },
+                                        content = new Container
+                                        {
+                                            Depth = float.MaxValue,
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new EditorSidebar
+                                        {
+                                            Children = new[]
+                                            {
+                                                settingsToolbox = new SkinSettingsToolbox
+                                                {
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                }
+                                            }
+                                        },
+                                    }
                                 }
                             }
-                        }
+                        },
                     }
                 }
             };
@@ -180,17 +209,9 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.Clear();
 
             Scheduler.AddOnce(loadBlueprintContainer);
+            Scheduler.AddOnce(populateSettings);
 
-            void loadBlueprintContainer()
-            {
-                content.Children = new Drawable[]
-                {
-                    new SkinBlueprintContainer(targetScreen)
-                    {
-                        Margin = new MarginPadding { Top = 100 },
-                    }
-                };
-            }
+            void loadBlueprintContainer() => content.Child = new SkinBlueprintContainer(targetScreen);
         }
 
         private void skinChanged()
