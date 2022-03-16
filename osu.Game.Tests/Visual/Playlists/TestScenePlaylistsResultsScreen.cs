@@ -40,24 +40,33 @@ namespace osu.Game.Tests.Visual.Playlists
         private int totalCount;
         private ScoreInfo userScore;
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
+        [SetUpSteps]
+        public override void SetUpSteps()
         {
-            lowestScoreId = 1;
-            highestScoreId = 1;
-            requestComplete = false;
-            totalCount = 0;
+            base.SetUpSteps();
 
-            userScore = TestResources.CreateTestScoreInfo();
-            userScore.TotalScore = 0;
-            userScore.Statistics = new Dictionary<HitResult, int>();
+            // Previous test instances of the results screen may still exist at this point so wait for
+            // those screens to be cleaned up by the base SetUpSteps before re-initialising test state.
+            // The the screen also holds a leased Beatmap bindable so reassigning it must happen after
+            // the screen as been exited.
+            AddStep("initialise user scores and beatmap", () =>
+            {
+                lowestScoreId = 1;
+                highestScoreId = 1;
+                requestComplete = false;
+                totalCount = 0;
 
-            bindHandler();
+                userScore = TestResources.CreateTestScoreInfo();
+                userScore.TotalScore = 0;
+                userScore.Statistics = new Dictionary<HitResult, int>();
 
-            // beatmap is required to be an actual beatmap so the scores can get their scores correctly calculated for standardised scoring.
-            // else the tests that rely on ordering will fall over.
-            Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-        });
+                bindHandler();
+
+                // Beatmap is required to be an actual beatmap so the scores can get their scores correctly
+                // calculated for standardised scoring, else the tests that rely on ordering will fall over.
+                Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
+            });
+        }
 
         [Test]
         public void TestShowWithUserScore()
