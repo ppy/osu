@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -84,7 +83,7 @@ namespace osu.Game.Skinning.Editor
             }
 
             var editor = new SkinEditor();
-            editor.State.BindValueChanged(editorVisibilityChanged);
+            editor.State.BindValueChanged(visibility => updateComponentVisibility());
 
             skinEditor = editor;
 
@@ -107,13 +106,13 @@ namespace osu.Game.Skinning.Editor
             });
         }
 
-        private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)
+        private void updateComponentVisibility()
         {
             Debug.Assert(skinEditor != null);
 
             const float toolbar_padding_requirement = 0.18f;
 
-            if (visibility.NewValue == Visibility.Visible)
+            if (skinEditor.State.Value == Visibility.Visible)
             {
                 scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
 
@@ -143,6 +142,9 @@ namespace osu.Game.Skinning.Editor
             if (skinEditor == null) return;
 
             skinEditor.Save();
+
+            // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
+            updateComponentVisibility();
 
             // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
             Scheduler.AddOnce(setTarget, screen);
