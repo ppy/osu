@@ -1184,7 +1184,7 @@ namespace osu.Game
                     BackButton.Hide();
             }
 
-            skinEditor.SetTarget((Screen)newScreen);
+            skinEditor.SetTarget((OsuScreen)newScreen);
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
