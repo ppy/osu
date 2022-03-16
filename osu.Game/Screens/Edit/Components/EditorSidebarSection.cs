@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
 
@@ -49,24 +49,32 @@ namespace osu.Game.Screens.Edit.Components
 
                 Margin = new MarginPadding { Vertical = 10, Horizontal = 5 };
 
-                AutoSizeAxes = Axes.Both;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
             }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                InternalChildren = new Drawable[]
+                InternalChild = new FillFlowContainer
                 {
-                    new OsuSpriteText
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
+                    Children = new Drawable[]
                     {
-                        Text = text,
-                        Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold),
-                    },
-                    new Circle
-                    {
-                        Y = 18,
-                        Colour = colourProvider.Highlight1,
-                        Size = new Vector2(28, 2),
+                        new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 16, weight: FontWeight.SemiBold))
+                        {
+                            Text = text,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        },
+                        new Circle
+                        {
+                            Colour = colourProvider.Highlight1,
+                            Size = new Vector2(28, 2),
+                        }
                     }
                 };
             }
