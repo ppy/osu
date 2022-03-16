@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Edit
     {
         protected readonly OsuScrollContainer Scroll;
 
+        protected readonly FillFlowContainer FillFlow;
+
         protected override Container<Drawable> Content { get; }
 
         public ScrollingToolboxGroup(string title, float scrollAreaHeight)
@@ -20,7 +22,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 RelativeSizeAxes = Axes.X,
                 Height = scrollAreaHeight,
-                Child = Content = new FillFlowContainer
+                Child = Content = FillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
