@@ -3,15 +3,15 @@
 
 using System.Diagnostics;
 using JetBrains.Annotations;
-using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -21,16 +21,21 @@ namespace osu.Game.Skinning.Editor
     /// </summary>
     public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
     {
-        private readonly ScalingContainer target;
+        private readonly ScalingContainer scalingContainer;
 
         [CanBeNull]
         private SkinEditor skinEditor;
 
         public const float VISIBLE_TARGET_SCALE = 0.8f;
 
-        public SkinEditorOverlay(ScalingContainer target)
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
+
+        private OsuScreen lastTargetScreen;
+
+        public SkinEditorOverlay(ScalingContainer scalingContainer)
         {
-            this.target = target;
+            this.scalingContainer = scalingContainer;
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -77,8 +82,8 @@ namespace osu.Game.Skinning.Editor
                 return;
             }
 
-            var editor = new SkinEditor(target);
-            editor.State.BindValueChanged(editorVisibilityChanged);
+            var editor = new SkinEditor();
+            editor.State.BindValueChanged(visibility => updateComponentVisibility());
 
             skinEditor = editor;
 
@@ -95,21 +100,31 @@ namespace osu.Game.Skinning.Editor
                         return;
 
                     AddInternal(editor);
+
+                    SetTarget(lastTargetScreen);
                 });
             });
         }
 
-        private void editorVisibilityChanged(ValueChangedEvent<Visibility> visibility)
+        private void updateComponentVisibility()
         {
+            Debug.Assert(skinEditor != null);
+
             const float toolbar_padding_requirement = 0.18f;
 
-            if (visibility.NewValue == Visibility.Visible)
+            if (skinEditor.State.Value == Visibility.Visible)
             {
-                target.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+                scalingContainer.SetCustomRect(new RectangleF(toolbar_padding_requirement, 0.1f, 0.8f - toolbar_padding_requirement, 0.7f), true);
+
+                game?.Toolbar.Hide();
+                game?.CloseAllOverlays();
             }
             else
             {
-                target.SetCustomRect(null);
+                scalingContainer.SetCustomRect(null);
+
+                if (lastTargetScreen?.HideOverlaysOnEnter != true)
+                    game?.Toolbar.Show();
             }
         }
 
@@ -120,17 +135,22 @@ namespace osu.Game.Skinning.Editor
         /// <summary>
         /// Set a new target screen which will be used to find skinnable components.
         /// </summary>
-        public void SetTarget(Screen screen)
+        public void SetTarget(OsuScreen screen)
         {
+            lastTargetScreen = screen;
+
             if (skinEditor == null) return;
 
             skinEditor.Save();
+
+            // ensure the toolbar is re-hidden even if a new screen decides to try and show it.
+            updateComponentVisibility();
 
             // AddOnce with parameter will ensure the newest target is loaded if there is any overlap.
             Scheduler.AddOnce(setTarget, screen);
         }
 
-        private void setTarget(Screen target)
+        private void setTarget(OsuScreen target)
         {
             Debug.Assert(skinEditor != null);
 
