@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private GameplayClock gameplayClock { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private DrawableRuleset drawableRuleset { get; set; }
 
         private IClock referenceClock;
