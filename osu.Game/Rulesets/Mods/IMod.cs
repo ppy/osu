@@ -41,13 +41,13 @@ namespace osu.Game.Rulesets.Mods
 
         /// <summary>
         /// Whether this mod is playable in a multiplayer match.
-        /// Should be <c>false</c> for mods that affect the gameplay progress based on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
+        /// Should be <c>false</c> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
         /// </summary>
         bool PlayableInMultiplayer { get; }
 
         /// <summary>
         /// Whether this mod is valid to be a "free mod" in a multiplayer match.
-        /// Should be <c>false</c> for mods that affect the gameplay progress (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
+        /// Should be <c>false</c> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
         /// </summary>
         bool ValidFreeModInMultiplayer { get; }
 
