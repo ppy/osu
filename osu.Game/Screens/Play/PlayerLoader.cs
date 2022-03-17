@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
         private bool readyForPush =>
             !playerConsumed
             // don't push unless the player is completely loaded
-            && player?.LoadState == LoadState.Ready
+            && CurrentPlayer?.LoadState == LoadState.Ready
             // don't push if the user is hovering one of the panes, unless they are idle.
             && (IsHovered || idleTracker.IsIdle.Value)
             // don't push if the user is dragging a slider or otherwise.
@@ -100,10 +100,14 @@ namespace osu.Game.Screens.Play
 
         private readonly Func<Player> createPlayer;
 
-        private Player player;
+        /// <summary>
+        /// The <see cref="Player"/> instance being loaded by this screen.
+        /// </summary>
+        [CanBeNull]
+        public Player CurrentPlayer { get; private set; }
 
         /// <summary>
-        /// Whether the curent player instance has been consumed via <see cref="consumePlayer"/>.
+        /// Whether the current player instance has been consumed via <see cref="consumePlayer"/>.
         /// </summary>
         private bool playerConsumed;
 
@@ -237,12 +241,12 @@ namespace osu.Game.Screens.Play
         {
             base.OnResuming(last);
 
-            var lastScore = player.Score;
+            var lastScore = CurrentPlayer.Score;
 
             AudioSettings.ReferenceScore.Value = lastScore?.ScoreInfo;
 
             // prepare for a retry.
-            player = null;
+            CurrentPlayer = null;
             playerConsumed = false;
             cancelLoad();
 
@@ -346,7 +350,7 @@ namespace osu.Game.Screens.Play
             Debug.Assert(!playerConsumed);
 
             playerConsumed = true;
-            return player;
+            return CurrentPlayer;
         }
 
         private void prepareNewPlayer()
@@ -354,11 +358,11 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen())
                 return;
 
-            player = createPlayer();
-            player.RestartCount = restartCount++;
-            player.RestartRequested = restartRequested;
+            CurrentPlayer = createPlayer();
+            CurrentPlayer.RestartCount = restartCount++;
+            CurrentPlayer.RestartRequested = restartRequested;
 
-            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
+            LoadTask = LoadComponentAsync(CurrentPlayer, _ => MetadataInfo.Loading = false);
         }
 
         private void restartRequested()
@@ -472,7 +476,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                DisposalTask = LoadTask?.ContinueWith(_ => player?.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => CurrentPlayer?.Dispose());
             }
         }
 
