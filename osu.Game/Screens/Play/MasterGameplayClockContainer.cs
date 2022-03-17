@@ -49,9 +49,6 @@ namespace osu.Game.Screens.Play
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         private readonly WorkingBeatmap beatmap;
-        private readonly double gameplayStartTime;
-        private readonly bool startAtGameplayStart;
-        private readonly double firstHitObjectTime;
 
         private HardwareCorrectionOffsetClock userGlobalOffsetClock;
         private HardwareCorrectionOffsetClock userBeatmapOffsetClock;
@@ -61,20 +58,29 @@ namespace osu.Game.Screens.Play
 
         private IDisposable beatmapOffsetSubscription;
 
+        private readonly double latestGameplayStartTime;
+
         [Resolved]
         private RealmAccess realm { get; set; }
 
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
+        /// <summary>
+        /// Create a new master gameplay clock container.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
+        /// <param name="latestGameplayStartTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
+        /// <param name="startFromLatestStartTime">Whether to start from the provided latest start time rather than zero.</param>
+        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double latestGameplayStartTime, bool startFromLatestStartTime = false)
             : base(beatmap.Track)
         {
             this.beatmap = beatmap;
-            this.gameplayStartTime = gameplayStartTime;
-            this.startAtGameplayStart = startAtGameplayStart;
 
-            firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
+            this.latestGameplayStartTime = latestGameplayStartTime;
+
+            if (startFromLatestStartTime)
+                StartTime = latestGameplayStartTime;
         }
 
         protected override void LoadComplete()
@@ -89,33 +95,34 @@ namespace osu.Game.Screens.Play
                 settings => settings.Offset,
                 val => userBeatmapOffsetClock.Offset = val);
 
-            if (GameplayStartTime == null)
-            {
-                // sane default provided by ruleset.
-                double offset = gameplayStartTime;
+            // Reset may have been called externally before LoadComplete.
+            // If it was, and the clock is in a playing state, we want to ensure that it isn't stopped here.
+            bool isStarted = !IsPaused.Value;
 
-                if (!startAtGameplayStart)
-                {
-                    offset = Math.Min(0, offset);
+            // If a custom start time was not specified, calculate the best value to use.
+            double gameplayStartTime = StartTime ?? findBeatmapStartTime();
 
-                    // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
-                    // this is commonly used to display an intro before the audio track start.
-                    double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
-                    if (firstStoryboardEvent != null)
-                        offset = Math.Min(offset, firstStoryboardEvent.Value);
+            Reset(startClock: isStarted, gameplayStartTime: gameplayStartTime);
+        }
 
-                    // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
-                    // this is not available as an option in the live editor but can still be applied via .osu editing.
-                    if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                        offset = Math.Min(offset, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
-                }
+        private double findBeatmapStartTime()
+        {
+            // start with the originally provided latest time as a sane default.
+            double time = latestGameplayStartTime;
 
-                // Reset may have been called externally before LoadComplete.
-                // If it was and the clock is in a playing state, we want to ensure that it isn't stopped here.
-                bool isStarted = !IsPaused.Value;
+            // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
+            // this is commonly used to display an intro before the audio track start.
+            double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
+            if (firstStoryboardEvent != null)
+                time = Math.Min(time, firstStoryboardEvent.Value);
 
-                Reset(startClock: isStarted, gameplayStartTime: offset);
-            }
+            // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
+            // this is not available as an option in the live editor but can still be applied via .osu editing.
+            double firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
+            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
+                time = Math.Min(time, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+
+            return time;
         }
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
@@ -158,10 +165,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > gameplayStartTime - MINIMUM_SKIP_TIME)
+            if (GameplayClock.CurrentTime > latestGameplayStartTime - MINIMUM_SKIP_TIME)
                 return;
 
-            double skipTarget = gameplayStartTime - MINIMUM_SKIP_TIME;
+            double skipTarget = latestGameplayStartTime - MINIMUM_SKIP_TIME;
 
             if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
