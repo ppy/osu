@@ -91,16 +91,13 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
+        public virtual bool IsPlayable(ModUsage usage) => true;
+
         [JsonIgnore]
+        [Obsolete("Override IsPlayable instead.")] // Can be removed 20220918
         public virtual bool UserPlayable => true;
 
-        [JsonIgnore]
-        public virtual bool PlayableInMultiplayer => UserPlayable;
-
-        [JsonIgnore]
-        public virtual bool ValidFreeModInMultiplayer => PlayableInMultiplayer;
-
-        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override and set UserPlayable to false.")] // Can be removed 20211009
+        [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override IsPlayable to false.")] // Can be removed 20211009
         public virtual bool Ranked => false;
 
         /// <summary>

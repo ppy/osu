@@ -34,22 +34,24 @@ namespace osu.Game.Rulesets.Mods
         IconUsage? Icon { get; }
 
         /// <summary>
+        /// Whether this mod is playable for the given usage.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>Should be always <c>false</c> for cases where the user is not interacting with the game.</item>
+        /// <item>Should be <c>false</c> in <see cref="ModUsage.MultiplayerRequired"/> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).</item>
+        /// <item>Should be <c>false</c> in <see cref="ModUsage.MultiplayerFree"/> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).</item>
+        /// </list>
+        /// </remarks>
+        /// <param name="usage">The mod usage.</param>
+        bool IsPlayable(ModUsage usage);
+
+        /// <summary>
         /// Whether this mod is playable by an end user.
         /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from multiplayer selection, for example).
         /// </summary>
+        [Obsolete("Override IsPlayable instead.")] // Can be removed 20220918
         bool UserPlayable { get; }
-
-        /// <summary>
-        /// Whether this mod is playable in a multiplayer match.
-        /// Should be <c>false</c> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).
-        /// </summary>
-        bool PlayableInMultiplayer { get; }
-
-        /// <summary>
-        /// Whether this mod is valid to be a "free mod" in a multiplayer match.
-        /// Should be <c>false</c> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).
-        /// </summary>
-        bool ValidFreeModInMultiplayer { get; }
 
         /// <summary>
         /// Create a fresh <see cref="Mod"/> instance based on this mod.
