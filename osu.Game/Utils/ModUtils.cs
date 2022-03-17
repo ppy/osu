@@ -115,13 +115,13 @@ namespace osu.Game.Utils
             => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && !(m is MultiMod), out invalidMods);
 
         /// <summary>
-        /// Check the provided combination of mods are valid for a multiplayer match session.
+        /// Check the provided combination of mods are valid as "required mods" in a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
-        public static bool CheckValidForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.PlayableInMultiplayer, out invalidMods);
+        public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
+            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerRequired), out invalidMods);
 
         /// <summary>
         /// Check the provided combination of mods are valid as "free mods" in a multiplayer match session.
@@ -130,7 +130,7 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.ValidFreeModInMultiplayer, out invalidMods);
+            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerFree), out invalidMods);
 
         private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {

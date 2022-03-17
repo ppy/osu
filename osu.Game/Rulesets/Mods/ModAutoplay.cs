@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
-        public override bool UserPlayable => false;
+        public override bool IsPlayable(ModUsage usage) => false;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail) };
 

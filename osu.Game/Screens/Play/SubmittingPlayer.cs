@@ -11,6 +11,7 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Screens.Play
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
 
-            if (Mods.Value.Any(m => !m.UserPlayable))
+            if (Mods.Value.Any(m => !m.IsPlayable(ModUsage.Solo)))
             {
                 handleTokenFailure(new InvalidOperationException("Non-user playable mod selected."));
                 return false;
