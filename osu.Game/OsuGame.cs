@@ -247,13 +247,13 @@ namespace osu.Game
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
+            ((SkinManager)ManagerStorage["SkinManager"]).CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
                 Live<SkinInfo> skinInfo = null;
 
                 if (Guid.TryParse(skinId.NewValue, out var guid))
-                    skinInfo = SkinManager.Query(s => s.ID == guid);
+                    skinInfo = ((SkinManager)ManagerStorage["SkinManager"]).Query(s => s.ID == guid);
 
                 if (skinInfo == null)
                 {
@@ -261,7 +261,7 @@ namespace osu.Game
                         skinInfo = DefaultLegacySkin.CreateInfo().ToLiveUnmanaged();
                 }
 
-                SkinManager.CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.CreateInfo().ToLiveUnmanaged();
+                ((SkinManager)ManagerStorage["SkinManager"]).CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.CreateInfo().ToLiveUnmanaged();
             };
             configSkin.TriggerChange();
 
@@ -443,10 +443,10 @@ namespace osu.Game
             Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
-                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
+                databasedSet = ((BeatmapManager)ManagerStorage["BeatmapManager"]).QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
 
             if (beatmap is BeatmapSetInfo localBeatmap)
-                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
+                databasedSet ??= ((BeatmapManager)ManagerStorage["BeatmapManager"]).QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
 
             if (databasedSet == null)
             {
@@ -472,12 +472,12 @@ namespace osu.Game
 
                 if (screen is IHandlePresentBeatmap presentableScreen)
                 {
-                    presentableScreen.PresentBeatmap(BeatmapManager.GetWorkingBeatmap(selection), selection.Ruleset);
+                    presentableScreen.PresentBeatmap(((BeatmapManager)ManagerStorage["BeatmapManager"]).GetWorkingBeatmap(selection), selection.Ruleset);
                 }
                 else
                 {
                     Ruleset.Value = selection.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(selection);
+                    Beatmap.Value = ((BeatmapManager)ManagerStorage["BeatmapManager"]).GetWorkingBeatmap(selection);
                 }
             }, validScreens: new[] { typeof(SongSelect), typeof(IHandlePresentBeatmap) });
         }
@@ -493,10 +493,10 @@ namespace osu.Game
             ScoreInfo databasedScoreInfo = null;
 
             if (score.OnlineID > 0)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
+                databasedScoreInfo = ((ScoreManager)ManagerStorage["ScoreManager"]).Query(s => s.OnlineID == score.OnlineID);
 
             if (score is ScoreInfo scoreInfo)
-                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
+                databasedScoreInfo ??= ((ScoreManager)ManagerStorage["ScoreManager"]).Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -504,7 +504,7 @@ namespace osu.Game
                 return;
             }
 
-            var databasedScore = ScoreManager.GetScore(databasedScoreInfo);
+            var databasedScore = ((ScoreManager)ManagerStorage["ScoreManager"]).GetScore(databasedScoreInfo);
 
             if (databasedScore.Replay == null)
             {
@@ -512,7 +512,7 @@ namespace osu.Game
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.BeatmapInfo.ID);
+            var databasedBeatmap = ((BeatmapManager)ManagerStorage["BeatmapManager"]).QueryBeatmap(b => b.ID == databasedScoreInfo.BeatmapInfo.ID);
 
             if (databasedBeatmap == null)
             {
@@ -523,7 +523,7 @@ namespace osu.Game
             PerformFromScreen(screen =>
             {
                 Ruleset.Value = databasedScore.ScoreInfo.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
+                Beatmap.Value = ((BeatmapManager)ManagerStorage["BeatmapManager"]).GetWorkingBeatmap(databasedBeatmap);
 
                 switch (presentType)
                 {
@@ -651,21 +651,18 @@ namespace osu.Game
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
             MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
 
-            // todo: all archive managers should be able to be looped here.
-            SkinManager.PostNotification = n => Notifications.Post(n);
+            foreach(KeyValuePair<string, object> manager in ManagerStorage)
+            {
+                ((IPostNotifications)manager.Value).PostNotification = n => Notifications.Post(n);
+            }
 
-            BeatmapManager.PostNotification = n => Notifications.Post(n);
-            BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
+            ((BeatmapManager)ManagerStorage["BeatmapManager"]).PostImport = items => PresentBeatmap(items.First().Value);
+            ((ScoreManager)ManagerStorage["ScoreManager"]).PostImport = items => PresentScore(items.First().Value);
 
-            BeatmapDownloader.PostNotification = n => Notifications.Post(n);
-            ScoreDownloader.PostNotification = n => Notifications.Post(n);
-
-            ScoreManager.PostNotification = n => Notifications.Post(n);
-            ScoreManager.PostImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
+            LocalConfig.LookupSkinName = id => ((SkinManager)ManagerStorage["SkinManager"]).Query(s => s.ID == id)?.ToString() ?? "Unknown";
 
             LocalConfig.LookupKeyBindings = l =>
             {
@@ -1056,7 +1053,7 @@ namespace osu.Game
                     return true;
 
                 case GlobalAction.RandomSkin:
-                    SkinManager.SelectRandomSkin();
+                    ((SkinManager)ManagerStorage["SkinManager"]).SelectRandomSkin();
                     return true;
             }
 

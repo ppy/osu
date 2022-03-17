@@ -101,15 +101,7 @@ namespace osu.Game
 
         protected SessionStatics SessionStatics { get; private set; }
 
-        protected BeatmapManager BeatmapManager { get; private set; }
-
-        protected BeatmapModelDownloader BeatmapDownloader { get; private set; }
-
-        protected ScoreManager ScoreManager { get; private set; }
-
-        protected ScoreModelDownloader ScoreDownloader { get; private set; }
-
-        protected SkinManager SkinManager { get; private set; }
+        protected Dictionary<string, object> ManagerStorage { get; private set; }
 
         protected RulesetStore RulesetStore { get; private set; }
 
@@ -240,8 +232,12 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
-            dependencies.CacheAs<ISkinSource>(SkinManager);
+            ManagerStorage = new Dictionary<string, object>
+            {
+                { "SkinManager", new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler) }
+            };
+            dependencies.Cache(ManagerStorage["SkinManager"]);
+            dependencies.CacheAs<ISkinSource>((ISkinSource)ManagerStorage["SkinManager"]);
 
             EndpointConfiguration endpoints = UseDevelopmentServer ? (EndpointConfiguration)new DevelopmentEndpointConfiguration() : new ProductionEndpointConfiguration();
 
@@ -255,11 +251,16 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, Scheduler, () => difficultyCache, LocalConfig));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true));
+            BeatmapManager beatmapManager = new BeatmapManager(Storage, realm, RulesetStore, API, Audio, Resources, Host, defaultBeatmap, performOnlineLookups: true);
+            ManagerStorage.Add("ScoreManager", new ScoreManager(RulesetStore, () => beatmapManager, Storage, realm, Scheduler, () => difficultyCache, LocalConfig));
+            ManagerStorage.Add("BeatmapManager", beatmapManager);
+            ManagerStorage.Add("BeatmapDownloader", new BeatmapModelDownloader(beatmapManager, API));
+            ManagerStorage.Add("ScoreDownloader", new ScoreModelDownloader((ScoreManager)ManagerStorage["ScoreManager"], API));
+            dependencies.Cache(ManagerStorage["ScoreManager"]);
+            dependencies.Cache(ManagerStorage["BeatmapManager"]);
 
-            dependencies.Cache(BeatmapDownloader = new BeatmapModelDownloader(BeatmapManager, API));
-            dependencies.Cache(ScoreDownloader = new ScoreModelDownloader(ScoreManager, API));
+            dependencies.Cache(ManagerStorage["BeatmapDownloader"]);
+            dependencies.Cache(ManagerStorage["ScoreDownloader"]);
 
             dependencies.Cache(difficultyCache = new BeatmapDifficultyCache());
             AddInternal(difficultyCache);
@@ -283,9 +284,9 @@ namespace osu.Game
             dependencies.Cache(SessionStatics = new SessionStatics());
             dependencies.Cache(new OsuColour());
 
-            RegisterImportHandler(BeatmapManager);
-            RegisterImportHandler(ScoreManager);
-            RegisterImportHandler(SkinManager);
+            RegisterImportHandler(((BeatmapManager)ManagerStorage["BeatmapManager"]));
+            RegisterImportHandler(((ScoreManager)ManagerStorage["ScoreManager"]));
+            RegisterImportHandler(((SkinManager)ManagerStorage["SkinManager"]));
 
             // drop track volume game-wide to leave some head-room for UI effects / samples.
             // this means that for the time being, gameplay sample playback is louder relative to the audio track, compared to stable.
@@ -331,7 +332,7 @@ namespace osu.Game
             dependencies.Cache(globalBindings);
 
             PreviewTrackManager previewTrackManager;
-            dependencies.Cache(previewTrackManager = new PreviewTrackManager(BeatmapManager.BeatmapTrackStore));
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager(((BeatmapManager)ManagerStorage["BeatmapManager"]).BeatmapTrackStore));
             Add(previewTrackManager);
 
             AddInternal(MusicController = new MusicController());
@@ -503,7 +504,8 @@ namespace osu.Game
             base.Dispose(isDisposing);
 
             RulesetStore?.Dispose();
-            BeatmapManager?.Dispose();
+            ((BeatmapManager)ManagerStorage["BeatmapManager"])?.Dispose();
+            ManagerStorage.Remove("BeatmapManager");
             LocalConfig?.Dispose();
 
             realm?.Dispose();

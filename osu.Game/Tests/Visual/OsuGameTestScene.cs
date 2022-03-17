@@ -116,9 +116,9 @@ namespace osu.Game.Tests.Visual
 
             public new BackButton BackButton => base.BackButton;
 
-            public new BeatmapManager BeatmapManager => base.BeatmapManager;
+            public BeatmapManager BeatmapManager => (BeatmapManager)base.ManagerStorage["BeatmapManager"];
 
-            public new ScoreManager ScoreManager => base.ScoreManager;
+            public ScoreManager ScoreManager => (ScoreManager)base.ManagerStorage["ScoreManager"];
 
             public new Container ScreenOffsetContainer => base.ScreenOffsetContainer;
 

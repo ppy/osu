@@ -59,7 +59,7 @@ namespace osu.Game.Tests
             {
                 // Beatmap must be imported before the collection manager is loaded.
                 if (withBeatmap)
-                    BeatmapManager.Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
+                    ((Game.Beatmaps.BeatmapManager)ManagerStorage["BeatmapManager"]).Import(TestResources.GetTestBeatmapForImport()).WaitSafely();
 
                 AddInternal(CollectionManager = new CollectionManager(Storage));
             }
