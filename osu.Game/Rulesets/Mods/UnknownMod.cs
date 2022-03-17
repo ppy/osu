@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0;
 
         public override bool UserPlayable => false;
-        public override bool PlayableInMultiplayer => true;
 
         public override ModType Type => ModType.System;
 
