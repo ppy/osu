@@ -42,6 +42,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached]
         private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
 
+        [Cached]
+        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
+
         protected override bool HasCustomSteps => true;
 
         [Test]
