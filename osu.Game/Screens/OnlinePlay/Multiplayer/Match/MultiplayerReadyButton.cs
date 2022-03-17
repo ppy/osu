@@ -17,12 +17,14 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Countdown;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -124,12 +126,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 return;
             }
 
+            // Local user is the room host and is in a ready state.
+            // The only action they can take is to stop a countdown if one's currently running.
+            if (Room.Countdown != null)
+            {
+                stopCountdown();
+                return;
+            }
+
             // And if a countdown isn't running, start the match.
             startMatch();
 
             bool isReady() => Client.LocalUser?.State == MultiplayerUserState.Ready || Client.LocalUser?.State == MultiplayerUserState.Spectating;
 
             void toggleReady() => Client.ToggleReady().ContinueWith(_ => endOperation());
+
+            void stopCountdown() => Client.SendMatchRequest(new StopCountdownRequest()).ContinueWith(_ => endOperation());
 
             void startMatch() => Client.StartMatch().ContinueWith(t =>
             {
@@ -146,6 +158,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void startCountdown(TimeSpan duration)
         {
+            Debug.Assert(clickOperation == null);
+            clickOperation = ongoingOperationTracker.BeginOperation();
+
+            Client.SendMatchRequest(new MatchStartCountdownRequest { Delay = duration }).ContinueWith(_ => endOperation());
         }
 
         private void endOperation()
@@ -167,16 +183,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
             int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            switch (localUser?.State)
+            if (Room.Countdown != null)
+                countdownButton.Alpha = 0;
+            else
             {
-                default:
-                    countdownButton.Alpha = 0;
-                    break;
+                switch (localUser?.State)
+                {
+                    default:
+                        countdownButton.Alpha = 0;
+                        break;
 
-                case MultiplayerUserState.Spectating:
-                case MultiplayerUserState.Ready:
-                    countdownButton.Alpha = Room.Host?.Equals(localUser) == true ? 1 : 0;
-                    break;
+                    case MultiplayerUserState.Spectating:
+                    case MultiplayerUserState.Ready:
+                        countdownButton.Alpha = Room.Host?.Equals(localUser) == true ? 1 : 0;
+                        break;
+                }
             }
 
             enabled.Value =
@@ -232,6 +253,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 onRoomUpdated();
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                if (room?.Countdown != null)
+                {
+                    // Update the countdown timer.
+                    onRoomUpdated();
+                }
+            }
+
             private void onRoomUpdated()
             {
                 updateButtonText();
@@ -251,21 +283,39 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 int countReady = room.Users.Count(u => u.State == MultiplayerUserState.Ready);
                 int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
+                string countdownText = room.Countdown == null ? string.Empty : $"Starting in {room.Countdown.EndTime - DateTimeOffset.Now:mm\\:ss}";
                 string countText = $"({countReady} / {countTotal} ready)";
 
-                switch (localUser?.State)
+                if (room.Countdown != null)
                 {
-                    default:
-                        Text = "Ready";
-                        break;
+                    switch (localUser?.State)
+                    {
+                        default:
+                            Text = $"Ready ({countdownText.ToLowerInvariant()})";
+                            break;
 
-                    case MultiplayerUserState.Spectating:
-                    case MultiplayerUserState.Ready:
-                        Text = room.Host?.Equals(localUser) == true
-                            ? $"Start match {countText}"
-                            : $"Waiting for host... {countText}";
+                        case MultiplayerUserState.Spectating:
+                        case MultiplayerUserState.Ready:
+                            Text = $"{countdownText} {countText}";
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (localUser?.State)
+                    {
+                        default:
+                            Text = "Ready";
+                            break;
 
-                        break;
+                        case MultiplayerUserState.Spectating:
+                        case MultiplayerUserState.Ready:
+                            Text = room.Host?.Equals(localUser) == true
+                                ? $"Start match {countText}"
+                                : $"Waiting for host... {countText}";
+
+                            break;
+                    }
                 }
             }
 
@@ -279,20 +329,37 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 var localUser = multiplayerClient.LocalUser;
 
-                switch (localUser?.State)
+                if (room.Countdown != null)
                 {
-                    default:
-                        setGreen();
-                        break;
-
-                    case MultiplayerUserState.Spectating:
-                    case MultiplayerUserState.Ready:
-                        if (room?.Host?.Equals(localUser) == true)
+                    switch (localUser?.State)
+                    {
+                        default:
                             setGreen();
-                        else
-                            setYellow();
+                            break;
 
-                        break;
+                        case MultiplayerUserState.Spectating:
+                        case MultiplayerUserState.Ready:
+                            setYellow();
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (localUser?.State)
+                    {
+                        default:
+                            setGreen();
+                            break;
+
+                        case MultiplayerUserState.Spectating:
+                        case MultiplayerUserState.Ready:
+                            if (room?.Host?.Equals(localUser) == true)
+                                setGreen();
+                            else
+                                setYellow();
+
+                            break;
+                    }
                 }
 
                 void setYellow()
@@ -316,6 +383,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 if (multiplayerClient != null)
                     multiplayerClient.RoomUpdated -= onRoomUpdated;
+            }
+
+            public override LocalisableString TooltipText
+            {
+                get
+                {
+                    if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready)
+                        return "Cancel countdown";
+
+                    return base.TooltipText;
+                }
             }
         }
 
