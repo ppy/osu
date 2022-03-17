@@ -8,6 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -55,15 +56,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
             };
 
-            if (button != null)
-                Remove(button);
-
-            Add(button = new MultiplayerReadyButton
+            Child = new PopoverContainer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(200, 50),
-            });
+                RelativeSizeAxes = Axes.Both,
+                Child = button = new MultiplayerReadyButton
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(200, 50),
+                }
+            };
         });
 
         [Test]

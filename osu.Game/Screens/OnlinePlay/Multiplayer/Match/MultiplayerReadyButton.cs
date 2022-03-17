@@ -4,15 +4,24 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Humanizer;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
@@ -30,19 +39,43 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private Sample sampleReadyAll;
         private Sample sampleUnready;
 
-        private readonly ReadyButton readyButton;
+        private readonly BindableBool enabled = new BindableBool();
+        private readonly CountdownButton countdownButton;
         private int countReady;
         private ScheduledDelegate readySampleDelegate;
         private IBindable<bool> operationInProgress;
 
         public MultiplayerReadyButton()
         {
-            InternalChild = readyButton = new ReadyButton
+            InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Size = Vector2.One,
-                Action = onReadyClick,
-                Enabled = { Value = true },
+                ColumnDimensions = new[]
+                {
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        new ReadyButton
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Size = Vector2.One,
+                            Action = onReadyClick,
+                            Enabled = { BindTarget = enabled },
+                        },
+                        countdownButton = new CountdownButton
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Size = new Vector2(40, 1),
+                            Alpha = 0,
+                            Action = startCountdown,
+                            Enabled = { BindTarget = enabled }
+                        }
+                    }
+                }
             };
         }
 
@@ -111,6 +144,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             });
         }
 
+        private void startCountdown(TimeSpan duration)
+        {
+        }
+
         private void endOperation()
         {
             clickOperation?.Dispose();
@@ -121,7 +158,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             if (Room == null)
             {
-                readyButton.Enabled.Value = false;
+                enabled.Value = false;
                 return;
             }
 
@@ -130,7 +167,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
             int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            readyButton.Enabled.Value =
+            switch (localUser?.State)
+            {
+                default:
+                    countdownButton.Alpha = 0;
+                    break;
+
+                case MultiplayerUserState.Spectating:
+                case MultiplayerUserState.Ready:
+                    countdownButton.Alpha = Room.Host?.Equals(localUser) == true ? 1 : 0;
+                    break;
+            }
+
+            enabled.Value =
                 Room.State == MultiplayerRoomState.Open
                 && CurrentPlaylistItem.Value?.ID == Room.Settings.PlaylistItemId
                 && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
@@ -138,7 +187,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
             if (localUser?.State == MultiplayerUserState.Spectating)
-                readyButton.Enabled.Value &= Room.Host?.Equals(localUser) == true && newCountReady > 0;
+                enabled.Value &= Room.Host?.Equals(localUser) == true && newCountReady > 0;
 
             if (newCountReady == countReady)
                 return;
@@ -267,6 +316,73 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 if (multiplayerClient != null)
                     multiplayerClient.RoomUpdated -= onRoomUpdated;
+            }
+        }
+
+        public class CountdownButton : IconButton, IHasPopover
+        {
+            private static readonly TimeSpan[] available_delays =
+            {
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(30),
+                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(2)
+            };
+
+            public new Action<TimeSpan> Action;
+
+            private readonly Drawable background;
+
+            public CountdownButton()
+            {
+                Icon = FontAwesome.Solid.CaretDown;
+                IconScale = new Vector2(0.6f);
+
+                Add(background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue
+                });
+
+                base.Action = this.ShowPopover;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                background.Colour = colours.Green;
+            }
+
+            public Popover GetPopover()
+            {
+                var flow = new FillFlowContainer
+                {
+                    Width = 200,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2),
+                };
+
+                foreach (var duration in available_delays)
+                {
+                    flow.Add(new PopoverButton
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Text = $"Start match in {duration.Humanize()}",
+                        BackgroundColour = background.Colour,
+                        Action = () =>
+                        {
+                            Action(duration);
+                            this.HidePopover();
+                        }
+                    });
+                }
+
+                return new OsuPopover { Child = flow };
+            }
+
+            public class PopoverButton : OsuButton
+            {
             }
         }
     }
