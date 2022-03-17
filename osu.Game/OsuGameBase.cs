@@ -79,7 +79,9 @@ namespace osu.Game
         /// <summary>
         /// MD5 representation of the game executable.
         /// </summary>
-        public string VersionHash { get; private set; }
+        public string VersionHash { get; protected set; }
+
+        public bool HashOverriden { get; protected set; }
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
@@ -188,6 +190,7 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load(ReadableKeyCombinationProvider keyCombinationProvider)
         {
+            //"ed49d24f6b7fb818c659409bc9e05775"
             try
             {
                 using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))

@@ -33,9 +33,14 @@ namespace osu.Desktop
     {
         private DBusManagerContainer dBusManagerContainer;
 
-        public OsuGameDesktop(string[] args = null)
+        public OsuGameDesktop(string[] args = null, string hashOverride = null)
             : base(args)
         {
+            if (!string.IsNullOrEmpty(hashOverride))
+            {
+                HashOverriden = true;
+                VersionHash = hashOverride;
+            }
         }
 
         public override StableStorage GetStorageForStableInstall()
