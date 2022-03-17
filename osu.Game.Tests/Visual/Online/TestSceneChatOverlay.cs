@@ -122,6 +122,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestHideOverlay()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
+
             AddAssert("Chat overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
 
@@ -134,6 +136,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelSelection()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
             AddStep("Setup get message response", () => onGetMessages = channel =>
             {
@@ -169,6 +172,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestSearchInSelector()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Search for 'no. 2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "no. 2");
             AddUntilStep("Only channel 2 visible", () =>
             {
@@ -180,6 +184,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelShortcutKeys()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join channels", () => channels.ForEach(channel => channelManager.JoinChannel(channel)));
             AddStep("Close channel selector", () => InputManager.Key(Key.Escape));
             AddUntilStep("Wait for close", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
@@ -199,6 +204,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestCloseChannelBehaviour()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddUntilStep("Join until dropdown has channels", () =>
             {
                 if (visibleChannels.Count() < joinedChannels.Count())
@@ -269,6 +275,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelCloseButton()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -289,6 +296,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestCloseTabShortcut()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -314,6 +322,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestNewTabShortcut()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -330,6 +339,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestRestoreTabShortcut()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 3 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -375,6 +385,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChatCommand()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
@@ -398,6 +409,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             Channel multiplayerChannel = null;
 
+            AddStep("open chat overlay", () => chatOverlay.Show());
+
             AddStep("join multiplayer channel", () => channelManager.JoinChannel(multiplayerChannel = new Channel(new APIUser())
             {
                 Name = "#mp_1",
@@ -417,6 +430,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
@@ -443,6 +457,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
@@ -471,6 +486,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             Message message = null;
 
+            AddStep("Open chat overlay", () => chatOverlay.Show());
+
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
@@ -496,14 +513,11 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestHighlightWhileChatHidden()
+        public void TestHighlightWhileChatNeverOpen()
         {
             Message message = null;
 
-            AddStep("hide chat", () => chatOverlay.Hide());
-
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
-            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
             AddStep("Send message in channel 1", () =>
             {
@@ -520,7 +534,7 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddStep("Highlight message and show chat", () =>
+            AddStep("Highlight message and open chat", () =>
             {
                 chatOverlay.HighlightMessage(message, channel1);
                 chatOverlay.Show();
@@ -571,8 +585,6 @@ namespace osu.Game.Tests.Visual.Online
                     ChannelManager,
                     ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
                 };
-
-                ChatOverlay.Show();
             }
         }
 
