@@ -17,13 +17,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             set => readyButton.OnReadyClick = value;
         }
 
-        public Action OnSpectateClick
-        {
-            set => spectateButton.OnSpectateClick = value;
-        }
-
         private readonly MultiplayerReadyButton readyButton;
-        private readonly MultiplayerSpectateButton spectateButton;
 
         public MultiplayerMatchFooter()
         {
@@ -37,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     new Drawable[]
                     {
                         null,
-                        spectateButton = new MultiplayerSpectateButton
+                        new MultiplayerSpectateButton
                         {
                             RelativeSizeAxes = Axes.Both,
                         },

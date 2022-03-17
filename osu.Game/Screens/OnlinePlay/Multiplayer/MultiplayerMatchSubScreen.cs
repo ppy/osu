@@ -233,7 +233,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         protected override Drawable CreateFooter() => new MultiplayerMatchFooter
         {
             OnReadyClick = onReadyClick,
-            OnSpectateClick = onSpectateClick
         };
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
@@ -356,20 +355,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             client.ToggleReady()
                   .ContinueWith(t => endOperation());
-
-            void endOperation()
-            {
-                readyClickOperation?.Dispose();
-                readyClickOperation = null;
-            }
-        }
-
-        private void onSpectateClick()
-        {
-            Debug.Assert(readyClickOperation == null);
-            readyClickOperation = ongoingOperationTracker.BeginOperation();
-
-            client.ToggleSpectate().ContinueWith(t => endOperation());
 
             void endOperation()
             {
