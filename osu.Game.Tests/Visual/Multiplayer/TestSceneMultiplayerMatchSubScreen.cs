@@ -145,7 +145,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for spectating user state", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
 
             AddUntilStep("match started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
         }
