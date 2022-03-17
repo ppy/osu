@@ -42,6 +42,15 @@ namespace osu.Game.Screens.Play
         public event Action OnSeek;
 
         /// <summary>
+        /// The time from which gameplay should start. Will be seeked to on calling <see cref="Reset"/>.
+        /// </summary>
+        /// <remarks>
+        /// If not set, a value of zero will be used.
+        /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
+        /// </remarks>
+        protected double? GameplayStartTime { get; private set; }
+
+        /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
         /// </summary>
         /// <param name="sourceClock">The source <see cref="IClock"/> used for timing.</param>
@@ -106,15 +115,20 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
-        public virtual void Reset()
+        /// <param name="startClock">Whether to start the clock immediately.</param>
+        /// <param name="gameplayStartTime">A time to use for future <see cref="Reset"/> calls as the definite start of gameplay.</param>
+        public void Reset(bool startClock = false, double? gameplayStartTime = null)
         {
+            if (gameplayStartTime != null)
+                GameplayStartTime = gameplayStartTime;
+
             ensureSourceClockSet();
-            Seek(0);
+            Seek(GameplayStartTime ?? 0);
 
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
 
-            if (!IsPaused.Value)
+            if (!IsPaused.Value && startClock)
                 Start();
         }
 
