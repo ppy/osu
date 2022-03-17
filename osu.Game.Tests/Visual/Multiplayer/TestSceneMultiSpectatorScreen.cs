@@ -473,7 +473,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             protected override MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap)
-                => new MasterGameplayClockContainer(beatmap, gameplayStartTime ?? 0, gameplayStartTime.HasValue);
+                => new MasterGameplayClockContainer(beatmap, gameplayStartTime ?? 0);
         }
     }
 }
