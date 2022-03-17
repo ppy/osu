@@ -71,16 +71,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Size = new Vector2(200, 50),
-                        OnSpectateClick = () =>
-                        {
-                            readyClickOperation = OngoingOperationTracker.BeginOperation();
-
-                            Task.Run(async () =>
-                            {
-                                await MultiplayerClient.ToggleSpectate();
-                                readyClickOperation.Dispose();
-                            });
-                        }
                     },
                     readyButton = new MultiplayerReadyButton
                     {
