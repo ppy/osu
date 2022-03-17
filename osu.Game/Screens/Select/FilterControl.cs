@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Select
 
         private SeekLimitedSearchTextBox searchTextBox;
         private CollectionFilterDropdown collectionDropdown;
+        private OsuSpriteText beatmapCountText;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -162,7 +163,7 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.4f,
                                     },
-                                    new OsuSpriteText
+                                    beatmapCountText = new OsuSpriteText
                                     {
                                         Text = "Test",
                                         Font = OsuFont.GetFont(size: 14),
@@ -218,6 +219,11 @@ namespace osu.Game.Screens.Select
         {
             searchTextBox.ReadOnly = false;
             searchTextBox.HoldFocus = true;
+        }
+
+        public void SetBeatmapCount(int count)
+        {
+            beatmapCountText.Text = count.ToString() + " Beatmaps";
         }
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();

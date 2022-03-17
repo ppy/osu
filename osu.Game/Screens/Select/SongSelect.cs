@@ -329,6 +329,7 @@ namespace osu.Game.Screens.Select
             bool shouldDebounce = this.IsCurrentScreen();
 
             Carousel.Filter(criteria, shouldDebounce);
+            FilterControl.SetBeatmapCount(Carousel.BeatmapSets.Count());
         }
 
         private DependencyContainer dependencies;
