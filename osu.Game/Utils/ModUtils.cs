@@ -153,31 +153,17 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Verifies all proposed mods are valid for a given ruleset and returns instantiated <see cref="Mod"/>s for further processing.
+        /// Returns an instantiated list of all proposed mods on a given ruleset.
         /// </summary>
-        /// <param name="ruleset">The ruleset to verify mods against.</param>
+        /// <param name="ruleset">The ruleset to instantiate mods.</param>
         /// <param name="proposedMods">The proposed mods.</param>
-        /// <param name="valid">Mods instantiated from <paramref name="proposedMods"/> which were valid for the given <paramref name="ruleset"/>.</param>
-        /// <returns>Whether all <paramref name="proposedMods"/> were valid for the given <paramref name="ruleset"/>.</returns>
-        public static bool InstantiateValidModsForRuleset(Ruleset ruleset, IEnumerable<APIMod> proposedMods, out List<Mod> valid)
+        /// <param name="mods">Mods instantiated from <paramref name="proposedMods"/> on the given <paramref name="ruleset"/>.</param>
+        public static void InstantiateModsForRuleset(Ruleset ruleset, IEnumerable<APIMod> proposedMods, out List<Mod> mods)
         {
-            valid = new List<Mod>();
-            bool proposedWereValid = true;
+            mods = new List<Mod>();
 
             foreach (var apiMod in proposedMods)
-            {
-                try
-                {
-                    // will throw if invalid
-                    valid.Add(apiMod.ToMod(ruleset));
-                }
-                catch
-                {
-                    proposedWereValid = false;
-                }
-            }
-
-            return proposedWereValid;
+                mods.Add(apiMod.ToMod(ruleset));
         }
     }
 }
