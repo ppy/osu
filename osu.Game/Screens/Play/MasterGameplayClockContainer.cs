@@ -100,15 +100,18 @@ namespace osu.Game.Screens.Play
             bool isStarted = !IsPaused.Value;
 
             // If a custom start time was not specified, calculate the best value to use.
-            double gameplayStartTime = StartTime ?? findBeatmapStartTime();
+            double gameplayStartTime = StartTime ?? findEarliestStartTime();
 
             Reset(startClock: isStarted, gameplayStartTime: gameplayStartTime);
         }
 
-        private double findBeatmapStartTime()
+        private double findEarliestStartTime()
         {
-            // start with the originally provided latest time as a sane default.
-            double time = latestGameplayStartTime;
+            // here we are trying to find the time to start playback from the "zero" point.
+            // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
+
+            // start with the originally provided latest time (if before zero).
+            double time = Math.Min(0, latestGameplayStartTime);
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
