@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModRateAdjust : Mod, IApplicableToRate
     {
-        public override bool ValidFreeModInMultiplayer => false;
+        public override bool IsPlayable(ModUsage usage) => usage != ModUsage.MultiplayerFree;
 
         public abstract BindableNumber<double> SpeedChange { get; }
 
