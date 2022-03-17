@@ -166,15 +166,15 @@ namespace osu.Game.Utils
 
             foreach (var apiMod in proposedMods)
             {
-                try
-                {
-                    // will throw if invalid
-                    valid.Add(apiMod.ToMod(ruleset));
-                }
-                catch
+                var mod = apiMod.ToMod(ruleset);
+
+                if (mod is UnknownMod)
                 {
                     proposedWereValid = false;
+                    continue;
                 }
+
+                valid.Add(mod);
             }
 
             return proposedWereValid;

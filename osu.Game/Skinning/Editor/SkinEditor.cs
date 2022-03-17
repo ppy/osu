@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -50,8 +49,8 @@ namespace osu.Game.Skinning.Editor
 
         private Container content;
 
-        private EditorSidebarSection settingsToolbox;
         private EditorSidebar componentsSidebar;
+        private EditorSidebar settingsSidebar;
 
         public SkinEditor()
         {
@@ -153,17 +152,7 @@ namespace osu.Game.Skinning.Editor
                                             Depth = float.MaxValue,
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        new EditorSidebar
-                                        {
-                                            Children = new[]
-                                            {
-                                                settingsToolbox = new SkinSettingsToolbox
-                                                {
-                                                    Anchor = Anchor.CentreRight,
-                                                    Origin = Anchor.CentreRight,
-                                                }
-                                            }
-                                        },
+                                        settingsSidebar = new EditorSidebar(),
                                     }
                                 }
                             }
@@ -261,14 +250,10 @@ namespace osu.Game.Skinning.Editor
 
         private void populateSettings()
         {
-            settingsToolbox.Clear();
+            settingsSidebar.Clear();
 
-            var first = SelectedComponents.OfType<Drawable>().FirstOrDefault();
-
-            if (first != null)
-            {
-                settingsToolbox.Children = first.CreateSettingsControls().ToArray();
-            }
+            foreach (var component in SelectedComponents.OfType<Drawable>())
+                settingsSidebar.Add(new SkinSettingsToolbox(component));
         }
 
         private IEnumerable<ISkinnableTarget> availableTargets => targetScreen.ChildrenOfType<ISkinnableTarget>();
