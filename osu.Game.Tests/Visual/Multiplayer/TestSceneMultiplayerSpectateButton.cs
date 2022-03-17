@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -56,23 +57,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
             };
 
-            Child = new FillFlowContainer
+            Child = new PopoverContainer
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
                 {
-                    spectateButton = new MultiplayerSpectateButton
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(200, 50),
-                    },
-                    readyButton = new MultiplayerReadyButton
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(200, 50),
+                        spectateButton = new MultiplayerSpectateButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(200, 50),
+                        },
+                        readyButton = new MultiplayerReadyButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(200, 50),
+                        }
                     }
                 }
             };
