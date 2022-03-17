@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -74,8 +75,14 @@ namespace osu.Game.Skinning.Editor
                     RequestPlacement = t => RequestPlacement?.Invoke(t)
                 });
             }
-            catch
+            catch (DependencyNotRegisteredException)
             {
+                // This loading code relies on try-catching any dependency injection errors to know which components are valid for the current target screen.
+                // If a screen can't provide the required dependencies, a skinnable component should not be displayed in the list.
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Skin component {type} could not be loaded in the editor component list due to an error");
             }
         }
 
