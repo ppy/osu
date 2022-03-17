@@ -14,20 +14,18 @@ namespace osu.Game.Screens.OnlinePlay.Components
     public abstract class ReadyButton : TriangleButton, IHasTooltip
     {
         public new readonly BindableBool Enabled = new BindableBool();
-
-        private IBindable<BeatmapAvailability> availability;
+        protected readonly IBindable<BeatmapAvailability> Availability = new Bindable<BeatmapAvailability>();
 
         [BackgroundDependencyLoader]
         private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
-            availability = beatmapTracker.Availability.GetBoundCopy();
-
-            availability.BindValueChanged(_ => updateState());
+            Availability.BindTo(beatmapTracker.Availability);
+            Availability.BindValueChanged(_ => updateState());
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
         private void updateState() =>
-            base.Enabled.Value = availability.Value.State == DownloadState.LocallyAvailable && Enabled.Value;
+            base.Enabled.Value = Availability.Value.State == DownloadState.LocallyAvailable && Enabled.Value;
 
         public virtual LocalisableString TooltipText
         {
@@ -36,7 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
                 if (Enabled.Value)
                     return string.Empty;
 
-                if (availability.Value.State != DownloadState.LocallyAvailable)
+                if (Availability.Value.State != DownloadState.LocallyAvailable)
                     return "Beatmap not downloaded";
 
                 return string.Empty;
