@@ -21,6 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             Client.RoomUpdated += invokeOnRoomUpdated;
+            Client.LoadRequested += invokeOnRoomLoadRequested;
             Client.UserLeft += invokeUserLeft;
             Client.UserKicked += invokeUserKicked;
             Client.UserJoined += invokeUserJoined;
@@ -38,6 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void invokeItemAdded(MultiplayerPlaylistItem item) => Schedule(() => PlaylistItemAdded(item));
         private void invokeItemRemoved(long item) => Schedule(() => PlaylistItemRemoved(item));
         private void invokeItemChanged(MultiplayerPlaylistItem item) => Schedule(() => PlaylistItemChanged(item));
+        private void invokeOnRoomLoadRequested() => Scheduler.AddOnce(OnRoomLoadRequested);
 
         /// <summary>
         /// Invoked when a user has joined the room.
@@ -91,6 +93,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         /// Invoked when any change occurs to the multiplayer room.
         /// </summary>
         protected virtual void OnRoomUpdated()
+        {
+        }
+
+        /// <summary>
+        /// Invoked when the room requests the local user to load into gameplay.
+        /// </summary>
+        protected virtual void OnRoomLoadRequested()
         {
         }
 
