@@ -2,33 +2,35 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Edit;
+using osu.Game.Overlays;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : ScrollingToolboxGroup
+    public class SkinComponentToolbox : EditorSidebarSection
     {
         public Action<Type> RequestPlacement;
 
-        private const float component_display_scale = 0.8f;
-
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new DummyRuleset())
         {
             Combo = { Value = RNG.Next(1, 1000) },
             TotalScore = { Value = RNG.Next(1000, 10000000) }
@@ -37,11 +39,9 @@ namespace osu.Game.Skinning.Editor
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
 
-        public SkinComponentToolbox(float height)
-            : base("Components", height)
+        public SkinComponentToolbox()
+            : base("Components")
         {
-            RelativeSizeAxes = Axes.None;
-            Width = 200;
         }
 
         [BackgroundDependencyLoader]
@@ -54,12 +54,13 @@ namespace osu.Game.Skinning.Editor
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(20)
+                Spacing = new Vector2(2)
             };
 
             var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
                                                 .Where(t => !t.IsInterface)
                                                 .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                                .OrderBy(t => t.Name)
                                                 .ToArray();
 
             foreach (var type in skinnableTypes)
@@ -105,6 +106,9 @@ namespace osu.Game.Skinning.Editor
 
             private Container innerContainer;
 
+            private const float contracted_size = 60;
+            private const float expanded_size = 120;
+
             public ToolboxComponentButton(Drawable component)
             {
                 this.component = component;
@@ -112,39 +116,48 @@ namespace osu.Game.Skinning.Editor
                 Enabled.Value = true;
 
                 RelativeSizeAxes = Axes.X;
-                Height = 70;
+                Height = contracted_size;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.Delay(300).ResizeHeightTo(expanded_size, 500, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+                this.ResizeHeightTo(contracted_size, 500, Easing.OutQuint);
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
-                BackgroundColour = colours.Gray3;
-                Content.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 2,
-                    Offset = new Vector2(0, 1),
-                    Colour = Color4.Black.Opacity(0.5f)
-                };
+                BackgroundColour = colourProvider.Background3;
 
                 AddRange(new Drawable[]
                 {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(10) { Bottom = 20 },
+                        Masking = true,
+                        Child = innerContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Child = component
+                        },
+                    },
                     new OsuSpriteText
                     {
                         Text = component.GetType().Name,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Margin = new MarginPadding(5),
                     },
-                    innerContainer = new Container
-                    {
-                        Y = 10,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Scale = new Vector2(component_display_scale),
-                        Masking = true,
-                        Child = component
-                    }
                 });
 
                 // adjust provided component to fit / display in a known state.
@@ -152,14 +165,17 @@ namespace osu.Game.Skinning.Editor
                 component.Origin = Anchor.Centre;
             }
 
-            protected override void LoadComplete()
+            protected override void Update()
             {
-                base.LoadComplete();
+                base.Update();
 
-                if (component.RelativeSizeAxes != Axes.None)
+                if (component.DrawSize != Vector2.Zero)
                 {
-                    innerContainer.AutoSizeAxes = Axes.None;
-                    innerContainer.Height = 100;
+                    float bestScale = Math.Min(
+                        innerContainer.DrawWidth / component.DrawWidth,
+                        innerContainer.DrawHeight / component.DrawHeight);
+
+                    innerContainer.Scale = new Vector2(bestScale);
                 }
             }
 
@@ -168,6 +184,16 @@ namespace osu.Game.Skinning.Editor
                 RequestPlacement?.Invoke(component.GetType());
                 return true;
             }
+        }
+
+        private class DummyRuleset : Ruleset
+        {
+            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
+            public override string Description => string.Empty;
+            public override string ShortName => string.Empty;
         }
     }
 }

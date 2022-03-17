@@ -73,6 +73,11 @@ namespace osu.Game.Extensions
         }
 
         /// <summary>
+        /// Check whether this <see cref="IRulesetInfo"/>'s online ID is within the range that defines it as a legacy ruleset (ie. either osu!, osu!taiko, osu!catch or osu!mania).
+        /// </summary>
+        public static bool IsLegacyRuleset(this IRulesetInfo ruleset) => ruleset.OnlineID >= 0 && ruleset.OnlineID <= ILegacyRuleset.MAX_LEGACY_RULESET_ID;
+
+        /// <summary>
         /// Check whether the online ID of two <see cref="IBeatmapSetInfo"/>s match.
         /// </summary>
         /// <param name="instance">The instance to compare.</param>

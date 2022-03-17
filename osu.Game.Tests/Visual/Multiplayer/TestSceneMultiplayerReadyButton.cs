@@ -43,8 +43,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
-
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
         }
 
         [SetUp]
@@ -52,8 +50,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AvailabilityTracker.SelectedItem.BindTo(selectedItem);
 
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
+
             selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
             {
                 RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
@@ -92,16 +92,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             OsuButton readyButton = null;
 
-            AddAssert("ensure ready button enabled", () =>
+            AddUntilStep("ensure ready button enabled", () =>
             {
                 readyButton = button.ChildrenOfType<OsuButton>().Single();
                 return readyButton.Enabled.Value;
             });
 
             AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
-            AddAssert("ready button disabled", () => !readyButton.Enabled.Value);
+            AddUntilStep("ready button disabled", () => !readyButton.Enabled.Value);
             AddStep("undelete beatmap", () => beatmaps.Undelete(importedSet));
-            AddAssert("ready button enabled back", () => readyButton.Enabled.Value);
+            AddUntilStep("ready button enabled back", () => readyButton.Enabled.Value);
         }
 
         [Test]

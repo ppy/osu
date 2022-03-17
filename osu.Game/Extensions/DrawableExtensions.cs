@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using Humanizer;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
@@ -59,7 +62,17 @@ namespace osu.Game.Extensions
             component.Origin = info.Origin;
 
             if (component is ISkinnableDrawable skinnable)
+            {
                 skinnable.UsesFixedAnchor = info.UsesFixedAnchor;
+
+                foreach (var (_, property) in component.GetSettingsSourceProperties())
+                {
+                    if (!info.Settings.TryGetValue(property.Name.Underscore(), out object settingValue))
+                        continue;
+
+                    skinnable.CopyAdjustedSetting((IBindable)property.GetValue(component), settingValue);
+                }
+            }
 
             if (component is Container container)
             {
