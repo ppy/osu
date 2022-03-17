@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 1;
 
+        public override bool PlayableInMultiplayer => false;
+
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
 
         [SettingSource("Initial rate", "The starting speed of the track")]
