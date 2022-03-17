@@ -102,10 +102,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
 
             AddUntilStep("wait for idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
 
             AddUntilStep("wait for ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
 
             AddUntilStep("wait for player", () => CurrentScreen is Player player && player.IsLoaded);
             AddAssert("ruleset is correct", () => ((Player)CurrentScreen).Ruleset.Value.Equals(new OsuRuleset().RulesetInfo));
@@ -119,10 +119,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("selected beatmap is initial beatmap", () => Beatmap.Value.BeatmapInfo.OnlineID == InitialBeatmap.OnlineID);
 
             AddUntilStep("wait for idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
 
             AddUntilStep("wait for ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
 
             AddUntilStep("wait for player", () => CurrentScreen is Player player && player.IsLoaded);
             AddAssert("mods are correct", () => !((Player)CurrentScreen).Mods.Value.Any());
