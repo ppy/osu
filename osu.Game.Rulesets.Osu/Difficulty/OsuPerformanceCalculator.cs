@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             aimValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                aimValue *= calculateMissPenalty(effectiveMissCount, Attributes.AimDifficultStrainCount);
+                aimValue *= calculateMissPenalty(effectiveMissCount, attributes.AimDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             speedValue *= lengthBonus;
 
             if (effectiveMissCount > 0)
-                speedValue *= calculateMissPenalty(effectiveMissCount, Attributes.SpeedDifficultStrainCount);
+                speedValue *= calculateMissPenalty(effectiveMissCount, attributes.SpeedDifficultStrainCount);
 
             double approachRateFactor = 0.0;
             if (attributes.ApproachRate > 10.33)
