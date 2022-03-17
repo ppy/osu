@@ -109,7 +109,7 @@ namespace osu.Game.Utils
         /// Check the provided combination of mods are valid for a local gameplay session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
-        /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidForGameplay(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
             => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && !(m is MultiMod), out invalidMods);
@@ -118,7 +118,7 @@ namespace osu.Game.Utils
         /// Check the provided combination of mods are valid for a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
-        /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
             => checkValid(mods, m => m.PlayableInMultiplayer, out invalidMods);
@@ -127,7 +127,7 @@ namespace osu.Game.Utils
         /// Check the provided combination of mods are valid as "free mods" in a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
-        /// <param name="invalidMods">Invalid mods, if any were found. Can be null if all mods were valid.</param>
+        /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
             => checkValid(mods, m => m.ValidFreeModInMultiplayer, out invalidMods);
