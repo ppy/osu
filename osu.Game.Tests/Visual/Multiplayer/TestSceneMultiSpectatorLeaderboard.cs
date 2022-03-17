@@ -46,7 +46,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray()) { Expanded = { Value = true } }, Add);
+                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray())
+                {
+                    Expanded = { Value = true }
+                }, Add);
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);

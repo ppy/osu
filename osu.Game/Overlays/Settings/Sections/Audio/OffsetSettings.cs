@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double, OffsetSlider>
+                new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = AudioSettingsStrings.AudioOffset,
                     Current = config.GetBindable<double>(OsuSetting.AudioOffset),
@@ -34,11 +34,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Text = AudioSettingsStrings.OffsetWizard
                 }
             };
-        }
-
-        private class OffsetSlider : OsuSliderBar<double>
-        {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"0ms");
         }
     }
 }

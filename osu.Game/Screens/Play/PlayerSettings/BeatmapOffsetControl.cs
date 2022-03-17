@@ -1,14 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -21,8 +24,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Statistics;
 using osuTK;
-
-#nullable enable
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -51,6 +52,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private OsuColour colours { get; set; } = null!;
 
         private double lastPlayAverage;
+        private double lastPlayBeatmapOffset;
+        private HitEventTimingDistributionGraph? lastPlayGraph;
 
         private SettingsButton? useAverageButton;
 
@@ -71,7 +74,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 Spacing = new Vector2(10),
                 Children = new Drawable[]
                 {
-                    new PlayerSliderBar<double>
+                    new OffsetSliderBar
                     {
                         KeyboardStep = 5,
                         LabelText = BeatmapOffsetControlStrings.BeatmapOffset,
@@ -88,30 +91,50 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
+        public class OffsetSliderBar : PlayerSliderBar<double>
+        {
+            protected override Drawable CreateControl() => new CustomSliderBar();
+
+            protected class CustomSliderBar : SliderBar
+            {
+                public override LocalisableString TooltipText =>
+                    Current.Value == 0
+                        ? new TranslatableString("_", @"{0} ms", base.TooltipText)
+                        : new TranslatableString("_", @"{0} ms {1}", base.TooltipText, getEarlyLateText(Current.Value));
+
+                private LocalisableString getEarlyLateText(double value)
+                {
+                    Debug.Assert(value != 0);
+
+                    return value > 0
+                        ? BeatmapOffsetControlStrings.HitObjectsAppearEarlier
+                        : BeatmapOffsetControlStrings.HitObjectsAppearLater;
+                }
+            }
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             ReferenceScore.BindValueChanged(scoreChanged, true);
 
-            beatmapOffsetSubscription = realm.RegisterCustomSubscription(r =>
-            {
-                var userSettings = r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings;
-
-                if (userSettings == null) // only the case for tests.
-                    return null;
-
-                Current.Value = userSettings.Offset;
-                userSettings.PropertyChanged += onUserSettingsOnPropertyChanged;
-
-                return new InvokeOnDisposal(() => userSettings.PropertyChanged -= onUserSettingsOnPropertyChanged);
-
-                void onUserSettingsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
+                r => r.Find<BeatmapInfo>(beatmap.Value.BeatmapInfo.ID)?.UserSettings,
+                settings => settings.Offset,
+                val =>
                 {
-                    if (args.PropertyName == nameof(BeatmapUserSettings.Offset))
-                        Current.Value = userSettings.Offset;
-                }
-            });
+                    // At the point we reach here, it's not guaranteed that all realm writes have taken place (there may be some in-flight).
+                    // We are only aware of writes that originated from our own flow, so if we do see one that's active we can avoid handling the feedback value arriving.
+                    if (realmWriteTask == null)
+                        Current.Value = val;
+
+                    if (realmWriteTask?.IsCompleted == true)
+                    {
+                        // we can also mark any in-flight write that is managed locally as "seen" and start handling any incoming changes again.
+                        realmWriteTask = null;
+                    }
+                });
 
             Current.BindValueChanged(currentChanged);
         }
@@ -122,6 +145,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             void updateOffset()
             {
+                // the last play graph is relative to the offset at the point of the last play, so we need to factor that out.
+                double adjustmentSinceLastPlay = lastPlayBeatmapOffset - Current.Value;
+
+                // Negative is applied here because the play graph is considering a hit offset, not track (as we currently use for clocks).
+                lastPlayGraph?.UpdateOffset(-adjustmentSinceLastPlay);
+
                 // ensure the previous write has completed. ignoring performance concerns, if we don't do this, the async writes could be out of sequence.
                 if (realmWriteTask?.IsCompleted == false)
                 {
@@ -130,7 +159,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 }
 
                 if (useAverageButton != null)
-                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, -Current.Value, Current.Precision / 2);
+                {
+                    useAverageButton.Enabled.Value = !Precision.AlmostEquals(lastPlayAverage, adjustmentSinceLastPlay, Current.Precision / 2);
+                }
 
                 realmWriteTask = realm.WriteAsync(r =>
                 {
@@ -139,10 +170,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     if (settings == null) // only the case for tests.
                         return;
 
-                    if (settings.Offset == Current.Value)
+                    double val = Current.Value;
+
+                    if (settings.Offset == val)
                         return;
 
-                    settings.Offset = Current.Value;
+                    settings.Offset = val;
                 });
             }
         }
@@ -187,10 +220,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
             }
 
             lastPlayAverage = average;
+            lastPlayBeatmapOffset = Current.Value;
 
             referenceScoreContainer.AddRange(new Drawable[]
             {
-                new HitEventTimingDistributionGraph(hitEvents)
+                lastPlayGraph = new HitEventTimingDistributionGraph(hitEvents)
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 50,
@@ -199,7 +233,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 useAverageButton = new SettingsButton
                 {
                     Text = BeatmapOffsetControlStrings.CalibrateUsingLastPlay,
-                    Action = () => Current.Value = -lastPlayAverage
+                    Action = () => Current.Value = lastPlayBeatmapOffset - lastPlayAverage
                 },
             });
         }
