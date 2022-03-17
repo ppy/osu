@@ -58,7 +58,6 @@ namespace osu.Game.Screens.Play
         private HardwareCorrectionOffsetClock platformOffsetClock;
         private MasterGameplayClock masterGameplayClock;
         private Bindable<double> userAudioOffset;
-        private double startOffset;
 
         private IDisposable beatmapOffsetSubscription;
 
@@ -90,26 +89,33 @@ namespace osu.Game.Screens.Play
                 settings => settings.Offset,
                 val => userBeatmapOffsetClock.Offset = val);
 
-            // sane default provided by ruleset.
-            startOffset = gameplayStartTime;
-
-            if (!startAtGameplayStart)
+            if (GameplayStartTime == null)
             {
-                startOffset = Math.Min(0, startOffset);
+                // sane default provided by ruleset.
+                double offset = gameplayStartTime;
 
-                // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
-                // this is commonly used to display an intro before the audio track start.
-                double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
-                if (firstStoryboardEvent != null)
-                    startOffset = Math.Min(startOffset, firstStoryboardEvent.Value);
+                if (!startAtGameplayStart)
+                {
+                    offset = Math.Min(0, offset);
 
-                // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
-                // this is not available as an option in the live editor but can still be applied via .osu editing.
-                if (beatmap.BeatmapInfo.AudioLeadIn > 0)
-                    startOffset = Math.Min(startOffset, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+                    // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
+                    // this is commonly used to display an intro before the audio track start.
+                    double? firstStoryboardEvent = beatmap.Storyboard.EarliestEventTime;
+                    if (firstStoryboardEvent != null)
+                        offset = Math.Min(offset, firstStoryboardEvent.Value);
+
+                    // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
+                    // this is not available as an option in the live editor but can still be applied via .osu editing.
+                    if (beatmap.BeatmapInfo.AudioLeadIn > 0)
+                        offset = Math.Min(offset, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+                }
+
+                // Reset may have been called externally before LoadComplete.
+                // If it was and the clock is in a playing state, we want to ensure that it isn't stopped here.
+                bool isStarted = !IsPaused.Value;
+
+                Reset(startClock: isStarted, gameplayStartTime: offset);
             }
-
-            Seek(startOffset);
         }
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
@@ -162,12 +168,6 @@ namespace osu.Game.Screens.Play
                 skipTarget = 0;
 
             Seek(skipTarget);
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-            Seek(startOffset);
         }
 
         protected override GameplayClock CreateGameplayClock(IFrameBasedClock source)
@@ -231,6 +231,7 @@ namespace osu.Game.Screens.Play
         }
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
+
         {
             private readonly BindableDouble pauseRateAdjust;
 
@@ -276,9 +277,9 @@ namespace osu.Game.Screens.Play
         }
 
         private class MasterGameplayClock : GameplayClock
+
         {
             public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
-
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
 
             public MasterGameplayClock(FramedOffsetClock underlyingClock)
