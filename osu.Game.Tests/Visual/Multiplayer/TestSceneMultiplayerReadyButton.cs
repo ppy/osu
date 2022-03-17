@@ -1,9 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -35,8 +33,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager beatmaps;
         private RulesetStore rulesets;
 
-        private IDisposable readyClickOperation;
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
@@ -67,23 +63,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(200, 50),
-                OnReadyClick = () =>
-                {
-                    readyClickOperation = OngoingOperationTracker.BeginOperation();
-
-                    Task.Run(async () =>
-                    {
-                        if (MultiplayerClient.IsHost && MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready)
-                        {
-                            await MultiplayerClient.StartMatch();
-                            return;
-                        }
-
-                        await MultiplayerClient.ToggleReady();
-
-                        readyClickOperation.Dispose();
-                    });
-                }
             });
         });
 
@@ -207,9 +186,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("user waiting for load", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
-
-            AddAssert("ready button disabled", () => !button.ChildrenOfType<OsuButton>().Single().Enabled.Value);
-            AddStep("transitioned to gameplay", () => readyClickOperation.Dispose());
 
             AddStep("finish gameplay", () =>
             {
