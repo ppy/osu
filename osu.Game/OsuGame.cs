@@ -575,11 +575,16 @@ namespace osu.Game
             if (SelectedMods.Disabled)
                 return;
 
-            if (!ModUtils.CheckValidForGameplay(mods.NewValue, out var invalid))
-            {
-                // ensure we always have a valid set of mods.
-                SelectedMods.Value = mods.NewValue.Except(invalid).ToArray();
-            }
+            var validMods = mods.NewValue;
+
+            if (!ModUtils.CheckCompatibleSet(validMods, out var incompatible))
+                validMods = validMods.Except(incompatible).ToArray();
+
+            if (!ModUtils.CheckValidForGameplay(validMods, out var invalid))
+                validMods = validMods.Except(invalid).ToArray();
+
+            // ensure we always have a valid set of mods.
+            SelectedMods.Value = validMods;
         }
 
         #endregion
