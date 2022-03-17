@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -25,6 +26,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+
+        [Cached]
+        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         [SetUpSteps]
         public void SetUpSteps()

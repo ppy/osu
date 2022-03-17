@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -33,6 +34,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Cached]
         private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+
+        [Cached]
+        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         // best way to check without exposing.
         private Drawable hideTarget => hudOverlay.KeyCounter;
