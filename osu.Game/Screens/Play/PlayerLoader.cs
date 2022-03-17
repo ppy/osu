@@ -1,10 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using ManagedBass.Fx;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -48,31 +49,31 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => true;
 
         // We show the previous screen status
-        protected override UserActivity InitialActivity => null;
+        protected override UserActivity? InitialActivity => null;
 
         protected override bool PlayResumeSound => false;
 
-        protected BeatmapMetadataDisplay MetadataInfo { get; private set; }
+        protected BeatmapMetadataDisplay MetadataInfo { get; private set; } = null!;
 
         /// <summary>
         /// A fill flow containing the player settings groups, exposed for the ability to hide it from inheritors of the player loader.
         /// </summary>
-        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; }
+        protected FillFlowContainer<PlayerSettingsGroup> PlayerSettings { get; private set; } = null!;
 
-        protected VisualSettings VisualSettings { get; private set; }
+        protected VisualSettings VisualSettings { get; private set; } = null!;
 
-        protected AudioSettings AudioSettings { get; private set; }
+        protected AudioSettings AudioSettings { get; private set; } = null!;
 
-        protected Task LoadTask { get; private set; }
+        protected Task? LoadTask { get; private set; }
 
-        protected Task DisposalTask { get; private set; }
+        protected Task? DisposalTask { get; private set; }
 
         private bool backgroundBrightnessReduction;
 
         private readonly BindableDouble volumeAdjustment = new BindableDouble(1);
 
-        private AudioFilter lowPassFilter;
-        private AudioFilter highPassFilter;
+        private AudioFilter lowPassFilter = null!;
+        private AudioFilter highPassFilter = null!;
 
         protected bool BackgroundBrightnessReduction
         {
@@ -94,47 +95,45 @@ namespace osu.Game.Screens.Play
             // don't push if the user is hovering one of the panes, unless they are idle.
             && (IsHovered || idleTracker.IsIdle.Value)
             // don't push if the user is dragging a slider or otherwise.
-            && inputManager?.DraggedDrawable == null
+            && inputManager.DraggedDrawable == null
             // don't push if a focused overlay is visible, like settings.
-            && inputManager?.FocusedDrawable == null;
+            && inputManager.FocusedDrawable == null;
 
         private readonly Func<Player> createPlayer;
 
         /// <summary>
         /// The <see cref="Player"/> instance being loaded by this screen.
         /// </summary>
-        [CanBeNull]
-        public Player CurrentPlayer { get; private set; }
+        public Player? CurrentPlayer { get; private set; }
 
         /// <summary>
         /// Whether the current player instance has been consumed via <see cref="consumePlayer"/>.
         /// </summary>
         private bool playerConsumed;
 
-        private LogoTrackingContainer content;
+        private LogoTrackingContainer content = null!;
 
         private bool hideOverlays;
 
-        private InputManager inputManager;
+        private InputManager inputManager = null!;
 
-        private IdleTracker idleTracker;
+        private IdleTracker idleTracker = null!;
 
-        private ScheduledDelegate scheduledPushPlayer;
+        private ScheduledDelegate? scheduledPushPlayer;
 
-        [CanBeNull]
-        private EpilepsyWarning epilepsyWarning;
-
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private EpilepsyWarning? epilepsyWarning;
 
         [Resolved(CanBeNull = true)]
-        private VolumeOverlay volumeOverlay { get; set; }
+        private NotificationOverlay? notificationOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private VolumeOverlay? volumeOverlay { get; set; }
 
         [Resolved]
-        private AudioManager audioManager { get; set; }
+        private AudioManager audioManager { get; set; } = null!;
 
         [Resolved(CanBeNull = true)]
-        private BatteryInfo batteryInfo { get; set; }
+        private BatteryInfo? batteryInfo { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -240,6 +239,8 @@ namespace osu.Game.Screens.Play
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+
+            Debug.Assert(CurrentPlayer != null);
 
             var lastScore = CurrentPlayer.Score;
 
@@ -348,6 +349,7 @@ namespace osu.Game.Screens.Play
         private Player consumePlayer()
         {
             Debug.Assert(!playerConsumed);
+            Debug.Assert(CurrentPlayer != null);
 
             playerConsumed = true;
             return CurrentPlayer;
@@ -484,7 +486,7 @@ namespace osu.Game.Screens.Play
 
         #region Mute warning
 
-        private Bindable<bool> muteWarningShownOnce;
+        private Bindable<bool> muteWarningShownOnce = null!;
 
         private int restartCount;
 
@@ -539,7 +541,7 @@ namespace osu.Game.Screens.Play
 
         #region Low battery warning
 
-        private Bindable<bool> batteryWarningShownOnce;
+        private Bindable<bool> batteryWarningShownOnce = null!;
 
         private void showBatteryWarningIfNeeded()
         {
