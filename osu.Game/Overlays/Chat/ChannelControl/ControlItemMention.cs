@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
     {
         public readonly BindableInt Mentions = new BindableInt();
 
-        private OsuSpriteText? countText;
+        private OsuSpriteText countText = null!;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour, OverlayColourProvider colourProvider)
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             {
                 int mentionCount = change.NewValue;
 
-                countText!.Text = mentionCount > 99 ? "99+" : mentionCount.ToString();
+                countText.Text = mentionCount > 99 ? "99+" : mentionCount.ToString();
 
                 if (mentionCount > 0)
                     Show();
