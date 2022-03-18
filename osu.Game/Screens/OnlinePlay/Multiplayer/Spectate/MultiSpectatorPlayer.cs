@@ -55,8 +55,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
             public SpectatorGameplayClockContainer([NotNull] IClock sourceClock)
                 : base(sourceClock)
             {
-                // the container should initially be in a stopped state until the catch-up clock is started by the sync manager.
-                Stop();
             }
 
             protected override void Update()
