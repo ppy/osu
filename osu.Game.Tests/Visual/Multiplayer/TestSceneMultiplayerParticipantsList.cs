@@ -164,6 +164,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestHostGetsPinnedToTop()
+        {
+            AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
+            {
+                Id = 3,
+                Username = "Second",
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
+            }));
+
+            AddStep("make second user host", () => MultiplayerClient.TransferHost(3));
+            AddAssert("second user above first", () =>
+            {
+                var first = this.ChildrenOfType<ParticipantPanel>().ElementAt(0);
+                var second = this.ChildrenOfType<ParticipantPanel>().ElementAt(1);
+                return second.Y < first.Y;
+            });
+        }
+
+        [Test]
         public void TestKickButtonOnlyPresentWhenHost()
         {
             AddStep("add user", () => MultiplayerClient.AddUser(new APIUser
