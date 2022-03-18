@@ -1,5 +1,5 @@
 name: Bug report
-description: Encountered a clear bug or crash with logs backing it? Fill it up!
+description: Report a very clearly broken issue.
 body:
   - type: markdown
     attributes:
@@ -20,9 +20,9 @@ body:
           - Cosmetic bug: something looks wrong (e.g. misaligned component, text not wrapping, etc.)
       options:
         - Crash to desktop
-        - Game behaviour bug
-        - Performance bug
-        - Cosmetic bug
+        - Game behaviour
+        - Performance
+        - Cosmetic
         - Other
     validations:
       required: true
@@ -35,14 +35,14 @@ body:
   - type: textarea
     attributes:
       label: Screenshots or videos
-      description: May also help in reproducing the encountered bug, in addition to descriptions.
+      description: Share any kind of visuals you can which show the bug or issue taking place.
       placeholder: You can attach by dragging and dropping the screenshots/videos into this box.
     validations:
       required: false
   - type: input
     attributes:
       label: Version
-      description: The version of osu!(lazer) you encountered this bug on.
+      description: The version you encountered this bug on. This is shown at the bottom of the main menu and also at the end of the settings screen.
     validations:
       required: true
   - type: markdown
@@ -66,7 +66,7 @@ body:
 
         If you have relocated your game folder, head into that location and open the `logs` folder.
 
-        Finally, select all log files and attach them in the "Logs" box below.
+        Finally, select all log files and drag them into the "Logs" box below.
 
   - type: textarea
     attributes:
