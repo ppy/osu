@@ -266,6 +266,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddRepeatStep("switch hosts", () => MultiplayerClient.TransferHost(RNG.Next(0, users_count)), 10);
+            AddStep("give host back", () => MultiplayerClient.TransferHost(API.LocalUser.Value.Id));
         }
 
         [Test]
