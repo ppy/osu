@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -36,9 +38,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [SettingSource("Centre marker style", "How to signify the centre of the display")]
         public Bindable<CentreMarkerStyles> CentreMarkerStyle { get; } = new Bindable<CentreMarkerStyles>(CentreMarkerStyles.Circle);
 
+        [SettingSource("Label style", "How to show early/late extremities")]
+        public Bindable<LabelStyles> LabelStyle { get; } = new Bindable<LabelStyles>(LabelStyles.Icons);
+
         private SpriteIcon arrow;
-        private SpriteIcon iconEarly;
-        private SpriteIcon iconLate;
+        private Drawable labelEarly;
+        private Drawable labelLate;
 
         private Container colourBarsEarly;
         private Container colourBarsLate;
@@ -70,7 +75,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             const int bar_height = 200;
             const int bar_width = 2;
             const float chevron_size = 8;
-            const float icon_size = 14;
 
             hitWindows = HitWindows.GetAllAvailableWindows().ToArray();
 
@@ -91,22 +95,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                         RelativeSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            iconEarly = new SpriteIcon
-                            {
-                                Y = -10,
-                                Size = new Vector2(icon_size),
-                                Icon = FontAwesome.Solid.ShippingFast,
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.Centre,
-                            },
-                            iconLate = new SpriteIcon
-                            {
-                                Y = 10,
-                                Size = new Vector2(icon_size),
-                                Icon = FontAwesome.Solid.Bicycle,
-                                Anchor = Anchor.BottomCentre,
-                                Origin = Anchor.Centre,
-                            },
                             colourBarsEarly = new Container
                             {
                                 Anchor = Anchor.Centre,
@@ -168,6 +156,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             colourBars.ResizeHeightTo(1, 800, Easing.OutQuint);
 
             CentreMarkerStyle.BindValueChanged(style => recreateCentreMarker(style.NewValue), true);
+            LabelStyle.BindValueChanged(style => recreateLabels(style.NewValue), true);
 
             // delay the appearance animations for only the initial appearance.
             using (arrowContainer.BeginDelayedSequence(450))
@@ -266,13 +255,87 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
+        private void recreateLabels(LabelStyles style)
+        {
+            const float icon_size = 14;
+
+            labelEarly?.Expire();
+            labelEarly = null;
+
+            labelLate?.Expire();
+            labelLate = null;
+
+            switch (style)
+            {
+                case LabelStyles.None:
+                    break;
+
+                case LabelStyles.Icons:
+                    labelEarly = new SpriteIcon
+                    {
+                        Y = -10,
+                        Size = new Vector2(icon_size),
+                        Icon = FontAwesome.Solid.ShippingFast,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                    };
+
+                    labelLate = new SpriteIcon
+                    {
+                        Y = 10,
+                        Size = new Vector2(icon_size),
+                        Icon = FontAwesome.Solid.Bicycle,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.Centre,
+                    };
+
+                    break;
+
+                case LabelStyles.Text:
+                    labelEarly = new OsuSpriteText
+                    {
+                        Y = -10,
+                        Text = "Early",
+                        Font = OsuFont.Default.With(size: 10),
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.Centre,
+                    };
+
+                    labelLate = new OsuSpriteText
+                    {
+                        Y = 10,
+                        Text = "Late",
+                        Font = OsuFont.Default.With(size: 10),
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.Centre,
+                    };
+
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(style), style, null);
+            }
+
+            if (labelEarly != null)
+            {
+                colourBars.Add(labelEarly);
+                labelEarly.FadeInFromZero(500);
+            }
+
+            if (labelLate != null)
+            {
+                colourBars.Add(labelLate);
+                labelLate.FadeInFromZero(500);
+            }
+        }
+
         protected override void Update()
         {
             base.Update();
 
             // undo any layout rotation to display icons in the correct orientation
-            iconEarly.Rotation = -Rotation;
-            iconLate.Rotation = -Rotation;
+            if (labelEarly != null) labelEarly.Rotation = -Rotation;
+            if (labelLate != null) labelLate.Rotation = -Rotation;
         }
 
         private void createColourBars((HitResult result, double length)[] windows)
@@ -418,6 +481,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             None,
             Circle,
             Line
+        }
+
+        public enum LabelStyles
+        {
+            None,
+            Icons,
+            Text
         }
     }
 }
