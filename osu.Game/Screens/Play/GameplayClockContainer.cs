@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Whether gameplay is paused.
         /// </summary>
-        public readonly BindableBool IsPaused = new BindableBool();
+        public readonly BindableBool IsPaused = new BindableBool(true);
 
         /// <summary>
         /// The adjustable source clock used for gameplay. Should be used for seeks and clock control.
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
-        /// <param name="startClock">Whether to start the clock immediately.</param>
+        /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
         /// <param name="gameplayStartTime">A time to use for future <see cref="Reset"/> calls as the definite start of gameplay.</param>
         public void Reset(bool startClock = false, double? gameplayStartTime = null)
         {
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
 
-            if (!IsPaused.Value && startClock)
+            if (!IsPaused.Value || startClock)
                 Start();
         }
 

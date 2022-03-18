@@ -85,10 +85,7 @@ namespace osu.Game.Tests.Gameplay
 
                 Add(gameplayClockContainer = new MasterGameplayClockContainer(working, 0));
 
-                if (whileStopped)
-                    gameplayClockContainer.Stop();
-
-                gameplayClockContainer.Reset();
+                gameplayClockContainer.Reset(startClock: !whileStopped);
             });
 
             AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(clockRate)));
