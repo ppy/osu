@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
 
         [SettingSource("Centre marker style", "How to signify the centre of the display")]
-        public Bindable<CentreMarker> CentreMarkerStyle { get; } = new Bindable<CentreMarker>(CentreMarker.Circle);
+        public Bindable<CentreMarkerStyles> CentreMarkerStyle { get; } = new Bindable<CentreMarkerStyles>(CentreMarkerStyles.Circle);
 
         private SpriteIcon arrow;
         private SpriteIcon iconEarly;
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        private void recreateCentreMarker(CentreMarker style)
+        private void recreateCentreMarker(CentreMarkerStyles style)
         {
             if (centreMarkerDrawables != null)
             {
@@ -197,10 +197,10 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             switch (style)
             {
-                case CentreMarker.None:
+                case CentreMarkerStyles.None:
                     break;
 
-                case CentreMarker.Circle:
+                case CentreMarkerStyles.Circle:
                     centreMarkerDrawables = new Drawable[]
                     {
                         new Circle
@@ -219,11 +219,39 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Depth = float.MinValue,
-                            Size = new Vector2(centre_marker_size),
-                            Scale = new Vector2(0.5f),
+                            Size = new Vector2(centre_marker_size / 2f),
                         },
                     };
                     break;
+
+                case CentreMarkerStyles.Line:
+                    const float border_size = 1.5f;
+
+                    centreMarkerDrawables = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Name = "middle marker behind",
+                            Colour = GetColourForHitResult(hitWindows.Last().result),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Depth = float.MaxValue,
+                            Size = new Vector2(judgement_line_width, centre_marker_size / 3f),
+                        },
+                        new Box
+                        {
+                            Name = "middle marker in front",
+                            Colour = GetColourForHitResult(hitWindows.Last().result).Darken(0.3f),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Depth = float.MinValue,
+                            Size = new Vector2(judgement_line_width - border_size, centre_marker_size / 3f - border_size),
+                        },
+                    };
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(style), style, null);
             }
 
             if (centreMarkerDrawables != null)
@@ -232,9 +260,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 {
                     colourBars.Add(d);
 
-                    Vector2 originalScale = d.Scale;
                     d.FadeInFromZero(500, Easing.OutQuint)
-                     .ScaleTo(0).ScaleTo(originalScale, 1000, Easing.OutElasticHalf);
+                     .ScaleTo(0).ScaleTo(1, 1000, Easing.OutElasticHalf);
                 }
             }
         }
@@ -386,10 +413,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public override void Clear() => judgementsContainer.Clear();
 
-        public enum CentreMarker
+        public enum CentreMarkerStyles
         {
             None,
-            Circle
+            Circle,
+            Line
         }
     }
 }
