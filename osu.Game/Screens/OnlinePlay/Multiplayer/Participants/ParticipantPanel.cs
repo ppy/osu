@@ -206,10 +206,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             else
                 kickButton.FadeOut(fade_time);
 
-            if (Room.Host?.Equals(User) == true)
-                crown.FadeIn(fade_time);
-            else
-                crown.FadeOut(fade_time);
+            crown.Alpha = Room.Host?.Equals(User) == true ? 1 : 0;
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.
