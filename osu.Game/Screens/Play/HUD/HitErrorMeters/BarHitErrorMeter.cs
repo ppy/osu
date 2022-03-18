@@ -4,12 +4,14 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -19,7 +21,14 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     public class BarHitErrorMeter : HitErrorMeter
     {
         private const int judgement_line_width = 14;
-        private const int judgement_line_height = 4;
+
+        [SettingSource("Judgement line thickness", "How thick the individual lines should be.")]
+        public BindableNumber<float> JudgementLineThickness { get; } = new BindableNumber<float>(4)
+        {
+            MinValue = 1,
+            MaxValue = 8,
+            Precision = 0.1f,
+        };
 
         private SpriteIcon arrow;
         private SpriteIcon iconEarly;
@@ -255,6 +264,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             judgementsContainer.Add(new JudgementLine
             {
+                JudgementLineThickness = { BindTarget = JudgementLineThickness },
                 Y = getRelativeJudgementPosition(judgement.TimeOffset),
                 Colour = GetColourForHitResult(judgement.Type),
             });
@@ -268,11 +278,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         internal class JudgementLine : CompositeDrawable
         {
+            public readonly BindableNumber<float> JudgementLineThickness = new BindableFloat();
+
             public JudgementLine()
             {
                 RelativeSizeAxes = Axes.X;
                 RelativePositionAxes = Axes.Y;
-                Height = judgement_line_height;
 
                 Blending = BlendingParameters.Additive;
 
@@ -294,6 +305,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
                 Alpha = 0;
                 Width = 0;
+
+                JudgementLineThickness.BindValueChanged(thickness => Height = thickness.NewValue, true);
 
                 this
                     .FadeTo(0.6f, judgement_fade_in_duration, Easing.OutQuint)
