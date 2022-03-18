@@ -239,7 +239,9 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="password">The new password, if any.</param>
         /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="queueMode">The new queue mode, if any.</param>
-        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default)
+        /// <param name="autoStartDuration">The new auto-start countdown duration, if any.</param>
+        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default,
+                                   Optional<TimeSpan> autoStartDuration = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -250,6 +252,7 @@ namespace osu.Game.Online.Multiplayer
                 Password = password.GetOr(Room.Settings.Password),
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
+                AutoStartDuration = autoStartDuration.GetOr(Room.Settings.AutoStartDuration),
             });
         }
 
