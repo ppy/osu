@@ -133,6 +133,7 @@ namespace osu.Game.Tests.Resources
                         StarRating = diff,
                         Length = length,
                         BPM = bpm,
+                        MaxCombo = 1000,
                         Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
                         Ruleset = rulesetInfo,
                         Metadata = metadata,
