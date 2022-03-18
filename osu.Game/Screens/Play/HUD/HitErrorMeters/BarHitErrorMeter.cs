@@ -294,6 +294,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 case LabelStyles.Text:
                     labelEarly = new OsuSpriteText
                     {
+                        X = -1,
                         Y = -10,
                         Text = "Early",
                         Font = OsuFont.Default.With(size: 10),
@@ -303,6 +304,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
                     labelLate = new OsuSpriteText
                     {
+                        X = -1,
                         Y = 10,
                         Text = "Late",
                         Font = OsuFont.Default.With(size: 10),
