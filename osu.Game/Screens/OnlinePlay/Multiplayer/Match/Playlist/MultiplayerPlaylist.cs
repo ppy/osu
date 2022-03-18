@@ -7,6 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -29,6 +31,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         private MultiplayerHistoryList historyList;
         private bool firstPopulation = true;
 
+        private OsuSpriteText queueListCount;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -41,6 +45,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     RelativeSizeAxes = Axes.X,
                     Height = tab_control_height,
                     Current = { BindTarget = DisplayMode }
+                },
+                queueListCount = new OsuSpriteText
+                {
+                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                 },
                 new Container
                 {
@@ -70,6 +80,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         {
             base.LoadComplete();
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
+            queueList.Items.BindCollectionChanged(
+                (_, __) => queueListCount.Text = queueList.Items.Count.ToString(), true);
         }
 
         private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
