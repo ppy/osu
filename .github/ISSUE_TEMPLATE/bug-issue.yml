@@ -9,8 +9,7 @@ body:
         Important to note that your issue may have already been reported before. Please check:
         - Pinned issues, at the top of https://github.com/ppy/osu/issues.
         - Current open `priority:0` issues, filterable [here](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Apriority%3A0).
-
-        And also search for your issue. If you find that it already exists, respond with a reaction or add any further information that may be helpful.
+        - And most importantly, search for your issue. If you find that it already exists, respond with a reaction or add any further information that may be helpful.
 
   - type: dropdown
     attributes:
