@@ -65,14 +65,10 @@ namespace osu.Game.Screens.Ranking.Expanded
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
-            bool isPerfect = true;
-            isPerfect &= !score.Statistics.TryGetValue(HitResult.Miss, out int missCount) || missCount == 0;
-            isPerfect &= !score.Statistics.TryGetValue(HitResult.LargeTickMiss, out int largeTickMissCount) || largeTickMissCount == 0;
-
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, beatmap.MaxCombo, isPerfect),
+                new ComboStatistic(score.MaxCombo, beatmap.MaxCombo, score.Statistics.All(stat => !stat.Key.BreaksCombo() || stat.Value == 0)),
                 new PerformanceStatistic(score),
             };
 
