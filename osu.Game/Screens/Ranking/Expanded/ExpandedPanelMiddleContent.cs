@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Ranking.Expanded
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out int missCount) || missCount == 0),
+                new ComboStatistic(score.MaxCombo, beatmap.MaxCombo, score.Statistics.All(stat => !stat.Key.BreaksCombo() || stat.Value == 0)),
                 new PerformanceStatistic(score),
             };
 
