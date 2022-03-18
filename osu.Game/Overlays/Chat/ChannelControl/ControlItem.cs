@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                         {
                             new[]
                             {
-                                createAvatar(),
+                                createIcon(),
                                 new ControlItemText(channel)
                                 {
                                     Anchor = Anchor.CentreLeft,
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             base.OnHoverLost(e);
         }
 
-        private Drawable createAvatar()
+        private Drawable createIcon()
         {
             if (channel.Type != ChannelType.PM)
                 return Drawable.Empty();
