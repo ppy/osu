@@ -1,0 +1,76 @@
+name: Bug report
+description: Encountered a clear bug or crash with logs backing it? Fill it up!
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # osu! bug report
+
+        Important to note that your issue may have already been reported before. Please check:
+        - Pinned issues, at the top of https://github.com/ppy/osu/issues.
+        - Current open `priority:0` issues, filterable [here](https://github.com/ppy/osu/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Apriority%3A0).
+
+        And also search for your issue. If you find that it already exists, respond with a reaction or add any further information that may be helpful.
+
+  - type: dropdown
+    attributes:
+      label: Type
+      description: |
+          - Game behaviour bug: game gets into an unexpected state (e.g. incorrect scoring, wrong multiplayer room state, etc.).
+          - Cosmetic bug: something looks wrong (e.g. misaligned component, text not wrapping, etc.)
+      options:
+        - Crash to desktop
+        - Game behaviour bug
+        - Performance bug
+        - Cosmetic bug
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Bug description
+      description: What are the steps for reproducing the bug? Any additional details that might be of help?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Screenshots or videos
+      description: May also help in reproducing the encountered bug, in addition to descriptions.
+      placeholder: You can attach by dragging and dropping the screenshots/videos into this box.
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Version
+      description: The version of osu!(lazer) you encountered this bug on.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Logs attachments
+
+        Logs are necessary to further investigate this bug. They are reset every new game session, so you need to ensure the logs are preserved by not starting/restarting osu! after encountering the bug.
+
+        In the case this isn't a "Crash to Desktop" report, to retrieve logs:
+          1. Head on to game settings and click on "Open osu! folder"
+          2. Then open the `logs` folder located there
+
+        Otherwise, logs can *only* be retrieved via file explorer, as running the game will reset them.
+
+        Logs are, by default, located at:
+          - `%AppData%/osu/logs` *(on Windows),*
+          - `~/.local/share/osu/logs` *(on Linux & macOS).*
+          - `Android/data/sh.ppy.osulazer/files/logs` *(on Android)*,
+          - on iOS they can be obtained by connecting your device to your desktop and copying the `logs` directory from the app's own document storage using iTunes. (https://support.apple.com/en-us/HT201301#copy-to-computer)
+
+        If you have relocated your game folder, head into that location and open the `logs` folder.
+
+        Finally, select all log files and attach them in the "Logs" box below.
+
+  - type: textarea
+    attributes:
+      label: Logs
+      placeholder: You can attach by dragging and dropping the log files into this box.
+    validations:
+      required: true
