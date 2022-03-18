@@ -12,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
+using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
@@ -34,23 +35,38 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         private OsuSpriteText queueListCount;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour osuColour)
         {
             const float tab_control_height = 25;
 
             InternalChildren = new Drawable[]
             {
-                new OsuTabControl<MultiplayerPlaylistDisplayMode>
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = tab_control_height,
-                    Current = { BindTarget = DisplayMode }
-                },
-                queueListCount = new OsuSpriteText
-                {
-                    Font = OsuFont.Default.With(weight: FontWeight.Bold),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    Direction = FillDirection.Horizontal,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(OsuTabControl<MultiplayerPlaylistDisplayMode>.HORIZONTAL_SPACING, 0),
+                    Children = new Drawable[]
+                    {
+                        queueListCount = new OsuSpriteText
+                        {
+                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Colour = osuColour.Yellow,
+                        },
+                        new OsuTabControl<MultiplayerPlaylistDisplayMode>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = tab_control_height,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Current = { BindTarget = DisplayMode },
+                        },
+                    }
                 },
                 new Container
                 {
