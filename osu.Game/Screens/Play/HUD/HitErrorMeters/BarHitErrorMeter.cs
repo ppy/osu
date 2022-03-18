@@ -30,6 +30,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             Precision = 0.1f,
         };
 
+        [SettingSource("Show moving average arrow", "Whether an arrow should move beneath the bar showing the average error.")]
+        public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
+
         private SpriteIcon arrow;
         private SpriteIcon iconEarly;
         private SpriteIcon iconLate;
@@ -40,6 +43,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private Container judgementsContainer;
 
         private double maxHitWindow;
+
+        private double floatingAverage;
+        private Container colourBars;
+        private Container arrowContainer;
+
+        private const int max_concurrent_judgements = 50;
 
         public BarHitErrorMeter()
         {
@@ -134,13 +143,16 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             },
                         }
                     },
-                    new Container
+                    arrowContainer = new Container
                     {
                         Name = "average chevron",
                         Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
+                        Origin = Anchor.CentreRight,
                         Width = chevron_size,
+                        X = chevron_size,
                         RelativeSizeAxes = Axes.Y,
+                        Alpha = 0,
+                        Scale = new Vector2(0, 1),
                         Child = arrow = new SpriteIcon
                         {
                             Anchor = Anchor.TopCentre,
@@ -164,8 +176,15 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             colourBars.Height = 0;
             colourBars.ResizeHeightTo(1, 800, Easing.OutQuint);
 
-            arrow.Alpha = 0;
-            arrow.Delay(200).FadeInFromZero(600);
+            // delay the arrow appearance animation for only the initial appearance.
+            using (arrowContainer.BeginDelayedSequence(250))
+            {
+                ShowMovingAverage.BindValueChanged(visible =>
+                {
+                    arrowContainer.FadeTo(visible.NewValue ? 1 : 0, 250, Easing.OutQuint);
+                    arrowContainer.ScaleTo(visible.NewValue ? new Vector2(1) : new Vector2(0, 1), 250, Easing.OutQuint);
+                }, true);
+            }
         }
 
         protected override void Update()
@@ -232,11 +251,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 };
             }
         }
-
-        private double floatingAverage;
-        private Container colourBars;
-
-        private const int max_concurrent_judgements = 50;
 
         protected override void OnNewJudgement(JudgementResult judgement)
         {
