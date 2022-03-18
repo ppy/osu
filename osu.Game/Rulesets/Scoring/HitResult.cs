@@ -125,30 +125,28 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether a <see cref="HitResult"/> increases the combo.
         /// </summary>
         public static bool IncreasesCombo(this HitResult result)
+            => AffectsCombo(result) && IsHit(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> breaks the combo and resets it back to zero.
+        /// </summary>
+        public static bool BreaksCombo(this HitResult result)
+            => AffectsCombo(result) && !IsHit(result);
+
+        /// <summary>
+        /// Whether a <see cref="HitResult"/> increases/breaks the combo, and affects the combo portion of the score.
+        /// </summary>
+        public static bool AffectsCombo(this HitResult result)
         {
             switch (result)
             {
+                case HitResult.Miss:
                 case HitResult.Meh:
                 case HitResult.Ok:
                 case HitResult.Good:
                 case HitResult.Great:
                 case HitResult.Perfect:
                 case HitResult.LargeTickHit:
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
-        /// Whether a <see cref="HitResult"/> breaks the combo and resets it back to zero.
-        /// </summary>
-        public static bool BreaksCombo(this HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.Miss:
                 case HitResult.LargeTickMiss:
                     return true;
 
@@ -156,12 +154,6 @@ namespace osu.Game.Rulesets.Scoring
                     return false;
             }
         }
-
-        /// <summary>
-        /// Whether a <see cref="HitResult"/> increases/breaks the combo, and affects the combo portion of the score.
-        /// </summary>
-        public static bool AffectsCombo(this HitResult result)
-            => IncreasesCombo(result) || BreaksCombo(result);
 
         /// <summary>
         /// Whether a <see cref="HitResult"/> affects the accuracy portion of the score.
