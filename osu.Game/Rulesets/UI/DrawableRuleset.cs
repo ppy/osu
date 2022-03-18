@@ -133,6 +133,11 @@ namespace osu.Game.Rulesets.UI
                 p.NewResult += (_, r) => NewResult?.Invoke(r);
                 p.RevertResult += (_, r) => RevertResult?.Invoke(r);
             }));
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             IsPaused.ValueChanged += paused =>
             {
