@@ -14,9 +14,6 @@ body:
   - type: dropdown
     attributes:
       label: Type
-      description: |
-          - Game behaviour bug: game gets into an unexpected state (e.g. incorrect scoring, wrong multiplayer room state, etc.).
-          - Cosmetic bug: something looks wrong (e.g. misaligned component, text not wrapping, etc.)
       options:
         - Crash to desktop
         - Game behaviour
