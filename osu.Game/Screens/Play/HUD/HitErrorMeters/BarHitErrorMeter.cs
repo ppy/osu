@@ -33,6 +33,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [SettingSource("Show moving average arrow", "Whether an arrow should move beneath the bar showing the average error.")]
         public Bindable<bool> ShowMovingAverage { get; } = new BindableBool(true);
 
+        [SettingSource("Centre marker style", "How to signify the centre of the display")]
+        public Bindable<CentreMarker> CentreMarkerStyle { get; } = new Bindable<CentreMarker>(CentreMarker.Circle);
+
         private SpriteIcon arrow;
         private SpriteIcon iconEarly;
         private SpriteIcon iconLate;
@@ -48,7 +51,13 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private Container colourBars;
         private Container arrowContainer;
 
+        private (HitResult result, double length)[] hitWindows;
+
         private const int max_concurrent_judgements = 50;
+
+        private Drawable[] centreMarkerDrawables;
+
+        private const int centre_marker_size = 8;
 
         public BarHitErrorMeter()
         {
@@ -58,13 +67,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         [BackgroundDependencyLoader]
         private void load()
         {
-            const int centre_marker_size = 8;
             const int bar_height = 200;
             const int bar_width = 2;
             const float chevron_size = 8;
             const float icon_size = 14;
 
-            var hitWindows = HitWindows.GetAllAvailableWindows().ToArray();
+            hitWindows = HitWindows.GetAllAvailableWindows().ToArray();
 
             InternalChild = new Container
             {
@@ -116,14 +124,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 RelativeSizeAxes = Axes.Y,
                                 Height = 0.5f,
                             },
-                            new Circle
-                            {
-                                Name = "middle marker behind",
-                                Colour = GetColourForHitResult(hitWindows.Last().result),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(centre_marker_size),
-                            },
                             judgementsContainer = new Container
                             {
                                 Name = "judgements",
@@ -131,15 +131,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
                                 Width = judgement_line_width,
-                            },
-                            new Circle
-                            {
-                                Name = "middle marker in front",
-                                Colour = GetColourForHitResult(hitWindows.Last().result).Darken(0.3f),
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Size = new Vector2(centre_marker_size),
-                                Scale = new Vector2(0.5f),
                             },
                         }
                     },
@@ -176,14 +167,75 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             colourBars.Height = 0;
             colourBars.ResizeHeightTo(1, 800, Easing.OutQuint);
 
-            // delay the arrow appearance animation for only the initial appearance.
-            using (arrowContainer.BeginDelayedSequence(250))
+            CentreMarkerStyle.BindValueChanged(style => recreateCentreMarker(style.NewValue), true);
+
+            // delay the appearance animations for only the initial appearance.
+            using (arrowContainer.BeginDelayedSequence(450))
             {
                 ShowMovingAverage.BindValueChanged(visible =>
                 {
                     arrowContainer.FadeTo(visible.NewValue ? 1 : 0, 250, Easing.OutQuint);
                     arrowContainer.ScaleTo(visible.NewValue ? new Vector2(1) : new Vector2(0, 1), 250, Easing.OutQuint);
                 }, true);
+            }
+        }
+
+        private void recreateCentreMarker(CentreMarker style)
+        {
+            if (centreMarkerDrawables != null)
+            {
+                foreach (var d in centreMarkerDrawables)
+                {
+                    d.ScaleTo(0, 500, Easing.OutQuint)
+                     .FadeOut(500, Easing.OutQuint);
+
+                    d.Expire();
+                }
+
+                centreMarkerDrawables = null;
+            }
+
+            switch (style)
+            {
+                case CentreMarker.None:
+                    break;
+
+                case CentreMarker.Circle:
+                    centreMarkerDrawables = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Name = "middle marker behind",
+                            Colour = GetColourForHitResult(hitWindows.Last().result),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Depth = float.MaxValue,
+                            Size = new Vector2(centre_marker_size),
+                        },
+                        new Circle
+                        {
+                            Name = "middle marker in front",
+                            Colour = GetColourForHitResult(hitWindows.Last().result).Darken(0.3f),
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Depth = float.MinValue,
+                            Size = new Vector2(centre_marker_size),
+                            Scale = new Vector2(0.5f),
+                        },
+                    };
+                    break;
+            }
+
+            if (centreMarkerDrawables != null)
+            {
+                foreach (var d in centreMarkerDrawables)
+                {
+                    colourBars.Add(d);
+
+                    Vector2 originalScale = d.Scale;
+                    d.FadeInFromZero(500, Easing.OutQuint)
+                     .ScaleTo(0).ScaleTo(originalScale, 1000, Easing.OutElasticHalf);
+                }
             }
         }
 
@@ -333,5 +385,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         }
 
         public override void Clear() => judgementsContainer.Clear();
+
+        public enum CentreMarker
+        {
+            None,
+            Circle
+        }
     }
 }
