@@ -120,7 +120,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             clickOperation = ongoingOperationTracker.BeginOperation();
 
             // Ensure the current user becomes ready before being able to do anything else (start match, stop countdown, unready).
-            if (!isReady() || !Client.IsHost)
+            if (!isReady() || !Client.IsHost || Room.Settings.AutoStartDuration != TimeSpan.Zero)
             {
                 toggleReady();
                 return;
@@ -183,7 +183,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
             int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            if (Room.Countdown != null)
+            if (Room.Countdown != null || Room.Settings.AutoStartDuration != TimeSpan.Zero)
                 countdownButton.Alpha = 0;
             else
             {
