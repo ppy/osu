@@ -202,9 +202,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestManyUsers()
         {
+            const int users_count = 20;
+
             AddStep("add many users", () =>
             {
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < users_count; i++)
                 {
                     MultiplayerClient.AddUser(new APIUser
                     {
@@ -243,6 +245,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 }
             });
+
+            AddRepeatStep("switch hosts", () => MultiplayerClient.TransferHost(RNG.Next(0, users_count)), 10);
         }
 
         [Test]
