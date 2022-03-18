@@ -166,20 +166,10 @@ namespace osu.Game.Rulesets.Scoring
             if (!result.Type.IsScorable())
                 return;
 
-            if (result.Type.AffectsCombo())
-            {
-                switch (result.Type)
-                {
-                    case HitResult.Miss:
-                    case HitResult.LargeTickMiss:
-                        Combo.Value = 0;
-                        break;
-
-                    default:
-                        Combo.Value++;
-                        break;
-                }
-            }
+            if (result.Type.IncreasesCombo())
+                Combo.Value++;
+            else if (result.Type.BreaksCombo())
+                Combo.Value = 0;
 
             double scoreIncrease = result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
 
