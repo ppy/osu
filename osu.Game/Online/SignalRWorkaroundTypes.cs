@@ -19,7 +19,7 @@ namespace osu.Game.Online
         internal static readonly IReadOnlyList<(Type derivedType, Type baseType)> BASE_TYPE_MAPPING = new[]
         {
             (typeof(ChangeTeamRequest), typeof(MatchUserRequest)),
-            (typeof(MatchStartCountdownRequest), typeof(MatchUserRequest)),
+            (typeof(StartMatchCountdownRequest), typeof(MatchUserRequest)),
             (typeof(StopCountdownRequest), typeof(MatchUserRequest)),
             (typeof(CountdownChangedEvent), typeof(MatchServerEvent)),
             (typeof(TeamVersusRoomState), typeof(MatchRoomState)),

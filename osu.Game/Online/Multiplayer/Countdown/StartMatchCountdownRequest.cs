@@ -12,7 +12,7 @@ namespace osu.Game.Online.Multiplayer.Countdown
     /// A request for a countdown to start the match.
     /// </summary>
     [MessagePackObject]
-    public class MatchStartCountdownRequest : MatchUserRequest
+    public class StartMatchCountdownRequest : MatchUserRequest
     {
         /// <summary>
         /// How long the countdown should last.

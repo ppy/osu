@@ -309,7 +309,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             switch (request)
             {
-                case MatchStartCountdownRequest matchCountdownRequest:
+                case StartMatchCountdownRequest matchCountdownRequest:
                     countdownStopSource?.Cancel();
 
                     var stopSource = countdownStopSource = new CancellationTokenSource();
