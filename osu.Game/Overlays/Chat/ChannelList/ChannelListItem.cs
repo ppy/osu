@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             if (channel.Type != ChannelType.PM)
                 return Drawable.Empty();
 
-            return new UpdateableAvatar(channel.Users.First(), false, false, true)
+            return new UpdateableAvatar(channel.Users.First(), isInteractive: false)
             {
                 Size = new Vector2(20),
                 Margin = new MarginPadding { Right = 5 },
