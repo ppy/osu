@@ -8,11 +8,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
@@ -32,41 +29,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         private MultiplayerHistoryList historyList;
         private bool firstPopulation = true;
 
-        private OsuSpriteText queueListCount;
+        private MultiplayerPlaylistTabControl playlistTabControl;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour osuColour)
+        private void load()
         {
             const float tab_control_height = 25;
 
             InternalChildren = new Drawable[]
             {
-                new FillFlowContainer
+                playlistTabControl = new MultiplayerPlaylistTabControl
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(OsuTabControl<MultiplayerPlaylistDisplayMode>.HORIZONTAL_SPACING, 0),
-                    Children = new Drawable[]
-                    {
-                        queueListCount = new OsuSpriteText
-                        {
-                            Font = OsuFont.Default.With(weight: FontWeight.Bold),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Colour = osuColour.Yellow,
-                        },
-                        new OsuTabControl<MultiplayerPlaylistDisplayMode>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = tab_control_height,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Current = { BindTarget = DisplayMode },
-                        },
-                    }
+                    Height = tab_control_height,
+                    Current = { BindTarget = DisplayMode },
                 },
                 new Container
                 {
@@ -97,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             base.LoadComplete();
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
             queueList.Items.BindCollectionChanged(
-                (_, __) => queueListCount.Text = queueList.Items.Count.ToString(), true);
+                (_, __) => playlistTabControl.queueListCount = queueList.Items.Count, true);
         }
 
         private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
