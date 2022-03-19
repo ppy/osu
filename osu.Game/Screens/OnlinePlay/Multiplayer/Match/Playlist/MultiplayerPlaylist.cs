@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 
@@ -25,11 +24,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         /// </summary>
         public Action<PlaylistItem> RequestEdit;
 
+        private MultiplayerPlaylistTabControl playlistTabControl;
         private MultiplayerQueueList queueList;
         private MultiplayerHistoryList historyList;
         private bool firstPopulation = true;
-
-        private MultiplayerPlaylistTabControl playlistTabControl;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -42,7 +40,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = tab_control_height,
-                    Current = { BindTarget = DisplayMode },
+                    Current = { BindTarget = DisplayMode }
                 },
                 new Container
                 {
