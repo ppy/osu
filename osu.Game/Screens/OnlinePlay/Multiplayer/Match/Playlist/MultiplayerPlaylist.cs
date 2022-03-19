@@ -73,7 +73,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             base.LoadComplete();
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
             queueList.Items.BindCollectionChanged(
-                (_, __) => playlistTabControl.queueListCount = queueList.Items.Count, true);
+                (_, __) => playlistTabControl.queueListCount.Value = queueList.Items.Count, true);
         }
 
         private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
