@@ -24,14 +24,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
         private class QueueTabItem : OsuTabItem
         {
-            private Bindable<int> count;
-
             public QueueTabItem(MultiplayerPlaylistDisplayMode value, Bindable<int> queueListCount)
                 : base(value)
             {
-                count = new Bindable<int>();
-                count.BindTo(queueListCount);
-                Text.Text += " (" + count.Value + ")";
+                queueListCount.BindValueChanged(
+                    _ => Text.Text = "Queue (" + queueListCount.Value + ")", true);
             }
         }
     }
