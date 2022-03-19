@@ -6,56 +6,28 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelControl
 {
-    public class ControlItemClose : OsuClickableContainer
+    public class ControlItemClose : OsuAnimatedButton
     {
-        private readonly SpriteIcon icon;
-
-        [Resolved]
-        private OsuColour osuColour { get; set; } = null!;
-
-        public ControlItemClose()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
         {
             Alpha = 0f;
             Size = new Vector2(20);
-            Child = icon = new SpriteIcon
+            Add(new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.75f),
                 Icon = FontAwesome.Solid.TimesCircle,
                 RelativeSizeAxes = Axes.Both,
-            };
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            icon.ScaleTo(0.5f, 1000, Easing.OutQuint);
-            return base.OnMouseDown(e);
-        }
-
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
-            base.OnMouseUp(e);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            icon.FadeColour(osuColour.Red1, 200, Easing.OutQuint);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            icon.FadeColour(Colour4.White, 200, Easing.OutQuint);
-            base.OnHoverLost(e);
+                Colour = osuColour.Red1,
+            });
         }
     }
 }
