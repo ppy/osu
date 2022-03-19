@@ -78,12 +78,17 @@ namespace osu.Game.Screens.Play
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            // TODO: This code should not be in the BDL load method, but is to avoid seeks being overwritten.
-            // See https://github.com/ppy/osu/issues/17267 for the issue.
-            // See https://github.com/ppy/osu/pull/17302 for a better fix which needs some more time.
+            base.LoadComplete();
+
+            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
+            userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
+
+            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
+                r => r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings,
+                settings => settings.Offset,
+                val => userBeatmapOffsetClock.Offset = val);
 
             // sane default provided by ruleset.
             startOffset = gameplayStartTime;
@@ -105,19 +110,6 @@ namespace osu.Game.Screens.Play
             }
 
             Seek(startOffset);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
-
-            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
-                r => r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings,
-                settings => settings.Offset,
-                val => userBeatmapOffsetClock.Offset = val);
         }
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
