@@ -70,7 +70,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
                     // Change position of new host to display above all participants.
                     if (Room.Host != null)
-                        panels.SetLayoutPosition(currentHostPanel = panels.SingleOrDefault(u => u.User.Equals(Room.Host)), -1);
+                    {
+                        currentHostPanel = panels.SingleOrDefault(u => u.User.Equals(Room.Host));
+
+                        if (currentHostPanel != null)
+                            panels.SetLayoutPosition(currentHostPanel, -1);
+                    }
                 }
             }
         }
