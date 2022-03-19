@@ -16,7 +16,6 @@
       "osu.Game.Tournament.Tests\\osu.Game.Tournament.Tests.csproj",
       "osu.Game.Tournament\\osu.Game.Tournament.csproj",
       "osu.Game\\osu.Game.csproj",
-
       "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform\\osu.Game.Rulesets.EmptyFreeform.csproj",
       "Templates\\Rulesets\\ruleset-empty\\osu.Game.Rulesets.EmptyFreeform.Tests\\osu.Game.Rulesets.EmptyFreeform.Tests.csproj",
       "Templates\\Rulesets\\ruleset-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
@@ -24,7 +23,9 @@
       "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling\\osu.Game.Rulesets.EmptyScrolling.csproj",
       "Templates\\Rulesets\\ruleset-scrolling-empty\\osu.Game.Rulesets.EmptyScrolling.Tests\\osu.Game.Rulesets.EmptyScrolling.Tests.csproj",
       "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon\\osu.Game.Rulesets.Pippidon.csproj",
-      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj"
+      "Templates\\Rulesets\\ruleset-scrolling-example\\osu.Game.Rulesets.Pippidon.Tests\\osu.Game.Rulesets.Pippidon.Tests.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.csproj",
+      "../osu-framework/osu.Framework/osu.Framework.NativeLibs.csproj"
     ]
   }
 }

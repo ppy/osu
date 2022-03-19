@@ -268,9 +268,11 @@ namespace osu.Game.Graphics.Backgrounds
                 parts.AddRange(Source.parts);
             }
 
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            private VertexBatchUsage<TexturedVertex2D> batchUsage;
+
+            public override void Draw(in DrawState drawState)
             {
-                base.Draw(vertexAction);
+                base.Draw(drawState);
 
                 if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
                 {
@@ -278,33 +280,35 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount, 1);
                 }
 
-                shader.Bind();
-
-                Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
-
-                foreach (TriangleParticle particle in parts)
+                using (vertexBatch.BeginUsage(ref batchUsage, this))
                 {
-                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    shader.Bind();
 
-                    var triangle = new Triangle(
-                        Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
-                    );
+                    Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                    ColourInfo colourInfo = DrawColourInfo.Colour;
-                    colourInfo.ApplyChild(particle.Colour);
+                    foreach (TriangleParticle particle in parts)
+                    {
+                        var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
 
-                    DrawTriangle(
-                        texture,
-                        triangle,
-                        colourInfo,
-                        null,
-                        vertexBatch.AddAction,
-                        Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
+                        var triangle = new Triangle(
+                            Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
+                            Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
+                            Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
+                        );
+
+                        ColourInfo colourInfo = DrawColourInfo.Colour;
+                        colourInfo.ApplyChild(particle.Colour);
+
+                        DrawTriangle(
+                            texture,
+                            triangle,
+                            colourInfo,
+                            ref batchUsage,
+                            inflationPercentage: Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
+                    }
+
+                    shader.Unbind();
                 }
-
-                shader.Unbind();
             }
 
             protected override void Dispose(bool isDisposing)
