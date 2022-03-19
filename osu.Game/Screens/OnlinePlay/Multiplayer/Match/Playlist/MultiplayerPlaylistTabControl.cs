@@ -4,31 +4,40 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 {
     public class MultiplayerPlaylistTabControl : OsuTabControl<MultiplayerPlaylistDisplayMode>
     {
-        public Bindable<int> queueListCount = new Bindable<int>(0);
-
-        public MultiplayerPlaylistTabControl()
-        {
-        }
+        public readonly IBindableList<PlaylistItem> QueueItems = new BindableList<PlaylistItem>();
 
         protected override TabItem<MultiplayerPlaylistDisplayMode> CreateTabItem(MultiplayerPlaylistDisplayMode value)
         {
             if (value == MultiplayerPlaylistDisplayMode.Queue)
-                return new QueueTabItem(value, queueListCount);
-            return new OsuTabItem(value);
+                return new QueueTabItem { QueueItems = { BindTarget = QueueItems } };
+
+            return base.CreateTabItem(value);
         }
 
         private class QueueTabItem : OsuTabItem
         {
-            public QueueTabItem(MultiplayerPlaylistDisplayMode value, Bindable<int> queueListCount)
-                : base(value)
+            public readonly IBindableList<PlaylistItem> QueueItems = new BindableList<PlaylistItem>();
+
+            public QueueTabItem()
+                : base(MultiplayerPlaylistDisplayMode.Queue)
             {
-                queueListCount.BindValueChanged(
-                    _ => Text.Text = "Queue (" + queueListCount.Value + ")", true);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                QueueItems.BindCollectionChanged((_,__) =>
+                {
+                    Text.Text = $"Queue";
+                    if (QueueItems.Count != 0)
+                        Text.Text += $" ({QueueItems.Count})";
+                }, true);
             }
         }
     }
