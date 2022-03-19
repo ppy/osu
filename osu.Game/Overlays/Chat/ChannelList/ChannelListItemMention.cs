@@ -12,9 +12,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
-namespace osu.Game.Overlays.Chat.ChannelControl
+namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ControlItemMention : CircularContainer
+    public class ChannelListItemMention : CircularContainer
     {
         public readonly BindableInt Mentions = new BindableInt();
 

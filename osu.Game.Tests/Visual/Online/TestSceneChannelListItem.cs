@@ -12,13 +12,13 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Chat.ChannelControl;
+using osu.Game.Overlays.Chat.ChannelList;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
     [TestFixture]
-    public class TestSceneChannelControlItem : OsuTestScene
+    public class TestSceneChannelListItem : OsuTestScene
     {
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Online
             createPrivateChannel("test user long name", 3),
         };
 
-        private readonly Dictionary<Channel, ControlItem> channelMap = new Dictionary<Channel, ControlItem>();
+        private readonly Dictionary<Channel, ChannelListItem> channelMap = new Dictionary<Channel, ChannelListItem>();
 
         private FillFlowContainer flow;
         private OsuSpriteText selectedText;
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 foreach (var channel in channels)
                 {
-                    var item = new ControlItem(channel);
+                    var item = new ChannelListItem(channel);
                     flow.Add(item);
                     channelMap.Add(channel, item);
                     item.OnRequestSelect += c => selected.Value = c;
