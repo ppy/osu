@@ -111,8 +111,11 @@ namespace osu.Game.Screens.Play
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        KeyCounter = CreateKeyCounter(),
                         HoldToQuit = CreateHoldForMenuButton(),
+                        KeyCounter = CreateKeyCounter().With(k =>
+                        {
+                            k.Margin = new MarginPadding { Horizontal = 10 };
+                        }),
                     }
                 }
             };
@@ -235,13 +238,11 @@ namespace osu.Game.Screens.Play
             {
                 PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);
-                KeyCounter.Margin = new MarginPadding(10) { Bottom = 30 };
             }
             else
             {
                 PlayerSettingsOverlay.Hide();
                 ModDisplay.Delay(2000).FadeOut(200);
-                KeyCounter.Margin = new MarginPadding(10);
             }
 
             updateVisibility();
