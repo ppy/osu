@@ -31,8 +31,8 @@ body:
   - type: textarea
     attributes:
       label: Screenshots or videos
-      description: Share any kind of visuals you can which show the bug or issue taking place.
-      placeholder: You can attach by dragging and dropping the screenshots/videos into this box.
+      description: Add screenshots or videos that show the bug here.
+      placeholder: Drag and drop the screenshots/videos into this box.
     validations:
       required: false
   - type: input
