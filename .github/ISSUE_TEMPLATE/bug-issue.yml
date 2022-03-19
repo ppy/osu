@@ -67,6 +67,6 @@ body:
   - type: textarea
     attributes:
       label: Logs
-      placeholder: You can attach by dragging and dropping the log files into this box.
+      placeholder: Drag and drop the log files into this box.
     validations:
       required: true
