@@ -10,7 +10,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat.ChannelControl
@@ -28,10 +30,14 @@ namespace osu.Game.Overlays.Chat.ChannelControl
 
         private Box? hoverBox;
         private Box? selectBox;
+        private OsuSpriteText? text;
         private ControlItemClose? close;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         public ControlItem(Channel channel)
         {
@@ -39,7 +45,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load()
         {
             Height = 30;
             RelativeSizeAxes = Axes.X;
@@ -77,11 +83,16 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                             new[]
                             {
                                 createIcon(),
-                                new ControlItemText(channel)
+                                text = new OsuSpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Unread = { BindTarget = Unread },
+                                    Text = channel.Type == ChannelType.Public ? $"# {channel.Name.Substring(1)}" : channel.Name,
+                                    Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
+                                    Colour = colourProvider.Light3,
+                                    Margin = new MarginPadding { Bottom = 2 },
+                                    RelativeSizeAxes = Axes.X,
+                                    Truncate = true,
                                 },
                                 new ControlItemMention
                                 {
@@ -116,6 +127,11 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                     selectBox?.Show();
                 else
                     selectBox?.Hide();
+            }, true);
+
+            Unread.BindValueChanged(change =>
+            {
+                text!.Colour = change.NewValue ? colourProvider.Content1 : colourProvider.Light3;
             }, true);
         }
 
