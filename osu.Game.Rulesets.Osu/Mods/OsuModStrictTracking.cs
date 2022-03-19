@@ -33,13 +33,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                 {
                     if (e.NewValue || slider.Judged) return;
 
-                    slider.MissForcefully();
+                    var tail = slider.NestedHitObjects.OfType<StrictTrackingDrawableSliderTail>().First();
 
-                    foreach (var o in slider.NestedHitObjects)
-                    {
-                        if (o is DrawableOsuHitObject h && !o.Judged)
-                            h.MissForcefully();
-                    }
+                    if (!tail.Judged)
+                        tail.MissForcefully();
                 };
             }
         }
@@ -66,7 +63,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
-            drawableRuleset.Playfield.RegisterPool<StrictTrackingSlider, DrawableSlider>(10, 100);
             drawableRuleset.Playfield.RegisterPool<StrictTrackingSliderTailCircle, StrictTrackingDrawableSliderTail>(10, 100);
         }
     }
