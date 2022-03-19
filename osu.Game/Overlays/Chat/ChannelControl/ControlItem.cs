@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,6 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelControl
 {
@@ -154,10 +157,14 @@ namespace osu.Game.Overlays.Chat.ChannelControl
             if (channel.Type != ChannelType.PM)
                 return Drawable.Empty();
 
-            return new ControlItemAvatar(channel)
+            return new UpdateableAvatar(channel.Users.First(), false, false, true)
             {
+                Size = new Vector2(20),
+                Margin = new MarginPadding { Right = 5 },
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
+                CornerRadius = 10,
+                Masking = true,
             };
         }
     }
