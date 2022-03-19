@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, __) => UpdateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 }
             }
 
-            updateNestedSamples();
+            UpdateNestedSamples();
         }
 
         private void updateNestedPositions()
@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TailCircle.Position = EndPosition;
         }
 
-        private void updateNestedSamples()
+        protected void UpdateNestedSamples()
         {
             var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
                               ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
