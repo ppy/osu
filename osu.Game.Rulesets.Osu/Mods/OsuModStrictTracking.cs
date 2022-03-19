@@ -2,17 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Mods.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModStrictTracking : Mod, IApplicableToDifficulty, IApplicableToDrawableHitObject, IApplicableToHitObject
+    public class OsuModStrictTracking : Mod, IApplicableAfterBeatmapConversion, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Name => @"Strict Tracking";
         public override string Acronym => @"ST";
@@ -21,11 +24,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Follow circles just got serious...";
         public override double ScoreMultiplier => 1.0;
         public override Type[] IncompatibleMods => new[] { typeof(ModClassic) };
-
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
-        {
-            difficulty.SliderTickRate = 0.0;
-        }
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
@@ -46,14 +44,30 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        public void ApplyToHitObject(HitObject hitObject)
+        public void ApplyToBeatmap(IBeatmap beatmap)
         {
-            switch (hitObject)
+            var osuBeatmap = (OsuBeatmap)beatmap;
+
+            if (osuBeatmap.HitObjects.Count == 0) return;
+
+            var hitObjects = osuBeatmap.HitObjects.Select(ho =>
             {
-                case Slider slider:
-                    slider.TailCircle.JudgeAsSliderTick = true;
-                    break;
-            }
+                if (ho is Slider slider)
+                {
+                    var newSlider = new StrictTrackingSlider(slider);
+                    return newSlider;
+                }
+
+                return ho;
+            }).ToList();
+
+            osuBeatmap.HitObjects = hitObjects;
+        }
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            drawableRuleset.Playfield.RegisterPool<StrictTrackingSlider, DrawableSlider>(10, 100);
+            drawableRuleset.Playfield.RegisterPool<StrictTrackingSliderTailCircle, StrictTrackingDrawableSliderTail>(10, 100);
         }
     }
 }
