@@ -18,9 +18,9 @@ using osu.Game.Online.Chat;
 using osu.Game.Users.Drawables;
 using osuTK;
 
-namespace osu.Game.Overlays.Chat.ChannelControl
+namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ControlItem : OsuClickableContainer
+    public class ChannelListItem : OsuClickableContainer
     {
         public event Action<Channel>? OnRequestSelect;
         public event Action<Channel>? OnRequestLeave;
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         private Box? hoverBox;
         private Box? selectBox;
         private OsuSpriteText? text;
-        private ControlItemClose? close;
+        private ChannelListItemClose? close;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Chat.ChannelControl
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public ControlItem(Channel channel)
+        public ChannelListItem(Channel channel)
         {
             this.channel = channel;
         }
@@ -97,14 +97,14 @@ namespace osu.Game.Overlays.Chat.ChannelControl
                                     RelativeSizeAxes = Axes.X,
                                     Truncate = true,
                                 },
-                                new ControlItemMention
+                                new ChannelListItemMention
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 3 },
                                     Mentions = { BindTarget = Mentions },
                                 },
-                                close = new ControlItemClose
+                                close = new ChannelListItemClose
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,

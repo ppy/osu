@@ -10,9 +10,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
-namespace osu.Game.Overlays.Chat.ChannelControl
+namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ControlItemClose : OsuAnimatedButton
+    public class ChannelListItemClose : OsuAnimatedButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour)
