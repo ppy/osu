@@ -12,7 +12,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Beatmap offset"
         /// </summary>
-        public static LocalisableString BeatmapOffset => new TranslatableString(getKey(@"beatmap_offset"), @"Beatmap offset");
+        public static LocalisableString BeatmapOffset => new TranslatableString(getKey(@"beatmap_offset"), @"谱面本地偏移");
 
         /// <summary>
         /// "Previous play:"
