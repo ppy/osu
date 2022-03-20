@@ -199,6 +199,12 @@ namespace osu.Game.Skinning.Editor
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
 
+            yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Position = Vector2.Zero;
+            });
+
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;
 

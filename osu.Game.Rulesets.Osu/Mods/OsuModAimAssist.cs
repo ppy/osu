@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override string Description => "不必追赶泡泡 - 因为他们会来追赶你！";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax) };
 
         private IFrameStableClock gameplayClock;
 

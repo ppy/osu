@@ -3,22 +3,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
-using System.Diagnostics;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -264,8 +264,23 @@ namespace osu.Game.Rulesets.UI
             var entry = CreateLifetimeEntry(hitObject);
             lifetimeEntryMap[entry.HitObject] = entry;
 
+            preloadSamples(hitObject);
+
             HitObjectContainer.Add(entry);
             OnHitObjectAdded(entry.HitObject);
+        }
+
+        private void preloadSamples(HitObject hitObject)
+        {
+            // prepare sample pools ahead of time so we're not initialising at runtime.
+            foreach (var sample in hitObject.Samples)
+                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+
+            foreach (var sample in hitObject.AuxiliarySamples)
+                prepareSamplePool(hitObject.SampleControlPoint.ApplyTo(sample));
+
+            foreach (var nestedObject in hitObject.NestedHitObjects)
+                preloadSamples(nestedObject);
         }
 
         /// <summary>
@@ -330,22 +345,7 @@ namespace osu.Game.Rulesets.UI
 
         DrawableHitObject IPooledHitObjectProvider.GetPooledDrawableRepresentation(HitObject hitObject, DrawableHitObject parent)
         {
-            var lookupType = hitObject.GetType();
-
-            IDrawablePool pool;
-
-            // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
-            if (!pools.TryGetValue(lookupType, out pool))
-            {
-                foreach (var (t, p) in pools)
-                {
-                    if (!t.IsInstanceOfType(hitObject))
-                        continue;
-
-                    pools[lookupType] = pool = p;
-                    break;
-                }
-            }
+            var pool = prepareDrawableHitObjectPool(hitObject);
 
             return (DrawableHitObject)pool?.Get(d =>
             {
@@ -372,14 +372,39 @@ namespace osu.Game.Rulesets.UI
             });
         }
 
+        private IDrawablePool prepareDrawableHitObjectPool(HitObject hitObject)
+        {
+            var lookupType = hitObject.GetType();
+
+            IDrawablePool pool;
+
+            // Tests may add derived hitobject instances for which pools don't exist. Try to find any applicable pool and dynamically assign the type if the pool exists.
+            if (!pools.TryGetValue(lookupType, out pool))
+            {
+                foreach (var (t, p) in pools)
+                {
+                    if (!t.IsInstanceOfType(hitObject))
+                        continue;
+
+                    pools[lookupType] = pool = p;
+                    break;
+                }
+            }
+
+            return pool;
+        }
+
         private readonly Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>> samplePools = new Dictionary<ISampleInfo, DrawablePool<PoolableSkinnableSample>>();
 
-        public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo)
-        {
-            if (!samplePools.TryGetValue(sampleInfo, out var existingPool))
-                AddInternal(samplePools[sampleInfo] = existingPool = new DrawableSamplePool(sampleInfo, 1));
+        public PoolableSkinnableSample GetPooledSample(ISampleInfo sampleInfo) => prepareSamplePool(sampleInfo).Get();
 
-            return existingPool.Get();
+        private DrawablePool<PoolableSkinnableSample> prepareSamplePool(ISampleInfo sampleInfo)
+        {
+            if (samplePools.TryGetValue(sampleInfo, out var pool)) return pool;
+
+            AddInternal(samplePools[sampleInfo] = pool = new DrawableSamplePool(sampleInfo, 1));
+
+            return pool;
         }
 
         private class DrawableSamplePool : DrawablePool<PoolableSkinnableSample>

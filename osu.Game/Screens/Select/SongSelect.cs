@@ -40,6 +40,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -247,6 +248,10 @@ namespace osu.Game.Screens.Select
                             }
                         }
                     }
+                },
+                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 
