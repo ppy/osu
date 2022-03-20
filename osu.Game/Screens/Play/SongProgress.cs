@@ -42,7 +42,8 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
 
-        public readonly Bindable<bool> ShowGraph = new Bindable<bool>();
+        [SettingSource("Show difficulty graph", "Whether a graph should show difficulty throughout the beatmap")]
+        public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
@@ -116,7 +117,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OsuConfigManager config)
+        private void load(OsuColour colours)
         {
             base.LoadComplete();
 
@@ -128,8 +129,6 @@ namespace osu.Game.Screens.Play
                 referenceClock = drawableRuleset.FrameStableClock;
                 Objects = drawableRuleset.Objects;
             }
-
-            config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
         }
