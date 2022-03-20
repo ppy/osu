@@ -91,7 +91,9 @@ namespace osu.Game.Rulesets.Mods
         [JsonIgnore]
         public virtual bool HasImplementation => this is IApplicableMod;
 
-        public virtual bool IsPlayable(ModUsage usage) => true;
+#pragma warning disable 618
+        public virtual bool IsPlayable(ModUsage usage) => UserPlayable;
+#pragma warning restore 618
 
         [JsonIgnore]
         [Obsolete("Override IsPlayable instead.")] // Can be removed 20220918
