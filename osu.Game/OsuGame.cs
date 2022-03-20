@@ -1211,6 +1211,10 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
+        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
+        {
+        }
+
         private void screenChanged(IScreen current, IScreen newScreen)
         {
             switch (newScreen)
@@ -1257,6 +1261,9 @@ namespace osu.Game
 
             skinEditor.SetTarget((OsuScreen)newScreen);
             gamemodeCondition.TriggerChange();
+
+            //在OsuGameDesktop处有和窗口相关的操作，先保留
+            ScreenChanged(current, newScreen);
         }
 
         private void gamemodeConditionChanged(GamemodeActivateCondition newCondition)
