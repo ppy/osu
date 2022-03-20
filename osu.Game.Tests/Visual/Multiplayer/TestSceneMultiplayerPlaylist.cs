@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestTabQueueListCount()
+        public void TestQueueTabCount()
         {
             assertQueueTabCount(1);
 
