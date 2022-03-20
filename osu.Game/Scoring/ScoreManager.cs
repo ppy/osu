@@ -153,7 +153,7 @@ namespace osu.Game.Scoring
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
-        /// <returns>The maximum achievable combo.</returns>
+        /// <returns>The maximum achievable combo. A <see langword="null"/> return value indicates the difficulty cache has failed to retrieve the combo.</returns>
         public async Task<int?> GetMaximumAchievableComboAsync([NotNull] ScoreInfo score, CancellationToken cancellationToken = default)
         {
             if (score.IsLegacyScore)
