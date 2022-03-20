@@ -72,14 +72,16 @@ namespace osu.Game
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
-        public bool UseDevelopmentServer { get; }
+        public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
         /// <summary>
         /// MD5 representation of the game executable.
         /// </summary>
-        public string VersionHash { get; private set; }
+        public string VersionHash { get; protected set; }
+
+        public bool HashOverriden { get; protected set; }
 
         public bool IsDeployedBuild => AssemblyVersion.Major > 0;
 
@@ -181,23 +183,25 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!";
         }
 
         [BackgroundDependencyLoader]
         private void load(ReadableKeyCombinationProvider keyCombinationProvider)
         {
-            try
+            if (string.IsNullOrEmpty(VersionHash))
             {
-                using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
-                    VersionHash = str.ComputeMD5Hash();
-            }
-            catch
-            {
-                // special case for android builds, which can't read DLLs from a packed apk.
-                // should eventually be handled in a better way.
-                VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+                try
+                {
+                    using (var str = File.OpenRead(typeof(OsuGameBase).Assembly.Location))
+                        VersionHash = str.ComputeMD5Hash();
+                }
+                catch
+                {
+                    // special case for android builds, which can't read DLLs from a packed apk.
+                    // should eventually be handled in a better way.
+                    VersionHash = $"{Version}-{RuntimeInfo.OS}".ComputeMD5Hash();
+                }
             }
 
             Resources.AddStore(new DllResourceStore(MResources.ResourceAssembly));

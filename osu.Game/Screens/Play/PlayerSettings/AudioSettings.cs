@@ -16,11 +16,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
         public AudioSettings()
-            : base("Audio Settings")
+            : base("音频设置")
         {
             Children = new Drawable[]
             {
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" },
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "谱面音效" },
                 new BeatmapOffsetControl
                 {
                     ReferenceScore = { BindTarget = ReferenceScore },

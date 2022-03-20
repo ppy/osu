@@ -48,7 +48,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create display", () => recreateDisplay(new OsuHitWindows(), 5));
 
-            AddRepeatStep("New random judgement", () => newJudgement(), 40);
+            AddRepeatStep("New random judgement", () =>
+            {
+                double offset = RNG.Next(-150, 150);
+                newJudgement(offset, drawableRuleset.HitWindows.ResultFor(offset));
+            }, 400);
 
             AddRepeatStep("New max negative", () => newJudgement(-drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddRepeatStep("New max positive", () => newJudgement(drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
@@ -273,6 +277,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScoreProcessor : ScoreProcessor
         {
+            public TestScoreProcessor()
+                : base(new OsuRuleset())
+            {
+            }
+
             public void Reset() => base.Reset(false);
         }
     }

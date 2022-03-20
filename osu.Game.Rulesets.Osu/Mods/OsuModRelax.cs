@@ -18,7 +18,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
+        public override string Description => @"你不用点击, 只需移动, 让你用来点击的手指放松一下";
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModAimAssist) }).ToArray();
 
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.

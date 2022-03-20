@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
@@ -73,31 +72,7 @@ namespace osu.Game.Storyboards.Drawables
         protected override Vector2 DrawScale
             => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
 
-        public override Anchor Origin
-        {
-            get
-            {
-                var origin = base.Origin;
-
-                if (FlipH)
-                {
-                    if (origin.HasFlagFast(Anchor.x0))
-                        origin = Anchor.x2 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
-                    else if (origin.HasFlagFast(Anchor.x2))
-                        origin = Anchor.x0 | (origin & (Anchor.y0 | Anchor.y1 | Anchor.y2));
-                }
-
-                if (FlipV)
-                {
-                    if (origin.HasFlagFast(Anchor.y0))
-                        origin = Anchor.y2 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
-                    else if (origin.HasFlagFast(Anchor.y2))
-                        origin = Anchor.y0 | (origin & (Anchor.x0 | Anchor.x1 | Anchor.x2));
-                }
-
-                return origin;
-            }
-        }
+        public override Anchor Origin => StoryboardExtensions.AdjustOrigin(base.Origin, VectorScale, FlipH, FlipV);
 
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;

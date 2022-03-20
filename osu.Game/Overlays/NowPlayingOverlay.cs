@@ -238,6 +238,12 @@ namespace osu.Game.Overlays
 
             musicController.TrackChanged += trackChanged;
             trackChanged(beatmap.Value);
+
+            optUI.BindValueChanged(v =>
+            {
+                bool enabled = v.NewValue;
+                llinButton.ScaleTo(enabled ? 1 : 0.8f, 300, Easing.OutQuint).FadeTo(enabled ? 1 : 0, 300, Easing.OutQuint);
+            }, true);
         }
 
         protected override void PopIn()
@@ -332,8 +338,7 @@ namespace osu.Game.Overlays
                                 break;
                         }
                     }
-
-                    if (!optUI.Value)
+                    else
                     {
                         switch (direction)
                         {

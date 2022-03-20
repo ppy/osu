@@ -35,6 +35,7 @@ namespace osu.Desktop
 
             string gameName = base_game_name;
             bool tournamentClient = false;
+            string hashOverride = "";
 
             foreach (string arg in args)
             {
@@ -57,6 +58,10 @@ namespace osu.Desktop
                             throw new ArgumentException("Provided client ID must be an integer.");
 
                         gameName = $"{base_game_name}-{clientID}";
+                        break;
+
+                    case "--hash-override":
+                        hashOverride = val;
                         break;
                 }
             }
@@ -106,7 +111,7 @@ namespace osu.Desktop
                 if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
-                    host.Run(new OsuGameDesktop(args));
+                    host.Run(new OsuGameDesktop(args, hashOverride));
             }
         }
 

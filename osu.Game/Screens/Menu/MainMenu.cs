@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Mf;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
@@ -127,6 +128,19 @@ namespace osu.Game.Screens.Menu
                 },
                 exitConfirmOverlay?.CreateProxy() ?? Empty()
             });
+
+            if (game.HashOverriden)
+            {
+                var hashOverridenWarning = new HashOverridenWarning
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
+                };
+
+                //hashOverridenWarning.Y = -hashOverridenWarning.Height;
+
+                AddInternal(hashOverridenWarning);
+            }
 
             buttons.StateChanged += state =>
             {
