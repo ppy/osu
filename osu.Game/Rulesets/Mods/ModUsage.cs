@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// In a solo gameplay session.
         /// </summary>
-        Solo,
+        User,
 
         /// <summary>
         /// In a multiplayer match, as a required mod.
