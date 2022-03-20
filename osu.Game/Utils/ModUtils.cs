@@ -121,7 +121,7 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerRequired), out invalidMods);
+            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerRoomWide), out invalidMods);
 
         /// <summary>
         /// Check the provided combination of mods are valid as "free mods" in a multiplayer match session.
@@ -130,7 +130,7 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerFree), out invalidMods);
+            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerPerPlayer), out invalidMods);
 
         private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
