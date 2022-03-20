@@ -64,14 +64,14 @@ namespace osu.Game.Skinning.Editor
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Scene library",
+                                    Text = "可用界面",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding(10),
                                 },
                                 new SceneButton
                                 {
-                                    Text = "Song Select",
+                                    Text = "歌曲选择",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => game?.PerformFromScreen(screen =>
@@ -84,7 +84,7 @@ namespace osu.Game.Skinning.Editor
                                 },
                                 new SceneButton
                                 {
-                                    Text = "Gameplay",
+                                    Text = "游戏内",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Action = () => game?.PerformFromScreen(screen =>

@@ -15,7 +15,7 @@ namespace osu.Game.Skinning.Editor
         protected override Container<Drawable> Content { get; }
 
         public SkinSettingsToolbox(Drawable component)
-            : base($"Settings ({component.GetType().Name})")
+            : base($"设置 ({component.GetType().Name})")
         {
             base.Content.Add(Content = new FillFlowContainer
             {

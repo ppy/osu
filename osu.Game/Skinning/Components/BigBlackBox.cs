@@ -23,10 +23,10 @@ namespace osu.Game.Skinning.Components
     {
         public bool UsesFixedAnchor { get; set; }
 
-        [SettingSource("Spinning text", "Whether the big text should spin")]
+        [SettingSource("旋转文本", "是否要让文本原地自转")]
         public Bindable<bool> TextSpin { get; } = new BindableBool();
 
-        [SettingSource("Alpha", "The alpha value of this box")]
+        [SettingSource("透明度", "盒子的背景透明度")]
         public BindableNumber<float> BoxAlpha { get; } = new BindableNumber<float>(1)
         {
             MinValue = 0,
@@ -55,14 +55,14 @@ namespace osu.Game.Skinning.Components
                 },
                 text = new OsuSpriteText
                 {
-                    Text = "Big Black Box",
+                    Text = "大黑盒子",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Font = OsuFont.Default.With(size: 40)
                 },
-                disclaimer = new OsuTextFlowContainer(st => st.Font = OsuFont.Default.With(size: 10))
+                disclaimer = new OsuTextFlowContainer(st => st.Font = OsuFont.Default.With(size: 18))
                 {
-                    Text = "This is intended to be a test component and may disappear in the future!",
+                    Text = "这是一个测试组件并且可能在将来消失！",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding(10),

@@ -48,8 +48,6 @@ namespace osu.Game.Screens.Play
         private readonly BreakArrows breakArrows;
         private readonly DrawableRuleset drawableRuleset;
         private readonly BindableBool replayLoaded = new BindableBool();
-        public readonly BreakSettingsOverlay BreakSettingsOverlay;
-        protected virtual BreakSettingsOverlay CreateBreakSettingsOverlay() => new BreakSettingsOverlay();
 
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset = null)
         {
@@ -104,8 +102,7 @@ namespace osu.Game.Screens.Play
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                    },
-                    BreakSettingsOverlay = CreateBreakSettingsOverlay()
+                    }
                 }
             };
 
@@ -120,7 +117,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
             initializeBreaks();
-            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
+
             if (drawableRuleset != null)
             {
                 BindDrawableRuleset(drawableRuleset);
@@ -162,19 +159,6 @@ namespace osu.Game.Screens.Play
                         breakArrows.Hide(BREAK_FADE_DURATION);
                     }
                 }
-            }
-            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
-        }
-
-        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
-        {
-            if (e.NewValue)
-            {
-                BreakSettingsOverlay.Hide();
-            }
-            else
-            {
-                BreakSettingsOverlay.Show();
             }
         }
 
