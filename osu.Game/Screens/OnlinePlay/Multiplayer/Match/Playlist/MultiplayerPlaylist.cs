@@ -64,13 +64,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     }
                 }
             };
+
+            playlistTabControl.QueueItems.BindTarget = queueList.Items;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             DisplayMode.BindValueChanged(onDisplayModeChanged, true);
-            playlistTabControl.QueueItems.BindTarget = queueList.Items;
         }
 
         private void onDisplayModeChanged(ValueChangedEvent<MultiplayerPlaylistDisplayMode> mode)
