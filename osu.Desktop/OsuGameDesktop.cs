@@ -76,6 +76,10 @@ namespace osu.Desktop
             stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
             if (checkExists(stableInstallPath))
                 return stableInstallPath;
+                
+            stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "osu-stable");
+            if (checkExists(stableInstallPath))
+                return stableInstallPath;
 
             return null;
         }
