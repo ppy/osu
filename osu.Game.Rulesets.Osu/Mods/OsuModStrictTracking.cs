@@ -3,12 +3,16 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Mods.Objects;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -64,6 +68,81 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             drawableRuleset.Playfield.RegisterPool<StrictTrackingSliderTailCircle, StrictTrackingDrawableSliderTail>(10, 100);
+        }
+
+        private class StrictTrackingSliderTailCircle : SliderTailCircle
+        {
+            public StrictTrackingSliderTailCircle(Slider slider)
+                : base(slider)
+            {
+            }
+
+            public override Judgement CreateJudgement() => new OsuJudgement();
+        }
+
+        private class StrictTrackingDrawableSliderTail : DrawableSliderTail
+        {
+            public override bool DisplayResult => true;
+        }
+
+        private class StrictTrackingSlider : Slider
+        {
+            public StrictTrackingSlider(Slider original)
+            {
+                StartTime = original.StartTime;
+                Samples = original.Samples;
+                Path = original.Path;
+                NodeSamples = original.NodeSamples;
+                RepeatCount = original.RepeatCount;
+                Position = original.Position;
+                NewCombo = original.NewCombo;
+                ComboOffset = original.ComboOffset;
+                LegacyLastTickOffset = original.LegacyLastTickOffset;
+                TickDistanceMultiplier = original.TickDistanceMultiplier;
+            }
+
+            protected override void CreateNestedHitObjects(CancellationToken cancellationToken)
+            {
+                var sliderEvents = SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset, cancellationToken);
+
+                foreach (var e in sliderEvents)
+                {
+                    switch (e.Type)
+                    {
+                        case SliderEventType.Head:
+                            AddNested(HeadCircle = new SliderHeadCircle
+                            {
+                                StartTime = e.Time,
+                                Position = Position,
+                                StackHeight = StackHeight,
+                            });
+                            break;
+
+                        case SliderEventType.LegacyLastTick:
+                            AddNested(TailCircle = new StrictTrackingSliderTailCircle(this)
+                            {
+                                RepeatIndex = e.SpanIndex,
+                                StartTime = e.Time,
+                                Position = EndPosition,
+                                StackHeight = StackHeight
+                            });
+                            break;
+
+                        case SliderEventType.Repeat:
+                            AddNested(new SliderRepeat(this)
+                            {
+                                RepeatIndex = e.SpanIndex,
+                                StartTime = StartTime + (e.SpanIndex + 1) * SpanDuration,
+                                Position = Position + Path.PositionAt(e.PathProgress),
+                                StackHeight = StackHeight,
+                                Scale = Scale,
+                            });
+                            break;
+                    }
+                }
+
+                UpdateNestedSamples();
+            }
         }
     }
 }
