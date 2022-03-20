@@ -39,8 +39,8 @@ namespace osu.Game.Rulesets.Mods
         /// <remarks>
         /// <list type="bullet">
         /// <item>Should be always <c>false</c> for cases where the user is not interacting with the game.</item>
-        /// <item>Should be <c>false</c> in <see cref="ModUsage.MultiplayerRequired"/> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).</item>
-        /// <item>Should be <c>false</c> in <see cref="ModUsage.MultiplayerFree"/> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).</item>
+        /// <item>Should be <c>false</c> in <see cref="ModUsage.MultiplayerRoomWide"/> for mods that make gameplay duration dependent on user input (e.g. <see cref="ModAdaptiveSpeed"/>).</item>
+        /// <item>Should be <c>false</c> in <see cref="ModUsage.MultiplayerPerPlayer"/> for mods that affect the gameplay duration (e.g. <see cref="ModRateAdjust"/> and <see cref="ModTimeRamp"/>).</item>
         /// </list>
         /// </remarks>
         /// <param name="usage">The mod usage.</param>
