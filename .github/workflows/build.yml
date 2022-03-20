@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['5.0.x']
+        dotnet-version: ['6.0.x']
 
     steps:
       - uses: actions/checkout@v2
@@ -26,11 +26,6 @@ jobs:
           ref: 'custom'
           path: 'osu-framework'
 
-      - name: 检查目录结构
-        run: |
-          ls
-          echo "pwd: $PWD"
-
       - name: 安装sdk (${{ matrix.dotnet-version }})
         uses: actions/setup-dotnet@v1.7.2
         with:
@@ -39,11 +34,6 @@ jobs:
       - name: 解决依赖
         working-directory: ./mfosu
         run: dotnet restore
-
-      - name: 再次检查目录结构
-        run: |
-          ls
-          echo "pwd: $PWD"
 
       - name: 构建
         working-directory: ./mfosu
