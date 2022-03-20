@@ -134,18 +134,6 @@ namespace osu.Game.Tests.Mods
 
         private static readonly object[] invalid_mod_test_scenarios =
         {
-            // incompatible pair.
-            new object[]
-            {
-                new Mod[] { new OsuModDoubleTime(), new OsuModHalfTime() },
-                new[] { typeof(OsuModDoubleTime), typeof(OsuModHalfTime) }
-            },
-            // incompatible pair with derived class.
-            new object[]
-            {
-                new Mod[] { new OsuModNightcore(), new OsuModHalfTime() },
-                new[] { typeof(OsuModNightcore), typeof(OsuModHalfTime) }
-            },
             // system mod.
             new object[]
             {
