@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
             // Token request construction should happen post-load to allow derived classes to potentially prepare DI backings that are used to create the request.
             var tcs = new TaskCompletionSource<bool>();
 
-            if (Mods.Value.Any(m => !m.IsPlayable(ModUsage.Solo)))
+            if (Mods.Value.Any(m => !m.IsPlayable(ModUsage.User)))
             {
                 handleTokenFailure(new InvalidOperationException("Non-user playable mod selected."));
                 return false;

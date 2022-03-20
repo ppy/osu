@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             if (score.NewValue == null)
                 return;
 
-            if (score.NewValue.Mods.Any(m => !m.IsPlayable(ModUsage.Solo)))
+            if (score.NewValue.Mods.Any(m => !m.IsPlayable(ModUsage.User)))
                 return;
 
             var hitEvents = score.NewValue.HitEvents;

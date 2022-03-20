@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override bool IsPlayable(ModUsage usage) => usage == ModUsage.Solo;
+        public override bool IsPlayable(ModUsage usage) => usage == ModUsage.User;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust), typeof(ModTimeRamp) };
 
