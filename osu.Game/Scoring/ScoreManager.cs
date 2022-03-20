@@ -160,8 +160,10 @@ namespace osu.Game.Scoring
             {
                 // This score is guaranteed to be an osu!stable score.
                 // The combo must be determined through either the beatmap's max combo value or the difficulty calculator, as lazer's scoring has changed and the score statistics cannot be used.
+#pragma warning disable CS0618
                 if (score.BeatmapInfo.MaxCombo != null)
                     return score.BeatmapInfo.MaxCombo.Value;
+#pragma warning restore CS0618
 
                 if (difficulties == null)
                     return null;
