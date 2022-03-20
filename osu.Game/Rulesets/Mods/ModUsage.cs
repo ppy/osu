@@ -4,22 +4,22 @@
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// The usage of this mod to determine its playability.
+    /// The usage of this mod to determine whether it's playable in such context.
     /// </summary>
     public enum ModUsage
     {
         /// <summary>
-        /// In a solo gameplay session.
+        /// Used for a per-user gameplay session. Determines whether the mod is playable by an end user.
         /// </summary>
         User,
 
         /// <summary>
-        /// In a multiplayer match, as a required mod.
+        /// Used as a "required mod" for a multiplayer match.
         /// </summary>
         MultiplayerRequired,
 
         /// <summary>
-        /// In a multiplayer match, as a "free" mod.
+        /// Used as a "free mod" for a multiplayer match.
         /// </summary>
         MultiplayerFree,
     }
