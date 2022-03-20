@@ -32,12 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                QueueItems.BindCollectionChanged((_,__) =>
-                {
-                    Text.Text = $"Queue";
-                    if (QueueItems.Count != 0)
-                        Text.Text += $" ({QueueItems.Count})";
-                }, true);
+                QueueItems.BindCollectionChanged((_, __) => Text.Text = QueueItems.Count > 0 ? $"Queue ({QueueItems.Count})" : "Queue", true);
             }
         }
     }
