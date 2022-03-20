@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "在正常的速度动次打次动次打次...";
         public override ModType Type => ModType.Fun;
         public override Type[] IncompatibleMods => new[] { typeof(ModNightcore) };
+        public override bool UserPlayable => false;
     }
 
     public abstract class ModBeatCore<TObject> : ModBeatCore, IApplicableToDrawableRuleset<TObject>
