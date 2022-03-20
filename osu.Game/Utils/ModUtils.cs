@@ -106,7 +106,7 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Check the provided combination of mods are valid for a local gameplay session.
+        /// Checks that all <see cref="Mod"/>s in a combination are valid for a local gameplay session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
@@ -115,7 +115,7 @@ namespace osu.Game.Utils
             => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && !(m is MultiMod), out invalidMods);
 
         /// <summary>
-        /// Check the provided combination of mods are valid as "required mods" in a multiplayer match session.
+        /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
@@ -124,7 +124,7 @@ namespace osu.Game.Utils
             => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerRoomWide), out invalidMods);
 
         /// <summary>
-        /// Check the provided combination of mods are valid as "free mods" in a multiplayer match session.
+        /// Checks that all <see cref="Mod"/>s in a combination are valid as "free mods" in a multiplayer match session.
         /// </summary>
         /// <param name="mods">The mods to check.</param>
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
