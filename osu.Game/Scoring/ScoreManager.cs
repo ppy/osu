@@ -134,7 +134,7 @@ namespace osu.Game.Scoring
             if (string.IsNullOrEmpty(score.BeatmapInfo.MD5Hash))
                 return score.TotalScore;
 
-            int? beatmapMaxCombo = await GetBeatmapMaximumComboAsync(score, cancellationToken).ConfigureAwait(false);
+            int? beatmapMaxCombo = await GetMaximumAchievableComboAsync(score, cancellationToken).ConfigureAwait(false);
             if (beatmapMaxCombo == null)
                 return score.TotalScore;
 
@@ -149,12 +149,12 @@ namespace osu.Game.Scoring
         }
 
         /// <summary>
-        /// Retrieves the maximum achievable combo on the beatmap of the provided score.
+        /// Retrieves the maximum achievable combo for the provided score.
         /// </summary>
         /// <param name="score">The <see cref="ScoreInfo"/> to compute the maximum achievable combo for.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to cancel the process.</param>
         /// <returns>The maximum achievable combo.</returns>
-        public async Task<int?> GetBeatmapMaximumComboAsync([NotNull] ScoreInfo score, CancellationToken cancellationToken = default)
+        public async Task<int?> GetMaximumAchievableComboAsync([NotNull] ScoreInfo score, CancellationToken cancellationToken = default)
         {
             if (score.IsLegacyScore)
             {
