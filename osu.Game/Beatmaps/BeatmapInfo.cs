@@ -172,9 +172,10 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// The maximum achievable combo on this beatmap, populated for online info purposes only.
-        /// Todo: This should never be used nor exist, but is still relied on in <see cref="ScoresContainer.Scores"/> since <see cref="IBeatmapInfo"/> can't be used yet.
+        /// Todo: This should never be used nor exist, but is still relied on in <see cref="ScoresContainer.Scores"/> since <see cref="IBeatmapInfo"/> can't be used yet. For now this is obsoleted until it is removed.
         /// </summary>
         [Ignored]
+        [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
         public int? MaxCombo { get; set; }
 
         [Ignored]

@@ -157,7 +157,7 @@ namespace osu.Game.Scoring
         public LocalisableString DisplayAccuracy => Accuracy.FormatAccuracy();
 
         /// <summary>
-        /// Whether this <see cref="EFScoreInfo"/> represents a legacy (osu!stable) score.
+        /// Whether this <see cref="ScoreInfo"/> represents a legacy (osu!stable) score.
         /// </summary>
         [Ignored]
         public bool IsLegacyScore => Mods.OfType<ModClassic>().Any();
