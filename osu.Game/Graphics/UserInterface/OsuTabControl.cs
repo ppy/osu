@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
         {
-            public readonly SpriteText Text;
+            protected readonly SpriteText Text;
             protected readonly Box Bar;
 
             private Color4 accentColour;
