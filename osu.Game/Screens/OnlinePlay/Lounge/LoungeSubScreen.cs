@@ -334,6 +334,10 @@ namespace osu.Game.Screens.OnlinePlay.Lounge
                 // ID must be unset as we use this as a marker for whether this is a client-side (not-yet-created) room or not.
                 r.RoomID.Value = null;
 
+                // Null out dates because end date is not supported client-side and the settings overlay will populate a duration.
+                r.EndDate.Value = null;
+                r.Duration.Value = null;
+
                 Open(r);
 
                 joiningRoomOperation?.Dispose();
