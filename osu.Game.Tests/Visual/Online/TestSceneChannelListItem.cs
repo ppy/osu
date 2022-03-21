@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -114,6 +115,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestVisual()
         {
+            AddStep("Select second item", () => selected.Value = channels.Skip(1).First());
+
             AddStep("Unread Selected", () =>
             {
                 if (selected.Value != null)
