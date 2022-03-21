@@ -56,8 +56,6 @@ namespace osu.Game.Skinning.Editor
 
         protected override void PopIn()
         {
-            // base call intentionally omitted as we have custom behaviour.
-
             if (skinEditor != null)
             {
                 skinEditor.Show();
@@ -88,11 +86,7 @@ namespace osu.Game.Skinning.Editor
             });
         }
 
-        protected override void PopOut()
-        {
-            // base call intentionally omitted.
-            skinEditor?.Hide();
-        }
+        protected override void PopOut() => skinEditor?.Hide();
 
         private void updateComponentVisibility()
         {
