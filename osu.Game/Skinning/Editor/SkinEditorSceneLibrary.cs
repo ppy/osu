@@ -94,7 +94,7 @@ namespace osu.Game.Skinning.Editor
 
                                         var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
                                         if (replayGeneratingMod != null)
-                                            screen.Push(new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods)));
+                                            screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods))));
                                     }, new[] { typeof(Player), typeof(SongSelect) })
                                 },
                             }
