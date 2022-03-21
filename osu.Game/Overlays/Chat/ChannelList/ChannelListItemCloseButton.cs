@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Scale = new Vector2(0.75f),
+                Size = new Vector2(0.75f),
                 Icon = FontAwesome.Solid.TimesCircle,
                 RelativeSizeAxes = Axes.Both,
                 Colour = normalColour,
