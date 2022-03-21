@@ -25,9 +25,10 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         /// Creates a new <see cref="ComboStatistic"/>.
         /// </summary>
         /// <param name="combo">The combo to be displayed.</param>
+        /// <param name="maxCombo">The maximum value of <paramref name="combo"/>.</param>
         /// <param name="isPerfect">Whether this is a perfect combo.</param>
-        public ComboStatistic(int combo, bool isPerfect)
-            : base("combo", combo)
+        public ComboStatistic(int combo, int? maxCombo, bool isPerfect)
+            : base("combo", combo, maxCombo)
         {
             this.isPerfect = isPerfect;
         }
