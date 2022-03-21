@@ -140,15 +140,15 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         protected override bool OnHover(HoverEvent e)
         {
-            hoverBox?.Show();
-            close?.Show();
+            hoverBox?.FadeIn(300, Easing.OutQuint);
+            close?.FadeIn(300, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverBox?.Hide();
-            close?.Hide();
+            hoverBox?.FadeOut(200, Easing.OutQuint);
+            close?.FadeOut(200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
