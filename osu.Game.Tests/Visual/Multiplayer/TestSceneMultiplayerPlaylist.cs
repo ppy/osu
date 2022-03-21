@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -239,8 +240,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep($"Queue tab shows \"{queueTabText}\"", () =>
             {
                 return this.ChildrenOfType<OsuTabControl<MultiplayerPlaylistDisplayMode>.OsuTabItem>()
-                           .First()
-                           .Text.Text.Equals(queueTabText);
+                           .Single(t => t.Value == MultiplayerPlaylistDisplayMode.Queue)
+                           .ChildrenOfType<OsuSpriteText>().Single().Text == queueTabText;
             });
         }
 
