@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -104,7 +105,7 @@ namespace osu.Game.Skinning.Editor
             };
         }
 
-        private class SceneButton : OsuButton
+        public class SceneButton : OsuButton
         {
             public SceneButton()
             {
