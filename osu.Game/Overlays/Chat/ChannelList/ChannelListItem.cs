@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Text = channel.Type == ChannelType.Public ? $"# {channel.Name.Substring(1)}" : channel.Name,
+                                    Text = channel.Name,
                                     Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
                                     Colour = colourProvider.Light3,
                                     Margin = new MarginPadding { Bottom = 2 },
