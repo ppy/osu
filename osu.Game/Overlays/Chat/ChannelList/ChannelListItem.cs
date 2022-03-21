@@ -127,9 +127,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
             selectedChannel.BindValueChanged(change =>
             {
                 if (change.NewValue == channel)
-                    selectBox?.Show();
+                    selectBox?.FadeIn(300, Easing.OutQuint);
                 else
-                    selectBox?.Hide();
+                    selectBox?.FadeOut(200, Easing.OutQuint);
             }, true);
 
             Unread.BindValueChanged(change =>
