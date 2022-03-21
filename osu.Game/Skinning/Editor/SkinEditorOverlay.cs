@@ -19,9 +19,11 @@ namespace osu.Game.Skinning.Editor
     /// A container which handles loading a skin editor on user request for a specified target.
     /// This also handles the scaling / positioning adjustment of the target.
     /// </summary>
-    public class SkinEditorOverlay : CompositeDrawable, IKeyBindingHandler<GlobalAction>
+    public class SkinEditorOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly ScalingContainer scalingContainer;
+
+        protected override bool BlockNonPositionalInput => true;
 
         [CanBeNull]
         private SkinEditor skinEditor;
@@ -49,30 +51,12 @@ namespace osu.Game.Skinning.Editor
 
                     Hide();
                     return true;
-
-                case GlobalAction.ToggleSkinEditor:
-                    Toggle();
-                    return true;
             }
 
             return false;
         }
 
-        public void Toggle()
-        {
-            if (skinEditor == null)
-                Show();
-            else
-                skinEditor.ToggleVisibility();
-        }
-
-        public override void Hide()
-        {
-            // base call intentionally omitted.
-            skinEditor?.Hide();
-        }
-
-        public override void Show()
+        protected override void PopIn()
         {
             // base call intentionally omitted as we have custom behaviour.
 
@@ -104,6 +88,12 @@ namespace osu.Game.Skinning.Editor
                     SetTarget(lastTargetScreen);
                 });
             });
+        }
+
+        protected override void PopOut()
+        {
+            // base call intentionally omitted.
+            skinEditor?.Hide();
         }
 
         private void updateComponentVisibility()
