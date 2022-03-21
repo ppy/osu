@@ -28,8 +28,6 @@ namespace osu.Game.Skinning.Editor
         [CanBeNull]
         private SkinEditor skinEditor;
 
-        public const float VISIBLE_TARGET_SCALE = 0.8f;
-
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }
 
