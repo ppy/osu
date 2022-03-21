@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelListItemClose : OsuAnimatedButton
+    public class ChannelListItemCloseButton : OsuAnimatedButton
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour)
