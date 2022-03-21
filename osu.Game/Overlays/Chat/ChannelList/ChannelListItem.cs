@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
             Unread.BindValueChanged(change =>
             {
-                text!.Colour = change.NewValue ? colourProvider.Content1 : colourProvider.Light3;
+                text!.FadeColour(change.NewValue ? colourProvider.Content1 : colourProvider.Light3, 300, Easing.OutQuint);
             }, true);
         }
 
