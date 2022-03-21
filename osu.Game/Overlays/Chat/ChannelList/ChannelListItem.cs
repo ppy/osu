@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private Box? hoverBox;
         private Box? selectBox;
         private OsuSpriteText? text;
-        private ChannelListItemClose? close;
+        private ChannelListItemCloseButton? close;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -97,14 +97,14 @@ namespace osu.Game.Overlays.Chat.ChannelList
                                     RelativeSizeAxes = Axes.X,
                                     Truncate = true,
                                 },
-                                new ChannelListItemMention
+                                new ChannelListItemMentionPill
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Margin = new MarginPadding { Right = 3 },
                                     Mentions = { BindTarget = Mentions },
                                 },
-                                close = new ChannelListItemClose
+                                close = new ChannelListItemCloseButton
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,

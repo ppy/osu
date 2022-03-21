@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
-    public class ChannelListItemMention : CircularContainer
+    public class ChannelListItemMentionPill : CircularContainer
     {
         public readonly BindableInt Mentions = new BindableInt();
 
