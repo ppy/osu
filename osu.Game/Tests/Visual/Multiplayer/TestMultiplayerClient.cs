@@ -322,13 +322,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     async Task start()
                     {
-                        try
-                        {
-                            await lastCountdownTask;
-                        }
-                        catch (OperationCanceledException)
-                        {
-                        }
+                        await lastCountdownTask;
 
                         Schedule(() =>
                         {
