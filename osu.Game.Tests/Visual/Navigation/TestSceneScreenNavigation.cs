@@ -263,6 +263,20 @@ namespace osu.Game.Tests.Visual.Navigation
         }
 
         [Test]
+        public void TestModsResetOnEnteringMultiplayer()
+        {
+            var osuAutomationMod = new OsuModAutoplay();
+
+            AddStep("Enable autoplay", () => { Game.SelectedMods.Value = new[] { osuAutomationMod }; });
+
+            PushAndConfirm(() => new Screens.OnlinePlay.Multiplayer.Multiplayer());
+            AddUntilStep("Mods are removed", () => SelectedMods.Value.Count == 0);
+
+            AddStep("Return to menu", () => Game.ScreenStack.CurrentScreen.Exit());
+            AddUntilStep("Mods are restored", () => Game.SelectedMods.Value.Contains(osuAutomationMod));
+        }
+
+        [Test]
         public void TestExitMultiWithEscape()
         {
             PushAndConfirm(() => new Screens.OnlinePlay.Playlists.Playlists());
