@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerClient.TransferHost(2);
             });
 
-            AddStep("start with countdown", () => MultiplayerClient.SendMatchRequest(new StartMatchCountdownRequest { Delay = TimeSpan.FromMinutes(2) }));
+            AddStep("start with countdown", () => MultiplayerClient.SendMatchRequest(new StartMatchCountdownRequest { Delay = TimeSpan.FromMinutes(2) }).WaitSafely());
 
             ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
             AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 MultiplayerClient.TransferHost(2);
             });
 
-            AddStep("start countdown", () => MultiplayerClient.SendMatchRequest(new StartMatchCountdownRequest { Delay = TimeSpan.FromMinutes(1) }));
+            AddStep("start countdown", () => MultiplayerClient.SendMatchRequest(new StartMatchCountdownRequest { Delay = TimeSpan.FromMinutes(1) }).WaitSafely());
             AddUntilStep("countdown started", () => MultiplayerClient.Room?.Countdown != null);
 
             AddStep("transfer host to local user", () => MultiplayerClient.TransferHost(API.LocalUser.Value.OnlineID));
