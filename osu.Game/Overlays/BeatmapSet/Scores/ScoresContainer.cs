@@ -78,7 +78,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
                 var beatmapInfo = new BeatmapInfo
                 {
+#pragma warning disable 618
                     MaxCombo = apiBeatmap.MaxCombo,
+#pragma warning restore 618
                     Status = apiBeatmap.Status,
                     MD5Hash = apiBeatmap.MD5Hash
                 };
