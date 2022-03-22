@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
@@ -51,30 +52,36 @@ namespace osu.Game.Skinning
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
 
-        private readonly RealmBackedResourceStore skinStorage;
-
-        protected Skin(SkinInfo skin, IStorageResourceProvider resources, [CanBeNull] Stream configurationStream = null)
+        protected Skin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null, [CanBeNull] Stream configurationStream = null)
         {
-            if (resources.RealmAccess != null)
+            if (resources != null)
             {
-                SkinInfo = skin.ToLive(resources.RealmAccess);
-                skinStorage = new RealmBackedResourceStore(skin, resources.Files);
+                if (resources.RealmAccess != null)
+                {
+                    SkinInfo = skin.ToLive(resources.RealmAccess);
 
-                var samples = resources?.AudioManager?.GetSampleStore(skinStorage);
+                    if (storage == null)
+                    {
+                        var realmStorage = new RealmBackedResourceStore(skin, resources.Files);
+                        realmStorage.AddExtension("ogg");
+
+                        storage = realmStorage;
+                    }
+                }
+                else
+                {
+                    SkinInfo = skin.ToLiveUnmanaged();
+                }
+
+                var samples = resources.AudioManager?.GetSampleStore(storage);
                 if (samples != null)
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
                 Samples = samples;
-                Textures = new TextureStore(resources?.CreateTextureLoaderStore(skinStorage));
-
-                skinStorage.AddExtension("ogg");
-            }
-            else
-            {
-                SkinInfo = skin.ToLiveUnmanaged();
+                Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
             }
 
-            configurationStream ??= skinStorage?.GetStream(@"skin.ini");
+            configurationStream ??= storage?.GetStream(@"skin.ini");
 
             if (configurationStream != null)
                 // stream will be closed after use by LineBufferedReader.
@@ -87,7 +94,7 @@ namespace osu.Game.Skinning
             {
                 string filename = $"{skinnableTarget}.json";
 
-                byte[] bytes = skinStorage?.Get(filename);
+                byte[] bytes = storage?.Get(filename);
 
                 if (bytes == null)
                     continue;
