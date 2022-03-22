@@ -282,12 +282,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 int countReady = room.Users.Count(u => u.State == MultiplayerUserState.Ready);
                 int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
-
-                string countdownText = room.Countdown == null ? string.Empty : $"Starting in {room.Countdown.EndTime - DateTimeOffset.Now:mm\\:ss}";
                 string countText = $"({countReady} / {countTotal} ready)";
 
                 if (room.Countdown != null)
                 {
+                    string countdownText = $"Starting in {room.Countdown.EndTime - DateTimeOffset.Now:mm\\:ss}";
+
                     switch (localUser?.State)
                     {
                         default:
@@ -329,37 +329,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 var localUser = multiplayerClient.LocalUser;
 
-                if (room.Countdown != null)
+                switch (localUser?.State)
                 {
-                    switch (localUser?.State)
-                    {
-                        default:
-                            setGreen();
-                            break;
+                    default:
+                        setGreen();
+                        break;
 
-                        case MultiplayerUserState.Spectating:
-                        case MultiplayerUserState.Ready:
+                    case MultiplayerUserState.Spectating:
+                    case MultiplayerUserState.Ready:
+                        if (room?.Host?.Equals(localUser) == true && room.Countdown == null)
+                            setGreen();
+                        else
                             setYellow();
-                            break;
-                    }
-                }
-                else
-                {
-                    switch (localUser?.State)
-                    {
-                        default:
-                            setGreen();
-                            break;
 
-                        case MultiplayerUserState.Spectating:
-                        case MultiplayerUserState.Ready:
-                            if (room?.Host?.Equals(localUser) == true)
-                                setGreen();
-                            else
-                                setYellow();
-
-                            break;
-                    }
+                        break;
                 }
 
                 void setYellow()
