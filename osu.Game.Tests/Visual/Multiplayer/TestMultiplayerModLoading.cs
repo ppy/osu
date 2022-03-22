@@ -6,10 +6,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select;
 
-// Resolve these names to types because there is a Namespace called "Playlists" and "Multiplayer" which conflicts
-using MultiplayerScreenAlias = osu.Game.Screens.OnlinePlay.Multiplayer.Multiplayer;
-using PlaylistsScreenAlias = osu.Game.Screens.OnlinePlay.Playlists.Playlists;
-
 namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestMultiplayerModLoading : OsuGameTestScene
