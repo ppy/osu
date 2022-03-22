@@ -300,7 +300,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private CancellationTokenSource? countdownStopSource;
         private Task countdownTask = Task.CompletedTask;
 
-        public void FinishCountDown() => countdownFinishSource?.Cancel();
+        public void FinishCountdown() => countdownFinishSource?.Cancel();
 
         public override async Task SendMatchRequest(MatchUserRequest request)
         {
