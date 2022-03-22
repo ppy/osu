@@ -590,6 +590,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.IsTrue(imported.DeletePending);
 
+                var originalAddedDate = imported.DateAdded;
+
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
@@ -597,6 +599,7 @@ namespace osu.Game.Tests.Database
                 Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
                 Assert.IsFalse(imported.DeletePending);
                 Assert.IsFalse(importedSecondTime.DeletePending);
+                Assert.That(importedSecondTime.DateAdded, Is.GreaterThan(originalAddedDate));
             });
         }
 
@@ -646,6 +649,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.IsTrue(imported.DeletePending);
 
+                var originalAddedDate = imported.DateAdded;
+
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
@@ -653,6 +658,7 @@ namespace osu.Game.Tests.Database
                 Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
                 Assert.IsFalse(imported.DeletePending);
                 Assert.IsFalse(importedSecondTime.DeletePending);
+                Assert.That(importedSecondTime.DateAdded, Is.GreaterThan(originalAddedDate));
             });
         }
 

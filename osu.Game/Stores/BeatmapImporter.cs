@@ -163,6 +163,12 @@ namespace osu.Game.Stores
             return existing.OnlineID == import.OnlineID && existingIds.SequenceEqual(importIds);
         }
 
+        protected override void UndeleteForReuse(BeatmapSetInfo existing)
+        {
+            base.UndeleteForReuse(existing);
+            existing.DateAdded = DateTimeOffset.UtcNow;
+        }
+
         public override bool IsAvailableLocally(BeatmapSetInfo model)
         {
             return Realm.Run(realm => realm.All<BeatmapSetInfo>().Any(s => s.OnlineID == model.OnlineID));
