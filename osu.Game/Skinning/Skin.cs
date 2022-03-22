@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.Screens.Play.HUD;
 
@@ -24,8 +23,19 @@ namespace osu.Game.Skinning
 {
     public abstract class Skin : IDisposable, ISkin
     {
+        /// <summary>
+        /// A texture store which can be used to perform user file loops for this skin.
+        /// </summary>
+        [CanBeNull]
+        protected TextureStore Textures { get; set; }
+
+        /// <summary>
+        /// A sample store which can be used to perform user file loops for this skin.
+        /// </summary>
+        [CanBeNull]
+        protected ISampleStore Samples { get; set; }
+
         public readonly Live<SkinInfo> SkinInfo;
-        private readonly IStorageResourceProvider resources;
 
         public SkinConfiguration Configuration { get; set; }
 
@@ -41,16 +51,30 @@ namespace osu.Game.Skinning
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
 
+        private readonly RealmBackedResourceStore skinStorage;
+
         protected Skin(SkinInfo skin, IStorageResourceProvider resources, [CanBeNull] Stream configurationStream = null)
         {
-            SkinInfo = resources?.RealmAccess != null
-                ? skin.ToLive(resources.RealmAccess)
-                // This path should only be used in some tests.
-                : skin.ToLiveUnmanaged();
+            if (resources.RealmAccess != null)
+            {
+                SkinInfo = skin.ToLive(resources.RealmAccess);
+                skinStorage = new RealmBackedResourceStore(skin, resources.Files);
 
-            this.resources = resources;
+                var samples = resources?.AudioManager?.GetSampleStore(skinStorage);
+                if (samples != null)
+                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
-            configurationStream ??= getConfigurationStream();
+                Samples = samples;
+                Textures = new TextureStore(resources?.CreateTextureLoaderStore(skinStorage));
+
+                skinStorage.AddExtension("ogg");
+            }
+            else
+            {
+                SkinInfo = skin.ToLiveUnmanaged();
+            }
+
+            configurationStream ??= skinStorage?.GetStream(@"skin.ini");
 
             if (configurationStream != null)
                 // stream will be closed after use by LineBufferedReader.
@@ -59,56 +83,36 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             // skininfo files may be null for default skin.
-            SkinInfo.PerformRead(s =>
+            foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
             {
-                // we may want to move this to some kind of async operation in the future.
-                foreach (SkinnableTarget skinnableTarget in Enum.GetValues(typeof(SkinnableTarget)))
+                string filename = $"{skinnableTarget}.json";
+
+                byte[] bytes = skinStorage?.Get(filename);
+
+                if (bytes == null)
+                    continue;
+
+                try
                 {
-                    string filename = $"{skinnableTarget}.json";
+                    string jsonContent = Encoding.UTF8.GetString(bytes);
+                    var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
 
-                    // skininfo files may be null for default skin.
-                    var fileInfo = s.Files.FirstOrDefault(f => f.Filename == filename);
-
-                    if (fileInfo == null)
+                    if (deserializedContent == null)
                         continue;
 
-                    byte[] bytes = resources?.Files.Get(fileInfo.File.GetStoragePath());
-
-                    if (bytes == null)
-                        continue;
-
-                    try
-                    {
-                        string jsonContent = Encoding.UTF8.GetString(bytes);
-                        var deserializedContent = JsonConvert.DeserializeObject<IEnumerable<SkinnableInfo>>(jsonContent);
-
-                        if (deserializedContent == null)
-                            continue;
-
-                        DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex, "Failed to load skin configuration.");
-                    }
+                    DrawableComponentInfo[skinnableTarget] = deserializedContent.ToArray();
                 }
-            });
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "Failed to load skin configuration.");
+                }
+            }
         }
 
         protected virtual void ParseConfigurationStream(Stream stream)
         {
             using (LineBufferedReader reader = new LineBufferedReader(stream, true))
                 Configuration = new LegacySkinDecoder().Decode(reader);
-        }
-
-        private Stream getConfigurationStream()
-        {
-            string path = SkinInfo.PerformRead(s => s.Files.SingleOrDefault(f => f.Filename.Equals(@"skin.ini", StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath());
-
-            if (string.IsNullOrEmpty(path))
-                return null;
-
-            return resources?.Files.GetStream(path);
         }
 
         /// <summary>
@@ -168,6 +172,9 @@ namespace osu.Game.Skinning
                 return;
 
             isDisposed = true;
+
+            Textures?.Dispose();
+            Samples?.Dispose();
         }
 
         #endregion
