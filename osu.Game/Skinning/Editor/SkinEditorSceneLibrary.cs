@@ -104,7 +104,7 @@ namespace osu.Game.Skinning.Editor
             };
         }
 
-        private class SceneButton : OsuButton
+        public class SceneButton : OsuButton
         {
             public SceneButton()
             {
