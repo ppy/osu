@@ -68,9 +68,6 @@ namespace osu.Game.Skinning.Editor
 
             skinEditor = editor;
 
-            if (editor != skinEditor)
-                return;
-
             LoadComponentAsync(editor, _ =>
             {
                 if (editor != skinEditor)
