@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Skins
         public class BeatmapSkinSource : LegacyBeatmapSkin
         {
             public BeatmapSkinSource()
-                : base(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, null, null)
+                : base(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo, null)
             {
             }
 
