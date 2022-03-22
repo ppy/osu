@@ -7,10 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
@@ -93,6 +96,10 @@ namespace osu.Game.Tests.Visual
 
         protected class TestEditor : Editor
         {
+            [Resolved(canBeNull: true)]
+            [CanBeNull]
+            private DialogOverlay dialogOverlay { get; set; }
+
             public new void Undo() => base.Undo();
 
             public new void Redo() => base.Redo();
@@ -110,6 +117,18 @@ namespace osu.Game.Tests.Visual
             public new void CreateNewDifficulty(RulesetInfo rulesetInfo) => base.CreateNewDifficulty(rulesetInfo);
 
             public new bool HasUnsavedChanges => base.HasUnsavedChanges;
+
+            public override bool OnExiting(IScreen next)
+            {
+                // For testing purposes allow the screen to exit without saving on second attempt.
+                if (!ExitConfirmed && dialogOverlay?.CurrentDialog is PromptForSaveDialog saveDialog)
+                {
+                    saveDialog.PerformAction<PopupDialogDangerousButton>();
+                    return true;
+                }
+
+                return base.OnExiting(next);
+            }
 
             public TestEditor(EditorLoader loader = null)
                 : base(loader)
