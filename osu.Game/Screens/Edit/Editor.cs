@@ -596,7 +596,7 @@ namespace osu.Game.Screens.Edit
                 }
 
                 // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
-                if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
+                if (dialogOverlay.CurrentDialog is PromptForSaveDialog)
                     return true;
 
                 if (isNewBeatmap || HasUnsavedChanges)
