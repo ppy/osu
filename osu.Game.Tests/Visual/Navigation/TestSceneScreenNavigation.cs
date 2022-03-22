@@ -269,8 +269,9 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("Enable autoplay", () => { Game.SelectedMods.Value = new[] { osuAutomationMod }; });
 
-            PushAndConfirm(() => new Screens.OnlinePlay.Multiplayer.Multiplayer());
-            AddUntilStep("Mods are removed", () => SelectedMods.Value.Count == 0);
+            Screens.OnlinePlay.Multiplayer.Multiplayer multiplayer = null;
+            PushAndConfirm(() => multiplayer = new Screens.OnlinePlay.Multiplayer.Multiplayer());
+            AddUntilStep("Mods are removed", () => multiplayer.Mods.Value.Count == 0);
 
             AddStep("Return to menu", () => Game.ScreenStack.CurrentScreen.Exit());
             AddUntilStep("Mods are restored", () => Game.SelectedMods.Value.Contains(osuAutomationMod));
