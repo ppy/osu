@@ -28,6 +28,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
@@ -598,7 +599,7 @@ namespace osu.Game.Screens.Edit
                 // if the dialog is already displayed, confirm exit with no save.
                 if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
                 {
-                    saveDialog.PerformOkAction();
+                    saveDialog.PerformAction<PopupDialogDangerousButton>();
                     return true;
                 }
 
