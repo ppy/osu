@@ -69,7 +69,7 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationStream">An optional stream containing the contents of a skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
-            : base(skin, resources, configurationStream)
+            : base(skin, resources, storage, configurationStream)
         {
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
