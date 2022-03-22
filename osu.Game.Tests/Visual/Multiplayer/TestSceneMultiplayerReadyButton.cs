@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddAssert("countdown button not visible", () => !this.ChildrenOfType<MultiplayerReadyButton.CountdownButton>().Single().IsPresent);
-            AddStep("finish countdown", () => MultiplayerClient.FinishCountDown());
+            AddStep("finish countdown", () => MultiplayerClient.FinishCountdown());
             AddUntilStep("match started", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.WaitingForLoad);
         }
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
 
-            AddStep("finish countdown", () => MultiplayerClient.FinishCountDown());
+            AddStep("finish countdown", () => MultiplayerClient.FinishCountdown());
             AddUntilStep("match not started", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
         }
 
@@ -158,7 +158,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("set spectating", () => MultiplayerClient.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
             AddUntilStep("local user is spectating", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
-            AddStep("finish countdown", () => MultiplayerClient.FinishCountDown());
+            AddStep("finish countdown", () => MultiplayerClient.FinishCountdown());
             AddUntilStep("match not started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.Open);
         }
 
