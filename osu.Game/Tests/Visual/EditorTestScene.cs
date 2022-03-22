@@ -97,6 +97,7 @@ namespace osu.Game.Tests.Visual
         protected class TestEditor : Editor
         {
             [Resolved(canBeNull: true)]
+            [CanBeNull]
             private DialogOverlay dialogOverlay { get; set; }
 
             public new void Undo() => base.Undo();
@@ -120,7 +121,7 @@ namespace osu.Game.Tests.Visual
             public override bool OnExiting(IScreen next)
             {
                 // For testing purposes allow the screen to exit without saving on second attempt.
-                if (!ExitConfirmed && dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
+                if (!ExitConfirmed && dialogOverlay?.CurrentDialog is PromptForSaveDialog saveDialog)
                 {
                     saveDialog.PerformAction<PopupDialogDangerousButton>();
                     return true;
