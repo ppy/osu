@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (osuComponent.Component)
                 {
                     case OsuSkinComponents.FollowPoint:
-                        return this.GetAnimation(component.LookupName, true, false, true, startAtCurrentTime: false);
+                        return this.GetAnimation(component.LookupName, true, true, true, startAtCurrentTime: false);
 
                     case OsuSkinComponents.SliderFollowCircle:
                         var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
