@@ -2,24 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
-using osu.Game.Beatmaps;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Components;
 using osuTK;
 
@@ -29,26 +22,19 @@ namespace osu.Game.Skinning.Editor
     {
         public Action<Type> RequestPlacement;
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor(new DummyRuleset())
-        {
-            Combo = { Value = RNG.Next(1, 1000) },
-            TotalScore = { Value = RNG.Next(1000, 10000000) }
-        };
+        private readonly CompositeDrawable target;
 
-        [Cached(typeof(HealthProcessor))]
-        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
-
-        public SkinComponentToolbox()
+        public SkinComponentToolbox(CompositeDrawable target = null)
             : base("Components")
         {
+            this.target = target;
         }
+
+        private FillFlowContainer fill;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            FillFlowContainer fill;
-
             Child = fill = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -57,25 +43,24 @@ namespace osu.Game.Skinning.Editor
                 Spacing = new Vector2(2)
             };
 
+            reloadComponents();
+        }
+
+        private void reloadComponents()
+        {
+            fill.Clear();
+
             var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
-                                                .Where(t => !t.IsInterface)
+                                                .Where(t => !t.IsInterface && !t.IsAbstract)
                                                 .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
                                                 .OrderBy(t => t.Name)
                                                 .ToArray();
 
             foreach (var type in skinnableTypes)
-            {
-                var component = attemptAddComponent(type);
-
-                if (component != null)
-                {
-                    component.RequestPlacement = t => RequestPlacement?.Invoke(t);
-                    fill.Add(component);
-                }
-            }
+                attemptAddComponent(type);
         }
 
-        private static ToolboxComponentButton attemptAddComponent(Type type)
+        private void attemptAddComponent(Type type)
         {
             try
             {
@@ -83,14 +68,21 @@ namespace osu.Game.Skinning.Editor
 
                 Debug.Assert(instance != null);
 
-                if (!((ISkinnableDrawable)instance).IsEditable)
-                    return null;
+                if (!((ISkinnableDrawable)instance).IsEditable) return;
 
-                return new ToolboxComponentButton(instance);
+                fill.Add(new ToolboxComponentButton(instance, target)
+                {
+                    RequestPlacement = t => RequestPlacement?.Invoke(t)
+                });
             }
-            catch
+            catch (DependencyNotRegisteredException)
             {
-                return null;
+                // This loading code relies on try-catching any dependency injection errors to know which components are valid for the current target screen.
+                // If a screen can't provide the required dependencies, a skinnable component should not be displayed in the list.
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Skin component {type} could not be loaded in the editor component list due to an error");
             }
         }
 
@@ -101,6 +93,7 @@ namespace osu.Game.Skinning.Editor
             public override bool PropagateNonPositionalInputSubTree => false;
 
             private readonly Drawable component;
+            private readonly CompositeDrawable dependencySource;
 
             public Action<Type> RequestPlacement;
 
@@ -109,9 +102,10 @@ namespace osu.Game.Skinning.Editor
             private const float contracted_size = 60;
             private const float expanded_size = 120;
 
-            public ToolboxComponentButton(Drawable component)
+            public ToolboxComponentButton(Drawable component, CompositeDrawable dependencySource)
             {
                 this.component = component;
+                this.dependencySource = dependencySource;
 
                 Enabled.Value = true;
 
@@ -143,7 +137,7 @@ namespace osu.Game.Skinning.Editor
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding(10) { Bottom = 20 },
                         Masking = true,
-                        Child = innerContainer = new Container
+                        Child = innerContainer = new DependencyBorrowingContainer(dependencySource)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
@@ -186,14 +180,17 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private class DummyRuleset : Ruleset
+        public class DependencyBorrowingContainer : Container
         {
-            public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
-            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
-            public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => throw new NotImplementedException();
-            public override string Description => string.Empty;
-            public override string ShortName => string.Empty;
+            private readonly CompositeDrawable donor;
+
+            public DependencyBorrowingContainer(CompositeDrawable donor)
+            {
+                this.donor = donor;
+            }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+                new DependencyContainer(donor?.Dependencies ?? base.CreateChildDependencies(parent));
         }
     }
 }

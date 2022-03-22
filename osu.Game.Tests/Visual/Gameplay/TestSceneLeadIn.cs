@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
@@ -107,7 +108,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(beatmap, storyboard);
+                Beatmap.Value = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), Audio);
                 LoadScreen(player = new LeadInPlayer());
             });
 
