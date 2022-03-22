@@ -58,7 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public Action SettingsApplied;
 
             public OsuTextBox NameField, MaxParticipantsField;
-            public RoomAvailabilityPicker AvailabilityPicker;
             public MatchTypePicker TypePicker;
             public OsuEnumDropdown<QueueMode> QueueModeDropdown;
             public OsuTextBox PasswordTextBox;
@@ -164,14 +163,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         RelativeSizeAxes = Axes.X,
                                                                         TabbableContentContainer = this,
                                                                         LengthLimit = 100,
-                                                                    },
-                                                                },
-                                                                new Section("Room visibility")
-                                                                {
-                                                                    Alpha = disabled_alpha,
-                                                                    Child = AvailabilityPicker = new RoomAvailabilityPicker
-                                                                    {
-                                                                        Enabled = { Value = false }
                                                                     },
                                                                 },
                                                                 new Section("Game type")
@@ -336,7 +327,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
-                Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 RoomID.BindValueChanged(roomId => playlistContainer.Alpha = roomId.NewValue == null ? 1 : 0, true);
@@ -402,7 +392,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 else
                 {
                     room.Name.Value = NameField.Text;
-                    room.Availability.Value = AvailabilityPicker.Current.Value;
                     room.Type.Value = TypePicker.Current.Value;
                     room.Password.Value = PasswordTextBox.Current.Value;
                     room.QueueMode.Value = QueueModeDropdown.Current.Value;
