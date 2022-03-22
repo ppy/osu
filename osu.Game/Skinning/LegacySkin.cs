@@ -27,12 +27,6 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
-        [CanBeNull]
-        protected TextureStore Textures;
-
-        [CanBeNull]
-        protected ISampleStore Samples;
-
         /// <summary>
         /// Whether texture for the keys exists.
         /// Used to determine if the mania ruleset is skinned.
@@ -77,18 +71,6 @@ namespace osu.Game.Skinning
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
             : base(skin, resources, configurationStream)
         {
-            if (storage != null)
-            {
-                var samples = resources?.AudioManager?.GetSampleStore(storage);
-                if (samples != null)
-                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-
-                Samples = samples;
-                Textures = new TextureStore(resources?.CreateTextureLoaderStore(storage));
-
-                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
-            }
-
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
@@ -550,13 +532,6 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             yield return componentName.Split('/').Last();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
     }
 }
