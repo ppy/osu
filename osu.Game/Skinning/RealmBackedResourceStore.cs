@@ -4,21 +4,22 @@
 using System.Collections.Generic;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
+using osu.Game.Database;
 using osu.Game.Extensions;
 
 namespace osu.Game.Skinning
 {
-    public class LegacyDatabasedSkinResourceStore : ResourceStore<byte[]>
+    public class RealmBackedResourceStore : ResourceStore<byte[]>
     {
         private readonly Dictionary<string, string> fileToStoragePathMapping = new Dictionary<string, string>();
 
-        public LegacyDatabasedSkinResourceStore(SkinInfo source, IResourceStore<byte[]> underlyingStore)
+        public RealmBackedResourceStore(IHasRealmFiles source, IResourceStore<byte[]> underlyingStore)
             : base(underlyingStore)
         {
             initialiseFileCache(source);
         }
 
-        private void initialiseFileCache(SkinInfo source)
+        private void initialiseFileCache(IHasRealmFiles source)
         {
             fileToStoragePathMapping.Clear();
             foreach (var f in source.Files)
