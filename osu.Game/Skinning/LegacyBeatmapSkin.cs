@@ -9,6 +9,7 @@ using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Objects.Types;
@@ -21,12 +22,26 @@ namespace osu.Game.Skinning
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
 
+        /// <summary>
+        /// Construct a new legacy beatmap skin instance.
+        /// </summary>
+        /// <param name="beatmapInfo">The model for this beatmap.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null)
-            : base(createSkinInfo(beatmapInfo), storage ?? (resources != null ? new RealmBackedResourceStore(beatmapInfo.BeatmapSet, resources.Files, new[] { @"ogg" }) : null), resources,
+            : base(createSkinInfo(beatmapInfo), storage ?? createRealmBackedStore(beatmapInfo, resources), resources,
                 beatmapInfo.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
+        }
+
+        private static IResourceStore<byte[]> createRealmBackedStore(BeatmapInfo beatmapInfo, [CanBeNull] IStorageResourceProvider resources)
+        {
+            if (resources == null)
+                return null;
+
+            return new RealmBackedResourceStore(beatmapInfo.BeatmapSet, resources.Files, new[] { @"ogg" });
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -79,6 +94,10 @@ namespace osu.Game.Skinning
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmapInfo) =>
-            new SkinInfo { Name = beatmapInfo.ToString(), Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty };
+            new SkinInfo
+            {
+                Name = beatmapInfo.ToString(),
+                Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty
+            };
     }
 }

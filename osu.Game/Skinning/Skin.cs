@@ -52,6 +52,13 @@ namespace osu.Game.Skinning
 
         public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
 
+        /// <summary>
+        /// Construct a new skin.
+        /// </summary>
+        /// <param name="skin">The skin's metadata. Usually a live realm object.</param>
+        /// <param name="resources">Access to game-wide resources.</param>
+        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
+        /// <param name="configurationStream">An optional stream which will be used to read the skin configuration. If null, the configuration will be retrieved from the storage using "skin.ini".</param>
         protected Skin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null, [CanBeNull] Stream configurationStream = null)
         {
             if (resources != null)
