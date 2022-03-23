@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -18,11 +21,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Skinning.Components;
 
 namespace osu.Game.Skinning.Editor
 {
     [Cached(typeof(SkinEditor))]
-    public class SkinEditor : VisibilityContainer
+    public class SkinEditor : VisibilityContainer, ICanAcceptFiles
     {
         public const double TRANSITION_DURATION = 500;
 
@@ -35,6 +39,9 @@ namespace osu.Game.Skinning.Editor
         private OsuTextFlowContainer headerText;
 
         private Bindable<Skin> currentSkin;
+
+        [Resolved(canBeNull: true)]
+        private OsuGame game { get; set; }
 
         [Resolved]
         private SkinManager skins { get; set; }
@@ -171,6 +178,8 @@ namespace osu.Game.Skinning.Editor
 
             Show();
 
+            game?.RegisterImportHandler(this);
+
             // as long as the skin editor is loaded, let's make sure we can modify the current skin.
             currentSkin = skins.CurrentSkin.GetBoundCopy();
 
@@ -184,6 +193,13 @@ namespace osu.Game.Skinning.Editor
             }, true);
 
             SelectedComponents.BindCollectionChanged((_, __) => Scheduler.AddOnce(populateSettings), true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            game?.UnregisterImportHandler(this);
         }
 
         public void UpdateTargetScreen(Drawable targetScreen)
@@ -230,13 +246,18 @@ namespace osu.Game.Skinning.Editor
 
         private void placeComponent(Type type)
         {
+            if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
+                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISkinnableDrawable)}.");
+
+            placeComponent(component);
+        }
+
+        private void placeComponent(ISkinnableDrawable component)
+        {
             var targetContainer = getFirstTarget();
 
             if (targetContainer == null)
                 return;
-
-            if (!(Activator.CreateInstance(type) is ISkinnableDrawable component))
-                throw new InvalidOperationException($"Attempted to instantiate a component for placement which was not an {typeof(ISkinnableDrawable)}.");
 
             var drawableComponent = (Drawable)component;
 
@@ -313,5 +334,32 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in items)
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
         }
+
+        public Task Import(params string[] paths)
+        {
+            Schedule(() =>
+            {
+                var file = new FileInfo(paths.First());
+
+                // import to skin
+                currentSkin.Value.SkinInfo.PerformWrite(skinInfo =>
+                {
+                    using (var contents = file.OpenRead())
+                        skins.AddFile(skinInfo, contents, file.Name);
+                });
+
+                // place component
+                placeComponent(new SkinSprite
+                {
+                    SpriteName = { Value = Path.GetFileNameWithoutExtension(file.Name) }
+                });
+            });
+
+            return Task.CompletedTask;
+        }
+
+        public Task Import(params ImportTask[] tasks) => throw new NotImplementedException();
+
+        public IEnumerable<string> HandledExtensions => new[] { ".jpg", ".jpeg", ".png" };
     }
 }
