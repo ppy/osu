@@ -51,7 +51,7 @@ namespace osu.Game.Skinning.Editor
             fill.Clear();
 
             var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
-                                                .Where(t => !t.IsInterface)
+                                                .Where(t => !t.IsInterface && !t.IsAbstract)
                                                 .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
                                                 .OrderBy(t => t.Name)
                                                 .ToArray();

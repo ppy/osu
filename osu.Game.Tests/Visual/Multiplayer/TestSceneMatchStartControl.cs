@@ -286,7 +286,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             ClickButtonWhenEnabled<ReadyButton>();
             AddUntilStep("user is idle (match not started)", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Idle);
-            AddAssert("ready button enabled", () => control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+            AddUntilStep("ready button enabled", () => control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
 
         [TestCase(true)]

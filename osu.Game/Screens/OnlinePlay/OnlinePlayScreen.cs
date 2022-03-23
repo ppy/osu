@@ -115,6 +115,8 @@ namespace osu.Game.Screens.OnlinePlay
             this.FadeIn();
             waves.Show();
 
+            Mods.SetDefault();
+
             if (loungeSubScreen.IsCurrentScreen())
                 loungeSubScreen.OnEntering(last);
             else
