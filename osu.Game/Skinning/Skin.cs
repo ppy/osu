@@ -28,13 +28,13 @@ namespace osu.Game.Skinning
         /// A texture store which can be used to perform user file loops for this skin.
         /// </summary>
         [CanBeNull]
-        protected TextureStore Textures { get; set; }
+        protected TextureStore Textures { get; }
 
         /// <summary>
         /// A sample store which can be used to perform user file loops for this skin.
         /// </summary>
         [CanBeNull]
-        protected ISampleStore Samples { get; set; }
+        protected ISampleStore Samples { get; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
