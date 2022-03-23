@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
@@ -27,14 +29,12 @@ namespace osu.Game.Skinning
         /// <summary>
         /// A texture store which can be used to perform user file loops for this skin.
         /// </summary>
-        [CanBeNull]
-        protected TextureStore Textures { get; }
+        protected TextureStore? Textures { get; }
 
         /// <summary>
         /// A sample store which can be used to perform user file loops for this skin.
         /// </summary>
-        [CanBeNull]
-        protected ISampleStore Samples { get; }
+        protected ISampleStore? Samples { get; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -44,13 +44,13 @@ namespace osu.Game.Skinning
 
         private readonly Dictionary<SkinnableTarget, SkinnableInfo[]> drawableComponentInfo = new Dictionary<SkinnableTarget, SkinnableInfo[]>();
 
-        public abstract ISample GetSample(ISampleInfo sampleInfo);
+        public abstract ISample? GetSample(ISampleInfo sampleInfo);
 
-        public Texture GetTexture(string componentName) => GetTexture(componentName, default, default);
+        public Texture? GetTexture(string componentName) => GetTexture(componentName, default, default);
 
-        public abstract Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
+        public abstract Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
-        public abstract IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup);
+        public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup);
 
         /// <summary>
         /// Construct a new skin.
@@ -59,13 +59,11 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to game-wide resources.</param>
         /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
-        protected Skin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null, [CanBeNull] string configurationFilename = @"skin.ini")
+        protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
         {
             if (resources != null)
             {
-                SkinInfo = resources.RealmAccess != null
-                    ? skin.ToLive(resources.RealmAccess)
-                    : skin.ToLiveUnmanaged();
+                SkinInfo = skin.ToLive(resources.RealmAccess);
 
                 storage ??= new RealmBackedResourceStore(skin, resources.Files, new[] { @"ogg" });
 
@@ -76,12 +74,20 @@ namespace osu.Game.Skinning
                 Samples = samples;
                 Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
             }
+            else
+            {
+                // Generally only used for tests.
+                SkinInfo = skin.ToLiveUnmanaged();
+            }
 
             var configurationStream = storage?.GetStream(configurationFilename);
 
             if (configurationStream != null)
+            {
                 // stream will be closed after use by LineBufferedReader.
                 ParseConfigurationStream(configurationStream);
+                Debug.Assert(Configuration != null);
+            }
             else
                 Configuration = new SkinConfiguration();
 
@@ -90,7 +96,7 @@ namespace osu.Game.Skinning
             {
                 string filename = $"{skinnableTarget}.json";
 
-                byte[] bytes = storage?.Get(filename);
+                byte[]? bytes = storage?.Get(filename);
 
                 if (bytes == null)
                     continue;
@@ -136,7 +142,7 @@ namespace osu.Game.Skinning
             DrawableComponentInfo[targetContainer.Target] = targetContainer.CreateSkinnableInfo().ToArray();
         }
 
-        public virtual Drawable GetDrawableComponent(ISkinComponent component)
+        public virtual Drawable? GetDrawableComponent(ISkinComponent component)
         {
             switch (component)
             {
