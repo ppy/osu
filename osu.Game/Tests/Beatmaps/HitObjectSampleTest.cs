@@ -96,12 +96,14 @@ namespace osu.Game.Tests.Beatmaps
             AddStep("setup skins", () =>
             {
                 userSkinInfo.Files.Clear();
-                userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
+                if (!string.IsNullOrEmpty(userFile))
+                    userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
 
                 beatmapInfo.BeatmapSet.Files.Clear();
-                beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
+                if (!string.IsNullOrEmpty(beatmapFile))
+                    beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
