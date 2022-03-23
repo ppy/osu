@@ -30,9 +30,9 @@ namespace osu.Game.Skinning
         public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(
                 skin,
+                resources,
                 // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
                 skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null,
-                resources,
                 "skin.ini"
             )
         {
