@@ -95,10 +95,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
         protected void RunGameplay()
         {
             AddUntilStep("wait for idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
-            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
+            ClickButtonWhenEnabled<ReadyButton>();
 
             AddUntilStep("wait for ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
-            ClickButtonWhenEnabled<MultiplayerReadyButton.ReadyButton>();
+            ClickButtonWhenEnabled<ReadyButton>();
 
             AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player player && player.IsLoaded);
             AddStep("exit player", () => multiplayerComponents.MultiplayerScreen.MakeCurrent());
