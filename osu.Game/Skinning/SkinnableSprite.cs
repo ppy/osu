@@ -11,7 +11,7 @@ namespace osu.Game.Skinning
     /// <summary>
     /// A skinnable element which uses a stable sprite and can therefore share implementation logic.
     /// </summary>
-    public class SkinnableSprite : SkinnableDrawable
+    public class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
     {
         protected override bool ApplySizeRestrictionsToDefault => true;
 
@@ -42,5 +42,7 @@ namespace osu.Game.Skinning
 
             public string LookupName { get; }
         }
+
+        public bool UsesFixedAnchor { get; set; }
     }
 }
