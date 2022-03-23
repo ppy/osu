@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -53,7 +54,7 @@ namespace osu.Game.Skinning
         /// Construct a new legacy skin instance.
         /// </summary>
         /// <param name="skin">The model for this skin.</param>
-        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
@@ -65,7 +66,7 @@ namespace osu.Game.Skinning
         /// Construct a new legacy skin instance.
         /// </summary>
         /// <param name="skin">The model for this skin.</param>
-        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
+        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationStream">An optional stream containing the contents of a skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
