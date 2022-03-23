@@ -10,7 +10,6 @@ namespace osu.Game.Rulesets.Mods
     {
         /// <summary>
         /// Used for a per-user gameplay session.
-        /// Determines whether the mod is playable by an end user.
         /// </summary>
         User,
 
