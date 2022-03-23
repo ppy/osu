@@ -45,7 +45,7 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, new RealmBackedResourceStore(skin, resources.Files), resources, "skin.ini")
+            : this(skin, null, resources, "skin.ini")
         {
         }
 
