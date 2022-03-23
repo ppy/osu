@@ -34,12 +34,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             onRoomUpdated();
         }
 
+        private MultiplayerCountdown countdown;
+        private DateTimeOffset countdownReceivedTime;
         private ScheduledDelegate countdownUpdateDelegate;
 
         private void onRoomUpdated()
         {
-            updateButtonText();
-            updateButtonColour();
+            if (countdown == null && room?.Countdown != null)
+                countdownReceivedTime = DateTimeOffset.Now;
+
+            countdown = room?.Countdown;
 
             if (room?.Countdown != null)
                 countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 1000, true);
@@ -48,6 +52,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 countdownUpdateDelegate?.Cancel();
                 countdownUpdateDelegate = null;
             }
+
+            updateButtonText();
+            updateButtonColour();
         }
 
         private void updateButtonText()
@@ -64,9 +71,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
             string countText = $"({countReady} / {countTotal} ready)";
 
-            if (room.Countdown != null)
+            if (countdown != null)
             {
-                string countdownText = $"Starting in {room.Countdown.EndTime - DateTimeOffset.Now:mm\\:ss}";
+                TimeSpan timeElapsed = DateTimeOffset.Now - countdownReceivedTime;
+                TimeSpan countdownRemaining;
+
+                if (timeElapsed > countdown.TimeRemaining)
+                    countdownRemaining = TimeSpan.Zero;
+                else
+                    countdownRemaining = countdown.TimeRemaining - timeElapsed;
+
+                string countdownText = $"Starting in {countdownRemaining:mm\\:ss}";
 
                 switch (localUser?.State)
                 {

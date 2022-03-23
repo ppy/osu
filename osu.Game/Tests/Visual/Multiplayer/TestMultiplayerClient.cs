@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     var stopSource = countdownStopSource = new CancellationTokenSource();
                     var finishSource = countdownFinishSource = new CancellationTokenSource();
                     var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, finishSource.Token);
-                    var countdown = new MatchStartCountdown { EndTime = DateTimeOffset.Now + matchCountdownRequest.Delay };
+                    var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Delay };
 
                     Task lastCountdownTask = countdownTask;
                     countdownTask = start();
