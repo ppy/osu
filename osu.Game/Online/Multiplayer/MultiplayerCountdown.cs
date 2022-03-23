@@ -5,6 +5,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.Multiplayer.Countdown;
 
 namespace osu.Game.Online.Multiplayer
 {
@@ -16,9 +17,12 @@ namespace osu.Game.Online.Multiplayer
     public abstract class MultiplayerCountdown
     {
         /// <summary>
-        /// The time at which the countdown will end.
+        /// The amount of time remaining in the countdown.
         /// </summary>
+        /// <remarks>
+        /// This is only sent once from the server upon initial retrieval of the <see cref="MultiplayerRoom"/> or via a <see cref="CountdownChangedEvent"/>.
+        /// </remarks>
         [Key(0)]
-        public DateTimeOffset EndTime { get; set; }
+        public TimeSpan TimeRemaining { get; set; }
     }
 }
