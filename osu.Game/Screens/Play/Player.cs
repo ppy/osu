@@ -615,16 +615,22 @@ namespace osu.Game.Screens.Play
         /// <param name="time">The destination time to seek to.</param>
         internal void NonFrameStableSeek(double time)
         {
-            if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
-                frameStablePlaybackResetDelegate.RunTask();
+            // TODO: This schedule should not be required and is a temporary hotfix.
+            // See https://github.com/ppy/osu/issues/17267 for the issue.
+            // See https://github.com/ppy/osu/pull/17302 for a better fix which needs some more time.
+            ScheduleAfterChildren(() =>
+            {
+                if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
+                    frameStablePlaybackResetDelegate.RunTask();
 
-            bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
-            DrawableRuleset.FrameStablePlayback = false;
+                bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
+                DrawableRuleset.FrameStablePlayback = false;
 
-            Seek(time);
+                Seek(time);
 
-            // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
-            frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+                // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
+                frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+            });
         }
 
         /// <summary>
