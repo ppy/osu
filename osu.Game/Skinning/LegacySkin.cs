@@ -46,7 +46,7 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, resources, null, "skin.ini")
+            : this(skin, resources, null)
         {
         }
 
@@ -57,7 +57,7 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage, string configurationFilename)
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage, string configurationFilename = @"skin.ini")
             : base(skin, resources, storage, configurationFilename)
         {
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
