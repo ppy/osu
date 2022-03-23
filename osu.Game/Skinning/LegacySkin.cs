@@ -58,19 +58,7 @@ namespace osu.Game.Skinning
         /// <param name="resources">Access to raw game resources.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
         protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
-            : this(skin, storage, resources, string.IsNullOrEmpty(configurationFilename) ? null : storage?.GetStream(configurationFilename))
-        {
-        }
-
-        /// <summary>
-        /// Construct a new legacy skin instance.
-        /// </summary>
-        /// <param name="skin">The model for this skin.</param>
-        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
-        /// <param name="resources">Access to raw game resources.</param>
-        /// <param name="configurationStream">An optional stream containing the contents of a skin.ini file.</param>
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
-            : base(skin, resources, storage, configurationStream)
+            : base(skin, resources, storage, configurationFilename)
         {
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(

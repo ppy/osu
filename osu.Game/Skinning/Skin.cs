@@ -58,8 +58,8 @@ namespace osu.Game.Skinning
         /// <param name="skin">The skin's metadata. Usually a live realm object.</param>
         /// <param name="resources">Access to game-wide resources.</param>
         /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
-        /// <param name="configurationStream">An optional stream which will be used to read the skin configuration. If null, the configuration will be retrieved from the storage using "skin.ini".</param>
-        protected Skin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null, [CanBeNull] Stream configurationStream = null)
+        /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
+        protected Skin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null, [CanBeNull] string configurationFilename = "skin.ini")
         {
             if (resources != null)
             {
@@ -77,7 +77,7 @@ namespace osu.Game.Skinning
                 Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
             }
 
-            configurationStream ??= storage?.GetStream(@"skin.ini");
+            var configurationStream = storage?.GetStream(configurationFilename);
 
             if (configurationStream != null)
                 // stream will be closed after use by LineBufferedReader.
