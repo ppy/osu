@@ -4,23 +4,23 @@
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// The usage of this mod to determine whether it's playable in such context.
+    /// The context in which a <see cref="Mod"/> is playable.
     /// </summary>
     public enum ModUsage
     {
         /// <summary>
-        /// Used for a per-user gameplay session.
+        /// This mod can be used for a per-user gameplay session.
         /// </summary>
         User,
 
         /// <summary>
-        /// Used in multiplayer but must be applied to all users.
+        /// This mod can be used in multiplayer but must be applied to all users.
         /// This is generally the case for mods which affect the length of gameplay.
         /// </summary>
         MultiplayerRoomWide,
 
         /// <summary>
-        /// Used in multiplayer either at a room or per-player level (i.e. "free mod").
+        /// This mod can be used in multiplayer either at a room or per-player level (i.e. "free mod").
         /// </summary>
         MultiplayerPerPlayer,
     }
