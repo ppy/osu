@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerSpectateButton : MultiplayerTestScene
     {
         private MultiplayerSpectateButton spectateButton;
-        private MultiplayerReadyButton readyButton;
+        private MatchStartControl startControl;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Origin = Anchor.Centre,
                             Size = new Vector2(200, 50),
                         },
-                        readyButton = new MultiplayerReadyButton
+                        startControl = new MatchStartControl
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -146,6 +146,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddUntilStep($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
 
         private void assertReadyButtonEnablement(bool shouldBeEnabled)
-            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
+            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => startControl.ChildrenOfType<ReadyButton>().Single().Enabled.Value == shouldBeEnabled);
     }
 }
