@@ -63,26 +63,18 @@ namespace osu.Game.Skinning
         {
             if (resources != null)
             {
-                if (resources.RealmAccess != null)
-                {
-                    SkinInfo = skin.ToLive(resources.RealmAccess);
+                SkinInfo = resources.RealmAccess != null
+                    ? skin.ToLive(resources.RealmAccess)
+                    : skin.ToLiveUnmanaged();
 
-                    storage ??= new RealmBackedResourceStore(skin, resources.Files, new[] { @"ogg" });
-                }
-                else
-                {
-                    SkinInfo = skin.ToLiveUnmanaged();
-                }
+                storage ??= new RealmBackedResourceStore(skin, resources.Files, new[] { @"ogg" });
 
-                if (storage != null)
-                {
-                    var samples = resources.AudioManager?.GetSampleStore(storage);
-                    if (samples != null)
-                        samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
+                var samples = resources.AudioManager?.GetSampleStore(storage);
+                if (samples != null)
+                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
-                    Samples = samples;
-                    Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
-                }
+                Samples = samples;
+                Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
             }
 
             configurationStream ??= storage?.GetStream(@"skin.ini");
