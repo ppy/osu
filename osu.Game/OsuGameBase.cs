@@ -189,7 +189,7 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load(ReadableKeyCombinationProvider keyCombinationProvider)
         {
-            if (string.IsNullOrEmpty(VersionHash))
+            if (!HashOverriden)
             {
                 try
                 {
