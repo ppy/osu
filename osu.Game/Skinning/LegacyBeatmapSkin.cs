@@ -21,8 +21,9 @@ namespace osu.Game.Skinning
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
 
-        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null)
-            : base(createSkinInfo(beatmapInfo), storage ?? new RealmBackedResourceStore(beatmapInfo.BeatmapSet, resources.Files), resources, beatmapInfo.Path)
+        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage = null)
+            : base(createSkinInfo(beatmapInfo), storage ?? (resources != null ? new RealmBackedResourceStore(beatmapInfo.BeatmapSet, resources.Files, new[] { @"ogg" }) : null), resources,
+                beatmapInfo.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
