@@ -6,6 +6,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.Multiplayer;
@@ -33,21 +34,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             onRoomUpdated();
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (room?.Countdown != null)
-            {
-                // Update the countdown timer.
-                onRoomUpdated();
-            }
-        }
+        private ScheduledDelegate countdownUpdateDelegate;
 
         private void onRoomUpdated()
         {
             updateButtonText();
             updateButtonColour();
+
+            if (room?.Countdown != null)
+                countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 1000, true);
+            else
+            {
+                countdownUpdateDelegate?.Cancel();
+                countdownUpdateDelegate = null;
+            }
         }
 
         private void updateButtonText()
