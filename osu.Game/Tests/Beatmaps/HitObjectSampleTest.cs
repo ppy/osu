@@ -193,22 +193,32 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap
+        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap, IStorageResourceProvider
         {
             private readonly BeatmapInfo skinBeatmapInfo;
-            private readonly IResourceStore<byte[]> resourceStore;
 
             private readonly IStorageResourceProvider resources;
 
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, IStorageResourceProvider resources)
+            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> accessMarkingResourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock,
+                                      IStorageResourceProvider resources)
                 : base(beatmap, storyboard, referenceClock, resources.AudioManager)
             {
                 this.skinBeatmapInfo = skinBeatmapInfo;
-                this.resourceStore = resourceStore;
+                Files = accessMarkingResourceStore;
                 this.resources = resources;
             }
 
-            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resources, resourceStore);
+            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, this);
+
+            public AudioManager AudioManager => resources.AudioManager;
+
+            public IResourceStore<byte[]> Files { get; }
+
+            public IResourceStore<byte[]> Resources => resources.Resources;
+
+            public RealmAccess RealmAccess => resources.RealmAccess;
+
+            public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => resources.CreateTextureLoaderStore(underlyingStore);
         }
     }
 }
