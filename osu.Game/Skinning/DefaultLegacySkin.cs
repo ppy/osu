@@ -30,7 +30,7 @@ namespace osu.Game.Skinning
         public DefaultLegacySkin(SkinInfo skin, IStorageResourceProvider resources)
             : base(
                 skin,
-                new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy"),
+                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null,
                 resources,
                 // A default legacy skin may still have a skin.ini if it is modified by the user.
                 // We must specify the stream directly as we are redirecting storage to the osu-resources location for other files.
