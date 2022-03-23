@@ -13,9 +13,16 @@ namespace osu.Game.Skinning
     {
         private readonly Dictionary<string, string> fileToStoragePathMapping = new Dictionary<string, string>();
 
-        public RealmBackedResourceStore(IHasRealmFiles source, IResourceStore<byte[]> underlyingStore)
+        public RealmBackedResourceStore(IHasRealmFiles source, IResourceStore<byte[]> underlyingStore, string[] extensions = null)
             : base(underlyingStore)
         {
+            // Must be initialised before the file cache.
+            if (extensions != null)
+            {
+                foreach (string extension in extensions)
+                    AddExtension(extension);
+            }
+
             initialiseFileCache(source);
         }
 
