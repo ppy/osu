@@ -315,7 +315,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     var stopSource = countdownStopSource = new CancellationTokenSource();
                     var finishSource = countdownFinishSource = new CancellationTokenSource();
                     var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, finishSource.Token);
-                    var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Delay };
+                    var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration };
 
                     Task lastCountdownTask = countdownTask;
                     countdownTask = start();
@@ -335,7 +335,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         try
                         {
-                            await Task.Delay(matchCountdownRequest.Delay, cancellationSource.Token).ConfigureAwait(false);
+                            await Task.Delay(matchCountdownRequest.Duration, cancellationSource.Token).ConfigureAwait(false);
                         }
                         catch (OperationCanceledException)
                         {
