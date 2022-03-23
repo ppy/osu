@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Gameplay
         private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, IStorageResourceProvider resources)
-                : base(DefaultLegacySkin.CreateInfo(), resources, new TestResourceStore(resourceName), "skin.ini")
+                : base(DefaultLegacySkin.CreateInfo(), resources, new TestResourceStore(resourceName))
             {
             }
         }

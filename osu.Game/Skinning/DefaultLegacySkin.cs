@@ -32,8 +32,7 @@ namespace osu.Game.Skinning
                 skin,
                 resources,
                 // In the case of the actual default legacy skin (ie. the fallback one, which a user hasn't applied any modifications to) we want to use the game provided resources.
-                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null,
-                "skin.ini"
+                skin.Protected ? new NamespacedResourceStore<byte[]>(resources.Resources, "Skins/Legacy") : null
             )
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
