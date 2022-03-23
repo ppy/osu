@@ -150,7 +150,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             Debug.Assert(clickOperation == null);
             clickOperation = ongoingOperationTracker.BeginOperation();
 
-            Client.SendMatchRequest(new StartMatchCountdownRequest { Delay = duration }).ContinueWith(_ => endOperation());
+            Client.SendMatchRequest(new StartMatchCountdownRequest { Duration = duration }).ContinueWith(_ => endOperation());
         }
 
         private void endOperation()

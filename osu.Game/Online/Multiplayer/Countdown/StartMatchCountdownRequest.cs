@@ -18,6 +18,6 @@ namespace osu.Game.Online.Multiplayer.Countdown
         /// How long the countdown should last.
         /// </summary>
         [Key(0)]
-        public TimeSpan Delay { get; set; }
+        public TimeSpan Duration { get; set; }
     }
 }
