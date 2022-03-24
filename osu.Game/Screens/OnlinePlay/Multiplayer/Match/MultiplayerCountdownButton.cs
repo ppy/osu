@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class CountdownButton : IconButton, IHasPopover
+    public class MultiplayerCountdownButton : IconButton, IHasPopover
     {
         private static readonly TimeSpan[] available_delays =
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private readonly Drawable background;
 
-        public CountdownButton()
+        public MultiplayerCountdownButton()
         {
             Icon = FontAwesome.Solid.CaretDown;
             IconScale = new Vector2(0.6f);

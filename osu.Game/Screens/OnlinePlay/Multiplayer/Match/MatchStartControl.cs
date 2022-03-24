@@ -31,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private Sample sampleUnready;
 
         private readonly BindableBool enabled = new BindableBool();
-        private readonly CountdownButton countdownButton;
+        private readonly MultiplayerCountdownButton countdownButton;
         private int countReady;
         private ScheduledDelegate readySampleDelegate;
         private IBindable<bool> operationInProgress;
@@ -50,14 +50,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     new Drawable[]
                     {
-                        new ReadyButton
+                        new MultiplayerReadyButton
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = Vector2.One,
                             Action = onReadyClick,
                             Enabled = { BindTarget = enabled },
                         },
-                        countdownButton = new CountdownButton
+                        countdownButton = new MultiplayerCountdownButton
                         {
                             RelativeSizeAxes = Axes.Y,
                             Size = new Vector2(40, 1),
