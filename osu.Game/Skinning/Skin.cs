@@ -25,13 +25,13 @@ namespace osu.Game.Skinning
     public abstract class Skin : IDisposable, ISkin
     {
         /// <summary>
-        /// A texture store which can be used to perform user file loops for this skin.
+        /// A texture store which can be used to perform user file lookups for this skin.
         /// </summary>
         [CanBeNull]
         protected TextureStore Textures { get; }
 
         /// <summary>
-        /// A sample store which can be used to perform user file loops for this skin.
+        /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
         [CanBeNull]
         protected ISampleStore Samples { get; }
