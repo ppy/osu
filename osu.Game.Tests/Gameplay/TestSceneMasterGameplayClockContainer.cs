@@ -73,10 +73,14 @@ namespace osu.Game.Tests.Gameplay
         public void TestSeekPerformsInGameplayTime(
             [Values(1.0, 0.5, 2.0)] double clockRate,
             [Values(0.0, 200.0, -200.0)] double userOffset,
-            [Values(false, true)] bool whileStopped)
+            [Values(false, true)] bool whileStopped,
+            [Values(false, true)] bool setAudioOffsetBeforeConstruction)
         {
             ClockBackedTestWorkingBeatmap working = null;
             GameplayClockContainer gameplayClockContainer = null;
+
+            if (setAudioOffsetBeforeConstruction)
+                AddStep($"preset audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
 
             AddStep("create container", () =>
             {
@@ -89,7 +93,9 @@ namespace osu.Game.Tests.Gameplay
             });
 
             AddStep($"set clock rate to {clockRate}", () => working.Track.AddAdjustment(AdjustableProperty.Frequency, new BindableDouble(clockRate)));
-            AddStep($"set audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
+
+            if (!setAudioOffsetBeforeConstruction)
+                AddStep($"set audio offset to {userOffset}", () => localConfig.SetValue(OsuSetting.AudioOffset, userOffset));
 
             AddStep("seek to 2500", () => gameplayClockContainer.Seek(2500));
             AddAssert("gameplay clock time = 2500", () => Precision.AlmostEquals(gameplayClockContainer.CurrentTime, 2500, 10f));
