@@ -79,7 +79,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton>().Single().ChildrenOfType<OsuButton>().First();
+                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton>().Single().ChildrenOfType<OsuButton>().First();
+                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
@@ -150,7 +150,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton>().Single().ChildrenOfType<OsuButton>().First();
+                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
@@ -173,7 +173,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton>().Single().ChildrenOfType<OsuButton>().First();
+                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
