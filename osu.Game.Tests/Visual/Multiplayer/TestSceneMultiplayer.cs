@@ -41,6 +41,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Spectate;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
+using ReadyButton = osu.Game.Screens.OnlinePlay.Components.ReadyButton;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -424,7 +425,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("Beatmap doesn't match current item", () => Beatmap.Value.BeatmapInfo.OnlineID != multiplayerClient.Room?.Playlist.First().BeatmapID);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
@@ -462,7 +463,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("Ruleset doesn't match current item", () => Ruleset.Value.OnlineID != multiplayerClient.Room?.Playlist.First().RulesetID);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
@@ -500,7 +501,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddAssert("Mods don't match current item", () => !SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
@@ -535,7 +536,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for spectating user state", () => multiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddAssert("play not started", () => multiplayerComponents.IsCurrentScreen());
         }
@@ -568,7 +569,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for spectating user state", () => multiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddStep("restore beatmap", () =>
             {
@@ -883,7 +884,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddStep("start match by other user", () =>
                 {
                     multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready);
-                    multiplayerClient.StartMatch();
+                    multiplayerClient.StartMatch().WaitSafely();
                 });
 
                 AddUntilStep("wait for loading", () => multiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);
