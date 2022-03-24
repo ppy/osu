@@ -226,7 +226,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Name = apiRoom.Name.Value,
                     MatchType = apiRoom.Type.Value,
                     Password = password,
-                    QueueMode = apiRoom.QueueMode.Value
+                    QueueMode = apiRoom.QueueMode.Value,
+                    AutoStartDuration = apiRoom.AutoStartDuration.Value
                 },
                 Playlist = serverSidePlaylist.ToList(),
                 Users = { localUser },
