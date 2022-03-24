@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
         private double totalAppliedOffset => userBeatmapOffsetClock.RateAdjustedOffset + userGlobalOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
 
-        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
+        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(); // Important that this starts at zero, matching the paused state of the clock.
 
         private readonly WorkingBeatmap beatmap;
 
