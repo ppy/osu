@@ -744,6 +744,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.Password.Value = Room.Settings.Password;
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
+            APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
 
             RoomUpdated?.Invoke();
         }
