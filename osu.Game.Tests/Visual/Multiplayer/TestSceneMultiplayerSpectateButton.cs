@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -26,7 +27,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMultiplayerSpectateButton : MultiplayerTestScene
     {
         private MultiplayerSpectateButton spectateButton;
-        private MultiplayerReadyButton readyButton;
+        private MatchStartControl startControl;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
 
@@ -56,23 +57,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
             };
 
-            Child = new FillFlowContainer
+            Child = new PopoverContainer
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
                 {
-                    spectateButton = new MultiplayerSpectateButton
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(200, 50),
-                    },
-                    readyButton = new MultiplayerReadyButton
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(200, 50),
+                        spectateButton = new MultiplayerSpectateButton
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(200, 50),
+                        },
+                        startControl = new MatchStartControl
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(200, 50),
+                        }
                     }
                 }
             };
@@ -141,6 +146,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddUntilStep($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
 
         private void assertReadyButtonEnablement(bool shouldBeEnabled)
-            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => readyButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
+            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => startControl.ChildrenOfType<MultiplayerReadyButton>().Single().Enabled.Value == shouldBeEnabled);
     }
 }
