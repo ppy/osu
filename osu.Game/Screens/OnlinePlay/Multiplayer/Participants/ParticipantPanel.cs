@@ -189,7 +189,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             var currentItem = Playlist.GetCurrentItem();
             Debug.Assert(currentItem != null);
 
-            var ruleset = rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance();
+            var ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
 
             int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
