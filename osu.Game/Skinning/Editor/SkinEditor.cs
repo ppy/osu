@@ -351,7 +351,7 @@ namespace osu.Game.Skinning.Editor
                 // place component
                 placeComponent(new SkinSprite
                 {
-                    SpriteName = { Value = Path.GetFileNameWithoutExtension(file.Name) }
+                    SpriteName = { Value = file.Name }
                 });
             });
 
