@@ -146,6 +146,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             => AddUntilStep($"spectate button {(shouldBeEnabled ? "is" : "is not")} enabled", () => spectateButton.ChildrenOfType<OsuButton>().Single().Enabled.Value == shouldBeEnabled);
 
         private void assertReadyButtonEnablement(bool shouldBeEnabled)
-            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => startControl.ChildrenOfType<ReadyButton>().Single().Enabled.Value == shouldBeEnabled);
+            => AddUntilStep($"ready button {(shouldBeEnabled ? "is" : "is not")} enabled", () => startControl.ChildrenOfType<MultiplayerReadyButton>().Single().Enabled.Value == shouldBeEnabled);
     }
 }

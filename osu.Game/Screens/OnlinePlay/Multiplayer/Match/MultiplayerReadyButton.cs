@@ -10,10 +10,11 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class ReadyButton : Components.ReadyButton
+    public class MultiplayerReadyButton : ReadyButton
     {
         public new Triangles Triangles => base.Triangles;
 
