@@ -296,11 +296,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        private CancellationTokenSource? countdownFinishSource;
+        private CancellationTokenSource? countdownSkipSource;
         private CancellationTokenSource? countdownStopSource;
         private Task countdownTask = Task.CompletedTask;
 
-        public void FinishCountdown() => countdownFinishSource?.Cancel();
+        /// <summary>
+        /// Skips to the end of the currently-running countdown, if one is running,
+        /// and runs the callback (e.g. to start the match) as soon as possible unless the countdown has been cancelled.
+        /// </summary>
+        public void SkipToEndOfCountdown() => countdownSkipSource?.Cancel();
 
         public override async Task SendMatchRequest(MatchUserRequest request)
         {
@@ -313,8 +317,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     countdownStopSource?.Cancel();
 
                     var stopSource = countdownStopSource = new CancellationTokenSource();
-                    var finishSource = countdownFinishSource = new CancellationTokenSource();
-                    var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, finishSource.Token);
+                    var skipSource = countdownSkipSource = new CancellationTokenSource();
+                    var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token);
                     var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration };
 
                     Task lastCountdownTask = countdownTask;
