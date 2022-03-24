@@ -42,12 +42,10 @@ namespace osu.Game.Screens.Play.HUD
 
         private const float alpha_when_invalid = 0.3f;
 
-        [CanBeNull]
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private ScoreProcessor scoreProcessor { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        [CanBeNull]
+        [Resolved]
         private GameplayState gameplayState { get; set; }
 
         [CanBeNull]
