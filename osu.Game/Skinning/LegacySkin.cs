@@ -356,26 +356,15 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = this.HasFont(LegacyFont.Score)
-                                    ? new Drawable[]
-                                    {
-                                        new LegacyComboCounter(),
-                                        new LegacyScoreCounter(),
-                                        new LegacyAccuracyCounter(),
-                                        new LegacyHealthDisplay(),
-                                        new SongProgress(),
-                                        new BarHitErrorMeter(),
-                                    }
-                                    : new Drawable[]
-                                    {
-                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
-                                        new DefaultComboCounter(),
-                                        new DefaultScoreCounter(),
-                                        new DefaultAccuracyCounter(),
-                                        new DefaultHealthDisplay(),
-                                        new SongProgress(),
-                                        new BarHitErrorMeter(),
-                                    }
+                                Children = new Drawable[]
+                                {
+                                    new LegacyComboCounter(),
+                                    new LegacyScoreCounter(),
+                                    new LegacyAccuracyCounter(),
+                                    new LegacyHealthDisplay(),
+                                    new SongProgress(),
+                                    new BarHitErrorMeter(),
+                                }
                             };
 
                             return skinnableTargetWrapper;
