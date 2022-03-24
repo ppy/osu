@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         shouldStopCountdown |= Room.Host?.State != MultiplayerUserState.Ready && Room.Host?.State != MultiplayerUserState.Spectating;
 
                         if (shouldStopCountdown)
-                            countdownStopSource?.Cancel();
+                            stopCountdown();
                         break;
 
                     case MultiplayerRoomState.WaitingForLoad:
@@ -319,10 +319,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     break;
 
                 case StopCountdownRequest _:
-                    countdownStopSource?.Cancel();
-
-                    Room.Countdown = null;
-                    await MatchEvent(new CountdownChangedEvent { Countdown = Room.Countdown });
+                    stopCountdown();
                     break;
 
                 case ChangeTeamRequest changeTeam:
@@ -348,7 +345,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
-            countdownStopSource?.Cancel();
+            stopCountdown();
 
             // Note that this will leak CTSs, however this is a test method and we haven't noticed foregoing disposal of non-linked CTSs to be detrimental.
             // If necessary, this can be moved into the final schedule below, and the class-level fields be nulled out accordingly.
@@ -396,6 +393,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 });
             }
         }
+
+        private void stopCountdown() => countdownStopSource?.Cancel();
 
         public override Task StartMatch()
         {
