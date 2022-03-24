@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
@@ -21,6 +22,7 @@ namespace osu.Game.Skinning
         private Lazy<Dictionary<string, string>> fileToStoragePathMapping;
 
         private readonly Live<T> liveSource;
+        private readonly IDisposable? realmSubscription;
 
         public RealmBackedResourceStore(Live<T> source, IResourceStore<byte[]> underlyingStore, RealmAccess? realm)
             : base(underlyingStore)
@@ -29,9 +31,17 @@ namespace osu.Game.Skinning
 
             invalidateCache();
             Debug.Assert(fileToStoragePathMapping != null);
+
+            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == source.ID), skinChanged);
         }
 
-        public void Invalidate() => invalidateCache();
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            realmSubscription?.Dispose();
+        }
+
+        private void skinChanged(IRealmCollection<T> sender, ChangeSet changes, Exception error) => invalidateCache();
 
         protected override IEnumerable<string> GetFilenames(string name)
         {

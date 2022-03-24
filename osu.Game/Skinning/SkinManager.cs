@@ -16,7 +16,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Threading;
@@ -27,7 +26,6 @@ using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
-using Realms;
 
 namespace osu.Game.Skinning
 {
@@ -60,8 +58,6 @@ namespace osu.Game.Skinning
         private readonly RealmAccess realm;
 
         private readonly IResourceStore<byte[]> userFiles;
-
-        private IDisposable currentSkinSubscription;
 
         /// <summary>
         /// The default skin.
@@ -104,12 +100,6 @@ namespace osu.Game.Skinning
             CurrentSkinInfo.ValueChanged += skin =>
             {
                 CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
-
-                scheduler.Add(() =>
-                {
-                    currentSkinSubscription?.Dispose();
-                    currentSkinSubscription = realm.RegisterForNotifications(r => r.All<SkinInfo>().Where(s => s.ID == skin.NewValue.ID), realmSkinChanged);
-                });
             };
 
             CurrentSkin.Value = DefaultSkin;
@@ -120,12 +110,6 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
-        }
-
-        private void realmSkinChanged<T>(IRealmCollection<T> sender, ChangeSet changes, Exception error) where T : RealmObjectBase
-        {
-            Logger.Log("Detected a skin change");
-            CurrentSkin.Value.InvalidateCaches();
         }
 
         public void SelectRandomSkin()
