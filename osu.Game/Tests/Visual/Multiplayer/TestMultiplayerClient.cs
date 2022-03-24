@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -314,6 +315,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (request)
             {
                 case StartMatchCountdownRequest matchCountdownRequest:
+                    Debug.Assert(ThreadSafety.IsUpdateThread);
+
                     countdownStopSource?.Cancel();
 
                     var stopSource = countdownStopSource = new CancellationTokenSource();
