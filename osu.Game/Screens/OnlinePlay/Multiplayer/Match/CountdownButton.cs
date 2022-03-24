@@ -64,7 +64,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             foreach (var duration in available_delays)
             {
-                flow.Add(new OsuButton
+                flow.Add(new PopoverButton
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = $"Start match in {duration.Humanize()}",
@@ -78,6 +78,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
 
             return new OsuPopover { Child = flow };
+        }
+
+        public class PopoverButton : OsuButton
+        {
         }
     }
 }
