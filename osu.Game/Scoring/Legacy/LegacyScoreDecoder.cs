@@ -23,6 +23,8 @@ namespace osu.Game.Scoring.Legacy
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
+        private float beatmapOffset;
+
         public Score Parse(Stream stream)
         {
             var score = new Score
@@ -71,6 +73,10 @@ namespace osu.Game.Scoring.Legacy
 
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
+
+                // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
+                // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
+                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? 24 : 0;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
@@ -229,7 +235,7 @@ namespace osu.Game.Scoring.Legacy
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            float lastTime = 0;
+            float lastTime = beatmapOffset;
             ReplayFrame currentFrame = null;
 
             string[] frames = reader.ReadToEnd().Split(',');

@@ -111,6 +111,10 @@ namespace osu.Game.Scoring.Legacy
             {
                 StringBuilder replayData = new StringBuilder();
 
+                // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
+                // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
+                double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -24 : 0;
+
                 if (score.Replay != null)
                 {
                     int lastTime = 0;
@@ -120,7 +124,7 @@ namespace osu.Game.Scoring.Legacy
                         var legacyFrame = getLegacyFrame(f);
 
                         // Rounding because stable could only parse integral values
-                        int time = (int)Math.Round(legacyFrame.Time);
+                        int time = (int)Math.Round(legacyFrame.Time + offset);
                         replayData.Append(FormattableString.Invariant($"{time - lastTime}|{legacyFrame.MouseX ?? 0}|{legacyFrame.MouseY ?? 0}|{(int)legacyFrame.ButtonState},"));
                         lastTime = time;
                     }
