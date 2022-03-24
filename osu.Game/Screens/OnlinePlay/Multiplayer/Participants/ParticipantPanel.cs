@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -187,8 +186,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             const double fade_time = 50;
 
             var currentItem = Playlist.GetCurrentItem();
-            Debug.Assert(currentItem != null);
-
             var ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
 
             int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
