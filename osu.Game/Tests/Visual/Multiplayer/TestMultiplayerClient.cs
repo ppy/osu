@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -296,11 +297,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
-        private CancellationTokenSource? countdownFinishSource;
+        private CancellationTokenSource? countdownSkipSource;
         private CancellationTokenSource? countdownStopSource;
         private Task countdownTask = Task.CompletedTask;
 
-        public void FinishCountDown() => countdownFinishSource?.Cancel();
+        /// <summary>
+        /// Skips to the end of the currently-running countdown, if one is running,
+        /// and runs the callback (e.g. to start the match) as soon as possible unless the countdown has been cancelled.
+        /// </summary>
+        public void SkipToEndOfCountdown() => countdownSkipSource?.Cancel();
 
         public override async Task SendMatchRequest(MatchUserRequest request)
         {
@@ -310,25 +315,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (request)
             {
                 case StartMatchCountdownRequest matchCountdownRequest:
+                    Debug.Assert(ThreadSafety.IsUpdateThread);
+
                     countdownStopSource?.Cancel();
 
+                    // Note that this will leak CTSs, however this is a test method and we haven't noticed foregoing disposal of non-linked CTSs to be detrimental.
+                    // If necessary, this can be moved into the final schedule below, and the class-level fields be nulled out accordingly.
                     var stopSource = countdownStopSource = new CancellationTokenSource();
-                    var finishSource = countdownFinishSource = new CancellationTokenSource();
-                    var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, finishSource.Token);
-                    var countdown = new MatchStartCountdown { EndTime = DateTimeOffset.Now + matchCountdownRequest.Delay };
+                    var skipSource = countdownSkipSource = new CancellationTokenSource();
+                    var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration };
 
                     Task lastCountdownTask = countdownTask;
                     countdownTask = start();
 
                     async Task start()
                     {
-                        try
-                        {
-                            await lastCountdownTask;
-                        }
-                        catch (OperationCanceledException)
-                        {
-                        }
+                        await lastCountdownTask;
 
                         Schedule(() =>
                         {
@@ -341,10 +343,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         try
                         {
-                            await Task.Delay(matchCountdownRequest.Delay, cancellationSource.Token).ConfigureAwait(false);
+                            using (var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token))
+                                await Task.Delay(matchCountdownRequest.Duration, cancellationSource.Token).ConfigureAwait(false);
                         }
                         catch (OperationCanceledException)
                         {
+                            // Clients need to be notified of cancellations in the following code.
                         }
 
                         Schedule(() =>
@@ -355,11 +359,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Room.Countdown = null;
                             MatchEvent(new CountdownChangedEvent { Countdown = null });
 
-                            using (cancellationSource)
-                            {
-                                if (stopSource.Token.IsCancellationRequested)
-                                    return;
-                            }
+                            if (stopSource.IsCancellationRequested)
+                                return;
 
                             StartMatch().WaitSafely();
                         });
@@ -392,7 +393,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         }
 
-        public override async Task StartMatch()
+        public override Task StartMatch()
         {
             Debug.Assert(Room != null);
 
@@ -400,7 +401,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
-            await ((IMultiplayerClient)this).LoadRequested();
+            return ((IMultiplayerClient)this).LoadRequested();
         }
 
         public override Task AbortGameplay()
