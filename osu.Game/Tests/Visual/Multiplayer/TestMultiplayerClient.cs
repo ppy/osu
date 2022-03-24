@@ -315,57 +315,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             switch (request)
             {
                 case StartMatchCountdownRequest matchCountdownRequest:
-                    Debug.Assert(ThreadSafety.IsUpdateThread);
-
-                    countdownStopSource?.Cancel();
-
-                    // Note that this will leak CTSs, however this is a test method and we haven't noticed foregoing disposal of non-linked CTSs to be detrimental.
-                    // If necessary, this can be moved into the final schedule below, and the class-level fields be nulled out accordingly.
-                    var stopSource = countdownStopSource = new CancellationTokenSource();
-                    var skipSource = countdownSkipSource = new CancellationTokenSource();
-                    var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration };
-
-                    Task lastCountdownTask = countdownTask;
-                    countdownTask = start();
-
-                    async Task start()
-                    {
-                        await lastCountdownTask;
-
-                        Schedule(() =>
-                        {
-                            if (stopSource.IsCancellationRequested)
-                                return;
-
-                            Room.Countdown = countdown;
-                            MatchEvent(new CountdownChangedEvent { Countdown = countdown });
-                        });
-
-                        try
-                        {
-                            using (var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token))
-                                await Task.Delay(matchCountdownRequest.Duration, cancellationSource.Token).ConfigureAwait(false);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                            // Clients need to be notified of cancellations in the following code.
-                        }
-
-                        Schedule(() =>
-                        {
-                            if (Room.Countdown != countdown)
-                                return;
-
-                            Room.Countdown = null;
-                            MatchEvent(new CountdownChangedEvent { Countdown = null });
-
-                            if (stopSource.IsCancellationRequested)
-                                return;
-
-                            StartMatch().WaitSafely();
-                        });
-                    }
-
+                    startCountdown(new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration }, StartMatch);
                     break;
 
                 case StopCountdownRequest _:
@@ -390,6 +340,60 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
 
                     break;
+            }
+        }
+
+        private void startCountdown(MultiplayerCountdown countdown, Func<Task> continuation)
+        {
+            Debug.Assert(Room != null);
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            countdownStopSource?.Cancel();
+
+            // Note that this will leak CTSs, however this is a test method and we haven't noticed foregoing disposal of non-linked CTSs to be detrimental.
+            // If necessary, this can be moved into the final schedule below, and the class-level fields be nulled out accordingly.
+            var stopSource = countdownStopSource = new CancellationTokenSource();
+            var skipSource = countdownSkipSource = new CancellationTokenSource();
+
+            Task lastCountdownTask = countdownTask;
+            countdownTask = start();
+
+            async Task start()
+            {
+                await lastCountdownTask;
+
+                Schedule(() =>
+                {
+                    if (stopSource.IsCancellationRequested)
+                        return;
+
+                    Room.Countdown = countdown;
+                    MatchEvent(new CountdownChangedEvent { Countdown = countdown });
+                });
+
+                try
+                {
+                    using (var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token))
+                        await Task.Delay(countdown.TimeRemaining, cancellationSource.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Clients need to be notified of cancellations in the following code.
+                }
+
+                Schedule(() =>
+                {
+                    if (Room.Countdown != countdown)
+                        return;
+
+                    Room.Countdown = null;
+                    MatchEvent(new CountdownChangedEvent { Countdown = null });
+
+                    if (stopSource.IsCancellationRequested)
+                        return;
+
+                    continuation().WaitSafely();
+                });
             }
         }
 
