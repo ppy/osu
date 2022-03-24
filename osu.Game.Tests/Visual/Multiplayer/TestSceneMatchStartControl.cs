@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -79,7 +80,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
+                var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
@@ -97,7 +98,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
+                var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
@@ -150,7 +151,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
+                var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
@@ -173,7 +174,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<CountdownButton>();
             AddStep("click the first countdown button", () =>
             {
-                var popoverButton = this.ChildrenOfType<CountdownButton.PopoverButton>().First();
+                var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
             });
