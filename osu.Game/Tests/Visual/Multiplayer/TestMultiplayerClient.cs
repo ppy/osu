@@ -319,9 +319,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                     countdownStopSource?.Cancel();
 
+                    // Note that this will leak CTSs, however this is a test method and we haven't noticed foregoing disposal of non-linked CTSs to be detrimental.
+                    // If necessary, this can be moved into the final schedule below, and the class-level fields be nulled out accordingly.
                     var stopSource = countdownStopSource = new CancellationTokenSource();
                     var skipSource = countdownSkipSource = new CancellationTokenSource();
-                    var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token);
                     var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration };
 
                     Task lastCountdownTask = countdownTask;
@@ -342,7 +343,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         try
                         {
-                            await Task.Delay(matchCountdownRequest.Duration, cancellationSource.Token).ConfigureAwait(false);
+                            using (var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token))
+                                await Task.Delay(matchCountdownRequest.Duration, cancellationSource.Token).ConfigureAwait(false);
                         }
                         catch (OperationCanceledException)
                         {
@@ -351,19 +353,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         Schedule(() =>
                         {
-                            using (cancellationSource)
-                            {
-                                if (Room.Countdown != countdown)
-                                    return;
+                            if (Room.Countdown != countdown)
+                                return;
 
-                                Room.Countdown = null;
-                                MatchEvent(new CountdownChangedEvent { Countdown = null });
+                            Room.Countdown = null;
+                            MatchEvent(new CountdownChangedEvent { Countdown = null });
 
-                                if (stopSource.Token.IsCancellationRequested)
-                                    return;
+                            if (stopSource.IsCancellationRequested)
+                                return;
 
-                                StartMatch().WaitSafely();
-                            }
+                            StartMatch().WaitSafely();
                         });
                     }
 
