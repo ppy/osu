@@ -125,6 +125,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void updateRoomStateIfRequired()
         {
             Debug.Assert(Room != null);
+            Debug.Assert(APIRoom != null);
 
             Schedule(() =>
             {
@@ -132,13 +133,28 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 {
                     case MultiplayerRoomState.Open:
                         // If there are no remaining ready users or the host is not ready, stop any existing countdown.
-                        // Todo: When we have an "automatic start" mode, this should also start a new countdown if any users _are_ ready.
                         // Todo: This doesn't yet support non-match-start countdowns.
-                        bool shouldStopCountdown = Room.Users.All(u => u.State != MultiplayerUserState.Ready);
-                        shouldStopCountdown |= Room.Host?.State != MultiplayerUserState.Ready && Room.Host?.State != MultiplayerUserState.Spectating;
+                        if (Room.Settings.AutoStartDuration != TimeSpan.Zero)
+                        {
+                            bool shouldHaveCountdown = !APIRoom.Playlist.GetCurrentItem()!.Expired && Room.Users.Any(u => u.State == MultiplayerUserState.Ready);
 
-                        if (shouldStopCountdown)
-                            stopCountdown();
+                            if (shouldHaveCountdown)
+                            {
+                                if (Room.Countdown == null)
+                                    startCountdown(new MatchStartCountdown { TimeRemaining = Room.Settings.AutoStartDuration }, StartMatch);
+                            }
+                            else
+                                stopCountdown();
+                        }
+                        else
+                        {
+                            bool shouldStopCountdown = Room.Users.All(u => u.State != MultiplayerUserState.Ready);
+                            shouldStopCountdown |= Room.Host?.State != MultiplayerUserState.Ready && Room.Host?.State != MultiplayerUserState.Spectating;
+
+                            if (shouldStopCountdown)
+                                stopCountdown();
+                        }
+
                         break;
 
                     case MultiplayerRoomState.WaitingForLoad:
