@@ -79,8 +79,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var score = decoder.Parse(resourceStream);
 
-                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + (offsetApplied ? 24 : 0)));
-                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + (offsetApplied ? 24 : 0)));
+                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
+                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
             }
         }
 
