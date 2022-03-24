@@ -1,51 +1,68 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
 using osu.Game.Extensions;
+using Realms;
 
 namespace osu.Game.Skinning
 {
-    public class RealmBackedResourceStore : ResourceStore<byte[]>
+    public class RealmBackedResourceStore<T> : ResourceStore<byte[]>
+        where T : RealmObject, IHasRealmFiles, IHasGuidPrimaryKey
     {
-        private readonly Dictionary<string, string> fileToStoragePathMapping = new Dictionary<string, string>();
+        private Lazy<Dictionary<string, string>> fileToStoragePathMapping;
 
-        public RealmBackedResourceStore(IHasRealmFiles source, IResourceStore<byte[]> underlyingStore, string[] extensions = null)
+        private readonly Live<T> liveSource;
+
+        public RealmBackedResourceStore(Live<T> source, IResourceStore<byte[]> underlyingStore, RealmAccess? realm)
             : base(underlyingStore)
         {
-            // Must be initialised before the file cache.
-            if (extensions != null)
-            {
-                foreach (string extension in extensions)
-                    AddExtension(extension);
-            }
+            liveSource = source;
 
-            initialiseFileCache(source);
+            invalidateCache();
+            Debug.Assert(fileToStoragePathMapping != null);
         }
 
-        private void initialiseFileCache(IHasRealmFiles source)
-        {
-            fileToStoragePathMapping.Clear();
-            foreach (var f in source.Files)
-                fileToStoragePathMapping[f.Filename.ToLowerInvariant()] = f.File.GetStoragePath();
-        }
+        public void Invalidate() => invalidateCache();
 
         protected override IEnumerable<string> GetFilenames(string name)
         {
             foreach (string filename in base.GetFilenames(name))
             {
-                string path = getPathForFile(filename.ToStandardisedPath());
+                string? path = getPathForFile(filename.ToStandardisedPath());
                 if (path != null)
                     yield return path;
             }
         }
 
-        private string getPathForFile(string filename) =>
-            fileToStoragePathMapping.TryGetValue(filename.ToLower(), out string path) ? path : null;
+        private string? getPathForFile(string filename)
+        {
+            if (fileToStoragePathMapping.Value.TryGetValue(filename.ToLowerInvariant(), out string path))
+                return path;
 
-        public override IEnumerable<string> GetAvailableResources() => fileToStoragePathMapping.Keys;
+            return null;
+        }
+
+        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache, LazyThreadSafetyMode.ExecutionAndPublication);
+
+        private Dictionary<string, string> initialiseFileCache() => liveSource.PerformRead(source =>
+        {
+            var dictionary = new Dictionary<string, string>();
+            dictionary.Clear();
+            foreach (var f in source.Files)
+                dictionary[f.Filename.ToLowerInvariant()] = f.File.GetStoragePath();
+
+            return dictionary;
+        });
+
+        public override IEnumerable<string> GetAvailableResources() => fileToStoragePathMapping.Value.Keys;
     }
 }
