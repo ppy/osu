@@ -7,12 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.Mods;
@@ -114,12 +117,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void ChangeUserState(int userId, MultiplayerUserState newState)
         {
             Debug.Assert(Room != null);
+
             ((IMultiplayerClient)this).UserStateChanged(userId, newState);
 
             Schedule(() =>
             {
                 switch (Room.State)
                 {
+                    case MultiplayerRoomState.Open:
+                        // If there are no remaining ready users or the host is not ready, stop any existing countdown.
+                        // Todo: When we have an "automatic start" mode, this should also start a new countdown if any users _are_ ready.
+                        // Todo: This doesn't yet support non-match-start countdowns.
+                        bool shouldStopCountdown = Room.Users.All(u => u.State != MultiplayerUserState.Ready);
+                        shouldStopCountdown |= Room.Host?.State != MultiplayerUserState.Ready && Room.Host?.State != MultiplayerUserState.Spectating;
+
+                        if (shouldStopCountdown)
+                            countdownStopSource?.Cancel();
+                        break;
+
                     case MultiplayerRoomState.WaitingForLoad:
                         if (Room.Users.All(u => u.State != MultiplayerUserState.WaitingForLoad))
                         {
@@ -282,6 +297,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return Task.CompletedTask;
         }
 
+        private CancellationTokenSource? countdownSkipSource;
+        private CancellationTokenSource? countdownStopSource;
+        private Task countdownTask = Task.CompletedTask;
+
+        /// <summary>
+        /// Skips to the end of the currently-running countdown, if one is running,
+        /// and runs the callback (e.g. to start the match) as soon as possible unless the countdown has been cancelled.
+        /// </summary>
+        public void SkipToEndOfCountdown() => countdownSkipSource?.Cancel();
+
         public override async Task SendMatchRequest(MatchUserRequest request)
         {
             Debug.Assert(Room != null);
@@ -289,6 +314,67 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             switch (request)
             {
+                case StartMatchCountdownRequest matchCountdownRequest:
+                    Debug.Assert(ThreadSafety.IsUpdateThread);
+
+                    countdownStopSource?.Cancel();
+
+                    // Note that this will leak CTSs, however this is a test method and we haven't noticed foregoing disposal of non-linked CTSs to be detrimental.
+                    // If necessary, this can be moved into the final schedule below, and the class-level fields be nulled out accordingly.
+                    var stopSource = countdownStopSource = new CancellationTokenSource();
+                    var skipSource = countdownSkipSource = new CancellationTokenSource();
+                    var countdown = new MatchStartCountdown { TimeRemaining = matchCountdownRequest.Duration };
+
+                    Task lastCountdownTask = countdownTask;
+                    countdownTask = start();
+
+                    async Task start()
+                    {
+                        await lastCountdownTask;
+
+                        Schedule(() =>
+                        {
+                            if (stopSource.IsCancellationRequested)
+                                return;
+
+                            Room.Countdown = countdown;
+                            MatchEvent(new CountdownChangedEvent { Countdown = countdown });
+                        });
+
+                        try
+                        {
+                            using (var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(stopSource.Token, skipSource.Token))
+                                await Task.Delay(matchCountdownRequest.Duration, cancellationSource.Token).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Clients need to be notified of cancellations in the following code.
+                        }
+
+                        Schedule(() =>
+                        {
+                            if (Room.Countdown != countdown)
+                                return;
+
+                            Room.Countdown = null;
+                            MatchEvent(new CountdownChangedEvent { Countdown = null });
+
+                            if (stopSource.IsCancellationRequested)
+                                return;
+
+                            StartMatch().WaitSafely();
+                        });
+                    }
+
+                    break;
+
+                case StopCountdownRequest _:
+                    countdownStopSource?.Cancel();
+
+                    Room.Countdown = null;
+                    await MatchEvent(new CountdownChangedEvent { Countdown = Room.Countdown });
+                    break;
+
                 case ChangeTeamRequest changeTeam:
 
                     TeamVersusRoomState roomState = (TeamVersusRoomState)Room.MatchState!;
