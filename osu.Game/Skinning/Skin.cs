@@ -54,8 +54,6 @@ namespace osu.Game.Skinning
             where TLookup : notnull
             where TValue : notnull;
 
-        public void InvalidateCaches() => realmBackedStorage?.Invalidate();
-
         private readonly RealmBackedResourceStore<SkinInfo> realmBackedStorage;
 
         /// <summary>
@@ -206,6 +204,8 @@ namespace osu.Game.Skinning
 
             Textures?.Dispose();
             Samples?.Dispose();
+
+            realmBackedStorage?.Dispose();
         }
 
         #endregion
