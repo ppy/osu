@@ -387,7 +387,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
         }
 
-        public override async Task StartMatch()
+        public override Task StartMatch()
         {
             Debug.Assert(Room != null);
 
@@ -395,7 +395,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
-            await ((IMultiplayerClient)this).LoadRequested();
+            return ((IMultiplayerClient)this).LoadRequested();
         }
 
         public override Task AbortGameplay()
