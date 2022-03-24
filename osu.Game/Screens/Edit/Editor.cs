@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Edit
 
         private bool canSave;
 
-        private bool exitConfirmed;
+        protected bool ExitConfirmed { get; private set; }
 
         private string lastSavedHash;
 
@@ -586,7 +586,7 @@ namespace osu.Game.Screens.Edit
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed)
+            if (!ExitConfirmed)
             {
                 // dialog overlay may not be available in visual tests.
                 if (dialogOverlay == null)
@@ -595,12 +595,9 @@ namespace osu.Game.Screens.Edit
                     return true;
                 }
 
-                // if the dialog is already displayed, confirm exit with no save.
-                if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
-                {
-                    saveDialog.PerformOkAction();
+                // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+                if (dialogOverlay.CurrentDialog is PromptForSaveDialog)
                     return true;
-                }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
@@ -645,7 +642,7 @@ namespace osu.Game.Screens.Edit
         {
             Save();
 
-            exitConfirmed = true;
+            ExitConfirmed = true;
             this.Exit();
         }
 
@@ -668,7 +665,7 @@ namespace osu.Game.Screens.Edit
                 Beatmap.SetDefault();
             }
 
-            exitConfirmed = true;
+            ExitConfirmed = true;
             this.Exit();
         }
 

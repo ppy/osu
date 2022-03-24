@@ -295,7 +295,6 @@ namespace osu.Game.Database
                                 TimelineZoom = beatmap.TimelineZoom,
                                 Countdown = beatmap.Countdown,
                                 CountdownOffset = beatmap.CountdownOffset,
-                                MaxCombo = beatmap.MaxCombo,
                                 Bookmarks = beatmap.Bookmarks,
                                 BeatmapSet = realmBeatmapSet,
                             };

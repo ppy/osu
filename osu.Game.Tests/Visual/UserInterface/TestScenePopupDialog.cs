@@ -40,6 +40,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Text = @"You're a fake!",
                     },
+                    new PopupDialogDangerousButton
+                    {
+                        Text = @"Careful with this one..",
+                    },
                 };
             }
         }
