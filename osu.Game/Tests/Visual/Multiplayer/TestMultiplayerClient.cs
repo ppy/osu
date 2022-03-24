@@ -343,19 +343,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                         Schedule(() =>
                         {
-                            if (Room.Countdown != countdown)
-                                return;
-
-                            Room.Countdown = null;
-                            MatchEvent(new CountdownChangedEvent { Countdown = null });
-
                             using (cancellationSource)
                             {
+                                if (Room.Countdown != countdown)
+                                    return;
+
+                                Room.Countdown = null;
+                                MatchEvent(new CountdownChangedEvent { Countdown = null });
+
                                 if (stopSource.Token.IsCancellationRequested)
                                     return;
-                            }
 
-                            StartMatch().WaitSafely();
+                                StartMatch().WaitSafely();
+                            }
                         });
                     }
 
