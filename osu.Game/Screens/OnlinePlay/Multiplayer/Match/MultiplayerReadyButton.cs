@@ -31,7 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             base.LoadComplete();
 
-            multiplayerClient.RoomUpdated += () => Scheduler.AddOnce(onRoomUpdated);
+            multiplayerClient.RoomUpdated += onRoomUpdated;
             onRoomUpdated();
         }
 
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private DateTimeOffset countdownReceivedTime;
         private ScheduledDelegate countdownUpdateDelegate;
 
-        private void onRoomUpdated()
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
             if (countdown == null && room?.Countdown != null)
                 countdownReceivedTime = DateTimeOffset.Now;
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             updateButtonText();
             updateButtonColour();
-        }
+        });
 
         private void updateButtonText()
         {
