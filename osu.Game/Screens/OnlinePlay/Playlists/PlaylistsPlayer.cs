@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Extensions;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -64,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
+            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeFinalScore(ScoringMode.Standardised, Score.ScoreInfo));
         }
 
         protected override void Dispose(bool isDisposing)

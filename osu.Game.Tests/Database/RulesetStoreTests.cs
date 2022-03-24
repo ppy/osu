@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RulesetStore(realm, storage);
+                var rulesets = new RealmRulesetStore(realm, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, realm.Realm.All<RulesetInfo>().Count());
@@ -26,8 +26,8 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RulesetStore(realm, storage);
-                var rulesets2 = new RulesetStore(realm, storage);
+                var rulesets = new RealmRulesetStore(realm, storage);
+                var rulesets2 = new RealmRulesetStore(realm, storage);
 
                 Assert.AreEqual(4, rulesets.AvailableRulesets.Count());
                 Assert.AreEqual(4, rulesets2.AvailableRulesets.Count());
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Database
         {
             RunTestWithRealm((realm, storage) =>
             {
-                var rulesets = new RulesetStore(realm, storage);
+                var rulesets = new RealmRulesetStore(realm, storage);
 
                 Assert.IsFalse(rulesets.AvailableRulesets.First().IsManaged);
                 Assert.IsFalse(rulesets.GetRuleset(0)?.IsManaged);

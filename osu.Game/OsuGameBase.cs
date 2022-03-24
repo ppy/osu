@@ -22,6 +22,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -68,7 +69,7 @@ namespace osu.Game
         /// </summary>
         private const double global_track_volume_adjust = 0.8;
 
-        public bool UseDevelopmentServer { get; }
+        public virtual bool UseDevelopmentServer => DebugUtils.IsDebugBuild;
 
         public virtual Version AssemblyVersion => Assembly.GetEntryAssembly()?.GetName().Version ?? new Version();
 
@@ -103,7 +104,7 @@ namespace osu.Game
 
         protected Dictionary<string, object> ManagerStorage { get; private set; }
 
-        protected RulesetStore RulesetStore { get; private set; }
+        protected RealmRulesetStore RulesetStore { get; private set; }
 
         protected RealmKeyBindingStore KeyBindingStore { get; private set; }
 
@@ -168,7 +169,6 @@ namespace osu.Game
 
         public OsuGameBase()
         {
-            UseDevelopmentServer = DebugUtils.IsDebugBuild;
             Name = @"osu!";
         }
 
@@ -194,8 +194,10 @@ namespace osu.Game
 
             dependencies.Cache(realm = new RealmAccess(Storage, "client", EFContextFactory));
 
-            dependencies.Cache(RulesetStore = new RulesetStore(realm, Storage));
+            dependencies.CacheAs<RulesetStore>(RulesetStore = new RealmRulesetStore(realm, Storage));
             dependencies.CacheAs<IRulesetStore>(RulesetStore);
+
+            Decoder.RegisterDependencies(RulesetStore);
 
             // Backup is taken here rather than in EFToRealmMigrator to avoid recycling realm contexts
             // after initial usages below. It can be moved once a direction is established for handling re-subscription.

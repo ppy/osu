@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Utils;
@@ -14,12 +16,12 @@ namespace osu.Game.Rulesets.Scoring
         /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
         /// Return true if the fail was permitted.
         /// </summary>
-        public event Func<bool> Failed;
+        public event Func<bool>? Failed;
 
         /// <summary>
         /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<HealthProcessor, JudgementResult, bool> FailConditions;
+        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
 
         /// <summary>
         /// The current health.

@@ -64,7 +64,7 @@ namespace osu.Game.Users.Drawables
 
         private void openProfile()
         {
-            if (user?.Id > 1)
+            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
                 game?.ShowUser(user);
         }
 

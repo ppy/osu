@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach ((int userId, var _) in clocks)
                 {
-                    SpectatorClient.StartPlay(userId, 0);
+                    SpectatorClient.SendStartPlay(userId, 0);
                     OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = userId });
                 }
             });
@@ -46,7 +46,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playable);
 
-                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray()) { Expanded = { Value = true } }, Add);
+                LoadComponentAsync(leaderboard = new MultiSpectatorLeaderboard(Ruleset.Value, scoreProcessor, clocks.Keys.Select(id => new MultiplayerRoomUser(id)).ToArray())
+                {
+                    Expanded = { Value = true }
+                }, Add);
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
@@ -68,10 +71,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 // For player 2, send frames in sets of 10.
                 for (int i = 0; i < 100; i++)
                 {
-                    SpectatorClient.SendFrames(PLAYER_1_ID, 1);
+                    SpectatorClient.SendFramesFromUser(PLAYER_1_ID, 1);
 
                     if (i % 10 == 0)
-                        SpectatorClient.SendFrames(PLAYER_2_ID, 10);
+                        SpectatorClient.SendFramesFromUser(PLAYER_2_ID, 10);
                 }
             });
 

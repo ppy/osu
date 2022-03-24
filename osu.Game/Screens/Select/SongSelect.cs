@@ -37,6 +37,7 @@ using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -233,6 +234,10 @@ namespace osu.Game.Screens.Select
                             }
                         }
                     }
+                },
+                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 

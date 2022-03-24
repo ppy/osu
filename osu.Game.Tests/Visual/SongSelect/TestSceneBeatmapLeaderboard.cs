@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, Scheduler));
             Dependencies.Cache(Realm);
@@ -119,7 +119,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
             AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
-            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardState.Unavailable));
+            AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));
+            AddStep(@"Beatmap unavailable", () => leaderboard.SetErrorState(LeaderboardState.BeatmapUnavailable));
             AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
         }
 

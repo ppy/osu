@@ -2,15 +2,19 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -25,7 +29,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
-    public class MainMenu : OsuScreen, IHandlePresentBeatmap
+    public class MainMenu : OsuScreen, IHandlePresentBeatmap, IKeyBindingHandler<GlobalAction>
     {
         public const float FADE_IN_DURATION = 300;
 
@@ -62,7 +66,7 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
-        private Bindable<float> holdDelay;
+        private Bindable<double> holdDelay;
         private Bindable<bool> loginDisplayed;
 
         private ExitConfirmOverlay exitConfirmOverlay;
@@ -73,7 +77,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
-            holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
             if (host.CanExit)
@@ -296,6 +300,27 @@ namespace osu.Game.Screens.Menu
             Ruleset.Value = ruleset;
 
             Schedule(loadSoloSongSelect);
+        }
+
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
+        {
+            if (e.Repeat)
+                return false;
+
+            switch (e.Action)
+            {
+                case GlobalAction.Back:
+                    // In the case of a host being able to exit, the back action is handled by ExitConfirmOverlay.
+                    Debug.Assert(!host.CanExit);
+
+                    return host.SuspendToBackground();
+            }
+
+            return false;
+        }
+
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
+        {
         }
     }
 }

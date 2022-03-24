@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 
@@ -25,6 +24,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         /// </summary>
         public Action<PlaylistItem> RequestEdit;
 
+        private MultiplayerPlaylistTabControl playlistTabControl;
         private MultiplayerQueueList queueList;
         private MultiplayerHistoryList historyList;
         private bool firstPopulation = true;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
 
             InternalChildren = new Drawable[]
             {
-                new OsuTabControl<MultiplayerPlaylistDisplayMode>
+                playlistTabControl = new MultiplayerPlaylistTabControl
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = tab_control_height,
@@ -64,6 +64,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                     }
                 }
             };
+
+            playlistTabControl.QueueItems.BindTarget = queueList.Items;
         }
 
         protected override void LoadComplete()

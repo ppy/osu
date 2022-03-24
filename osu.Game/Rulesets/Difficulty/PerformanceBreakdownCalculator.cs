@@ -63,9 +63,8 @@ namespace osu.Game.Rulesets.Difficulty
 
                 // calculate total score
                 ScoreProcessor scoreProcessor = ruleset.CreateScoreProcessor();
-                scoreProcessor.HighestCombo.Value = perfectPlay.MaxCombo;
                 scoreProcessor.Mods.Value = perfectPlay.Mods;
-                perfectPlay.TotalScore = (long)scoreProcessor.GetImmediateScore(ScoringMode.Standardised, perfectPlay.MaxCombo, statistics);
+                perfectPlay.TotalScore = (long)scoreProcessor.ComputeFinalScore(ScoringMode.Standardised, perfectPlay);
 
                 // compute rank achieved
                 // default to SS, then adjust the rank with mods
@@ -85,7 +84,7 @@ namespace osu.Game.Rulesets.Difficulty
                 ).ConfigureAwait(false);
 
                 // ScorePerformanceCache is not used to avoid caching multiple copies of essentially identical perfect performance attributes
-                return difficulty == null ? null : ruleset.CreatePerformanceCalculator(difficulty.Value.Attributes, perfectPlay)?.Calculate();
+                return difficulty == null ? null : ruleset.CreatePerformanceCalculator()?.Calculate(perfectPlay, difficulty.Value.Attributes);
             }, cancellationToken);
         }
 
