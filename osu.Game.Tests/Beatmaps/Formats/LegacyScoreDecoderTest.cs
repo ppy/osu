@@ -65,10 +65,29 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
         }
 
+        [TestCase(3, true)]
+        [TestCase(6, false)]
+        [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]
+        public void TestLegacyBeatmapReplayOffsetsDecode(int beatmapVersion, bool offsetApplied)
+        {
+            const double first_frame_time = 48;
+            const double second_frame_time = 65;
+
+            var decoder = new TestLegacyScoreDecoder(beatmapVersion);
+
+            using (var resourceStream = TestResources.OpenResource("Replays/mania-replay.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + (offsetApplied ? 24 : 0)));
+                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + (offsetApplied ? 24 : 0)));
+            }
+        }
+
         [TestCase(3)]
         [TestCase(6)]
         [TestCase(LegacyBeatmapDecoder.LATEST_VERSION)]
-        public void TestLegacyBeatmapReplayOffsets(int beatmapVersion)
+        public void TestLegacyBeatmapReplayOffsetsEncodeDecode(int beatmapVersion)
         {
             const double first_frame_time = 2000;
             const double second_frame_time = 3000;
