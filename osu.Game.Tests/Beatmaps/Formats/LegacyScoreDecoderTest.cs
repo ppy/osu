@@ -115,19 +115,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 }
             };
 
-            // the "se" culture is used here, as it encodes the negative number sign as U+2212 MINUS SIGN,
-            // rather than the classic ASCII U+002D HYPHEN-MINUS.
-            CultureInfo.CurrentCulture = new CultureInfo("se");
-
-            var encodeStream = new MemoryStream();
-
-            var encoder = new LegacyScoreEncoder(score, beatmap);
-            encoder.Encode(encodeStream);
-
-            var decodeStream = new MemoryStream(encodeStream.GetBuffer());
-
-            var decoder = new TestLegacyScoreDecoder(beatmapVersion);
-            var decodedAfterEncode = decoder.Parse(decodeStream);
+            var decodedAfterEncode = encodeThenDecode(beatmapVersion, score, beatmap);
 
             Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(first_frame_time));
             Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(second_frame_time));
@@ -155,15 +143,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             // rather than the classic ASCII U+002D HYPHEN-MINUS.
             CultureInfo.CurrentCulture = new CultureInfo("se");
 
-            var encodeStream = new MemoryStream();
-
-            var encoder = new LegacyScoreEncoder(score, beatmap);
-            encoder.Encode(encodeStream);
-
-            var decodeStream = new MemoryStream(encodeStream.GetBuffer());
-
-            var decoder = new TestLegacyScoreDecoder();
-            var decodedAfterEncode = decoder.Parse(decodeStream);
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
 
             Assert.Multiple(() =>
             {
@@ -177,6 +157,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.That(decodedAfterEncode.Replay.Frames.Count, Is.EqualTo(1));
             });
+        }
+
+        private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
+        {
+            var encodeStream = new MemoryStream();
+
+            var encoder = new LegacyScoreEncoder(score, beatmap);
+            encoder.Encode(encodeStream);
+
+            var decodeStream = new MemoryStream(encodeStream.GetBuffer());
+
+            var decoder = new TestLegacyScoreDecoder(beatmapVersion);
+            var decodedAfterEncode = decoder.Parse(decodeStream);
+            return decodedAfterEncode;
         }
 
         [TearDown]
