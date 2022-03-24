@@ -339,6 +339,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         }
                         catch (OperationCanceledException)
                         {
+                            // Clients need to be notified of cancellations in the following code.
                         }
 
                         Schedule(() =>
