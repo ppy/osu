@@ -119,6 +119,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Debug.Assert(Room != null);
 
             ((IMultiplayerClient)this).UserStateChanged(userId, newState);
+            updateRoomStateIfRequired();
+        }
+
+        private void updateRoomStateIfRequired()
+        {
+            Debug.Assert(Room != null);
 
             Schedule(() =>
             {
@@ -263,6 +269,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 ChangeUserState(user.UserID, MultiplayerUserState.Idle);
 
             await changeMatchType(settings.MatchType).ConfigureAwait(false);
+            updateRoomStateIfRequired();
         }
 
         public override Task ChangeState(MultiplayerUserState newState)
@@ -430,6 +437,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             await addItem(item).ConfigureAwait(false);
             await updateCurrentItem(Room).ConfigureAwait(false);
+            updateRoomStateIfRequired();
         }
 
         public override Task AddPlaylistItem(MultiplayerPlaylistItem item) => AddUserPlaylistItem(api.LocalUser.Value.OnlineID, item);
@@ -486,6 +494,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             await ((IMultiplayerClient)this).PlaylistItemRemoved(playlistItemId).ConfigureAwait(false);
 
             await updateCurrentItem(Room).ConfigureAwait(false);
+            updateRoomStateIfRequired();
         }
 
         public override Task RemovePlaylistItem(long playlistItemId) => RemoveUserPlaylistItem(api.LocalUser.Value.OnlineID, playlistItemId);
