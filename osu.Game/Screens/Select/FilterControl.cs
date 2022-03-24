@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Select
                                     beatmapCountText = new OsuSpriteText
                                     {
                                         Text = "Test",
-                                        Font = OsuFont.GetFont(size: 14),
+                                        Font = OsuFont.GetFont(size: 18),
                                         Margin = new MarginPadding(5),
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,

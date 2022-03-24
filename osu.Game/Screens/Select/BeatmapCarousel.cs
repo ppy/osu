@@ -102,6 +102,8 @@ namespace osu.Game.Screens.Select
         // todo: only used for testing, maybe remove.
         private bool loadedTestBeatmaps;
 
+        public FilterControl FilterControl;
+
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get => beatmapSets.Select(g => g.BeatmapSet);
@@ -712,6 +714,7 @@ namespace osu.Game.Screens.Select
                         Scroll.Add(panel);
                     }
                 }
+                FilterControl.SetBeatmapCount(visibleItems.Count);
             }
 
             // Update externally controlled state of currently visible items (e.g. x-offset and opacity).

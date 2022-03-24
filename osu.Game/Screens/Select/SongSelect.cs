@@ -130,7 +130,6 @@ namespace osu.Game.Screens.Select
                 BeatmapSetsChanged = carouselBeatmapsLoaded,
                 GetRecommendedBeatmap = s => recommender?.GetRecommendedBeatmap(s),
             }, c => carouselContainer.Child = c);
-
             AddRangeInternal(new Drawable[]
             {
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
@@ -304,6 +303,8 @@ namespace osu.Game.Screens.Select
                     }
                 });
             }
+            Carousel.FilterControl = FilterControl;
+
         }
 
         /// <summary>
@@ -329,7 +330,6 @@ namespace osu.Game.Screens.Select
             bool shouldDebounce = this.IsCurrentScreen();
 
             Carousel.Filter(criteria, shouldDebounce);
-            FilterControl.SetBeatmapCount(Carousel.BeatmapSets.Count());
         }
 
         private DependencyContainer dependencies;
@@ -401,6 +401,7 @@ namespace osu.Game.Screens.Select
             }
             else if (OnStart())
                 Carousel.AllowSelection = false;
+
         }
 
         /// <summary>
@@ -434,7 +435,6 @@ namespace osu.Game.Screens.Select
                 var criteria = FilterControl.CreateCriteria();
                 criteria.SelectedBeatmapSet = e.NewValue.BeatmapInfo.BeatmapSet;
                 Carousel.Filter(criteria);
-
                 Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
             }
         }
@@ -477,7 +477,6 @@ namespace osu.Game.Screens.Select
             var ruleset = rulesetNoDebounce;
 
             selectionChangedDebounce?.Cancel();
-
             if (beatmapInfoNoDebounce == null)
                 run();
             else
@@ -497,7 +496,7 @@ namespace osu.Game.Screens.Select
 
                 beatmapInfoPrevious = beatmap;
             }
-
+            
             void run()
             {
                 // clear pending task immediately to track any potential nested debounce operation.
@@ -746,6 +745,7 @@ namespace osu.Game.Screens.Select
             Carousel.AllowSelection = true;
 
             // If a selection was already obtained, do not attempt to update the selected beatmap.
+
             if (Carousel.SelectedBeatmapSet != null)
                 return;
 
