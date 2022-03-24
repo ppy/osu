@@ -1,20 +1,21 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
 using osu.Game.IO.Legacy;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using SharpCompress.Compressors.LZMA;
-
-#nullable enable
 
 namespace osu.Game.Scoring.Legacy
 {
@@ -111,9 +112,8 @@ namespace osu.Game.Scoring.Legacy
             {
                 StringBuilder replayData = new StringBuilder();
 
-                // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
-                double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -24 : 0;
+                double offset = beatmap?.BeatmapInfo.BeatmapVersion < 5 ? -LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
                 if (score.Replay != null)
                 {

@@ -74,9 +74,8 @@ namespace osu.Game.Scoring.Legacy
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
-                // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
                 // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
-                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? 24 : 0;
+                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
 
                 /* score.HpGraphString = */
                 sr.ReadString();
