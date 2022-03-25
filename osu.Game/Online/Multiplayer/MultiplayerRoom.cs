@@ -54,6 +54,12 @@ namespace osu.Game.Online.Multiplayer
         [Key(6)]
         public IList<MultiplayerPlaylistItem> Playlist { get; set; } = new List<MultiplayerPlaylistItem>();
 
+        /// <summary>
+        /// The currently-running countdown.
+        /// </summary>
+        [Key(7)]
+        public MultiplayerCountdown? Countdown { get; set; }
+
         [JsonConstructor]
         [SerializationConstructor]
         public MultiplayerRoom(long roomId)

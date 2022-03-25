@@ -323,7 +323,7 @@ namespace osu.Game.Rulesets.UI
         /// </param>
         /// <typeparam name="TObject">The <see cref="HitObject"/> type.</typeparam>
         /// <typeparam name="TDrawable">The <see cref="DrawableHitObject"/> receiver for <typeparamref name="TObject"/>s.</typeparam>
-        protected void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
+        public void RegisterPool<TObject, TDrawable>(int initialSize, int? maximumSize = null)
             where TObject : HitObject
             where TDrawable : DrawableHitObject, new()
             => RegisterPool<TObject, TDrawable>(new DrawablePool<TDrawable>(initialSize, maximumSize));
