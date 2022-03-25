@@ -54,7 +54,7 @@ namespace osu.Game.Skinning
             where TLookup : notnull
             where TValue : notnull;
 
-        private readonly RealmBackedResourceStore<SkinInfo> realmBackedStorage;
+        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
 
         /// <summary>
         /// Construct a new skin.
