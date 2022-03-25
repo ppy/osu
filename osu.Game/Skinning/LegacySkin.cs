@@ -282,6 +282,7 @@ namespace osu.Game.Skinning
             => source.ImageLookups.TryGetValue(lookup, out string image) ? new Bindable<string>(image) : null;
 
         private IBindable<TValue>? legacySettingLookup<TValue>(SkinConfiguration.LegacySetting legacySetting)
+            where TValue : notnull
         {
             switch (legacySetting)
             {
@@ -294,10 +295,9 @@ namespace osu.Game.Skinning
         }
 
         private IBindable<TValue>? genericLookup<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull
         {
-            if (lookup == null)
-                return null;
-
             try
             {
                 if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out string val))

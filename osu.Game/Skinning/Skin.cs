@@ -50,7 +50,9 @@ namespace osu.Game.Skinning
 
         public abstract Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT);
 
-        public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup);
+        public abstract IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull;
 
         /// <summary>
         /// Construct a new skin.
