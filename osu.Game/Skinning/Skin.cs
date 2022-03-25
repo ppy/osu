@@ -152,9 +152,23 @@ namespace osu.Game.Skinning
                     if (!DrawableComponentInfo.TryGetValue(target.Target, out var skinnableInfo))
                         return null;
 
+                    var components = new List<Drawable>();
+
+                    foreach (var i in skinnableInfo)
+                    {
+                        try
+                        {
+                            components.Add(i.CreateInstance());
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.Error(e, $"Unable to create skin component {i.Type.Name}");
+                        }
+                    }
+
                     return new SkinnableTargetComponentsContainer
                     {
-                        ChildrenEnumerable = skinnableInfo.Select(i => i.CreateInstance())
+                        Children = components,
                     };
             }
 
