@@ -147,7 +147,10 @@ namespace osu.Game.Tests.Database
                     Live<BeatmapSetInfo>? imported;
 
                     using (var reader = new ZipArchiveReader(TestResources.GetTestBeatmapStream()))
+                    {
                         imported = await importer.Import(reader);
+                        EnsureLoaded(realm.Realm);
+                    }
 
                     Assert.AreEqual(1, realm.Realm.All<BeatmapSetInfo>().Count());
 
@@ -510,6 +513,8 @@ namespace osu.Game.Tests.Database
                     new ImportTask(zipStream, string.Empty)
                 );
 
+                realm.Run(r => r.Refresh());
+
                 checkBeatmapSetCount(realm.Realm, 0);
                 checkBeatmapCount(realm.Realm, 0);
 
@@ -565,6 +570,8 @@ namespace osu.Game.Tests.Database
                 {
                 }
 
+                EnsureLoaded(realm.Realm);
+
                 checkBeatmapSetCount(realm.Realm, 1);
                 checkBeatmapCount(realm.Realm, 12);
 
@@ -590,6 +597,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.IsTrue(imported.DeletePending);
 
+                var originalAddedDate = imported.DateAdded;
+
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
@@ -597,6 +606,7 @@ namespace osu.Game.Tests.Database
                 Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
                 Assert.IsFalse(imported.DeletePending);
                 Assert.IsFalse(importedSecondTime.DeletePending);
+                Assert.That(importedSecondTime.DateAdded, Is.GreaterThan(originalAddedDate));
             });
         }
 
@@ -646,6 +656,8 @@ namespace osu.Game.Tests.Database
 
                 Assert.IsTrue(imported.DeletePending);
 
+                var originalAddedDate = imported.DateAdded;
+
                 var importedSecondTime = await LoadOszIntoStore(importer, realm.Realm);
 
                 // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
@@ -653,6 +665,7 @@ namespace osu.Game.Tests.Database
                 Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
                 Assert.IsFalse(imported.DeletePending);
                 Assert.IsFalse(importedSecondTime.DeletePending);
+                Assert.That(importedSecondTime.DateAdded, Is.GreaterThan(originalAddedDate));
             });
         }
 
@@ -719,6 +732,8 @@ namespace osu.Game.Tests.Database
                 };
 
                 var imported = importer.Import(toImport);
+
+                realm.Run(r => r.Refresh());
 
                 Assert.NotNull(imported);
                 Debug.Assert(imported != null);
@@ -884,6 +899,8 @@ namespace osu.Game.Tests.Database
 
                 string? temp = TestResources.GetTestBeatmapForImport();
                 await importer.Import(temp);
+
+                EnsureLoaded(realm.Realm);
 
                 // Update via the beatmap, not the beatmap info, to ensure correct linking
                 BeatmapSetInfo setToUpdate = realm.Realm.All<BeatmapSetInfo>().First();

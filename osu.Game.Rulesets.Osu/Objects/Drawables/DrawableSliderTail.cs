@@ -74,6 +74,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ScaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue));
         }
 
+        protected override void LoadSamples()
+        {
+            // Tail models don't actually get samples, as the playback is handled by DrawableSlider.
+            // This override is only here for visibility in explaining this weird flow.
+        }
+
+        public override void PlaySamples()
+        {
+            // Tail models don't actually get samples, as the playback is handled by DrawableSlider.
+            // This override is only here for visibility in explaining this weird flow.
+        }
+
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();

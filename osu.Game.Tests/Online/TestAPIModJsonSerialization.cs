@@ -25,6 +25,20 @@ namespace osu.Game.Tests.Online
     public class TestAPIModJsonSerialization
     {
         [Test]
+        public void TestUnknownMod()
+        {
+            var apiMod = new APIMod { Acronym = "WNG" };
+
+            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+
+            var converted = deserialized?.ToMod(new TestRuleset());
+
+            Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
+            Assert.That(converted?.Type, Is.EqualTo(ModType.System));
+            Assert.That(converted?.Acronym, Is.EqualTo("WNG??"));
+        }
+
+        [Test]
         public void TestAcronymIsPreserved()
         {
             var apiMod = new APIMod(new TestMod());

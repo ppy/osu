@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
@@ -71,6 +72,10 @@ namespace osu.Game.Overlays
 
         private Container channelSelectionContainer;
         protected ChannelSelectionOverlay ChannelSelectionOverlay;
+
+        private readonly IBindableList<Channel> availableChannels = new BindableList<Channel>();
+        private readonly IBindableList<Channel> joinedChannels = new BindableList<Channel>();
+        private readonly Bindable<Channel> currentChannel = new Bindable<Channel>();
 
         public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos)
                                                                  || (ChannelSelectionOverlay.State.Value == Visibility.Visible && ChannelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos));
@@ -197,9 +202,13 @@ namespace osu.Game.Overlays
                 },
             };
 
+            availableChannels.BindTo(channelManager.AvailableChannels);
+            joinedChannels.BindTo(channelManager.JoinedChannels);
+            currentChannel.BindTo(channelManager.CurrentChannel);
+
             textBox.OnCommit += postMessage;
 
-            ChannelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
+            ChannelTabControl.Current.ValueChanged += current => currentChannel.Value = current.NewValue;
             ChannelTabControl.ChannelSelectorActive.ValueChanged += active => ChannelSelectionOverlay.State.Value = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             ChannelSelectionOverlay.State.ValueChanged += state =>
             {
@@ -237,17 +246,11 @@ namespace osu.Game.Overlays
             Schedule(() =>
             {
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
-                channelManager.JoinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
-
-                channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
-                availableChannelsChanged(null, null);
-
-                currentChannel = channelManager.CurrentChannel.GetBoundCopy();
+                joinedChannels.BindCollectionChanged(joinedChannelsChanged, true);
+                availableChannels.BindCollectionChanged(availableChannelsChanged, true);
                 currentChannel.BindValueChanged(currentChannelChanged, true);
             });
         }
-
-        private Bindable<Channel> currentChannel;
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
         {
@@ -301,6 +304,26 @@ namespace osu.Game.Overlays
             // mark channel as read when channel switched
             if (e.NewValue.Messages.Any())
                 channelManager.MarkChannelAsRead(e.NewValue);
+        }
+
+        /// <summary>
+        /// Highlights a certain message in the specified channel.
+        /// </summary>
+        /// <param name="message">The message to highlight.</param>
+        /// <param name="channel">The channel containing the message.</param>
+        public void HighlightMessage(Message message, Channel channel)
+        {
+            Debug.Assert(channel.Id == message.ChannelId);
+
+            if (currentChannel.Value.Id != channel.Id)
+            {
+                if (!channel.Joined.Value)
+                    channel = channelManager.JoinChannel(channel);
+
+                currentChannel.Value = channel;
+            }
+
+            channel.HighlightedMessage.Value = message;
         }
 
         private float startDragChatHeight;
@@ -386,7 +409,7 @@ namespace osu.Game.Overlays
                     return true;
 
                 case PlatformAction.DocumentClose:
-                    channelManager.LeaveChannel(channelManager.CurrentChannel.Value);
+                    channelManager.LeaveChannel(currentChannel.Value);
                     return true;
             }
 
@@ -466,19 +489,7 @@ namespace osu.Game.Overlays
 
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            ChannelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (channelManager != null)
-            {
-                channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
-                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
-                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
-            }
+            ChannelSelectionOverlay.UpdateAvailableChannels(availableChannels);
         }
 
         private void postMessage(TextBox textBox, bool newText)

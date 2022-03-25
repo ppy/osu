@@ -18,9 +18,11 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -32,10 +34,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         private SkinManager skinManager { get; set; }
 
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         [Cached(typeof(HealthProcessor))]
         private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
+
+        [Cached]
+        private GameplayState gameplayState = new GameplayState(new TestBeatmap(new OsuRuleset().RulesetInfo), new OsuRuleset());
+
+        [Cached]
+        private readonly GameplayClock gameplayClock = new GameplayClock(new FramedClock());
 
         protected override bool HasCustomSteps => true;
 

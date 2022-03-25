@@ -1,17 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-
-#nullable enable
 
 namespace osu.Game.Utils
 {
@@ -155,39 +153,6 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Returns the underlying value of the given mod setting object.
-        /// Used in <see cref="APIMod"/> for serialization and equality comparison purposes.
-        /// </summary>
-        /// <param name="setting">The mod setting.</param>
-        public static object GetSettingUnderlyingValue(object setting)
-        {
-            switch (setting)
-            {
-                case Bindable<double> d:
-                    return d.Value;
-
-                case Bindable<int> i:
-                    return i.Value;
-
-                case Bindable<float> f:
-                    return f.Value;
-
-                case Bindable<bool> b:
-                    return b.Value;
-
-                case IBindable u:
-                    // A mod with unknown (e.g. enum) generic type.
-                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
-                    Debug.Assert(valueMethod != null);
-                    return valueMethod.GetValue(u);
-
-                default:
-                    // fall back for non-bindable cases.
-                    return setting;
-            }
-        }
-
-        /// <summary>
         /// Verifies all proposed mods are valid for a given ruleset and returns instantiated <see cref="Mod"/>s for further processing.
         /// </summary>
         /// <param name="ruleset">The ruleset to verify mods against.</param>
@@ -201,15 +166,15 @@ namespace osu.Game.Utils
 
             foreach (var apiMod in proposedMods)
             {
-                try
-                {
-                    // will throw if invalid
-                    valid.Add(apiMod.ToMod(ruleset));
-                }
-                catch
+                var mod = apiMod.ToMod(ruleset);
+
+                if (mod is UnknownMod)
                 {
                     proposedWereValid = false;
+                    continue;
                 }
+
+                valid.Add(mod);
             }
 
             return proposedWereValid;
