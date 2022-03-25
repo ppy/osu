@@ -21,7 +21,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Skinning.Components;
 
 namespace osu.Game.Skinning.Editor
 {
@@ -349,9 +348,9 @@ namespace osu.Game.Skinning.Editor
                 });
 
                 // place component
-                placeComponent(new SkinSprite
+                placeComponent(new SkinnableSprite
                 {
-                    SpriteName = { Value = file.Name }
+                    SpriteName = { Value = Path.GetFileNameWithoutExtension(file.Name) }
                 });
             });
 
