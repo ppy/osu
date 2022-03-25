@@ -165,6 +165,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         LengthLimit = 100,
                                                                     },
                                                                 },
+                                                                // new Section("Room visibility")
+                                                                // {
+                                                                //     Alpha = disabled_alpha,
+                                                                //     Child = AvailabilityPicker = new RoomAvailabilityPicker
+                                                                //     {
+                                                                //         Enabled = { Value = false }
+                                                                //     },
+                                                                // },
                                                                 new Section("Game type")
                                                                 {
                                                                     Child = new FillFlowContainer
