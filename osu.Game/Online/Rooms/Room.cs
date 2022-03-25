@@ -95,7 +95,7 @@ namespace osu.Game.Online.Rooms
         [Cached]
         public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
 
-        [JsonProperty("start_duration")]
+        [JsonProperty("auto_start_duration")]
         private ushort autoStartDuration
         {
             get => (ushort)AutoStartDuration.Value.TotalSeconds;
