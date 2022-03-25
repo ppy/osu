@@ -5,78 +5,62 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
-using osu.Framework.Utils;
+using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Overlays;
+using osu.Game.Screens.Edit.Components;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Skinning.Editor
 {
-    public class SkinComponentToolbox : ScrollingToolboxGroup
+    public class SkinComponentToolbox : EditorSidebarSection
     {
-        public const float WIDTH = 200;
-
         public Action<Type> RequestPlacement;
 
-        private const float component_display_scale = 0.8f;
+        private readonly CompositeDrawable target;
 
-        [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor
+        public SkinComponentToolbox(CompositeDrawable target = null)
+            : base("Components")
         {
-            Combo = { Value = RNG.Next(1, 1000) },
-            TotalScore = { Value = RNG.Next(1000, 10000000) }
-        };
-
-        [Cached(typeof(HealthProcessor))]
-        private HealthProcessor healthProcessor = new DrainingHealthProcessor(0);
-
-        public SkinComponentToolbox(float height)
-            : base("Components", height)
-        {
-            RelativeSizeAxes = Axes.None;
-            Width = WIDTH;
+            this.target = target;
         }
+
+        private FillFlowContainer fill;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            FillFlowContainer fill;
-
             Child = fill = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(20)
+                Spacing = new Vector2(2)
             };
 
+            reloadComponents();
+        }
+
+        private void reloadComponents()
+        {
+            fill.Clear();
+
             var skinnableTypes = typeof(OsuGame).Assembly.GetTypes()
-                                                .Where(t => !t.IsInterface)
+                                                .Where(t => !t.IsInterface && !t.IsAbstract)
                                                 .Where(t => typeof(ISkinnableDrawable).IsAssignableFrom(t))
+                                                .OrderBy(t => t.Name)
                                                 .ToArray();
 
             foreach (var type in skinnableTypes)
-            {
-                var component = attemptAddComponent(type);
-
-                if (component != null)
-                {
-                    component.RequestPlacement = t => RequestPlacement?.Invoke(t);
-                    fill.Add(component);
-                }
-            }
+                attemptAddComponent(type);
         }
 
-        private static ToolboxComponentButton attemptAddComponent(Type type)
+        private void attemptAddComponent(Type type)
         {
             try
             {
@@ -84,14 +68,21 @@ namespace osu.Game.Skinning.Editor
 
                 Debug.Assert(instance != null);
 
-                if (!((ISkinnableDrawable)instance).IsEditable)
-                    return null;
+                if (!((ISkinnableDrawable)instance).IsEditable) return;
 
-                return new ToolboxComponentButton(instance);
+                fill.Add(new ToolboxComponentButton(instance, target)
+                {
+                    RequestPlacement = t => RequestPlacement?.Invoke(t)
+                });
             }
-            catch
+            catch (DependencyNotRegisteredException)
             {
-                return null;
+                // This loading code relies on try-catching any dependency injection errors to know which components are valid for the current target screen.
+                // If a screen can't provide the required dependencies, a skinnable component should not be displayed in the list.
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Skin component {type} could not be loaded in the editor component list due to an error");
             }
         }
 
@@ -102,51 +93,65 @@ namespace osu.Game.Skinning.Editor
             public override bool PropagateNonPositionalInputSubTree => false;
 
             private readonly Drawable component;
+            private readonly CompositeDrawable dependencySource;
 
             public Action<Type> RequestPlacement;
 
             private Container innerContainer;
 
-            public ToolboxComponentButton(Drawable component)
+            private const float contracted_size = 60;
+            private const float expanded_size = 120;
+
+            public ToolboxComponentButton(Drawable component, CompositeDrawable dependencySource)
             {
                 this.component = component;
+                this.dependencySource = dependencySource;
 
                 Enabled.Value = true;
 
                 RelativeSizeAxes = Axes.X;
-                Height = 70;
+                Height = contracted_size;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.Delay(300).ResizeHeightTo(expanded_size, 500, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+                this.ResizeHeightTo(contracted_size, 500, Easing.OutQuint);
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
-                BackgroundColour = colours.Gray3;
-                Content.EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Radius = 2,
-                    Offset = new Vector2(0, 1),
-                    Colour = Color4.Black.Opacity(0.5f)
-                };
+                BackgroundColour = colourProvider.Background3;
 
                 AddRange(new Drawable[]
                 {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(10) { Bottom = 20 },
+                        Masking = true,
+                        Child = innerContainer = new DependencyBorrowingContainer(dependencySource)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Child = component
+                        },
+                    },
                     new OsuSpriteText
                     {
                         Text = component.GetType().Name,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Margin = new MarginPadding(5),
                     },
-                    innerContainer = new Container
-                    {
-                        Y = 10,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Scale = new Vector2(component_display_scale),
-                        Masking = true,
-                        Child = component
-                    }
                 });
 
                 // adjust provided component to fit / display in a known state.
@@ -154,14 +159,17 @@ namespace osu.Game.Skinning.Editor
                 component.Origin = Anchor.Centre;
             }
 
-            protected override void LoadComplete()
+            protected override void Update()
             {
-                base.LoadComplete();
+                base.Update();
 
-                if (component.RelativeSizeAxes != Axes.None)
+                if (component.DrawSize != Vector2.Zero)
                 {
-                    innerContainer.AutoSizeAxes = Axes.None;
-                    innerContainer.Height = 100;
+                    float bestScale = Math.Min(
+                        innerContainer.DrawWidth / component.DrawWidth,
+                        innerContainer.DrawHeight / component.DrawHeight);
+
+                    innerContainer.Scale = new Vector2(bestScale);
                 }
             }
 
@@ -170,6 +178,19 @@ namespace osu.Game.Skinning.Editor
                 RequestPlacement?.Invoke(component.GetType());
                 return true;
             }
+        }
+
+        public class DependencyBorrowingContainer : Container
+        {
+            private readonly CompositeDrawable donor;
+
+            public DependencyBorrowingContainer(CompositeDrawable donor)
+            {
+                this.donor = donor;
+            }
+
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+                new DependencyContainer(donor?.Dependencies ?? base.CreateChildDependencies(parent));
         }
     }
 }
