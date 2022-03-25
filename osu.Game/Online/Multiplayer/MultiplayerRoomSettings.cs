@@ -31,6 +31,8 @@ namespace osu.Game.Online.Multiplayer
         [Key(5)]
         public TimeSpan AutoStartDuration { get; set; }
 
+        public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
+
         public bool Equals(MultiplayerRoomSettings? other)
         {
             if (ReferenceEquals(this, other)) return true;

@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     case MultiplayerRoomState.Open:
                         // If there are no remaining ready users or the host is not ready, stop any existing countdown.
                         // Todo: This doesn't yet support non-match-start countdowns.
-                        if (Room.Settings.AutoStartDuration != TimeSpan.Zero)
+                        if (Room.Settings.AutoStartEnabled)
                         {
                             bool shouldHaveCountdown = !APIRoom.Playlist.GetCurrentItem()!.Expired && Room.Users.Any(u => u.State == MultiplayerUserState.Ready);
 
