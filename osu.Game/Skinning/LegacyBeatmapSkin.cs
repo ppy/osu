@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,11 +21,25 @@ namespace osu.Game.Skinning
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
 
-        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmapInfo), new LegacySkinResourceStore(beatmapInfo.BeatmapSet, storage), resources, beatmapInfo.Path)
+        /// <summary>
+        /// Construct a new legacy beatmap skin instance.
+        /// </summary>
+        /// <param name="beatmapInfo">The model for this beatmap.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, [CanBeNull] IStorageResourceProvider resources)
+            : base(createSkinInfo(beatmapInfo), resources, createRealmBackedStore(beatmapInfo, resources), beatmapInfo.Path)
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
+        }
+
+        private static IResourceStore<byte[]> createRealmBackedStore(BeatmapInfo beatmapInfo, [CanBeNull] IStorageResourceProvider resources)
+        {
+            if (resources == null)
+                // should only ever be used in tests.
+                return new ResourceStore<byte[]>();
+
+            return new RealmBackedResourceStore(beatmapInfo.BeatmapSet, resources.Files, new[] { @"ogg" });
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
@@ -77,6 +92,10 @@ namespace osu.Game.Skinning
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmapInfo) =>
-            new SkinInfo { Name = beatmapInfo.ToString(), Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty };
+            new SkinInfo
+            {
+                Name = beatmapInfo.ToString(),
+                Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty
+            };
     }
 }
