@@ -1,8 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -30,7 +30,12 @@ namespace osu.Game.Skinning
         [Resolved]
         private ISkinSource source { get; set; }
 
-        public IEnumerable<string> AvailableFiles => (source.AllSources.First() as Skin)?.SkinInfo.PerformRead(s => s.Files.Select(f => Path.GetFileNameWithoutExtension(f.Filename)).Distinct());
+        public IEnumerable<string> AvailableFiles => (source.AllSources.First() as Skin)?.SkinInfo.PerformRead(s => s.Files
+                                                                                                                     .Where(f =>
+                                                                                                                         f.Filename.EndsWith(".png", StringComparison.Ordinal)
+                                                                                                                         || f.Filename.EndsWith(".jpg", StringComparison.Ordinal)
+                                                                                                                     )
+                                                                                                                     .Select(f => f.Filename).Distinct());
 
         public SkinnableSprite(string textureName, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(new SpriteComponent(textureName), confineMode)
