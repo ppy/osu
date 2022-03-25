@@ -152,14 +152,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                                                                 PlaceholderText = "Unlimited",
                                                             },
                                                         },
-                                                        new Section("Room visibility")
-                                                        {
-                                                            Alpha = disabled_alpha,
-                                                            Child = AvailabilityPicker = new RoomAvailabilityPicker
-                                                            {
-                                                                Enabled = { Value = false }
-                                                            },
-                                                        },
+                                                        // new Section("Room visibility")
+                                                        // {
+                                                        //     Alpha = disabled_alpha,
+                                                        //     Child = AvailabilityPicker = new RoomAvailabilityPicker
+                                                        //     {
+                                                        //         Enabled = { Value = false }
+                                                        //     },
+                                                        // },
                                                         new Section("Max participants")
                                                         {
                                                             Alpha = disabled_alpha,
