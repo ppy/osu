@@ -138,21 +138,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         {
                             bool shouldHaveCountdown = !APIRoom.Playlist.GetCurrentItem()!.Expired && Room.Users.Any(u => u.State == MultiplayerUserState.Ready);
 
-                            if (shouldHaveCountdown)
-                            {
-                                if (Room.Countdown == null)
-                                    startCountdown(new MatchStartCountdown { TimeRemaining = Room.Settings.AutoStartDuration }, StartMatch);
-                            }
-                            else
-                                stopCountdown();
-                        }
-                        else
-                        {
-                            bool shouldStopCountdown = Room.Users.All(u => u.State != MultiplayerUserState.Ready);
-                            shouldStopCountdown |= Room.Host?.State != MultiplayerUserState.Ready && Room.Host?.State != MultiplayerUserState.Spectating;
-
-                            if (shouldStopCountdown)
-                                stopCountdown();
+                            if (shouldHaveCountdown && Room.Countdown == null)
+                                startCountdown(new MatchStartCountdown { TimeRemaining = Room.Settings.AutoStartDuration }, StartMatch);
                         }
 
                         break;
