@@ -144,26 +144,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSpectatingDuringCountdownWithNoReadyUsersCancelsCountdown()
-        {
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("countdown button shown", () => this.ChildrenOfType<MultiplayerCountdownButton>().SingleOrDefault()?.IsPresent == true);
-            ClickButtonWhenEnabled<MultiplayerCountdownButton>();
-            AddStep("click the first countdown button", () =>
-            {
-                var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
-                InputManager.MoveMouseTo(popoverButton);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddStep("set spectating", () => MultiplayerClient.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
-            AddUntilStep("local user is spectating", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
-
-            AddStep("finish countdown", () => MultiplayerClient.SkipToEndOfCountdown());
-            AddUntilStep("match not started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.Open);
-        }
-
-        [Test]
         public void TestReadyButtonEnabledWhileSpectatingDuringCountdown()
         {
             AddStep("add second user", () => MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" }));
