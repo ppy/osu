@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -27,12 +28,6 @@ namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
-        [CanBeNull]
-        protected TextureStore Textures;
-
-        [CanBeNull]
-        protected ISampleStore Samples;
-
         /// <summary>
         /// Whether texture for the keys exists.
         /// Used to determine if the mania ruleset is skinned.
@@ -51,7 +46,7 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public LegacySkin(SkinInfo skin, IStorageResourceProvider resources)
-            : this(skin, new LegacyDatabasedSkinResourceStore(skin, resources.Files), resources, "skin.ini")
+            : this(skin, resources, null)
         {
         }
 
@@ -59,36 +54,12 @@ namespace osu.Game.Skinning
         /// Construct a new legacy skin instance.
         /// </summary>
         /// <param name="skin">The model for this skin.</param>
-        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
         /// <param name="resources">Access to raw game resources.</param>
+        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
         /// <param name="configurationFilename">The user-facing filename of the configuration file to be parsed. Can accept an .osu or skin.ini file.</param>
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, string configurationFilename)
-            : this(skin, storage, resources, string.IsNullOrEmpty(configurationFilename) ? null : storage?.GetStream(configurationFilename))
+        protected LegacySkin(SkinInfo skin, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] IResourceStore<byte[]> storage, string configurationFilename = @"skin.ini")
+            : base(skin, resources, storage, configurationFilename)
         {
-        }
-
-        /// <summary>
-        /// Construct a new legacy skin instance.
-        /// </summary>
-        /// <param name="skin">The model for this skin.</param>
-        /// <param name="storage">A storage for looking up files within this skin using user-facing filenames.</param>
-        /// <param name="resources">Access to raw game resources.</param>
-        /// <param name="configurationStream">An optional stream containing the contents of a skin.ini file.</param>
-        protected LegacySkin(SkinInfo skin, [CanBeNull] IResourceStore<byte[]> storage, [CanBeNull] IStorageResourceProvider resources, [CanBeNull] Stream configurationStream)
-            : base(skin, resources, configurationStream)
-        {
-            if (storage != null)
-            {
-                var samples = resources?.AudioManager?.GetSampleStore(storage);
-                if (samples != null)
-                    samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
-
-                Samples = samples;
-                Textures = new TextureStore(resources?.CreateTextureLoaderStore(storage));
-
-                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
-            }
-
             // todo: this shouldn't really be duplicated here (from ManiaLegacySkinTransformer). we need to come up with a better solution.
             hasKeyTexture = new Lazy<bool>(() => this.GetAnimation(
                 lookupForMania<string>(new LegacyManiaSkinConfigurationLookup(4, LegacyManiaSkinConfigurationLookups.KeyImage, 0))?.Value ?? "mania-key1", true,
@@ -385,26 +356,15 @@ namespace osu.Game.Skinning
                                 }
                             })
                             {
-                                Children = this.HasFont(LegacyFont.Score)
-                                    ? new Drawable[]
-                                    {
-                                        new LegacyComboCounter(),
-                                        new LegacyScoreCounter(),
-                                        new LegacyAccuracyCounter(),
-                                        new LegacyHealthDisplay(),
-                                        new SongProgress(),
-                                        new BarHitErrorMeter(),
-                                    }
-                                    : new Drawable[]
-                                    {
-                                        // TODO: these should fallback to using osu!classic skin textures, rather than doing this.
-                                        new DefaultComboCounter(),
-                                        new DefaultScoreCounter(),
-                                        new DefaultAccuracyCounter(),
-                                        new DefaultHealthDisplay(),
-                                        new SongProgress(),
-                                        new BarHitErrorMeter(),
-                                    }
+                                Children = new Drawable[]
+                                {
+                                    new LegacyComboCounter(),
+                                    new LegacyScoreCounter(),
+                                    new LegacyAccuracyCounter(),
+                                    new LegacyHealthDisplay(),
+                                    new SongProgress(),
+                                    new BarHitErrorMeter(),
+                                }
                             };
 
                             return skinnableTargetWrapper;
@@ -550,13 +510,6 @@ namespace osu.Game.Skinning
 
             // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/osu/approachcircle" -> "approachcircle").
             yield return componentName.Split('/').Last();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            Textures?.Dispose();
-            Samples?.Dispose();
         }
     }
 }

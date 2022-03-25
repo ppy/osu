@@ -28,6 +28,14 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected virtual bool AllowMultipleFires => false;
 
+        /// <summary>
+        /// Specify a custom activation delay, overriding the game-wide user setting.
+        /// </summary>
+        /// <remarks>
+        /// This should be used in special cases where we want to be extra sure the user knows what they are doing. An example is when changes would be lost.
+        /// </remarks>
+        protected virtual double? HoldActivationDelay => null;
+
         public Bindable<double> Progress = new BindableDouble();
 
         private Bindable<double> holdActivationDelay;
@@ -35,7 +43,9 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            holdActivationDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
+            holdActivationDelay = HoldActivationDelay != null
+                ? new Bindable<double>(HoldActivationDelay.Value)
+                : config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
         }
 
         protected void BeginConfirm()
