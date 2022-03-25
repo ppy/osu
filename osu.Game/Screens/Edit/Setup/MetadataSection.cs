@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Edit.Setup
 
                 Empty(),
 
-                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.AuthorString),
-                difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.Version),
+                creatorTextBox = createTextBox<LabelledTextBox>("Creator", metadata.Author.Username),
+                difficultyTextBox = createTextBox<LabelledTextBox>("Difficulty Name", Beatmap.BeatmapInfo.DifficultyName),
                 sourceTextBox = createTextBox<LabelledTextBox>("Source", metadata.Source),
                 tagsTextBox = createTextBox<LabelledTextBox>("Tags", metadata.Tags)
             };
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Edit.Setup
             base.LoadComplete();
 
             if (string.IsNullOrEmpty(ArtistTextBox.Current.Value))
-                GetContainingInputManager().ChangeFocus(ArtistTextBox);
+                ScheduleAfterChildren(() => GetContainingInputManager().ChangeFocus(ArtistTextBox));
 
             ArtistTextBox.Current.BindValueChanged(artist => transferIfRomanised(artist.NewValue, RomanisedArtistTextBox));
             TitleTextBox.Current.BindValueChanged(title => transferIfRomanised(title.NewValue, RomanisedTitleTextBox));
@@ -110,8 +110,8 @@ namespace osu.Game.Screens.Edit.Setup
             Beatmap.Metadata.TitleUnicode = TitleTextBox.Current.Value;
             Beatmap.Metadata.Title = RomanisedTitleTextBox.Current.Value;
 
-            Beatmap.Metadata.AuthorString = creatorTextBox.Current.Value;
-            Beatmap.BeatmapInfo.Version = difficultyTextBox.Current.Value;
+            Beatmap.Metadata.Author.Username = creatorTextBox.Current.Value;
+            Beatmap.BeatmapInfo.DifficultyName = difficultyTextBox.Current.Value;
             Beatmap.Metadata.Source = sourceTextBox.Current.Value;
             Beatmap.Metadata.Tags = tagsTextBox.Current.Value;
         }

@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -42,9 +43,9 @@ namespace osu.Game.Overlays.Dialog
             set => icon.Icon = value;
         }
 
-        private string headerText;
+        private LocalisableString headerText;
 
-        public string HeaderText
+        public LocalisableString HeaderText
         {
             get => headerText;
             set
@@ -57,9 +58,9 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        private string bodyText;
+        private LocalisableString bodyText;
 
-        public string BodyText
+        public LocalisableString BodyText
         {
             get => bodyText;
             set
@@ -218,7 +219,12 @@ namespace osu.Game.Overlays.Dialog
         /// <summary>
         /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
         /// </summary>
-        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().TriggerClick();
+        public void PerformOkAction() => PerformAction<PopupDialogOkButton>();
+
+        /// <summary>
+        /// Programmatically clicks the first button of the provided type.
+        /// </summary>
+        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

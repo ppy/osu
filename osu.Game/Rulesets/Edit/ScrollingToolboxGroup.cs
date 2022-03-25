@@ -7,9 +7,11 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class ScrollingToolboxGroup : ToolboxGroup
+    public class ScrollingToolboxGroup : EditorToolboxGroup
     {
         protected readonly OsuScrollContainer Scroll;
+
+        protected readonly FillFlowContainer FillFlow;
 
         protected override Container<Drawable> Content { get; }
 
@@ -20,7 +22,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 RelativeSizeAxes = Axes.X,
                 Height = scrollAreaHeight,
-                Child = Content = new FillFlowContainer
+                Child = Content = FillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

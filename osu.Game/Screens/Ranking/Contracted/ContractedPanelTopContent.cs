@@ -2,36 +2,42 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Contracted
 {
     public class ContractedPanelTopContent : CompositeDrawable
     {
-        private readonly ScoreInfo score;
+        public readonly Bindable<int?> ScorePosition = new Bindable<int?>();
 
-        public ContractedPanelTopContent(ScoreInfo score)
+        private OsuSpriteText text;
+
+        public ContractedPanelTopContent()
         {
-            this.score = score;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = new OsuSpriteText
+            InternalChild = text = new OsuSpriteText
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 Y = 6,
-                Text = score.Position != null ? $"#{score.Position}" : string.Empty,
                 Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ScorePosition.BindValueChanged(pos => text.Text = pos.NewValue != null ? $"#{pos.NewValue}" : string.Empty, true);
         }
     }
 }

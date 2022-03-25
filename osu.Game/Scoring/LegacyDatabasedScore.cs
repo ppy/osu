@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 using osu.Game.Scoring.Legacy;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Scoring
         {
             ScoreInfo = score;
 
-            string replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            string replayFilename = score.Files.FirstOrDefault(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase))?.File.GetStoragePath();
 
             if (replayFilename == null)
                 return;

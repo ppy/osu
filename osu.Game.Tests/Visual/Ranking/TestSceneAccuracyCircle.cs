@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -15,7 +16,6 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking.Expanded.Accuracy;
 using osu.Game.Tests.Beatmaps;
-using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Ranking
@@ -66,12 +66,13 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private ScoreInfo createScore(double accuracy, ScoreRank rank) => new ScoreInfo
         {
-            User = new User
+            User = new APIUser
             {
                 Id = 2,
                 Username = "peppy",
             },
             BeatmapInfo = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo,
+            Ruleset = new OsuRuleset().RulesetInfo,
             Mods = new Mod[] { new OsuModHardRock(), new OsuModDoubleTime() },
             TotalScore = 2845370,
             Accuracy = accuracy,

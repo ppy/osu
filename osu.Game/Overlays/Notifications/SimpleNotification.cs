@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -15,9 +16,9 @@ namespace osu.Game.Overlays.Notifications
 {
     public class SimpleNotification : Notification
     {
-        private string text = string.Empty;
+        private LocalisableString text;
 
-        public string Text
+        public override LocalisableString Text
         {
             get => text;
             set
@@ -42,13 +43,13 @@ namespace osu.Game.Overlays.Notifications
         private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
-        protected Box IconBackgound;
+        protected Box IconBackground;
 
         public SimpleNotification()
         {
             IconContent.AddRange(new Drawable[]
             {
-                IconBackgound = new Box
+                IconBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))

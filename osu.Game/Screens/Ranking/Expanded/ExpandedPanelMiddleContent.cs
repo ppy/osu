@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -62,12 +63,14 @@ namespace osu.Game.Screens.Ranking.Expanded
         {
             var beatmap = score.BeatmapInfo;
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
-            string creator = metadata.Author?.Username;
+            string creator = metadata.Author.Username;
+
+            int? beatmapMaxCombo = scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely();
 
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out int missCount) || missCount == 0),
+                new ComboStatistic(score.MaxCombo, beatmapMaxCombo),
                 new PerformanceStatistic(score),
             };
 
@@ -78,8 +81,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
-
-            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).Result;
 
             AddInternal(new FillFlowContainer
             {
@@ -143,14 +144,6 @@ namespace osu.Game.Screens.Ranking.Expanded
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Spacing = new Vector2(5, 0),
-                                Children = new Drawable[]
-                                {
-                                    new StarRatingDisplay(starDifficulty)
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft
-                                    },
-                                }
                             },
                             new FillFlowContainer
                             {
@@ -164,7 +157,7 @@ namespace osu.Game.Screens.Ranking.Expanded
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = beatmap.Version,
+                                        Text = beatmap.DifficultyName,
                                         Font = OsuFont.Torus.With(size: 16, weight: FontWeight.SemiBold),
                                     },
                                     new OsuTextFlowContainer(s => s.Font = OsuFont.Torus.With(size: 12))
@@ -230,6 +223,17 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
+
+            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
+
+            if (starDifficulty != null)
+            {
+                starAndModDisplay.Add(new StarRatingDisplay(starDifficulty.Value)
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft
+                });
+            }
 
             if (score.Mods.Any())
             {

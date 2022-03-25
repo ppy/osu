@@ -8,12 +8,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
 
 namespace osu.Game.Scoring.Legacy
@@ -22,6 +22,8 @@ namespace osu.Game.Scoring.Legacy
     {
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
+
+        private float beatmapOffset;
 
         public Score Parse(Stream stream)
         {
@@ -45,7 +47,7 @@ namespace osu.Game.Scoring.Legacy
                 if (workingBeatmap is DummyWorkingBeatmap)
                     throw new BeatmapNotFoundException();
 
-                scoreInfo.User = new User { Username = sr.ReadString() };
+                scoreInfo.User = new APIUser { Username = sr.ReadString() };
 
                 // MD5Hash
                 sr.ReadString();
@@ -72,6 +74,9 @@ namespace osu.Game.Scoring.Legacy
                 currentBeatmap = workingBeatmap.GetPlayableBeatmap(currentRuleset.RulesetInfo, scoreInfo.Mods);
                 scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
+                // As this is baked into hitobject timing (see `LegacyBeatmapDecoder`) we also need to apply this to replay frame timing.
+                beatmapOffset = currentBeatmap.BeatmapInfo.BeatmapVersion < 5 ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0;
+
                 /* score.HpGraphString = */
                 sr.ReadString();
 
@@ -80,12 +85,9 @@ namespace osu.Game.Scoring.Legacy
                 byte[] compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    scoreInfo.OnlineScoreID = sr.ReadInt64();
+                    scoreInfo.OnlineID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    scoreInfo.OnlineScoreID = sr.ReadInt32();
-
-                if (scoreInfo.OnlineScoreID <= 0)
-                    scoreInfo.OnlineScoreID = null;
+                    scoreInfo.OnlineID = sr.ReadInt32();
 
                 if (compressedReplay?.Length > 0)
                 {
@@ -115,7 +117,7 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
-            CalculateAccuracy(score.ScoreInfo);
+            PopulateAccuracy(score.ScoreInfo);
 
             // before returning for database import, we must restore the database-sourced BeatmapInfo.
             // if not, the clone operation in GetPlayableBeatmap will cause a dereference and subsequent database exception.
@@ -124,7 +126,14 @@ namespace osu.Game.Scoring.Legacy
             return score;
         }
 
-        protected void CalculateAccuracy(ScoreInfo score)
+        /// <summary>
+        /// Populates the accuracy of a given <see cref="ScoreInfo"/> from its contained statistics.
+        /// </summary>
+        /// <remarks>
+        /// Legacy use only.
+        /// </remarks>
+        /// <param name="score">The <see cref="ScoreInfo"/> to populate.</param>
+        public static void PopulateAccuracy(ScoreInfo score)
         {
             int countMiss = score.GetCountMiss() ?? 0;
             int count50 = score.GetCount50() ?? 0;
@@ -133,7 +142,7 @@ namespace osu.Game.Scoring.Legacy
             int countGeki = score.GetCountGeki() ?? 0;
             int countKatu = score.GetCountKatu() ?? 0;
 
-            switch (score.Ruleset.ID)
+            switch (score.Ruleset.OnlineID)
             {
                 case 0:
                 {
@@ -225,7 +234,7 @@ namespace osu.Game.Scoring.Legacy
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
-            float lastTime = 0;
+            float lastTime = beatmapOffset;
             ReplayFrame currentFrame = null;
 
             string[] frames = reader.ReadToEnd().Split(',');

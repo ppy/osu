@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -12,9 +13,11 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
@@ -26,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private const float performance_background_shear = 0.45f;
 
-        protected readonly ScoreInfo Score;
+        protected readonly APIScore Score;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -34,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        public DrawableProfileScore(ScoreInfo score)
+        public DrawableProfileScore(APIScore score)
         {
             Score = score;
 
@@ -43,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(RulesetStore rulesets)
         {
             AddInternal(new ProfileItemContainer
             {
@@ -79,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Spacing = new Vector2(0, 2),
                                         Children = new Drawable[]
                                         {
-                                            new ScoreBeatmapMetadataContainer(Score.BeatmapInfo),
+                                            new ScoreBeatmapMetadataContainer(Score.Beatmap),
                                             new FillFlowContainer
                                             {
                                                 AutoSizeAxes = Axes.Both,
@@ -89,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                 {
                                                     new OsuSpriteText
                                                     {
-                                                        Text = $"{Score.BeatmapInfo.Version}",
+                                                        Text = $"{Score.Beatmap?.DifficultyName}",
                                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                                         Colour = colours.Yellow
                                                     },
@@ -129,9 +132,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                         Origin = Anchor.CentreRight,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(2),
-                                        Children = Score.Mods.Select(mod => new ModIcon(mod)
+                                        Children = Score.Mods.Select(mod =>
                                         {
-                                            Scale = new Vector2(0.35f)
+                                            var ruleset = rulesets.GetRuleset(Score.RulesetID) ?? throw new InvalidOperationException();
+
+                                            return new ModIcon(ruleset.CreateInstance().CreateModFromAcronym(mod.Acronym))
+                                            {
+                                                Scale = new Vector2(0.35f)
+                                            };
                                         }).ToList(),
                                     }
                                 }
@@ -198,7 +206,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             RelativeSizeAxes = Axes.Y,
             Child = new OsuSpriteText
             {
-                Text = Score.DisplayAccuracy,
+                Text = Score.Accuracy.FormatAccuracy(),
                 Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                 Colour = colours.Yellow,
                 Anchor = Anchor.CentreLeft,

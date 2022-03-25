@@ -8,7 +8,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : PaginatedAPIRequest<List<APILegacyScoreInfo>>
+    public class GetUserScoresRequest : PaginatedAPIRequest<List<APIScore>>
     {
         private readonly long userId;
         private readonly ScoreType type;
@@ -39,6 +39,7 @@ namespace osu.Game.Online.API.Requests
     {
         Best,
         Firsts,
-        Recent
+        Recent,
+        Pinned
     }
 }

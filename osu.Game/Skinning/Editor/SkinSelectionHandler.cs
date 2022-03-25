@@ -70,14 +70,16 @@ namespace osu.Game.Skinning.Editor
             if (anchor.HasFlagFast(Anchor.x1)) scale.X = 0;
             if (anchor.HasFlagFast(Anchor.y1)) scale.Y = 0;
 
-            bool shouldAspectLock =
-                // for now aspect lock scale adjustments that occur at corners..
-                (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
-                // ..or if any of the selection have been rotated.
-                // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
-                || SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0));
-
-            if (shouldAspectLock)
+            // for now aspect lock scale adjustments that occur at corners..
+            if (!anchor.HasFlagFast(Anchor.x1) && !anchor.HasFlagFast(Anchor.y1))
+            {
+                // project scale vector along diagonal
+                Vector2 diag = (selectionRect.TopLeft - selectionRect.BottomRight).Normalized();
+                scale = Vector2.Dot(scale, diag) * diag;
+            }
+            // ..or if any of the selection have been rotated.
+            // this is to avoid requiring skew logic (which would likely not be the user's expected transform anyway).
+            else if (SelectedBlueprints.Any(b => !Precision.AlmostEquals(((Drawable)b.Item).Rotation, 0)))
             {
                 if (anchor.HasFlagFast(Anchor.x1))
                     // if dragging from the horizontal centre, only a vertical component is available.
@@ -124,7 +126,7 @@ namespace osu.Game.Skinning.Editor
             return true;
         }
 
-        public override bool HandleFlip(Direction direction)
+        public override bool HandleFlip(Direction direction, bool flipOverOrigin)
         {
             var selectionQuad = getSelectionQuad();
             Vector2 scaleFactor = direction == Direction.Horizontal ? new Vector2(-1, 1) : new Vector2(1, -1);
@@ -133,7 +135,7 @@ namespace osu.Game.Skinning.Editor
             {
                 var drawableItem = (Drawable)b.Item;
 
-                var flippedPosition = GetFlippedPosition(direction, selectionQuad, b.ScreenSpaceSelectionPoint);
+                var flippedPosition = GetFlippedPosition(direction, flipOverOrigin ? drawableItem.Parent.ScreenSpaceDrawQuad : selectionQuad, b.ScreenSpaceSelectionPoint);
 
                 updateDrawablePosition(drawableItem, flippedPosition);
 
@@ -196,6 +198,12 @@ namespace osu.Game.Skinning.Editor
             {
                 Items = createAnchorItems((d, o) => ((Drawable)d).Origin == o, applyOrigins).ToArray()
             };
+
+            yield return new OsuMenuItem("Reset position", MenuItemType.Standard, () =>
+            {
+                foreach (var blueprint in SelectedBlueprints)
+                    ((Drawable)blueprint.Item).Position = Vector2.Zero;
+            });
 
             foreach (var item in base.GetContextMenuItemsForSelection(selection))
                 yield return item;

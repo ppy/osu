@@ -28,17 +28,20 @@ namespace osu.Game.Storyboards.Drawables
             LifetimeStart = sampleInfo.StartTime;
         }
 
-        [Resolved]
-        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+        [Resolved(CanBeNull = true)]
+        private IReadOnlyList<Mod> mods { get; set; }
 
         protected override void SkinChanged(ISkinSource skin)
         {
             base.SkinChanged(skin);
 
-            foreach (var mod in mods.Value.OfType<IApplicableToSample>())
+            if (mods != null)
             {
-                foreach (var sample in DrawableSamples)
-                    mod.ApplyToSample(sample);
+                foreach (var mod in mods.OfType<IApplicableToSample>())
+                {
+                    foreach (var sample in DrawableSamples)
+                        mod.ApplyToSample(sample);
+                }
             }
         }
 

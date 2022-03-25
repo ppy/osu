@@ -18,6 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Users;
@@ -35,7 +36,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private IAPIProvider api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private IRulesetStore rulesets { get; set; }
 
         private SpriteIcon crown;
 
@@ -184,9 +185,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
 
             const double fade_time = 50;
 
-            var ruleset = rulesets.GetRuleset(Room.Settings.RulesetID).CreateInstance();
+            var currentItem = Playlist.GetCurrentItem();
+            var ruleset = currentItem != null ? rulesets.GetRuleset(currentItem.RulesetID)?.CreateInstance() : null;
 
-            int? currentModeRank = User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank;
+            int? currentModeRank = ruleset != null ? User.User?.RulesetsStatistics?.GetValueOrDefault(ruleset.ShortName)?.GlobalRank : null;
             userRankText.Text = currentModeRank != null ? $"#{currentModeRank.Value:N0}" : string.Empty;
 
             userStateDisplay.UpdateStatus(User.State, User.BeatmapAvailability);
@@ -196,15 +198,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             else
                 userModsDisplay.FadeOut(fade_time);
 
-            if (Client.IsHost && !User.Equals(Client.LocalUser))
-                kickButton.FadeIn(fade_time);
-            else
-                kickButton.FadeOut(fade_time);
-
-            if (Room.Host?.Equals(User) == true)
-                crown.FadeIn(fade_time);
-            else
-                crown.FadeOut(fade_time);
+            kickButton.Alpha = Client.IsHost && !User.Equals(Client.LocalUser) ? 1 : 0;
+            crown.Alpha = Room.Host?.Equals(User) == true ? 1 : 0;
 
             // If the mods are updated at the end of the frame, the flow container will skip a reflow cycle: https://github.com/ppy/osu-framework/issues/4187
             // This looks particularly jarring here, so re-schedule the update to that start of our frame as a fix.

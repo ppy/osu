@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -34,6 +35,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
 
         [Resolved]
         private ScoreManager scoreManager { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         public PlaylistsResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, bool allowRetry, bool allowWatchingReplay = true)
             : base(score, allowRetry, allowWatchingReplay)
@@ -82,6 +86,13 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
             userScoreReq.Success += userScore =>
             {
                 var allScores = new List<MultiplayerScore> { userScore };
+
+                // Other scores could have arrived between score submission and entering the results screen. Ensure the local player score position is up to date.
+                if (Score != null)
+                {
+                    Score.Position = userScore.Position;
+                    ScorePanelList.GetPanelForScore(Score).ScorePosition.Value = userScore.Position;
+                }
 
                 if (userScore.ScoresAround?.Higher != null)
                 {
@@ -169,7 +180,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         /// <param name="pivot">An optional pivot around which the scores were retrieved.</param>
         private void performSuccessCallback([NotNull] Action<IEnumerable<ScoreInfo>> callback, [NotNull] List<MultiplayerScore> scores, [CanBeNull] MultiplayerScores pivot = null)
         {
-            var scoreInfos = scores.Select(s => s.CreateScoreInfo(playlistItem)).ToArray();
+            var scoreInfos = scores.Select(s => s.CreateScoreInfo(rulesets, playlistItem, Beatmap.Value.BeatmapInfo)).ToArray();
 
             // Score panels calculate total score before displaying, which can take some time. In order to count that calculation as part of the loading spinner display duration,
             // calculate the total scores locally before invoking the success callback.
@@ -182,12 +193,12 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                     Schedule(() =>
                     {
                         // Prefer selecting the local user's score, or otherwise default to the first visible score.
-                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.Id == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
+                        SelectedScore.Value = scoreInfos.FirstOrDefault(s => s.User.OnlineID == api.LocalUser.Value.Id) ?? scoreInfos.FirstOrDefault();
                     });
                 }
 
                 // Invoke callback to add the scores. Exclude the user's current score which was added previously.
-                callback.Invoke(scoreInfos.Where(s => s.OnlineScoreID != Score?.OnlineScoreID));
+                callback.Invoke(scoreInfos.Where(s => s.OnlineID != Score?.OnlineID));
 
                 hideLoadingSpinners(pivot);
             }));

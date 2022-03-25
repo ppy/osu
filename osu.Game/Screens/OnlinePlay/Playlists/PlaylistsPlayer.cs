@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Screens;
+using osu.Game.Extensions;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -32,13 +34,14 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         private void load(IBindable<RulesetInfo> ruleset)
         {
             // Sanity checks to ensure that PlaylistsPlayer matches the settings for the current PlaylistItem
-            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != PlaylistItem.Beatmap.Value.OnlineBeatmapID)
+            if (!Beatmap.Value.BeatmapInfo.MatchesOnlineID(PlaylistItem.Beatmap))
                 throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
 
-            if (ruleset.Value.ID != PlaylistItem.Ruleset.Value.ID)
+            if (ruleset.Value.OnlineID != PlaylistItem.RulesetID)
                 throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
 
-            if (!PlaylistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
+            var requiredLocalMods = PlaylistItem.RequiredMods.Select(m => m.ToMod(GameplayState.Ruleset));
+            if (!requiredLocalMods.All(m => Mods.Value.Any(m.Equals)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
         }
 
@@ -62,7 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
         {
             await base.PrepareScoreForResultsAsync(score).ConfigureAwait(false);
 
-            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
+            Score.ScoreInfo.TotalScore = (int)Math.Round(ScoreProcessor.ComputeFinalScore(ScoringMode.Standardised, Score.ScoreInfo));
         }
 
         protected override void Dispose(bool isDisposing)

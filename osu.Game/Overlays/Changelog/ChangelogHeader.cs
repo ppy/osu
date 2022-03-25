@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Changelog
 
         public static LocalisableString ListingString => LayoutStrings.HeaderChangelogIndex;
 
+        private readonly Bindable<APIUpdateStream> currentStream = new Bindable<APIUpdateStream>();
+
         private Box streamsBackground;
 
         public ChangelogHeader()
@@ -39,7 +41,7 @@ namespace osu.Game.Overlays.Changelog
 
             Build.ValueChanged += showBuild;
 
-            Streams.Current.ValueChanged += e =>
+            currentStream.ValueChanged += e =>
             {
                 if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Build.Value?.UpdateStream))
                     Build.Value = e.NewValue.LatestBuild;
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays.Changelog
             else
             {
                 Current.Value = ListingString;
-                Streams.Current.Value = null;
+                currentStream.Value = null;
             }
         }
 
@@ -92,7 +94,7 @@ namespace osu.Game.Overlays.Changelog
                         Horizontal = 65,
                         Vertical = 20
                     },
-                    Child = Streams = new ChangelogUpdateStreamControl()
+                    Child = Streams = new ChangelogUpdateStreamControl { Current = currentStream },
                 }
             }
         };
@@ -110,7 +112,7 @@ namespace osu.Game.Overlays.Changelog
             if (Build.Value == null)
                 return;
 
-            Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
+            currentStream.Value = Streams.Items.FirstOrDefault(s => s.Name == Build.Value.UpdateStream.Name);
         }
 
         private class ChangelogHeaderTitle : OverlayTitle

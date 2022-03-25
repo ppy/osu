@@ -4,6 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
 using osu.Game.Rulesets;
 
 #nullable enable
@@ -19,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public int OnlineBeatmapSetID { get; set; }
 
         [JsonProperty(@"status")]
-        public BeatmapSetOnlineStatus Status { get; set; }
+        public BeatmapOnlineStatus Status { get; set; }
 
         [JsonProperty("checksum")]
         public string Checksum { get; set; } = string.Empty;
@@ -43,16 +44,16 @@ namespace osu.Game.Online.API.Requests.Responses
         public double StarRating { get; set; }
 
         [JsonProperty(@"drain")]
-        private float drainRate { get; set; }
+        public float DrainRate { get; set; }
 
         [JsonProperty(@"cs")]
-        private float circleSize { get; set; }
+        public float CircleSize { get; set; }
 
         [JsonProperty(@"ar")]
-        private float approachRate { get; set; }
+        public float ApproachRate { get; set; }
 
         [JsonProperty(@"accuracy")]
-        private float overallDifficulty { get; set; }
+        public float OverallDifficulty { get; set; }
 
         [JsonIgnore]
         public double Length { get; set; }
@@ -81,55 +82,73 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public double BPM { get; set; }
 
-        public virtual BeatmapInfo ToBeatmapInfo(RulesetStore rulesets)
-        {
-            var set = BeatmapSet?.ToBeatmapSet(rulesets);
-
-            return new BeatmapInfo
-            {
-                Metadata = set?.Metadata ?? new BeatmapMetadata(),
-                Ruleset = rulesets.GetRuleset(RulesetID),
-                StarDifficulty = StarRating,
-                OnlineBeatmapID = OnlineID,
-                Version = DifficultyName,
-                // this is actually an incorrect mapping (Length is calculated as drain length in lazer's import process, see BeatmapManager.calculateLength).
-                Length = Length,
-                Status = Status,
-                MD5Hash = Checksum,
-                BeatmapSet = set,
-                MaxCombo = MaxCombo,
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = drainRate,
-                    CircleSize = circleSize,
-                    ApproachRate = approachRate,
-                    OverallDifficulty = overallDifficulty,
-                },
-                OnlineInfo = this,
-            };
-        }
-
         #region Implementation of IBeatmapInfo
 
         public IBeatmapMetadataInfo Metadata => (BeatmapSet as IBeatmapSetInfo)?.Metadata ?? new BeatmapMetadata();
 
         public IBeatmapDifficultyInfo Difficulty => new BeatmapDifficulty
         {
-            DrainRate = drainRate,
-            CircleSize = circleSize,
-            ApproachRate = approachRate,
-            OverallDifficulty = overallDifficulty,
+            DrainRate = DrainRate,
+            CircleSize = CircleSize,
+            ApproachRate = ApproachRate,
+            OverallDifficulty = OverallDifficulty,
         };
 
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
 
         public string MD5Hash => Checksum;
 
-        public IRulesetInfo Ruleset => new RulesetInfo { ID = RulesetID };
+        public IRulesetInfo Ruleset => new APIRuleset { OnlineID = RulesetID };
 
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
 
         #endregion
+
+        public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);
+
+        private class APIRuleset : IRulesetInfo
+        {
+            public int OnlineID { get; set; } = -1;
+
+            public string Name => $@"{nameof(APIRuleset)} (ID: {OnlineID})";
+
+            public string ShortName
+            {
+                get
+                {
+                    // TODO: this should really not exist.
+                    switch (OnlineID)
+                    {
+                        case 0: return "osu";
+
+                        case 1: return "taiko";
+
+                        case 2: return "fruits";
+
+                        case 3: return "mania";
+
+                        default: throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+
+            public string InstantiationInfo => string.Empty;
+
+            public Ruleset CreateInstance() => throw new NotImplementedException();
+
+            public bool Equals(IRulesetInfo? other) => other is APIRuleset r && this.MatchesOnlineID(r);
+
+            public int CompareTo(IRulesetInfo other)
+            {
+                if (!(other is APIRuleset ruleset))
+                    throw new ArgumentException($@"Object is not of type {nameof(APIRuleset)}.", nameof(other));
+
+                return OnlineID.CompareTo(ruleset.OnlineID);
+            }
+
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => OnlineID;
+        }
     }
 }

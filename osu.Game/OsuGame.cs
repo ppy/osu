@@ -4,57 +4,58 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using osu.Framework.Configuration;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
-using osu.Framework.Logging;
-using osu.Framework.Allocation;
-using osu.Game.Overlays.Toolbar;
-using osu.Game.Screens;
-using osu.Game.Screens.Menu;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Input.Bindings;
+using osu.Game.IO;
+using osu.Game.Localisation;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Music;
-using osu.Game.Skinning;
-using osuTK.Graphics;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Overlays.Toolbar;
 using osu.Game.Overlays.Volume;
+using osu.Game.Performance;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
-using osu.Game.Updater;
-using osu.Game.Utils;
-using LogLevel = osu.Framework.Logging.LogLevel;
-using osu.Game.Database;
-using osu.Game.Extensions;
-using osu.Game.IO;
-using osu.Game.Localisation;
-using osu.Game.Performance;
+using osu.Game.Skinning;
 using osu.Game.Skinning.Editor;
+using osu.Game.Updater;
+using osu.Game.Users;
+using osu.Game.Utils;
+using osuTK.Graphics;
 
 namespace osu.Game
 {
@@ -102,7 +103,7 @@ namespace osu.Game
 
         private Container topMostOverlayContent;
 
-        private ScalingContainer screenContainer;
+        protected ScalingContainer ScreenContainer { get; private set; }
 
         protected Container ScreenOffsetContainer { get; private set; }
 
@@ -115,7 +116,7 @@ namespace osu.Game
         private readonly DifficultyRecommender difficultyRecommender = new DifficultyRecommender();
 
         [Cached]
-        private readonly StableImportManager stableImportManager = new StableImportManager();
+        private readonly LegacyImportManager legacyImportManager = new LegacyImportManager();
 
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
@@ -149,18 +150,21 @@ namespace osu.Game
         protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
+
         private OsuLogo osuLogo;
 
         private MainMenu menuScreen;
 
+        private VersionManager versionManager;
+
         [CanBeNull]
         private IntroScreen introScreen;
 
-        private Bindable<int> configRuleset;
+        private Bindable<string> configRuleset;
 
         private Bindable<float> uiScale;
 
-        private Bindable<int> configSkin;
+        private Bindable<string> configSkin;
 
         private readonly string[] args;
 
@@ -178,7 +182,7 @@ namespace osu.Game
         }
 
         private void updateBlockingOverlayFade() =>
-            screenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+            ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
         public void AddBlockingOverlay(OverlayContainer overlay)
         {
@@ -220,10 +224,13 @@ namespace osu.Game
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
-            configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
+            configRuleset = LocalConfig.GetBindable<string>(OsuSetting.Ruleset);
             uiScale = LocalConfig.GetBindable<float>(OsuSetting.UIScale);
 
-            var preferredRuleset = RulesetStore.GetRuleset(configRuleset.Value);
+            var preferredRuleset = int.TryParse(configRuleset.Value, out int rulesetId)
+                // int parsing can be removed 20220522
+                ? RulesetStore.GetRuleset(rulesetId)
+                : RulesetStore.GetRuleset(configRuleset.Value);
 
             try
             {
@@ -236,30 +243,25 @@ namespace osu.Game
                 Ruleset.Value = RulesetStore.AvailableRulesets.First();
             }
 
-            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
+            Ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ShortName;
 
             // bind config int to database SkinInfo
-            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
+            configSkin = LocalConfig.GetBindable<string>(OsuSetting.Skin);
+            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                var skinInfo = SkinManager.Query(s => s.ID == skinId.NewValue);
+                Live<SkinInfo> skinInfo = null;
+
+                if (Guid.TryParse(skinId.NewValue, out var guid))
+                    skinInfo = SkinManager.Query(s => s.ID == guid);
 
                 if (skinInfo == null)
                 {
-                    switch (skinId.NewValue)
-                    {
-                        case -1:
-                            skinInfo = DefaultLegacySkin.Info;
-                            break;
-
-                        default:
-                            skinInfo = SkinInfo.Default;
-                            break;
-                    }
+                    if (guid == SkinInfo.CLASSIC_SKIN)
+                        skinInfo = DefaultLegacySkin.CreateInfo().ToLiveUnmanaged();
                 }
 
-                SkinManager.CurrentSkinInfo.Value = skinInfo;
+                SkinManager.CurrentSkinInfo.Value = skinInfo ?? DefaultSkin.CreateInfo().ToLiveUnmanaged();
             };
             configSkin.TriggerChange();
 
@@ -287,25 +289,27 @@ namespace osu.Game
         /// <param name="link">The link to load.</param>
         public void HandleLink(LinkDetails link) => Schedule(() =>
         {
+            string argString = link.Argument.ToString();
+
             switch (link.Action)
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    if (int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                    if (int.TryParse(argString.Contains('?') ? argString.Split('?')[0] : argString, out int beatmapId))
                         ShowBeatmap(beatmapId);
                     break;
 
                 case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(link.Argument, out int setId))
+                    if (int.TryParse(argString, out int setId))
                         ShowBeatmapSet(setId);
                     break;
 
                 case LinkAction.OpenChannel:
-                    ShowChannel(link.Argument);
+                    ShowChannel(argString);
                     break;
 
                 case LinkAction.SearchBeatmapSet:
-                    SearchBeatmapSet(link.Argument);
+                    SearchBeatmapSet(argString);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -319,27 +323,31 @@ namespace osu.Game
                     break;
 
                 case LinkAction.External:
-                    OpenUrlExternally(link.Argument);
+                    OpenUrlExternally(argString);
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (int.TryParse(link.Argument, out int userId))
-                        ShowUser(userId);
-                    else
-                        ShowUser(link.Argument);
+                    if (!(link.Argument is IUser user))
+                    {
+                        user = int.TryParse(argString, out int userId)
+                            ? new APIUser { Id = userId }
+                            : new APIUser { Username = argString };
+                    }
+
+                    ShowUser(user);
 
                     break;
 
                 case LinkAction.OpenWiki:
-                    ShowWiki(link.Argument);
+                    ShowWiki(argString);
                     break;
 
                 case LinkAction.OpenChangelog:
-                    if (string.IsNullOrEmpty(link.Argument))
+                    if (string.IsNullOrEmpty(argString))
                         ShowChangelogListing();
                     else
                     {
-                        string[] changelogArgs = link.Argument.Split("/");
+                        string[] changelogArgs = argString.Split("/");
                         ShowChangelogBuild(changelogArgs[0], changelogArgs[1]);
                     }
 
@@ -350,12 +358,12 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
 
-            externalLinkOpener.OpenUrlExternally(url);
+            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
 
         /// <summary>
@@ -383,14 +391,8 @@ namespace osu.Game
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
-        /// <param name="userId">The user to display.</param>
-        public void ShowUser(int userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
-
-        /// <summary>
-        /// Show a user's profile as an overlay.
-        /// </summary>
-        /// <param name="username">The user to display.</param>
-        public void ShowUser(string username) => waitForReady(() => userProfile, _ => userProfile.ShowUser(username));
+        /// <param name="user">The user to display.</param>
+        public void ShowUser(IUser user) => waitForReady(() => userProfile, _ => userProfile.ShowUser(user));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
@@ -436,11 +438,15 @@ namespace osu.Game
         /// <item>first beatmap from any ruleset.</item>
         /// </list>
         /// </remarks>
-        public void PresentBeatmap(BeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
+        public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            var databasedSet = beatmap.OnlineBeatmapSetID != null
-                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
-                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
+            Live<BeatmapSetInfo> databasedSet = null;
+
+            if (beatmap.OnlineID > 0)
+                databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
+
+            if (beatmap is BeatmapSetInfo localBeatmap)
+                databasedSet ??= BeatmapManager.QueryBeatmapSet(s => s.Hash == localBeatmap.Hash);
 
             if (databasedSet == null)
             {
@@ -448,14 +454,16 @@ namespace osu.Game
                 return;
             }
 
+            var detachedSet = databasedSet.PerformRead(s => s.Detach());
+
             PerformFromScreen(screen =>
             {
                 // Find beatmaps that match our predicate.
-                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
+                var beatmaps = detachedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
 
                 // Use all beatmaps if predicate matched nothing
                 if (beatmaps.Count == 0)
-                    beatmaps = databasedSet.Beatmaps;
+                    beatmaps = detachedSet.Beatmaps.ToList();
 
                 // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
                 var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
@@ -478,16 +486,17 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        public void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
+        public void PresentScore(IScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
             ScoreInfo databasedScoreInfo = null;
 
-            if (score.OnlineScoreID != null)
-                databasedScoreInfo = ScoreManager.Query(s => s.OnlineScoreID == score.OnlineScoreID);
+            if (score.OnlineID > 0)
+                databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
 
-            databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
+            if (score is ScoreInfo scoreInfo)
+                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -648,12 +657,15 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => Notifications.Post(n);
             BeatmapManager.PostImport = items => PresentBeatmap(items.First().Value);
 
+            BeatmapDownloader.PostNotification = n => Notifications.Post(n);
+            ScoreDownloader.PostNotification = n => Notifications.Post(n);
+
             ScoreManager.PostNotification = n => Notifications.Post(n);
             ScoreManager.PostImport = items => PresentScore(items.First().Value);
 
             // make config aware of how to lookup skins for on-screen display purposes.
             // if this becomes a more common thing, tracked settings should be reconsidered to allow local DI.
-            LocalConfig.LookupSkinName = id => SkinManager.GetAllUsableSkins().FirstOrDefault(s => s.ID == id)?.ToString() ?? "Unknown";
+            LocalConfig.LookupSkinName = id => SkinManager.Query(s => s.ID == id)?.ToString() ?? "Unknown";
 
             LocalConfig.LookupKeyBindings = l =>
             {
@@ -674,7 +686,7 @@ namespace osu.Game
             sessionIdleTracker.IsIdle.BindValueChanged(idle =>
             {
                 if (idle.NewValue)
-                    SessionStatics.ResetValues();
+                    SessionStatics.ResetAfterInactivity();
             });
 
             Add(sessionIdleTracker);
@@ -692,7 +704,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                        ScreenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
@@ -737,6 +749,9 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -774,7 +789,7 @@ namespace osu.Game
                 PostNotification = n => Notifications.Post(n),
             }, Add, true);
 
-            loadComponentSingleFile(stableImportManager, Add);
+            loadComponentSingleFile(legacyImportManager, Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
@@ -795,7 +810,7 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
-            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(screenContainer), overlayContent.Add, true);
+            loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
 
             loadComponentSingleFile(new LoginOverlay
             {
@@ -814,7 +829,18 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
-            chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
+            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
+            // Multiplayer modes need to increase poll rate temporarily.
+            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
+
+            void updateChatPollRate()
+            {
+                channelManager.HighPollRate.Value =
+                    chatOverlay.State.Value == Visibility.Visible
+                    || API.Activity.Value is UserActivity.InLobby
+                    || API.Activity.Value is UserActivity.InMultiplayerGame
+                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
+            }
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
@@ -874,8 +900,20 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
+
                 if (paths.Length > 0)
-                    Task.Run(() => Import(paths));
+                {
+                    string firstPath = paths.First();
+
+                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        HandleLink(firstPath);
+                    }
+                    else
+                    {
+                        Task.Run(() => Import(paths));
+                    }
+                }
             }
         }
 
@@ -1001,10 +1039,17 @@ namespace osu.Game
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (introScreen == null) return false;
 
             switch (e.Action)
             {
+                case GlobalAction.ToggleSkinEditor:
+                    skinEditor.ToggleVisibility();
+                    return true;
+
                 case GlobalAction.ResetInputSettings:
                     Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
@@ -1099,18 +1144,22 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
+        private void screenChanged(IScreen current, IScreen newScreen)
         {
-            skinEditor.Reset();
-
             switch (newScreen)
             {
                 case IntroScreen intro:
                     introScreen = intro;
+                    versionManager?.Show();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
+                    versionManager?.Show();
+                    break;
+
+                default:
+                    versionManager?.Hide();
                     break;
             }
 
@@ -1138,18 +1187,15 @@ namespace osu.Game
                 else
                     BackButton.Hide();
             }
+
+            skinEditor.SetTarget((OsuScreen)newScreen);
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen)
-        {
-            ScreenChanged(lastScreen, newScreen);
-            Logger.Log($"Screen changed → {newScreen}");
-        }
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            ScreenChanged(lastScreen, newScreen);
-            Logger.Log($"Screen changed ← {newScreen}");
+            screenChanged(lastScreen, newScreen);
 
             if (newScreen == null)
                 Exit();

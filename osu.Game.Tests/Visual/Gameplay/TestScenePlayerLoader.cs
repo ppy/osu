@@ -95,8 +95,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void prepareBeatmap()
         {
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            Beatmap.Value.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+            var workingBeatmap = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            workingBeatmap.BeatmapInfo.EpilepsyWarning = epilepsyWarning;
+            Beatmap.Value = workingBeatmap;
 
             foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
@@ -250,7 +251,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestMutedNotificationMuteButton()
         {
-            addVolumeSteps("mute button", () => volumeOverlay.IsMuted.Value = true, () => !volumeOverlay.IsMuted.Value);
+            addVolumeSteps("mute button", () =>
+            {
+                // Importantly, in the case the volume is muted but the user has a volume level set, it should be retained.
+                audioManager.VolumeTrack.Value = 0.5f;
+                volumeOverlay.IsMuted.Value = true;
+            }, () => !volumeOverlay.IsMuted.Value && audioManager.VolumeTrack.Value == 0.5f);
         }
 
         /// <remarks>

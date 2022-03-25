@@ -40,9 +40,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private bool isRolling;
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         private readonly Container counterContainer;
 
         /// <summary>
@@ -70,22 +67,32 @@ namespace osu.Game.Screens.Play.HUD
 
             Scale = new Vector2(1.2f);
 
-            InternalChild = counterContainer = new Container
+            InternalChildren = new[]
             {
-                AutoSizeAxes = Axes.Both,
-                AlwaysPresent = true,
-                Children = new[]
+                counterContainer = new Container
                 {
-                    popOutCount = new LegacySpriteText(LegacyFont.Combo)
+                    AutoSizeAxes = Axes.Both,
+                    AlwaysPresent = true,
+                    Children = new[]
                     {
-                        Alpha = 0,
-                        Margin = new MarginPadding(0.05f),
-                        Blending = BlendingParameters.Additive,
-                    },
-                    displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
-                    {
-                        Alpha = 0,
-                    },
+                        popOutCount = new LegacySpriteText(LegacyFont.Combo)
+                        {
+                            Alpha = 0,
+                            Margin = new MarginPadding(0.05f),
+                            Blending = BlendingParameters.Additive,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            BypassAutoSizeAxes = Axes.Both,
+                        },
+                        displayedCountSpriteText = new LegacySpriteText(LegacyFont.Combo)
+                        {
+                            // Initial text and AlwaysPresent allow the counter to have a size before it first displays a combo.
+                            // This is useful for display in the skin editor.
+                            Text = formatCount(0),
+                            AlwaysPresent = true,
+                            Alpha = 0,
+                        },
+                    }
                 }
             };
         }
@@ -102,7 +109,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
 
                 if (isRolling)
-                    onDisplayedCountRolling(displayedCount, value);
+                    onDisplayedCountRolling(value);
                 else if (displayedCount + 1 == value)
                     onDisplayedCountIncrement(value);
                 else
@@ -124,13 +131,6 @@ namespace osu.Game.Screens.Play.HUD
 
             ((IHasText)displayedCountSpriteText).Text = formatCount(Current.Value);
 
-            counterContainer.Anchor = Anchor;
-            counterContainer.Origin = Origin;
-            displayedCountSpriteText.Anchor = Anchor;
-            displayedCountSpriteText.Origin = Origin;
-            popOutCount.Anchor = Anchor;
-            popOutCount.Origin = Origin;
-
             Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
         }
 
@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Play.HUD
                 if (prev + 1 == Current.Value)
                     onCountIncrement(prev, Current.Value);
                 else
-                    onCountChange(prev, Current.Value);
+                    onCountChange(Current.Value);
             }
             else
             {
@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play.HUD
             transformRoll(currentValue, newValue);
         }
 
-        private void onCountChange(int currentValue, int newValue)
+        private void onCountChange(int newValue)
         {
             scheduledPopOutCurrentId++;
 
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Play.HUD
             DisplayedCount = newValue;
         }
 
-        private void onDisplayedCountRolling(int currentValue, int newValue)
+        private void onDisplayedCountRolling(int newValue)
         {
             if (newValue == 0)
                 displayedCountSpriteText.FadeOut(fade_out_duration);

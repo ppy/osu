@@ -8,6 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Extensions;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
@@ -77,27 +79,38 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
-                if (backgroundPath == null)
+                string backgroundPath = BeatmapInfo.Metadata.BackgroundFile;
+
+                if (string.IsNullOrEmpty(backgroundPath))
                     return false;
+
+                // Importantly, do this after the NullOrEmpty because EF may have stored the non-nullable value as null to the database, bypassing compile-time constraints.
+                backgroundPath = backgroundPath.ToLowerInvariant();
 
                 return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
             }
         }
 
-        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null) =>
-            new DrawableStoryboard(this);
+        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null) =>
+            new DrawableStoryboard(this, mods);
 
         public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
         {
             Drawable drawable = null;
-            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.Find(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
-            if (storyboardPath != null)
+            string storyboardPath = BeatmapInfo.BeatmapSet?.Files.FirstOrDefault(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
+
+            if (!string.IsNullOrEmpty(storyboardPath))
                 drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
             // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
             else if (UseSkinSprites)
-                drawable = new SkinnableSprite(path);
+            {
+                drawable = new SkinnableSprite(path)
+                {
+                    RelativeSizeAxes = Axes.None,
+                    AutoSizeAxes = Axes.Both,
+                };
+            }
 
             return drawable;
         }

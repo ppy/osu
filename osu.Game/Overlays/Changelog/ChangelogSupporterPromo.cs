@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Changelog
                                             t.Colour = colour.PinkLighter;
                                         })
                                         {
-                                            Text = ChangelogStrings.SupportText2.ToString(),
+                                            Text = ChangelogStrings.SupportText2,
                                             Margin = new MarginPadding { Top = 10 },
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,

@@ -12,8 +12,8 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
-using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
 
@@ -195,12 +195,12 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (var added in e.NewItems.OfType<User>())
+                    foreach (var added in e.NewItems.OfType<APIUser>())
                         addUser(added);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var removed in e.OldItems.OfType<User>())
+                    foreach (var removed in e.OldItems.OfType<APIUser>())
                         removeUser(removed);
                     break;
 
@@ -222,13 +222,13 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private int displayedCircles => avatarFlow.Count + (hiddenUsers.Count > 0 ? 1 : 0);
 
-        private void addUser(User user)
+        private void addUser(APIUser user)
         {
             if (displayedCircles < NumberOfCircles)
                 avatarFlow.Add(new CircularAvatar { User = user });
         }
 
-        private void removeUser(User user)
+        private void removeUser(APIUser user)
         {
             avatarFlow.RemoveAll(a => a.User == user);
         }
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        private void onHostChanged(ValueChangedEvent<User> host)
+        private void onHostChanged(ValueChangedEvent<APIUser> host)
         {
             hostAvatar.User = host.NewValue;
             hostText.Clear();
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
 
         private class CircularAvatar : CompositeDrawable
         {
-            public User User
+            public APIUser User
             {
                 get => avatar.User;
                 set => avatar.User = value;

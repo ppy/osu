@@ -13,16 +13,22 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
+using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
+using Realms;
 
 namespace osu.Game.Tests.Visual.Ranking
 {
@@ -32,13 +38,22 @@ namespace osu.Game.Tests.Visual.Ranking
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
-            if (beatmapInfo != null)
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            realm.Run(r =>
+            {
+                var beatmapInfo = r.All<BeatmapInfo>()
+                                   .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
+                                   .FirstOrDefault();
+
+                if (beatmapInfo != null)
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
+            });
         }
 
         [Test]
@@ -72,11 +87,10 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             TestResultsScreen screen = null;
 
-            var score = new TestScoreInfo(new OsuRuleset().RulesetInfo)
-            {
-                Accuracy = accuracy,
-                Rank = rank
-            };
+            var score = TestResources.CreateTestScoreInfo();
+
+            score.Accuracy = accuracy;
+            score.Rank = rank;
 
             AddStep("load results", () => Child = new TestResultsContainer(screen = createResultsScreen(score)));
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
@@ -119,7 +133,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("click to right of panel", () =>
             {
                 var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
-                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(100, 0));
+                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(50, 0));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -204,14 +218,22 @@ namespace osu.Game.Tests.Visual.Ranking
         {
             DelayedFetchResultsScreen screen = null;
 
-            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo), 3000)));
+            var tcs = new TaskCompletionSource<bool>();
+
+            AddStep("load results", () => Child = new TestResultsContainer(screen = new DelayedFetchResultsScreen(TestResources.CreateTestScoreInfo(), tcs.Task)));
+
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
+
             AddStep("click expanded panel", () =>
             {
                 var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
                 InputManager.MoveMouseTo(expandedPanel);
                 InputManager.Click(MouseButton.Left);
             });
+
+            AddAssert("no fetch yet", () => !screen.FetchCompleted);
+
+            AddStep("allow fetch", () => tcs.SetResult(true));
 
             AddUntilStep("wait for fetch", () => screen.FetchCompleted);
             AddAssert("expanded panel still on screen", () => this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded).ScreenSpaceDrawQuad.TopLeft.X > 0);
@@ -237,9 +259,26 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
         }
 
-        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? new TestScoreInfo(new OsuRuleset().RulesetInfo));
+        [Test]
+        public void TestRulesetWithNoPerformanceCalculator()
+        {
+            var ruleset = new RulesetWithNoPerformanceCalculator();
+            var score = TestResources.CreateTestScoreInfo(ruleset.RulesetInfo);
 
-        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(new TestScoreInfo(new OsuRuleset().RulesetInfo));
+            AddStep("load results", () => Child = new TestResultsContainer(createResultsScreen(score)));
+            AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
+
+            AddAssert("PP displayed as 0", () =>
+            {
+                var performance = this.ChildrenOfType<PerformanceStatistic>().Single();
+                var counter = performance.ChildrenOfType<StatisticCounter>().Single();
+                return counter.Current.Value == 0;
+            });
+        }
+
+        private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo());
+
+        private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo());
 
         private class TestResultsContainer : Container
         {
@@ -282,7 +321,7 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 for (int i = 0; i < 20; i++)
                 {
-                    var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+                    var score = TestResources.CreateTestScoreInfo();
                     score.TotalScore += 10 - i;
                     score.Hash = $"test{i}";
                     scores.Add(score);
@@ -296,27 +335,27 @@ namespace osu.Game.Tests.Visual.Ranking
 
         private class DelayedFetchResultsScreen : TestResultsScreen
         {
+            private readonly Task fetchWaitTask;
+
             public bool FetchCompleted { get; private set; }
 
-            private readonly double delay;
-
-            public DelayedFetchResultsScreen(ScoreInfo score, double delay)
+            public DelayedFetchResultsScreen(ScoreInfo score, Task fetchWaitTask = null)
                 : base(score)
             {
-                this.delay = delay;
+                this.fetchWaitTask = fetchWaitTask ?? Task.CompletedTask;
             }
 
             protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
             {
                 Task.Run(async () =>
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(delay));
+                    await fetchWaitTask;
 
                     var scores = new List<ScoreInfo>();
 
                     for (int i = 0; i < 20; i++)
                     {
-                        var score = new TestScoreInfo(new OsuRuleset().RulesetInfo);
+                        var score = TestResources.CreateTestScoreInfo();
                         score.TotalScore += 10 - i;
                         scores.Add(score);
                     }
@@ -337,8 +376,8 @@ namespace osu.Game.Tests.Visual.Ranking
             public UnrankedSoloResultsScreen(ScoreInfo score)
                 : base(score, true)
             {
-                Score.BeatmapInfo.OnlineBeatmapID = 0;
-                Score.BeatmapInfo.Status = BeatmapSetOnlineStatus.Pending;
+                Score.BeatmapInfo.OnlineID = 0;
+                Score.BeatmapInfo.Status = BeatmapOnlineStatus.Pending;
             }
 
             protected override void LoadComplete()
@@ -347,6 +386,11 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
             }
+        }
+
+        private class RulesetWithNoPerformanceCalculator : OsuRuleset
+        {
+            public override PerformanceCalculator CreatePerformanceCalculator() => null;
         }
     }
 }

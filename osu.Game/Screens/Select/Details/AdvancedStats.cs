@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Extensions;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
@@ -38,9 +39,9 @@ namespace osu.Game.Screens.Select.Details
         protected readonly StatisticRow FirstValue, HpDrain, Accuracy, ApproachRate;
         private readonly StatisticRow starDifficulty;
 
-        private BeatmapInfo beatmapInfo;
+        private IBeatmapInfo beatmapInfo;
 
-        public BeatmapInfo BeatmapInfo
+        public IBeatmapInfo BeatmapInfo
         {
             get => beatmapInfo;
             set
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.BaseDifficulty;
+            IBeatmapDifficultyInfo baseDifficulty = BeatmapInfo?.Difficulty;
             BeatmapDifficulty adjustedDifficulty = null;
 
             if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            switch (BeatmapInfo?.Ruleset?.ID ?? 0)
+            switch (BeatmapInfo?.Ruleset.OnlineID)
             {
                 case 3:
                     // Account for mania differences locally for now
@@ -147,12 +148,18 @@ namespace osu.Game.Screens.Select.Details
 
             starDifficultyCancellationSource = new CancellationTokenSource();
 
-            var normalStarDifficulty = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
-            var moddedStarDifficulty = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
+            var normalStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, null, starDifficultyCancellationSource.Token);
+            var moddedStarDifficultyTask = difficultyCache.GetDifficultyAsync(BeatmapInfo, ruleset.Value, mods.Value, starDifficultyCancellationSource.Token);
 
-            Task.WhenAll(normalStarDifficulty, moddedStarDifficulty).ContinueWith(_ => Schedule(() =>
+            Task.WhenAll(normalStarDifficultyTask, moddedStarDifficultyTask).ContinueWith(_ => Schedule(() =>
             {
-                starDifficulty.Value = ((float)normalStarDifficulty.Result.Stars, (float)moddedStarDifficulty.Result.Stars);
+                var normalDifficulty = normalStarDifficultyTask.GetResultSafely();
+                var moddedDifficulty = moddedStarDifficultyTask.GetResultSafely();
+
+                if (normalDifficulty == null || moddedDifficulty == null)
+                    return;
+
+                starDifficulty.Value = ((float)normalDifficulty.Value.Stars, (float)moddedDifficulty.Value.Stars);
             }), starDifficultyCancellationSource.Token, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Current);
         }
 

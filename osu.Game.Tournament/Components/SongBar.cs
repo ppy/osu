@@ -127,7 +127,7 @@ namespace osu.Game.Tournament.Components
 
             (string heading, string content)[] stats;
 
-            switch (ruleset.Value.ID)
+            switch (ruleset.Value.OnlineID)
             {
                 default:
                     stats = new (string heading, string content)[]
@@ -186,7 +186,7 @@ namespace osu.Game.Tournament.Components
                                         Children = new Drawable[]
                                         {
                                             new DiffPiece(stats),
-                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.#}{srExtra}"))
+                                            new DiffPiece(("Star Rating", $"{beatmap.StarRating:0.##}{srExtra}"))
                                         }
                                     },
                                     new FillFlowContainer

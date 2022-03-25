@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
@@ -38,6 +39,9 @@ namespace osu.Game.Overlays.Toolbar
 
         [Resolved]
         private TextureStore textures { get; set; }
+
+        [Resolved]
+        private ReadableKeyCombinationProvider keyCombinationProvider { get; set; }
 
         public void SetIcon(string texture) =>
             SetIcon(new Sprite
@@ -76,7 +80,7 @@ namespace osu.Game.Overlays.Toolbar
         protected FillFlowContainer Flow;
 
         [Resolved]
-        private RealmContextFactory realmFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected ToolbarButton()
             : base(HoverSampleSet.Toolbar)
@@ -203,11 +207,11 @@ namespace osu.Game.Overlays.Toolbar
         {
             if (Hotkey == null) return;
 
-            var realmKeyBinding = realmFactory.Context.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetID == null && rkb.ActionInt == (int)Hotkey.Value);
+            var realmKeyBinding = realm.Realm.All<RealmKeyBinding>().FirstOrDefault(rkb => rkb.RulesetName == null && rkb.ActionInt == (int)Hotkey.Value);
 
             if (realmKeyBinding != null)
             {
-                string keyBindingString = realmKeyBinding.KeyCombination.ReadableString();
+                string keyBindingString = keyCombinationProvider.GetReadableString(realmKeyBinding.KeyCombination);
 
                 if (!string.IsNullOrEmpty(keyBindingString))
                     keyBindingTooltip.Text = $" ({keyBindingString})";

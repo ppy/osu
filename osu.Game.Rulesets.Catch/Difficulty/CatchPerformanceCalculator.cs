@@ -13,40 +13,36 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceCalculator : PerformanceCalculator
     {
-        protected new CatchDifficultyAttributes Attributes => (CatchDifficultyAttributes)base.Attributes;
-
-        private Mod[] mods;
-
         private int fruitsHit;
         private int ticksHit;
         private int tinyTicksHit;
         private int tinyTicksMissed;
         private int misses;
 
-        public CatchPerformanceCalculator(Ruleset ruleset, DifficultyAttributes attributes, ScoreInfo score)
-            : base(ruleset, attributes, score)
+        public CatchPerformanceCalculator()
+            : base(new CatchRuleset())
         {
 
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
-            mods = Score.Mods;
+            var catchAttributes = (CatchDifficultyAttributes)attributes;
 
-            fruitsHit = Score.Statistics.GetValueOrDefault(HitResult.Great);
-            ticksHit = Score.Statistics.GetValueOrDefault(HitResult.LargeTickHit);
-            tinyTicksHit = Score.Statistics.GetValueOrDefault(HitResult.SmallTickHit);
-            tinyTicksMissed = Score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-            misses = Score.Statistics.GetValueOrDefault(HitResult.Miss);
+            fruitsHit = score.Statistics.GetValueOrDefault(HitResult.Great);
+            ticksHit = score.Statistics.GetValueOrDefault(HitResult.LargeTickHit);
+            tinyTicksHit = score.Statistics.GetValueOrDefault(HitResult.SmallTickHit);
+            tinyTicksMissed = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
+            misses = score.Statistics.GetValueOrDefault(HitResult.Miss);
 
             // We are heavily relying on aim in catch the beat
-            double value = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
+            double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
 
             // Longer maps are worth more
-            double lengthFactor = numTotalHits * 0.5 + Attributes.DirectionChangeCount;
+            double lengthFactor = numTotalHits * 0.5 + catchAttributes.DirectionChangeCount;
             double lengthBonus = 0.9 + 0.39 * Math.Min(1.0, lengthFactor / 1700);
 
             // Longer maps are worth more
@@ -56,10 +52,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             value *= Math.Pow(0.96, misses);
 
             // Combo scaling
-            if (Attributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(Score.MaxCombo, 0.55) / Math.Pow(Attributes.MaxCombo, 0.55), 1.0);
+            if (catchAttributes.MaxCombo > 0)
+                value *= Math.Min(Math.Pow(score.MaxCombo, 0.55) / Math.Pow(score.MaxCombo, 0.55), 1.0);
 
-            double approachRate = Attributes.ApproachRate;
+
+            double approachRate = catchAttributes.ApproachRate;
             double approachRateFactor = 1.0;
             if (approachRate > 9.0)
                 approachRateFactor += 0.08 * (approachRate - 9.0); // 8% for each AR above 9
@@ -70,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             value *= approachRateFactor;
 
-            if (mods.Any(m => m is ModHidden))
+            if (score.Mods.Any(m => m is ModHidden))
             {
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
                 if (approachRate <= 10.0)
@@ -82,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 1 + 0.02 * (9.0 - approachRate); // Additional 2% for each AR below 9
             }
 
-            if (mods.Any(m => m is ModFlashlight))
+            if (score.Mods.Any(m => m is ModFlashlight))
             {
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 value *= 1.25 * lengthBonus;
@@ -98,10 +95,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Scale the aim value with accuracy _slightly_
             value *= Math.Pow(accuracy(), 6);
 
-            if (mods.Any(m => m is ModNoFail))
+            if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * misses);
 
-            return value;
+            return new CatchPerformanceAttributes
+            {
+                Total = value
+            };
         }
 
         private double accuracy() => totalHits() == 0 ? 0 : Math.Clamp((double)totalSuccessfulHits() / totalHits(), 0, 1);

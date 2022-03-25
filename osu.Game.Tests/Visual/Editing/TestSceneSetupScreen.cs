@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Edit;
@@ -23,9 +24,18 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         public TestSceneSetupScreen()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            });
         }
 
         [Test]

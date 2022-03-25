@@ -12,11 +12,9 @@ using osu.Framework.Platform;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.IO;
 using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
@@ -58,7 +56,6 @@ namespace osu.Game.Tests.Visual.Navigation
         private IReadOnlyList<Type> requiredGameBaseDependencies => new[]
         {
             typeof(OsuGameBase),
-            typeof(DatabaseContextFactory),
             typeof(Bindable<RulesetInfo>),
             typeof(IBindable<RulesetInfo>),
             typeof(Bindable<IReadOnlyList<Mod>>),
@@ -69,10 +66,9 @@ namespace osu.Game.Tests.Visual.Navigation
             typeof(ISkinSource),
             typeof(IAPIProvider),
             typeof(RulesetStore),
-            typeof(FileStore),
             typeof(ScoreManager),
             typeof(BeatmapManager),
-            typeof(RulesetConfigCache),
+            typeof(IRulesetConfigCache),
             typeof(OsuColour),
             typeof(IBindable<WorkingBeatmap>),
             typeof(Bindable<WorkingBeatmap>),
@@ -82,9 +78,6 @@ namespace osu.Game.Tests.Visual.Navigation
 
         [Resolved]
         private OsuGameBase gameBase { get; set; }
-
-        [Resolved]
-        private GameHost host { get; set; }
 
         [Test]
         public void TestNullRulesetHandled()

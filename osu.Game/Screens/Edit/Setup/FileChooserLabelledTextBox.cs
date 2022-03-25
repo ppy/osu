@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osuTK;
@@ -35,9 +34,6 @@ namespace osu.Game.Screens.Edit.Setup
 
         [Resolved]
         private OsuGameBase game { get; set; }
-
-        [Resolved]
-        private SectionsContainer<SetupSection> sectionsContainer { get; set; }
 
         public FileChooserLabelledTextBox(params string[] handledExtensions)
         {

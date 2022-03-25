@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("setup cover", () => Child = new UpdateableOnlineBeatmapSetCover(coverType)
             {
-                OnlineInfo = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet.OnlineInfo,
+                OnlineInfo = CreateAPIBeatmapSet(),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
             });
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("setup covers", () =>
             {
-                BeatmapSetInfo setInfo = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet;
+                var beatmapSet = CreateAPIBeatmapSet();
 
                 FillFlowContainer fillFlow;
 
@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     var cover = new UpdateableOnlineBeatmapSetCover(coverType)
                     {
-                        OnlineInfo = setInfo.OnlineInfo,
+                        OnlineInfo = beatmapSet,
                         Height = 100,
                         Masking = true,
                     };
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("setup cover", () => Child = updateableCover = new TestUpdateableOnlineBeatmapSetCover
             {
-                OnlineInfo = CreateBeatmap(Ruleset.Value).BeatmapInfo.BeatmapSet.OnlineInfo,
+                OnlineInfo = CreateAPIBeatmapSet(),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
             });
@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("setup cover", () => Child = updateableCover = new TestUpdateableOnlineBeatmapSetCover(0)
             {
-                OnlineInfo = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg").OnlineInfo,
+                OnlineInfo = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg"),
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 Alpha = 0.4f
@@ -128,16 +128,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("wait for fade complete", () => initialCover.Alpha == 1);
 
             AddStep("switch beatmap",
-                () => updateableCover.OnlineInfo = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1079428/covers/cover.jpg").OnlineInfo);
+                () => updateableCover.OnlineInfo = createBeatmapWithCover("https://assets.ppy.sh/beatmaps/1079428/covers/cover.jpg"));
             AddUntilStep("new cover loaded", () => updateableCover.ChildrenOfType<OnlineBeatmapSetCover>().Except(new[] { initialCover }).Any());
         }
 
-        private static BeatmapSetInfo createBeatmapWithCover(string coverUrl) => new BeatmapSetInfo
+        private static APIBeatmapSet createBeatmapWithCover(string coverUrl) => new APIBeatmapSet
         {
-            OnlineInfo = new APIBeatmapSet
-            {
-                Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
-            }
+            Covers = new BeatmapSetOnlineCovers { Cover = coverUrl }
         };
 
         private class TestUpdateableOnlineBeatmapSetCover : UpdateableOnlineBeatmapSetCover

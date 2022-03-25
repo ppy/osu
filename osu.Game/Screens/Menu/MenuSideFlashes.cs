@@ -13,10 +13,10 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Skinning;
 using osu.Game.Online.API;
-using osu.Game.Users;
 using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Screens.Menu
 {
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Menu
         private const double box_fade_in_time = 65;
         private const int box_width = 200;
 
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
         private Bindable<Skin> skin;
 
         [Resolved]
@@ -94,9 +94,9 @@ namespace osu.Game.Screens.Menu
             if (beatIndex < 0)
                 return;
 
-            if (effectPoint.KiaiMode ? beatIndex % 2 == 0 : beatIndex % (int)timingPoint.TimeSignature == 0)
+            if (effectPoint.KiaiMode ? beatIndex % 2 == 0 : beatIndex % timingPoint.TimeSignature.Numerator == 0)
                 flash(leftBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
-            if (effectPoint.KiaiMode ? beatIndex % 2 == 1 : beatIndex % (int)timingPoint.TimeSignature == 0)
+            if (effectPoint.KiaiMode ? beatIndex % 2 == 1 : beatIndex % timingPoint.TimeSignature.Numerator == 0)
                 flash(rightBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
         }
 

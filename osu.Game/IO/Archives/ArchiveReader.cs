@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 
 namespace osu.Game.IO.Archives
@@ -31,18 +33,20 @@ namespace osu.Game.IO.Archives
 
         public abstract IEnumerable<string> Filenames { get; }
 
-        public virtual byte[] Get(string name) => GetAsync(name).Result;
+        public virtual byte[] Get(string name)
+        {
+            using (Stream input = GetStream(name))
+                return input?.ReadAllBytesToArray();
+        }
 
-        public async Task<byte[]> GetAsync(string name)
+        public async Task<byte[]> GetAsync(string name, CancellationToken cancellationToken = default)
         {
             using (Stream input = GetStream(name))
             {
                 if (input == null)
                     return null;
 
-                byte[] buffer = new byte[input.Length];
-                await input.ReadAsync(buffer).ConfigureAwait(false);
-                return buffer;
+                return await input.ReadAllBytesToArrayAsync(cancellationToken).ConfigureAwait(false);
             }
         }
     }

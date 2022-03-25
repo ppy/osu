@@ -1,16 +1,15 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-
-#nullable enable
 
 namespace osu.Game.Utils
 {
@@ -154,36 +153,31 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Returns the underlying value of the given mod setting object.
-        /// Used in <see cref="APIMod"/> for serialization and equality comparison purposes.
+        /// Verifies all proposed mods are valid for a given ruleset and returns instantiated <see cref="Mod"/>s for further processing.
         /// </summary>
-        /// <param name="setting">The mod setting.</param>
-        public static object GetSettingUnderlyingValue(object setting)
+        /// <param name="ruleset">The ruleset to verify mods against.</param>
+        /// <param name="proposedMods">The proposed mods.</param>
+        /// <param name="valid">Mods instantiated from <paramref name="proposedMods"/> which were valid for the given <paramref name="ruleset"/>.</param>
+        /// <returns>Whether all <paramref name="proposedMods"/> were valid for the given <paramref name="ruleset"/>.</returns>
+        public static bool InstantiateValidModsForRuleset(Ruleset ruleset, IEnumerable<APIMod> proposedMods, out List<Mod> valid)
         {
-            switch (setting)
+            valid = new List<Mod>();
+            bool proposedWereValid = true;
+
+            foreach (var apiMod in proposedMods)
             {
-                case Bindable<double> d:
-                    return d.Value;
+                var mod = apiMod.ToMod(ruleset);
 
-                case Bindable<int> i:
-                    return i.Value;
+                if (mod is UnknownMod)
+                {
+                    proposedWereValid = false;
+                    continue;
+                }
 
-                case Bindable<float> f:
-                    return f.Value;
-
-                case Bindable<bool> b:
-                    return b.Value;
-
-                case IBindable u:
-                    // A mod with unknown (e.g. enum) generic type.
-                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
-                    Debug.Assert(valueMethod != null);
-                    return valueMethod.GetValue(u);
-
-                default:
-                    // fall back for non-bindable cases.
-                    return setting;
+                valid.Add(mod);
             }
+
+            return proposedWereValid;
         }
     }
 }

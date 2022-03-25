@@ -30,17 +30,17 @@ namespace osu.Game.Rulesets.Catch.Tests
             var controlPointInfo = new ControlPointInfo();
             controlPointInfo.Add(0, new TimingControlPoint());
 
-            WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
+            IWorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
                 HitObjects = new List<HitObject> { new Fruit() },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty(),
+                    Difficulty = new BeatmapDifficulty(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
                         Title = @"You're breathtaking",
-                        AuthorString = @"Everyone",
+                        Author = { Username = @"Everyone" },
                     },
                     Ruleset = new CatchRuleset().RulesetInfo
                 },
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         }
 
         [Test]
-        public void TestJuicestream()
+        public void TestJuiceStream()
         {
             AddStep("hit juicestream", () => spawnJuiceStream(true));
             AddUntilStep("wait for completion", () => playfieldIsEmpty);

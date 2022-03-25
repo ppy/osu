@@ -8,12 +8,12 @@ using System.Collections.Generic;
 
 namespace osu.Game.Database
 {
-    public interface IPostImports<out TModel>
-        where TModel : class
+    public interface IPostImports<TModel>
+        where TModel : class, IHasGuidPrimaryKey
     {
         /// <summary>
         /// Fired when the user requests to view the resulting import.
         /// </summary>
-        public Action<IEnumerable<ILive<TModel>>>? PostImport { set; }
+        public Action<IEnumerable<Live<TModel>>>? PostImport { set; }
     }
 }

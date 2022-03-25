@@ -5,8 +5,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.EmptyScrolling.Replays;
 using osu.Game.Scoring;
-using osu.Game.Users;
 using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Rulesets.EmptyScrolling.Mods
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.EmptyScrolling.Mods
         {
             ScoreInfo = new ScoreInfo
             {
-                User = new User { Username = "sample" },
+                User = new APIUser { Username = "sample" },
             },
             Replay = new EmptyScrollingAutoGenerator(beatmap).Generate(),
         };

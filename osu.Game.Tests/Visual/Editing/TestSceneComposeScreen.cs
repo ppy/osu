@@ -26,9 +26,13 @@ namespace osu.Game.Tests.Visual.Editing
                 }
             });
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Cached]
+        private EditorClipboard clipboard = new EditorClipboard();
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
 
             Child = new ComposeScreen

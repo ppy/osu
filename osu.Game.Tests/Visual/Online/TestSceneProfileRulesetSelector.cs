@@ -7,10 +7,10 @@ using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
-using osu.Game.Users;
 using osu.Framework.Bindables;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneProfileRulesetSelector()
         {
             ProfileRulesetSelector selector;
-            var user = new Bindable<User>();
+            var user = new Bindable<APIUser>();
 
             Child = selector = new ProfileRulesetSelector
             {
@@ -36,10 +36,10 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set taiko as default", () => selector.SetDefaultRuleset(new TaikoRuleset().RulesetInfo));
             AddStep("set catch as default", () => selector.SetDefaultRuleset(new CatchRuleset().RulesetInfo));
 
-            AddStep("User with osu as default", () => user.Value = new User { PlayMode = "osu" });
-            AddStep("User with mania as default", () => user.Value = new User { PlayMode = "mania" });
-            AddStep("User with taiko as default", () => user.Value = new User { PlayMode = "taiko" });
-            AddStep("User with catch as default", () => user.Value = new User { PlayMode = "fruits" });
+            AddStep("User with osu as default", () => user.Value = new APIUser { PlayMode = "osu" });
+            AddStep("User with mania as default", () => user.Value = new APIUser { PlayMode = "mania" });
+            AddStep("User with taiko as default", () => user.Value = new APIUser { PlayMode = "taiko" });
+            AddStep("User with catch as default", () => user.Value = new APIUser { PlayMode = "fruits" });
             AddStep("null user", () => user.Value = null);
         }
     }

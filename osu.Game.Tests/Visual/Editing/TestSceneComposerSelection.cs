@@ -5,7 +5,10 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Testing;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
@@ -29,6 +32,9 @@ namespace osu.Game.Tests.Visual.Editing
         private ComposeBlueprintContainer blueprintContainer
             => Editor.ChildrenOfType<ComposeBlueprintContainer>().First();
 
+        private ContextMenuContainer contextMenuContainer
+            => Editor.ChildrenOfType<ContextMenuContainer>().First();
+
         private void moveMouseToObject(Func<HitObject> targetFunc)
         {
             AddStep("move mouse to object", () =>
@@ -40,6 +46,19 @@ namespace osu.Game.Tests.Visual.Editing
 
                 InputManager.MoveMouseTo(pos);
             });
+        }
+
+        [Test]
+        public void TestSelectAndShowContextMenu()
+        {
+            var addedObject = new HitCircle { StartTime = 100, Position = new Vector2(100, 100) };
+            AddStep("add hitobject", () => EditorBeatmap.Add(addedObject));
+
+            moveMouseToObject(() => addedObject);
+            AddStep("right click", () => InputManager.Click(MouseButton.Right));
+
+            AddUntilStep("hitobject selected", () => EditorBeatmap.SelectedHitObjects.Single() == addedObject);
+            AddUntilStep("context menu is visible", () => contextMenuContainer.ChildrenOfType<OsuContextMenu>().Single().State == MenuState.Open);
         }
 
         [Test]

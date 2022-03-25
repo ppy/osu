@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         private readonly LegacyRollingCounter explosion;
 
-        public LegacyCatchComboCounter(ISkin skin)
+        public LegacyCatchComboCounter()
         {
             AutoSizeAxes = Axes.Both;
 

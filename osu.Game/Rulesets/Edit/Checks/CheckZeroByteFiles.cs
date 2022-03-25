@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -20,12 +21,15 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
 
-            foreach (var file in beatmapSet.Files)
+            if (beatmapSet != null)
             {
-                using (Stream data = context.WorkingBeatmap.GetStream(file.FileInfo.StoragePath))
+                foreach (var file in beatmapSet.Files)
                 {
-                    if (data?.Length == 0)
-                        yield return new IssueTemplateZeroBytes(this).Create(file.Filename);
+                    using (Stream data = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
+                    {
+                        if (data?.Length == 0)
+                            yield return new IssueTemplateZeroBytes(this).Create(file.Filename);
+                    }
                 }
             }
         }

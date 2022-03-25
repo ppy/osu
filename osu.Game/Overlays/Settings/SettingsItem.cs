@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings
         {
             set
             {
-                bool hasValue = !string.IsNullOrWhiteSpace(value.ToString());
+                bool hasValue = value != default;
 
                 if (warningText == null)
                 {
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Settings
                 }
 
                 warningText.Alpha = hasValue ? 1 : 0;
-                warningText.Text = value.ToString(); // TODO: Remove ToString() call after TextFlowContainer supports localisation (see https://github.com/ppy/osu-framework/issues/4636).
+                warningText.Text = value ?? default;
             }
         }
 

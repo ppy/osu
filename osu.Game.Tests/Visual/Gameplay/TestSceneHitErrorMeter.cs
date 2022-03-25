@@ -48,7 +48,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("create display", () => recreateDisplay(new OsuHitWindows(), 5));
 
-            AddRepeatStep("New random judgement", () => newJudgement(), 40);
+            AddRepeatStep("New random judgement", () =>
+            {
+                double offset = RNG.Next(-150, 150);
+                newJudgement(offset, drawableRuleset.HitWindows.ResultFor(offset));
+            }, 400);
 
             AddRepeatStep("New max negative", () => newJudgement(-drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
             AddRepeatStep("New max positive", () => newJudgement(drawableRuleset.HitWindows.WindowFor(HitResult.Meh)), 20);
@@ -235,8 +239,17 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IEnumerable<HitObject> Objects => new[] { new HitCircle { HitWindows = HitWindows } };
 
-            public override event Action<JudgementResult> NewResult;
-            public override event Action<JudgementResult> RevertResult;
+            public override event Action<JudgementResult> NewResult
+            {
+                add => throw new InvalidOperationException();
+                remove => throw new InvalidOperationException();
+            }
+
+            public override event Action<JudgementResult> RevertResult
+            {
+                add => throw new InvalidOperationException();
+                remove => throw new InvalidOperationException();
+            }
 
             public override Playfield Playfield { get; }
             public override Container Overlays { get; }
@@ -251,9 +264,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestDrawableRuleset()
                 : base(new OsuRuleset())
             {
-                // won't compile without this.
-                NewResult?.Invoke(null);
-                RevertResult?.Invoke(null);
             }
 
             public override void SetReplayScore(Score replayScore) => throw new NotImplementedException();
@@ -267,6 +277,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScoreProcessor : ScoreProcessor
         {
+            public TestScoreProcessor()
+                : base(new OsuRuleset())
+            {
+            }
+
             public void Reset() => base.Reset(false);
         }
     }

@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osuTK;
@@ -156,18 +157,18 @@ namespace osu.Game.Graphics.UserInterfaceV2
             descriptionText.Colour = osuColour.Yellow;
         }
 
-        public string Label
+        public LocalisableString Label
         {
             set => labelText.Text = value;
         }
 
-        public string Description
+        public LocalisableString Description
         {
             set
             {
                 descriptionText.Text = value;
 
-                if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty(value.ToString()))
                     descriptionText.Show();
                 else
                     descriptionText.Hide();

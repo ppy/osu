@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -8,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Header.Components;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         private FillFlowContainer badgeFlowContainer;
 
-        public readonly Bindable<User> User = new Bindable<User>();
+        public readonly Bindable<APIUser> User = new Bindable<APIUser>();
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -63,10 +64,16 @@ namespace osu.Game.Overlays.Profile.Header
             };
         }
 
-        private void updateDisplay(User user)
+        private CancellationTokenSource cancellationTokenSource;
+
+        private void updateDisplay(APIUser user)
         {
-            var badges = user.Badges;
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource = new CancellationTokenSource();
+
             badgeFlowContainer.Clear();
+
+            var badges = user.Badges;
 
             if (badges?.Length > 0)
             {
@@ -79,13 +86,19 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         // load in stable order regardless of async load order.
                         badgeFlowContainer.Insert(displayIndex, asyncBadge);
-                    });
+                    }, cancellationTokenSource.Token);
                 }
             }
             else
             {
                 Hide();
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            cancellationTokenSource?.Cancel();
+            base.Dispose(isDisposing);
         }
     }
 }

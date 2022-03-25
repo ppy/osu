@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Play
 
         private void userSentFrames(int userId, FrameDataBundle bundle)
         {
-            if (userId != score.ScoreInfo.User.Id)
+            if (userId != score.ScoreInfo.User.OnlineID)
                 return;
 
             if (!LoadedBeatmapSuccessfully)
@@ -72,6 +72,7 @@ namespace osu.Game.Screens.Play
 
                 var convertedFrame = (ReplayFrame)convertibleFrame;
                 convertedFrame.Time = frame.Time;
+                convertedFrame.Header = frame.Header;
 
                 score.Replay.Frames.Add(convertedFrame);
             }

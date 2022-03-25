@@ -136,10 +136,9 @@ namespace osu.Game.Rulesets.Osu.Statistics
                             }
                         }
                     },
-                    bufferedGrid = new BufferedContainer
+                    bufferedGrid = new BufferedContainer(cachedFrameBuffer: true)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        CacheDrawnFrameBuffer = true,
                         BackgroundColour = Color4Extensions.FromHex("#202624").Opacity(0),
                         Child = pointGrid = new GridContainer
                         {
@@ -175,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Statistics
 
             pointGrid.Content = points;
 
-            if (score.HitEvents == null || score.HitEvents.Count == 0)
+            if (score.HitEvents.Count == 0)
                 return;
 
             // Todo: This should probably not be done like this.

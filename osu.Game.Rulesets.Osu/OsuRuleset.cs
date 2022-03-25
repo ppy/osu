@@ -159,6 +159,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
+                        new OsuModStrictTracking()
                     };
 
                 case ModType.Conversion:
@@ -169,6 +170,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
+                        new OsuModAlternate(),
                     };
 
                 case ModType.Automation:
@@ -193,6 +195,8 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModApproachDifferent(),
                         new OsuModMuted(),
                         new OsuModNoScope(),
+                        new OsuModAimAssist(),
+                        new ModAdaptiveSpeed()
                     };
 
                 case ModType.System:
@@ -208,9 +212,9 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(this, beatmap);
+        public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(RulesetInfo, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new OsuPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator();
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
@@ -277,22 +281,10 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem("Timing Distribution",
-                            new HitEventTimingDistributionGraph(timedHitEvents)
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 250
-                            }),
-                    }
-                },
-                new StatisticRow
-                {
-                    Columns = new[]
-                    {
-                        new StatisticItem("Accuracy Heatmap", new AccuracyHeatmap(score, playableBeatmap)
+                        new StatisticItem("Performance Breakdown", () => new PerformanceBreakdownChart(score, playableBeatmap)
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 250
+                            AutoSizeAxes = Axes.Y
                         }),
                     }
                 },
@@ -300,10 +292,33 @@ namespace osu.Game.Rulesets.Osu
                 {
                     Columns = new[]
                     {
-                        new StatisticItem(string.Empty, new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        new StatisticItem("Timing Distribution", () => new HitEventTimingDistributionGraph(timedHitEvents)
                         {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }, true),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem("Accuracy Heatmap", () => new AccuracyHeatmap(score, playableBeatmap)
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 250
+                        }, true),
+                    }
+                },
+                new StatisticRow
+                {
+                    Columns = new[]
+                    {
+                        new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
+                        {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
-                        }))
+                        }), true)
                     }
                 }
             };

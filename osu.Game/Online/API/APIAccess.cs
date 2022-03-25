@@ -17,6 +17,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API
@@ -35,19 +36,21 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
+        public int APIVersion => 20220217; // We may want to pull this from the game version eventually.
+
         public Exception LastLoginError { get; private set; }
 
         public string ProvidedUsername { get; private set; }
 
         private string password;
 
-        public IBindable<User> LocalUser => localUser;
-        public IBindableList<User> Friends => friends;
+        public IBindable<APIUser> LocalUser => localUser;
+        public IBindableList<APIUser> Friends => friends;
         public IBindable<UserActivity> Activity => activity;
 
-        private Bindable<User> localUser { get; } = new Bindable<User>(createGuestUser());
+        private Bindable<APIUser> localUser { get; } = new Bindable<APIUser>(createGuestUser());
 
-        private BindableList<User> friends { get; } = new BindableList<User>();
+        private BindableList<APIUser> friends { get; } = new BindableList<APIUser>();
 
         private Bindable<UserActivity> activity { get; } = new Bindable<UserActivity>();
 
@@ -398,7 +401,10 @@ namespace osu.Game.Online.API
             lock (queue)
             {
                 if (state.Value == APIState.Offline)
+                {
+                    request.Fail(new WebException(@"User not logged in"));
                     return;
+                }
 
                 queue.Enqueue(request);
             }
@@ -415,7 +421,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException(@"Disconnected from server"));
+                        req.Fail(new WebException($@"Request failed from flush operation (state {state.Value})"));
                 }
             }
         }
@@ -436,7 +442,7 @@ namespace osu.Game.Online.API
             flushQueue();
         }
 
-        private static User createGuestUser() => new GuestUser();
+        private static APIUser createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -447,7 +453,7 @@ namespace osu.Game.Online.API
         }
     }
 
-    internal class GuestUser : User
+    internal class GuestUser : APIUser
     {
         public GuestUser()
         {

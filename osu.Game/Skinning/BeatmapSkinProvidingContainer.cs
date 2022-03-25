@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Configuration;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Skinning
 {
@@ -56,12 +57,12 @@ namespace osu.Game.Skinning
             return beatmapSkins.Value;
         }
 
-        protected override bool AllowSampleLookup(ISampleInfo componentName)
+        protected override bool AllowSampleLookup(ISampleInfo sampleInfo)
         {
             if (beatmapSkins == null)
                 throw new InvalidOperationException($"{nameof(BeatmapSkinProvidingContainer)} needs to be loaded before being consumed.");
 
-            return beatmapHitsounds.Value;
+            return sampleInfo is StoryboardSampleInfo || beatmapHitsounds.Value;
         }
 
         public BeatmapSkinProvidingContainer(ISkin skin)

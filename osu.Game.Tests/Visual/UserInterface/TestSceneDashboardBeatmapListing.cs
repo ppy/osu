@@ -7,11 +7,11 @@ using osu.Game.Overlays.Dashboard.Home;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
-using osu.Game.Users;
 using System;
 using osu.Framework.Graphics.Shapes;
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
+using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -56,95 +56,71 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Set width to 300", () => content.ResizeWidthTo(300, 500));
         }
 
-        private static readonly List<BeatmapSetInfo> new_beatmaps = new List<BeatmapSetInfo>
+        private static readonly List<APIBeatmapSet> new_beatmaps = new List<APIBeatmapSet>
         {
-            new BeatmapSetInfo
+            new APIBeatmapSet
             {
-                Metadata = new BeatmapMetadata
+                Title = "Very Long Title (TV size) [TATOE]",
+                Artist = "This artist has a really long name how is this possible",
+                Author = new APIUser
                 {
-                    Title = "Very Long Title (TV size) [TATOE]",
-                    Artist = "This artist has a really long name how is this possible",
-                    Author = new User
-                    {
-                        Username = "author",
-                        Id = 100
-                    }
+                    Username = "author",
+                    Id = 100
                 },
-                OnlineInfo = new APIBeatmapSet
+                Covers = new BeatmapSetOnlineCovers
                 {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
-                    },
-                    Ranked = DateTimeOffset.Now
-                }
+                    Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
+                },
+                Ranked = DateTimeOffset.Now
             },
-            new BeatmapSetInfo
+            new APIBeatmapSet
             {
-                Metadata = new BeatmapMetadata
+                Title = "Very Long Title (TV size) [TATOE]",
+                Artist = "This artist has a really long name how is this possible",
+                Author = new APIUser
                 {
-                    Title = "Very Long Title (TV size) [TATOE]",
-                    Artist = "This artist has a really long name how is this possible",
-                    Author = new User
-                    {
-                        Username = "author",
-                        Id = 100
-                    }
+                    Username = "author",
+                    Id = 100
                 },
-                OnlineInfo = new APIBeatmapSet
+                Covers = new BeatmapSetOnlineCovers
                 {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
-                    },
-                    Ranked = DateTimeOffset.MinValue
-                }
+                    Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
+                },
+                Ranked = DateTimeOffset.Now
             }
         };
 
-        private static readonly List<BeatmapSetInfo> popular_beatmaps = new List<BeatmapSetInfo>
+        private static readonly List<APIBeatmapSet> popular_beatmaps = new List<APIBeatmapSet>
         {
-            new BeatmapSetInfo
+            new APIBeatmapSet
             {
-                Metadata = new BeatmapMetadata
+                Title = "Very Long Title (TV size) [TATOE]",
+                Artist = "This artist has a really long name how is this possible",
+                Author = new APIUser
                 {
-                    Title = "Title",
-                    Artist = "Artist",
-                    Author = new User
-                    {
-                        Username = "author",
-                        Id = 100
-                    }
+                    Username = "author",
+                    Id = 100
                 },
-                OnlineInfo = new APIBeatmapSet
+                Covers = new BeatmapSetOnlineCovers
                 {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = "https://assets.ppy.sh/beatmaps/1079428/covers/cover.jpg?1595295586",
-                    },
-                    FavouriteCount = 100
-                }
+                    Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
+                },
+                Ranked = DateTimeOffset.Now
             },
-            new BeatmapSetInfo
+            new APIBeatmapSet
             {
-                Metadata = new BeatmapMetadata
+                Title = "Very Long Title (TV size) [TATOE]",
+                Artist = "This artist has a really long name how is this possible",
+                Author = new APIUser
                 {
-                    Title = "Title 2",
-                    Artist = "Artist 2",
-                    Author = new User
-                    {
-                        Username = "someone",
-                        Id = 100
-                    }
+                    Username = "author",
+                    Id = 100
                 },
-                OnlineInfo = new APIBeatmapSet
+                Covers = new BeatmapSetOnlineCovers
                 {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = "https://assets.ppy.sh/beatmaps/1079428/covers/cover.jpg?1595295586",
-                    },
-                    FavouriteCount = 10
-                }
+                    Cover = "https://assets.ppy.sh/beatmaps/1189904/covers/cover.jpg?1595456608",
+                },
+                Ranked = DateTimeOffset.Now
             }
         };
     }

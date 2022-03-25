@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BaseDifficulty = new BeatmapDifficulty { CircleSize = 6, SliderMultiplier = 3 },
+                    Difficulty = new BeatmapDifficulty { CircleSize = 6, SliderMultiplier = 3 },
                     Ruleset = ruleset
                 }
             };

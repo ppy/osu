@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Edit.Verify
         private IssueTable table;
 
         [Resolved]
-        private EditorClock clock { get; set; }
-
-        [Resolved]
         private IBindable<WorkingBeatmap> workingBeatmap { get; set; }
 
         [Resolved]
@@ -43,7 +40,7 @@ namespace osu.Game.Screens.Edit.Verify
         private void load(OverlayColourProvider colours)
         {
             generalVerifier = new BeatmapVerifier();
-            rulesetVerifier = beatmap.BeatmapInfo.Ruleset?.CreateInstance()?.CreateBeatmapVerifier();
+            rulesetVerifier = beatmap.BeatmapInfo.Ruleset.CreateInstance().CreateBeatmapVerifier();
 
             context = new BeatmapVerifierContext(beatmap, workingBeatmap.Value, verify.InterpretedDifficulty.Value);
             verify.InterpretedDifficulty.BindValueChanged(difficulty => context.InterpretedDifficulty = difficulty.NewValue);

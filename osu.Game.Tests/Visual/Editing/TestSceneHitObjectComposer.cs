@@ -39,9 +39,16 @@ namespace osu.Game.Tests.Visual.Editing
             {
                 Beatmap.Value = CreateWorkingBeatmap(new Beatmap
                 {
+                    BeatmapInfo =
+                    {
+                        Ruleset = new OsuRuleset().RulesetInfo
+                    },
                     HitObjects = new List<HitObject>
                     {
-                        new HitCircle { Position = new Vector2(256, 192), Scale = 0.5f },
+                        new HitCircle
+                        {
+                            Position = new Vector2(256, 192), Scale = 0.5f
+                        },
                         new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f },
                         new Slider
                         {
@@ -81,11 +88,11 @@ namespace osu.Game.Tests.Visual.Editing
 
         public class EditorBeatmapContainer : Container
         {
-            private readonly WorkingBeatmap working;
+            private readonly IWorkingBeatmap working;
 
             public EditorBeatmap EditorBeatmap { get; private set; }
 
-            public EditorBeatmapContainer(WorkingBeatmap working)
+            public EditorBeatmapContainer(IWorkingBeatmap working)
             {
                 this.working = working;
 

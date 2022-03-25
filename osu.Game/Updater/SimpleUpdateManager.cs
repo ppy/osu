@@ -2,10 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
@@ -84,7 +83,8 @@ namespace osu.Game.Updater
                     break;
 
                 case RuntimeInfo.Platform.macOS:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip", StringComparison.Ordinal));
+                    string arch = RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "Apple.Silicon" : "Intel";
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith($".app.{arch}.zip", StringComparison.Ordinal));
                     break;
 
                 case RuntimeInfo.Platform.Linux:
@@ -103,27 +103,6 @@ namespace osu.Game.Updater
             }
 
             return bestAsset?.BrowserDownloadUrl ?? release.HtmlUrl;
-        }
-
-        public class GitHubRelease
-        {
-            [JsonProperty("html_url")]
-            public string HtmlUrl { get; set; }
-
-            [JsonProperty("tag_name")]
-            public string TagName { get; set; }
-
-            [JsonProperty("assets")]
-            public List<GitHubAsset> Assets { get; set; }
-        }
-
-        public class GitHubAsset
-        {
-            [JsonProperty("name")]
-            public string Name { get; set; }
-
-            [JsonProperty("browser_download_url")]
-            public string BrowserDownloadUrl { get; set; }
         }
     }
 }

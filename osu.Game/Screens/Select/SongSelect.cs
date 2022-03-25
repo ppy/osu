@@ -37,6 +37,7 @@ using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -51,7 +52,7 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
-        protected virtual bool DisplayStableImportPrompt => stableImportManager?.SupportsImportFromStable == true;
+        protected virtual bool DisplayStableImportPrompt => legacyImportManager?.SupportsImportFromStable == true;
 
         public override bool? AllowTrackAdjustments => true;
 
@@ -76,6 +77,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public virtual bool AllowEditing => true;
 
+        public bool BeatmapSetsLoaded => IsLoaded && Carousel?.BeatmapSetsLoaded == true;
+
         [Resolved]
         private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
 
@@ -90,7 +93,7 @@ namespace osu.Game.Screens.Select
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private StableImportManager stableImportManager { get; set; }
+        private LegacyImportManager legacyImportManager { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
@@ -104,6 +107,8 @@ namespace osu.Game.Screens.Select
         protected BeatmapDetailArea BeatmapDetails { get; private set; }
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
+
+        private double audioFeedbackLastPlaybackTime;
 
         [Resolved]
         private MusicController music { get; set; }
@@ -231,6 +236,10 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
+                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
 
             if (ShowFooter)
@@ -291,11 +300,11 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     // if we have no beatmaps, let's prompt the user to import from over a stable install if he has one.
-                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && DisplayStableImportPrompt)
+                    if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null && DisplayStableImportPrompt)
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
-                            Task.Run(() => stableImportManager.ImportFromStableAsync(StableContent.All));
+                            Task.Run(() => legacyImportManager.ImportFromStableAsync(StableContent.All));
                         }));
                     }
                 });
@@ -417,7 +426,7 @@ namespace osu.Game.Screens.Select
                 // A selection may not have been possible with filters applied.
 
                 // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
-                if (e.NewValue.BeatmapInfo.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
+                if (!e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
                     Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
                     transferRulesetValue();
@@ -435,6 +444,7 @@ namespace osu.Game.Screens.Select
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
+        private BeatmapInfo beatmapInfoPrevious;
         private BeatmapInfo beatmapInfoNoDebounce;
         private RulesetInfo rulesetNoDebounce;
 
@@ -477,12 +487,27 @@ namespace osu.Game.Screens.Select
             else
                 selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
 
+            if (beatmap?.Equals(beatmapInfoPrevious) != true)
+            {
+                if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
+                {
+                    if (beatmap.BeatmapSet?.ID == beatmapInfoPrevious.BeatmapSet?.ID)
+                        sampleChangeDifficulty.Play();
+                    else
+                        sampleChangeBeatmap.Play();
+
+                    audioFeedbackLastPlaybackTime = Time.Current;
+                }
+
+                beatmapInfoPrevious = beatmap;
+            }
+
             void run()
             {
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -508,18 +533,7 @@ namespace osu.Game.Screens.Select
                 if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
-
-                    int? lastSetID = Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
-
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
-
-                    if (beatmap != null)
-                    {
-                        if (beatmap.BeatmapSetInfoID == lastSetID)
-                            sampleChangeDifficulty.Play();
-                        else
-                            sampleChangeBeatmap.Play();
-                    }
                 }
 
                 if (this.IsCurrentScreen())
@@ -610,6 +624,10 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
+            // Without this, it's possible for a transfer to happen while we are not the current screen.
+            transferRulesetValue();
+
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 
@@ -664,7 +682,7 @@ namespace osu.Game.Screens.Select
             music.TrackChanged -= ensureTrackLooping;
         }
 
-        private void ensureTrackLooping(WorkingBeatmap beatmap, TrackChangeDirection changeDirection)
+        private void ensureTrackLooping(IWorkingBeatmap beatmap, TrackChangeDirection changeDirection)
             => beatmap.PrepareTrackForPreviewLooping();
 
         public override bool OnBackButton()
@@ -798,14 +816,14 @@ namespace osu.Game.Screens.Select
 
         private void delete(BeatmapSetInfo beatmap)
         {
-            if (beatmap == null || beatmap.ID <= 0) return;
+            if (beatmap == null) return;
 
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
         private void clearScores(BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo == null || beatmapInfo.ID <= 0) return;
+            if (beatmapInfo == null) return;
 
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmapInfo, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
@@ -814,6 +832,9 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             if (!this.IsCurrentScreen()) return false;
 
             switch (e.Action)

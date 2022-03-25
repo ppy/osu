@@ -19,6 +19,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -147,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(current => updateTooltipText(current.NewValue), true);
+            CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -177,7 +178,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnUserChange(value);
             playSample(value);
-            updateTooltipText(value);
+            TooltipText = getTooltipText(value);
         }
 
         private void playSample(T value)
@@ -202,28 +203,22 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        private void updateTooltipText(T value)
+        private LocalisableString getTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                TooltipText = value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
-            else
-            {
-                double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
+                return value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
 
-                if (DisplayAsPercentage)
-                {
-                    TooltipText = floatValue.ToString("0%");
-                }
-                else
-                {
-                    decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
+            double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                    // Find the number of significant digits (we could have less than 5 after normalize())
-                    int significantDigits = findPrecision(decimalPrecision);
+            if (DisplayAsPercentage)
+                return floatValue.ToString("0%");
 
-                    TooltipText = floatValue.ToString($"N{significantDigits}");
-                }
-            }
+            decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
+
+            // Find the number of significant digits (we could have less than 5 after normalize())
+            int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
+
+            return floatValue.ToString($"N{significantDigits}");
         }
 
         protected override void UpdateAfterChildren()
@@ -248,23 +243,5 @@ namespace osu.Game.Graphics.UserInterface
         /// <returns>The normalised decimal.</returns>
         private decimal normalise(decimal d, int sd)
             => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
-
-        /// <summary>
-        /// Finds the number of digits after the decimal.
-        /// </summary>
-        /// <param name="d">The value to find the number of decimal digits for.</param>
-        /// <returns>The number decimal digits.</returns>
-        private int findPrecision(decimal d)
-        {
-            int precision = 0;
-
-            while (d != Math.Round(d))
-            {
-                d *= 10;
-                precision++;
-            }
-
-            return precision;
-        }
     }
 }

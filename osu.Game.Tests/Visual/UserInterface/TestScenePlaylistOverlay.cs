@@ -1,16 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Music;
+using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
 
@@ -18,9 +19,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePlaylistOverlay : OsuManualInputManagerTestScene
     {
-        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+        private readonly BindableList<Live<BeatmapSetInfo>> beatmapSets = new BindableList<Live<BeatmapSetInfo>>();
 
         private PlaylistOverlay playlistOverlay;
+
+        private Live<BeatmapSetInfo> first;
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -43,18 +46,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             for (int i = 0; i < 100; i++)
             {
-                beatmapSets.Add(new BeatmapSetInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        // Create random metadata, then we can check if sorting works based on these
-                        Artist = "Some Artist " + RNG.Next(0, 9),
-                        Title = $"Some Song {i + 1}",
-                        AuthorString = "Some Guy " + RNG.Next(0, 9),
-                    },
-                    DateAdded = DateTimeOffset.UtcNow,
-                });
+                beatmapSets.Add(TestResources.CreateTestBeatmapSetInfo().ToLiveUnmanaged());
             }
+
+            first = beatmapSets.First();
 
             playlistOverlay.BeatmapSets.BindTo(beatmapSets);
         });
@@ -66,7 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("hold 1st item handle", () =>
             {
-                var handle = this.ChildrenOfType<PlaylistItem.PlaylistItemHandle>().First();
+                var handle = this.ChildrenOfType<OsuRearrangeableListItem<Live<BeatmapSetInfo>>.PlaylistItemHandle>().First();
                 InputManager.MoveMouseTo(handle.ScreenSpaceDrawQuad.Centre);
                 InputManager.PressButton(MouseButton.Left);
             });
@@ -74,10 +69,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("drag to 5th", () =>
             {
                 var item = this.ChildrenOfType<PlaylistItem>().ElementAt(4);
-                InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.Centre);
+                InputManager.MoveMouseTo(item.ScreenSpaceDrawQuad.BottomLeft);
             });
 
-            AddAssert("song 1 is 5th", () => beatmapSets[4].Metadata.Title == "Some Song 1");
+            AddAssert("song 1 is 5th", () => beatmapSets[4].Equals(first));
 
             AddStep("release handle", () => InputManager.ReleaseButton(MouseButton.Left));
         }

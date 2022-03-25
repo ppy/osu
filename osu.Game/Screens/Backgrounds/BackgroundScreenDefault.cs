@@ -11,8 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Skinning;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private int currentDisplay;
         private const int background_count = 7;
-        private IBindable<User> user;
+        private IBindable<APIUser> user;
         private Bindable<Skin> skin;
         private Bindable<BackgroundSource> mode;
         private Bindable<IntroSequence> introSequence;
@@ -48,16 +48,19 @@ namespace osu.Game.Screens.Backgrounds
 
             AddInternal(seasonalBackgroundLoader);
 
-            user.ValueChanged += _ => Next();
-            skin.ValueChanged += _ => Next();
-            mode.ValueChanged += _ => Next();
-            beatmap.ValueChanged += _ => Next();
-            introSequence.ValueChanged += _ => Next();
-            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Next();
+            user.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            skin.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            mode.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            beatmap.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            introSequence.ValueChanged += _ => Scheduler.AddOnce(loadNextIfRequired);
+            seasonalBackgroundLoader.SeasonalBackgroundChanged += () => Scheduler.AddOnce(loadNextIfRequired);
 
             currentDisplay = RNG.Next(0, background_count);
 
             Next();
+
+            // helper function required for AddOnce usage.
+            void loadNextIfRequired() => Next();
         }
 
         private ScheduledDelegate nextTask;
@@ -67,7 +70,7 @@ namespace osu.Game.Screens.Backgrounds
         /// Request loading the next background.
         /// </summary>
         /// <returns>Whether a new background was queued for load. May return false if the current background is still valid.</returns>
-        public bool Next()
+        public virtual bool Next()
         {
             var nextBackground = createBackground();
 

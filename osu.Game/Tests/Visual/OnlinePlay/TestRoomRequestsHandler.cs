@@ -4,14 +4,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
+using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.OnlinePlay.Components;
-using osu.Game.Users;
+using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual.OnlinePlay
 {
@@ -25,9 +27,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
         private readonly List<Room> serverSideRooms = new List<Room>();
 
-        private int currentRoomId;
-        private int currentPlaylistItemId;
-        private int currentScoreId;
+        private int currentRoomId = 1;
+        private int currentPlaylistItemId = 1;
+        private int currentScoreId = 1;
 
         /// <summary>
         /// Handles an API request, while also updating the local state to match
@@ -35,9 +37,9 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// </summary>
         /// <param name="request">The API request to handle.</param>
         /// <param name="localUser">The local user to store in responses where required.</param>
-        /// <param name="game">The game base for cases where actual online requests need to be sent.</param>
+        /// <param name="beatmapManager">The beatmap manager to attempt to retrieve beatmaps from, prior to returning dummy beatmaps.</param>
         /// <returns>Whether the request was successfully handled.</returns>
-        public bool HandleRequest(APIRequest request, User localUser, OsuGameBase game)
+        public bool HandleRequest(APIRequest request, APIUser localUser, BeatmapManager beatmapManager)
         {
             switch (request)
             {
@@ -50,7 +52,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     apiRoom.HasPassword.Value = !string.IsNullOrEmpty(createRoomRequest.Room.Password.Value);
                     apiRoom.Password.Value = createRoomRequest.Room.Password.Value;
 
-                    AddServerSideRoom(apiRoom);
+                    AddServerSideRoom(apiRoom, localUser);
 
                     var responseRoom = new APICreatedRoom();
                     responseRoom.CopyFrom(createResponseRoom(apiRoom, false));
@@ -72,6 +74,29 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     return true;
                 }
 
+                case GetRoomLeaderboardRequest roomLeaderboardRequest:
+                    roomLeaderboardRequest.TriggerSuccess(new APILeaderboard
+                    {
+                        Leaderboard = new List<APIUserScoreAggregate>
+                        {
+                            new APIUserScoreAggregate
+                            {
+                                TotalScore = 1000000,
+                                TotalAttempts = 5,
+                                CompletedBeatmaps = 2,
+                                User = new APIUser { Username = "best user" }
+                            },
+                            new APIUserScoreAggregate
+                            {
+                                TotalScore = 50,
+                                TotalAttempts = 1,
+                                CompletedBeatmaps = 1,
+                                User = new APIUser { Username = "worst user" }
+                            }
+                        }
+                    });
+                    return true;
+
                 case PartRoomRequest partRoomRequest:
                     partRoomRequest.TriggerSuccess();
                     return true;
@@ -87,15 +112,6 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 case GetRoomRequest getRoomRequest:
                     getRoomRequest.TriggerSuccess(createResponseRoom(ServerSideRooms.Single(r => r.RoomID.Value == getRoomRequest.RoomId), true));
-                    return true;
-
-                case GetBeatmapSetRequest getBeatmapSetRequest:
-                    var onlineReq = new GetBeatmapSetRequest(getBeatmapSetRequest.ID, getBeatmapSetRequest.Type);
-                    onlineReq.Success += res => getBeatmapSetRequest.TriggerSuccess(res);
-                    onlineReq.Failure += e => getBeatmapSetRequest.TriggerFailure(e);
-
-                    // Get the online API from the game's dependencies.
-                    game.Dependencies.Get<IAPIProvider>().Queue(onlineReq);
                     return true;
 
                 case CreateRoomScoreRequest createRoomScoreRequest:
@@ -116,6 +132,26 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                         Statistics = new Dictionary<HitResult, int>()
                     });
                     return true;
+
+                case GetBeatmapsRequest getBeatmapsRequest:
+                    var result = new List<APIBeatmap>();
+
+                    foreach (int id in getBeatmapsRequest.BeatmapIds)
+                    {
+                        var baseBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineID == id);
+
+                        if (baseBeatmap == null)
+                        {
+                            baseBeatmap = new TestBeatmap(new RulesetInfo { OnlineID = 0 }).BeatmapInfo;
+                            baseBeatmap.OnlineID = id;
+                            baseBeatmap.BeatmapSet!.OnlineID = id;
+                        }
+
+                        result.Add(OsuTestScene.CreateAPIBeatmap(baseBeatmap));
+                    }
+
+                    getBeatmapsRequest.TriggerSuccess(new GetBeatmapsResponse { Beatmaps = result });
+                    return true;
             }
 
             return false;
@@ -125,11 +161,17 @@ namespace osu.Game.Tests.Visual.OnlinePlay
         /// Adds a room to a local "server-side" list that's returned when a <see cref="GetRoomsRequest"/> is fired.
         /// </summary>
         /// <param name="room">The room.</param>
-        public void AddServerSideRoom(Room room)
+        /// <param name="host">The room host.</param>
+        public void AddServerSideRoom(Room room, APIUser host)
         {
             room.RoomID.Value ??= currentRoomId++;
+            room.Host.Value = host;
+
             for (int i = 0; i < room.Playlist.Count; i++)
+            {
                 room.Playlist[i].ID = currentPlaylistItemId++;
+                room.Playlist[i].OwnerID = room.Host.Value.OnlineID;
+            }
 
             serverSideRooms.Add(room);
         }

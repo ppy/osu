@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
 using osu.Game.Overlays.Settings;
@@ -20,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly Container userPanelArea;
         private readonly AccountCreationOverlay accountCreation;
 
-        private IBindable<User> localUser;
+        private IBindable<APIUser> localUser;
 
         public TestSceneAccountCreationOverlay()
         {

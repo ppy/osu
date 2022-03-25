@@ -60,6 +60,9 @@ namespace osu.Game.Graphics
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
+            if (e.Repeat)
+                return false;
+
             switch (e.Action)
             {
                 case GlobalAction.TakeScreenshot:
@@ -108,6 +111,8 @@ namespace osu.Game.Graphics
             {
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
+
+                host.GetClipboard()?.SetImage(image);
 
                 string filename = getFilename();
 

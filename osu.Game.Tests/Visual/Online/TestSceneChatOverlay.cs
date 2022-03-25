@@ -13,17 +13,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
-using osu.Game.Users;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Online
@@ -47,13 +46,10 @@ namespace osu.Game.Tests.Visual.Online
         [CanBeNull]
         private Func<Channel, List<Message>> onGetMessages;
 
-        [Resolved]
-        private GameHost host { get; set; }
-
         public TestSceneChatOverlay()
         {
             channels = Enumerable.Range(1, 10)
-                                 .Select(index => new Channel(new User())
+                                 .Select(index => new Channel(new APIUser())
                                  {
                                      Name = $"Channel no. {index}",
                                      Topic = index == 3 ? null : $"We talk about the number {index} here",
@@ -98,7 +94,7 @@ namespace osu.Game.Tests.Visual.Online
                         case GetUserRequest getUser:
                             if (getUser.Lookup.Equals("some body", StringComparison.OrdinalIgnoreCase))
                             {
-                                getUser.TriggerSuccess(new User
+                                getUser.TriggerSuccess(new APIUser
                                 {
                                     Username = "some body",
                                     Id = 1,
@@ -126,6 +122,8 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestHideOverlay()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
+
             AddAssert("Chat overlay is visible", () => chatOverlay.State.Value == Visibility.Visible);
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
 
@@ -138,6 +136,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelSelection()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
             AddStep("Setup get message response", () => onGetMessages = channel =>
             {
@@ -149,7 +148,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             ChannelId = channel1.Id,
                             Content = "hello from channel 1!",
-                            Sender = new User
+                            Sender = new APIUser
                             {
                                 Id = 2,
                                 Username = "test_user"
@@ -173,6 +172,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestSearchInSelector()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Search for 'no. 2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "no. 2");
             AddUntilStep("Only channel 2 visible", () =>
             {
@@ -184,6 +184,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelShortcutKeys()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join channels", () => channels.ForEach(channel => channelManager.JoinChannel(channel)));
             AddStep("Close channel selector", () => InputManager.Key(Key.Escape));
             AddUntilStep("Wait for close", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
@@ -203,6 +204,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestCloseChannelBehaviour()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddUntilStep("Join until dropdown has channels", () =>
             {
                 if (visibleChannels.Count() < joinedChannels.Count())
@@ -273,6 +275,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChannelCloseButton()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -293,6 +296,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestCloseTabShortcut()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -318,6 +322,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestNewTabShortcut()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 2 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -334,6 +339,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestRestoreTabShortcut()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join 3 channels", () =>
             {
                 channelManager.JoinChannel(channel1);
@@ -379,6 +385,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestChatCommand()
         {
+            AddStep("Open chat overlay", () => chatOverlay.Show());
             AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
             AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
 
@@ -395,6 +402,143 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Open chat with user", () => channelManager.PostCommand("chat some body"));
             AddAssert("PM channel is selected", () =>
                 channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single().Username == "some body");
+        }
+
+        [Test]
+        public void TestMultiplayerChannelIsNotShown()
+        {
+            Channel multiplayerChannel = null;
+
+            AddStep("open chat overlay", () => chatOverlay.Show());
+
+            AddStep("join multiplayer channel", () => channelManager.JoinChannel(multiplayerChannel = new Channel(new APIUser())
+            {
+                Name = "#mp_1",
+                Type = ChannelType.Multiplayer,
+            }));
+
+            AddAssert("channel joined", () => channelManager.JoinedChannels.Contains(multiplayerChannel));
+            AddAssert("channel not present in overlay", () => !chatOverlay.TabMap.ContainsKey(multiplayerChannel));
+            AddAssert("multiplayer channel is not current", () => channelManager.CurrentChannel.Value != multiplayerChannel);
+
+            AddStep("leave channel", () => channelManager.LeaveChannel(multiplayerChannel));
+            AddAssert("channel left", () => !channelManager.JoinedChannels.Contains(multiplayerChannel));
+        }
+
+        [Test]
+        public void TestHighlightOnCurrentChannel()
+        {
+            Message message = null;
+
+            AddStep("Open chat overlay", () => chatOverlay.Show());
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Send message in channel 1", () =>
+            {
+                channel1.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel1.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
+        }
+
+        [Test]
+        public void TestHighlightOnAnotherChannel()
+        {
+            Message message = null;
+
+            AddStep("Open chat overlay", () => chatOverlay.Show());
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+            AddStep("Send message in channel 2", () =>
+            {
+                channel2.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel2.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel2));
+            AddAssert("Switched to channel 2", () => channelManager.CurrentChannel.Value == channel2);
+        }
+
+        [Test]
+        public void TestHighlightOnLeftChannel()
+        {
+            Message message = null;
+
+            AddStep("Open chat overlay", () => chatOverlay.Show());
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+            AddStep("Select channel 1", () => clickDrawable(chatOverlay.TabMap[channel1]));
+
+            AddStep("Join channel 2", () => channelManager.JoinChannel(channel2));
+            AddStep("Send message in channel 2", () =>
+            {
+                channel2.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel2.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+            AddStep("Leave channel 2", () => channelManager.LeaveChannel(channel2));
+
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel2));
+            AddAssert("Switched to channel 2", () => channelManager.CurrentChannel.Value == channel2);
+        }
+
+        [Test]
+        public void TestHighlightWhileChatNeverOpen()
+        {
+            Message message = null;
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+
+            AddStep("Send message in channel 1", () =>
+            {
+                channel1.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel1.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
+            });
+
+            AddStep("Highlight message and open chat", () =>
+            {
+                chatOverlay.HighlightMessage(message, channel1);
+                chatOverlay.Show();
+            });
         }
 
         private void pressChannelHotkey(int number)
@@ -441,8 +585,6 @@ namespace osu.Game.Tests.Visual.Online
                     ChannelManager,
                     ChatOverlay = new TestChatOverlay { RelativeSizeAxes = Axes.Both, },
                 };
-
-                ChatOverlay.Show();
             }
         }
 

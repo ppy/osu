@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
@@ -27,255 +28,87 @@ namespace osu.Game.Beatmaps
     public abstract class WorkingBeatmap : IWorkingBeatmap
     {
         public readonly BeatmapInfo BeatmapInfo;
-
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        public readonly BeatmapMetadata Metadata;
+        // TODO: remove once the fallback lookup is not required (and access via `working.BeatmapInfo.Metadata` directly).
+        public BeatmapMetadata Metadata => BeatmapInfo.Metadata;
 
-        protected AudioManager AudioManager { get; }
+        public Waveform Waveform => waveform.Value;
+
+        public Storyboard Storyboard => storyboard.Value;
+
+        public Texture Background => GetBackground(); // Texture uses ref counting, so we want to return a new instance every usage.
+
+        public ISkin Skin => skin.Value;
+
+        private AudioManager audioManager { get; }
+
+        private CancellationTokenSource loadCancellationSource = new CancellationTokenSource();
+
+        private readonly object beatmapFetchLock = new object();
+
+        private readonly Lazy<Waveform> waveform;
+        private readonly Lazy<Storyboard> storyboard;
+        private readonly Lazy<ISkin> skin;
+        private Track track; // track is not Lazy as we allow transferring and loading multiple times.
 
         protected WorkingBeatmap(BeatmapInfo beatmapInfo, AudioManager audioManager)
         {
-            AudioManager = audioManager;
+            this.audioManager = audioManager;
+
             BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapInfo.BeatmapSet;
-            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
+            BeatmapSetInfo = beatmapInfo.BeatmapSet ?? new BeatmapSetInfo();
 
-            background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
-            waveform = new RecyclableLazy<Waveform>(GetWaveform);
-            storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
-            skin = new RecyclableLazy<ISkin>(GetSkin);
+            waveform = new Lazy<Waveform>(GetWaveform);
+            storyboard = new Lazy<Storyboard>(GetStoryboard);
+            skin = new Lazy<ISkin>(GetSkin);
         }
 
-        protected virtual Track GetVirtualTrack(double emptyLength = 0)
-        {
-            const double excess_length = 1000;
+        #region Resource getters
 
-            var lastObject = Beatmap?.HitObjects.LastOrDefault();
+        protected virtual Waveform GetWaveform() => new Waveform(null);
+        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
 
-            double length;
-
-            switch (lastObject)
-            {
-                case null:
-                    length = emptyLength;
-                    break;
-
-                case IHasDuration endTime:
-                    length = endTime.EndTime + excess_length;
-                    break;
-
-                default:
-                    length = lastObject.StartTime + excess_length;
-                    break;
-            }
-
-            return AudioManager.Tracks.GetVirtual(length);
-        }
+        protected abstract IBeatmap GetBeatmap();
+        protected abstract Texture GetBackground();
+        protected abstract Track GetBeatmapTrack();
 
         /// <summary>
-        /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> for a specified <see cref="Ruleset"/>.
+        /// Creates a new skin instance for this beatmap.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
-        /// <param name="ruleset">The <see cref="Ruleset"/> for which <paramref name="beatmap"/> should be converted.</param>
-        /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
-        protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
+        /// <remarks>
+        /// This should only be called externally in scenarios where it is explicitly desired to get a new instance of a skin
+        /// (e.g. for editing purposes, to avoid state pollution).
+        /// For standard reading purposes, <see cref="Skin"/> should always be used directly.
+        /// </remarks>
+        protected internal abstract ISkin GetSkin();
 
-        public virtual IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null, TimeSpan? timeout = null)
-        {
-            using (var cancellationSource = createCancellationTokenSource(timeout))
-            {
-                mods ??= Array.Empty<Mod>();
+        #endregion
 
-                var rulesetInstance = ruleset.CreateInstance();
+        #region Async load control
 
-                IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
+        public void BeginAsyncLoad() => loadBeatmapAsync();
 
-                // Check if the beatmap can be converted
-                if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
-                    throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
-
-                // Apply conversion mods
-                foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
-                {
-                    if (cancellationSource.IsCancellationRequested)
-                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
-                    mod.ApplyToBeatmapConverter(converter);
-                }
-
-                // Convert
-                IBeatmap converted = converter.Convert(cancellationSource.Token);
-
-                // Apply conversion mods to the result
-                foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
-                {
-                    if (cancellationSource.IsCancellationRequested)
-                        throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
-                    mod.ApplyToBeatmap(converted);
-                }
-
-                // Apply difficulty mods
-                if (mods.Any(m => m is IApplicableToDifficulty))
-                {
-                    foreach (var mod in mods.OfType<IApplicableToDifficulty>())
-                    {
-                        if (cancellationSource.IsCancellationRequested)
-                            throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
-                        mod.ApplyToDifficulty(converted.Difficulty);
-                    }
-                }
-
-                IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
-
-                foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
-                    mod.ApplyToBeatmapProcessor(processor);
-
-                processor?.PreProcess();
-
-                // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
-                try
-                {
-                    foreach (var obj in converted.HitObjects)
-                    {
-                        if (cancellationSource.IsCancellationRequested)
-                            throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
-                        obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, cancellationSource.Token);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    throw new BeatmapLoadTimeoutException(BeatmapInfo);
-                }
-
-                foreach (var mod in mods.OfType<IApplicableToHitObject>())
-                {
-                    foreach (var obj in converted.HitObjects)
-                    {
-                        if (cancellationSource.IsCancellationRequested)
-                            throw new BeatmapLoadTimeoutException(BeatmapInfo);
-
-                        mod.ApplyToHitObject(obj);
-                    }
-                }
-
-                processor?.PostProcess();
-
-                foreach (var mod in mods.OfType<IApplicableToBeatmap>())
-                {
-                    cancellationSource.Token.ThrowIfCancellationRequested();
-                    mod.ApplyToBeatmap(converted);
-                }
-
-                return converted;
-            }
-        }
-
-        private CancellationTokenSource loadCancellation = new CancellationTokenSource();
-
-        /// <summary>
-        /// Beings loading the contents of this <see cref="WorkingBeatmap"/> asynchronously.
-        /// </summary>
-        public void BeginAsyncLoad()
-        {
-            loadBeatmapAsync();
-        }
-
-        /// <summary>
-        /// Cancels the asynchronous loading of the contents of this <see cref="WorkingBeatmap"/>.
-        /// </summary>
         public void CancelAsyncLoad()
         {
             lock (beatmapFetchLock)
             {
-                loadCancellation?.Cancel();
-                loadCancellation = new CancellationTokenSource();
+                loadCancellationSource?.Cancel();
+                loadCancellationSource = new CancellationTokenSource();
 
                 if (beatmapLoadTask?.IsCompleted != true)
                     beatmapLoadTask = null;
             }
         }
 
-        private CancellationTokenSource createCancellationTokenSource(TimeSpan? timeout)
-        {
-            if (Debugger.IsAttached)
-                // ignore timeout when debugger is attached (may be breakpointing / debugging).
-                return new CancellationTokenSource();
+        #endregion
 
-            return new CancellationTokenSource(timeout ?? TimeSpan.FromSeconds(10));
-        }
+        #region Track
 
-        private readonly object beatmapFetchLock = new object();
+        public virtual bool TrackLoaded => track != null;
 
-        private Task<IBeatmap> loadBeatmapAsync()
-        {
-            lock (beatmapFetchLock)
-            {
-                return beatmapLoadTask ??= Task.Factory.StartNew(() =>
-                {
-                    // Todo: Handle cancellation during beatmap parsing
-                    var b = GetBeatmap() ?? new Beatmap();
+        public Track LoadTrack() => track = GetBeatmapTrack() ?? GetVirtualTrack(1000);
 
-                    // The original beatmap version needs to be preserved as the database doesn't contain it
-                    BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
-
-                    // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
-                    b.BeatmapInfo = BeatmapInfo;
-
-                    return b;
-                }, loadCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-            }
-        }
-
-        public override string ToString() => BeatmapInfo.ToString();
-
-        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
-
-        public IBeatmap Beatmap
-        {
-            get
-            {
-                try
-                {
-                    return loadBeatmapAsync().Result;
-                }
-                catch (AggregateException ae)
-                {
-                    // This is the exception that is generally expected here, which occurs via natural cancellation of the asynchronous load
-                    if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
-                        return null;
-
-                    Logger.Error(ae, "Beatmap failed to load");
-                    return null;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, "Beatmap failed to load");
-                    return null;
-                }
-            }
-        }
-
-        protected abstract IBeatmap GetBeatmap();
-        private Task<IBeatmap> beatmapLoadTask;
-
-        public bool BackgroundLoaded => background.IsResultAvailable;
-        public Texture Background => background.Value;
-        protected virtual bool BackgroundStillValid(Texture b) => b == null || b.Available;
-        protected abstract Texture GetBackground();
-        private readonly RecyclableLazy<Texture> background;
-
-        private Track loadedTrack;
-
-        [NotNull]
-        public Track LoadTrack() => loadedTrack = GetBeatmapTrack() ?? GetVirtualTrack(1000);
-
-        /// <summary>
-        /// Reads the correct track restart point from beatmap metadata and sets looping to enabled.
-        /// </summary>
         public void PrepareTrackForPreviewLooping()
         {
             Track.Looping = true;
@@ -298,12 +131,7 @@ namespace osu.Game.Beatmaps
         /// across difficulties in the same beatmap set.
         /// </summary>
         /// <param name="track">The track to transfer.</param>
-        public void TransferTrack([NotNull] Track track) => loadedTrack = track ?? throw new ArgumentNullException(nameof(track));
-
-        /// <summary>
-        /// Whether this beatmap's track has been loaded via <see cref="LoadTrack"/>.
-        /// </summary>
-        public virtual bool TrackLoaded => loadedTrack != null;
+        public void TransferTrack([NotNull] Track track) => this.track = track ?? throw new ArgumentNullException(nameof(track));
 
         /// <summary>
         /// Get the loaded audio track instance. <see cref="LoadTrack"/> must have first been called.
@@ -316,82 +144,198 @@ namespace osu.Game.Beatmaps
                 if (!TrackLoaded)
                     throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
 
-                return loadedTrack;
+                return track;
             }
         }
 
-        protected abstract Track GetBeatmapTrack();
-
-        public bool WaveformLoaded => waveform.IsResultAvailable;
-        public Waveform Waveform => waveform.Value;
-        protected virtual Waveform GetWaveform() => new Waveform(null);
-        private readonly RecyclableLazy<Waveform> waveform;
-
-        public bool StoryboardLoaded => storyboard.IsResultAvailable;
-        public Storyboard Storyboard => storyboard.Value;
-        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
-        private readonly RecyclableLazy<Storyboard> storyboard;
-
-        public bool SkinLoaded => skin.IsResultAvailable;
-        public ISkin Skin => skin.Value;
-
-        /// <summary>
-        /// Creates a new skin instance for this beatmap.
-        /// </summary>
-        /// <remarks>
-        /// This should only be called externally in scenarios where it is explicitly desired to get a new instance of a skin
-        /// (e.g. for editing purposes, to avoid state pollution).
-        /// For standard reading purposes, <see cref="Skin"/> should always be used directly.
-        /// </remarks>
-        protected internal abstract ISkin GetSkin();
-
-        private readonly RecyclableLazy<ISkin> skin;
-
-        public abstract Stream GetStream(string storagePath);
-
-        public class RecyclableLazy<T>
+        protected Track GetVirtualTrack(double emptyLength = 0)
         {
-            private Lazy<T> lazy;
-            private readonly Func<T> valueFactory;
-            private readonly Func<T, bool> stillValidFunction;
+            const double excess_length = 1000;
 
-            private readonly object fetchLock = new object();
+            var lastObject = Beatmap?.HitObjects.LastOrDefault();
 
-            public RecyclableLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
+            double length;
+
+            switch (lastObject)
             {
-                this.valueFactory = valueFactory;
-                this.stillValidFunction = stillValidFunction;
+                case null:
+                    length = emptyLength;
+                    break;
 
-                recreate();
+                case IHasDuration endTime:
+                    length = endTime.EndTime + excess_length;
+                    break;
+
+                default:
+                    length = lastObject.StartTime + excess_length;
+                    break;
             }
 
-            public void Recycle()
+            return audioManager.Tracks.GetVirtual(length);
+        }
+
+        #endregion
+
+        #region Beatmap
+
+        public virtual bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
+
+        public IBeatmap Beatmap
+        {
+            get
             {
-                if (!IsResultAvailable) return;
-
-                (lazy.Value as IDisposable)?.Dispose();
-                recreate();
-            }
-
-            public bool IsResultAvailable => stillValid;
-
-            public T Value
-            {
-                get
+                try
                 {
-                    lock (fetchLock)
-                    {
-                        if (!stillValid)
-                            recreate();
-                        return lazy.Value;
-                    }
+                    return loadBeatmapAsync().GetResultSafely();
+                }
+                catch (AggregateException ae)
+                {
+                    // This is the exception that is generally expected here, which occurs via natural cancellation of the asynchronous load
+                    if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
+                        return null;
+
+                    Logger.Error(ae, "Beatmap failed to load");
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Beatmap failed to load");
+                    return null;
+                }
+            }
+        }
+
+        private Task<IBeatmap> beatmapLoadTask;
+
+        private Task<IBeatmap> loadBeatmapAsync()
+        {
+            lock (beatmapFetchLock)
+            {
+                return beatmapLoadTask ??= Task.Factory.StartNew(() =>
+                {
+                    // Todo: Handle cancellation during beatmap parsing
+                    var b = GetBeatmap() ?? new Beatmap();
+
+                    // The original beatmap version needs to be preserved as the database doesn't contain it
+                    BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
+
+                    // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
+                    b.BeatmapInfo = BeatmapInfo;
+
+                    return b;
+                }, loadCancellationSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }
+        }
+
+        #endregion
+
+        #region Playable beatmap
+
+        public IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
+        {
+            try
+            {
+                using (var cancellationTokenSource = new CancellationTokenSource(10_000))
+                {
+                    // don't apply the default timeout when debugger is attached (may be breakpointing / debugging).
+                    return GetPlayableBeatmap(ruleset, mods ?? Array.Empty<Mod>(), Debugger.IsAttached ? new CancellationToken() : cancellationTokenSource.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw new BeatmapLoadTimeoutException(BeatmapInfo);
+            }
+        }
+
+        public virtual IBeatmap GetPlayableBeatmap(IRulesetInfo ruleset, IReadOnlyList<Mod> mods, CancellationToken token)
+        {
+            var rulesetInstance = ruleset.CreateInstance();
+
+            if (rulesetInstance == null)
+                throw new RulesetLoadException("Creating ruleset instance failed when attempting to create playable beatmap.");
+
+            IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
+
+            // Check if the beatmap can be converted
+            if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
+
+            // Apply conversion mods
+            foreach (var mod in mods.OfType<IApplicableToBeatmapConverter>())
+            {
+                token.ThrowIfCancellationRequested();
+                mod.ApplyToBeatmapConverter(converter);
+            }
+
+            // Convert
+            IBeatmap converted = converter.Convert(token);
+
+            // Apply conversion mods to the result
+            foreach (var mod in mods.OfType<IApplicableAfterBeatmapConversion>())
+            {
+                token.ThrowIfCancellationRequested();
+                mod.ApplyToBeatmap(converted);
+            }
+
+            // Apply difficulty mods
+            if (mods.Any(m => m is IApplicableToDifficulty))
+            {
+                foreach (var mod in mods.OfType<IApplicableToDifficulty>())
+                {
+                    token.ThrowIfCancellationRequested();
+                    mod.ApplyToDifficulty(converted.Difficulty);
                 }
             }
 
-            private bool stillValid => lazy.IsValueCreated && (stillValidFunction?.Invoke(lazy.Value) ?? true);
+            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
 
-            private void recreate() => lazy = new Lazy<T>(valueFactory, LazyThreadSafetyMode.ExecutionAndPublication);
+            foreach (var mod in mods.OfType<IApplicableToBeatmapProcessor>())
+                mod.ApplyToBeatmapProcessor(processor);
+
+            processor?.PreProcess();
+
+            // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
+            foreach (var obj in converted.HitObjects)
+            {
+                token.ThrowIfCancellationRequested();
+                obj.ApplyDefaults(converted.ControlPointInfo, converted.Difficulty, token);
+            }
+
+            foreach (var mod in mods.OfType<IApplicableToHitObject>())
+            {
+                foreach (var obj in converted.HitObjects)
+                {
+                    token.ThrowIfCancellationRequested();
+                    mod.ApplyToHitObject(obj);
+                }
+            }
+
+            processor?.PostProcess();
+
+            foreach (var mod in mods.OfType<IApplicableToBeatmap>())
+            {
+                token.ThrowIfCancellationRequested();
+                mod.ApplyToBeatmap(converted);
+            }
+
+            return converted;
         }
+
+        /// <summary>
+        /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> for a specified <see cref="Ruleset"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
+        /// <param name="ruleset">The <see cref="Ruleset"/> for which <paramref name="beatmap"/> should be converted.</param>
+        /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
+        protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
+
+        #endregion
+
+        public override string ToString() => BeatmapInfo.ToString();
+
+        public abstract Stream GetStream(string storagePath);
+
+        IBeatmapInfo IWorkingBeatmap.BeatmapInfo => BeatmapInfo;
 
         private class BeatmapLoadTimeoutException : TimeoutException
         {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.IO;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -47,11 +48,15 @@ namespace osu.Game.Rulesets.Edit.Checks
             else if (texture.Width < low_width || texture.Height < low_height)
                 yield return new IssueTemplateLowResolution(this).Create(texture.Width, texture.Height);
 
-            string storagePath = context.Beatmap.BeatmapInfo.BeatmapSet.GetPathForFile(backgroundFile);
-            double filesizeMb = context.WorkingBeatmap.GetStream(storagePath).Length / (1024d * 1024d);
+            string storagePath = context.Beatmap.BeatmapInfo.BeatmapSet?.GetPathForFile(backgroundFile);
 
-            if (filesizeMb > max_filesize_mb)
-                yield return new IssueTemplateTooUncompressed(this).Create(filesizeMb);
+            using (Stream stream = context.WorkingBeatmap.GetStream(storagePath))
+            {
+                double filesizeMb = stream.Length / (1024d * 1024d);
+
+                if (filesizeMb > max_filesize_mb)
+                    yield return new IssueTemplateTooUncompressed(this).Create(filesizeMb);
+            }
         }
 
         public class IssueTemplateTooHighResolution : IssueTemplate

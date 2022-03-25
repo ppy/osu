@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using ManagedBass;
 using osu.Framework.Audio.Callbacks;
+using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -29,32 +30,35 @@ namespace osu.Game.Rulesets.Edit.Checks
         {
             var beatmapSet = context.Beatmap.BeatmapInfo.BeatmapSet;
 
-            foreach (var file in beatmapSet.Files)
+            if (beatmapSet != null)
             {
-                using (Stream data = context.WorkingBeatmap.GetStream(file.FileInfo.StoragePath))
+                foreach (var file in beatmapSet.Files)
                 {
-                    if (data == null)
-                        continue;
-
-                    var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                    int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode | BassFlags.Prescan, fileCallbacks.Callbacks, fileCallbacks.Handle);
-
-                    if (decodeStream == 0)
+                    using (Stream data = context.WorkingBeatmap.GetStream(file.File.GetStoragePath()))
                     {
-                        // If the file is not likely to be properly parsed by Bass, we don't produce Error issues about it.
-                        // Image files and audio files devoid of audio data both fail, for example, but neither would be issues in this check.
-                        if (hasAudioExtension(file.Filename) && probablyHasAudioData(data))
-                            yield return new IssueTemplateBadFormat(this).Create(file.Filename);
+                        if (data == null)
+                            continue;
 
-                        continue;
+                        var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
+                        int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode | BassFlags.Prescan, fileCallbacks.Callbacks, fileCallbacks.Handle);
+
+                        if (decodeStream == 0)
+                        {
+                            // If the file is not likely to be properly parsed by Bass, we don't produce Error issues about it.
+                            // Image files and audio files devoid of audio data both fail, for example, but neither would be issues in this check.
+                            if (hasAudioExtension(file.Filename) && probablyHasAudioData(data))
+                                yield return new IssueTemplateBadFormat(this).Create(file.Filename);
+
+                            continue;
+                        }
+
+                        long length = Bass.ChannelGetLength(decodeStream);
+                        double ms = Bass.ChannelBytes2Seconds(decodeStream, length) * 1000;
+
+                        // Extremely short audio files do not play on some soundcards, resulting in nothing being heard in-game for some users.
+                        if (ms > 0 && ms < ms_threshold)
+                            yield return new IssueTemplateTooShort(this).Create(file.Filename, ms);
                     }
-
-                    long length = Bass.ChannelGetLength(decodeStream);
-                    double ms = Bass.ChannelBytes2Seconds(decodeStream, length) * 1000;
-
-                    // Extremely short audio files do not play on some soundcards, resulting in nothing being heard in-game for some users.
-                    if (ms > 0 && ms < ms_threshold)
-                        yield return new IssueTemplateTooShort(this).Create(file.Filename, ms);
                 }
             }
         }

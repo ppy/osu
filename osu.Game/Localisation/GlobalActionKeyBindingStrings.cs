@@ -170,6 +170,11 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorCycleGridDisplayMode => new TranslatableString(getKey(@"editor_cycle_grid_display_mode"), @"Cycle grid display mode");
 
         /// <summary>
+        /// "Test gameplay"
+        /// </summary>
+        public static LocalisableString EditorTestGameplay => new TranslatableString(getKey(@"editor_test_gameplay"), @"Test gameplay");
+
+        /// <summary>
         /// "Hold for HUD"
         /// </summary>
         public static LocalisableString HoldForHUD => new TranslatableString(getKey(@"hold_for_hud"), @"Hold for HUD");
@@ -223,6 +228,16 @@ namespace osu.Game.Localisation
         /// "Nudge selection right"
         /// </summary>
         public static LocalisableString EditorNudgeRight => new TranslatableString(getKey(@"editor_nudge_right"), @"Nudge selection right");
+
+        /// <summary>
+        /// "Flip selection horizontally"
+        /// </summary>
+        public static LocalisableString EditorFlipHorizontally => new TranslatableString(getKey(@"editor_flip_horizontally"), @"Flip selection horizontally");
+
+        /// <summary>
+        /// "Flip selection vertically"
+        /// </summary>
+        public static LocalisableString EditorFlipVertically => new TranslatableString(getKey(@"editor_flip_vertically"), @"Flip selection vertically");
 
         /// <summary>
         /// "Toggle skin editor"
