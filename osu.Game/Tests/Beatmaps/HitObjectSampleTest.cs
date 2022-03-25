@@ -96,12 +96,14 @@ namespace osu.Game.Tests.Beatmaps
             AddStep("setup skins", () =>
             {
                 userSkinInfo.Files.Clear();
-                userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
+                if (!string.IsNullOrEmpty(userFile))
+                    userSkinInfo.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = userFile }, userFile));
 
                 Debug.Assert(beatmapInfo.BeatmapSet != null);
 
                 beatmapInfo.BeatmapSet.Files.Clear();
-                beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
+                if (!string.IsNullOrEmpty(beatmapFile))
+                    beatmapInfo.BeatmapSet.Files.Add(new RealmNamedFileUsage(new RealmFile { Hash = beatmapFile }, beatmapFile));
 
                 // Need to refresh the cached skin source to refresh the skin resource store.
                 dependencies.SkinSource = new SkinProvidingContainer(Skin = new LegacySkin(userSkinInfo, this));
@@ -191,22 +193,32 @@ namespace osu.Game.Tests.Beatmaps
             }
         }
 
-        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap
+        private class TestWorkingBeatmap : ClockBackedTestWorkingBeatmap, IStorageResourceProvider
         {
             private readonly BeatmapInfo skinBeatmapInfo;
-            private readonly IResourceStore<byte[]> resourceStore;
 
             private readonly IStorageResourceProvider resources;
 
-            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> resourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, IStorageResourceProvider resources)
+            public TestWorkingBeatmap(BeatmapInfo skinBeatmapInfo, IResourceStore<byte[]> accessMarkingResourceStore, IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock,
+                                      IStorageResourceProvider resources)
                 : base(beatmap, storyboard, referenceClock, resources.AudioManager)
             {
                 this.skinBeatmapInfo = skinBeatmapInfo;
-                this.resourceStore = resourceStore;
+                Files = accessMarkingResourceStore;
                 this.resources = resources;
             }
 
-            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, resourceStore, resources);
+            protected internal override ISkin GetSkin() => new LegacyBeatmapSkin(skinBeatmapInfo, this);
+
+            public AudioManager AudioManager => resources.AudioManager;
+
+            public IResourceStore<byte[]> Files { get; }
+
+            public IResourceStore<byte[]> Resources => resources.Resources;
+
+            public RealmAccess RealmAccess => resources.RealmAccess;
+
+            public IResourceStore<TextureUpload> CreateTextureLoaderStore(IResourceStore<byte[]> underlyingStore) => resources.CreateTextureLoaderStore(underlyingStore);
         }
     }
 }
