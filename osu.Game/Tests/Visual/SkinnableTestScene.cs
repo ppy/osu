@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new OsuSpriteText
                     {
-                        Text = skin?.SkinInfo?.Value.Name ?? "none",
+                        Text = skin?.SkinInfo.Value.Name ?? "none",
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
