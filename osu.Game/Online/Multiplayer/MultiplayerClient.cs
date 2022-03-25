@@ -171,6 +171,8 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     APIRoom = room;
 
+                    Debug.Assert(joinedRoom.Playlist.Count > 0);
+
                     APIRoom.Playlist.Clear();
                     APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(createPlaylistItem));
 
@@ -682,6 +684,8 @@ namespace osu.Game.Online.Multiplayer
 
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
                 APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
+
+                Debug.Assert(Room.Playlist.Count > 0);
 
                 ItemRemoved?.Invoke(playlistItemId);
                 RoomUpdated?.Invoke();
