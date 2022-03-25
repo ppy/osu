@@ -48,12 +48,12 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (positionInfo == positionInfos.First())
                 {
-                    positionInfo.DistanceFromPrevious = (float)rng.NextDouble() * OsuPlayfield.BASE_SIZE.Y / 2;
+                    positionInfo.DistanceFromPrevious = (float)(rng.NextDouble() * OsuPlayfield.BASE_SIZE.X / 2);
                     positionInfo.RelativeAngle = (float)(rng.NextDouble() * 2 * Math.PI - Math.PI);
                 }
                 else
                 {
-                    positionInfo.RelativeAngle = (float)(rateOfChangeMultiplier * 2 * Math.PI * Math.Min(1f, positionInfo.DistanceFromPrevious / (playfield_diagonal * 0.5f)));
+                    positionInfo.RelativeAngle = rateOfChangeMultiplier * 2 * (float)Math.PI * Math.Min(1f, positionInfo.DistanceFromPrevious / (playfield_diagonal * 0.5f));
                 }
             }
 
