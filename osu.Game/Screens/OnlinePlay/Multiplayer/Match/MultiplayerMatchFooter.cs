@@ -28,7 +28,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                             RelativeSizeAxes = Axes.Both,
                         },
                         null,
-                        new MultiplayerReadyButton
+                        new MatchStartControl
                         {
                             RelativeSizeAxes = Axes.Both,
                         },

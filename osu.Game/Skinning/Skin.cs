@@ -27,12 +27,12 @@ namespace osu.Game.Skinning
     public abstract class Skin : IDisposable, ISkin
     {
         /// <summary>
-        /// A texture store which can be used to perform user file loops for this skin.
+        /// A texture store which can be used to perform user file lookups for this skin.
         /// </summary>
         protected TextureStore? Textures { get; }
 
         /// <summary>
-        /// A sample store which can be used to perform user file loops for this skin.
+        /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
         protected ISampleStore? Samples { get; }
 
@@ -57,7 +57,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skin">The skin's metadata. Usually a live realm object.</param>
         /// <param name="resources">Access to game-wide resources.</param>
-        /// <param name="storage">An optional store which will be used for looking up skin resources. If null, one will be created from realm <see cref="IHasRealmFiles"/> pattern.</param>
+        /// <param name="storage">An optional store which will *replace* all file lookups that are usually sourced from <paramref name="skin"/>.</param>
         /// <param name="configurationFilename">An optional filename to read the skin configuration from. If not provided, the configuration will be retrieved from the storage using "skin.ini".</param>
         protected Skin(SkinInfo skin, IStorageResourceProvider? resources, IResourceStore<byte[]>? storage = null, string configurationFilename = @"skin.ini")
         {

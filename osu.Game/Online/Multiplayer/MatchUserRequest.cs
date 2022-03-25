@@ -3,6 +3,7 @@
 
 using System;
 using MessagePack;
+using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
 namespace osu.Game.Online.Multiplayer
@@ -12,7 +13,10 @@ namespace osu.Game.Online.Multiplayer
     /// </summary>
     [Serializable]
     [MessagePackObject]
-    [Union(0, typeof(ChangeTeamRequest))] // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
+    // IMPORTANT: Add rules to SignalRUnionWorkaroundResolver for new derived types.
+    [Union(0, typeof(ChangeTeamRequest))]
+    [Union(1, typeof(StartMatchCountdownRequest))]
+    [Union(2, typeof(StopCountdownRequest))]
     public abstract class MatchUserRequest
     {
     }
