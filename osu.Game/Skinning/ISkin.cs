@@ -52,6 +52,8 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="lookup">The requested configuration value.</param>
         /// <returns>A matching value boxed in an <see cref="IBindable{TValue}"/>, or null if unavailable.</returns>
-        IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup);
+        IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
+            where TLookup : notnull
+            where TValue : notnull;
     }
 }
