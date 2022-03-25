@@ -144,26 +144,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestSpectatingDuringCountdownWithNoReadyUsersCancelsCountdown()
-        {
-            ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("countdown button shown", () => this.ChildrenOfType<MultiplayerCountdownButton>().SingleOrDefault()?.IsPresent == true);
-            ClickButtonWhenEnabled<MultiplayerCountdownButton>();
-            AddStep("click the first countdown button", () =>
-            {
-                var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
-                InputManager.MoveMouseTo(popoverButton);
-                InputManager.Click(MouseButton.Left);
-            });
-
-            AddStep("set spectating", () => MultiplayerClient.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
-            AddUntilStep("local user is spectating", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
-
-            AddStep("finish countdown", () => MultiplayerClient.SkipToEndOfCountdown());
-            AddUntilStep("match not started", () => MultiplayerClient.Room?.State == MultiplayerRoomState.Open);
-        }
-
-        [Test]
         public void TestReadyButtonEnabledWhileSpectatingDuringCountdown()
         {
             AddStep("add second user", () => MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" }));
@@ -203,6 +183,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
             AddAssert("countdown still active", () => MultiplayerClient.Room?.Countdown != null);
+        }
+
+        [Test]
+        public void TestCountdownButtonVisibilityWithAutoStartEnablement()
+        {
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            AddUntilStep("countdown button visible", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
+
+            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            AddUntilStep("countdown button not visible", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
+        }
+
+        [Test]
+        public void TestClickingReadyButtonUnReadiesDuringAutoStart()
+        {
+            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
         }
 
         [Test]

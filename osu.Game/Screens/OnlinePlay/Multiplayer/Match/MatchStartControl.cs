@@ -109,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             clickOperation = ongoingOperationTracker.BeginOperation();
 
             // Ensure the current user becomes ready before being able to do anything else (start match, stop countdown, unready).
-            if (!isReady() || !Client.IsHost)
+            if (!isReady() || !Client.IsHost || Room.Settings.AutoStartEnabled)
             {
                 toggleReady();
                 return;
@@ -172,19 +172,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             int newCountReady = Room.Users.Count(u => u.State == MultiplayerUserState.Ready);
             int newCountTotal = Room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
 
-            if (Room.Countdown != null)
-                countdownButton.Alpha = 0;
+            if (!Client.IsHost || Room.Countdown != null || Room.Settings.AutoStartEnabled)
+                countdownButton.Hide();
             else
             {
                 switch (localUser?.State)
                 {
                     default:
-                        countdownButton.Alpha = 0;
+                        countdownButton.Hide();
                         break;
 
                     case MultiplayerUserState.Spectating:
                     case MultiplayerUserState.Ready:
-                        countdownButton.Alpha = Room.Host?.Equals(localUser) == true ? 1 : 0;
+                        countdownButton.Show();
                         break;
                 }
             }
@@ -197,7 +197,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
             if (localUser?.State == MultiplayerUserState.Spectating)
-                enabled.Value &= Room.Host?.Equals(localUser) == true && newCountReady > 0;
+                enabled.Value &= Client.IsHost && newCountReady > 0;
 
             if (newCountReady == countReady)
                 return;
