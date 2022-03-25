@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
             if (TriggerKey == e.Key && TriggerKey != Key.Unknown)
