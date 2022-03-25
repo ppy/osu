@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
@@ -29,6 +30,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         };
 
         public new Action<TimeSpan> Action;
+        public Action CancelAction;
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         private readonly Drawable background;
 
@@ -72,6 +80,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     Action = () =>
                     {
                         Action(duration);
+                        this.HidePopover();
+                    }
+                });
+            }
+
+            if (multiplayerClient.Room?.Countdown != null && multiplayerClient.IsHost)
+            {
+                flow.Add(new OsuButton
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Text = "Cancel",
+                    BackgroundColour = colours.Red,
+                    Action = () =>
+                    {
+                        CancelAction();
                         this.HidePopover();
                     }
                 });
