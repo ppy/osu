@@ -192,7 +192,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
             AddUntilStep("countdown button visible", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
 
-            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
+            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestClickingReadyButtonUnReadiesDuringAutoStart()
         {
-            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
+            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
 
