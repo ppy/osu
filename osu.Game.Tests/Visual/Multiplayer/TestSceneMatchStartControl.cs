@@ -186,6 +186,31 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void TestCountdownButtonVisibilityWithAutoStartEnablement()
+        {
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            AddUntilStep("countdown button visible", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
+
+            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            AddUntilStep("countdown button not visible", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
+        }
+
+        [Test]
+        public void TestClickingReadyButtonUnReadiesDuringAutoStart()
+        {
+            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+
+            ClickButtonWhenEnabled<MultiplayerReadyButton>();
+            AddUntilStep("local user became idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
+        }
+
+        [Test]
         public void TestDeletedBeatmapDisableReady()
         {
             OsuButton readyButton = null;
