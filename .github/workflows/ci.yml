@@ -25,6 +25,9 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
+      - name: Instal .NET workloads
+        run: dotnet workload install android
+
       # FIXME: libavformat is not included in Ubuntu. Let's fix that.
       # https://github.com/ppy/osu-framework/issues/4349
       # Remove this once https://github.com/actions/virtual-environments/issues/3306 has been resolved.
@@ -70,6 +73,9 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
+      - name: Instal .NET workloads
+        run: dotnet workload install android
+
       # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
@@ -113,6 +119,9 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
+
+      - name: Instal .NET workloads
+        run: dotnet workload install android
 
       - name: Restore Tools
         run: dotnet tool restore
