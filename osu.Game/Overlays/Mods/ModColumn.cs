@@ -48,6 +48,8 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        public Action<Mod, bool>? ModStateChanged { get; set; }
+
         private readonly ModType modType;
         private readonly Key[]? toggleKeys;
 
@@ -251,7 +253,14 @@ namespace osu.Game.Overlays.Mods
                 panelFlow.ChildrenEnumerable = loaded;
 
                 foreach (var panel in panelFlow)
-                    panel.Active.BindValueChanged(_ => updateToggleState());
+                {
+                    panel.Active.BindValueChanged(_ =>
+                    {
+                        updateToggleState();
+                        ModStateChanged?.Invoke(panel.Mod, panel.Active.Value);
+                    });
+                }
+
                 updateToggleState();
 
                 updateFilter();
