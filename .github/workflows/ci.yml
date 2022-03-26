@@ -61,13 +61,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # Pin Xamarin.Android version to 11.2 for now to avoid build failures caused by a Xamarin-side regression.
-      # See: https://github.com/xamarin/xamarin-android/issues/6284
-      # This can be removed/reverted when the fix makes it to upstream and is deployed on github runners.
-      - name: Set default Xamarin SDK version
-        run: |
-            $VM_ASSETS/select-xamarin-sdk-v2.sh --mono=6.12 --android=11.2
-
       - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
@@ -76,11 +69,8 @@ jobs:
       - name: Instal .NET workloads
         run: dotnet workload install android
 
-      # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
-      # cannot accept .sln(f) files as arguments.
-      # Build just the main game for now.
-      - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
+      - name: Compile
+        run: dotnet build -c Debug -warnaserror osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
