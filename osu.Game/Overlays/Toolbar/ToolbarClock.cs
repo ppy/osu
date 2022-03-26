@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -14,6 +15,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarClock : CompositeDrawable
     {
+        private const float hand_thickness = 2.2f;
+
         public ToolbarClock()
         {
             RelativeSizeAxes = Axes.Y;
@@ -72,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
             private Drawable second;
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuColour colours)
             {
                 Size = new Vector2(30);
 
@@ -82,37 +85,93 @@ namespace osu.Game.Overlays.Toolbar
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    hour = new Hand
-                    {
-                        Colour = Color4.Orange,
-                        Size = new Vector2(0.3f, 1.2f),
-                    },
-                    minute = new Hand
-                    {
-                        Colour = Color4.Green,
-                        Size = new Vector2(0.45f, 1),
-                    },
-                    second = new Hand
-                    {
-                        Colour = Color4.Blue,
-                        Size = new Vector2(0.48f, 0.5f),
-                    },
-                    new Circle
+                    hour = new LargeHand(0.3f),
+                    minute = new LargeHand(0.45f),
+                    second = new SecondHand(),
+                    new CentreCircle
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(1.5f),
-                        Colour = Color4.Black,
-                    },
+                    }
                 };
             }
 
-            private class Hand : Circle
+            private class CentreCircle : CompositeDrawable
             {
-                public Hand()
+                public CentreCircle()
+                {
+                    InternalChildren = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(hand_thickness),
+                            Colour = Color4.Black,
+                        },
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(hand_thickness * 0.7f),
+                            Colour = Color4.White,
+                        },
+                    };
+                }
+            }
+
+            private class SecondHand : CompositeDrawable
+            {
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    RelativeSizeAxes = Axes.X;
+                    Width = 0.54f;
+
+                    Height = hand_thickness / 2;
+                    Anchor = Anchor.Centre;
+                    Origin = Anchor.Custom;
+
+                    OriginPosition = new Vector2(Height * 2, Height / 2);
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Colour = colours.YellowDark,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    };
+                }
+            }
+
+            private class LargeHand : CompositeDrawable
+            {
+                public LargeHand(float length)
+                {
+                    Width = length;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
                 {
                     Anchor = Anchor.Centre;
                     Origin = Anchor.CentreLeft;
+
+                    Origin = Anchor.Custom;
+                    OriginPosition = new Vector2(hand_thickness / 2); // offset x also, to ensure the centre of the line is centered on the face.
+                    Height = hand_thickness;
+
+                    InternalChildren = new Drawable[]
+                    {
+                        new Circle
+                        {
+                            Colour = colours.PurpleLight,
+                            RelativeSizeAxes = Axes.Both,
+                            BorderThickness = 0.5f,
+                            BorderColour = colours.Purple,
+                        },
+                    };
 
                     RelativeSizeAxes = Axes.X;
                 }
@@ -144,7 +203,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private abstract class ClockDisplay : CompositeDrawable
         {
-            private int lastSecond;
+            private int? lastSecond;
 
             protected override void Update()
             {
