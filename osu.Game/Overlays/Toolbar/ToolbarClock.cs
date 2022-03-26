@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarClock : CompositeDrawable
     {
-        private const float hand_thickness = 2.2f;
+        private const float hand_thickness = 2.4f;
 
         public ToolbarClock()
         {
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Toolbar
                     gameTime = new OsuSpriteText
                     {
                         Y = 14,
-                        Colour = colours.PurpleLight,
+                        Colour = colours.PinkLight,
                         Scale = new Vector2(0.6f)
                     }
                 };
@@ -89,16 +89,25 @@ namespace osu.Game.Overlays.Toolbar
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(20);
+                Size = new Vector2(22);
 
                 InternalChildren = new[]
                 {
-                    new Circle
+                    new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = 2,
+                        BorderColour = Color4.White,
+                        Child = new Box
+                        {
+                            AlwaysPresent = true,
+                            Alpha = 0,
+                            RelativeSizeAxes = Axes.Both
+                        },
                     },
-                    hour = new LargeHand(0.3f),
-                    minute = new LargeHand(0.45f),
+                    hour = new LargeHand(0.34f),
+                    minute = new LargeHand(0.48f),
                     second = new SecondHand(),
                     new CentreCircle
                     {
@@ -110,7 +119,8 @@ namespace osu.Game.Overlays.Toolbar
 
             private class CentreCircle : CompositeDrawable
             {
-                public CentreCircle()
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
                 {
                     InternalChildren = new Drawable[]
                     {
@@ -119,14 +129,14 @@ namespace osu.Game.Overlays.Toolbar
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(hand_thickness),
-                            Colour = Color4.Black,
+                            Colour = Color4.White,
                         },
                         new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(hand_thickness * 0.7f),
-                            Colour = Color4.White,
+                            Colour = colours.PinkLight,
                         },
                     };
                 }
@@ -138,9 +148,9 @@ namespace osu.Game.Overlays.Toolbar
                 private void load(OsuColour colours)
                 {
                     RelativeSizeAxes = Axes.X;
-                    Width = 0.54f;
+                    Width = 0.66f;
 
-                    Height = hand_thickness / 2;
+                    Height = hand_thickness * 0.7f;
                     Anchor = Anchor.Centre;
                     Origin = Anchor.Custom;
 
@@ -150,7 +160,7 @@ namespace osu.Game.Overlays.Toolbar
                     {
                         new Circle
                         {
-                            Colour = colours.YellowDark,
+                            Colour = colours.PinkLight,
                             RelativeSizeAxes = Axes.Both,
                         },
                     };
@@ -178,10 +188,10 @@ namespace osu.Game.Overlays.Toolbar
                     {
                         new Circle
                         {
-                            Colour = colours.PurpleLight,
+                            Colour = Color4.White,
                             RelativeSizeAxes = Axes.Both,
-                            BorderThickness = 0.5f,
-                            BorderColour = colours.Purple,
+                            BorderThickness = 0.7f,
+                            BorderColour = colours.Gray2,
                         },
                     };
 
