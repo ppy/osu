@@ -30,6 +30,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         };
 
         public new Action<TimeSpan> Action;
+
         public Action CancelAction;
 
         [Resolved]
@@ -61,6 +62,38 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             background.Colour = colours.Green;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            multiplayerClient.RoomUpdated += onRoomUpdated;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            multiplayerClient.RoomUpdated -= onRoomUpdated;
+        }
+
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
+        {
+            bool countdownActive = multiplayerClient.Room?.Countdown != null;
+
+            if (countdownActive)
+            {
+                background
+                    .FadeColour(colours.YellowLight, 100, Easing.In)
+                    .Then()
+                    .FadeColour(colours.YellowDark, 900, Easing.OutQuint)
+                    .Loop();
+            }
+            else
+            {
+                background
+                    .FadeColour(colours.Green, 200, Easing.OutQuint);
+            }
+        });
+
         public Popover GetPopover()
         {
             var flow = new FillFlowContainer
@@ -77,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = $"Start match in {duration.Humanize()}",
-                    BackgroundColour = background.Colour,
+                    BackgroundColour = colours.Green,
                     Action = () =>
                     {
                         Action(duration);
@@ -91,7 +124,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 flow.Add(new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Cancel",
+                    Text = "Stop countdown",
                     BackgroundColour = colours.Red,
                     Action = () =>
                     {
