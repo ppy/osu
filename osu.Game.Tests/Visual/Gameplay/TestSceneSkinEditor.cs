@@ -37,6 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Player.ScaleTo(0.4f);
                 LoadComponentAsync(skinEditor = new SkinEditor(Player), Add);
             });
+            AddUntilStep("wait for loaded", () => skinEditor.IsLoaded);
         }
 
         [Test]
