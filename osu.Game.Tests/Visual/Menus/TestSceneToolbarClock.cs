@@ -27,7 +27,6 @@ namespace osu.Game.Tests.Visual.Menus
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
                     Height = Toolbar.HEIGHT,
-                    Scale = new Vector2(4),
                     Children = new Drawable[]
                     {
                         new Box
@@ -62,6 +61,8 @@ namespace osu.Game.Tests.Visual.Menus
                     }
                 },
             };
+
+            AddSliderStep("scale", 0.5, 4, 1, scale => mainContainer.Scale = new Vector2((float)scale));
         }
 
         [Test]
