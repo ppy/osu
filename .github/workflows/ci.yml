@@ -25,7 +25,7 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Instal .NET workloads
+      - name: Install .NET workloads
         run: dotnet workload install android
 
       # FIXME: libavformat is not included in Ubuntu. Let's fix that.
@@ -66,7 +66,7 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Instal .NET workloads
+      - name: Install .NET workloads
         run: dotnet workload install android
 
       - name: Compile
@@ -110,7 +110,7 @@ jobs:
         with:
           dotnet-version: "6.0.x"
 
-      - name: Instal .NET workloads
+      - name: Install .NET workloads
         run: dotnet workload install android
 
       - name: Restore Tools
