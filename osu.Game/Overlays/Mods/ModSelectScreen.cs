@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Mods
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Cached]
-        private Bindable<IReadOnlyList<Mod>> selectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -169,9 +169,9 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var column in columnFlow)
             {
-                column.ModStateChanged = (mod, active) => selectedMods.Value = active
-                    ? selectedMods.Value.Append(mod).ToArray()
-                    : selectedMods.Value.Except(new[] { mod }).ToArray();
+                column.ModStateChanged = (mod, active) => SelectedMods.Value = active
+                    ? SelectedMods.Value.Append(mod).ToArray()
+                    : SelectedMods.Value.Except(new[] { mod }).ToArray();
             }
 
             columnFlow.Shear = new Vector2(ModPanel.SHEAR_X, 0);
@@ -181,8 +181,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(selectedMods);
-            selectedMods.BindValueChanged(val =>
+            ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
+            SelectedMods.BindValueChanged(val =>
             {
                 updateMultiplier();
                 updateCustomisation(val);
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Mods
         {
             double multiplier = 1.0;
 
-            foreach (var mod in selectedMods.Value)
+            foreach (var mod in SelectedMods.Value)
                 multiplier *= mod.ScoreMultiplier;
 
             multiplierDisplay.Current.Value = multiplier;
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.Mods
             bool anyCustomisableMod = false;
             bool anyModWithRequiredCustomisationAdded = false;
 
-            foreach (var mod in selectedMods.Value)
+            foreach (var mod in SelectedMods.Value)
             {
                 anyCustomisableMod |= mod.GetSettingsSourceProperties().Any();
                 anyModWithRequiredCustomisationAdded |= !valueChangedEvent.OldValue.Contains(mod) && mod.RequiresConfiguration;
