@@ -1,14 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.Android.props"/>
   <PropertyGroup>
     <TargetFramework>net6.0-android</TargetFramework>
-    <RuntimeIdentifiers>android-x86;android-arm;android-arm64</RuntimeIdentifiers>
     <OutputType>Exe</OutputType>
     <RootNamespace>osu.Android</RootNamespace>
     <AssemblyName>osu.Android</AssemblyName>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <AndroidPackageFormat>apk</AndroidPackageFormat>
-    <MandroidI18n>CJK;Mideast;Rare;West;Other;</MandroidI18n>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
 
     <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
     <EnableLLVM>false</EnableLLVM>
@@ -24,7 +20,6 @@
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2022.314.0" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>
 </Project>
