@@ -47,7 +47,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             countdown = room?.Countdown;
 
             if (room?.Countdown != null)
-                countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 1000, true);
+                countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 100, true);
             else
             {
                 countdownUpdateDelegate?.Cancel();
