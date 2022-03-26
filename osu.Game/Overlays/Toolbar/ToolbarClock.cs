@@ -3,9 +3,12 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -15,6 +18,11 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarClock : CompositeDrawable
     {
+        private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
+
+        private DigitalDisplay digital;
+        private AnalogDisplay analog;
+
         private const float hand_thickness = 2.4f;
 
         public ToolbarClock()
@@ -26,8 +34,10 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
+            clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
+
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Y,
@@ -36,12 +46,12 @@ namespace osu.Game.Overlays.Toolbar
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
-                    new AnalogDisplay
+                    analog = new AnalogDisplay
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
-                    new DigitalDisplay
+                    digital = new DigitalDisplay
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -50,16 +60,75 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            clockDisplayMode.BindValueChanged(displayMode =>
+            {
+                bool showAnalog = displayMode.NewValue == ToolbarClockDisplayMode.Analog || displayMode.NewValue == ToolbarClockDisplayMode.Full;
+                bool showDigital = displayMode.NewValue != ToolbarClockDisplayMode.Analog;
+                bool showRuntime = displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime || displayMode.NewValue == ToolbarClockDisplayMode.Full;
+
+                digital.FadeTo(showDigital ? 1 : 0);
+                digital.ShowRuntime = showRuntime;
+
+                analog.FadeTo(showAnalog ? 1 : 0);
+            }, true);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            cycleDisplayMode();
+            return true;
+        }
+
+        private void cycleDisplayMode()
+        {
+            switch (clockDisplayMode.Value)
+            {
+                case ToolbarClockDisplayMode.Analog:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.Full;
+                    break;
+
+                case ToolbarClockDisplayMode.Digital:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.Analog;
+                    break;
+
+                case ToolbarClockDisplayMode.DigitalWithRuntime:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.Digital;
+                    break;
+
+                case ToolbarClockDisplayMode.Full:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.DigitalWithRuntime;
+                    break;
+            }
+        }
+
         private class DigitalDisplay : ClockDisplay
         {
             private OsuSpriteText realTime;
             private OsuSpriteText gameTime;
 
+            private bool showRuntime = true;
+
+            public bool ShowRuntime
+            {
+                get => showRuntime;
+                set
+                {
+                    if (showRuntime == value)
+                        return;
+
+                    showRuntime = value;
+                    updateMetrics();
+                }
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 AutoSizeAxes = Axes.Y;
-                Width = 66; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
 
                 InternalChildren = new Drawable[]
                 {
@@ -71,12 +140,20 @@ namespace osu.Game.Overlays.Toolbar
                         Scale = new Vector2(0.6f)
                     }
                 };
+
+                updateMetrics();
             }
 
             protected override void UpdateDisplay(DateTimeOffset now)
             {
                 realTime.Text = $"{now:HH:mm:ss}";
                 gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
+            }
+
+            private void updateMetrics()
+            {
+                Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+                gameTime.FadeTo(showRuntime ? 1 : 0);
             }
         }
 
