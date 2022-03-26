@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            Padding = new MarginPadding(5);
+            Padding = new MarginPadding(10);
         }
 
         [BackgroundDependencyLoader]
