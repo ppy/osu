@@ -34,8 +34,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         public MultiplayerCountdownButton()
         {
-            Icon = FontAwesome.Solid.CaretDown;
-            IconScale = new Vector2(0.6f);
+            Icon = FontAwesome.Regular.Clock;
 
             Add(background = new Box
             {
@@ -44,6 +43,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             });
 
             base.Action = this.ShowPopover;
+
+            TooltipText = "Countdown settings";
         }
 
         [BackgroundDependencyLoader]
