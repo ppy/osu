@@ -70,7 +70,7 @@ jobs:
         run: dotnet workload install android
 
       - name: Compile
-        run: dotnet build -c Debug -warnaserror osu.Android.slnf
+        run: dotnet build -c Debug osu.Android.slnf
 
   build-only-ios:
     name: Build only (iOS)
