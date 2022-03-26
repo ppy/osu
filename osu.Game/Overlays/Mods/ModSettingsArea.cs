@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Mods
     {
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>();
 
+        public const float HEIGHT = 250;
+
         private readonly Box background;
         private readonly FillFlowContainer modSettingsFlow;
 
@@ -32,7 +34,7 @@ namespace osu.Game.Overlays.Mods
         public ModSettingsArea()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 250;
+            Height = HEIGHT;
 
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
