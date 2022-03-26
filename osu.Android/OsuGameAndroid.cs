@@ -42,7 +42,7 @@ namespace osu.Android
                     // https://stackoverflow.com/questions/52977079/android-sdk-28-versioncode-in-packageinfo-has-been-deprecated
                     string versionName = string.Empty;
 
-                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+                    if (Build.VERSION.SdkInt >= BuildVersionCodes.P && OperatingSystem.IsAndroidVersionAtLeast(28))
                     {
                         versionName = packageInfo.LongVersionCode.ToString();
                         // ensure we only read the trailing portion of long (the part we are interested in).

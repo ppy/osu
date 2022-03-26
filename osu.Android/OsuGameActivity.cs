@@ -72,7 +72,9 @@ namespace osu.Android
             Debug.Assert(Resources?.DisplayMetrics != null);
 
             Point displaySize = new Point();
+#pragma warning disable 618 // GetSize is deprecated
             WindowManager.DefaultDisplay.GetSize(displaySize);
+#pragma warning restore 618
             float smallestWidthDp = Math.Min(displaySize.X, displaySize.Y) / Resources.DisplayMetrics.Density;
             bool isTablet = smallestWidthDp >= 600f;
 
@@ -125,7 +127,9 @@ namespace osu.Android
 
                 cursor.MoveToFirst();
 
+#pragma warning disable 618 // OpenableColumns is deprecated
                 int filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
+#pragma warning restore 618
                 string filename = cursor.GetString(filenameColumn);
 
                 // SharpCompress requires archive streams to be seekable, which the stream opened by
