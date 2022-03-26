@@ -135,10 +135,10 @@ namespace osu.Game.Overlays.Toolbar
             private void load(OsuColour colours)
             {
                 Anchor = Anchor.Centre;
-                Origin = Anchor.CentreLeft;
-
                 Origin = Anchor.Custom;
+
                 OriginPosition = new Vector2(hand_thickness / 2); // offset x also, to ensure the centre of the line is centered on the face.
+
                 Height = hand_thickness;
 
                 InternalChildren = new Drawable[]
