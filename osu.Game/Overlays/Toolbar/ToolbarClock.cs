@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            Padding = new MarginPadding(10);
+            Padding = new MarginPadding(5);
         }
 
         [BackgroundDependencyLoader]
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Toolbar
             private void load(OsuColour colours)
             {
                 AutoSizeAxes = Axes.Y;
-                Width = 70; // Allows for space for game time up to 99 days.
+                Width = 66; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
 
                 InternalChildren = new Drawable[]
                 {
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Toolbar
             [BackgroundDependencyLoader]
             private void load()
             {
-                Size = new Vector2(30);
+                Size = new Vector2(20);
 
                 InternalChildren = new[]
                 {
