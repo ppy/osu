@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarClock()
         {
             RelativeSizeAxes = Axes.Y;
-            Width = 110;
+            AutoSizeAxes = Axes.X;
 
             Padding = new MarginPadding(10);
         }
@@ -28,43 +28,55 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new FillFlowContainer
             {
-                new AnalogDisplay
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(5),
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                },
-                new DigitalDisplay
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
+                    new AnalogDisplay
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    new DigitalDisplay
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    }
                 }
             };
         }
 
         private class DigitalDisplay : ClockDisplay
         {
-            private OsuSpriteText text;
+            private OsuSpriteText realTime;
+            private OsuSpriteText gameTime;
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuColour colours)
             {
                 AutoSizeAxes = Axes.Y;
-                Width = 50;
+                Width = 70; // Allows for space for game time up to 99 days.
 
                 InternalChildren = new Drawable[]
                 {
-                    text = new OsuSpriteText
+                    realTime = new OsuSpriteText(),
+                    gameTime = new OsuSpriteText
                     {
-                        Text = "00:00:00",
+                        Y = 14,
+                        Colour = colours.PurpleLight,
+                        Scale = new Vector2(0.6f)
                     }
                 };
             }
 
             protected override void UpdateDisplay(DateTimeOffset now)
             {
-                text.Text = $"{now:HH:mm:ss}";
+                realTime.Text = $"{now:HH:mm:ss}";
+                gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
             }
         }
 
@@ -75,7 +87,7 @@ namespace osu.Game.Overlays.Toolbar
             private Drawable second;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 Size = new Vector2(30);
 

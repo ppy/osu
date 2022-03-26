@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Game.Overlays.Toolbar;
 using osuTK;
 using osuTK.Graphics;
@@ -14,11 +15,13 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public class TestSceneToolbarClock : OsuManualInputManagerTestScene
     {
+        private readonly Container mainContainer;
+
         public TestSceneToolbarClock()
         {
             Children = new Drawable[]
             {
-                new Container
+                mainContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -59,6 +62,18 @@ namespace osu.Game.Tests.Visual.Menus
                     }
                 },
             };
+        }
+
+        [Test]
+        public void TestRealGameTime()
+        {
+            AddStep("Set game time real", () => mainContainer.Clock = Clock);
+        }
+
+        [Test]
+        public void TestLongGameTime()
+        {
+            AddStep("Set game time long", () => mainContainer.Clock = new FramedOffsetClock(Clock, false) { Offset = 3600.0 * 24 * 1000 * 98 });
         }
     }
 }
