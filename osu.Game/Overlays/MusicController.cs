@@ -294,7 +294,7 @@ namespace osu.Game.Overlays
             {
                 if (!CurrentTrack.IsDummyDevice)
                 {
-                    beatmaps.ReplayGainManager?.AddReplayGain(current.BeatmapInfo.ReplayGainInfo);
+                    beatmaps.ReplayGainManager?.AddLoudnessNormalization(current.BeatmapInfo.ReplayGainInfo);
                 }
 
                 changeTrack();

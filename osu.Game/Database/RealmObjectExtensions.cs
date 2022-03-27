@@ -33,7 +33,7 @@ namespace osu.Game.Database
                  copyChangesToRealm(s.Author, d.Author);
              });
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
-            c.CreateMap<ReplayGainInfo, ReplayGainInfo>();
+            c.CreateMap<LoudnessNormalizationInfo, LoudnessNormalizationInfo>();
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();
             c.CreateMap<RealmNamedFileUsage, RealmNamedFileUsage>();
@@ -66,7 +66,7 @@ namespace osu.Game.Database
                              ID = beatmap.ID,
                              BeatmapSet = d,
                              Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName),
-                             ReplayGainInfo = d.Realm.Find<ReplayGainInfo>(beatmap.ReplayGainInfo.ID)
+                             ReplayGainInfo = d.Realm.Find<LoudnessNormalizationInfo>(beatmap.ReplayGainInfo.ID)
                          };
                          d.Beatmaps.Add(newBeatmap);
                          copyChangesToRealm(beatmap, newBeatmap);
@@ -159,7 +159,7 @@ namespace osu.Game.Database
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
-            c.CreateMap<ReplayGainInfo, ReplayGainInfo>();
+            c.CreateMap<LoudnessNormalizationInfo, LoudnessNormalizationInfo>();
             c.CreateMap<ScoreInfo, ScoreInfo>();
             c.CreateMap<RealmUser, RealmUser>();
             c.CreateMap<RealmFile, RealmFile>();

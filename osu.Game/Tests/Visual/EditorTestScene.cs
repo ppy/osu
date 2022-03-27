@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue, ReplayGainManager manager)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue, LoudnessNormalizationManager manager)
             {
                 return new TestBeatmapModelManager(storage, realm, onlineLookupQueue, manager);
             }
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual
 
             internal class TestBeatmapModelManager : BeatmapModelManager
             {
-                public TestBeatmapModelManager(Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue, ReplayGainManager manager)
+                public TestBeatmapModelManager(Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue, LoudnessNormalizationManager manager)
                     : base(databaseAccess, storage, beatmapOnlineLookupQueue, manager)
                 {
                 }

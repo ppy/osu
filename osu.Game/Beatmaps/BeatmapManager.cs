@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, RealmNamedFileUsage>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
-        public ReplayGainManager? ReplayGainManager { get; }
+        public LoudnessNormalizationManager? ReplayGainManager { get; }
 
         private readonly BeatmapModelManager beatmapModelManager;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Beatmaps
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            ReplayGainManager = new ReplayGainManager(BeatmapTrackStore, audioManager, new RealmFileStore(realm, storage));
+            ReplayGainManager = new LoudnessNormalizationManager(BeatmapTrackStore, audioManager, new RealmFileStore(realm, storage));
             beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue, ReplayGainManager);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue, ReplayGainManager replayGainManager) =>
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue, LoudnessNormalizationManager replayGainManager) =>
             new BeatmapModelManager(realm, storage, onlineBeatmapLookupQueue, replayGainManager);
 
         /// <summary>

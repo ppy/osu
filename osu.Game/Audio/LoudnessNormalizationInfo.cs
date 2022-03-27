@@ -11,7 +11,7 @@ using Realms;
 namespace osu.Game.Audio
 {
     [ExcludeFromDynamicCompile]
-    public class ReplayGainInfo : RealmObject, IReplayGainInfo, IHasGuidPrimaryKey, IEquatable<ReplayGainInfo>, IDeepCloneable<ReplayGainInfo>
+    public class LoudnessNormalizationInfo : RealmObject, ILoudnessNormalizationInfo, IHasGuidPrimaryKey, IEquatable<LoudnessNormalizationInfo>, IDeepCloneable<LoudnessNormalizationInfo>
     {
         [PrimaryKey]
         public Guid ID { get; set; }
@@ -20,18 +20,18 @@ namespace osu.Game.Audio
         public float PeakAmplitude { get; set; }
 
         [UsedImplicitly]
-        public ReplayGainInfo()
+        public LoudnessNormalizationInfo()
         {
         }
 
-        public ReplayGainInfo(float peakAmp, float gain)
+        public LoudnessNormalizationInfo(float peakAmp, float gain)
         {
             ID = Guid.NewGuid();
             TrackGain = gain;
             PeakAmplitude = peakAmp;
         }
 
-        public bool Equals(ReplayGainInfo other)
+        public bool Equals(LoudnessNormalizationInfo other)
         {
             if (TrackGain == other?.TrackGain && PeakAmplitude == other.PeakAmplitude)
                 return true;
@@ -47,11 +47,11 @@ namespace osu.Game.Audio
                 return false;
         }
 
-        public bool Equals(IReplayGainInfo other) => other is ReplayGainInfo b && Equals(b);
+        public bool Equals(ILoudnessNormalizationInfo other) => other is LoudnessNormalizationInfo b && Equals(b);
 
-        public ReplayGainInfo DeepClone()
+        public LoudnessNormalizationInfo DeepClone()
         {
-            return new ReplayGainInfo
+            return new LoudnessNormalizationInfo
             {
                 ID = ID,
                 TrackGain = TrackGain,

@@ -181,7 +181,7 @@ namespace osu.Game.Beatmaps
         IRulesetInfo IBeatmapInfo.Ruleset => RulesetInfo;
 
         [JsonIgnore]
-        IReplayGainInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
+        ILoudnessNormalizationInfo IBeatmapInfo.ReplayGainInfo => throw new NotImplementedException();
 
         #endregion
     }

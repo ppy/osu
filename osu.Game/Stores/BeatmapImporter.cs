@@ -45,9 +45,9 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        private readonly ReplayGainManager? replayGainManager;
+        private readonly LoudnessNormalizationManager? replayGainManager;
 
-        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, ReplayGainManager? manager = null)
+        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, LoudnessNormalizationManager? manager = null)
             : base(storage, realm)
         {
             replayGainManager = manager;
@@ -75,7 +75,7 @@ namespace osu.Game.Stores
             {
                 if (replayGainManager != null && b.ReplayGainInfo.IsDefault())
                 {
-                    ReplayGainInfo info = replayGainManager.GenerateReplayGainInfo(b, beatmapSet);
+                    LoudnessNormalizationInfo info = replayGainManager.GenerateLoudnessNormalizationInfo(b, beatmapSet);
                     b.ReplayGainInfo = info;
                     beatmapSet = replayGainManager.PopulateSet(b, beatmapSet);
                 }

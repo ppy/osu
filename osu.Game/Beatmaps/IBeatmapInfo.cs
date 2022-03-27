@@ -38,7 +38,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The info required to apply loudness correction to the audio
         /// </summary>
-        IReplayGainInfo ReplayGainInfo { get; }
+        ILoudnessNormalizationInfo ReplayGainInfo { get; }
 
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
