@@ -31,6 +31,8 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModColumn : CompositeDrawable
     {
+        public readonly ModType ModType;
+
         private Func<Mod, bool>? filter;
 
         /// <summary>
@@ -48,9 +50,8 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        public Action<Mod, bool>? ModStateChanged { get; set; }
+        public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        private readonly ModType modType;
         private readonly Key[]? toggleKeys;
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -71,7 +72,7 @@ namespace osu.Game.Overlays.Mods
 
         public ModColumn(ModType modType, bool allowBulkSelection, Key[]? toggleKeys = null)
         {
-            this.modType = modType;
+            ModType = modType;
             this.toggleKeys = toggleKeys;
 
             Width = 320;
@@ -195,7 +196,7 @@ namespace osu.Game.Overlays.Mods
 
         private void createHeaderText()
         {
-            IEnumerable<string> headerTextWords = modType.Humanize(LetterCasing.Title).Split(' ');
+            IEnumerable<string> headerTextWords = ModType.Humanize(LetterCasing.Title).Split(' ');
 
             if (headerTextWords.Count() > 1)
             {
@@ -211,7 +212,7 @@ namespace osu.Game.Overlays.Mods
         {
             availableMods.BindTo(game.AvailableMods);
 
-            headerBackground.Colour = accentColour = colours.ForModType(modType);
+            headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
             if (toggleAllCheckbox != null)
             {
@@ -227,6 +228,12 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
             availableMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods));
+            SelectedMods.BindValueChanged(_ =>
+            {
+                // if a load is in progress, don't try to update the selection - the load flow will do so.
+                if (latestLoadTask == null)
+                    updateActiveState();
+            });
             updateMods();
         }
 
@@ -234,7 +241,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(modType) ?? Array.Empty<Mod>()).ToList();
+            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>()).ToList();
 
             if (newMods.SequenceEqual(panelFlow.Children.Select(p => p.Mod)))
                 return;
@@ -252,24 +259,32 @@ namespace osu.Game.Overlays.Mods
             {
                 panelFlow.ChildrenEnumerable = loaded;
 
+                updateActiveState();
+                updateToggleAllState();
+                updateFilter();
+
                 foreach (var panel in panelFlow)
                 {
                     panel.Active.BindValueChanged(_ =>
                     {
-                        updateToggleState();
-                        ModStateChanged?.Invoke(panel.Mod, panel.Active.Value);
+                        updateToggleAllState();
+                        SelectedMods.Value = panel.Active.Value
+                            ? SelectedMods.Value.Append(panel.Mod).ToArray()
+                            : SelectedMods.Value.Except(new[] { panel.Mod }).ToArray();
                     });
                 }
-
-                updateToggleState();
-
-                updateFilter();
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>
             {
                 if (loadTask == latestLoadTask)
                     latestLoadTask = null;
             });
+        }
+
+        private void updateActiveState()
+        {
+            foreach (var panel in panelFlow)
+                panel.Active.Value = SelectedMods.Value.Contains(panel.Mod, EqualityComparer<Mod>.Default);
         }
 
         #region Bulk select / deselect
@@ -306,7 +321,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void updateToggleState()
+        private void updateToggleAllState()
         {
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
@@ -408,7 +423,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var modPanel in panelFlow)
                 modPanel.ApplyFilter(Filter);
 
-            updateToggleState();
+            updateToggleAllState();
         }
 
         #endregion

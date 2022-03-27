@@ -167,13 +167,6 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
-            foreach (var column in columnFlow)
-            {
-                column.ModStateChanged = (mod, active) => SelectedMods.Value = active
-                    ? SelectedMods.Value.Append(mod).ToArray()
-                    : SelectedMods.Value.Except(new[] { mod }).ToArray();
-            }
-
             columnFlow.Shear = new Vector2(ModPanel.SHEAR_X, 0);
         }
 
@@ -182,11 +175,19 @@ namespace osu.Game.Overlays.Mods
             base.LoadComplete();
 
             ((IBindable<IReadOnlyList<Mod>>)modSettingsArea.SelectedMods).BindTo(SelectedMods);
+
             SelectedMods.BindValueChanged(val =>
             {
                 updateMultiplier();
                 updateCustomisation(val);
+                updateSelectionFromBindable();
             }, true);
+
+            foreach (var column in columnFlow)
+            {
+                column.SelectedMods.BindValueChanged(_ => updateBindableFromSelection());
+            }
+
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
 
             FinishTransforms(true);
@@ -237,6 +238,33 @@ namespace osu.Game.Overlays.Mods
 
             modSettingsArea.ResizeHeightTo(modAreaHeight, 800, Easing.InOutCubic);
             mainContent.TransformTo(nameof(Margin), new MarginPadding { Bottom = modAreaHeight }, 800, Easing.InOutCubic);
+        }
+
+        private bool selectionBindableSyncInProgress;
+
+        private void updateSelectionFromBindable()
+        {
+            if (selectionBindableSyncInProgress)
+                return;
+
+            selectionBindableSyncInProgress = true;
+
+            foreach (var column in columnFlow)
+                column.SelectedMods.Value = SelectedMods.Value.Where(mod => mod.Type == column.ModType).ToArray();
+
+            selectionBindableSyncInProgress = false;
+        }
+
+        private void updateBindableFromSelection()
+        {
+            if (selectionBindableSyncInProgress)
+                return;
+
+            selectionBindableSyncInProgress = true;
+
+            SelectedMods.Value = columnFlow.SelectMany(column => column.SelectedMods.Value).ToArray();
+
+            selectionBindableSyncInProgress = false;
         }
 
         protected override void PopIn()
