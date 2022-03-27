@@ -54,6 +54,8 @@ namespace osu.Game.Overlays.Mods
 
         public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
+        protected virtual ModPanel CreateModPanel(Mod mod) => new ModPanel(mod);
+
         private readonly Key[]? toggleKeys;
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -258,10 +260,7 @@ namespace osu.Game.Overlays.Mods
 
             cancellationTokenSource?.Cancel();
 
-            var panels = newMods.Select(mod => new ModPanel(mod)
-            {
-                Shear = new Vector2(-ModPanel.SHEAR_X, 0)
-            });
+            var panels = newMods.Select(mod => CreateModPanel(mod).With(panel => panel.Shear = new Vector2(-ModPanel.SHEAR_X, 0)));
 
             Task? loadTask;
 
