@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,16 +33,43 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool StartHidden => true;
 
+        private Func<Mod, bool> isValidMod = m => true;
+
+        public Func<Mod, bool> IsValidMod
+        {
+            get => isValidMod;
+            set
+            {
+                isValidMod = value ?? throw new ArgumentNullException(nameof(value));
+
+                if (IsLoaded)
+                    updateAvailableMods();
+            }
+        }
+
+        /// <summary>
+        /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
+        /// </summary>
+        protected virtual bool AllowConfiguration => true;
+
+        /// <summary>
+        /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
+        /// </summary>
+        protected virtual bool ShowTotalMultiplier => true;
+
+        protected virtual ModColumn CreateModColumn(ModType modType, Key[]? toggleKeys = null) => new ModColumn(modType, false, toggleKeys);
+
         private readonly BindableBool customisationVisible = new BindableBool();
 
-        private DifficultyMultiplierDisplay multiplierDisplay;
-        private ModSettingsArea modSettingsArea;
-        private FillFlowContainer<ModColumn> columnFlow;
-        private GridContainer grid;
-        private Container mainContent;
+        private DifficultyMultiplierDisplay? multiplierDisplay;
+        private ModSettingsArea modSettingsArea = null!;
+        private Container aboveColumnsContainer = null!;
+        private FillFlowContainer<ModColumn> columnFlow = null!;
+        private GridContainer grid = null!;
+        private Container mainContent = null!;
 
-        private PopupScreenTitle header;
-        private Container footer;
+        private PopupScreenTitle header = null!;
+        private Container footer = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -82,7 +111,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 new Drawable[]
                                 {
-                                    new Container
+                                    aboveColumnsContainer = new Container
                                     {
                                         Anchor = Anchor.Centre,
                                         Origin = Anchor.Centre,
@@ -94,11 +123,6 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             Horizontal = 100,
                                             Vertical = 10
-                                        },
-                                        Child = multiplierDisplay = new DifficultyMultiplierDisplay
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre
                                         }
                                     }
                                 },
@@ -126,11 +150,11 @@ namespace osu.Game.Overlays.Mods
                                                     Margin = new MarginPadding { Right = 70 },
                                                     Children = new[]
                                                     {
-                                                        new ModColumn(ModType.DifficultyReduction, false, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
-                                                        new ModColumn(ModType.DifficultyIncrease, false, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
-                                                        new ModColumn(ModType.Automation, false, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
-                                                        new ModColumn(ModType.Conversion, false),
-                                                        new ModColumn(ModType.Fun, false)
+                                                        CreateModColumn(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
+                                                        CreateModColumn(ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
+                                                        CreateModColumn(ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
+                                                        CreateModColumn(ModType.Conversion),
+                                                        CreateModColumn(ModType.Fun)
                                                     }
                                                 }
                                             }
@@ -182,6 +206,15 @@ namespace osu.Game.Overlays.Mods
                 }
             };
 
+            if (ShowTotalMultiplier)
+            {
+                aboveColumnsContainer.Add(multiplierDisplay = new DifficultyMultiplierDisplay
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight
+                });
+            }
+
             columnFlow.Shear = new Vector2(ModPanel.SHEAR_X, 0);
         }
 
@@ -204,10 +237,15 @@ namespace osu.Game.Overlays.Mods
             }
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
+
+            updateAvailableMods();
         }
 
         private void updateMultiplier()
         {
+            if (multiplierDisplay == null)
+                return;
+
             double multiplier = 1.0;
 
             foreach (var mod in SelectedMods.Value)
@@ -216,8 +254,17 @@ namespace osu.Game.Overlays.Mods
             multiplierDisplay.Current.Value = multiplier;
         }
 
+        private void updateAvailableMods()
+        {
+            foreach (var column in columnFlow)
+                column.Filter = isValidMod;
+        }
+
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
         {
+            if (!AllowConfiguration)
+                return;
+
             bool anyCustomisableMod = false;
             bool anyModWithRequiredCustomisationAdded = false;
 
@@ -292,7 +339,7 @@ namespace osu.Game.Overlays.Mods
             header.MoveToY(0, fade_in_duration, Easing.OutQuint);
             footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
 
-            multiplierDisplay
+            multiplierDisplay?
                 .Delay(fade_in_duration * 0.65f)
                 .FadeIn(fade_in_duration / 2, Easing.OutQuint)
                 .ScaleTo(1, fade_in_duration, Easing.OutElastic);
@@ -313,7 +360,7 @@ namespace osu.Game.Overlays.Mods
             base.PopOut();
             this.FadeOut(fade_out_duration, Easing.OutQuint);
 
-            multiplierDisplay
+            multiplierDisplay?
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
 
@@ -368,7 +415,7 @@ namespace osu.Game.Overlays.Mods
         {
             public BindableBool HandleMouse { get; } = new BindableBool();
 
-            public Action OnClicked { get; set; }
+            public Action? OnClicked { get; set; }
 
             protected override bool Handle(UIEvent e)
             {
