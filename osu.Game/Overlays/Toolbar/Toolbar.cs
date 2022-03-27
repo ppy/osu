@@ -104,6 +104,7 @@ namespace osu.Game.Overlays.Toolbar
                         //    Icon = FontAwesome.Solid.search
                         //},
                         userButton = new ToolbarUserButton(),
+                        new ToolbarClock(),
                         new ToolbarNotificationButton(),
                     }
                 }
