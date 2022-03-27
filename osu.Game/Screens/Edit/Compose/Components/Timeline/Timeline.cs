@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
+        public override float DragTolerance => 1f;
+
         [Resolved]
         private EditorClock editorClock { get; set; }
 

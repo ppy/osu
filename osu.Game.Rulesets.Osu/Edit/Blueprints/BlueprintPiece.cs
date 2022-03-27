@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     public abstract class BlueprintPiece<T> : CompositeDrawable
         where T : OsuHitObject
     {
+        public override float DragTolerance => 1f;
+
         /// <summary>
         /// Updates this <see cref="BlueprintPiece{T}"/> using the properties of a <see cref="OsuHitObject"/>.
         /// </summary>

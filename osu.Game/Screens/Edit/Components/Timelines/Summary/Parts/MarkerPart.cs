@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     {
         private Drawable marker;
 
+        public override float DragTolerance => 1f;
+
         [Resolved]
         private EditorClock editorClock { get; set; }
 

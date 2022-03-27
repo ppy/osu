@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Catch.Edit.Blueprints.Components
 
         private readonly JuiceStreamPath path = new JuiceStreamPath();
 
+        public override float DragTolerance => 1f;
+
         // Invariant: `path.Vertices.Count == vertexStates.Count`
         private readonly List<VertexState> vertexStates = new List<VertexState>
         {

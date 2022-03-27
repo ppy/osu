@@ -283,6 +283,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool HandlePositionalInput => hitObject != null;
 
+            public override float DragTolerance => 1f;
+
             public DragArea(HitObject hitObject)
             {
                 this.hitObject = hitObject;

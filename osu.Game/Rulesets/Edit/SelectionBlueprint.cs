@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Edit
 
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
+        public override float DragTolerance => 1f;
 
         protected SelectionBlueprint(T item)
         {

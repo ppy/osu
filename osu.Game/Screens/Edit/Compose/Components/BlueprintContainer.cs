@@ -45,6 +45,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected readonly BindableList<T> SelectedItems = new BindableList<T>();
 
+        public override float DragTolerance => 1f;
+
         protected BlueprintContainer()
         {
             RelativeSizeAxes = Axes.Both;
