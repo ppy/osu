@@ -34,8 +34,8 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, LoudnessNormalizationManager? replayGainManager = null)
-            : base(realm, storage, onlineLookupQueue, replayGainManager)
+        public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, LoudnessNormalizationManager? loudnessNormalizationManager = null)
+            : base(realm, storage, onlineLookupQueue, loudnessNormalizationManager)
         {
         }
 

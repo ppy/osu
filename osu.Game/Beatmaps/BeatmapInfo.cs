@@ -37,13 +37,13 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; } = null!;
 
-        public LoudnessNormalizationInfo ReplayGainInfo { get; set; } = null!;
+        public LoudnessNormalizationInfo LoudnessNormalizationInfo { get; set; } = null!;
 
         [JsonIgnore]
         [Backlink(nameof(ScoreInfo.BeatmapInfo))]
         public IQueryable<ScoreInfo> Scores { get; } = null!;
 
-        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null, LoudnessNormalizationInfo? replayGainInfo = null)
+        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null, LoudnessNormalizationInfo? loudnessNormalizationInfo = null)
         {
             ID = Guid.NewGuid();
             Ruleset = ruleset ?? new RulesetInfo
@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
             };
             Difficulty = difficulty ?? new BeatmapDifficulty();
             Metadata = metadata ?? new BeatmapMetadata();
-            ReplayGainInfo = replayGainInfo ?? new LoudnessNormalizationInfo { ID = Guid.NewGuid(), PeakAmplitude = 0, TrackGain = 0 };
+            LoudnessNormalizationInfo = loudnessNormalizationInfo ?? new LoudnessNormalizationInfo { ID = Guid.NewGuid(), PeakAmplitude = 0, TrackGain = 0 };
         }
 
         [UsedImplicitly]
@@ -153,7 +153,7 @@ namespace osu.Game.Beatmaps
         IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
         IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
         IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
-        ILoudnessNormalizationInfo IBeatmapInfo.ReplayGainInfo => ReplayGainInfo;
+        ILoudnessNormalizationInfo IBeatmapInfo.LoudnessNormalizationInfo => LoudnessNormalizationInfo;
 
         #region Compatibility properties
 

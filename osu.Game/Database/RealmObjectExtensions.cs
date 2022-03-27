@@ -66,7 +66,7 @@ namespace osu.Game.Database
                              ID = beatmap.ID,
                              BeatmapSet = d,
                              Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName),
-                             ReplayGainInfo = d.Realm.Find<LoudnessNormalizationInfo>(beatmap.ReplayGainInfo.ID)
+                             LoudnessNormalizationInfo = d.Realm.Find<LoudnessNormalizationInfo>(beatmap.LoudnessNormalizationInfo.ID)
                          };
                          d.Beatmaps.Add(newBeatmap);
                          copyChangesToRealm(beatmap, newBeatmap);

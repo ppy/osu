@@ -45,7 +45,7 @@ namespace osu.Game.Audio
             GainParameters gainParameters = new GainParameters
             {
                 fCurrent = 1,
-                fTarget = (float)Math.Pow(10, (info.TrackGain / 20)), //inverse of the loudness calculation as per ReplayGain 1.0 specs
+                fTarget = (float)Math.Pow(10, (info.TrackGain / 20)),
                 fTime = 0,
             };
             addFx(gainParameters);
@@ -107,9 +107,9 @@ namespace osu.Game.Audio
             {
                 foreach (BeatmapInfo beatmap in bSetInfo.Beatmaps)
                 {
-                    if (beatmap.ReplayGainInfo.IsDefault() && beatmap.AudioEquals(beatmapInfo))
+                    if (beatmap.LoudnessNormalizationInfo.IsDefault() && beatmap.AudioEquals(beatmapInfo))
                     {
-                        beatmap.ReplayGainInfo = beatmapInfo.ReplayGainInfo;
+                        beatmap.LoudnessNormalizationInfo = beatmapInfo.LoudnessNormalizationInfo;
                     }
                 }
             }

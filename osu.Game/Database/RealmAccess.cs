@@ -178,7 +178,7 @@ namespace osu.Game.Database
                         foreach (var score in beatmap.Scores)
                             realm.Remove(score);
 
-                        realm.Remove(beatmap.ReplayGainInfo);
+                        realm.Remove(beatmap.LoudnessNormalizationInfo);
 
                         realm.Remove(beatmap.Metadata);
 
