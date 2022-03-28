@@ -142,7 +142,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updateLayout()
         {
-            // Eye-balled to match stable
             const float font_height_ratio = 0.625f;
             const float vertical_offset = 9;
 
