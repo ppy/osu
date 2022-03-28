@@ -167,6 +167,7 @@ namespace osu.Game.Database
                     {
                         // Not guaranteed to be the only cause of exception, but let's roll with it for now.
                         log("Please download and run the intel version of osu! once\nto allow data migration to complete!");
+                        efContextFactory.SetMigrationCompletion();
                         return;
                     }
 
