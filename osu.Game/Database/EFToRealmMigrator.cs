@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -162,7 +163,7 @@ namespace osu.Game.Database
                     log("Migration failed!");
                     Logger.Log(t.Exception.ToString(), LoggingTarget.Database);
 
-                    if (t.Exception.Flatten().InnerException is TypeInitializationException)
+                    if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && t.Exception.Flatten().InnerException is TypeInitializationException)
                     {
                         // Not guaranteed to be the only cause of exception, but let's roll with it for now.
                         log("Please download and run the intel version of osu! once\nto allow data migration to complete!");
