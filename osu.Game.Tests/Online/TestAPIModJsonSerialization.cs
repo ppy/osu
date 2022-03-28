@@ -25,6 +25,20 @@ namespace osu.Game.Tests.Online
     public class TestAPIModJsonSerialization
     {
         [Test]
+        public void TestUnknownMod()
+        {
+            var apiMod = new APIMod { Acronym = "WNG" };
+
+            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+
+            var converted = deserialized?.ToMod(new TestRuleset());
+
+            Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
+            Assert.That(converted?.Type, Is.EqualTo(ModType.System));
+            Assert.That(converted?.Acronym, Is.EqualTo("WNG??"));
+        }
+
+        [Test]
         public void TestAcronymIsPreserved()
         {
             var apiMod = new APIMod(new TestMod());
@@ -119,6 +133,17 @@ namespace osu.Game.Tests.Online
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
             Assert.That((deserialised?.Mods[0])?.Settings["speed_change"], Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestAPIModDetachedFromSource()
+        {
+            var mod = new OsuModDoubleTime { SpeedChange = { Value = 1.01 } };
+            var apiMod = new APIMod(mod);
+
+            mod.SpeedChange.Value = 1.5;
+
+            Assert.That(apiMod.Settings["speed_change"], Is.EqualTo(1.01d));
         }
 
         private class TestRuleset : Ruleset

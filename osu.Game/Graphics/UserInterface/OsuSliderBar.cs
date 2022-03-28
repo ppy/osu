@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            CurrentNumber.BindValueChanged(current => updateTooltipText(current.NewValue), true);
+            CurrentNumber.BindValueChanged(current => TooltipText = getTooltipText(current.NewValue), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -178,7 +178,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnUserChange(value);
             playSample(value);
-            updateTooltipText(value);
+            TooltipText = getTooltipText(value);
         }
 
         private void playSample(T value)
@@ -203,28 +203,22 @@ namespace osu.Game.Graphics.UserInterface
             channel.Play();
         }
 
-        private void updateTooltipText(T value)
+        private LocalisableString getTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                TooltipText = value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
-            else
-            {
-                double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
+                return value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
 
-                if (DisplayAsPercentage)
-                {
-                    TooltipText = floatValue.ToString("0%");
-                }
-                else
-                {
-                    decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
+            double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                    // Find the number of significant digits (we could have less than 5 after normalize())
-                    int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
+            if (DisplayAsPercentage)
+                return floatValue.ToString("0%");
 
-                    TooltipText = floatValue.ToString($"N{significantDigits}");
-                }
-            }
+            decimal decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
+
+            // Find the number of significant digits (we could have less than 5 after normalize())
+            int significantDigits = FormatUtils.FindPrecision(decimalPrecision);
+
+            return floatValue.ToString($"N{significantDigits}");
         }
 
         protected override void UpdateAfterChildren()

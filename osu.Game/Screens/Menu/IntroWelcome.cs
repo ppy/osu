@@ -13,7 +13,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
+using osu.Game.Online.API;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Menu
@@ -23,8 +26,11 @@ namespace osu.Game.Screens.Menu
         protected override string BeatmapHash => "64e00d7022195959bfa3109d09c2e2276c8f12f486b91fcf6175583e973b48f2";
         protected override string BeatmapFile => "welcome.osz";
         private const double delay_step_two = 2142;
-        private Sample welcome;
-        private Sample pianoReverb;
+
+        private SkinnableSound skinnableWelcome;
+        private ISample welcome;
+
+        private ISample pianoReverb;
         protected override string SeeyaSampleName => "Intro/Welcome/seeya";
 
         protected override BackgroundScreen CreateBackground() => background = new BackgroundScreenDefault(false)
@@ -40,10 +46,15 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, IAPIProvider api)
         {
             if (MenuVoice.Value)
-                welcome = audio.Samples.Get(@"Intro/Welcome/welcome");
+            {
+                if (api.LocalUser.Value.IsSupporter)
+                    AddInternal(skinnableWelcome = new SkinnableSound(new SampleInfo(@"Intro/Welcome/welcome")));
+                else
+                    welcome = audio.Samples.Get(@"Intro/Welcome/welcome");
+            }
 
             pianoReverb = audio.Samples.Get(@"Intro/Welcome/welcome_piano");
         }
@@ -65,7 +76,10 @@ namespace osu.Game.Screens.Menu
 
                     AddInternal(intro);
 
-                    welcome?.Play();
+                    if (skinnableWelcome != null)
+                        skinnableWelcome.Play();
+                    else
+                        welcome?.Play();
 
                     var reverbChannel = pianoReverb?.Play();
                     if (reverbChannel != null)
@@ -100,13 +114,13 @@ namespace osu.Game.Screens.Menu
 
         private class WelcomeIntroSequence : Container
         {
-            private Sprite welcomeText;
+            private Drawable welcomeText;
             private Container scaleContainer;
 
             public LogoVisualisation LogoVisualisation { get; private set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(TextureStore textures, IAPIProvider api)
             {
                 Origin = Anchor.Centre;
                 Anchor = Anchor.Centre;
@@ -135,15 +149,17 @@ namespace osu.Game.Screens.Menu
                                 Size = new Vector2(480),
                                 Colour = Color4.Black
                             },
-                            welcomeText = new Sprite
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Texture = textures.Get(@"Intro/Welcome/welcome_text")
-                            },
                         }
                     },
                 };
+
+                if (api.LocalUser.Value.IsSupporter)
+                    scaleContainer.Add(welcomeText = new SkinnableSprite(@"Intro/Welcome/welcome_text"));
+                else
+                    scaleContainer.Add(welcomeText = new Sprite { Texture = textures.Get(@"Intro/Welcome/welcome_text") });
+
+                welcomeText.Anchor = Anchor.Centre;
+                welcomeText.Origin = Anchor.Centre;
             }
 
             protected override void LoadComplete()

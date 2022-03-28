@@ -119,7 +119,8 @@ namespace osu.Game.Screens.Play
         {
             bool exiting = base.OnExiting(next);
 
-            submitScore(Score.DeepClone());
+            if (LoadedBeatmapSuccessfully)
+                submitScore(Score.DeepClone());
 
             return exiting;
         }

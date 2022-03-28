@@ -18,6 +18,13 @@ namespace osu.Game.Tests.Visual.Editing
     public class TestSceneEditorSaving : EditorSavingTestScene
     {
         [Test]
+        public void TestCantExitWithoutSaving()
+        {
+            AddRepeatStep("Exit", () => InputManager.Key(Key.Escape), 10);
+            AddAssert("Editor is still active screen", () => Game.ScreenStack.CurrentScreen is Editor);
+        }
+
+        [Test]
         public void TestMetadata()
         {
             AddStep("Set artist and title", () =>
@@ -48,6 +55,8 @@ namespace osu.Game.Tests.Visual.Editing
         {
             double originalTimelineZoom = 0;
             double changedTimelineZoom = 0;
+
+            AddUntilStep("wait for timeline load", () => Editor.ChildrenOfType<Timeline>().SingleOrDefault()?.IsLoaded == true);
 
             AddStep("Set beat divisor", () => Editor.Dependencies.Get<BindableBeatDivisor>().Value = 16);
             AddStep("Set timeline zoom", () =>

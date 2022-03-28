@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using osuTK;
@@ -11,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Stores;
 
@@ -50,14 +53,18 @@ namespace osu.Game.Storyboards.Drawables
 
         private double? lastEventEndTime;
 
+        [Cached(typeof(IReadOnlyList<Mod>))]
+        public IReadOnlyList<Mod> Mods { get; }
+
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        public DrawableStoryboard(Storyboard storyboard)
+        public DrawableStoryboard(Storyboard storyboard, IReadOnlyList<Mod> mods = null)
         {
             Storyboard = storyboard;
+            Mods = mods ?? Array.Empty<Mod>();
 
             Size = new Vector2(640, 480);
 

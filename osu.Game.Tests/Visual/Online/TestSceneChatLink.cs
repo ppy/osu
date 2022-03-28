@@ -87,8 +87,8 @@ namespace osu.Game.Tests.Visual.Online
             addMessageWithChecks("likes to post this [https://dev.ppy.sh/home link].", 1, true, true, expectedActions: LinkAction.External);
             addMessageWithChecks("Join my multiplayer game osump://12346.", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
             addMessageWithChecks("Join my [multiplayer game](osump://12346).", 1, expectedActions: LinkAction.JoinMultiplayerMatch);
-            addMessageWithChecks("Join my [#english](osu://chan/#english).", 1, expectedActions: LinkAction.OpenChannel);
-            addMessageWithChecks("Join my osu://chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks($"Join my [#english]({OsuGameBase.OSU_PROTOCOL}chan/#english).", 1, expectedActions: LinkAction.OpenChannel);
+            addMessageWithChecks($"Join my {OsuGameBase.OSU_PROTOCOL}chan/#english.", 1, expectedActions: LinkAction.OpenChannel);
             addMessageWithChecks("Join my #english or #japanese channels.", 2, expectedActions: new[] { LinkAction.OpenChannel, LinkAction.OpenChannel });
             addMessageWithChecks("Join my #english or #nonexistent #hashtag channels.", 1, expectedActions: LinkAction.OpenChannel);
 

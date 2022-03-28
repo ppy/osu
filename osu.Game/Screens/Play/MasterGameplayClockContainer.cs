@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 
 namespace osu.Game.Screens.Play
 {
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Play
             Precision = 0.1,
         };
 
-        private double totalAppliedOffset => userOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
+        private double totalAppliedOffset => userBeatmapOffsetClock.RateAdjustedOffset + userGlobalOffsetClock.RateAdjustedOffset + platformOffsetClock.RateAdjustedOffset;
 
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
@@ -52,11 +53,20 @@ namespace osu.Game.Screens.Play
         private readonly bool startAtGameplayStart;
         private readonly double firstHitObjectTime;
 
-        private HardwareCorrectionOffsetClock userOffsetClock;
+        private HardwareCorrectionOffsetClock userGlobalOffsetClock;
+        private HardwareCorrectionOffsetClock userBeatmapOffsetClock;
         private HardwareCorrectionOffsetClock platformOffsetClock;
         private MasterGameplayClock masterGameplayClock;
         private Bindable<double> userAudioOffset;
         private double startOffset;
+
+        private IDisposable beatmapOffsetSubscription;
+
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
 
         public MasterGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStartTime, bool startAtGameplayStart = false)
             : base(beatmap.Track)
@@ -68,11 +78,17 @@ namespace osu.Game.Screens.Play
             firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
-            userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
+            userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
+
+            beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
+                r => r.Find<BeatmapInfo>(beatmap.BeatmapInfo.ID)?.UserSettings,
+                settings => settings.Offset,
+                val => userBeatmapOffsetClock.Offset = val);
 
             // sane default provided by ruleset.
             startOffset = gameplayStartTime;
@@ -161,9 +177,10 @@ namespace osu.Game.Screens.Play
             platformOffsetClock = new HardwareCorrectionOffsetClock(source, pauseFreqAdjust) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 15 : 0 };
 
             // the final usable gameplay clock with user-set offsets applied.
-            userOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, pauseFreqAdjust);
+            userGlobalOffsetClock = new HardwareCorrectionOffsetClock(platformOffsetClock, pauseFreqAdjust);
+            userBeatmapOffsetClock = new HardwareCorrectionOffsetClock(userGlobalOffsetClock, pauseFreqAdjust);
 
-            return masterGameplayClock = new MasterGameplayClock(userOffsetClock);
+            return masterGameplayClock = new MasterGameplayClock(userBeatmapOffsetClock);
         }
 
         /// <summary>
@@ -209,6 +226,7 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+            beatmapOffsetSubscription?.Dispose();
             removeSourceClockAdjustments();
         }
 
