@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Margin = new MarginPadding(10);
 
-            Scale = new Vector2(1.3f);
+            Scale = new Vector2(1.28f);
 
             InternalChildren = new[]
             {
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             ((IHasText)popOutCount).Text = formatCount(newValue);
 
-            popOutCount.ScaleTo(1.6f);
+            popOutCount.ScaleTo(1.56f);
             popOutCount.FadeTo(0.6f);
 
             popOutCount.ScaleTo(1, big_pop_out_duration);
