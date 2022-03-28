@@ -42,6 +42,9 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private SkinEditorOverlay skinEditorOverlay { get; set; }
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
@@ -107,7 +110,7 @@ namespace osu.Game.Skinning.Editor
                                                     new EditorMenuItem("Save", MenuItemType.Standard, Save),
                                                     new EditorMenuItem("Revert to default", MenuItemType.Destructive, revert),
                                                     new EditorMenuItemSpacer(),
-                                                    new EditorMenuItem("Exit", MenuItemType.Standard, Hide),
+                                                    new EditorMenuItem("Exit", MenuItemType.Standard, () => skinEditorOverlay?.Hide()),
                                                 },
                                             },
                                         }
