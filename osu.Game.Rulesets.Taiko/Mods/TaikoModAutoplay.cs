@@ -14,7 +14,14 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
         {
-            ScoreInfo = new ScoreInfo { User = new APIUser { Username = "mekkadosu!" } },
+            ScoreInfo = new ScoreInfo
+            {
+                User = new APIUser
+                {
+                    Id = APIUser.SYSTEM_USER_ID,
+                    Username = "mekkadosu!"
+                }
+            },
             Replay = new TaikoAutoGenerator(beatmap).Generate(),
         };
     }

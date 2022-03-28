@@ -16,7 +16,11 @@ namespace osu.Game.Rulesets.EmptyScrolling.Mods
         {
             ScoreInfo = new ScoreInfo
             {
-                User = new APIUser { Username = "sample" },
+                User = new APIUser
+                {
+                    Id = APIUser.SYSTEM_USER_ID,
+                    Username = "sample"
+                },
             },
             Replay = new EmptyScrollingAutoGenerator(beatmap).Generate(),
         };
