@@ -184,11 +184,11 @@ namespace osu.Game.Screens.Play.HUD
         {
             ((IHasText)popOutCount).Text = formatCount(newValue);
 
-            popOutCount.ScaleTo(1.56f);
-            popOutCount.FadeTo(0.6f);
+            popOutCount.ScaleTo(1.56f)
+                       .ScaleTo(1, big_pop_out_duration);
 
-            popOutCount.ScaleTo(1, big_pop_out_duration);
-            popOutCount.FadeOut(big_pop_out_duration);
+            popOutCount.FadeTo(0.6f)
+                       .FadeOut(big_pop_out_duration);
         }
 
         private void transformNoPopOut(int newValue)
