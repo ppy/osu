@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual
         /// Instantiate a replay player that renders an autoplay mod.
         /// </summary>
         public TestReplayPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
-            : base((beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateReplayScore(beatmap, mods), new PlayerConfiguration
+            : base((beatmap, mods) => mods.OfType<ModAutoplay>().First().CreateScoreFromReplayData(beatmap, mods), new PlayerConfiguration
             {
                 AllowPause = allowPause,
                 ShowResults = showResults

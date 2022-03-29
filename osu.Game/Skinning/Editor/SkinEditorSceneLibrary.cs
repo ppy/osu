@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK;
@@ -94,7 +95,7 @@ namespace osu.Game.Skinning.Editor
 
                                         var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
                                         if (replayGeneratingMod != null)
-                                            screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods))));
+                                            screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
                                     }, new[] { typeof(Player), typeof(SongSelect) })
                                 },
                             }
