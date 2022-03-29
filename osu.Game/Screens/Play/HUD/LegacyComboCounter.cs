@@ -44,9 +44,6 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly Container counterContainer;
 
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         /// <summary>
         /// Hides the combo counter internally without affecting its <see cref="SkinnableInfo"/>.
         /// </summary>
@@ -135,8 +132,6 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.BindValueChanged(combo => updateCount(combo.NewValue == 0), true);
 
-            // Since layout depends on combo font height we need to update it during skin change
-            skin.SourceChanged += updateLayout;
             updateLayout();
         }
 
@@ -291,14 +286,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             double difference = currentValue > newValue ? currentValue - newValue : newValue - currentValue;
             return difference * rolling_duration;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (skin != null)
-                skin.SourceChanged -= updateLayout;
         }
     }
 }
