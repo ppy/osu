@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "The whole playfield is on a wheel!";
         public override double ScoreMultiplier => 1;
 
-        public override string SettingDescription => $"{SpinSpeed.Value} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
+        public override string SettingDescription => $"{SpinSpeed.Value:N2} rpm {Direction.Value.GetDescription().ToLowerInvariant()}";
 
         public void Update(Playfield playfield)
         {
