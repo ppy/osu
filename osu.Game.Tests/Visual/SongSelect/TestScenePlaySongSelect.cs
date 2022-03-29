@@ -68,7 +68,9 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("reset defaults", () =>
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
+
                 Beatmap.SetDefault();
+                SelectedMods.SetDefault();
 
                 songSelect = null;
             });
@@ -563,7 +565,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestAutoplayViaCtrlEnter()
+        public void TestAutoplayShortcut()
         {
             addRulesetImportStep(0);
 
@@ -580,11 +582,65 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
 
-            AddAssert("autoplay enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModAutoplay);
+            AddAssert("autoplay selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
 
             AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
 
-            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
+            AddAssert("no mods selected", () => songSelect.Mods.Value.Count == 0);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutKeepsAutoplayIfSelectedAlready()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
+            changeMods(new OsuModAutoplay());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("autoplay still selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
+        }
+
+        [Test]
+        public void TestAutoplayShortcutReturnsInitialModsOnExit()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for selection", () => !Beatmap.IsDefault);
+
+            changeMods(new OsuModRelax());
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Key(Key.Enter);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("only autoplay selected", () => songSelect.Mods.Value.Single() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("relax returned", () => songSelect.Mods.Value.Single() is ModRelax);
         }
 
         [Test]
