@@ -207,8 +207,8 @@ namespace osu.Game.Screens.Play.HUD
             counterContainer.Size = displayedCountSpriteText.Size;
 
             displayedCountSpriteText.ScaleTo(1).Then()
-                                    .ScaleTo(1.1f, small_pop_out_duration / 2, Easing.InQuad).Then()
-                                    .ScaleTo(1, small_pop_out_duration / 2, Easing.OutQuad);
+                                    .ScaleTo(1.1f, small_pop_out_duration / 2, Easing.In).Then()
+                                    .ScaleTo(1, small_pop_out_duration / 2, Easing.Out);
         }
 
         private void scheduledPopOutSmall(uint id)
