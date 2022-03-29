@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Replays;
@@ -11,7 +12,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplay
+    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplayData
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
@@ -30,6 +31,18 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
+        [Obsolete("Use CreateScoreFromReplayData(IBeatmap, IReadOnlyList<Mod>) instead")] // Can be removed 20220929
         public virtual Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score { Replay = new Replay() };
+
+        public virtual ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        {
+            Logger.Log($"Ruleset mod implementation for {GetType().Name} should be updated to newer {nameof(ICreateReplayData)} signature.", LoggingTarget.Information);
+
+#pragma warning disable CS0618
+            var replayScore = CreateReplayScore(beatmap, mods);
+#pragma warning restore CS0618
+
+            return new ModReplayData(replayScore.Replay, new ModCreatedReplayUser { Username = replayScore.ScoreInfo.User.Username });
+        }
     }
 }
