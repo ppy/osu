@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool UserPlayable => false;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModCinema), typeof(ModRelax), typeof(ModFailCondition), typeof(ModNoFail) };
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
