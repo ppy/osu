@@ -108,16 +108,10 @@ namespace osu.Game.Overlays.Chat
 
             ShowSearch.BindValueChanged(change =>
             {
-                if (change.NewValue)
-                {
-                    chattingTextContainer.Hide();
-                    searchIconContainer.Show();
-                }
-                else
-                {
-                    chattingTextContainer.Show();
-                    searchIconContainer.Hide();
-                }
+                bool showSearch = change.NewValue;
+
+                chattingTextContainer.FadeTo(showSearch ? 0 : 1);
+                searchIconContainer.FadeTo(showSearch ? 1 : 0);
             }, true);
 
             currentChannel.BindValueChanged(change =>
