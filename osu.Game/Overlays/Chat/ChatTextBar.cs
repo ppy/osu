@@ -28,7 +28,6 @@ namespace osu.Game.Overlays.Chat
 
         private OsuTextFlowContainer chattingTextContainer = null!;
         private Container searchIconContainer = null!;
-        private Container enterContainer = null!;
 
         private const float chatting_text_width = 180;
         private const float search_icon_width = 40;
@@ -54,7 +53,6 @@ namespace osu.Game.Overlays.Chat
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
                     },
                     Content = new[]
                     {
@@ -98,34 +96,6 @@ namespace osu.Game.Overlays.Chat
                                     ReleaseFocusOnCommit = false,
                                 },
                             },
-                            enterContainer = new Container
-                            {
-                                Origin = Anchor.CentreLeft,
-                                Anchor = Anchor.CentreLeft,
-                                Masking = true,
-                                BorderColour = colourProvider.Background1,
-                                BorderThickness = 2,
-                                CornerRadius = 10,
-                                Margin = new MarginPadding { Right = 10 },
-                                Size = new Vector2(60, 30),
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Colour4.Transparent,
-                                    },
-                                    new OsuSpriteText
-                                    {
-                                        Text = "Enter",
-                                        Origin = Anchor.Centre,
-                                        Anchor = Anchor.Centre,
-                                        Colour = colourProvider.Background1,
-                                        Font = OsuFont.Torus.With(size: 20),
-                                        Margin = new MarginPadding { Bottom = 2 },
-                                    },
-                                },
-                            },
                         },
                     },
                 },
@@ -141,13 +111,11 @@ namespace osu.Game.Overlays.Chat
                 if (change.NewValue)
                 {
                     chattingTextContainer.Hide();
-                    enterContainer.Hide();
                     searchIconContainer.Show();
                 }
                 else
                 {
                     chattingTextContainer.Show();
-                    enterContainer.Show();
                     searchIconContainer.Hide();
                 }
             }, true);
