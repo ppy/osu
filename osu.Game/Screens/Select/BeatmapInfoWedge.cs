@@ -314,8 +314,8 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
+                titleBinding.BindValueChanged(_ => setMetadata());
+                artistBinding.BindValueChanged(_ => setMetadata(), true);
 
                 addInfoLabels();
             }
@@ -352,10 +352,10 @@ namespace osu.Game.Screens.Select
                 }, true);
             }
 
-            private void setMetadata(string source)
+            private void setMetadata()
             {
                 ArtistLabel.Text = artistBinding.Value;
-                TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
+                TitleLabel.Text = titleBinding.Value;
             }
 
             private void addInfoLabels()
