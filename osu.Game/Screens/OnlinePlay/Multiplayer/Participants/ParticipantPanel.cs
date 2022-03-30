@@ -169,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                             Origin = Anchor.Centre,
                             Alpha = 0,
                             Margin = new MarginPadding(4),
-                            Action = () => Client.KickUser(User.UserID),
+                            Action = () => Client.KickUser(User.UserID).FireAndForget(),
                         },
                     },
                 }
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         if (!Client.IsHost)
                             return;
 
-                        Client.TransferHost(targetUser);
+                        Client.TransferHost(targetUser).FireAndForget();
                     }),
                     new OsuMenuItem("Kick", MenuItemType.Destructive, () =>
                     {
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                         if (!Client.IsHost)
                             return;
 
-                        Client.KickUser(targetUser);
+                        Client.KickUser(targetUser).FireAndForget();
                     })
                 };
             }
