@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mods
         /// For callers that want to receive a directly usable <see cref="Score"/> instance,
         /// the <see cref="ModExtensions.CreateScoreFromReplayData"/> extension method is provided for convenience.
         /// </remarks>
-        public ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods);
+        ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods);
     }
 
     /// <summary>
