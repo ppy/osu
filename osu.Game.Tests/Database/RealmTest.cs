@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Database
                     // ReSharper disable once AccessToDisposedClosure
                     var testStorage = new OsuStorage(host, storage.GetStorageForDirectory(caller));
 
-                    using (var realm = new RealmAccess(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
                         testAction(realm, testStorage);
@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Database
                 {
                     var testStorage = storage.GetStorageForDirectory(caller);
 
-                    using (var realm = new RealmAccess(testStorage, "client"))
+                    using (var realm = new RealmAccess(testStorage, OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
                         Logger.Log($"Running test using realm file {testStorage.GetFullPath(realm.Filename)}");
                         await testAction(realm, testStorage);
