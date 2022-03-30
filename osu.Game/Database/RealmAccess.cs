@@ -212,7 +212,7 @@ namespace osu.Game.Database
                     if (realm.All<ScoreInfo>().Any())
                     {
                         Logger.Log(@"Recovery aborted as the existing database has scores set already.", LoggingTarget.Database);
-                        Logger.Log(@"To perform recovery, delete client.realm while osu! is not running.", LoggingTarget.Database);
+                        Logger.Log($@"To perform recovery, delete {OsuGameBase.CLIENT_DATABASE_FILENAME} while osu! is not running.", LoggingTarget.Database);
                         return;
                     }
                 }

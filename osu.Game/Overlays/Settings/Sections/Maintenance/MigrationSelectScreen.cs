@@ -3,11 +3,14 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Game.IO;
+using osu.Game.Overlays.Dialog;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -15,6 +18,12 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
     {
         [Resolved]
         private Storage storage { get; set; }
+
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private DialogOverlay dialogOverlay { get; set; }
 
         protected override DirectoryInfo InitialPath => new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent;
 
@@ -32,8 +41,29 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             try
             {
-                if (target.GetDirectories().Length > 0 || target.GetFiles().Length > 0)
+                var directoryInfos = target.GetDirectories();
+                var fileInfos = target.GetFiles();
+
+                if (directoryInfos.Length > 0 || fileInfos.Length > 0)
+                {
+                    // Quick test for whether there's already an osu! install at the target path.
+                    if (fileInfos.Any(f => f.Name == OsuGameBase.CLIENT_DATABASE_FILENAME))
+                    {
+                        dialogOverlay.Push(new ConfirmDialog("The target directory already seems to have an osu! install. Use that data instead?", () =>
+                            {
+                                dialogOverlay.Push(new ConfirmDialog("To complete this operation, osu! will close. Please open it again to use the new data location.", () =>
+                                {
+                                    (storage as OsuStorage)?.ChangeDataPath(target.FullName);
+                                    game.GracefullyExit();
+                                }, () => { }));
+                            },
+                            () => { }));
+
+                        return;
+                    }
+
                     target = target.CreateSubdirectory("osu-lazer");
+                }
             }
             catch (Exception e)
             {
