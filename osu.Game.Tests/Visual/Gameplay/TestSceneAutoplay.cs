@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("score has combo", () => getResultsScreen().Score.Combo > 100);
             AddAssert("score has no misses", () => getResultsScreen().Score.Statistics[HitResult.Miss] == 0);
 
-            AddUntilStep("avatar dispalyed", () => getAvatar() != null);
+            AddUntilStep("avatar displayed", () => getAvatar() != null);
             AddAssert("avatar not clickable", () => getAvatar().ChildrenOfType<OsuClickableContainer>().First().Action == null);
 
             ClickableAvatar getAvatar() => getResultsScreen()
