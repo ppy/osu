@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Mods
@@ -17,9 +18,13 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Create replay data.
         /// </summary>
-        /// <param name="beatmap"></param>
-        /// <param name="mods"></param>
-        /// <returns></returns>
+        /// <param name="beatmap">The beatmap to create replay data for.</param>
+        /// <param name="mods">The mods to take into account when creating the replay data.</param>
+        /// <returns>A <see cref="ModReplayData"/> structure, containing the generated replay data.</returns>
+        /// <remarks>
+        /// For callers that want to receive a directly usable <see cref="Score"/> instance,
+        /// the <see cref="ModExtensions.CreateScoreFromReplayData"/> extension method is provided for convenience.
+        /// </remarks>
         public ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods);
     }
 
