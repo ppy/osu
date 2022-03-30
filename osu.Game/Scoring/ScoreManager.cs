@@ -118,7 +118,11 @@ namespace osu.Game.Scoring
         public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             GetTotalScoreAsync(score, mode, cancellationToken)
-                .ContinueWith(task => scheduler.Add(() => callback(task.GetResultSafely())), TaskContinuationOptions.OnlyOnRanToCompletion);
+                .ContinueWith(task => scheduler.Add(() =>
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                        callback(task.GetResultSafely());
+                }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         /// <summary>
