@@ -116,7 +116,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void testBeatmapLabels(Ruleset ruleset)
         {
             AddAssert("check version", () => infoWedge.Info.VersionLabel.Current.Value == $"{ruleset.ShortName}Version");
-            AddAssert("check title", () => infoWedge.Info.TitleLabel.Current.Value == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
+            AddAssert("check title", () => infoWedge.Info.TitleLabel.Current.Value == $"{ruleset.ShortName}Title");
             AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Current.Value == $"{ruleset.ShortName}Artist");
             AddAssert("check author", () => infoWedge.Info.MapperContainer.ChildrenOfType<OsuSpriteText>().Any(s => s.Current.Value == $"{ruleset.ShortName}Author"));
         }
