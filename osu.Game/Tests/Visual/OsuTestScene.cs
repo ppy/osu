@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual
 
             Resources = parent.Get<OsuGameBase>().Resources;
 
-            realm = new Lazy<RealmAccess>(() => new RealmAccess(LocalStorage, "client", host.UpdateThread));
+            realm = new Lazy<RealmAccess>(() => new RealmAccess(LocalStorage, OsuGameBase.CLIENT_DATABASE_FILENAME, host.UpdateThread));
 
             RecycleLocalStorage(false);
 
