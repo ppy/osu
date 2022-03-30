@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
@@ -103,23 +102,7 @@ namespace osu.Game.Screens.Select
 
                 if (replayGeneratingMod != null)
                 {
-                    return new ReplayPlayer((beatmap, mods) =>
-                    {
-                        var replayData = replayGeneratingMod.CreateReplayData(beatmap, mods);
-
-                        return new Score
-                        {
-                            Replay = replayData.Replay,
-                            ScoreInfo =
-                            {
-                                User = new APIUser
-                                {
-                                    Id = APIUser.SYSTEM_USER_ID,
-                                    Username = replayData.User.Username,
-                                }
-                            }
-                        };
-                    });
+                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
                 }
 
                 return new SoloPlayer();
