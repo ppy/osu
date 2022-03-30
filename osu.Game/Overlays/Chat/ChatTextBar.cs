@@ -21,14 +21,13 @@ namespace osu.Game.Overlays.Chat
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 
-        public ChatTextBox TextBox => chatTextBox;
+        public ChatTextBox TextBox { get; private set; } = null!;
 
         [Resolved]
         private Bindable<Channel> currentChannel { get; set; } = null!;
 
         private OsuTextFlowContainer chattingTextContainer = null!;
         private Container searchIconContainer = null!;
-        private ChatTextBox chatTextBox = null!;
         private Container enterContainer = null!;
 
         private const float chatting_text_width = 180;
@@ -89,7 +88,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Right = 5 },
-                                Child = chatTextBox =  new ChatTextBox
+                                Child = TextBox = new ChatTextBox
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -156,16 +155,19 @@ namespace osu.Game.Overlays.Chat
             currentChannel.BindValueChanged(change =>
             {
                 Channel newChannel = change.NewValue;
+
                 switch (newChannel?.Type)
                 {
                     case ChannelType.Public:
                         chattingTextContainer.Text = $"chatting in {newChannel.Name}";
                         break;
+
                     case ChannelType.PM:
                         chattingTextContainer.Text = $"chatting with {newChannel.Name}";
                         break;
+
                     default:
-                        chattingTextContainer.Text = "";
+                        chattingTextContainer.Text = string.Empty;
                         break;
                 }
             }, true);
