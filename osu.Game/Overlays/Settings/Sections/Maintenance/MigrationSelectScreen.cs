@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 if (directoryInfos.Length > 0 || fileInfos.Length > 0)
                 {
                     // Quick test for whether there's already an osu! install at the target path.
-                    if (fileInfos.Any(f => f.Name == @"client.realm"))
+                    if (fileInfos.Any(f => f.Name == OsuGameBase.CLIENT_DATABASE_FILENAME))
                     {
                         dialogOverlay.Push(new ConfirmDialog("The target directory already seems to have an osu! install. Use that data instead?", () =>
                             {
