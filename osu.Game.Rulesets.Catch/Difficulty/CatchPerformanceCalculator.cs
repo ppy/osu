@@ -36,14 +36,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             misses = score.Statistics.GetValueOrDefault(HitResult.Miss);
 
             // We are heavily relying on aim in catch the beat
-            double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
+            double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 150000.0;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
 
             // Longer maps are worth more
             double lengthFactor = numTotalHits * 0.5 + catchAttributes.DirectionChangeCount;
-            double lengthBonus = 0.9 + 0.39 * Math.Min(1.0, lengthFactor / 1700);
+            //double lengthBonus = 0.9 + 0.42 * Math.Min(1.0, lengthFactor / 1700);
+            double lengthBonus = Math.Log10(lengthFactor + 315) - 1.5 + 0.22 * Math.Min(1.0, lengthFactor / 2000);
 
             // Longer maps are worth more
             value *= lengthBonus;
@@ -53,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(score.MaxCombo, 0.55) / Math.Pow(score.MaxCombo, 0.55), 1.0);
+                value *= Math.Min(Math.Pow(score.MaxCombo, 0.55) / Math.Pow(catchAttributes.MaxCombo, 0.55), 1.0);
 
 
             double approachRate = catchAttributes.ApproachRate;
@@ -82,13 +83,30 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight))
             {
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
-                value *= 1.25 * lengthBonus;
+                value *= Math.Pow(lengthBonus, 0.7);
 
                 if (approachRate > 8.0f)
                     value *= 0.18f * (approachRate - 8.0f) + 1; // 18% for each AR above 8
 
                 if (approachRate <= 8.0f)
                     value *= (0.025f * approachRate) + 0.8f; // Dreasing by a few percentages below AR 8
+            }
+
+            // Adding a bonus for long maps with DT and HR because both mods require more stamina
+            if (score.Mods.Any(m => m is ModDoubleTime))
+            {
+                value *= Math.Pow(lengthBonus, 0.2);
+            }
+
+            if (score.Mods.Any(m => m is ModHardRock))
+            {
+                value *= Math.Pow(lengthBonus, 0.1);
+            }
+
+            // Adding a malus for long maps with HT because it requires less stamina
+            if (score.Mods.Any(m => m is ModHalfTime))
+            {
+                value *= Math.Pow(lengthBonus, -0.2);
             }
 
 

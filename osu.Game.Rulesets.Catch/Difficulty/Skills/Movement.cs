@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (!catchCurrent.LastObject.HyperDash)
             {
                 // The base value is a ratio between distance moved and strain time
-                movementValue = 0.062 * Math.Abs(distanceMoved) / weightedStrainTime;
+                movementValue = 0.065 * Math.Abs(distanceMoved) / weightedStrainTime;
 
                 if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0)
                 {
@@ -105,14 +105,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
                 // Direction change scaling
                 if (!isSameDirection && lastStrainTime > 0)
-                    movementValue *= 1 + (0.3 * Math.Pow(Math.Abs(lastExactDistanceMoved), 1.15) / lastStrainTime);
+                    movementValue *= 1 + (0.28 * Math.Pow(Math.Abs(lastExactDistanceMoved), 1.15) / lastStrainTime);
                 else movementValue *= 0.7;
 
                 // Handling hyperdash chains
                if (previousIsDoubleHdash)
                {
                     // Scaling hyperdash chains according to movement
-                    movementValue *= isSameDirection ? Math.Abs(distanceMoved / 60) : 0.63;
+                    movementValue *= isSameDirection ? Math.Abs(distanceMoved / 60) : 0.75;
                }
             }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (catchCurrent.LastObject.DistanceToHyperDash <= 20)
             {
                 if (!catchCurrent.LastObject.HyperDash)
-                    edgeDashBonus += 8;
+                    edgeDashBonus += 8.2;
                 else
                 {
                     // After a hyperdash we ARE in the correct position. Always!
@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 }
 
                 // The edge dash bonus is scaled according to the distance to hyperdashes
-                movementValue *= 1.0 + edgeDashBonus * (Math.Pow(20 - catchCurrent.LastObject.DistanceToHyperDash, 1.3) / 80) * Math.Pow(Math.Min(catchCurrent.StrainTime, 265) / 265, 2); // Edge Dashes are easier at lower ms values
+                movementValue *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 45) * Math.Pow(Math.Min(catchCurrent.StrainTime, 265) / 265, 2); // Edge Dashes are easier at lower ms values
             }
 
             if (Math.Abs(distanceMoved) <= absolute_player_positioning_error && Math.Abs(exactDistanceMoved) == Math.Abs(lastExactDistanceMoved) && catchCurrent.StrainTime == lastStrainTime)
