@@ -234,6 +234,48 @@ namespace osu.Game.Tests.NonVisual
         }
 
         [Test]
+        public void TestMigrationFailsOnExistingData()
+        {
+            string customPath = prepareCustomPath();
+            string customPath2 = prepareCustomPath();
+
+            using (var host = new CustomTestHeadlessGameHost())
+            {
+                try
+                {
+                    var osu = LoadOsuIntoHost(host);
+
+                    var storage = osu.Dependencies.Get<Storage>();
+                    var osuStorage = storage as OsuStorage;
+
+                    string originalDirectory = storage.GetFullPath(".");
+
+                    const string database_filename = "client.realm";
+
+                    Assert.DoesNotThrow(() => osu.Migrate(customPath));
+                    Assert.That(File.Exists(Path.Combine(customPath, database_filename)));
+
+                    Directory.CreateDirectory(customPath2);
+                    File.Copy(Path.Combine(customPath, database_filename), Path.Combine(customPath2, database_filename));
+
+                    // Fails because file already exists.
+                    Assert.Throws<ArgumentException>(() => osu.Migrate(customPath2));
+
+                    osuStorage?.ChangeDataPath(customPath2);
+
+                    Assert.That(osuStorage?.CustomStoragePath, Is.EqualTo(customPath2));
+                    Assert.That(new StreamReader(Path.Combine(originalDirectory, "storage.ini")).ReadToEnd().Contains($"FullPath = {customPath2}"));
+                }
+                finally
+                {
+                    host.Exit();
+                    cleanupPath(customPath);
+                    cleanupPath(customPath2);
+                }
+            }
+        }
+
+        [Test]
         public void TestMigrationToNestedTargetFails()
         {
             string customPath = prepareCustomPath();
