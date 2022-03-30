@@ -287,12 +287,14 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
+                                Current = { BindTarget = titleBinding },
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
                             },
                             ArtistLabel = new OsuSpriteText
                             {
+                                Current = { BindTarget = artistBinding },
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
@@ -313,9 +315,6 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 };
-
-                titleBinding.BindValueChanged(_ => setMetadata());
-                artistBinding.BindValueChanged(_ => setMetadata(), true);
 
                 addInfoLabels();
             }
@@ -350,12 +349,6 @@ namespace osu.Game.Screens.Select
                     settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
                     settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
                 }, true);
-            }
-
-            private void setMetadata()
-            {
-                ArtistLabel.Text = artistBinding.Value;
-                TitleLabel.Text = titleBinding.Value;
             }
 
             private void addInfoLabels()
