@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            dependencies.Cache(rulesetStore = new RulesetStore(Realm));
+            dependencies.Cache(rulesetStore = new RealmRulesetStore(Realm));
             dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, Realm, rulesetStore, null, dependencies.Get<AudioManager>(), Resources, dependencies.Get<GameHost>(), Beatmap.Default));
             dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, Realm, Scheduler));
             Dependencies.Cache(Realm);
@@ -119,7 +119,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Network failure", () => leaderboard.SetErrorState(LeaderboardState.NetworkFailure));
             AddStep(@"No supporter", () => leaderboard.SetErrorState(LeaderboardState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetErrorState(LeaderboardState.NotLoggedIn));
-            AddStep(@"Unavailable", () => leaderboard.SetErrorState(LeaderboardState.Unavailable));
+            AddStep(@"Ruleset unavailable", () => leaderboard.SetErrorState(LeaderboardState.RulesetUnavailable));
+            AddStep(@"Beatmap unavailable", () => leaderboard.SetErrorState(LeaderboardState.BeatmapUnavailable));
             AddStep(@"None selected", () => leaderboard.SetErrorState(LeaderboardState.NoneSelected));
         }
 
@@ -197,6 +198,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now,
                     Mods = new Mod[]
                     {
                         new OsuModHidden(),
@@ -234,6 +236,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddSeconds(-30),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -254,6 +257,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddSeconds(-70),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -275,6 +279,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddMinutes(-40),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -296,6 +301,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-2),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -317,6 +323,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.9826,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-25),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -338,6 +345,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.9654,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-50),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -359,6 +367,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.6025,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddHours(-72),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -380,6 +389,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddMonths(-3),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,
@@ -401,6 +411,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 0.4222,
                     MaxCombo = 244,
                     TotalScore = 1707827,
+                    Date = DateTime.Now.AddYears(-2),
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
                     BeatmapInfo = beatmapInfo,
                     Ruleset = new OsuRuleset().RulesetInfo,

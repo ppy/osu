@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
         [TearDownSteps]
         public void TearDownSteps()
         {
-            if (DebugUtils.IsNUnitRunning)
+            if (DebugUtils.IsNUnitRunning && Game != null)
             {
                 AddStep("exit game", () => Game.Exit());
                 AddUntilStep("wait for game exit", () => Game.Parent == null);

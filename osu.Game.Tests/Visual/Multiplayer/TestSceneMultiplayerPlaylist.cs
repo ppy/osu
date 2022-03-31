@@ -11,6 +11,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -33,7 +35,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
         }
@@ -129,6 +131,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("item 1 not in lists", () => !inHistoryList(0) && !inQueueList(0));
         }
 
+        [Test]
+        public void TestQueueTabCount()
+        {
+            assertQueueTabCount(1);
+
+            addItemStep();
+            assertQueueTabCount(2);
+
+            addItemStep();
+            assertQueueTabCount(3);
+
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
+            assertQueueTabCount(2);
+
+            AddStep("leave room", () => RoomManager.PartRoom());
+            AddUntilStep("wait for room part", () => !RoomJoined);
+            assertQueueTabCount(0);
+        }
+
         [Ignore("Expired items are initially removed from the room.")]
         [Test]
         public void TestJoinRoomWithMixedItemsAddedInCorrectLists()
@@ -210,6 +231,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                               .OrderBy(drawable => drawable.Position.Y)
                               .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
                               .Count() == visualIndex;
+            });
+        }
+
+        private void assertQueueTabCount(int count)
+        {
+            string queueTabText = count > 0 ? $"Queue ({count})" : "Queue";
+            AddUntilStep($"Queue tab shows \"{queueTabText}\"", () =>
+            {
+                return this.ChildrenOfType<OsuTabControl<MultiplayerPlaylistDisplayMode>.OsuTabItem>()
+                           .Single(t => t.Value == MultiplayerPlaylistDisplayMode.Queue)
+                           .ChildrenOfType<OsuSpriteText>().Single().Text == queueTabText;
             });
         }
 
