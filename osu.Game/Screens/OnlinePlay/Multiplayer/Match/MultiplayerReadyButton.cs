@@ -36,18 +36,19 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         }
 
         private MultiplayerCountdown countdown;
-        private DateTimeOffset countdownReceivedTime;
+        private DateTimeOffset countdownChangeTime;
         private ScheduledDelegate countdownUpdateDelegate;
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            if (countdown == null && room?.Countdown != null)
-                countdownReceivedTime = DateTimeOffset.Now;
+            if (countdown != room?.Countdown)
+            {
+                countdown = room?.Countdown;
+                countdownChangeTime = DateTimeOffset.Now;
+            }
 
-            countdown = room?.Countdown;
-
-            if (room?.Countdown != null)
-                countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 1000, true);
+            if (countdown != null)
+                countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 100, true);
             else
             {
                 countdownUpdateDelegate?.Cancel();
@@ -74,7 +75,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             if (countdown != null)
             {
-                TimeSpan timeElapsed = DateTimeOffset.Now - countdownReceivedTime;
+                TimeSpan timeElapsed = DateTimeOffset.Now - countdownChangeTime;
                 TimeSpan countdownRemaining;
 
                 if (timeElapsed > countdown.TimeRemaining)
@@ -168,7 +169,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready)
+                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready && !room.Settings.AutoStartEnabled)
                     return "Cancel countdown";
 
                 return base.TooltipText;

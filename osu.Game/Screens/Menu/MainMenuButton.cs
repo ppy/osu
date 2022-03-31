@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : BeatSyncedContainer, IStateful<ButtonState>
+    public class MainMenuButton : BeatSyncedContainer, IStateful<ButtonState>
     {
         public event Action<ButtonState> StateChanged;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public Button(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public MainMenuButton(LocalisableString text, string sampleName, IconUsage symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
                 return false;
 
             if (TriggerKey == e.Key && TriggerKey != Key.Unknown)
