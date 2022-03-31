@@ -98,9 +98,12 @@ namespace osu.Game.Screens.Select
 
             Player createPlayer()
             {
-                var replayGeneratingMod = Mods.Value.OfType<ICreateReplay>().FirstOrDefault();
+                var replayGeneratingMod = Mods.Value.OfType<ICreateReplayData>().FirstOrDefault();
+
                 if (replayGeneratingMod != null)
-                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods));
+                {
+                    return new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods));
+                }
 
                 return new SoloPlayer();
             }
