@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
-        [Obsolete("Use CreateScoreFromReplayData(IBeatmap, IReadOnlyList<Mod>) instead")] // Can be removed 20220929
+        [Obsolete("Override CreateReplayData(IBeatmap, IReadOnlyList<Mod>) instead")] // Can be removed 20220929
         public virtual Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score { Replay = new Replay() };
 
         public virtual ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
