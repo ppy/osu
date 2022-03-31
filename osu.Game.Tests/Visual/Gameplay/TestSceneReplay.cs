@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
 
-            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod()?.CreateReplayScore(beatmap, Array.Empty<Mod>()));
+            return new ScoreAccessibleReplayPlayer(ruleset.GetAutoplayMod()?.CreateScoreFromReplayData(beatmap, Array.Empty<Mod>()));
         }
 
         protected override void AddCheckSteps()

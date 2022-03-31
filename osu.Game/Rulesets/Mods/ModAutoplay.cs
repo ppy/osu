@@ -11,7 +11,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplay
+    public abstract class ModAutoplay : Mod, IApplicableFailOverride, ICreateReplayData
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
@@ -30,6 +30,16 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
+        [Obsolete("Override CreateReplayData(IBeatmap, IReadOnlyList<Mod>) instead")] // Can be removed 20220929
         public virtual Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score { Replay = new Replay() };
+
+        public virtual ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        {
+#pragma warning disable CS0618
+            var replayScore = CreateReplayScore(beatmap, mods);
+#pragma warning restore CS0618
+
+            return new ModReplayData(replayScore.Replay, new ModCreatedUser { Username = replayScore.ScoreInfo.User.Username });
+        }
     }
 }

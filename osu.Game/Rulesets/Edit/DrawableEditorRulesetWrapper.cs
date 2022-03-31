@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Edit
         private void regenerateAutoplay()
         {
             var autoplayMod = drawableRuleset.Mods.OfType<ModAutoplay>().Single();
-            drawableRuleset.SetReplayScore(autoplayMod.CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
+            drawableRuleset.SetReplayScore(autoplayMod.CreateScoreFromReplayData(drawableRuleset.Beatmap, drawableRuleset.Mods));
         }
 
         private void addHitObject(HitObject hitObject)
