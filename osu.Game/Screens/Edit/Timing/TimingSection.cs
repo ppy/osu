@@ -13,7 +13,6 @@ namespace osu.Game.Screens.Edit.Timing
 {
     internal class TimingSection : Section<TimingControlPoint>
     {
-        private SettingsSlider<double> bpmSlider;
         private LabelledTimeSignature timeSignature;
         private BPMTextBox bpmTextEntry;
 
@@ -23,7 +22,6 @@ namespace osu.Game.Screens.Edit.Timing
             Flow.AddRange(new Drawable[]
             {
                 bpmTextEntry = new BPMTextBox(),
-                bpmSlider = new BPMSlider(),
                 timeSignature = new LabelledTimeSignature
                 {
                     Label = "Time Signature"
@@ -35,9 +33,6 @@ namespace osu.Game.Screens.Edit.Timing
         {
             if (point.NewValue != null)
             {
-                bpmSlider.Current = point.NewValue.BeatLengthBindable;
-                bpmSlider.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
-
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
                 // no need to hook change handler here as it's the same bindable as above
 
@@ -99,51 +94,6 @@ namespace osu.Game.Screens.Edit.Timing
                     beatLengthBindable.UnbindBindings();
                     beatLengthBindable.BindTo(value);
                 }
-            }
-        }
-
-        private class BPMSlider : SettingsSlider<double>
-        {
-            private const double sane_minimum = 60;
-            private const double sane_maximum = 240;
-
-            private readonly BindableNumber<double> beatLengthBindable = new TimingControlPoint().BeatLengthBindable;
-
-            private readonly BindableDouble bpmBindable = new BindableDouble(60000 / TimingControlPoint.DEFAULT_BEAT_LENGTH)
-            {
-                MinValue = sane_minimum,
-                MaxValue = sane_maximum,
-            };
-
-            public BPMSlider()
-            {
-                beatLengthBindable.BindValueChanged(beatLength => updateCurrent(beatLengthToBpm(beatLength.NewValue)), true);
-                bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
-
-                base.Current = bpmBindable;
-
-                TransferValueOnCommit = true;
-            }
-
-            public override Bindable<double> Current
-            {
-                get => base.Current;
-                set
-                {
-                    // incoming will be beat length, not bpm
-                    beatLengthBindable.UnbindBindings();
-                    beatLengthBindable.BindTo(value);
-                }
-            }
-
-            private void updateCurrent(double newValue)
-            {
-                // we use a more sane range for the slider display unless overridden by the user.
-                // if a value comes in outside our range, we should expand temporarily.
-                bpmBindable.MinValue = Math.Min(newValue, sane_minimum);
-                bpmBindable.MaxValue = Math.Max(newValue, sane_maximum);
-
-                bpmBindable.Value = newValue;
             }
         }
 
