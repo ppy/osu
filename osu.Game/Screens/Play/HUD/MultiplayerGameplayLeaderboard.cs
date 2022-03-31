@@ -228,6 +228,7 @@ namespace osu.Game.Screens.Play.HUD
             public int? Team => (User.MatchState as TeamVersusUserState)?.TeamID;
 
             private readonly RulesetInfo ruleset;
+            private readonly ScoreInfo scoreInfo;
 
             public TrackedUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor)
             {
@@ -235,6 +236,8 @@ namespace osu.Game.Screens.Play.HUD
 
                 User = user;
                 ScoreProcessor = scoreProcessor;
+
+                scoreInfo = new ScoreInfo { Ruleset = ruleset };
 
                 ScoringMode.BindValueChanged(_ => UpdateScore());
             }
@@ -253,12 +256,10 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var header = frame.Header;
 
-                Score.Value = ScoreProcessor.ComputePartialScore(ScoringMode.Value, new ScoreInfo
-                {
-                    Ruleset = ruleset,
-                    MaxCombo = header.MaxCombo,
-                    Statistics = header.Statistics
-                });
+                scoreInfo.MaxCombo = header.MaxCombo;
+                scoreInfo.Statistics = header.Statistics;
+
+                Score.Value = ScoreProcessor.ComputePartialScore(ScoringMode.Value, scoreInfo);
 
                 Accuracy.Value = header.Accuracy;
                 CurrentCombo.Value = header.Combo;
