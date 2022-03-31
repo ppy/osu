@@ -207,6 +207,9 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed || e.SuperPressed)
+                return false;
+
             if (State == ButtonSystemState.Initial)
             {
                 if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
