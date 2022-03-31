@@ -80,6 +80,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 {
                     Schedule(() =>
                     {
+                        // If an error or server side trigger occurred this screen may have already exited by external means.
+                        if (!this.IsCurrentScreen())
+                            return;
+
                         loadingLayer.Hide();
 
                         if (t.IsFaulted)

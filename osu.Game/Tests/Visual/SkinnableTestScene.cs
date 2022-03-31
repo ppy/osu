@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new OsuSpriteText
                     {
-                        Text = skin?.SkinInfo?.Value.Name ?? "none",
+                        Text = skin?.SkinInfo.Value.Name ?? "none",
                         Scale = new Vector2(1.5f),
                         Padding = new MarginPadding(5),
                     },
@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Visual
             private readonly bool extrapolateAnimations;
 
             public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, IStorageResourceProvider resources, bool extrapolateAnimations)
-                : base(skin, storage, resources, "skin.ini")
+                : base(skin, resources, storage)
             {
                 this.extrapolateAnimations = extrapolateAnimations;
             }
