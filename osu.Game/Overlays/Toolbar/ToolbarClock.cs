@@ -3,54 +3,83 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osuTK.Graphics;
+
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarClock : CompositeDrawable
+    public class ToolbarClock : OsuClickableContainer
     {
         private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
+
+        protected Box HoverBackground;
+        private readonly Box flashBackground;
+        private readonly FillFlowContainer clockContainer;
 
         private DigitalClockDisplay digital;
         private AnalogClockDisplay analog;
 
         public ToolbarClock()
+            : base(HoverSampleSet.Toolbar)
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
-            Padding = new MarginPadding(10);
+            Children = new Drawable[]
+            {
+                HoverBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(80).Opacity(180),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                },
+                flashBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                    Colour = Color4.White.Opacity(100),
+                    Blending = BlendingParameters.Additive,
+                },
+
+                clockContainer = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5),
+                    Padding = new MarginPadding(10),
+                    Children = new Drawable[]
+                    {
+                        analog = new AnalogClockDisplay
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        },
+                        digital = new DigitalClockDisplay
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                        }
+                    }
+                }
+            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
             clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
-
-            InternalChild = new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.Y,
-                AutoSizeAxes = Axes.X,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(5),
-                Children = new Drawable[]
-                {
-                    analog = new AnalogClockDisplay
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    },
-                    digital = new DigitalClockDisplay
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                    }
-                }
-            };
         }
 
         protected override void LoadComplete()
@@ -72,8 +101,23 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnClick(ClickEvent e)
         {
+            flashBackground.FadeOutFromOne(800, Easing.OutQuint);
+
             cycleDisplayMode();
-            return true;
+
+            return base.OnClick(e);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            HoverBackground.FadeIn(200);
+
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            HoverBackground.FadeOut(200);
         }
 
         private void cycleDisplayMode()
