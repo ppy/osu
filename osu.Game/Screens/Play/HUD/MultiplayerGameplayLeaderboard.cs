@@ -227,13 +227,10 @@ namespace osu.Game.Screens.Play.HUD
 
             public int? Team => (User.MatchState as TeamVersusUserState)?.TeamID;
 
-            private readonly RulesetInfo ruleset;
             private readonly ScoreInfo scoreInfo;
 
             public TrackedUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor)
             {
-                this.ruleset = ruleset;
-
                 User = user;
                 ScoreProcessor = scoreProcessor;
 
