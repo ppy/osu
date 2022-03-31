@@ -37,10 +37,12 @@ namespace osu.Game.Graphics.UserInterface
         private Sample? sampleOff;
         private Sample? sampleOn;
 
+        private const float shear = 0.2f;
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public ShearedToggleButton(float shear)
+        public ShearedToggleButton()
         {
             Height = 50;
             Padding = new MarginPadding { Horizontal = shear * 50 };
