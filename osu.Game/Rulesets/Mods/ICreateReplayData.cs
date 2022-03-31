@@ -41,19 +41,19 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// Placeholder user data to show in place of the local user when the associated mod is active.
         /// </summary>
-        public readonly ModCreatedReplayUser User;
+        public readonly ModCreatedUser User;
 
-        public ModReplayData(Replay replay, ModCreatedReplayUser user = null)
+        public ModReplayData(Replay replay, ModCreatedUser user = null)
         {
             Replay = replay;
-            User = user ?? new ModCreatedReplayUser();
+            User = user ?? new ModCreatedUser();
         }
     }
 
     /// <summary>
     /// A user which is associated with a replay that was created by a mod (ie. autoplay or cinema).
     /// </summary>
-    public class ModCreatedReplayUser : IUser
+    public class ModCreatedUser : IUser
     {
         public int OnlineID => APIUser.SYSTEM_USER_ID;
         public bool IsBot => true;

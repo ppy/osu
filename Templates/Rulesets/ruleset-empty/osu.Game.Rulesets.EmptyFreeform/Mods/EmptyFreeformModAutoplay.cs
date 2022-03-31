@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.EmptyFreeform.Mods
     public class EmptyFreeformModAutoplay : ModAutoplay
     {
         public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
-            => new ModReplayData(new EmptyFreeformAutoGenerator(beatmap).Generate(), new ModCreatedReplayUser { Username = "sample" });
+            => new ModReplayData(new EmptyFreeformAutoGenerator(beatmap).Generate(), new ModCreatedUser { Username = "sample" });
     }
 }

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mods
         ModReplayData ICreateReplayData.CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
             var replayScore = CreateReplayScore(beatmap, mods);
-            return new ModReplayData(replayScore.Replay, new ModCreatedReplayUser { Username = replayScore.ScoreInfo.User.Username });
+            return new ModReplayData(replayScore.Replay, new ModCreatedUser { Username = replayScore.ScoreInfo.User.Username });
         }
     }
 }
