@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mods
             var replayScore = CreateReplayScore(beatmap, mods);
 #pragma warning restore CS0618
 
-            return new ModReplayData(replayScore.Replay, new ModCreatedReplayUser { Username = replayScore.ScoreInfo.User.Username });
+            return new ModReplayData(replayScore.Replay, new ModCreatedUser { Username = replayScore.ScoreInfo.User.Username });
         }
     }
 }

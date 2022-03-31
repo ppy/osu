@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Pippidon.Mods
     public class PippidonModAutoplay : ModAutoplay
     {
         public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
-            => new ModReplayData(new PippidonAutoGenerator(beatmap).Generate(), new ModCreatedReplayUser { Username = "sample" });
+            => new ModReplayData(new PippidonAutoGenerator(beatmap).Generate(), new ModCreatedUser { Username = "sample" });
     }
 }

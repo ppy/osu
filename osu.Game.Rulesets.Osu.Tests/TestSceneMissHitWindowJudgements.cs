@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private class TestAutoMod : OsuModAutoplay
         {
             public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
-                => new ModReplayData(new MissingAutoGenerator(beatmap, mods).Generate(), new ModCreatedReplayUser { Username = "Autoplay" });
+                => new ModReplayData(new MissingAutoGenerator(beatmap, mods).Generate(), new ModCreatedUser { Username = "Autoplay" });
         }
 
         private class MissingAutoGenerator : OsuAutoGeneratorBase
