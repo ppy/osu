@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Timing
             if (point.NewValue != null)
             {
                 bpmTextEntry.Bindable = point.NewValue.BeatLengthBindable;
-                // no need to hook change handler here as it's the same bindable as above
+                bpmTextEntry.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
 
                 timeSignature.Current = point.NewValue.TimeSignatureBindable;
                 timeSignature.Current.BindValueChanged(_ => ChangeHandler?.SaveState());
