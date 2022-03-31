@@ -36,8 +36,6 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
-            Logger.Log($"Ruleset mod implementation for {GetType().Name} should be updated to newer {nameof(ICreateReplayData)} signature.", LoggingTarget.Information);
-
 #pragma warning disable CS0618
             var replayScore = CreateReplayScore(beatmap, mods);
 #pragma warning restore CS0618
