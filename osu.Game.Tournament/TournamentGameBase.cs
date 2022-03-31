@@ -64,8 +64,6 @@ namespace osu.Game.Tournament
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
-
-            Task.Run(readBracket);
         }
 
         private void readBracket()
@@ -290,6 +288,8 @@ namespace osu.Game.Tournament
             MenuCursorContainer.Cursor.Alpha = 0;
 
             base.LoadComplete();
+
+            Task.Run(readBracket);
         }
 
         protected virtual void SaveChanges()
