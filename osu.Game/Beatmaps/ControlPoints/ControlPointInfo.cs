@@ -164,7 +164,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             int closestDivisor = 0;
             double closestTime = double.MaxValue;
 
-            foreach (int divisor in BindableBeatDivisor.VALID_DIVISORS)
+            foreach (int divisor in BindableBeatDivisor.PREDEFINED_DIVISORS)
             {
                 double distanceFromSnap = Math.Abs(time - getClosestSnappedTime(timingPoint, time, divisor));
 

@@ -38,6 +38,7 @@ namespace osu.Game.Database
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
              .ForMember(s => s.Ruleset, cc => cc.Ignore())
              .ForMember(s => s.Metadata, cc => cc.Ignore())
+             .ForMember(s => s.UserSettings, cc => cc.Ignore())
              .ForMember(s => s.Difficulty, cc => cc.Ignore())
              .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
              .AfterMap((s, d) =>
@@ -154,6 +155,7 @@ namespace osu.Game.Database
 
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
+            c.CreateMap<BeatmapUserSettings, BeatmapUserSettings>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
             c.CreateMap<ScoreInfo, ScoreInfo>();

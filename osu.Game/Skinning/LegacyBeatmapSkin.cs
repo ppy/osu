@@ -1,8 +1,11 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
@@ -20,14 +23,28 @@ namespace osu.Game.Skinning
         protected override bool AllowManiaSkin => false;
         protected override bool UseCustomSampleBanks => true;
 
-        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IResourceStore<byte[]> storage, IStorageResourceProvider resources)
-            : base(createSkinInfo(beatmapInfo), new LegacySkinResourceStore(beatmapInfo.BeatmapSet, storage), resources, beatmapInfo.Path)
+        /// <summary>
+        /// Construct a new legacy beatmap skin instance.
+        /// </summary>
+        /// <param name="beatmapInfo">The model for this beatmap.</param>
+        /// <param name="resources">Access to raw game resources.</param>
+        public LegacyBeatmapSkin(BeatmapInfo beatmapInfo, IStorageResourceProvider? resources)
+            : base(createSkinInfo(beatmapInfo), resources, createRealmBackedStore(beatmapInfo, resources), beatmapInfo.Path.AsNonNull())
         {
             // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
             Configuration.AllowDefaultComboColoursFallback = false;
         }
 
-        public override Drawable GetDrawableComponent(ISkinComponent component)
+        private static IResourceStore<byte[]> createRealmBackedStore(BeatmapInfo beatmapInfo, IStorageResourceProvider? resources)
+        {
+            if (resources == null)
+                // should only ever be used in tests.
+                return new ResourceStore<byte[]>();
+
+            return new RealmBackedResourceStore(beatmapInfo.BeatmapSet, resources.Files, new[] { @"ogg" });
+        }
+
+        public override Drawable? GetDrawableComponent(ISkinComponent component)
         {
             if (component is SkinnableTargetComponent targetComponent)
             {
@@ -46,7 +63,7 @@ namespace osu.Game.Skinning
             return base.GetDrawableComponent(component);
         }
 
-        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        public override IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
         {
             switch (lookup)
             {
@@ -62,10 +79,10 @@ namespace osu.Game.Skinning
             return base.GetConfig<TLookup, TValue>(lookup);
         }
 
-        protected override IBindable<Color4> GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
+        protected override IBindable<Color4>? GetComboColour(IHasComboColours source, int comboIndex, IHasComboInformation combo)
             => base.GetComboColour(source, combo.ComboIndexWithOffsets, combo);
 
-        public override ISample GetSample(ISampleInfo sampleInfo)
+        public override ISample? GetSample(ISampleInfo sampleInfo)
         {
             if (sampleInfo is ConvertHitObjectParser.LegacyHitSampleInfo legacy && legacy.CustomSampleBank == 0)
             {
@@ -77,6 +94,10 @@ namespace osu.Game.Skinning
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmapInfo) =>
-            new SkinInfo { Name = beatmapInfo.ToString(), Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty };
+            new SkinInfo
+            {
+                Name = beatmapInfo.ToString(),
+                Creator = beatmapInfo.Metadata.Author.Username ?? string.Empty
+            };
     }
 }

@@ -13,13 +13,17 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 using Realms;
@@ -54,7 +58,8 @@ namespace osu.Game.Screens.Menu
 
         private const int exit_delay = 3000;
 
-        private Sample seeya;
+        private SkinnableSound skinnableSeeya;
+        private ISample seeya;
 
         protected virtual string SeeyaSampleName => "Intro/seeya";
 
@@ -71,6 +76,9 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private readonly Func<OsuScreen> createNextScreen;
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
         /// Only valid during or after <see cref="LogoArriving"/>.
@@ -86,14 +94,18 @@ namespace osu.Game.Screens.Menu
         private BeatmapManager beatmaps { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, Framework.Game game, RealmAccess realm)
+        private void load(OsuConfigManager config, Framework.Game game, RealmAccess realm, IAPIProvider api)
         {
             // prevent user from changing beatmap while the intro is still running.
             beatmap = Beatmap.BeginLease(false);
 
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
-            seeya = audio.Samples.Get(SeeyaSampleName);
+
+            if (api.LocalUser.Value.IsSupporter)
+                AddInternal(skinnableSeeya = new SkinnableSound(new SampleInfo(SeeyaSampleName)));
+            else
+                seeya = audio.Samples.Get(SeeyaSampleName);
 
             // if the user has requested not to play theme music, we should attempt to find a random beatmap from their collection.
             if (!MenuMusic.Value)
@@ -117,7 +129,11 @@ namespace osu.Game.Screens.Menu
             // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
             if (initialBeatmap == null)
             {
-                if (!loadThemedIntro())
+                // Intro beatmaps are generally made using the osu! ruleset.
+                // It might not be present in test projects for other rulesets.
+                bool osuRulesetPresent = rulesets.GetRuleset(0) != null;
+
+                if (!loadThemedIntro() && osuRulesetPresent)
                 {
                     // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
                     // this could happen if a user has nuked their files store. for now, reimport to repair this.
@@ -193,7 +209,15 @@ namespace osu.Game.Screens.Menu
             // we also handle the exit transition.
             if (MenuVoice.Value)
             {
-                seeya.Play();
+                if (skinnableSeeya != null)
+                {
+                    // resuming a screen (i.e. calling OnResume) happens before the screen itself becomes alive,
+                    // therefore skinnable samples may not be updated yet with the recently selected skin.
+                    // schedule after children to ensure skinnable samples have processed skin changes before playing.
+                    ScheduleAfterChildren(() => skinnableSeeya.Play());
+                }
+                else
+                    seeya.Play();
 
                 // if playing the outro voice, we have more time to have fun with the background track.
                 // initially fade to almost silent then ramp out over the remaining time.

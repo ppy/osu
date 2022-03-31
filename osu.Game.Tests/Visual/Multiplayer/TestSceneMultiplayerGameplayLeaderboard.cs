@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
+                    SpectatorClient.SendStartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
                     multiplayerUsers.Add(OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = user }, true));
                 }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, multiplayerUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(Ruleset.Value, scoreProcessor, multiplayerUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

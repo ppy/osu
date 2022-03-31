@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Online
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, GameHost host)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.CacheAs<BeatmapManager>(beatmaps = new TestBeatmapManager(LocalStorage, Realm, rulesets, API, audio, Resources, host, Beatmap.Default));
             Dependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new TestBeatmapModelDownloader(beatmaps, API));
         }
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestBeatmapDownloadingFlow()
         {
-            AddAssert("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("ensure beatmap unavailable", () => !beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state not downloaded", BeatmapAvailability.NotDownloaded);
 
             AddStep("start downloading", () => beatmapDownloader.Download(testBeatmapSet));
@@ -132,7 +132,7 @@ namespace osu.Game.Tests.Online
 
             AddStep("allow importing", () => beatmaps.AllowImport.SetResult(true));
             AddUntilStep("wait for import", () => beatmaps.CurrentImport != null);
-            AddAssert("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
+            AddUntilStep("ensure beatmap available", () => beatmaps.IsAvailableLocally(testBeatmapSet));
             addAvailabilityCheckStep("state is locally available", BeatmapAvailability.LocallyAvailable);
         }
 

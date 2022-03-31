@@ -67,6 +67,8 @@ namespace osu.Game.Overlays.BeatmapListing
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        private IBindable<APIUser> apiUser;
+
         public BeatmapListingFilterControl()
         {
             RelativeSizeAxes = Axes.X;
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.BeatmapListing
         }
 
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
         {
             sortControlBackground.Colour = colourProvider.Background4;
         }
@@ -161,6 +163,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
+
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ => queueUpdateSearch());
         }
 
         public void TakeFocus() => searchControl.TakeFocus();
@@ -189,6 +194,9 @@ namespace osu.Game.Overlays.BeatmapListing
             SearchStarted?.Invoke();
 
             resetSearch();
+
+            if (!api.IsLoggedIn)
+                return;
 
             queryChangedDebounce = Scheduler.AddDelayed(() =>
             {

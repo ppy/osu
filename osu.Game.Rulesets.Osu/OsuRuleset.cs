@@ -159,6 +159,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
+                        new OsuModStrictTracking()
                     };
 
                 case ModType.Conversion:
@@ -195,6 +196,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModMuted(),
                         new OsuModNoScope(),
                         new OsuModAimAssist(),
+                        new ModAdaptiveSpeed()
                     };
 
                 case ModType.System:
@@ -212,7 +214,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override DifficultyCalculator CreateDifficultyCalculator(IWorkingBeatmap beatmap) => new OsuDifficultyCalculator(RulesetInfo, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => new OsuPerformanceCalculator(this, attributes, score);
+        public override PerformanceCalculator CreatePerformanceCalculator() => new OsuPerformanceCalculator();
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
@@ -314,6 +316,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new StatisticItem(string.Empty, () => new SimpleStatisticTable(3, new SimpleStatisticItem[]
                         {
+                            new AverageHitError(timedHitEvents),
                             new UnstableRate(timedHitEvents)
                         }), true)
                     }

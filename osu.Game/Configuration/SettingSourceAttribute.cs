@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
@@ -169,6 +170,39 @@ namespace osu.Game.Configuration
         }
 
         private static readonly ConcurrentDictionary<Type, (SettingSourceAttribute, PropertyInfo)[]> property_info_cache = new ConcurrentDictionary<Type, (SettingSourceAttribute, PropertyInfo)[]>();
+
+        /// <summary>
+        /// Returns the underlying value of the given mod setting object.
+        /// Can be used for serialization and equality comparison purposes.
+        /// </summary>
+        /// <param name="setting">A <see cref="SettingSourceAttribute"/> bindable.</param>
+        public static object GetUnderlyingSettingValue(this object setting)
+        {
+            switch (setting)
+            {
+                case Bindable<double> d:
+                    return d.Value;
+
+                case Bindable<int> i:
+                    return i.Value;
+
+                case Bindable<float> f:
+                    return f.Value;
+
+                case Bindable<bool> b:
+                    return b.Value;
+
+                case IBindable u:
+                    // An unknown (e.g. enum) generic type.
+                    var valueMethod = u.GetType().GetProperty(nameof(IBindable<int>.Value));
+                    Debug.Assert(valueMethod != null);
+                    return valueMethod.GetValue(u);
+
+                default:
+                    // fall back for non-bindable cases.
+                    return setting;
+            }
+        }
 
         public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties(this object obj)
         {

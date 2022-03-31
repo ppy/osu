@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private FillFlowContainer<SettingsSlider<float>> scalingSettings;
 
-        private readonly IBindable<Display> currentDisplay = new Bindable<Display>();
+        private readonly Bindable<Display> currentDisplay = new Bindable<Display>();
         private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private Bindable<ScalingMode> scalingMode;
@@ -39,6 +39,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private OsuGameBase game { get; set; }
 
         private SettingsDropdown<Size> resolutionDropdown;
+        private SettingsDropdown<Display> displayDropdown;
         private SettingsDropdown<WindowMode> windowModeDropdown;
 
         private Bindable<float> scalingPositionX;
@@ -71,6 +72,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = GraphicsSettingsStrings.ScreenMode,
                     ItemSource = windowModes,
                     Current = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
+                },
+                displayDropdown = new DisplaySettingsDropdown
+                {
+                    LabelText = GraphicsSettingsStrings.Display,
+                    Items = host.Window?.Displays,
+                    Current = currentDisplay,
                 },
                 resolutionDropdown = new ResolutionSettingsDropdown
                 {
@@ -142,7 +149,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             windowModeDropdown.Current.BindValueChanged(mode =>
             {
-                updateResolutionDropdown();
+                updateDisplayModeDropdowns();
 
                 windowModeDropdown.WarningText = mode.NewValue != WindowMode.Fullscreen ? GraphicsSettingsStrings.NotFullscreenNote : default;
             }, true);
@@ -168,7 +175,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                                                 .Distinct());
                 }
 
-                updateResolutionDropdown();
+                updateDisplayModeDropdowns();
             }), true);
 
             scalingMode.BindValueChanged(mode =>
@@ -183,12 +190,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             // initial update bypasses transforms
             updateScalingModeVisibility();
 
-            void updateResolutionDropdown()
+            void updateDisplayModeDropdowns()
             {
                 if (resolutions.Count > 1 && windowModeDropdown.Current.Value == WindowMode.Fullscreen)
                     resolutionDropdown.Show();
                 else
                     resolutionDropdown.Hide();
+
+                if (displayDropdown.Items.Count() > 1)
+                    displayDropdown.Show();
+                else
+                    displayDropdown.Hide();
             }
 
             void updateScalingModeVisibility()
@@ -241,6 +253,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private class UIScaleSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => base.TooltipText + "x";
+        }
+
+        private class DisplaySettingsDropdown : SettingsDropdown<Display>
+        {
+            protected override OsuDropdown<Display> CreateDropdown() => new DisplaySettingsDropdownControl();
+
+            private class DisplaySettingsDropdownControl : DropdownControl
+            {
+                protected override LocalisableString GenerateItemText(Display item)
+                {
+                    return $"{item.Index}: {item.Name} ({item.Bounds.Width}x{item.Bounds.Height})";
+                }
+            }
         }
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>

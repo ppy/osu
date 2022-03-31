@@ -21,9 +21,16 @@ namespace osu.Game.Tests.Visual.Spectator
     public class TestSpectatorClient : SpectatorClient
     {
         /// <summary>
-        /// Maximum number of frames sent per bundle via <see cref="SendFrames"/>.
+        /// Maximum number of frames sent per bundle via <see cref="SendFramesFromUser"/>.
         /// </summary>
         public const int FRAME_BUNDLE_SIZE = 10;
+
+        /// <summary>
+        /// Whether to force send operations to fail (simulating a network issue).
+        /// </summary>
+        public bool ShouldFailSendingFrames { get; set; }
+
+        public int FrameSendAttempts { get; private set; }
 
         public override IBindable<bool> IsConnected { get; } = new Bindable<bool>(true);
 
@@ -47,7 +54,7 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to start play for.</param>
         /// <param name="beatmapId">The playing beatmap id.</param>
-        public void StartPlay(int userId, int beatmapId)
+        public void SendStartPlay(int userId, int beatmapId)
         {
             userBeatmapDictionary[userId] = beatmapId;
             userNextFrameDictionary[userId] = 0;
@@ -59,7 +66,7 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to end play for.</param>
         /// <param name="state">The spectator state to end play with.</param>
-        public void EndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
+        public void SendEndPlay(int userId, SpectatedUserState state = SpectatedUserState.Quit)
         {
             if (!userBeatmapDictionary.ContainsKey(userId))
                 return;
@@ -74,14 +81,15 @@ namespace osu.Game.Tests.Visual.Spectator
             userBeatmapDictionary.Remove(userId);
         }
 
-        public new void Schedule(Action action) => base.Schedule(action);
-
         /// <summary>
         /// Sends frames for an arbitrary user, in bundles containing 10 frames each.
+        /// This bypasses the standard queueing mechanism completely and should only be used to test cases where multiple users need to be sending data.
+        /// Importantly, <see cref="ShouldFailSendingFrames"/> will have no effect.
         /// </summary>
         /// <param name="userId">The user to send frames for.</param>
         /// <param name="count">The total number of frames to send.</param>
-        public void SendFrames(int userId, int count)
+        /// <param name="startTime">The time to start gameplay frames from.</param>
+        public void SendFramesFromUser(int userId, int count, double startTime = 0)
         {
             var frames = new List<LegacyReplayFrame>();
 
@@ -95,7 +103,7 @@ namespace osu.Game.Tests.Visual.Spectator
                     flush();
 
                 var buttonState = currentFrameIndex == lastFrameIndex ? ReplayButtonState.None : ReplayButtonState.Left1;
-                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
+                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100 + startTime, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
             }
 
             flush();
@@ -123,7 +131,15 @@ namespace osu.Game.Tests.Visual.Spectator
             return ((ISpectatorClient)this).UserBeganPlaying(api.LocalUser.Value.Id, state);
         }
 
-        protected override Task SendFramesInternal(FrameDataBundle data) => ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, data);
+        protected override Task SendFramesInternal(FrameDataBundle bundle)
+        {
+            FrameSendAttempts++;
+
+            if (ShouldFailSendingFrames)
+                return Task.FromException(new InvalidOperationException());
+
+            return ((ISpectatorClient)this).UserSentFrames(api.LocalUser.Value.Id, bundle);
+        }
 
         protected override Task EndPlayingInternal(SpectatorState state) => ((ISpectatorClient)this).UserFinishedPlaying(api.LocalUser.Value.Id, state);
 

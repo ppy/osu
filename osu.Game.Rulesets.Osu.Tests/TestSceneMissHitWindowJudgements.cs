@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -13,7 +12,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 using osu.Game.Tests.Visual;
 using osuTK;
 
@@ -67,11 +65,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestAutoMod : OsuModAutoplay
         {
-            public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
-            {
-                ScoreInfo = new ScoreInfo { User = new APIUser { Username = "Autoplay" } },
-                Replay = new MissingAutoGenerator(beatmap, mods).Generate()
-            };
+            public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+                => new ModReplayData(new MissingAutoGenerator(beatmap, mods).Generate(), new ModCreatedUser { Username = "Autoplay" });
         }
 
         private class MissingAutoGenerator : OsuAutoGeneratorBase

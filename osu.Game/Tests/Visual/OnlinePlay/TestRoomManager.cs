@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
             base.JoinRoom(room, password, onSuccess, onError);
         }
 
-        public void AddRooms(int count, RulesetInfo ruleset = null, bool withPassword = false)
+        public void AddRooms(int count, RulesetInfo ruleset = null, bool withPassword = false, bool withSpotlightRooms = false)
         {
             for (int i = 0; i < count; i++)
             {
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.OnlinePlay
                     Name = { Value = $@"Room {currentRoomId}" },
                     Host = { Value = new APIUser { Username = @"Host" } },
                     EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) },
-                    Category = { Value = i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal },
+                    Category = { Value = withSpotlightRooms && i % 2 == 0 ? RoomCategory.Spotlight : RoomCategory.Normal },
                 };
 
                 if (withPassword)
@@ -43,6 +43,11 @@ namespace osu.Game.Tests.Visual.OnlinePlay
 
                 if (ruleset != null)
                 {
+                    room.PlaylistItemStats.Value = new Room.RoomPlaylistItemStats
+                    {
+                        RulesetIDs = new[] { ruleset.OnlineID },
+                    };
+
                     room.Playlist.Add(new PlaylistItem(new BeatmapInfo { Metadata = new BeatmapMetadata() })
                     {
                         RulesetID = ruleset.OnlineID,
