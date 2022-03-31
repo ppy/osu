@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(0.2f)
+                Child = button = new ShearedToggleButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton(0.2f)
+                Child = button = new ShearedToggleButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
