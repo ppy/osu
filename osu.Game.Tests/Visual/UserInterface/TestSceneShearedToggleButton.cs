@@ -23,17 +23,38 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton
+                Child = button = new ShearedToggleButton(200)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
-                    Width = 200
                 };
             });
 
             AddToggleStep("toggle button", active => button.Active.Value = active);
             AddToggleStep("toggle disabled", disabled => button.Active.Disabled = disabled);
+        }
+
+        [Test]
+        public void TestSizing()
+        {
+            ShearedToggleButton toggleButton = null;
+
+            AddStep("create fixed width button", () => Child = toggleButton = new ShearedToggleButton(200)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = "Fixed width"
+            });
+            AddStep("change text", () => toggleButton.Text = "New text");
+
+            AddStep("create auto-sizing button", () => Child = toggleButton = new ShearedToggleButton
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = "This button autosizes to its text!"
+            });
+            AddStep("change text", () => toggleButton.Text = "New text");
         }
 
         [Test]

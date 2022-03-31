@@ -42,7 +42,17 @@ namespace osu.Game.Graphics.UserInterface
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; } = null!;
 
-        public ShearedToggleButton()
+        /// <summary>
+        /// Creates a new <see cref="ShearedToggleButton"/>
+        /// </summary>
+        /// <param name="width">
+        /// The width of the button.
+        /// <list type="bullet">
+        /// <item>If a non-<see langword="null"/> value is provided, this button will have a fixed width equal to the provided value.</item>
+        /// <item>If a <see langword="null"/> value is provided (or the argument is omitted entirely), the button will autosize in width to fit the text.</item>
+        /// </list>
+        /// </param>
+        public ShearedToggleButton(float? width = null)
         {
             Height = 50;
             Padding = new MarginPadding { Horizontal = shear * 50 };
@@ -67,6 +77,16 @@ namespace osu.Game.Graphics.UserInterface
                     Shear = new Vector2(-shear, 0)
                 }
             };
+
+            if (width != null)
+            {
+                Width = width.Value;
+            }
+            else
+            {
+                AutoSizeAxes = Axes.X;
+                text.Margin = new MarginPadding { Horizontal = 15 };
+            }
         }
 
         [BackgroundDependencyLoader]
