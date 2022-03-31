@@ -21,9 +21,8 @@ namespace osu.Game.Overlays.Toolbar
     {
         private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
 
-        protected Box HoverBackground;
-        private readonly Box flashBackground;
-        private readonly FillFlowContainer clockContainer;
+        private Box hoverBackground;
+        private Box flashBackground;
 
         private DigitalClockDisplay digital;
         private AnalogClockDisplay analog;
@@ -33,10 +32,16 @@ namespace osu.Game.Overlays.Toolbar
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
 
             Children = new Drawable[]
             {
-                HoverBackground = new Box
+                hoverBackground = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(80).Opacity(180),
@@ -50,8 +55,7 @@ namespace osu.Game.Overlays.Toolbar
                     Colour = Color4.White.Opacity(100),
                     Blending = BlendingParameters.Additive,
                 },
-
-                clockContainer = new FillFlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
@@ -73,12 +77,6 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
         }
 
         protected override void LoadComplete()
@@ -109,14 +107,16 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool OnHover(HoverEvent e)
         {
-            HoverBackground.FadeIn(200);
+            hoverBackground.FadeIn(200);
 
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            HoverBackground.FadeOut(200);
+            hoverBackground.FadeOut(200);
+
+            base.OnHoverLost(e);
         }
 
         private void cycleDisplayMode()
