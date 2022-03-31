@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarClock : OsuClickableContainer
