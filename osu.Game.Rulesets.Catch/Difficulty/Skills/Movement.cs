@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private const float absolute_player_positioning_error = 12f;
         private const float normalized_hitobject_radius = 41.0f;
 
-        protected override double SkillMultiplier => 490;
+        protected override double SkillMultiplier => 620;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (!catchCurrent.LastObject.HyperDash)
             {
                 // The base value is a ratio between distance moved and strain time
-                movementValue = 0.062 * Math.Abs(distanceMoved) / weightedStrainTime;
+                movementValue = 0.055 * Math.Abs(distanceMoved) / weightedStrainTime / Math.Max(1.0, Math.Pow(catcherSpeedMultiplier, 0.45));
 
                 if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0)
                 {
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 // Hyperdashes calculation
                 // Both strain time and distance moved are scaled down because both factors are not optimally representing the difficulty
-                movementValue = 0.078 * Math.Pow(Math.Abs(distanceMoved) / weightedStrainTime, 0.2);
+                movementValue = 0.070 * Math.Pow(Math.Abs(distanceMoved) / weightedStrainTime, 0.2);
 
                 // Direction change scaling
                 if (!previousLastObjectWasHyperDash && lastStrainTime > 0)
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 if (previousLastObjectWasHyperDash)
                {
                     // Scaling hyperdash chains according to movement
-                    movementValue *= isSameDirection ? Math.Pow(Math.Abs(distanceMoved), 0.5) / 6.5 : 10 / Math.Pow(Math.Abs(distanceMoved), 0.3);
+                    movementValue *= isSameDirection ? Math.Pow(Math.Abs(distanceMoved), 0.5) / 8 : 9 / Math.Pow(Math.Abs(distanceMoved), 0.3);
                }
             }
 
