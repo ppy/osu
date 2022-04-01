@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Utils
 
                 if (hitObject is Spinner)
                 {
-                    previous = null;
+                    previous = current;
                     continue;
                 }
 
