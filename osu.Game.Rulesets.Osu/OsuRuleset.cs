@@ -171,6 +171,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModRandom(),
                         new OsuModMirror(),
                         new OsuModAlternate(),
+                        new OsuModSpacingAdjust()
                     };
 
                 case ModType.Automation:
