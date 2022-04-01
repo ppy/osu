@@ -87,7 +87,7 @@ namespace osu.Game.Skinning
                 // Round-about way of getting the user's skin to find available resources.
                 // In the future we'll probably want to allow access to resources from the fallbacks, or potentially other skins
                 // but that requires further thought.
-                var highestPrioritySkin = ((SkinnableSprite)Source).source.AllSources.First() as Skin;
+                var highestPrioritySkin = ((SkinnableSprite)SettingSourceObject).source.AllSources.First() as Skin;
 
                 string[] availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
                                                                                           .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
