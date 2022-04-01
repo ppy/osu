@@ -91,21 +91,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= (0.019f * approachRate) + 0.85f; // Dreasing by a few percentages below AR 8
             }
 
-            // Adding a bonus for long maps with DT and HR because both mods require more stamina
-            if (score.Mods.Any(m => m is ModDoubleTime))
-            {
-                value *= Math.Pow(lengthBonus, 0.15);
-            }
-
             if (score.Mods.Any(m => m is ModHardRock))
             {
                 value *= Math.Pow(lengthBonus, 0.1);
-            }
-
-            // Adding a malus for long maps with HT because it requires less stamina
-            if (score.Mods.Any(m => m is ModHalfTime))
-            {
-                value *= Math.Pow(lengthBonus, -0.15);
             }
 
 
