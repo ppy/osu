@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         private IFrameStableClock gameplayClock;
 
         [SettingSource("Attraction strength", "How strong the pull is.", 0)]
-        public BindableFloat AssistStrength { get; } = new BindableFloat(0.5f)
+        public BindableFloat AttractionStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
             MinValue = 0.05f,
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void easeTo(DrawableHitObject hitObject, Vector2 destination)
         {
-            double dampLength = Interpolation.Lerp(3000, 40, AssistStrength.Value);
+            double dampLength = Interpolation.Lerp(3000, 40, AttractionStrength.Value);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);
