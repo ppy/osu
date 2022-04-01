@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private const float absolute_player_positioning_error = 12f;
         private const float normalized_hitobject_radius = 41.0f;
 
-        protected override double SkillMultiplier => 450;
+        protected override double SkillMultiplier => 490;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             float distanceMoved = playerPosition - lastPlayerPosition.Value;
             double exactDistanceMoved = catchCurrent.NormalizedPosition - lastPlayerPosition.Value;
 
-            double weightedStrainTime = catchCurrent.StrainTime;
+            double weightedStrainTime = catchCurrent.StrainTime / Math.Pow(catcherSpeedMultiplier, 0.45);
             double edgeDashBonus = 0;
             bool isSameDirection = Math.Sign(exactDistanceMoved) == Math.Sign(lastExactDistanceMoved);
 
@@ -101,18 +101,21 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 // Hyperdashes calculation
                 // Both strain time and distance moved are scaled down because both factors are not optimally representing the difficulty
-                movementValue = 0.071 * Math.Pow(Math.Abs(distanceMoved) / weightedStrainTime, 0.2);
+                movementValue = 0.078 * Math.Pow(Math.Abs(distanceMoved) / weightedStrainTime, 0.2);
 
                 // Direction change scaling
-                if (!isSameDirection && lastStrainTime > 0)
-                    movementValue *= 1 + (0.28 * Math.Pow(Math.Abs(lastExactDistanceMoved), 1.15) / lastStrainTime);
+                if (!previousLastObjectWasHyperDash && lastStrainTime > 0)
+                    movementValue *= 1 + (0.3 * Math.Pow(Math.Abs(lastDistanceMoved), 1.15) / lastStrainTime);
                 else movementValue *= 0.7;
 
+                if (catchCurrent.LastObject.HyperDash && catchCurrent.BaseObject.HyperDash || isSameDirection)
+                    movementValue *= 0.7;
+
                 // Handling hyperdash chains
-               if (previousIsDoubleHdash)
+                if (previousLastObjectWasHyperDash)
                {
                     // Scaling hyperdash chains according to movement
-                    movementValue *= isSameDirection ? Math.Abs(distanceMoved / 60) : 0.75;
+                    movementValue *= isSameDirection ? Math.Pow(Math.Abs(distanceMoved), 0.5) / 6.5 : 10 / Math.Pow(Math.Abs(distanceMoved), 0.3);
                }
             }
 
@@ -157,7 +160,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
                 }
 
                 // The edge dash bonus is scaled according to the distance to hyperdashes
-                movementValue *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 45) * Math.Pow(Math.Min(catchCurrent.StrainTime, 265) / 265, 2); // Edge Dashes are easier at lower ms values
+                movementValue *= 1.0 + edgeDashBonus * ((20 - catchCurrent.LastObject.DistanceToHyperDash) / 45) * Math.Pow(Math.Min(catchCurrent.StrainTime, 265) / 265, 2) / Math.Max(1.0, Math.Pow(catcherSpeedMultiplier, 0.6)); // Edge Dashes are easier at lower ms values
             }
 
             if (Math.Abs(distanceMoved) <= absolute_player_positioning_error && Math.Abs(exactDistanceMoved) == Math.Abs(lastExactDistanceMoved) && catchCurrent.StrainTime == lastStrainTime)

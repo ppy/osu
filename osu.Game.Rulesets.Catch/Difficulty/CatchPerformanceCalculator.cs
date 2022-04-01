@@ -43,8 +43,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Longer maps are worth more
             double lengthFactor = numTotalHits * 0.5 + catchAttributes.DirectionChangeCount;
-            //double lengthBonus = 0.9 + 0.42 * Math.Min(1.0, lengthFactor / 1700);
-            double lengthBonus = Math.Log10(lengthFactor + 315) - 1.5 + 0.22 * Math.Min(1.0, lengthFactor / 2000);
+            double lengthBonus = Math.Log10(lengthFactor + 315) - 1.5 + 0.12 * Math.Min(1.0, lengthFactor / 2000);
 
             // Longer maps are worth more
             value *= lengthBonus;
@@ -62,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (approachRate > 9.0)
                 approachRateFactor += 0.08 * (approachRate - 9.0); // 8% for each AR above 9
             if (approachRate > 10.0)
-                approachRateFactor += 0.35 * (approachRate - 10.0); // Additional 35% at AR 11
+                approachRateFactor += 0.30 * (approachRate - 10.0); // Additional 30% at AR 11
             else if (approachRate < 8.0)
                 approachRateFactor += 0.02 * (8.0 - approachRate); // 2% for each AR below 8
 
@@ -72,9 +71,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
                 if (approachRate <= 10.0)
-                    value *= 1.05 + 0.1 * (10.0 - Math.Min(10.0, approachRate)); // 7% for each AR below 10
+                    value *= 1.06 + 0.06 * (10.0 - Math.Min(10.0, approachRate)); // 6% for each AR below 10
                 else if (approachRate > 10.0)
-                    value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
+                    value *= 1 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 4% at AR 10, 1% at AR 11
 
                 if (approachRate < 9.0)
                     value *= 1 + 0.02 * (9.0 - approachRate); // Additional 2% for each AR below 9
@@ -89,13 +88,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     value *= 0.18f * (approachRate - 8.0f) + 1; // 18% for each AR above 8
 
                 if (approachRate <= 8.0f)
-                    value *= (0.025f * approachRate) + 0.8f; // Dreasing by a few percentages below AR 8
+                    value *= (0.019f * approachRate) + 0.85f; // Dreasing by a few percentages below AR 8
             }
 
             // Adding a bonus for long maps with DT and HR because both mods require more stamina
             if (score.Mods.Any(m => m is ModDoubleTime))
             {
-                value *= Math.Pow(lengthBonus, 0.2);
+                value *= Math.Pow(lengthBonus, 0.15);
             }
 
             if (score.Mods.Any(m => m is ModHardRock))
@@ -106,12 +105,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Adding a malus for long maps with HT because it requires less stamina
             if (score.Mods.Any(m => m is ModHalfTime))
             {
-                value *= Math.Pow(lengthBonus, -0.2);
+                value *= Math.Pow(lengthBonus, -0.15);
             }
 
 
             // Scale the aim value with accuracy _slightly_
-            value *= Math.Pow(accuracy(), 6);
+            value *= Math.Pow(accuracy(), 5.9);
 
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * misses);
