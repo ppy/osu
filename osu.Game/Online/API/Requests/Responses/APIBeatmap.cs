@@ -104,8 +104,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonIgnore]
         public string Hash => throw new NotImplementedException();
 
-        ILoudnessNormalizationInfo IBeatmapInfo.LoudnessNormalizationInfo => throw new NotImplementedException();
-
         #endregion
 
         public bool Equals(IBeatmapInfo? other) => other is APIBeatmap b && this.MatchesOnlineID(b);

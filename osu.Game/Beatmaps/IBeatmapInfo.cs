@@ -36,11 +36,6 @@ namespace osu.Game.Beatmaps
         IBeatmapSetInfo? BeatmapSet { get; }
 
         /// <summary>
-        /// The info required to apply loudness correction to the audio
-        /// </summary>
-        ILoudnessNormalizationInfo LoudnessNormalizationInfo { get; }
-
-        /// <summary>
         /// The playable length in milliseconds of this beatmap.
         /// </summary>
         double Length { get; }

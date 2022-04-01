@@ -177,9 +177,6 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         IRulesetInfo IBeatmapInfo.Ruleset => RulesetInfo;
 
-        [JsonIgnore]
-        ILoudnessNormalizationInfo IBeatmapInfo.LoudnessNormalizationInfo => throw new NotImplementedException();
-
         #endregion
     }
 }

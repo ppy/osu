@@ -45,12 +45,9 @@ namespace osu.Game.Stores
 
         private readonly BeatmapOnlineLookupQueue? onlineLookupQueue;
 
-        private readonly LoudnessNormalizationManager? loudnessNormalizationManager;
-
-        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, LoudnessNormalizationManager? manager = null)
+        protected BeatmapImporter(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
             : base(storage, realm)
         {
-            loudnessNormalizationManager = manager;
             this.onlineLookupQueue = onlineLookupQueue;
         }
 
@@ -73,11 +70,11 @@ namespace osu.Game.Stores
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
-                if (loudnessNormalizationManager != null && b.LoudnessNormalizationInfo.IsDefault())
+                if (b.LoudnessNormalizationInfo == null || b.LoudnessNormalizationInfo.IsDefault())
                 {
-                    LoudnessNormalizationInfo info = loudnessNormalizationManager.GenerateLoudnessNormalizationInfo(b, beatmapSet);
+                    LoudnessNormalizationInfo info = new LoudnessNormalizationInfo().GenerateLoudnessNormalizationInfo(b, beatmapSet, Files);
                     b.LoudnessNormalizationInfo = info;
-                    beatmapSet = loudnessNormalizationManager.PopulateSet(b, beatmapSet);
+                    beatmapSet = b.LoudnessNormalizationInfo.PopulateSet(b, beatmapSet);
                 }
             }
 

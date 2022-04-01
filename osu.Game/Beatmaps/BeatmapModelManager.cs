@@ -11,7 +11,6 @@ using System.Text;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.Extensions;
@@ -34,8 +33,8 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null, LoudnessNormalizationManager? loudnessNormalizationManager = null)
-            : base(realm, storage, onlineLookupQueue, loudnessNormalizationManager)
+        public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+            : base(realm, storage, onlineLookupQueue)
         {
         }
 

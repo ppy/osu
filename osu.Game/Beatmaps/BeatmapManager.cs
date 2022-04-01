@@ -13,7 +13,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 using osu.Game.Models;
@@ -36,7 +35,6 @@ namespace osu.Game.Beatmaps
     public class BeatmapManager : IModelManager<BeatmapSetInfo>, IModelFileManager<BeatmapSetInfo, RealmNamedFileUsage>, IModelImporter<BeatmapSetInfo>, IWorkingBeatmapCache, IDisposable
     {
         public ITrackStore BeatmapTrackStore { get; }
-        public LoudnessNormalizationManager? LoudnessNormalizationManager { get; }
 
         private readonly BeatmapModelManager beatmapModelManager;
 
@@ -61,8 +59,7 @@ namespace osu.Game.Beatmaps
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
-            LoudnessNormalizationManager = new LoudnessNormalizationManager(BeatmapTrackStore, audioManager, new RealmFileStore(realm, storage));
-            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue, LoudnessNormalizationManager);
+            beatmapModelManager = CreateBeatmapModelManager(storage, realm, rulesets, onlineBeatmapLookupQueue);
 
             workingBeatmapCache = CreateWorkingBeatmapCache(audioManager, gameResources, userResources, defaultBeatmap, host);
 
@@ -74,8 +71,8 @@ namespace osu.Game.Beatmaps
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
 
-        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue, LoudnessNormalizationManager loudnessNormalizationManager) =>
-            new BeatmapModelManager(realm, storage, onlineBeatmapLookupQueue, loudnessNormalizationManager);
+        protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
+            new BeatmapModelManager(realm, storage, onlineBeatmapLookupQueue);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,

@@ -9,12 +9,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using ManagedBass;
+using ManagedBass.Fx;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Mixing;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Testing;
+using osu.Game.Audio;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
@@ -145,6 +149,51 @@ namespace osu.Game.Beatmaps
                     throw new InvalidOperationException($"Cannot access {nameof(Track)} without first calling {nameof(LoadTrack)}.");
 
                 return track;
+            }
+        }
+
+        public void AddLoudnessNormalization()
+        {
+            LoudnessNormalizationInfo info = BeatmapInfo.LoudnessNormalizationInfo;
+
+            if (info != null)
+            {
+                if (Math.Pow(10, (info.TrackGain / 20)) * info.PeakAmplitude >= 1)
+                {
+                    CompressorParameters compParams = new CompressorParameters
+                    {
+                        fAttack = 0.01f,
+                        fGain = 0,
+                        fRatio = 20,
+                        fRelease = 200,
+                        fThreshold = -20
+                    };
+                    addFx(compParams);
+                }
+
+                GainParameters gainParameters = new GainParameters
+                {
+                    fCurrent = 1,
+                    fTarget = (float)Math.Pow(10, (info.TrackGain / 20)),
+                    fTime = 0,
+                };
+                addFx(gainParameters);
+            }
+        }
+
+        private void addFx(IEffectParameter effectParameter)
+        {
+            AudioMixer audioMixer = audioManager.TrackMixer;
+            IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+
+            if (effect != null)
+            {
+                int i = audioMixer.Effects.IndexOf(effect);
+                audioMixer.Effects[i] = effectParameter;
+            }
+            else
+            {
+                audioMixer.Effects.Add(effectParameter);
             }
         }
 
