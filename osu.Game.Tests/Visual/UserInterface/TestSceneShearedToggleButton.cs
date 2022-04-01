@@ -64,12 +64,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("create button", () =>
             {
-                Child = button = new ShearedToggleButton
+                Child = button = new ShearedToggleButton(200)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "Toggle me",
-                    Width = 200
                 };
             });
 
