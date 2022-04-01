@@ -85,6 +85,19 @@ namespace osu.Game.Online.Rooms
             Beatmap = beatmap;
         }
 
+        public PlaylistItem(MultiplayerPlaylistItem item)
+            : this(new APIBeatmap { OnlineID = item.BeatmapID })
+        {
+            ID = item.ID;
+            OwnerID = item.OwnerID;
+            RulesetID = item.RulesetID;
+            Expired = item.Expired;
+            PlaylistOrder = item.PlaylistOrder;
+            PlayedAt = item.PlayedAt;
+            RequiredMods = item.RequiredMods.ToArray();
+            AllowedMods = item.AllowedMods.ToArray();
+        }
+
         public void MarkInvalid() => valid.Value = false;
 
         #region Newtonsoft.Json implicit ShouldSerialize() methods
