@@ -7,8 +7,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens;
 using osu.Game.Tournament.Screens.Drawings;
@@ -23,6 +25,7 @@ using osu.Game.Tournament.Screens.TeamIntro;
 using osu.Game.Tournament.Screens.TeamWin;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tournament
 {
@@ -123,16 +126,16 @@ namespace osu.Game.Tournament
                                 new ScreenButton(typeof(RoundEditorScreen)) { Text = "Rounds Editor", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(LadderEditorScreen)) { Text = "Bracket Editor", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(ScheduleScreen)) { Text = "Schedule", RequestSelection = SetScreen },
-                                new ScreenButton(typeof(LadderScreen)) { Text = "Bracket", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(ScheduleScreen), Key.S) { Text = "Schedule", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(LadderScreen), Key.B) { Text = "Bracket", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(TeamIntroScreen)) { Text = "Team Intro", RequestSelection = SetScreen },
-                                new ScreenButton(typeof(SeedingScreen)) { Text = "Seeding", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(TeamIntroScreen), Key.I) { Text = "Team Intro", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(SeedingScreen), Key.D) { Text = "Seeding", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(MapPoolScreen)) { Text = "Map Pool", RequestSelection = SetScreen },
-                                new ScreenButton(typeof(GameplayScreen)) { Text = "Gameplay", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(MapPoolScreen), Key.M) { Text = "Map Pool", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(GameplayScreen), Key.G) { Text = "Gameplay", RequestSelection = SetScreen },
                                 new Separator(),
-                                new ScreenButton(typeof(TeamWinScreen)) { Text = "Win", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(TeamWinScreen), Key.W) { Text = "Win", RequestSelection = SetScreen },
                                 new Separator(),
                                 new ScreenButton(typeof(DrawingsScreen)) { Text = "Drawings", RequestSelection = SetScreen },
                                 new ScreenButton(typeof(ShowcaseScreen)) { Text = "Showcase", RequestSelection = SetScreen },
@@ -231,13 +234,60 @@ namespace osu.Game.Tournament
         {
             public readonly Type Type;
 
-            public ScreenButton(Type type)
+            private readonly Key? shortcutKey;
+
+            public ScreenButton(Type type, Key? shortcutKey = null)
             {
+                this.shortcutKey = shortcutKey;
+
                 Type = type;
+
                 BackgroundColour = OsuColour.Gray(0.2f);
                 Action = () => RequestSelection?.Invoke(type);
 
                 RelativeSizeAxes = Axes.X;
+
+                if (shortcutKey != null)
+                {
+                    Add(new Container
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Size = new Vector2(24),
+                        Margin = new MarginPadding(5),
+                        Masking = true,
+                        CornerRadius = 4,
+                        Alpha = 0.5f,
+                        Blending = BlendingParameters.Additive,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                Colour = OsuColour.Gray(0.1f),
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                            new OsuSpriteText
+                            {
+                                Font = OsuFont.Default.With(size: 24),
+                                Y = -2,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Text = shortcutKey.ToString(),
+                            }
+                        }
+                    });
+                }
+            }
+
+            protected override bool OnKeyDown(KeyDownEvent e)
+            {
+                if (e.Key == shortcutKey)
+                {
+                    TriggerClick();
+                    return true;
+                }
+
+                return base.OnKeyDown(e);
             }
 
             private bool isSelected;
