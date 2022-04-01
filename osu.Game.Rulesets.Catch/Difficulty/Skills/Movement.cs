@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         private const float absolute_player_positioning_error = 12f;
         private const float normalized_hitobject_radius = 41.0f;
 
-        protected override double SkillMultiplier => 620;
+        protected override double SkillMultiplier => 610;
         protected override double StrainDecayBase => 0.2;
 
         protected override double DecayWeight => 0.94;
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             double movementValue;
 
             // Counting direction changes for length scaling in the performance calculation
-            if (Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0 && Math.Abs(distanceMoved) > 0.1)
+            if (Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0 && Math.Abs(distanceMoved) > absolute_player_positioning_error)
             {
                 DirectionChangeCount += 1;
             }
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (!catchCurrent.LastObject.HyperDash)
             {
                 // The base value is a ratio between distance moved and strain time
-                movementValue = 0.055 * Math.Abs(distanceMoved) / weightedStrainTime / Math.Max(1.0, Math.Pow(catcherSpeedMultiplier, 0.45));
+                movementValue = 0.067 * Math.Abs(distanceMoved) / weightedStrainTime / Math.Max(1.0, Math.Pow(catcherSpeedMultiplier, 0.45));
 
                 if (Math.Abs(distanceMoved) > 0.1 && Math.Sign(distanceMoved) != Math.Sign(lastDistanceMoved) && Math.Sign(lastDistanceMoved) != 0)
                 {
@@ -101,11 +101,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             {
                 // Hyperdashes calculation
                 // Both strain time and distance moved are scaled down because both factors are not optimally representing the difficulty
-                movementValue = 0.070 * Math.Pow(Math.Abs(distanceMoved) / weightedStrainTime, 0.2);
+                movementValue = 0.069 * Math.Pow(Math.Abs(distanceMoved) / weightedStrainTime, 0.22);
 
                 // Direction change scaling
                 if (!previousLastObjectWasHyperDash && lastStrainTime > 0)
-                    movementValue *= 1 + (0.3 * Math.Pow(Math.Abs(lastDistanceMoved), 1.15) / lastStrainTime);
+                    movementValue *= 1 + (0.25 * Math.Pow(Math.Abs(lastDistanceMoved), 1.15) / lastStrainTime);
                 else movementValue *= 0.7;
 
                 if (catchCurrent.LastObject.HyperDash && catchCurrent.BaseObject.HyperDash || isSameDirection)

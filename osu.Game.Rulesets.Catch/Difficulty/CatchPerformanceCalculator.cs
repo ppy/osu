@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(score.MaxCombo, 0.55) / Math.Pow(catchAttributes.MaxCombo, 0.55), 1.0);
+                value *= Math.Min(Math.Pow(score.MaxCombo, 0.45) / Math.Pow(catchAttributes.MaxCombo, 0.45), 1.0);
 
 
             double approachRate = catchAttributes.ApproachRate;
@@ -90,12 +90,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 if (approachRate <= 8.0f)
                     value *= (0.019f * approachRate) + 0.85f; // Dreasing by a few percentages below AR 8
             }
-
-            if (score.Mods.Any(m => m is ModHardRock))
-            {
-                value *= Math.Pow(lengthBonus, 0.1);
-            }
-
 
             // Scale the aim value with accuracy _slightly_
             value *= Math.Pow(accuracy(), 5.9);
