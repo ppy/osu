@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             {
                 Mod = new OsuModMagnetised
                 {
-                    AssistStrength = { Value = strength },
+                    AttractionStrength = { Value = strength },
                 },
                 PassCondition = () => true,
                 Autoplay = false,
