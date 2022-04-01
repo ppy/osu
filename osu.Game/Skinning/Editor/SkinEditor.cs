@@ -48,6 +48,9 @@ namespace osu.Game.Skinning.Editor
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved]
+        private RealmAccess realm { get; set; }
+
         [Resolved(canBeNull: true)]
         private SkinEditorOverlay skinEditorOverlay { get; set; }
 
@@ -346,6 +349,11 @@ namespace osu.Game.Skinning.Editor
                     using (var contents = file.OpenRead())
                         skins.AddFile(skinInfo, contents, file.Name);
                 });
+
+                // Even though we are 100% on an update thread, we need to wait for realm callbacks to fire (to correctly invalidate caches in RealmBackedResourceStore).
+                // See https://github.com/realm/realm-dotnet/discussions/2634#discussioncomment-2483573 for further discussion.
+                // This is the best we can do for now.
+                realm.Run(r => r.Refresh());
 
                 // place component
                 placeComponent(new SkinnableSprite
