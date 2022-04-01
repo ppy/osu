@@ -339,13 +339,13 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Get the absolute rotation of a slider, defined as the angle from its start position to its end position.
+        /// Get the absolute rotation of a slider, defined as the angle from its start position to the end of its path.
         /// </summary>
         /// <param name="slider">The slider to process.</param>
         /// <returns>The angle in radians.</returns>
         private static float getSliderRotation(Slider slider)
         {
-            var endPositionVector = slider.EndPosition - slider.Position;
+            var endPositionVector = slider.Path.PositionAt(1);
             return (float)Math.Atan2(endPositionVector.Y, endPositionVector.X);
         }
 
@@ -373,7 +373,7 @@ namespace osu.Game.Rulesets.Osu.Utils
 
             /// <summary>
             /// The rotation of the hit object, relative to its jump angle.
-            /// For sliders, this is defined as the angle from the slider's start position to its end position, relative to its jump angle.
+            /// For sliders, this is defined as the angle from the slider's start position to the end of its path, relative to its jump angle.
             /// For hit circles and spinners, this property is ignored.
             /// </summary>
             public float Rotation { get; set; }
