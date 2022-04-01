@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osuTK;
@@ -167,7 +168,8 @@ namespace osu.Game.Rulesets.Osu.Utils
             centreOfMassModified = RotateAwayFromEdge(current.PositionModified, centreOfMassModified);
 
             float relativeRotation = (float)Math.Atan2(centreOfMassModified.Y, centreOfMassModified.X) - (float)Math.Atan2(centreOfMassOriginal.Y, centreOfMassOriginal.X);
-            RotateSlider(slider, relativeRotation);
+            if (!Precision.AlmostEquals(relativeRotation, 0))
+                RotateSlider(slider, relativeRotation);
         }
 
         /// <summary>
@@ -316,6 +318,8 @@ namespace osu.Game.Rulesets.Osu.Utils
 
         private static Vector2 calculateCentreOfMass(Slider slider)
         {
+            if (slider.Distance < 1) return Vector2.Zero;
+
             int count = 0;
             Vector2 sum = Vector2.Zero;
             double pathDistance = slider.Distance;
