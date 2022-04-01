@@ -148,7 +148,7 @@ namespace osu.Game.Skinning
                 string[] existingSkinNames = realm.Run(r => r.All<SkinInfo>()
                                                              .Where(skin => !skin.DeletePending)
                                                              .AsEnumerable()
-                                                             .Select(skin => skin.Name)).ToArray();
+                                                             .Select(skin => skin.Name).ToArray());
 
                 // if the user is attempting to save one of the default skin implementations, create a copy first.
                 var skinInfo = new SkinInfo
