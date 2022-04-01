@@ -198,13 +198,13 @@ namespace osu.Game.Rulesets.Osu.Utils
             var previousPosition = workingObject.PositionModified;
 
             // Clamp slider position to the placement area
-            // If the slider is larger than the playfield, force it to stay at the original position
+            // If the slider is larger than the playfield, at least make sure that the head circle is inside the playfield
             float newX = possibleMovementBounds.Width < 0
-                ? workingObject.PositionOriginal.X
+                ? Math.Clamp(possibleMovementBounds.Left, 0, OsuPlayfield.BASE_SIZE.X)
                 : Math.Clamp(previousPosition.X, possibleMovementBounds.Left, possibleMovementBounds.Right);
 
             float newY = possibleMovementBounds.Height < 0
-                ? workingObject.PositionOriginal.Y
+                ? Math.Clamp(possibleMovementBounds.Top, 0, OsuPlayfield.BASE_SIZE.Y)
                 : Math.Clamp(previousPosition.Y, possibleMovementBounds.Top, possibleMovementBounds.Bottom);
 
             slider.Position = workingObject.PositionModified = new Vector2(newX, newY);
