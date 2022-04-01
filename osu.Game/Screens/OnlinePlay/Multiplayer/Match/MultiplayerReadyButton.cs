@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -26,6 +28,17 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         [CanBeNull]
         private MultiplayerRoom room => multiplayerClient.Room;
+
+        private Sample countdownTickSample;
+        private Sample countdownTickFinalSample;
+        private int? lastTickPlayed;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            countdownTickFinalSample = audio.Samples.Get(@"Multiplayer/countdown-tick-final");
+        }
 
         protected override void LoadComplete()
         {
@@ -82,6 +95,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                     countdownRemaining = TimeSpan.Zero;
                 else
                     countdownRemaining = countdown.TimeRemaining - timeElapsed;
+
+                if (countdownRemaining.Seconds <= 10 && (lastTickPlayed == null || lastTickPlayed != countdownRemaining.Seconds))
+                {
+                    countdownTickSample?.Play();
+
+                    if (countdownRemaining.Seconds <= 3)
+                        countdownTickFinalSample?.Play();
+
+                    lastTickPlayed = countdownRemaining.Seconds;
+                }
 
                 string countdownText = $"Starting in {countdownRemaining:mm\\:ss}";
 
