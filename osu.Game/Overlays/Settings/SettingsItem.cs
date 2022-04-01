@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings
         /// <summary>
         /// The source component if this <see cref="SettingsItem{T}"/> was created via <see cref="SettingSourceAttribute"/>.
         /// </summary>
-        public Drawable Source { get; internal set; }
+        public object SettingSourceObject { get; internal set; }
 
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
