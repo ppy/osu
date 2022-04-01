@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -30,13 +29,6 @@ namespace osu.Game.Skinning
 
         [Resolved]
         private ISkinSource source { get; set; }
-
-        public IEnumerable<string> AvailableFiles => (source.AllSources.First() as Skin)?.SkinInfo.PerformRead(s => s.Files
-                                                                                                                     .Where(f =>
-                                                                                                                         f.Filename.EndsWith(".png", StringComparison.Ordinal)
-                                                                                                                         || f.Filename.EndsWith(".jpg", StringComparison.Ordinal)
-                                                                                                                     )
-                                                                                                                     .Select(f => f.Filename).Distinct());
 
         public SkinnableSprite(string textureName, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(new SpriteComponent(textureName), confineMode)
@@ -88,14 +80,22 @@ namespace osu.Game.Skinning
 
         public class SpriteSelectorControl : SettingsDropdown<string>
         {
-            public SkinnableSprite Source { get; set; }
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
-                if (Source.AvailableFiles.Any())
-                    Items = Source.AvailableFiles;
+                // Round-about way of getting the user's skin to find available resources.
+                // In the future we'll probably want to allow access to resources from the fallbacks, or potentially other skins
+                // but that requires further thought.
+                var highestPrioritySkin = ((SkinnableSprite)Source).source.AllSources.First() as Skin;
+
+                string[] availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
+                                                                                          .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
+                                                                                                      || f.Filename.EndsWith(".jpg", StringComparison.Ordinal))
+                                                                                          .Select(f => f.Filename).Distinct()).ToArray();
+
+                if (availableFiles?.Length > 0)
+                    Items = availableFiles;
             }
         }
     }
