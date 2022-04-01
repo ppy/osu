@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -62,7 +63,13 @@ namespace osu.Game.Skinning
             var texture = textures.Get(component.LookupName);
 
             if (texture == null)
-                return null;
+            {
+                return new SpriteIcon
+                {
+                    Size = new Vector2(100),
+                    Icon = FontAwesome.Solid.QuestionCircle
+                };
+            }
 
             return new Sprite { Texture = texture };
         }
@@ -87,7 +94,8 @@ namespace osu.Game.Skinning
             {
                 base.LoadComplete();
 
-                Items = Source.AvailableFiles;
+                if (Source.AvailableFiles.Any())
+                    Items = Source.AvailableFiles;
             }
         }
     }
