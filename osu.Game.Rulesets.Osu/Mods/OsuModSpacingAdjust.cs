@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.01f,
         };
 
+        public override string SettingDescription => ObjectSpacing.IsDefault ? string.Empty : $"{ObjectSpacing.Value:N2}x";
+
         public void ApplyToBeatmap(IBeatmap beatmap)
         {
             if (!(beatmap is OsuBeatmap osuBeatmap))
