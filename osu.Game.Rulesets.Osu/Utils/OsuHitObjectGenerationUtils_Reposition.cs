@@ -40,11 +40,20 @@ namespace osu.Game.Rulesets.Osu.Utils
                 float absoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
                 float relativeAngle = absoluteAngle - previousAngle;
 
-                positionInfos.Add(new ObjectPositionInfo(hitObject)
+                ObjectPositionInfo positionInfo;
+                positionInfos.Add(positionInfo = new ObjectPositionInfo(hitObject)
                 {
                     RelativeAngle = relativeAngle,
                     DistanceFromPrevious = relativePosition.Length
                 });
+
+                if (hitObject is Slider)
+                {
+                    var endPositionVector = hitObject.EndPosition - hitObject.Position;
+                    float absoluteRotation = (float)Math.Atan2(endPositionVector.Y, endPositionVector.X);
+                    positionInfo.Rotation = absoluteRotation - absoluteAngle;
+                    absoluteAngle = absoluteRotation;
+                }
 
                 previousPosition = hitObject.EndPosition;
                 previousAngle = absoluteAngle;
@@ -124,9 +133,16 @@ namespace osu.Game.Rulesets.Osu.Utils
 
             if (previous != null)
             {
-                Vector2 earliestPosition = beforePrevious?.HitObject.EndPosition ?? playfield_centre;
-                Vector2 relativePosition = previous.HitObject.Position - earliestPosition;
-                previousAbsoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
+                if (previous.HitObject is Slider s)
+                {
+                    previousAbsoluteAngle = getSliderRotation(s);
+                }
+                else
+                {
+                    Vector2 earliestPosition = beforePrevious?.HitObject.EndPosition ?? playfield_centre;
+                    Vector2 relativePosition = previous.HitObject.Position - earliestPosition;
+                    previousAbsoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
+                }
             }
 
             float absoluteAngle = previousAbsoluteAngle + current.PositionInfo.RelativeAngle;
@@ -141,6 +157,16 @@ namespace osu.Game.Rulesets.Osu.Utils
             posRelativeToPrev = RotateAwayFromEdge(lastEndPosition, posRelativeToPrev);
 
             current.PositionModified = lastEndPosition + posRelativeToPrev;
+
+            if (!(current.HitObject is Slider slider))
+                return;
+
+            Vector2 centreOfMassOriginal = calculateCentreOfMass(slider);
+            Vector2 centreOfMassModified = rotateVector(centreOfMassOriginal, current.PositionInfo.Rotation - current.RotationOriginal);
+            centreOfMassModified = RotateAwayFromEdge(current.PositionModified, centreOfMassModified);
+
+            float relativeRotation = (float)Math.Atan2(centreOfMassModified.Y, centreOfMassModified.X) - (float)Math.Atan2(centreOfMassOriginal.Y, centreOfMassOriginal.X);
+            RotateSlider(slider, relativeRotation);
         }
 
         /// <summary>
@@ -287,6 +313,27 @@ namespace osu.Game.Rulesets.Osu.Utils
             );
         }
 
+        private static Vector2 calculateCentreOfMass(Slider slider)
+        {
+            int count = 0;
+            Vector2 sum = Vector2.Zero;
+            double pathDistance = slider.Distance;
+
+            for (double i = 0; i < pathDistance; i++)
+            {
+                sum += slider.Path.PositionAt(i / pathDistance);
+                count++;
+            }
+
+            return sum / count;
+        }
+
+        private static float getSliderRotation(Slider slider)
+        {
+            var endPositionVector = slider.EndPosition - slider.Position;
+            return (float)Math.Atan2(endPositionVector.Y, endPositionVector.X);
+        }
+
         public class ObjectPositionInfo
         {
             /// <summary>
@@ -310,6 +357,13 @@ namespace osu.Game.Rulesets.Osu.Utils
             public float DistanceFromPrevious { get; set; }
 
             /// <summary>
+            /// The rotation of the hit object, relative to its jump angle.
+            /// For sliders, this is defined as the angle from the slider's start position to its end position, relative to its jump angle.
+            /// For hit circles and spinners, this property is ignored.
+            /// </summary>
+            public float Rotation { get; set; }
+
+            /// <summary>
             /// The hit object associated with this <see cref="ObjectPositionInfo"/>.
             /// </summary>
             public OsuHitObject HitObject { get; }
@@ -325,6 +379,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             public Vector2 PositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
             public Vector2 EndPositionModified { get; set; }
+            public float RotationOriginal { get; }
 
             public ObjectPositionInfo PositionInfo { get; }
             public OsuHitObject HitObject => PositionInfo.HitObject;
@@ -334,6 +389,15 @@ namespace osu.Game.Rulesets.Osu.Utils
                 PositionInfo = positionInfo;
                 PositionModified = PositionOriginal = HitObject.Position;
                 EndPositionModified = HitObject.EndPosition;
+
+                if (HitObject is Slider slider)
+                {
+                    RotationOriginal = getSliderRotation(slider);
+                }
+                else
+                {
+                    RotationOriginal = 0;
+                }
             }
         }
     }

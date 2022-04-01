@@ -146,5 +146,40 @@ namespace osu.Game.Rulesets.Osu.Utils
 
             slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
         }
+
+        /// <summary>
+        /// Rotate a slider about its start position by the specified angle.
+        /// </summary>
+        /// <param name="slider">The slider to be rotated.</param>
+        /// <param name="rotation">The angle to rotate the slider by.</param>
+        public static void RotateSlider(Slider slider, float rotation)
+        {
+            void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
+
+            slider.NestedHitObjects.OfType<SliderTick>().ForEach(rotateNestedObject);
+            slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(rotateNestedObject);
+
+            var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
+            foreach (var point in controlPoints)
+                point.Position = rotateVector(point.Position, rotation);
+
+            slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance.Value);
+        }
+
+        /// <summary>
+        /// Rotate a vector by the specified angle.
+        /// </summary>
+        /// <param name="vector">The vector to be rotated.</param>
+        /// <param name="rotation">The angle to rotate the vector by.</param>
+        /// <returns>The rotated vector.</returns>
+        private static Vector2 rotateVector(Vector2 vector, float rotation)
+        {
+            float angle = (float)Math.Atan2(vector.Y, vector.X) + rotation;
+            float length = vector.Length;
+            return new Vector2(
+                length * (float)Math.Cos(angle),
+                length * (float)Math.Sin(angle)
+            );
+        }
     }
 }
