@@ -19,14 +19,12 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         public LegacyComboSplash()
         {
-            AlwaysPresent = true;
             AutoSizeAxes = Axes.Both;
             Origin = Anchor.CentreLeft;
-            Current.BindValueChanged(e => OnNewCombo(e.NewValue), false);
         }
 
         private void OnNewCombo(int combo)
@@ -73,7 +71,13 @@ namespace osu.Game.Screens.Play.HUD
                 InternalChild = createSprite(defaultTex);
         }
 
-        private Sprite createSprite(Texture tex) => new Sprite()
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Current.BindValueChanged(e => OnNewCombo(e.NewValue));
+        }
+
+        private Sprite createSprite(Texture tex) => new Sprite
         {
             Texture = tex,
             Alpha = 0,
