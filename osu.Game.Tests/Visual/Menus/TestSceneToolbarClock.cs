@@ -97,11 +97,11 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
             AddAssert("State is digital with runtime", () => clockDisplayMode.Value == ToolbarClockDisplayMode.DigitalWithRuntime);
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
-            AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
+            AddAssert("State is digital", () => clockDisplayMode.Value == ToolbarClockDisplayMode.Digital);
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
-            AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
+            AddAssert("State is analog", () => clockDisplayMode.Value == ToolbarClockDisplayMode.Analog);
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
-            AddAssert("State is equal to initial", () => clockDisplayMode.Value == initialDisplayMode);
+            AddAssert("State is full", () => clockDisplayMode.Value == ToolbarClockDisplayMode.Full);
         }
     }
 }
