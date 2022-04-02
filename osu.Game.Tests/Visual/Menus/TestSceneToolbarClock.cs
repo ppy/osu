@@ -2,10 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.Overlays.Toolbar;
 using osuTK;
 using osuTK.Graphics;
@@ -15,6 +18,8 @@ namespace osu.Game.Tests.Visual.Menus
     [TestFixture]
     public class TestSceneToolbarClock : OsuManualInputManagerTestScene
     {
+        private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
+
         private readonly Container mainContainer;
         private readonly ToolbarClock toolbarClock;
 
@@ -66,6 +71,12 @@ namespace osu.Game.Tests.Visual.Menus
             AddSliderStep("scale", 0.5, 4, 1, scale => mainContainer.Scale = new Vector2((float)scale));
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
+        }
+
         [Test]
         public void TestRealGameTime()
         {
@@ -91,6 +102,23 @@ namespace osu.Game.Tests.Visual.Menus
             AddAssert("Hover background is visible", () => hoverBackground.Alpha != 0);
             AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(toolbarClock, new Vector2(0, 200)));
             AddUntilStep("Hover background is not visible", () => hoverBackground.Alpha == 0);
+        }
+
+        [Test]
+        public void TestDisplayModeChange()
+        {
+            ToolbarClockDisplayMode initialDisplayMode = 0;
+
+            AddStep("Retrieve current state", () => initialDisplayMode = (ToolbarClockDisplayMode)clockDisplayMode.Value);
+
+            AddStep("Trigger click", () => toolbarClock.TriggerClick());
+            AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
+            AddStep("Trigger click", () => toolbarClock.TriggerClick());
+            AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
+            AddStep("Trigger click", () => toolbarClock.TriggerClick());
+            AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
+            AddStep("Trigger click", () => toolbarClock.TriggerClick());
+            AddAssert("State is equal to initial", () => clockDisplayMode.Value == initialDisplayMode);
         }
     }
 }
