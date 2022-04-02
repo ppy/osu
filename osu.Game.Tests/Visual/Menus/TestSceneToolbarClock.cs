@@ -85,13 +85,13 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("Retrieve hover background", () => hoverBackground = (Box)toolbarClock.Children[0]);
 
-            AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(mainContainer, new Vector2(0,200)));
+            AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(toolbarClock, new Vector2(0,200)));
             AddAssert("Hover background is not visible", () => hoverBackground.Alpha == 0);
 
-            AddStep("Move mouse on top of clock", () => InputManager.MoveMouseTo(mainContainer));
+            AddStep("Move mouse on top of clock", () => InputManager.MoveMouseTo(toolbarClock));
             AddAssert("Hover background is visible", () => hoverBackground.Alpha != 0);
-            
-            AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(mainContainer, new Vector2(0,200)));
+
+            AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(toolbarClock, new Vector2(0,200)));
             AddUntilStep("Hover background is not visible", () => hoverBackground.Alpha == 0);
         }
     }
