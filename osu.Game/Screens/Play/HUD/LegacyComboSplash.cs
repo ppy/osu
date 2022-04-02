@@ -32,7 +32,8 @@ namespace osu.Game.Screens.Play.HUD
             if (shouldDisplay(combo) && InternalChildren.Count != 0)
             {
                 Drawable sprite = InternalChildren[random.Next(0, InternalChildren.Count)];
-                sprite.FadeTo(1).MoveToX(-sprite.Width).Then().MoveToX(0, 1000, Easing.OutCirc).FadeOut(1000, Easing.OutQuad);
+                sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
+                sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
             }
         }
 
