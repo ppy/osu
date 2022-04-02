@@ -16,6 +16,7 @@ namespace osu.Game.Tests.Visual.Menus
     public class TestSceneToolbarClock : OsuManualInputManagerTestScene
     {
         private readonly Container mainContainer;
+        private readonly ToolbarClock toolbarClock;
 
         public TestSceneToolbarClock()
         {
@@ -49,7 +50,7 @@ namespace osu.Game.Tests.Visual.Menus
                                     RelativeSizeAxes = Axes.Y,
                                     Width = 2,
                                 },
-                                new ToolbarClock(),
+                                toolbarClock = new ToolbarClock(),
                                 new Box
                                 {
                                     Colour = Color4.DarkRed,
@@ -75,6 +76,23 @@ namespace osu.Game.Tests.Visual.Menus
         public void TestLongGameTime()
         {
             AddStep("Set game time long", () => mainContainer.Clock = new FramedOffsetClock(Clock, false) { Offset = 3600.0 * 24 * 1000 * 98 });
+        }
+
+        [Test]
+        public void TestHoverBackground()
+        {
+            Box hoverBackground = null;
+
+            AddStep("Retrieve hover background", () => hoverBackground = (Box)toolbarClock.Children[0]);
+
+            AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(mainContainer, new Vector2(0,200)));
+            AddAssert("Hover background is not visible", () => hoverBackground.Alpha == 0);
+
+            AddStep("Move mouse on top of clock", () => InputManager.MoveMouseTo(mainContainer));
+            AddAssert("Hover background is visible", () => hoverBackground.Alpha != 0);
+            
+            AddStep("Move mouse away from clock", () => InputManager.MoveMouseTo(mainContainer, new Vector2(0,200)));
+            AddUntilStep("Hover background is not visible", () => hoverBackground.Alpha == 0);
         }
     }
 }
