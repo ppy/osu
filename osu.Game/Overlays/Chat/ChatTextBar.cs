@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Chat
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 
-        public event TextBox.OnCommitHandler? OnChatMessageCommit;
+        public event Action<string>? OnChatMessageCommitted;
 
         public event Action<string>? OnSearchTermsChanged;
 
@@ -154,7 +154,9 @@ namespace osu.Game.Overlays.Chat
         private void chatTextBoxCommit(TextBox sender, bool newText)
         {
             if (!ShowSearch.Value)
-                OnChatMessageCommit?.Invoke(sender, newText);
+                OnChatMessageCommitted?.Invoke(sender.Text);
+
+            sender.Text = string.Empty;
         }
     }
 }

@@ -88,11 +88,10 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 };
 
-                bar.OnChatMessageCommit += (sender, newText) =>
+                bar.OnChatMessageCommitted += text =>
                 {
-                    commitText.Text = $"OnChatMessageCommit: {sender.Text}";
+                    commitText.Text = $"OnChatMessageCommitted: {text}";
                     commitText.FadeOutFromOne(1000, Easing.InQuint);
-                    sender.Text = string.Empty;
                 };
 
                 bar.OnSearchTermsChanged += text =>
