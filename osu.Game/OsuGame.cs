@@ -95,8 +95,6 @@ namespace osu.Game
 
         private SkinEditorOverlay skinEditor;
 
-        private NowPlayingOverlay nowPlayingOverlay;
-
         private Container overlayContent;
 
         private Container rightFloatingOverlayContent;
@@ -820,7 +818,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(nowPlayingOverlay = new NowPlayingOverlay
+            loadComponentSingleFile(new NowPlayingOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -1070,26 +1068,6 @@ namespace osu.Game
                         return false;
 
                     SkinManager.SelectRandomSkin();
-                    return true;
-
-                case GlobalAction.ToggleChat:
-                    chatOverlay.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSocial:
-                    dashboard.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleNowPlaying:
-                    nowPlayingOverlay.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleBeatmapListing:
-                    beatmapListing.ToggleVisibility();
-                    return true;
-
-                case GlobalAction.ToggleSettings:
-                    Settings.ToggleVisibility();
                     return true;
             }
 
