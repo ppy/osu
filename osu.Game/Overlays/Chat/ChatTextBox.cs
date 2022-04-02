@@ -20,8 +20,10 @@ namespace osu.Game.Overlays.Chat
 
             ShowSearch.BindValueChanged(change =>
             {
-                PlaceholderText = change.NewValue ? "type here to search" : "type here";
-                Schedule(() => Text = string.Empty);
+                bool showSearch = change.NewValue;
+
+                PlaceholderText = showSearch ? "type here to search" : "type here";
+                Text = string.Empty;
             }, true);
         }
 
