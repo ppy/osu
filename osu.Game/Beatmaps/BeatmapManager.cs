@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
         }
 
         protected virtual BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue? onlineLookupQueue) =>
-            new BeatmapModelManager(realm, storage, onlineBeatmapLookupQueue);
+            new BeatmapModelManager(realm, storage, onlineLookupQueue);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,
