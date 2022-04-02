@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Online
                     sender.Text = string.Empty;
                 };
 
-                bar.OnSearchTermsChanged += (text) =>
+                bar.OnSearchTermsChanged += text =>
                 {
                     searchText.Text = $"OnSearchTermsChanged: {text}";
                 };

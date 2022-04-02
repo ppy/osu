@@ -122,7 +122,6 @@ namespace osu.Game.Overlays.Chat
                 // Clear search terms if any exist when switching back to chat mode
                 if (!showSearch)
                     OnSearchTermsChanged?.Invoke(string.Empty);
-
             }, true);
 
             currentChannel.BindValueChanged(change =>
