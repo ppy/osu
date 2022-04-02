@@ -375,10 +375,10 @@ namespace osu.Game.Tests.Visual.Online
 
         private void setCardSize(BeatmapCardSize cardSize, bool viaConfig) => AddStep($"set card size to {cardSize}", () =>
         {
-            if (!viaConfig)
-                overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize;
-            else
+            if (viaConfig)
                 localConfig.SetValue(OsuSetting.BeatmapListingCardSize, cardSize);
+            else
+                overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize;
         });
 
         private void assertAllCardsOfType<T>(int expectedCount)
