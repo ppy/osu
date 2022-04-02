@@ -3,15 +3,15 @@
 
 #nullable enable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK;
 
@@ -21,13 +21,16 @@ namespace osu.Game.Overlays.Chat
     {
         public readonly BindableBool ShowSearch = new BindableBool();
 
-        public ChatTextBox TextBox { get; private set; } = null!;
+        public event TextBox.OnCommitHandler? OnChatMessageCommit;
+
+        public event Action<string>? OnSearchTermsChanged;
 
         [Resolved]
         private Bindable<Channel> currentChannel { get; set; } = null!;
 
         private OsuTextFlowContainer chattingTextContainer = null!;
         private Container searchIconContainer = null!;
+        private ChatTextBox chatTextBox = null!;
 
         private const float chatting_text_width = 180;
         private const float search_icon_width = 40;
@@ -86,7 +89,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Padding = new MarginPadding { Right = 5 },
-                                Child = TextBox = new ChatTextBox
+                                Child = chatTextBox = new ChatTextBox
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -106,12 +109,20 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
 
+            chatTextBox.Current.ValueChanged += chatTextBoxChange;
+            chatTextBox.OnCommit += chatTextBoxCommit;
+
             ShowSearch.BindValueChanged(change =>
             {
                 bool showSearch = change.NewValue;
 
                 chattingTextContainer.FadeTo(showSearch ? 0 : 1);
                 searchIconContainer.FadeTo(showSearch ? 1 : 0);
+
+                // Clear search terms if any exist when switching back to chat mode
+                if (!showSearch)
+                    OnSearchTermsChanged?.Invoke(string.Empty);
+
             }, true);
 
             currentChannel.BindValueChanged(change =>
@@ -133,6 +144,18 @@ namespace osu.Game.Overlays.Chat
                         break;
                 }
             }, true);
+        }
+
+        private void chatTextBoxChange(ValueChangedEvent<string> change)
+        {
+            if (ShowSearch.Value)
+                OnSearchTermsChanged?.Invoke(change.NewValue);
+        }
+
+        private void chatTextBoxCommit(TextBox sender, bool newText)
+        {
+            if (!ShowSearch.Value)
+                OnChatMessageCommit?.Invoke(sender, newText);
         }
     }
 }
