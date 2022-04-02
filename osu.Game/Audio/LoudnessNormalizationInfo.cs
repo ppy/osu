@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using JetBrains.Annotations;
 using osu.Framework.Audio.Callbacks;
@@ -37,24 +38,24 @@ namespace osu.Game.Audio
 
             if (!string.IsNullOrEmpty(audiofile))
             {
-                string filePath = setInfo.GetPathForFile(info.Metadata.AudioFile);
-                if (!string.IsNullOrEmpty(audiofile))
-                    filePath = storage.Storage.GetFullPath(filePath);
-
-                EbUr128LoudnessNormalization loudnessNormalization = new EbUr128LoudnessNormalization(filePath);
-                PeakAmplitude = (float)loudnessNormalization.PeakAmp;
-                TrackGain = (float)loudnessNormalization.Gain;
-
-                return this;
-            }
-            else
-            {
-                return new LoudnessNormalizationInfo
+                string filePath = setInfo.GetPathForFile(audiofile);
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    TrackGain = 0,
-                    PeakAmplitude = 0,
-                };
+                    filePath = storage.Storage.GetFullPath(filePath);
+                    if(!string.IsNullOrEmpty(filePath))
+                    {
+                        EbUr128LoudnessNormalization loudnessNormalization = new EbUr128LoudnessNormalization(filePath);
+                        PeakAmplitude = (float)loudnessNormalization.PeakAmp;
+                        TrackGain = (float)loudnessNormalization.Gain;
+                        return this;
+                    }
+                }
             }
+            return new LoudnessNormalizationInfo
+            {
+                TrackGain = 0,
+                PeakAmplitude = 0,
+            };
         }
 
         internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo bSetInfo)

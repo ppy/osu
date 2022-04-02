@@ -43,6 +43,7 @@ namespace osu.Game.Database
              .ForMember(s => s.UserSettings, cc => cc.Ignore())
              .ForMember(s => s.Difficulty, cc => cc.Ignore())
              .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
+             .ForMember(s => s.LoudnessNormalizationInfo, cc => cc.Ignore())
              .AfterMap((s, d) =>
              {
                  d.Ruleset = d.Realm.Find<RulesetInfo>(s.Ruleset.ShortName);
