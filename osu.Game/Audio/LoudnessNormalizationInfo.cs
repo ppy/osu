@@ -2,11 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
-using System.IO;
 using JetBrains.Annotations;
-using osu.Framework.Audio.Callbacks;
-using osu.Framework.Audio.Track;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Stores;
@@ -39,10 +35,12 @@ namespace osu.Game.Audio
             if (!string.IsNullOrEmpty(audiofile))
             {
                 string filePath = setInfo.GetPathForFile(audiofile);
+
                 if (!string.IsNullOrEmpty(filePath))
                 {
                     filePath = storage.Storage.GetFullPath(filePath);
-                    if(!string.IsNullOrEmpty(filePath))
+
+                    if (!string.IsNullOrEmpty(filePath))
                     {
                         EbUr128LoudnessNormalization loudnessNormalization = new EbUr128LoudnessNormalization(filePath);
                         PeakAmplitude = (float)loudnessNormalization.PeakAmp;
@@ -51,6 +49,7 @@ namespace osu.Game.Audio
                     }
                 }
             }
+
             return new LoudnessNormalizationInfo
             {
                 TrackGain = 0,

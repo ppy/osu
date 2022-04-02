@@ -14,7 +14,6 @@ using osu.Game.Scoring;
 using osu.Game.Skinning;
 using SQLitePCL;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
-using osu.Game.Audio;
 
 namespace osu.Game.Database
 {

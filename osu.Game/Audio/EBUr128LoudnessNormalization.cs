@@ -3,11 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ManagedBass;
-using osu.Framework.Audio.Callbacks;
 using osu.Framework.Audio.Track;
 
 namespace osu.Game.Audio
@@ -15,14 +13,11 @@ namespace osu.Game.Audio
     public class EbUr128LoudnessNormalization
     {
         /*
-         * 
          * references links:
          * 
          * ITU-R BS.1770-4, Algorithms to measure audio programme loudness and true-peak audio level (https://www.itu.int/rec/R-REC-BS.1770-4-201510-I)
          * EBU R 128, Loudness normalisation and permitted maximum level of audio signals (https://tech.ebu.ch/publications/e128)
          * EBU TECH 3341, Loudness Metering: ‘EBU Mode’ metering to supplement loudness normalisation in accordance with EBU R 128 (https://tech.ebu.ch/publications/tech3341)
-         * 
-         * 
          */
         public double PeakAmp { get; private set; }
         public double Gain { get; private set; }
@@ -102,19 +97,19 @@ namespace osu.Game.Audio
             if (info.Frequency == 48000)
             {
                 //filter coeffs for 48000hz sampling rate (from ITU_R_BS._1770._4 guidelines)
-                headA = new double[]
+                headA = new[]
                 {
                     -1.69065929318241, 0.73248077421585
                 };
-                headB = new double[]
+                headB = new[]
                 {
                     1.53512485958697, -2.69169618940638, 1.19839281085285
                 };
-                highPassA = new double[]
+                highPassA = new[]
                 {
                     -1.99004745483398, 0.99007225036621
                 };
-                highPassB = new double[]
+                highPassB = new[]
                 {
                     1.0, -2.0, 1.0
                 };
@@ -122,42 +117,41 @@ namespace osu.Game.Audio
             else if (info.Frequency == 44100)
             {
                 //filter coeffs for 44100hz sampling rate precalculated for speed
-                headA = new double[]
+                headA = new[]
                 {
                     -1.6636551132560202, 0.7125954280732254
                 };
-                headB = new double[]
+                headB = new[]
                 {
                     1.5308412300503478, -2.650979995154729, 1.1690790799215869
                 };
 
-                highPassA = new double[]
+                highPassA = new[]
                 {
                     -1.9891696736297957, 0.9891990357870394
                 };
-                highPassB = new double[]
+                highPassB = new[]
                 {
                     0.9995600645425144, -1.999120129085029, 0.9995600645425144
                 };
             }
             else
             {
-
                 //for the rest of the sampling rates coeffs are recalculated at runtime
-                headA = new double[]
+                headA = new[]
                 {
                     -1.69065929318241, 0.73248077421585
                 };
-                headB = new double[]
+                headB = new[]
                 {
                     1.53512485958697, -2.69169618940638, 1.19839281085285
                 };
 
-                highPassA = new double[]
+                highPassA = new[]
                 {
                     -1.99004745483398, 0.99007225036621
                 };
-                highPassB = new double[]
+                highPassB = new[]
                 {
                     1.0, -2.0, 1.0
                 };
@@ -430,27 +424,26 @@ namespace osu.Game.Audio
         //calc of filter coeffs for sampling rates different from 48000
         private void filterCoeffsRecalc(double samplingFreq, double[] a, double[] b)
         {
-
             /*
              * adapted from https://github.com/klangfreund/LUFSMeter/blob/master/filters/SecondOrderIIRFilter.cpp
              * derivation of the equations can be found at https://github.com/klangfreund/LUFSMeter/blob/master/docs/developmentNotes/111222_filter_coefficients/111222_my_notes_to_the_calculation_of_the_filter_coefficients.tif
              */
-            double KoverQ = (2.0 - 2.0 * a[1]) / (a[1] - a[0] + 1.0);
-            double K = Math.Sqrt((a[0] + a[1] + 1.0) / (a[1] - a[0] + 1.0));
-            double Q = K / KoverQ;
-            double ArctanK = Math.Atan(K);
-            double VB = (b[0] - b[2]) / (1.0 - a[1]);
-            double VH = (b[0] - b[1] + b[2]) / (a[1] - a[0] + 1.0);
-            double VL = (b[0] + b[1] + b[2]) / (a[0] + a[1] + 1.0);
+            double koverQ = (2.0 - 2.0 * a[1]) / (a[1] - a[0] + 1.0);
+            double k = Math.Sqrt((a[0] + a[1] + 1.0) / (a[1] - a[0] + 1.0));
+            double q = k / koverQ;
+            double arctanK = Math.Atan(k);
+            double vb = (b[0] - b[2]) / (1.0 - a[1]);
+            double vh = (b[0] - b[1] + b[2]) / (a[1] - a[0] + 1.0);
+            double vl = (b[0] + b[1] + b[2]) / (a[0] + a[1] + 1.0);
 
-            double newK = Math.Tan(ArctanK * reference_sampling_frequency / samplingFreq);
-            double commonFactor = 1.0 / (1.0 + newK / Q + newK * newK);
+            double newK = Math.Tan(arctanK * reference_sampling_frequency / samplingFreq);
+            double commonFactor = 1.0 / (1.0 + newK / q + newK * newK);
 
-            b[0] = (VH + VB * newK / Q + VL * newK * newK) * commonFactor;
-            b[1] = 2.0 * (VL * newK * newK - VH) * commonFactor;
-            b[2] = (VH - VB * newK / Q + VL * newK * newK) * commonFactor;
+            b[0] = (vh + vb * newK / q + vl * newK * newK) * commonFactor;
+            b[1] = 2.0 * (vl * newK * newK - vh) * commonFactor;
+            b[2] = (vh - vb * newK / q + vl * newK * newK) * commonFactor;
             a[0] = 2.0 * (newK * newK - 1.0) * commonFactor;
-            a[1] = (1.0 - newK / Q + newK * newK) * commonFactor;
+            a[1] = (1.0 - newK / q + newK * newK) * commonFactor;
         }
     }
 }

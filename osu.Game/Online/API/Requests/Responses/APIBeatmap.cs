@@ -3,7 +3,6 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Rulesets;
