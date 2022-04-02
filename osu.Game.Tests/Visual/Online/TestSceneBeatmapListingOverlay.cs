@@ -132,9 +132,8 @@ namespace osu.Game.Tests.Visual.Online
             assertAllCardsOfType<BeatmapCardNormal>(30);
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestCardSizeSwitching(bool viaConfig)
+        [Test]
+        public void TestCardSizeSwitching([Values] bool viaConfig)
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
