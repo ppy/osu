@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Visual.Online
         private readonly Bindable<Channel> currentChannel = new Bindable<Channel>();
 
         private OsuSpriteText commitText;
+        private OsuSpriteText searchText;
         private ChatTextBar bar;
 
         [SetUp]
@@ -47,11 +48,32 @@ namespace osu.Game.Tests.Visual.Online
                     {
                         new Drawable[]
                         {
-                            commitText = new OsuSpriteText
+                            new GridContainer
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Font = OsuFont.Default.With(size: 20),
+                                RelativeSizeAxes = Axes.Both,
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(),
+                                    new Dimension(),
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        commitText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Font = OsuFont.Default.With(size: 20),
+                                        },
+                                        searchText = new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Font = OsuFont.Default.With(size: 20),
+                                        },
+                                    },
+                                },
                             },
                         },
                         new Drawable[]
@@ -66,11 +88,16 @@ namespace osu.Game.Tests.Visual.Online
                     },
                 };
 
-                bar.TextBox.OnCommit += (sender, newText) =>
+                bar.OnChatMessageCommit += (sender, newText) =>
                 {
-                    commitText.Text = $"Commit: {sender.Text}";
+                    commitText.Text = $"OnChatMessageCommit: {sender.Text}";
                     commitText.FadeOutFromOne(1000, Easing.InQuint);
                     sender.Text = string.Empty;
+                };
+
+                bar.OnSearchTermsChanged += (text) =>
+                {
+                    searchText.Text = $"OnSearchTermsChanged: {text}";
                 };
             });
         }
