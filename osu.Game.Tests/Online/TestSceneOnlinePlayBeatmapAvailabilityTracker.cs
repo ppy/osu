@@ -211,17 +211,17 @@ namespace osu.Game.Tests.Online
             {
             }
 
-            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue, LoudnessNormalizationManager manager)
+            protected override BeatmapModelManager CreateBeatmapModelManager(Storage storage, RealmAccess realm, RulesetStore rulesets, BeatmapOnlineLookupQueue onlineLookupQueue)
             {
-                return new TestBeatmapModelManager(this, storage, realm, onlineLookupQueue, manager);
+                return new TestBeatmapModelManager(this, storage, realm, onlineLookupQueue);
             }
 
             internal class TestBeatmapModelManager : BeatmapModelManager
             {
                 private readonly TestBeatmapManager testBeatmapManager;
 
-                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue, LoudnessNormalizationManager manager)
-                    : base(databaseAccess, storage, beatmapOnlineLookupQueue, manager)
+                public TestBeatmapModelManager(TestBeatmapManager testBeatmapManager, Storage storage, RealmAccess databaseAccess, BeatmapOnlineLookupQueue beatmapOnlineLookupQueue)
+                    : base(databaseAccess, storage, beatmapOnlineLookupQueue)
                 {
                     this.testBeatmapManager = testBeatmapManager;
                 }
