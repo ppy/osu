@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.Menus
         {
             ToolbarClockDisplayMode initialDisplayMode = 0;
 
-            AddStep("Retrieve current state", () => initialDisplayMode = (ToolbarClockDisplayMode)clockDisplayMode.Value);
+            AddStep("Retrieve current state", () => initialDisplayMode = clockDisplayMode.Value);
 
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
             AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
