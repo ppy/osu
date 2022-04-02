@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -42,7 +41,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Y = 14,
                     Colour = colours.PinkLight,
-                    Scale = new Vector2(0.6f)
+                    Font = OsuFont.Default.With(size: 10, weight: FontWeight.SemiBold),
                 }
             };
 
