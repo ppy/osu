@@ -92,12 +92,10 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestDisplayModeChange()
         {
-            ToolbarClockDisplayMode initialDisplayMode = 0;
-
-            AddStep("Retrieve current state", () => initialDisplayMode = clockDisplayMode.Value);
+            AddStep("Set clock display mode", () => clockDisplayMode.Value = ToolbarClockDisplayMode.Full);
 
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
-            AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
+            AddAssert("State is digital with runtime", () => clockDisplayMode.Value == ToolbarClockDisplayMode.DigitalWithRuntime);
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
             AddAssert("State changed from initial", () => clockDisplayMode.Value != initialDisplayMode);
             AddStep("Trigger click", () => toolbarClock.TriggerClick());
