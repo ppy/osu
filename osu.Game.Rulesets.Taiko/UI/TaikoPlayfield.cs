@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Pooling;
@@ -30,6 +31,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="DrawableTaikoRuleset"/>.
         /// </summary>
         public const float DEFAULT_HEIGHT = 200;
+
+        /// <summary>
+        /// Whether the hit target should be nudged further towards the left area, matching the stable "classic" position.
+        /// </summary>
+        public Bindable<bool> ClassicHitTargetPosition = new BindableBool();
 
         private Container<HitExplosion> hitExplosionContainer;
         private Container<KiaiHitExplosion> kiaiExplosionContainer;
@@ -190,7 +196,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             // Padding is required to be updated for elements which are based on "absolute" X sized elements.
             // This is basically allowing for correct alignment as relative pieces move around them.
-            rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth };
+            rightArea.Padding = new MarginPadding { Left = leftArea.DrawWidth - (ClassicHitTargetPosition.Value ? 45 : 0) };
             hitTargetOffsetContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
 
             mascot.Scale = new Vector2(DrawHeight / DEFAULT_HEIGHT);
