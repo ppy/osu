@@ -1,7 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
@@ -43,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
 
-            positionInfos.ForEach(p => p.DistanceFromPrevious *= ObjectSpacing.Value);
+            positionInfos.Skip(1).ForEach(p => p.DistanceFromPrevious *= ObjectSpacing.Value);
 
             osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
         }
