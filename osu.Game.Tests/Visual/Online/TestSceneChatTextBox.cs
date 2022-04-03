@@ -90,13 +90,13 @@ namespace osu.Game.Tests.Visual.Online
 
                 bar.OnChatMessageCommitted += text =>
                 {
-                    commitText.Text = $"OnChatMessageCommitted: {text}";
+                    commitText.Text = $"{nameof(bar.OnChatMessageCommitted)}: {text}";
                     commitText.FadeOutFromOne(1000, Easing.InQuint);
                 };
 
                 bar.OnSearchTermsChanged += text =>
                 {
-                    searchText.Text = $"OnSearchTermsChanged: {text}";
+                    searchText.Text = $"{nameof(bar.OnSearchTermsChanged)}: {text}";
                 };
             });
         }
