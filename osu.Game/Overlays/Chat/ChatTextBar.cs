@@ -153,9 +153,10 @@ namespace osu.Game.Overlays.Chat
 
         private void chatTextBoxCommit(TextBox sender, bool newText)
         {
-            if (!ShowSearch.Value)
-                OnChatMessageCommitted?.Invoke(sender.Text);
+            if (ShowSearch.Value)
+                return;
 
+            OnChatMessageCommitted?.Invoke(sender.Text);
             sender.Text = string.Empty;
         }
     }
