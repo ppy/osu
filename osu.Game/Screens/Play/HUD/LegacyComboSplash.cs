@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class LegacyComboSplash : CompositeDrawable, ISkinnableDrawable
+    public class LegacyComboSplash : Container<Container<Sprite>>, ISkinnableDrawable
     {
         [SettingSource("Side, where bursts will appear")]
         public Bindable<Side> BurstsSide { get; } = new Bindable<Side>(Side.Random);
@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly Random random = new Random();
 
-        private Container left;
-        private Container right;
+        private Container<Sprite> left;
+        private Container<Sprite> right;
 
         public LegacyComboSplash()
         {
@@ -49,10 +49,10 @@ namespace osu.Game.Screens.Play.HUD
 
                 foreach (var x in toShow)
                 {
-                    Container container = (Container)x;
+                    var container = (Container<Sprite>)x;
                     if (container.Count == 0) continue;
 
-                    Drawable sprite = container[random.Next(0, container.Count)];
+                    Sprite sprite = container[random.Next(0, container.Count)];
                     sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
                     sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
                 }
@@ -74,13 +74,13 @@ namespace osu.Game.Screens.Play.HUD
         {
             Current.BindTo(scoreProcessor.Combo);
 
-            left = new Container
+            left = new Container<Sprite>
             {
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreLeft,
                 AutoSizeAxes = Axes.Both,
             };
-            right = new Container
+            right = new Container<Sprite>
             {
                 Origin = Anchor.CentreLeft,
                 Anchor = Anchor.CentreRight,
@@ -112,8 +112,8 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }
 
-            AddInternal(left);
-            AddInternal(right);
+            Add(left);
+            Add(right);
         }
 
         private void OnSideChanged(Side side)
