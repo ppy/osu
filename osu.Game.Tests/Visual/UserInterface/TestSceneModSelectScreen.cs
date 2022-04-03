@@ -6,8 +6,10 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osuTK.Input;
 
@@ -21,23 +23,55 @@ namespace osu.Game.Tests.Visual.UserInterface
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("create screen", () => Child = modSelectScreen = new ModSelectScreen
-            {
-                RelativeSizeAxes = Axes.Both,
-                State = { Value = Visibility.Visible },
-                SelectedMods = { BindTarget = SelectedMods }
-            });
+            AddStep("reset mods", () => SelectedMods.SetDefault());
         }
+
+        private void createScreen() => AddStep("create screen", () => Child = modSelectScreen = new ModSelectScreen
+        {
+            RelativeSizeAxes = Axes.Both,
+            State = { Value = Visibility.Visible },
+            SelectedMods = { BindTarget = SelectedMods }
+        });
 
         [Test]
         public void TestStateChange()
         {
+            createScreen();
             AddToggleStep("toggle state", visible => modSelectScreen.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestPreexistingSelection()
+        {
+            AddStep("set mods", () => SelectedMods.Value = new Mod[] { new OsuModAlternate(), new OsuModDaycore() });
+            createScreen();
+            AddUntilStep("two panels active", () => modSelectScreen.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+            AddAssert("mod multiplier correct", () =>
+            {
+                double multiplier = SelectedMods.Value.Aggregate(1d, (multiplier, mod) => multiplier * mod.ScoreMultiplier);
+                return Precision.AlmostEquals(multiplier, modSelectScreen.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
+            });
+            assertCustomisationToggleState(disabled: false, active: false);
+        }
+
+        [Test]
+        public void TestExternalSelection()
+        {
+            createScreen();
+            AddStep("set mods", () => SelectedMods.Value = new Mod[] { new OsuModAlternate(), new OsuModDaycore() });
+            AddUntilStep("two panels active", () => modSelectScreen.ChildrenOfType<ModPanel>().Count(panel => panel.Active.Value) == 2);
+            AddAssert("mod multiplier correct", () =>
+            {
+                double multiplier = SelectedMods.Value.Aggregate(1d, (multiplier, mod) => multiplier * mod.ScoreMultiplier);
+                return Precision.AlmostEquals(multiplier, modSelectScreen.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
+            });
+            assertCustomisationToggleState(disabled: false, active: false);
         }
 
         [Test]
         public void TestCustomisationToggleState()
         {
+            createScreen();
             assertCustomisationToggleState(disabled: true, active: false);
 
             AddStep("select customisable mod", () => SelectedMods.Value = new[] { new OsuModDoubleTime() });
