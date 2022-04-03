@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -12,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Mania.Skinning.Legacy
@@ -75,6 +77,22 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
         {
             switch (component)
             {
+                case SkinnableTargetComponent targetComponent:
+                    if (targetComponent.Target == SkinnableTarget.MainHUDComponents)
+                    {
+                        var components = base.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+                        if (components == null) return null;
+
+                        foreach (var comboSplash in components.OfType<LegacyComboSplash>())
+                        {
+                            comboSplash.BurstCondition = combo => combo > 0 && combo % 100 == 0;
+                        }
+
+                        return components;
+                    }
+
+                    break;
+
                 case GameplaySkinComponent<HitResult> resultComponent:
                     return getResult(resultComponent.Component);
 
