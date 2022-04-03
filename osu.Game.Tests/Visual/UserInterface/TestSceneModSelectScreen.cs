@@ -9,8 +9,12 @@ using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -66,6 +70,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return Precision.AlmostEquals(multiplier, modSelectScreen.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
+        }
+
+        [Test]
+        public void TestRulesetChange()
+        {
+            createScreen();
+            AddStep("change to osu!", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep("change to osu!taiko", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddStep("change to osu!catch", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("change to osu!mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
         }
 
         [Test]
