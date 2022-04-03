@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
@@ -17,8 +15,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => OsuIcon.ModHalftime;
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "Less zoom...";
-
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
 
         [SettingSource("Speed decrease", "The actual decrease to apply")]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
