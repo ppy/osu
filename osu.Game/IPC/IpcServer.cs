@@ -50,7 +50,10 @@ namespace osu.Game.IPC
             Schedule(() =>
             {
                 if (!channels.TryGetValue(message.Type, out var chan))
-                    chan = loadChannelByType(message.Value.GetType());
+                    chan = tryLoadChannelByType(message.Value.GetType());
+
+                if (chan == null)
+                    return;
 
                 // Can't send a response because this may load components
                 chan.HandleMessage(message.Value);
@@ -67,11 +70,11 @@ namespace osu.Game.IPC
             base.Dispose(isDisposing);
         }
 
-        private ILoadableIpcChannel loadChannelByType(Type messageType)
+        private ILoadableIpcChannel? tryLoadChannelByType(Type messageType)
         {
             var attribute = messageType.GetCustomAttribute<IpcMessageAttribute>();
             if (attribute == null)
-                throw new InvalidOperationException(@"Response type doesn't represent a message.");
+                return null;
 
             var chanType = attribute.ChannelType;
             Debug.Assert(typeof(ILoadableIpcChannel).IsAssignableFrom(chanType));
