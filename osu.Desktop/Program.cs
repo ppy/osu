@@ -70,37 +70,8 @@ namespace osu.Desktop
 
                 if (!host.IsPrimaryInstance)
                 {
-                    if (args.Length > 0)
-                    {
-                        string arg = args[0];
-
-                        if (arg.StartsWith(Game.OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
-                        {
-                            using (new IpcServer(host).PrepareSingleUse(out OsuLinkIPCChannel handler))
-                            {
-                                Console.WriteLine(@"Handling link {0}", arg);
-                                if (!handler.HandleLinkAsync(arg).Wait(3000))
-                                    throw new TimeoutException(@"IPC took too long to send");
-                            }
-
-                            return;
-                        }
-
-                        if (arg.Contains('.')) // easy way to check for a file import in args
-                        {
-                            using (new IpcServer(host).PrepareSingleUse(out ArchiveImportIPCChannel importer))
-                            {
-                                foreach (string file in args)
-                                {
-                                    Console.WriteLine(@"Importing {0}", file);
-                                    if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
-                                        throw new TimeoutException(@"IPC took too long to send");
-                                }
-                            }
-
-                            return;
-                        }
-                    }
+                    if (args.Length > 0 && handleRemoteHostArguments(host, args, cwd))
+                        return;
 
                     // we want to allow multiple instances to be started when in debug.
                     if (!DebugUtils.IsDebugBuild)
@@ -134,6 +105,44 @@ namespace osu.Desktop
                     {
                         game.OnLoadComplete += _ => game.Add(ipc);
                     }));
+            }
+        }
+
+        /// <returns>
+        /// True if a host request was sent, false otherwise.
+        /// </returns>
+        private static bool handleRemoteHostArguments(DesktopGameHost host, string[] args, string cwd)
+        {
+            string arg = args[0];
+
+            if (arg.StartsWith(Game.OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
+            {
+                Console.WriteLine(@"Handling link {0}", arg);
+                sendMessageAndWait(new OsuOpenLinkMessage { Link = arg });
+                return true;
+            }
+
+            if (arg.Contains('.')) // easy way to check for a file import in args
+            {
+                foreach (string file in args)
+                {
+                    Console.WriteLine(@"Importing {0}", file);
+                    sendMessageAndWait(new ArchiveImportMessage { Path = Path.GetFullPath(file, cwd) });
+                }
+
+                return true;
+            }
+
+            return false;
+
+            void sendMessageAndWait<T>(T message)
+            {
+                if (!host.SendMessageAsync(new IpcMessage
+                {
+                    Type = typeof(T).AssemblyQualifiedName,
+                    Value = message,
+                }).Wait(3000))
+                    throw new TimeoutException(@"IPC took too long to send");
             }
         }
 
