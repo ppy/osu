@@ -25,6 +25,17 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool UsesFixedAnchor { get; set; }
 
+        public Func<int, bool> BurstCondition { get; set; } = combo =>
+        {
+            // by default, std/taiko/catch milestones are used.
+            if (combo >= 100)
+            {
+                return combo % 50 == 0;
+            }
+
+            return combo == 30 || combo == 60;
+        };
+
         private readonly Random random = new Random();
 
         private Container<Sprite> left;
@@ -38,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void OnNewCombo(int combo)
         {
-            if (shouldDisplay(combo))
+            if (BurstCondition(combo))
             {
                 IEnumerable<Drawable> toShow;
 
@@ -57,16 +68,6 @@ namespace osu.Game.Screens.Play.HUD
                     sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
                 }
             }
-        }
-
-        private bool shouldDisplay(int currentCombo)
-        {
-            if (currentCombo >= 100)
-            {
-                return currentCombo % 50 == 0;
-            }
-
-            return currentCombo == 30 || currentCombo == 60;
         }
 
         [BackgroundDependencyLoader]
