@@ -23,7 +23,7 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelectScreen : OsuFocusedOverlayContainer
+    public abstract class ModSelectScreen : OsuFocusedOverlayContainer
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
