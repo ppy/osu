@@ -155,16 +155,7 @@ namespace osu.Game.Skinning
                     var components = new List<Drawable>();
 
                     foreach (var i in skinnableInfo)
-                    {
-                        try
-                        {
-                            components.Add(i.CreateInstance());
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error(e, $"Unable to create skin component {i.Type.Name}");
-                        }
-                    }
+                        components.Add(i.CreateInstance());
 
                     return new SkinnableTargetComponentsContainer
                     {

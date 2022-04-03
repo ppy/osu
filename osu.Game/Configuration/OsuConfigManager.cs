@@ -44,6 +44,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
 
+            SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
+
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
             SetDefault(OsuSetting.Token, string.Empty);
@@ -295,6 +297,7 @@ namespace osu.Game.Configuration
         RandomSelectAlgorithm,
         ShowFpsDisplay,
         ChatDisplayHeight,
+        ToolbarClockDisplayMode,
         Version,
         ShowConvertedBeatmaps,
         Skin,
