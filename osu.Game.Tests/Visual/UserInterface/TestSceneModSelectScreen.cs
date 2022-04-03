@@ -3,18 +3,16 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Catch;
-using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Taiko;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -22,20 +20,29 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneModSelectScreen : OsuManualInputManagerTestScene
     {
+        [Resolved]
+        private RulesetStore rulesetStore { get; set; }
+
         private ModSelectScreen modSelectScreen;
 
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("clear contents", Clear);
+            AddStep("reset ruleset", () => Ruleset.Value = rulesetStore.GetRuleset(0));
             AddStep("reset mods", () => SelectedMods.SetDefault());
         }
 
-        private void createScreen() => AddStep("create screen", () => Child = modSelectScreen = new ModSelectScreen
+        private void createScreen()
         {
-            RelativeSizeAxes = Axes.Both,
-            State = { Value = Visibility.Visible },
-            SelectedMods = { BindTarget = SelectedMods }
-        });
+            AddStep("create screen", () => Child = modSelectScreen = new ModSelectScreen
+            {
+                RelativeSizeAxes = Axes.Both,
+                State = { Value = Visibility.Visible },
+                SelectedMods = { BindTarget = SelectedMods }
+            });
+            waitForColumnLoad();
+        }
 
         [Test]
         public void TestStateChange()
@@ -76,10 +83,10 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestRulesetChange()
         {
             createScreen();
-            AddStep("change to osu!", () => Ruleset.Value = new OsuRuleset().RulesetInfo);
-            AddStep("change to osu!taiko", () => Ruleset.Value = new TaikoRuleset().RulesetInfo);
-            AddStep("change to osu!catch", () => Ruleset.Value = new CatchRuleset().RulesetInfo);
-            AddStep("change to osu!mania", () => Ruleset.Value = new ManiaRuleset().RulesetInfo);
+            changeRuleset(0);
+            changeRuleset(1);
+            changeRuleset(2);
+            changeRuleset(3);
         }
 
         [Test]
@@ -111,6 +118,15 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("select mod without configuration", () => SelectedMods.Value = new[] { new OsuModAutoplay() });
             assertCustomisationToggleState(disabled: true, active: false); // config was dismissed without explicit user action.
+        }
+
+        private void waitForColumnLoad() => AddUntilStep("all column content loaded",
+            () => modSelectScreen.ChildrenOfType<ModColumn>().Any() && modSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
+
+        private void changeRuleset(int id)
+        {
+            AddStep($"set ruleset to {id}", () => Ruleset.Value = rulesetStore.GetRuleset(id));
+            waitForColumnLoad();
         }
 
         private void assertCustomisationToggleState(bool disabled, bool active)
