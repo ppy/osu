@@ -21,6 +21,11 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// </summary>
         private const int preceding_hitobjects_to_shift = 10;
 
+        /// <summary>
+        /// How far an object has to be out of bounds before it gets rotated towards playfield center.
+        /// </summary>
+        private const double out_of_bounds_tolerance = 10;
+
         private static readonly Vector2 playfield_centre = OsuPlayfield.BASE_SIZE / 2;
 
         /// <summary>
@@ -102,11 +107,11 @@ namespace osu.Game.Rulesets.Osu.Utils
 
                 if (shift.LengthSquared >= 1)
                 {
-                    if (!rotateAwayFromEdge)
+                    if (!rotateAwayFromEdge && shift.LengthSquared > out_of_bounds_tolerance * out_of_bounds_tolerance)
                     {
                         furthestIndex = i;
                         rotateAwayFromEdge = true;
-                        i = Math.Max(0, preceding_hitobjects_to_shift);
+                        i = Math.Max(0, i - preceding_hitobjects_to_shift);
                         continue;
                     }
 
@@ -123,13 +128,10 @@ namespace osu.Game.Rulesets.Osu.Utils
                     if (toBeShifted.Count > 0)
                         applyDecreasingShift(toBeShifted, shift);
                 }
-                else
+                else if (i > furthestIndex)
                 {
-                    if (i > furthestIndex)
-                    {
-                        furthestIndex = i;
-                        rotateAwayFromEdge = false;
-                    }
+                    furthestIndex = i;
+                    rotateAwayFromEdge = false;
                 }
             }
 
