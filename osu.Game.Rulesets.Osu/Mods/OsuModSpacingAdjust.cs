@@ -3,11 +3,12 @@
 
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Utils;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -44,8 +45,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                 return;
 
             var positionInfos = OsuHitObjectGenerationUtils.GeneratePositionInfos(osuBeatmap.HitObjects);
+            var firstObjectsAfterBreaks = osuBeatmap.Breaks
+                                                    .Select(period => osuBeatmap.HitObjects.FirstOrDefault(o => o.GetEndTime() >= period.EndTime))
+                                                    .Where(o => o != null)
+                                                    .ToList();
 
-            positionInfos.Skip(1).ForEach(p => p.DistanceFromPrevious *= ObjectSpacing.Value);
+            for (int i = 0; i < positionInfos.Count; i++)
+            {
+                var positionInfo = positionInfos[i];
+
+                if (i == 0 || positionInfos[i - 1].HitObject is Spinner || firstObjectsAfterBreaks.Contains(positionInfo.HitObject))
+                {
+                    positionInfo.StayInPlace = true;
+                }
+
+                positionInfo.DistanceFromPrevious *= ObjectSpacing.Value;
+            }
 
             osuBeatmap.HitObjects = OsuHitObjectGenerationUtils.RepositionHitObjects(positionInfos);
         }
