@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             List<WorkingObject> workingObjects = objectPositionInfos.Select(o => new WorkingObject(o)).ToList();
             bool rotateAwayFromEdge = false;
             int furthestIndex = 0;
+            int furthestIndexWithRotation = 0;
 
             for (int i = 0; i < workingObjects.Count; i++)
             {
@@ -84,7 +85,10 @@ namespace osu.Game.Rulesets.Osu.Utils
                 WorkingObject? previous = i > 0 ? workingObjects[i - 1] : null;
                 var hitObject = current.HitObject;
 
-                if (hitObject is Spinner || current.PositionInfo.StayInPlace)
+                if (rotateAwayFromEdge)
+                    furthestIndexWithRotation = Math.Max(i, furthestIndexWithRotation);
+
+                if (current.PositionInfo.StayInPlace)
                 {
                     continue;
                 }
@@ -111,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                     {
                         furthestIndex = i;
                         rotateAwayFromEdge = true;
-                        i = Math.Max(0, i - preceding_hitobjects_to_shift);
+                        i = Math.Max(furthestIndexWithRotation, i - preceding_hitobjects_to_shift);
                         continue;
                     }
 
@@ -157,7 +161,12 @@ namespace osu.Game.Rulesets.Osu.Utils
                 }
                 else
                 {
-                    Vector2 earliestPosition = beforePrevious?.HitObject.EndPosition ?? playfield_centre;
+                    Vector2 earliestPosition;
+                    if (previous.PositionInfo.StayInPlace)
+                        // beforePrevious should not affect this object if the previous object stays in place
+                        earliestPosition = beforePrevious?.EndPositionOriginal ?? playfield_centre;
+                    else
+                        earliestPosition = beforePrevious?.HitObject.EndPosition ?? playfield_centre;
                     Vector2 relativePosition = previous.HitObject.Position - earliestPosition;
                     previousAbsoluteAngle = (float)Math.Atan2(relativePosition.Y, relativePosition.X);
                 }
@@ -387,11 +396,17 @@ namespace osu.Game.Rulesets.Osu.Utils
             /// </summary>
             public float Rotation { get; set; }
 
+            private bool stayInPlace;
+
             /// <summary>
             /// Forces this object to never be moved by the generation algorithm.
-            /// Spinners ignore this property and are never moved.
+            /// This is always true for spinners.
             /// </summary>
-            public bool StayInPlace { get; set; }
+            public bool StayInPlace
+            {
+                get => stayInPlace || HitObject is Spinner;
+                set => stayInPlace = value;
+            }
 
             /// <summary>
             /// The hit object associated with this <see cref="ObjectPositionInfo"/>.
@@ -407,6 +422,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         private class WorkingObject
         {
             public Vector2 PositionOriginal { get; }
+            public Vector2 EndPositionOriginal { get; }
             public Vector2 PositionModified { get; set; }
             public Vector2 EndPositionModified { get; set; }
 
@@ -417,7 +433,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             {
                 PositionInfo = positionInfo;
                 PositionModified = PositionOriginal = HitObject.Position;
-                EndPositionModified = HitObject.EndPosition;
+                EndPositionModified = EndPositionOriginal = HitObject.EndPosition;
             }
         }
     }
