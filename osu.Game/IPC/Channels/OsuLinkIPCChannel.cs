@@ -12,31 +12,16 @@ namespace osu.Game.IPC.Channels
 {
     public class OsuLinkIPCChannel : LoadableIpcChannel<OsuOpenLinkMessage>
     {
-        [Resolved(CanBeNull = true)]
-        private OsuGame? handler { get; set; }
+        [Resolved]
+        private OsuGame handler { get; set; } = null!;
 
         protected override IpcMessage? HandleMessage(OsuOpenLinkMessage msg)
         {
             Debug.Assert(handler != null);
 
-            HandleLinkAsync(msg.Link).ContinueWith(t =>
-            {
-                if (t.Exception != null) throw t.Exception;
-            }, TaskContinuationOptions.OnlyOnFaulted);
+            handler.HandleLink(msg.Link);
 
             return null;
-        }
-
-        public async Task HandleLinkAsync(string link)
-        {
-            if (handler == null)
-            {
-                // we want to contact a remote osu! to handle the link.
-                await Ipc.SendMessageAsync(new OsuOpenLinkMessage { Link = link }).ConfigureAwait(false);
-                return;
-            }
-
-            handler.HandleLink(link);
         }
     }
 

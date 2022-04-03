@@ -14,8 +14,8 @@ namespace osu.Game.IPC.Channels
 {
     public class ArchiveImportIPCChannel : LoadableIpcChannel<ArchiveImportMessage>
     {
-        [Resolved(CanBeNull = true)]
-        private OsuGame? game { get; set; }
+        [Resolved]
+        private OsuGame game { get; set; } = null!;
 
         protected override IpcMessage? HandleMessage(ArchiveImportMessage msg)
         {
@@ -31,13 +31,6 @@ namespace osu.Game.IPC.Channels
 
         public async Task ImportAsync(string path)
         {
-            if (game == null)
-            {
-                // we want to contact a remote osu! to handle the import.
-                await Ipc.SendMessageAsync(new ArchiveImportMessage { Path = path }).ConfigureAwait(false);
-                return;
-            }
-
             if (game.HandledExtensions.Contains(Path.GetExtension(path)?.ToLowerInvariant()))
                 await game.Import(path).ConfigureAwait(false);
         }
