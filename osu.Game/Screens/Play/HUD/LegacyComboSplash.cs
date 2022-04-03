@@ -43,9 +43,7 @@ namespace osu.Game.Screens.Play.HUD
                 IEnumerable<Drawable> toShow;
 
                 if (BurstsSide.Value == Side.Random)
-
                     toShow = new[] { InternalChildren[random.Next(0, InternalChildren.Count)] };
-
                 else
                     toShow = InternalChildren;
 
@@ -163,6 +161,11 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
             Current.BindValueChanged(e => OnNewCombo(e.NewValue));
             BurstsSide.BindValueChanged(e => OnSideChanged(e.NewValue), true);
+
+            if (Parent is SkinnableTargetComponentsContainer container)
+            {
+                container.ChangeChildDepth(this, 1000);
+            }
         }
 
         private Sprite createSprite(Texture tex) => new Sprite
