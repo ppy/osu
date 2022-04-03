@@ -5,48 +5,47 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Allocation;
 using osu.Framework.Platform;
-using osu.Game.Database;
 
-namespace osu.Game.IPC
+#nullable enable
+
+namespace osu.Game.IPC.Channels
 {
-    public class ArchiveImportIPCChannel : IpcChannel<ArchiveImportMessage>
+    public class ArchiveImportIPCChannel : LoadableIpcChannel<ArchiveImportMessage>
     {
-        private readonly ICanAcceptFiles importer;
+        [Resolved(CanBeNull = true)]
+        private OsuGame? game { get; set; }
 
-        public ArchiveImportIPCChannel(IIpcHost host, ICanAcceptFiles importer = null)
-            : base(host)
+        protected override IpcMessage? HandleMessage(ArchiveImportMessage msg)
         {
-            this.importer = importer;
+            Debug.Assert(game != null);
 
-            MessageReceived += msg =>
+            ImportAsync(msg.Path).ContinueWith(t =>
             {
-                Debug.Assert(importer != null);
-                ImportAsync(msg.Path).ContinueWith(t =>
-                {
-                    if (t.Exception != null) throw t.Exception;
-                }, TaskContinuationOptions.OnlyOnFaulted);
+                if (t.Exception != null) throw t.Exception;
+            }, TaskContinuationOptions.OnlyOnFaulted);
 
-                return null;
-            };
+            return null;
         }
 
         public async Task ImportAsync(string path)
         {
-            if (importer == null)
+            if (game == null)
             {
                 // we want to contact a remote osu! to handle the import.
-                await SendMessageAsync(new ArchiveImportMessage { Path = path }).ConfigureAwait(false);
+                await Ipc.SendMessageAsync(new ArchiveImportMessage { Path = path }).ConfigureAwait(false);
                 return;
             }
 
-            if (importer.HandledExtensions.Contains(Path.GetExtension(path)?.ToLowerInvariant()))
-                await importer.Import(path).ConfigureAwait(false);
+            if (game.HandledExtensions.Contains(Path.GetExtension(path)?.ToLowerInvariant()))
+                await game.Import(path).ConfigureAwait(false);
         }
     }
 
+    [IpcMessage(typeof(ArchiveImportIPCChannel))]
     public class ArchiveImportMessage
     {
-        public string Path;
+        public string Path = null!;
     }
 }

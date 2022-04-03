@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 using osu.Desktop.LegacyIpc;
 using osu.Framework;
 using osu.Framework.Development;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
+using osu.Game.IPC.Channels;
 using osu.Game.Tournament;
 using Squirrel;
 
@@ -22,6 +24,7 @@ namespace osu.Desktop
         private const string base_game_name = @"osu";
 
         private static LegacyTcpIpcProvider legacyIpc;
+        private static IpcServer ipc;
 
         [STAThread]
         public static void Main(string[] args)
@@ -67,18 +70,24 @@ namespace osu.Desktop
 
                 if (!host.IsPrimaryInstance)
                 {
-                    if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
+                    if (args.Length > 0)
                     {
-                        var importer = new ArchiveImportIPCChannel(host);
+                        string arg = args[0];
 
-                        foreach (string file in args)
+                        if (arg.Contains('.')) // easy way to check for a file import in args
                         {
-                            Console.WriteLine(@"Importing {0}", file);
-                            if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
-                                throw new TimeoutException(@"IPC took too long to send");
-                        }
+                            using (new IpcServer(host).PrepareSingleUse(out ArchiveImportIPCChannel importer))
+                            {
+                                foreach (string file in args)
+                                {
+                                    Console.WriteLine(@"Importing {0}", file);
+                                    if (!importer.ImportAsync(Path.GetFullPath(file, cwd)).Wait(3000))
+                                        throw new TimeoutException(@"IPC took too long to send");
+                                }
+                            }
 
-                        return;
+                            return;
+                        }
                     }
 
                     // we want to allow multiple instances to be started when in debug.
@@ -101,12 +110,18 @@ namespace osu.Desktop
                     {
                         Logger.Error(ex, "Failed to start legacy IPC provider");
                     }
+
+                    Logger.Log("Starting IPC handler...");
+                    ipc = new IpcServer(host);
                 }
 
                 if (tournamentClient)
                     host.Run(new TournamentGame());
                 else
-                    host.Run(new OsuGameDesktop(args));
+                    host.Run(new OsuGameDesktop(args).With(game =>
+                    {
+                        game.OnLoadComplete += _ => game.Add(ipc);
+                    }));
             }
         }
 
