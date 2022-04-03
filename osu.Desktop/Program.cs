@@ -74,6 +74,18 @@ namespace osu.Desktop
                     {
                         string arg = args[0];
 
+                        if (arg.StartsWith(Game.OsuGameBase.OSU_PROTOCOL, StringComparison.Ordinal))
+                        {
+                            using (new IpcServer(host).PrepareSingleUse(out OsuLinkIPCChannel handler))
+                            {
+                                Console.WriteLine(@"Handling link {0}", arg);
+                                if (!handler.HandleLinkAsync(arg).Wait(3000))
+                                    throw new TimeoutException(@"IPC took too long to send");
+                            }
+
+                            return;
+                        }
+
                         if (arg.Contains('.')) // easy way to check for a file import in args
                         {
                             using (new IpcServer(host).PrepareSingleUse(out ArchiveImportIPCChannel importer))
