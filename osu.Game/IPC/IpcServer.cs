@@ -22,7 +22,7 @@ namespace osu.Game.IPC
     public class IpcServer : CompositeDrawable
     {
         private readonly IIpcHost host;
-        private readonly Dictionary<string, ILoadableIpcChannel> channels = new Dictionary<string, ILoadableIpcChannel>();
+        private readonly Dictionary<Type, ILoadableIpcChannel> channels = new Dictionary<Type, ILoadableIpcChannel>();
 
         public IpcServer(IIpcHost host)
         {
@@ -49,8 +49,9 @@ namespace osu.Game.IPC
         {
             Schedule(() =>
             {
-                if (!channels.TryGetValue(message.Type, out var chan))
-                    chan = tryLoadChannelByType(message.Value.GetType());
+                Type messageType = message.Value.GetType();
+                if (!channels.TryGetValue(messageType, out var chan))
+                    chan = tryLoadChannelByType(messageType);
 
                 if (chan == null)
                     return;
@@ -64,8 +65,7 @@ namespace osu.Game.IPC
 
         protected override void Dispose(bool isDisposing)
         {
-            if (!IsDisposed)
-                host.MessageReceived -= handleMessage;
+            host.MessageReceived -= handleMessage;
 
             base.Dispose(isDisposing);
         }
@@ -82,6 +82,7 @@ namespace osu.Game.IPC
             ILoadableIpcChannel channel = (ILoadableIpcChannel)Activator.CreateInstance(chanType);
             LoadComponent((Component)channel);
             AddInternal((Component)channel);
+            channels.Add(messageType, channel);
             return channel;
         }
     }
