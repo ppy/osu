@@ -179,10 +179,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         private static Vector2 clampHitCircleToPlayfield(WorkingObject workingObject)
         {
             var previousPosition = workingObject.PositionModified;
-            workingObject.EndPositionModified = workingObject.PositionModified = clampToPlayfieldWithPadding(
-                workingObject.PositionModified,
-                (float)workingObject.HitObject.Radius
-            );
+            workingObject.EndPositionModified = workingObject.PositionModified = clampToPlayfield(workingObject.PositionModified);
 
             workingObject.HitObject.Position = workingObject.PositionModified;
 
@@ -233,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                 // The last object is shifted by a vector slightly larger than zero
                 Vector2 position = hitObject.Position + shift * ((hitObjects.Count - i) / (float)(hitObjects.Count + 1));
 
-                hitObject.Position = clampToPlayfieldWithPadding(position, (float)hitObject.Radius);
+                hitObject.Position = clampToPlayfield(position);
             }
         }
 
@@ -265,15 +262,6 @@ namespace osu.Game.Rulesets.Osu.Utils
                 maxY = MathF.Max(maxY, pos.Y);
             }
 
-            // Take the circle radius into account.
-            float radius = (float)slider.Radius;
-
-            minX -= radius;
-            minY -= radius;
-
-            maxX += radius;
-            maxY += radius;
-
             // Given the bounding box of the slider (via min/max X/Y),
             // the amount that the slider can move to the left is minX (with the sign flipped, since positive X is to the right),
             // and the amount that it can move to the right is WIDTH - maxX.
@@ -303,16 +291,15 @@ namespace osu.Game.Rulesets.Osu.Utils
         }
 
         /// <summary>
-        /// Clamp a position to playfield, keeping a specified distance from the edges.
+        /// Clamp a position to playfield.
         /// </summary>
         /// <param name="position">The position to be clamped.</param>
-        /// <param name="padding">The minimum distance allowed from playfield edges.</param>
         /// <returns>The clamped position.</returns>
-        private static Vector2 clampToPlayfieldWithPadding(Vector2 position, float padding)
+        private static Vector2 clampToPlayfield(Vector2 position)
         {
             return new Vector2(
-                Math.Clamp(position.X, padding, OsuPlayfield.BASE_SIZE.X - padding),
-                Math.Clamp(position.Y, padding, OsuPlayfield.BASE_SIZE.Y - padding)
+                Math.Clamp(position.X, 0, OsuPlayfield.BASE_SIZE.X),
+                Math.Clamp(position.Y, 0, OsuPlayfield.BASE_SIZE.Y)
             );
         }
 
