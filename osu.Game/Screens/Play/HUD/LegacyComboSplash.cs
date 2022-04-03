@@ -2,24 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class LegacyComboSplash : CompositeDrawable, ISkinnableDrawable
     {
+        [SettingSource("Side, where bursts will appear")]
+        public Bindable<Side> BurstsSide { get; } = new Bindable<Side>(Side.Random);
+
         public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
 
         public bool UsesFixedAnchor { get; set; }
 
         private readonly Random random = new Random();
+
+        private Container left;
+        private Container right;
 
         public LegacyComboSplash()
         {
@@ -29,11 +38,26 @@ namespace osu.Game.Screens.Play.HUD
 
         private void OnNewCombo(int combo)
         {
-            if (shouldDisplay(combo) && InternalChildren.Count != 0)
+            if (shouldDisplay(combo))
             {
-                Drawable sprite = InternalChildren[random.Next(0, InternalChildren.Count)];
-                sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
-                sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
+                IEnumerable<Drawable> toShow;
+
+                if (BurstsSide.Value == Side.Random)
+
+                    toShow = new[] { InternalChildren[random.Next(0, InternalChildren.Count)] };
+
+                else
+                    toShow = InternalChildren;
+
+                foreach (var x in toShow)
+                {
+                    Container container = (Container)x;
+                    if (container.Count == 0) continue;
+
+                    Drawable sprite = container[random.Next(0, container.Count)];
+                    sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
+                    sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
+                }
             }
         }
 
@@ -52,6 +76,20 @@ namespace osu.Game.Screens.Play.HUD
         {
             Current.BindTo(scoreProcessor.Combo);
 
+            left = new Container
+            {
+                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.CentreLeft,
+                AutoSizeAxes = Axes.Both,
+            };
+            right = new Container
+            {
+                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.CentreRight,
+                AutoSizeAxes = Axes.Both,
+                Scale = new Vector2(-1, 1)
+            };
+
             if (skin.GetTexture("comboburst-0") != null)
             {
                 // loading comboburst-{n}.png files
@@ -61,21 +99,70 @@ namespace osu.Game.Screens.Play.HUD
                     if (tex == null)
                         break;
 
-                    AddInternal(createSprite(tex));
+                    left.Add(createSprite(tex));
+                    right.Add(createSprite(tex));
                 }
+            }
+            else
+            {
+                var defaultTex = skin.GetTexture("comboburst");
 
-                return;
+                if (defaultTex != null)
+                {
+                    left.Add(createSprite(defaultTex));
+                    right.Add(createSprite(defaultTex));
+                }
             }
 
-            var defaultTex = skin.GetTexture("comboburst");
-            if (defaultTex != null)
-                InternalChild = createSprite(defaultTex);
+            AddInternal(left);
+            AddInternal(right);
+        }
+
+        private void OnSideChanged(Side side)
+        {
+            switch (side)
+            {
+                case Side.Both:
+                case Side.Random:
+                    // when both sides are used, the component should cover the entire screen.
+                    AutoSizeAxes = Axes.None;
+                    RelativeSizeAxes = Axes.Both;
+                    Position = new Vector2(0);
+                    Size = new Vector2(1, 1);
+                    break;
+
+                case Side.Left:
+                case Side.Right:
+                    RelativeSizeAxes = Axes.None;
+                    AutoSizeAxes = Axes.Both;
+                    break;
+            }
+
+            switch (side)
+            {
+                case Side.Both:
+                case Side.Random:
+                    left.FadeIn(500);
+                    right.FadeIn(500);
+                    break;
+
+                case Side.Left:
+                    left.FadeIn(500);
+                    right.FadeOut(500);
+                    break;
+
+                case Side.Right:
+                    left.FadeOut(500);
+                    right.FadeIn(500);
+                    break;
+            }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             Current.BindValueChanged(e => OnNewCombo(e.NewValue));
+            BurstsSide.BindValueChanged(e => OnSideChanged(e.NewValue), true);
         }
 
         private Sprite createSprite(Texture tex) => new Sprite
@@ -84,5 +171,13 @@ namespace osu.Game.Screens.Play.HUD
             Alpha = 0,
             AlwaysPresent = true, // needed to make the component having size in editor
         };
+
+        public enum Side
+        {
+            Left,
+            Right,
+            Both,
+            Random
+        }
     }
 }
