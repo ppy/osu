@@ -3,12 +3,12 @@
 
 using System;
 using Android.App;
+using Android.Content;
 using Android.OS;
 using osu.Framework.Allocation;
 using osu.Game;
 using osu.Game.Updater;
 using osu.Game.Utils;
-using Xamarin.Essentials;
 
 namespace osu.Android
 {
@@ -79,9 +79,42 @@ namespace osu.Android
 
         private class AndroidBatteryInfo : BatteryInfo
         {
-            public override double ChargeLevel => Battery.ChargeLevel;
+            // Code copied from Xamarin.Essentials
 
-            public override bool IsCharging => Battery.PowerSource != BatteryPowerSource.Battery;
+            // Mono debugger crashes on loading Realms
+            // when any other monoandroid dependency present.
+            // https://github.com/dotnet/runtime/issues/67140
+
+            public override double ChargeLevel
+            {
+                get
+                {
+                    using (IntentFilter filter = new IntentFilter("android.intent.action.BATTERY_CHANGED"))
+                    using (Intent battery = Application.Context.RegisterReceiver(null, filter))
+                    {
+                        int level = battery.GetIntExtra("level", -1);
+                        int scale = battery.GetIntExtra("scale", -1);
+                        if (scale <= 0)
+                        {
+                            return 1.0;
+                        }
+                        return level / scale;
+                    }
+                }
+            }
+
+            public override bool IsCharging
+            {
+                get
+                {
+                    using (IntentFilter filter = new IntentFilter("android.intent.action.BATTERY_CHANGED"))
+                    using (Intent battery = Application.Context.RegisterReceiver(null, filter))
+                    {
+                        int state = battery.GetIntExtra("plugged", -1);
+                        return state != 1 && state != 2 && state != 4;
+                    }
+                }
+            }
         }
     }
 }
