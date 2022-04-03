@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Utils
                 var current = workingObjects[i];
                 var hitObject = current.HitObject;
 
-                if (hitObject is Spinner)
+                if (hitObject is Spinner || current.PositionInfo.StayInPlace)
                 {
                     previous = current;
                     continue;
@@ -364,6 +364,12 @@ namespace osu.Game.Rulesets.Osu.Utils
             /// For hit circles and spinners, this property is ignored.
             /// </summary>
             public float Rotation { get; set; }
+
+            /// <summary>
+            /// Forces this object to never be moved by the generation algorithm.
+            /// Spinners ignore this property and are never moved.
+            /// </summary>
+            public bool StayInPlace { get; set; }
 
             /// <summary>
             /// The hit object associated with this <see cref="ObjectPositionInfo"/>.
