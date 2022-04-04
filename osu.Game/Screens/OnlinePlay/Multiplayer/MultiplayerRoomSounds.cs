@@ -37,21 +37,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
             base.UserJoined(user);
 
-            userJoinedSample?.Play();
+            Scheduler.AddOnce(() => userJoinedSample?.Play());
         }
 
         protected override void UserLeft(MultiplayerRoomUser user)
         {
             base.UserLeft(user);
 
-            userLeftSample?.Play();
+            Scheduler.AddOnce(() => userLeftSample?.Play());
         }
 
         protected override void UserKicked(MultiplayerRoomUser user)
         {
             base.UserKicked(user);
 
-            userKickedSample?.Play();
+            Scheduler.AddOnce(() => userKickedSample?.Play());
         }
 
         private void hostChanged(ValueChangedEvent<APIUser> value)
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // only play sound when the host changes from an already-existing host.
             if (value.OldValue == null) return;
 
-            hostChangedSample?.Play();
+            Scheduler.AddOnce(() => hostChangedSample?.Play());
         }
     }
 }

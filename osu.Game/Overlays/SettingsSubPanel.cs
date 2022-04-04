@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : SidebarButton
+        public class BackButton : SidebarButton
         {
             private Container content;
 
