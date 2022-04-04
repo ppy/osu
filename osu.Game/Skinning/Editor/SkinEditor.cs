@@ -197,13 +197,6 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.BindCollectionChanged((_, __) => Scheduler.AddOnce(populateSettings), true);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            game?.UnregisterImportHandler(this);
-        }
-
         public void UpdateTargetScreen(Drawable targetScreen)
         {
             this.targetScreen = targetScreen;
@@ -337,6 +330,8 @@ namespace osu.Game.Skinning.Editor
                 availableTargets.FirstOrDefault(t => t.Components.Contains(item))?.Remove(item);
         }
 
+        #region Drag & drop import handling
+
         public Task Import(params string[] paths)
         {
             Schedule(() =>
@@ -368,5 +363,14 @@ namespace osu.Game.Skinning.Editor
         public Task Import(params ImportTask[] tasks) => throw new NotImplementedException();
 
         public IEnumerable<string> HandledExtensions => new[] { ".jpg", ".jpeg", ".png" };
+
+        #endregion
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            game?.UnregisterImportHandler(this);
+        }
     }
 }
