@@ -117,8 +117,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
         {
             base.PlaylistItemChanged(item);
 
-            removeItemFromLists(item.ID);
-            addItemToLists(item);
+            var newApiItem = Playlist.SingleOrDefault(i => i.ID == item.ID);
+            var existingApiItemInQueue = queueList.Items.SingleOrDefault(i => i.ID == item.ID);
+
+            // Test if the only change between the two playlist items is the order.
+            if (newApiItem != null && existingApiItemInQueue != null && existingApiItemInQueue.With(playlistOrder: newApiItem.PlaylistOrder).Equals(newApiItem))
+            {
+                // Set the new playlist order directly without refreshing the DrawablePlaylistItem.
+                existingApiItemInQueue.PlaylistOrder = newApiItem.PlaylistOrder;
+
+                // The following isn't really required, but is here for safety and explicitness.
+                // MultiplayerQueueList internally binds to changes in Playlist to invalidate its own layout, which is mutated on every playlist operation.
+                queueList.Invalidate();
+            }
+            else
+            {
+                removeItemFromLists(item.ID);
+                addItemToLists(item);
+            }
         }
 
         private void addItemToLists(MultiplayerPlaylistItem item)
