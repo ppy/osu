@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestStateChange()
         {
             createScreen();
-            AddToggleStep("toggle state", visible => modSelectScreen.State.Value = visible ? Visibility.Visible : Visibility.Hidden);
+            AddStep("toggle state", () => modSelectScreen.ToggleVisibility());
         }
 
         [Test]
