@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
         private readonly Live<T> liveSource;
         private readonly IDisposable? realmSubscription;
 
-        public RealmBackedResourceStore(Live<T> source, IResourceStore<byte[]> underlyingStore, RealmAccess? realm)
+        public RealmBackedResourceStore(Live<T> source, IResourceStore<byte[]> underlyingStore, RealmAccess realm)
             : base(underlyingStore)
         {
             liveSource = source;
@@ -32,7 +32,7 @@ namespace osu.Game.Skinning
             invalidateCache();
             Debug.Assert(fileToStoragePathMapping != null);
 
-            realmSubscription = realm?.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == source.ID), skinChanged);
+            realmSubscription = realm.RegisterForNotifications(r => r.All<T>().Where(s => s.ID == source.ID), skinChanged);
         }
 
         protected override void Dispose(bool disposing)
