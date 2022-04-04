@@ -38,6 +38,9 @@ namespace osu.Game.Overlays.Mods
         private GridContainer grid;
         private Container mainContent;
 
+        private PopupScreenTitle header;
+        private Container footer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -67,7 +70,7 @@ namespace osu.Game.Overlays.Mods
                             {
                                 new Drawable[]
                                 {
-                                    new PopupScreenTitle
+                                    header = new PopupScreenTitle
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
@@ -96,7 +99,6 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         RelativePositionAxes = Axes.Both,
-                                        X = 1,
                                         Padding = new MarginPadding { Horizontal = 70 },
                                         Children = new Drawable[]
                                         {
@@ -126,7 +128,7 @@ namespace osu.Game.Overlays.Mods
                                 new[] { Empty() }
                             }
                         },
-                        new Container
+                        footer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -269,16 +271,26 @@ namespace osu.Game.Overlays.Mods
 
         protected override void PopIn()
         {
+            const double fade_in_duration = 500;
+
             base.PopIn();
-            this.MoveToY(0, 800, Easing.OutQuint);
-            columnContainer.MoveToX(0, 800, Easing.OutQuint);
+
+            header.MoveToY(0, fade_in_duration, Easing.OutQuint);
+            footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
+
+            this.FadeIn(fade_in_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
+            const double fade_out_duration = 500;
+
             base.PopOut();
-            this.MoveToY(1.2f, 800, Easing.OutQuint);
-            columnContainer.MoveToX(1, 800, Easing.OutQuint);
+
+            header.MoveToY(-header.DrawHeight, fade_out_duration, Easing.OutQuint);
+            footer.MoveToY(footer.DrawHeight, fade_out_duration, Easing.OutQuint);
+
+            this.FadeOut(fade_out_duration, Easing.OutQuint);
         }
 
         private class ModColumnContainer : FillFlowContainer<ModColumn>
