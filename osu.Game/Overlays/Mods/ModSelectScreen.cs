@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.Mods
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
+        protected override bool StartHidden => true;
+
         private readonly BindableBool customisationVisible = new BindableBool();
 
         private DifficultyMultiplierDisplay multiplierDisplay;
@@ -164,7 +166,8 @@ namespace osu.Game.Overlays.Mods
                 modSettingsArea = new ModSettingsArea
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Origin = Anchor.BottomCentre,
+                    Height = 0
                 }
             };
 
@@ -190,8 +193,6 @@ namespace osu.Game.Overlays.Mods
             }
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
-
-            FinishTransforms(true);
         }
 
         private void updateMultiplier()
