@@ -158,6 +158,13 @@ namespace osu.Game.Skinning
                     break;
             }
 
+            switch (component.LookupName)
+            {
+                // Temporary until default skin has a valid hit lighting.
+                case @"lighting":
+                    return Drawable.Empty();
+            }
+
             if (GetTexture(component.LookupName) is Texture t)
                 return new Sprite { Texture = t };
 
