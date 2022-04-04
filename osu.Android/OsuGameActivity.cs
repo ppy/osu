@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -79,6 +80,15 @@ namespace osu.Android
             bool isTablet = smallestWidthDp >= 600f;
 
             RequestedOrientation = DefaultOrientation = isTablet ? ScreenOrientation.FullUser : ScreenOrientation.SensorLandscape;
+
+            // Currently (SDK 6.0.200), BundleAssemblies is not runnable for net6-android.
+            // The assembly files are not available as files either after native AOT.
+            // Manually load them so that they can be loaded by RulesetStore.loadFromAppDomain.
+            // REMEMBER to fully uninstall previous version every time when investigating this!
+            Assembly.Load("osu.Game.Rulesets.Osu");
+            Assembly.Load("osu.Game.Rulesets.Taiko");
+            Assembly.Load("osu.Game.Rulesets.Catch");
+            Assembly.Load("osu.Game.Rulesets.Mania");
         }
 
         protected override void OnNewIntent(Intent intent) => handleIntent(intent);
