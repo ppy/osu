@@ -61,7 +61,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache, LazyThreadSafetyMode.ExecutionAndPublication);
+        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
 
         private Dictionary<string, string> initialiseFileCache() => liveSource.PerformRead(source =>
         {
