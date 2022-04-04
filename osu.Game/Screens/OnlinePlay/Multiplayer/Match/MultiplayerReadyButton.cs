@@ -47,17 +47,33 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 countdownChangeTime = DateTimeOffset.Now;
             }
 
+            scheduleNextCountdownUpdate();
+
+            updateButtonText();
+            updateButtonColour();
+        });
+
+        private void scheduleNextCountdownUpdate()
+        {
             if (countdown != null)
-                countdownUpdateDelegate ??= Scheduler.AddDelayed(updateButtonText, 100, true);
+            {
+                // If a countdown is active, schedule relevant components to update on the next whole second.
+                double timeToNextSecond = countdownTimeRemaining.TotalMilliseconds % 1000;
+
+                countdownUpdateDelegate = Scheduler.AddDelayed(onCountdownTick, timeToNextSecond);
+            }
             else
             {
                 countdownUpdateDelegate?.Cancel();
                 countdownUpdateDelegate = null;
             }
 
-            updateButtonText();
-            updateButtonColour();
-        });
+            void onCountdownTick()
+            {
+                updateButtonText();
+                scheduleNextCountdownUpdate();
+            }
+        }
 
         private void updateButtonText()
         {
@@ -75,15 +91,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             if (countdown != null)
             {
-                TimeSpan timeElapsed = DateTimeOffset.Now - countdownChangeTime;
-                TimeSpan countdownRemaining;
-
-                if (timeElapsed > countdown.TimeRemaining)
-                    countdownRemaining = TimeSpan.Zero;
-                else
-                    countdownRemaining = countdown.TimeRemaining - timeElapsed;
-
-                string countdownText = $"Starting in {countdownRemaining:mm\\:ss}";
+                string countdownText = $"Starting in {countdownTimeRemaining:mm\\:ss}";
 
                 switch (localUser?.State)
                 {
@@ -113,6 +121,22 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                         break;
                 }
+            }
+        }
+
+        private TimeSpan countdownTimeRemaining
+        {
+            get
+            {
+                TimeSpan timeElapsed = DateTimeOffset.Now - countdownChangeTime;
+                TimeSpan remaining;
+
+                if (timeElapsed > countdown.TimeRemaining)
+                    remaining = TimeSpan.Zero;
+                else
+                    remaining = countdown.TimeRemaining - timeElapsed;
+
+                return remaining;
             }
         }
 
