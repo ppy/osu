@@ -458,8 +458,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public async Task EditUserPlaylistItem(int userId, MultiplayerPlaylistItem item)
         {
             Debug.Assert(Room != null);
-            Debug.Assert(APIRoom != null);
             Debug.Assert(currentItem != null);
+            Debug.Assert(serverSideAPIRoom != null);
 
             item.OwnerID = userId;
 
@@ -478,6 +478,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             item.PlaylistOrder = existingItem.PlaylistOrder;
 
             serverSidePlaylist[serverSidePlaylist.IndexOf(existingItem)] = item;
+            serverSideAPIRoom.Playlist[serverSideAPIRoom.Playlist.IndexOf(serverSideAPIRoom.Playlist.Single(i => i.ID == item.ID))] = new PlaylistItem(item);
 
             await ((IMultiplayerClient)this).PlaylistItemChanged(item).ConfigureAwait(false);
         }
