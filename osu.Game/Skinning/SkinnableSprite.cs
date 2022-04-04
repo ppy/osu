@@ -6,9 +6,11 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osuTK;
 
@@ -55,13 +57,7 @@ namespace osu.Game.Skinning
             var texture = textures.Get(component.LookupName);
 
             if (texture == null)
-            {
-                return new SpriteIcon
-                {
-                    Size = new Vector2(100),
-                    Icon = FontAwesome.Solid.QuestionCircle
-                };
-            }
+                return new SpriteNotFound(component.LookupName);
 
             return new Sprite { Texture = texture };
         }
@@ -96,6 +92,29 @@ namespace osu.Game.Skinning
 
                 if (availableFiles?.Length > 0)
                     Items = availableFiles;
+            }
+        }
+
+        public class SpriteNotFound : CompositeDrawable
+        {
+            public SpriteNotFound(string lookup)
+            {
+                AutoSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Size = new Vector2(50),
+                        Icon = FontAwesome.Solid.QuestionCircle
+                    },
+                    new OsuSpriteText
+                    {
+                        Position = new Vector2(25, 50),
+                        Text = $"missing: {lookup}",
+                        Origin = Anchor.TopCentre,
+                    }
+                };
             }
         }
     }

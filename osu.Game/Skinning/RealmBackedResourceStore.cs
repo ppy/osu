@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
