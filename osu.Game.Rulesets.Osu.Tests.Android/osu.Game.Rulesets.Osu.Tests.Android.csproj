@@ -10,6 +10,12 @@
     <Compile Include="..\osu.Game.Rulesets.Osu.Tests\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <!-- TargetPath is relative to RootNamespace,
+         and DllResourceStore is relative to AssemblyName. -->
+    <EmbeddedResource Include="..\osu.Game.Rulesets.Osu.Tests\**\Resources\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <TargetPath>Android\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />

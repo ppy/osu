@@ -29,8 +29,7 @@
     <Compile Include="..\osu.Game.Tests\**\ScrollAlgorithms\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Visual\**\*.cs"
-             Exclude="..\osu.Game.Tests\Visual\Beatmaps\**\*.cs">
+    <Compile Include="..\osu.Game.Tests\**\Visual\**\*.cs" Exclude="..\osu.Game.Tests\Visual\Beatmaps\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <Compile Include="..\osu.Game.Tests\**\Resources\**\*.cs">
@@ -39,6 +38,12 @@
     <Compile Include="..\osu.Game.Tests\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <!-- TargetPath is relative to RootNamespace,
+         and DllResourceStore is relative to AssemblyName. -->
+    <EmbeddedResource Include="..\osu.Game.Tests\**\Resources\**\*">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <TargetPath>Android\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
