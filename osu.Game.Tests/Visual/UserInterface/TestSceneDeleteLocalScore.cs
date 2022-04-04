@@ -174,6 +174,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
             AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineID != scoreBeingDeleted.OnlineID));
+
+            // "Clean up"
+            AddStep("release left mouse button", () => InputManager.ReleaseButton(MouseButton.Left));
         }
 
         [Test]
