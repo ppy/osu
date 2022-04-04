@@ -169,7 +169,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("click delete button", () =>
             {
                 InputManager.MoveMouseTo(dialogOverlay.ChildrenOfType<DialogButton>().First());
-                InputManager.Click(MouseButton.Left);
+                InputManager.PressButton(MouseButton.Left);
             });
 
             AddUntilStep("wait for fetch", () => leaderboard.Scores != null);
