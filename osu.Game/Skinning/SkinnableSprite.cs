@@ -15,7 +15,7 @@ using osuTK;
 namespace osu.Game.Skinning
 {
     /// <summary>
-    /// A skinnable element which uses a stable sprite and can therefore share implementation logic.
+    /// A skinnable element which uses a single texture backing.
     /// </summary>
     public class SkinnableSprite : SkinnableDrawable, ISkinnableDrawable
     {
