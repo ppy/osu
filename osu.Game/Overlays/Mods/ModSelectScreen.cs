@@ -234,12 +234,14 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisationVisualState()
         {
-            grid.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, 800, Easing.OutQuint);
+            const double transition_duration = 700;
+
+            grid.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, transition_duration, Easing.InOutCubic);
 
             float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
 
-            modSettingsArea.ResizeHeightTo(modAreaHeight, 800, Easing.InOutCubic);
-            mainContent.TransformTo(nameof(Margin), new MarginPadding { Bottom = modAreaHeight }, 800, Easing.InOutCubic);
+            modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
+            mainContent.TransformTo(nameof(Margin), new MarginPadding { Bottom = modAreaHeight }, transition_duration, Easing.InOutCubic);
         }
 
         private bool selectionBindableSyncInProgress;
