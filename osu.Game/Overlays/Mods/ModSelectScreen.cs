@@ -33,7 +33,6 @@ namespace osu.Game.Overlays.Mods
 
         private DifficultyMultiplierDisplay multiplierDisplay;
         private ModSettingsArea modSettingsArea;
-        private Container columnContainer;
         private FillFlowContainer<ModColumn> columnFlow;
         private GridContainer grid;
         private Container mainContent;
@@ -95,7 +94,7 @@ namespace osu.Game.Overlays.Mods
                                 },
                                 new Drawable[]
                                 {
-                                    columnContainer = new Container
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         RelativePositionAxes = Axes.Both,
