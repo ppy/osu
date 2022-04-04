@@ -24,6 +24,7 @@ using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Utils;
 
 namespace osu.Game.Skinning
 {
@@ -144,20 +145,26 @@ namespace osu.Game.Skinning
                 if (!s.Protected)
                     return;
 
+                string[] existingSkinNames = realm.Run(r => r.All<SkinInfo>()
+                                                             .Where(skin => !skin.DeletePending)
+                                                             .AsEnumerable()
+                                                             .Select(skin => skin.Name).ToArray());
+
                 // if the user is attempting to save one of the default skin implementations, create a copy first.
-                var result = skinModelManager.Import(new SkinInfo
+                var skinInfo = new SkinInfo
                 {
-                    Name = s.Name + @" (modified)",
                     Creator = s.Creator,
                     InstantiationInfo = s.InstantiationInfo,
-                });
+                    Name = NamingUtils.GetNextBestName(existingSkinNames, $"{s.Name} (modified)")
+                };
+
+                var result = skinModelManager.Import(skinInfo);
 
                 if (result != null)
                 {
                     // save once to ensure the required json content is populated.
                     // currently this only happens on save.
                     result.PerformRead(skin => Save(skin.CreateInstance(this)));
-
                     CurrentSkinInfo.Value = result;
                 }
             });
