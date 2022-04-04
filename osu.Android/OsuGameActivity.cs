@@ -85,6 +85,7 @@ namespace osu.Android
             // The assembly files are not available as files either after native AOT.
             // Manually load them so that they can be loaded by RulesetStore.loadFromAppDomain.
             // REMEMBER to fully uninstall previous version every time when investigating this!
+            // Don't forget osu.Game.Tests.Android too.
             Assembly.Load("osu.Game.Rulesets.Osu");
             Assembly.Load("osu.Game.Rulesets.Taiko");
             Assembly.Load("osu.Game.Rulesets.Catch");
