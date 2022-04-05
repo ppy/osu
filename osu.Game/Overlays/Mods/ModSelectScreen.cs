@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Mods
                                                     RelativeSizeAxes = Axes.Y,
                                                     AutoSizeAxes = Axes.X,
                                                     Spacing = new Vector2(10, 0),
-                                                    Margin = new MarginPadding { Horizontal = 70 },
+                                                    Margin = new MarginPadding { Right = 70 },
                                                     Children = new[]
                                                     {
                                                         new ModColumn(ModType.DifficultyReduction, false, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
