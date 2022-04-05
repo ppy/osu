@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -23,6 +24,7 @@ using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Models;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
 
@@ -36,7 +38,7 @@ namespace osu.Game.Skinning
     /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
     [ExcludeFromDynamicCompile]
-    public class SkinManager : ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
+    public class SkinManager : ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>, IModelManager<SkinInfo>, IModelFileManager<SkinInfo, RealmNamedFileUsage>
     {
         private readonly AudioManager audio;
 
@@ -96,7 +98,10 @@ namespace osu.Game.Skinning
                 }
             });
 
-            CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
+            CurrentSkinInfo.ValueChanged += skin =>
+            {
+                CurrentSkin.Value = skin.NewValue.PerformRead(GetSkin);
+            };
 
             CurrentSkin.Value = DefaultSkin;
             CurrentSkin.ValueChanged += skin =>
@@ -313,5 +318,45 @@ namespace osu.Game.Skinning
         }
 
         #endregion
+
+        public bool Delete(SkinInfo item)
+        {
+            return skinModelManager.Delete(item);
+        }
+
+        public void Delete(List<SkinInfo> items, bool silent = false)
+        {
+            skinModelManager.Delete(items, silent);
+        }
+
+        public void Undelete(List<SkinInfo> items, bool silent = false)
+        {
+            skinModelManager.Undelete(items, silent);
+        }
+
+        public void Undelete(SkinInfo item)
+        {
+            skinModelManager.Undelete(item);
+        }
+
+        public bool IsAvailableLocally(SkinInfo model)
+        {
+            return skinModelManager.IsAvailableLocally(model);
+        }
+
+        public void ReplaceFile(SkinInfo model, RealmNamedFileUsage file, Stream contents)
+        {
+            skinModelManager.ReplaceFile(model, file, contents);
+        }
+
+        public void DeleteFile(SkinInfo model, RealmNamedFileUsage file)
+        {
+            skinModelManager.DeleteFile(model, file);
+        }
+
+        public void AddFile(SkinInfo model, Stream contents, string filename)
+        {
+            skinModelManager.AddFile(model, contents, filename);
+        }
     }
 }

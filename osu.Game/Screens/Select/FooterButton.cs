@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Select
 
         public virtual bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
                 TriggerClick();
                 return true;
