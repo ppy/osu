@@ -284,25 +284,25 @@ namespace osu.Game.Overlays.Mods
 
         protected override void PopIn()
         {
-            const double fade_in_duration = 500;
+            const double fade_in_duration = 400;
 
             base.PopIn();
+            this.FadeIn(fade_in_duration, Easing.OutQuint);
 
             header.MoveToY(0, fade_in_duration, Easing.OutQuint);
             footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
 
-            this.FadeIn(fade_in_duration, Easing.OutQuint);
-
             multiplierDisplay
-                .Delay(300)
-                .FadeIn(200, Easing.OutQuint)
+                .Delay(fade_in_duration * 0.65f)
+                .FadeIn(fade_in_duration / 2, Easing.OutQuint)
                 .ScaleTo(1, fade_in_duration, Easing.OutElastic);
 
             for (int i = 0; i < columnFlow.Count; i++)
             {
                 columnFlow[i].TopLevelContent
                              .Delay(i * 30)
-                             .MoveToY(0, fade_in_duration, Easing.OutQuint);
+                             .MoveToY(0, fade_in_duration, Easing.OutQuint)
+                             .FadeIn(fade_in_duration, Easing.OutQuint);
             }
         }
 
@@ -311,21 +311,22 @@ namespace osu.Game.Overlays.Mods
             const double fade_out_duration = 500;
 
             base.PopOut();
+            this.FadeOut(fade_out_duration, Easing.OutQuint);
 
             multiplierDisplay
-                .FadeOut(200, Easing.OutQuint)
+                .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
 
             header.MoveToY(-header.DrawHeight, fade_out_duration, Easing.OutQuint);
             footer.MoveToY(footer.DrawHeight, fade_out_duration, Easing.OutQuint);
 
-            this.FadeOut(fade_out_duration, Easing.OutQuint);
-
             for (int i = 0; i < columnFlow.Count; i++)
             {
                 const float distance = 700;
 
-                columnFlow[i].TopLevelContent.MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint);
+                columnFlow[i].TopLevelContent
+                             .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
+                             .FadeOut(fade_out_duration, Easing.OutQuint);
             }
         }
 
