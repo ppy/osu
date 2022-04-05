@@ -214,11 +214,11 @@ namespace osu.Game.Overlays.Mods
                 if (parentScrollContainer == null)
                     return base.OnScroll(e);
 
-                // If not on screen, handle scroll but also allow parent to scroll at the same time.
-                bool topRightOutsideOfView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.TopRight) == false;
-                bool bottomLeftOutsideOfView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.BottomLeft) == false;
+                bool topRightInView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.TopRight);
+                bool bottomLeftInView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.BottomLeft);
 
-                if (topRightOutsideOfView || bottomLeftOutsideOfView)
+                // If not completely on-screen, handle scroll but also allow parent to scroll at the same time (to hopefully bring our content into full view).
+                if (!topRightInView || !bottomLeftInView)
                 {
                     base.OnScroll(e);
                     return false;
@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Mods
                 bool scrollingPastEnd = e.ScrollDelta.Y < 0 && IsScrolledToEnd();
                 bool scrollingPastStart = e.ScrollDelta.Y > 0 && Target <= 0;
 
-                // Same deal if at one of the two extents of the view.
+                // If at either of our extents, allow the parent scroll to handle as a horizontal scroll to view more content.
                 if (scrollingPastStart || scrollingPastEnd)
                 {
                     base.OnScroll(e);
