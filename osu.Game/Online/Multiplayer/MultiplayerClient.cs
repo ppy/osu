@@ -401,19 +401,9 @@ namespace osu.Game.Online.Multiplayer
             });
         }
 
-        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) =>
-            handleUserLeft(user, UserLeft);
+        Task IMultiplayerClient.UserLeft(MultiplayerRoomUser user) => handleUserLeft(user, UserLeft);
 
-        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user)
-        {
-            if (LocalUser == null)
-                return Task.CompletedTask;
-
-            if (user.Equals(LocalUser))
-                LeaveRoom();
-
-            return handleUserLeft(user, UserKicked);
-        }
+        Task IMultiplayerClient.UserKicked(MultiplayerRoomUser user) => handleUserLeft(user, UserKicked);
 
         private void addUserToAPIRoom(MultiplayerRoomUser user)
         {
@@ -431,6 +421,9 @@ namespace osu.Game.Online.Multiplayer
         {
             if (Room == null)
                 return Task.CompletedTask;
+
+            if (user.Equals(LocalUser))
+                LeaveRoom();
 
             Scheduler.Add(() =>
             {
