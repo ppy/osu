@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         private const float middle_split = 0.025f;
 
+        public SkinnableDrawable Skinnable { get; private set; }
+
         [Cached]
         private DrumSampleTriggerSource sampleTriggerSource;
 
@@ -39,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Children = new Drawable[]
             {
-                new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
+                Skinnable = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.InputDrum), _ => new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
@@ -69,7 +71,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                             CentreAction = TaikoAction.RightCentre
                         }
                     }
-                }),
+                })
+                {
+                    CentreComponent = false,
+                },
                 sampleTriggerSource
             };
         }
