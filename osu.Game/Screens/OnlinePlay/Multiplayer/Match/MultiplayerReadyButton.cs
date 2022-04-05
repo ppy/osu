@@ -73,8 +73,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 // The remaining time on a countdown may be at a fractional portion between two seconds.
                 // We want to align certain audio/visual cues to the point at which integer seconds change.
-                // To do so, we schedule to the next whole second.
-                // Note that scheduler invocation isn't guaranteed to be accurate, so this may still occur slightly late.
+                // To do so, we schedule to the next whole second. Note that scheduler invocation isn't
+                // guaranteed to be accurate, so this may still occur slightly late, but even in such a case
+                // the next invocation will be roughly correct.
                 double timeToNextSecond = countdownTimeRemaining.TotalMilliseconds % 1000;
 
                 countdownUpdateDelegate = Scheduler.AddDelayed(onCountdownTick, timeToNextSecond);
