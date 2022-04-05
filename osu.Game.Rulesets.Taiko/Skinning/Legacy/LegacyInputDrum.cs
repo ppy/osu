@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
     {
         private LegacyHalfDrum left;
         private LegacyHalfDrum right;
-        private Container content;
 
         public LegacyInputDrum()
         {
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
-            Child = content = new Container
+            Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
