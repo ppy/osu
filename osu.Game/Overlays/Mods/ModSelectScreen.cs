@@ -110,6 +110,7 @@ namespace osu.Game.Overlays.Mods
                                                 ScrollbarOverlapsContent = false,
                                                 Child = columnFlow = new ModColumnContainer
                                                 {
+                                                    Direction = FillDirection.Horizontal,
                                                     RelativeSizeAxes = Axes.Y,
                                                     AutoSizeAxes = Axes.X,
                                                     Spacing = new Vector2(10, 0),
