@@ -84,13 +84,21 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     new Container
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding { Horizontal = 100, Vertical = 10 },
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        AutoSizeAxes = Axes.X,
+                                        RelativePositionAxes = Axes.X,
+                                        X = 0.3f,
+                                        Height = DifficultyMultiplierDisplay.HEIGHT,
+                                        Margin = new MarginPadding
+                                        {
+                                            Horizontal = 100,
+                                            Vertical = 10
+                                        },
                                         Child = multiplierDisplay = new DifficultyMultiplierDisplay
                                         {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre
                                         }
                                     }
                                 },
@@ -283,6 +291,11 @@ namespace osu.Game.Overlays.Mods
             footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
 
             this.FadeIn(fade_in_duration, Easing.OutQuint);
+
+            multiplierDisplay
+                .Delay(300)
+                .FadeIn(200, Easing.OutQuint)
+                .ScaleTo(1, fade_in_duration, Easing.OutElastic);
         }
 
         protected override void PopOut()
@@ -290,6 +303,10 @@ namespace osu.Game.Overlays.Mods
             const double fade_out_duration = 500;
 
             base.PopOut();
+
+            multiplierDisplay
+                .FadeOut(200, Easing.OutQuint)
+                .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
 
             header.MoveToY(-header.DrawHeight, fade_out_duration, Easing.OutQuint);
             footer.MoveToY(footer.DrawHeight, fade_out_duration, Easing.OutQuint);
