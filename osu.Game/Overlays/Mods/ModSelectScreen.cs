@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisationVisualState()
         {
-            const double transition_duration = 700;
+            const double transition_duration = 300;
 
             grid.FadeColour(customisationVisible.Value ? Colour4.Gray : Colour4.White, transition_duration, Easing.InOutCubic);
 
