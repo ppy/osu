@@ -98,16 +98,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             }
         }
 
-        private double? lastTickSampleTime;
-
         private void playTickSound(int secondsRemaining)
         {
-            // Simplified debounce. Ticks should only be played roughly once per second regardless of how often this function is called.
-            if (Time.Current - lastTickSampleTime < 500)
-                return;
-
-            lastTickSampleTime = Time.Current;
-
             if (secondsRemaining < 10) countdownTickSample?.Play();
             // disabled for now pending further work on sound effect
             // if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
