@@ -5,6 +5,8 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -27,6 +29,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         [CanBeNull]
         private MultiplayerRoom room => multiplayerClient.Room;
 
+        private Sample countdownTickSample;
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            // disabled for now pending further work on sound effect
+            // countdownTickFinalSample = audio.Samples.Get(@"Multiplayer/countdown-tick-final");
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -36,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         }
 
         private MultiplayerCountdown countdown;
-        private DateTimeOffset countdownChangeTime;
+        private double countdownChangeTime;
         private ScheduledDelegate countdownUpdateDelegate;
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
@@ -44,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (countdown != room?.Countdown)
             {
                 countdown = room?.Countdown;
-                countdownChangeTime = DateTimeOffset.Now;
+                countdownChangeTime = Time.Current;
             }
 
             scheduleNextCountdownUpdate();
@@ -55,9 +67,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void scheduleNextCountdownUpdate()
         {
+            countdownUpdateDelegate?.Cancel();
+
             if (countdown != null)
             {
-                // If a countdown is active, schedule relevant components to update on the next whole second.
+                // The remaining time on a countdown may be at a fractional portion between two seconds.
+                // We want to align certain audio/visual cues to the point at which integer seconds change.
+                // To do so, we schedule to the next whole second. Note that scheduler invocation isn't
+                // guaranteed to be accurate, so this may still occur slightly late, but even in such a case
+                // the next invocation will be roughly correct.
                 double timeToNextSecond = countdownTimeRemaining.TotalMilliseconds % 1000;
 
                 countdownUpdateDelegate = Scheduler.AddDelayed(onCountdownTick, timeToNextSecond);
@@ -71,8 +89,21 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             void onCountdownTick()
             {
                 updateButtonText();
-                scheduleNextCountdownUpdate();
+
+                int secondsRemaining = countdownTimeRemaining.Seconds;
+
+                playTickSound(secondsRemaining);
+
+                if (secondsRemaining > 0)
+                    scheduleNextCountdownUpdate();
             }
+        }
+
+        private void playTickSound(int secondsRemaining)
+        {
+            if (secondsRemaining < 10) countdownTickSample?.Play();
+            // disabled for now pending further work on sound effect
+            // if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
         }
 
         private void updateButtonText()
@@ -128,13 +159,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                TimeSpan timeElapsed = DateTimeOffset.Now - countdownChangeTime;
+                double timeElapsed = Time.Current - countdownChangeTime;
                 TimeSpan remaining;
 
-                if (timeElapsed > countdown.TimeRemaining)
+                if (timeElapsed > countdown.TimeRemaining.TotalMilliseconds)
                     remaining = TimeSpan.Zero;
                 else
-                    remaining = countdown.TimeRemaining - timeElapsed;
+                    remaining = countdown.TimeRemaining - TimeSpan.FromMilliseconds(timeElapsed);
 
                 return remaining;
             }
