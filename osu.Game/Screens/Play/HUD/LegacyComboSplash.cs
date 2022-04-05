@@ -51,12 +51,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (BurstCondition(combo))
             {
-                IEnumerable<Drawable> toShow;
-
-                if (BurstsSide.Value == Side.Random)
-                    toShow = new[] { InternalChildren[random.Next(0, InternalChildren.Count)] };
-                else
-                    toShow = InternalChildren;
+                IEnumerable<Drawable> toShow = BurstsSide.Value == Side.Random ? new[] { InternalChildren[random.Next(0, InternalChildren.Count)] } : InternalChildren;
 
                 foreach (var x in toShow)
                 {
@@ -77,25 +72,26 @@ namespace osu.Game.Screens.Play.HUD
 
             var c = new LegacyComboSplashComponent();
 
-            if (skin.GetDrawableComponent(c) is LegacyComboSplashSide side)
+            if (skin.GetDrawableComponent(c) is LegacyComboSplashSide side1)
             {
-                side.Origin = Anchor.CentreLeft;
-                side.Anchor = Anchor.CentreLeft;
-                left = side;
+                side1.Origin = Anchor.CentreLeft;
+                side1.Anchor = Anchor.CentreLeft;
+                left = side1;
                 Add(left);
+            }
+            else
+                Add(left = new Container<Sprite>());
 
-                side = (LegacyComboSplashSide)skin.GetDrawableComponent(c);
-                side.Origin = Anchor.CentreLeft;
-                side.Anchor = Anchor.CentreRight;
-                side.Scale = new Vector2(-1, 1);
-                right = side;
+            if (skin.GetDrawableComponent(c) is LegacyComboSplashSide side2)
+            {
+                side2.Origin = Anchor.CentreLeft;
+                side2.Anchor = Anchor.CentreRight;
+                side2.Scale = new Vector2(-1, 1);
+                right = side2;
                 Add(right);
             }
             else
-            {
-                Add(left = new Container<Sprite>());
                 Add(right = new Container<Sprite>());
-            }
         }
 
         private void OnSideChanged(Side side)
