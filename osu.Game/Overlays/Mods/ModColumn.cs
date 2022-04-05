@@ -195,63 +195,6 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        /// <summary>
-        /// A scroll container that handles the case of vertically scrolling content inside a larger horizontally scrolling parent container.
-        /// </summary>
-        private class NestedVerticalScrollContainer : OsuScrollContainer
-        {
-            private OsuScrollContainer? parentScrollContainer;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                parentScrollContainer = findClosestParent<OsuScrollContainer>();
-            }
-
-            protected override bool OnScroll(ScrollEvent e)
-            {
-                if (parentScrollContainer == null)
-                    return base.OnScroll(e);
-
-                bool topRightInView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.TopRight);
-                bool bottomLeftInView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.BottomLeft);
-
-                // If not completely on-screen, handle scroll but also allow parent to scroll at the same time (to hopefully bring our content into full view).
-                if (!topRightInView || !bottomLeftInView)
-                {
-                    base.OnScroll(e);
-                    return false;
-                }
-
-                bool scrollingPastEnd = e.ScrollDelta.Y < 0 && IsScrolledToEnd();
-                bool scrollingPastStart = e.ScrollDelta.Y > 0 && Target <= 0;
-
-                // If at either of our extents, allow the parent scroll to handle as a horizontal scroll to view more content.
-                if (scrollingPastStart || scrollingPastEnd)
-                {
-                    base.OnScroll(e);
-                    return false;
-                }
-
-                return base.OnScroll(e);
-            }
-
-            // TODO: remove when https://github.com/ppy/osu-framework/pull/5092 is available.
-            private T? findClosestParent<T>() where T : class, IDrawable
-            {
-                Drawable cursor = this;
-
-                while ((cursor = cursor.Parent) != null)
-                {
-                    if (cursor is T match)
-                        return match;
-                }
-
-                return default;
-            }
-        }
-
         private void createHeaderText()
         {
             IEnumerable<string> headerTextWords = ModType.Humanize(LetterCasing.Title).Split(' ');
