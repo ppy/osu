@@ -54,6 +54,8 @@ namespace osu.Game.Skinning
             where TLookup : notnull
             where TValue : notnull;
 
+        private readonly RealmBackedResourceStore<SkinInfo>? realmBackedStorage;
+
         /// <summary>
         /// Construct a new skin.
         /// </summary>
@@ -67,7 +69,9 @@ namespace osu.Game.Skinning
             {
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
-                storage ??= new RealmBackedResourceStore(skin, resources.Files, new[] { @"ogg" });
+                storage ??= realmBackedStorage = new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess);
+
+                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
 
                 var samples = resources.AudioManager?.GetSampleStore(storage);
                 if (samples != null)
@@ -191,6 +195,8 @@ namespace osu.Game.Skinning
 
             Textures?.Dispose();
             Samples?.Dispose();
+
+            realmBackedStorage?.Dispose();
         }
 
         #endregion

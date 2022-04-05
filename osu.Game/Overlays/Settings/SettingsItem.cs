@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
@@ -23,6 +24,11 @@ namespace osu.Game.Overlays.Settings
         protected abstract Drawable CreateControl();
 
         protected Drawable Control { get; }
+
+        /// <summary>
+        /// The source component if this <see cref="SettingsItem{T}"/> was created via <see cref="SettingSourceAttribute"/>.
+        /// </summary>
+        public object SettingSourceObject { get; internal set; }
 
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
