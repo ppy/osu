@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
         public LegacyInputDrum()
         {
-            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(180, 200);
         }
 
         [BackgroundDependencyLoader]
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
         {
             Child = content = new Container
             {
-                Size = new Vector2(180, 200),
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     new Sprite
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
             const float ratio = 1.6f;
 
             // because the right half is flipped, we need to position using width - position to get the true "topleft" origin position
-            float negativeScaleAdjust = content.Width / ratio;
+            float negativeScaleAdjust = Width / ratio;
 
             if (skin.GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value >= 2.1m)
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
             // Relying on RelativeSizeAxes.Both + FillMode.Fit doesn't work due to the precise pixel layout requirements.
             // This is a bit ugly but makes the non-legacy implementations a lot cleaner to implement.
-            content.Scale = new Vector2(DrawHeight / content.Size.Y);
+            Scale = new Vector2(Parent.DrawHeight / Size.Y);
         }
 
         /// <summary>
