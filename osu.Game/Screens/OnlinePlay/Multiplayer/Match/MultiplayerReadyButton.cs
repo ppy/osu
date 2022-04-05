@@ -30,13 +30,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private MultiplayerRoom room => multiplayerClient.Room;
 
         private Sample countdownTickSample;
-        private Sample countdownTickFinalSample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
-            countdownTickFinalSample = audio.Samples.Get(@"Multiplayer/countdown-tick-final");
+            // disabled for now pending further work on sound effect
+            // countdownTickFinalSample = audio.Samples.Get(@"Multiplayer/countdown-tick-final");
         }
 
         protected override void LoadComplete()
