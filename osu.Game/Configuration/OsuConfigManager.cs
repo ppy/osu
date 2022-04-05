@@ -102,6 +102,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuParallax, true);
 
+            SetDefault(OsuSetting.Prefer24HourTime, false);
+
             // Gameplay
             SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
@@ -287,6 +289,7 @@ namespace osu.Game.Configuration
         MenuVoice,
         CursorRotation,
         MenuParallax,
+        Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
         Username,
