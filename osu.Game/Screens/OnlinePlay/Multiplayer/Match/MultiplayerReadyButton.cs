@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         }
 
         private MultiplayerCountdown countdown;
-        private DateTimeOffset countdownChangeTime;
+        private double countdownChangeTime;
         private ScheduledDelegate countdownUpdateDelegate;
 
         private void onRoomUpdated() => Scheduler.AddOnce(() =>
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             if (countdown != room?.Countdown)
             {
                 countdown = room?.Countdown;
-                countdownChangeTime = DateTimeOffset.Now;
+                countdownChangeTime = Time.Current;
             }
 
             scheduleNextCountdownUpdate();
@@ -86,11 +86,25 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 int secondsRemaining = countdownTimeRemaining.Seconds;
 
-                if (secondsRemaining < 10) countdownTickSample?.Play();
-                if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
+                playTickSound(secondsRemaining);
 
-                scheduleNextCountdownUpdate();
+                if (secondsRemaining > 0)
+                    scheduleNextCountdownUpdate();
             }
+        }
+
+        private double? lastTickSampleTime;
+
+        private void playTickSound(int secondsRemaining)
+        {
+            // Simplified debounce. Ticks should only be played roughly once per second regardless of how often this function is called.
+            if (Time.Current - lastTickSampleTime < 500)
+                return;
+
+            lastTickSampleTime = Time.Current;
+
+            if (secondsRemaining < 10) countdownTickSample?.Play();
+            if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
         }
 
         private void updateButtonText()
@@ -146,13 +160,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         {
             get
             {
-                TimeSpan timeElapsed = DateTimeOffset.Now - countdownChangeTime;
+                double timeElapsed = Time.Current - countdownChangeTime;
                 TimeSpan remaining;
 
-                if (timeElapsed > countdown.TimeRemaining)
+                if (timeElapsed > countdown.TimeRemaining.TotalMilliseconds)
                     remaining = TimeSpan.Zero;
                 else
-                    remaining = countdown.TimeRemaining - timeElapsed;
+                    remaining = countdown.TimeRemaining - TimeSpan.FromMilliseconds(timeElapsed);
 
                 return remaining;
             }
