@@ -31,6 +31,8 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModColumn : CompositeDrawable
     {
+        public readonly Container TopLevelContent;
+
         public readonly ModType ModType;
 
         private Func<Mod, bool>? filter;
@@ -78,90 +80,97 @@ namespace osu.Game.Overlays.Mods
             Width = 320;
             RelativeSizeAxes = Axes.Y;
             Shear = new Vector2(ModPanel.SHEAR_X, 0);
-            CornerRadius = ModPanel.CORNER_RADIUS;
-            Masking = true;
 
             Container controlContainer;
             InternalChildren = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = header_height + ModPanel.CORNER_RADIUS,
-                    Children = new Drawable[]
-                    {
-                        headerBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = header_height + ModPanel.CORNER_RADIUS
-                        },
-                        headerText = new OsuTextFlowContainer(t =>
-                        {
-                            t.Font = OsuFont.TorusAlternate.With(size: 17);
-                            t.Shadow = false;
-                            t.Colour = Colour4.Black;
-                        })
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Shear = new Vector2(-ModPanel.SHEAR_X, 0),
-                            Padding = new MarginPadding
-                            {
-                                Horizontal = 17,
-                                Bottom = ModPanel.CORNER_RADIUS
-                            }
-                        }
-                    }
-                },
-                new Container
+                TopLevelContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = header_height },
-                    Child = contentContainer = new Container
+                    CornerRadius = ModPanel.CORNER_RADIUS,
+                    Masking = true,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = ModPanel.CORNER_RADIUS,
-                        BorderThickness = 3,
-                        Children = new Drawable[]
+                        new Container
                         {
-                            contentBackground = new Box
+                            RelativeSizeAxes = Axes.X,
+                            Height = header_height + ModPanel.CORNER_RADIUS,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            new GridContainer
+                                headerBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = header_height + ModPanel.CORNER_RADIUS
+                                },
+                                headerText = new OsuTextFlowContainer(t =>
+                                {
+                                    t.Font = OsuFont.TorusAlternate.With(size: 17);
+                                    t.Shadow = false;
+                                    t.Colour = Colour4.Black;
+                                })
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Shear = new Vector2(-ModPanel.SHEAR_X, 0),
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = 17,
+                                        Bottom = ModPanel.CORNER_RADIUS
+                                    }
+                                }
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = header_height },
+                            Child = contentContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RowDimensions = new[]
+                                Masking = true,
+                                CornerRadius = ModPanel.CORNER_RADIUS,
+                                BorderThickness = 3,
+                                Children = new Drawable[]
                                 {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension()
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    contentBackground = new Box
                                     {
-                                        controlContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Padding = new MarginPadding { Horizontal = 14 }
-                                        }
+                                        RelativeSizeAxes = Axes.Both
                                     },
-                                    new Drawable[]
+                                    new GridContainer
                                     {
-                                        new NestedVerticalScrollContainer
+                                        RelativeSizeAxes = Axes.Both,
+                                        RowDimensions = new[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            ClampExtension = 100,
-                                            ScrollbarOverlapsContent = false,
-                                            Child = panelFlow = new FillFlowContainer<ModPanel>
+                                            new Dimension(GridSizeMode.AutoSize),
+                                            new Dimension()
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Spacing = new Vector2(0, 7),
-                                                Padding = new MarginPadding(7)
+                                                controlContainer = new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Padding = new MarginPadding { Horizontal = 14 }
+                                                }
+                                            },
+                                            new Drawable[]
+                                            {
+                                                new NestedVerticalScrollContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    ClampExtension = 100,
+                                                    ScrollbarOverlapsContent = false,
+                                                    Child = panelFlow = new FillFlowContainer<ModPanel>
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Spacing = new Vector2(0, 7),
+                                                        Padding = new MarginPadding(7)
+                                                    }
+                                                }
                                             }
                                         }
                                     }

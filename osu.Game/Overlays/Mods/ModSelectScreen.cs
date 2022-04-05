@@ -106,6 +106,7 @@ namespace osu.Game.Overlays.Mods
                                 {
                                     new Container
                                     {
+                                        Depth = float.MaxValue,
                                         RelativeSizeAxes = Axes.Both,
                                         RelativePositionAxes = Axes.Both,
                                         Children = new Drawable[]
@@ -296,6 +297,13 @@ namespace osu.Game.Overlays.Mods
                 .Delay(300)
                 .FadeIn(200, Easing.OutQuint)
                 .ScaleTo(1, fade_in_duration, Easing.OutElastic);
+
+            for (int i = 0; i < columnFlow.Count; i++)
+            {
+                columnFlow[i].TopLevelContent
+                             .Delay(i * 30)
+                             .MoveToY(0, fade_in_duration, Easing.OutQuint);
+            }
         }
 
         protected override void PopOut()
@@ -312,6 +320,13 @@ namespace osu.Game.Overlays.Mods
             footer.MoveToY(footer.DrawHeight, fade_out_duration, Easing.OutQuint);
 
             this.FadeOut(fade_out_duration, Easing.OutQuint);
+
+            for (int i = 0; i < columnFlow.Count; i++)
+            {
+                const float distance = 700;
+
+                columnFlow[i].TopLevelContent.MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint);
+            }
         }
 
         private class ModColumnContainer : FillFlowContainer<ModColumn>
