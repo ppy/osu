@@ -247,7 +247,7 @@ namespace osu.Game.Skinning.Editor
             placeComponent(component);
         }
 
-        private void placeComponent(ISkinnableDrawable component)
+        private void placeComponent(ISkinnableDrawable component, bool applyDefaults = true)
         {
             var targetContainer = getFirstTarget();
 
@@ -256,10 +256,13 @@ namespace osu.Game.Skinning.Editor
 
             var drawableComponent = (Drawable)component;
 
-            // give newly added components a sane starting location.
-            drawableComponent.Origin = Anchor.TopCentre;
-            drawableComponent.Anchor = Anchor.TopCentre;
-            drawableComponent.Y = targetContainer.DrawSize.Y / 2;
+            if (applyDefaults)
+            {
+                // give newly added components a sane starting location.
+                drawableComponent.Origin = Anchor.TopCentre;
+                drawableComponent.Anchor = Anchor.TopCentre;
+                drawableComponent.Y = targetContainer.DrawSize.Y / 2;
+            }
 
             targetContainer.Add(component);
 
@@ -351,10 +354,16 @@ namespace osu.Game.Skinning.Editor
                 realm.Run(r => r.Refresh());
 
                 // place component
-                placeComponent(new SkinnableSprite
+                var sprite = new SkinnableSprite
                 {
-                    SpriteName = { Value = file.Name }
-                });
+                    SpriteName = { Value = file.Name },
+                    Origin = Anchor.Centre,
+                    Position = getFirstTarget().ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position),
+                };
+
+                placeComponent(sprite, false);
+
+                SkinSelectionHandler.ApplyClosestAnchor(sprite);
             });
 
             return Task.CompletedTask;
