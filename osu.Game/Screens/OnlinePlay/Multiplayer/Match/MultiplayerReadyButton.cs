@@ -104,7 +104,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             lastTickSampleTime = Time.Current;
 
             if (secondsRemaining < 10) countdownTickSample?.Play();
-            if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
+            // disabled for now pending further work on sound effect
+            // if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
         }
 
         private void updateButtonText()
