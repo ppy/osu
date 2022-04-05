@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (e.Action == Hotkey)
+            if (e.Action == Hotkey && !e.Repeat)
             {
                 TriggerClick();
                 return true;

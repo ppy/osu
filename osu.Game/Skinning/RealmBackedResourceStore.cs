@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
@@ -61,7 +60,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache, LazyThreadSafetyMode.ExecutionAndPublication);
+        private void invalidateCache() => fileToStoragePathMapping = new Lazy<Dictionary<string, string>>(initialiseFileCache);
 
         private Dictionary<string, string> initialiseFileCache() => liveSource.PerformRead(source =>
         {
