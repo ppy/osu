@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public class TestSceneMatchStartControl : MultiplayerTestScene
     {
         private MatchStartControl control;
+        private OsuButton abortGameplayButton;
         private BeatmapSetInfo importedSet;
 
         private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
@@ -63,14 +64,49 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Child = new PopoverContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = control = new MatchStartControl
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(250, 50),
+                    control = new MatchStartControl
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(250, 50),
+                    },
+                    abortGameplayButton = new OsuButton
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(250, 50),
+                        Y = 60,
+                        Text = "Abort gameplay",
+                        Action = () => MultiplayerClient?.AbortGameplay()
+                    }
                 }
             };
         });
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (abortGameplayButton != null)
+            {
+                switch (MultiplayerClient?.LocalUser?.State)
+                {
+                    case MultiplayerUserState.WaitingForLoad:
+                    case MultiplayerUserState.Loaded:
+                    case MultiplayerUserState.Playing:
+                    case MultiplayerUserState.FinishedPlay:
+                    case MultiplayerUserState.Results:
+                        abortGameplayButton.Enabled.Value = true;
+                        break;
+
+                    default:
+                        abortGameplayButton.Enabled.Value = false;
+                        break;
+                }
+            }
+        }
 
         [Test]
         public void TestStartWithCountdown()
