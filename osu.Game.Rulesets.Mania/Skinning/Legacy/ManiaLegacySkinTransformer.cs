@@ -137,6 +137,9 @@ namespace osu.Game.Rulesets.Mania.Skinning.Legacy
                     }
 
                     break;
+
+                case LegacyComboSplash.LegacyComboSplashComponent _:
+                    return new LegacyComboSplash.LegacyComboSplashSide("comboburst-mania");
             }
 
             return base.GetDrawableComponent(component);

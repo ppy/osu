@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -125,6 +126,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                         return new LegacyApproachCircle();
                 }
             }
+
+            if (component is LegacyComboSplash.LegacyComboSplashComponent)
+                return new LegacyComboSplash.LegacyComboSplashSide("comboburst");
 
             return base.GetDrawableComponent(component);
         }

@@ -93,6 +93,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                 }
             }
 
+            if (component is LegacyComboSplash.LegacyComboSplashComponent)
+                return new LegacyComboSplash.LegacyComboSplashSide("comboburst-fruits");
+
             return base.GetDrawableComponent(component);
         }
 
