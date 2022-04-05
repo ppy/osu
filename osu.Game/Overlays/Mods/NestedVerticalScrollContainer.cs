@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
-            parentScrollContainer = findClosestParent<OsuScrollContainer>();
+            parentScrollContainer = this.FindClosestParent<OsuScrollContainer>();
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -42,20 +42,6 @@ namespace osu.Game.Overlays.Mods
                 return false;
 
             return base.OnScroll(e);
-        }
-
-        // TODO: remove when https://github.com/ppy/osu-framework/pull/5092 is available.
-        private T? findClosestParent<T>() where T : class, IDrawable
-        {
-            Drawable cursor = this;
-
-            while ((cursor = cursor.Parent) != null)
-            {
-                if (cursor is T match)
-                    return match;
-            }
-
-            return default;
         }
     }
 }
