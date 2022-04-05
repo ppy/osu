@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -83,7 +84,7 @@ namespace osu.Game.Skinning
                 // Round-about way of getting the user's skin to find available resources.
                 // In the future we'll probably want to allow access to resources from the fallbacks, or potentially other skins
                 // but that requires further thought.
-                var highestPrioritySkin = ((SkinnableSprite)SettingSourceObject).source.AllSources.First() as Skin;
+                var highestPrioritySkin = getHighestPriorityUserSkin(((SkinnableSprite)SettingSourceObject).source.AllSources) as Skin;
 
                 string[] availableFiles = highestPrioritySkin?.SkinInfo.PerformRead(s => s.Files
                                                                                           .Where(f => f.Filename.EndsWith(".png", StringComparison.Ordinal)
@@ -92,6 +93,26 @@ namespace osu.Game.Skinning
 
                 if (availableFiles?.Length > 0)
                     Items = availableFiles;
+
+                static ISkin getHighestPriorityUserSkin(IEnumerable<ISkin> skins)
+                {
+                    foreach (var skin in skins)
+                    {
+                        if (skin is LegacySkinTransformer transformer && isUserSkin(transformer.Skin))
+                            return transformer.Skin;
+
+                        if (isUserSkin(skin))
+                            return skin;
+                    }
+
+                    return null;
+                }
+
+                // Temporarily used to exclude undesirable ISkin implementations
+                static bool isUserSkin(ISkin skin)
+                    => skin.GetType() == typeof(DefaultSkin)
+                       || skin.GetType() == typeof(DefaultLegacySkin)
+                       || skin.GetType() == typeof(LegacySkin);
             }
         }
 
