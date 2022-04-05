@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
@@ -46,13 +47,13 @@ namespace osu.Game.Skinning
             this.resources = resources;
         }
 
-        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
+        public override Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => Textures?.Get(componentName, wrapModeS, wrapModeT);
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
             foreach (string lookup in sampleInfo.LookupNames)
             {
-                var sample = resources.AudioManager.Samples.Get(lookup);
+                var sample = Samples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
                 if (sample != null)
                     return sample;
             }
@@ -156,6 +157,16 @@ namespace osu.Game.Skinning
 
                     break;
             }
+
+            switch (component.LookupName)
+            {
+                // Temporary until default skin has a valid hit lighting.
+                case @"lighting":
+                    return Drawable.Empty();
+            }
+
+            if (GetTexture(component.LookupName) is Texture t)
+                return new Sprite { Texture = t };
 
             return null;
         }
