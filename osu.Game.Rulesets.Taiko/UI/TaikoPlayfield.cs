@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Container leftArea = null;
+            Container leftArea;
 
             InternalChildren = new[]
             {
