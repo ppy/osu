@@ -25,11 +25,6 @@ namespace osu.Game.Localisation
         public static LocalisableString CursorRotation => new TranslatableString(getKey(@"cursor_rotation"), @"Rotate cursor when dragging");
 
         /// <summary>
-        /// "Prefer 24-hour time"
-        /// </summary>
-        public static LocalisableString Prefer24HourTime => new TranslatableString(getKey(@"prefer_24_hour_time"), @"Prefer 24-hour time");
-
-        /// <summary>
         /// "Menu cursor size"
         /// </summary>
         public static LocalisableString MenuCursorSize => new TranslatableString(getKey(@"menu_cursor_size"), @"Menu cursor size");
