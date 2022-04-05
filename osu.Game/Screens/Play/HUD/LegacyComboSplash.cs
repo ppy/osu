@@ -75,46 +75,27 @@ namespace osu.Game.Screens.Play.HUD
         {
             Current.BindTo(scoreProcessor.Combo);
 
-            left = new Container<Sprite>
-            {
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-                AutoSizeAxes = Axes.Both,
-            };
-            right = new Container<Sprite>
-            {
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreRight,
-                AutoSizeAxes = Axes.Both,
-                Scale = new Vector2(-1, 1)
-            };
+            var c = new LegacyComboSplashComponent();
 
-            if (skin.GetTexture("comboburst-0") != null)
+            if (skin.GetDrawableComponent(c) is LegacyComboSplashSide side)
             {
-                // loading comboburst-{n}.png files
-                for (int i = 0;; i++)
-                {
-                    var tex = skin.GetTexture($"comboburst-{i}");
-                    if (tex == null)
-                        break;
+                side.Origin = Anchor.CentreLeft;
+                side.Anchor = Anchor.CentreLeft;
+                left = side;
+                Add(left);
 
-                    left.Add(createSprite(tex));
-                    right.Add(createSprite(tex));
-                }
+                side = (LegacyComboSplashSide)skin.GetDrawableComponent(c);
+                side.Origin = Anchor.CentreLeft;
+                side.Anchor = Anchor.CentreRight;
+                side.Scale = new Vector2(-1, 1);
+                right = side;
+                Add(right);
             }
             else
             {
-                var defaultTex = skin.GetTexture("comboburst");
-
-                if (defaultTex != null)
-                {
-                    left.Add(createSprite(defaultTex));
-                    right.Add(createSprite(defaultTex));
-                }
+                Add(left = new Container<Sprite>());
+                Add(right = new Container<Sprite>());
             }
-
-            Add(left);
-            Add(right);
         }
 
         private void OnSideChanged(Side side)
@@ -169,19 +150,61 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private Sprite createSprite(Texture tex) => new Sprite
-        {
-            Texture = tex,
-            Alpha = 0,
-            AlwaysPresent = true, // needed to make the component having size in editor
-        };
-
         public enum Side
         {
             Left,
             Right,
             Both,
             Random
+        }
+
+        public class LegacyComboSplashComponent : ISkinComponent
+        {
+            public string LookupName => "comboburst";
+        }
+
+        public class LegacyComboSplashSide : Container<Sprite>
+        {
+            public LegacyComboSplashSide(string spriteName)
+            {
+                this.spriteName = spriteName;
+                AutoSizeAxes = Axes.Both;
+            }
+
+            private readonly string spriteName;
+
+            [BackgroundDependencyLoader]
+            private void load(ISkinSource skin)
+            {
+                if (skin.GetTexture($"{spriteName}-0") != null)
+                {
+                    // loading comboburst-{n}.png files
+                    for (int i = 0;; i++)
+                    {
+                        var tex = skin.GetTexture($"{spriteName}-{i}");
+                        if (tex == null)
+                            break;
+
+                        Add(createSprite(tex));
+                    }
+
+                    return;
+                }
+
+                var defaultTex = skin.GetTexture(spriteName);
+
+                if (defaultTex != null)
+                {
+                    Add(createSprite(defaultTex));
+                }
+            }
+
+            private Sprite createSprite(Texture tex) => new Sprite
+            {
+                Texture = tex,
+                Alpha = 0,
+                AlwaysPresent = true, // needed to make the component having size in editor
+            };
         }
     }
 }
