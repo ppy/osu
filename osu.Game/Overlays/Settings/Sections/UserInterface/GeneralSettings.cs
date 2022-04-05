@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = UserInterfaceStrings.Prefer24HourTime,
+                    Current = config.GetBindable<bool>(OsuSetting.Prefer24HourTime)
+                },
             };
         }
     }
