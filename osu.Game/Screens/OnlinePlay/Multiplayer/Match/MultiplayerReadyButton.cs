@@ -67,9 +67,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
         private void scheduleNextCountdownUpdate()
         {
+            countdownUpdateDelegate?.Cancel();
+
             if (countdown != null)
             {
-                // If a countdown is active, schedule relevant components to update on the next whole second.
+                // The remaining time on a countdown may be at a fractional portion between two seconds.
+                // We want to align certain audio/visual cues to the point at which integer seconds change.
+                // To do so, we schedule to the next whole second.
+                // Note that scheduler invocation isn't guaranteed to be accurate, so this may still occur slightly late.
                 double timeToNextSecond = countdownTimeRemaining.TotalMilliseconds % 1000;
 
                 countdownUpdateDelegate = Scheduler.AddDelayed(onCountdownTick, timeToNextSecond);
