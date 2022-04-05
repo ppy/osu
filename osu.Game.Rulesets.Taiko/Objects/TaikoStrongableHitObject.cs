@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// <summary>
         /// Scale multiplier for a strong drawable taiko hit object.
         /// </summary>
-        public const float STRONG_SCALE = 1.525f;
+        public const float STRONG_SCALE = 1 / 0.65f;
 
         /// <summary>
         /// Default size of a strong drawable taiko hit object.
