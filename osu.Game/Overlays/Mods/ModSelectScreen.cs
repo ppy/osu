@@ -106,6 +106,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Masking = false,
+                                                ClampExtension = 100,
                                                 ScrollbarOverlapsContent = false,
                                                 Child = columnFlow = new ModColumnContainer
                                                 {

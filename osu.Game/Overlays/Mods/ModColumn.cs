@@ -151,9 +151,10 @@ namespace osu.Game.Overlays.Mods
                                     },
                                     new Drawable[]
                                     {
-                                        new OsuScrollContainer
+                                        new NestedVerticalScrollContainer
                                         {
                                             RelativeSizeAxes = Axes.Both,
+                                            ClampExtension = 100,
                                             ScrollbarOverlapsContent = false,
                                             Child = panelFlow = new FillFlowContainer<ModPanel>
                                             {
@@ -191,6 +192,63 @@ namespace osu.Game.Overlays.Mods
                     Bottom = 7,
                     Horizontal = 7
                 };
+            }
+        }
+
+        /// <summary>
+        /// A scroll container that handles the case of vertically scrolling content inside a larger horizontally scrolling parent container.
+        /// </summary>
+        private class NestedVerticalScrollContainer : OsuScrollContainer
+        {
+            private OsuScrollContainer? parentScrollContainer;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                parentScrollContainer = findClosestParent<OsuScrollContainer>();
+            }
+
+            protected override bool OnScroll(ScrollEvent e)
+            {
+                if (parentScrollContainer == null)
+                    return base.OnScroll(e);
+
+                // If not on screen, handle scroll but also allow parent to scroll at the same time.
+                bool topRightOutsideOfView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.TopRight) == false;
+                bool bottomLeftOutsideOfView = parentScrollContainer.ScreenSpaceDrawQuad.Contains(ScreenSpaceDrawQuad.BottomLeft) == false;
+
+                if (topRightOutsideOfView || bottomLeftOutsideOfView)
+                {
+                    base.OnScroll(e);
+                    return false;
+                }
+
+                bool scrollingPastEnd = e.ScrollDelta.Y < 0 && IsScrolledToEnd();
+                bool scrollingPastStart = e.ScrollDelta.Y > 0 && Target <= 0;
+
+                // Same deal if at one of the two extents of the view.
+                if (scrollingPastStart || scrollingPastEnd)
+                {
+                    base.OnScroll(e);
+                    return false;
+                }
+
+                return base.OnScroll(e);
+            }
+
+            // TODO: remove when https://github.com/ppy/osu-framework/pull/5092 is available.
+            private T? findClosestParent<T>() where T : class, IDrawable
+            {
+                Drawable cursor = this;
+
+                while ((cursor = cursor.Parent) != null)
+                {
+                    if (cursor is T match)
+                        return match;
+                }
+
+                return default;
             }
         }
 
