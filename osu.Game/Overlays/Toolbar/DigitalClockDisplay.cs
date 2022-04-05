@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
+        private bool format12H = true;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -50,13 +52,17 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = $"{now:HH:mm:ss}";
+            realTime.Text = format12H ? $"{now:hh:mm:ss tt}" : $"{now:HH:mm:ss}";
             gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
         private void updateMetrics()
         {
-            Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+            if (format12H)
+                Width = 74;
+            else
+                Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+
             gameTime.FadeTo(showRuntime ? 1 : 0);
         }
     }
