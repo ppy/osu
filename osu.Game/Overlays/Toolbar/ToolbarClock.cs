@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Toolbar
         private Box hoverBackground;
         private Box flashBackground;
 
+        private DigitalClockDisplay digital12h;
         private DigitalClockDisplay digital;
         private AnalogClockDisplay analog;
 
@@ -73,6 +74,11 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
+                        },
+                        digital12h = new DigitalClockDisplay(true)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
                         }
                     }
                 }
@@ -85,12 +91,16 @@ namespace osu.Game.Overlays.Toolbar
 
             clockDisplayMode.BindValueChanged(displayMode =>
             {
-                bool showAnalog = displayMode.NewValue == ToolbarClockDisplayMode.Analog || displayMode.NewValue == ToolbarClockDisplayMode.Full;
-                bool showDigital = displayMode.NewValue != ToolbarClockDisplayMode.Analog;
-                bool showRuntime = displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime || displayMode.NewValue == ToolbarClockDisplayMode.Full;
+                bool showAnalog = displayMode.NewValue == ToolbarClockDisplayMode.Analog || displayMode.NewValue == ToolbarClockDisplayMode.Full || displayMode.NewValue == ToolbarClockDisplayMode.Full12H;
+                bool showDigital = displayMode.NewValue == ToolbarClockDisplayMode.Digital || displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime || displayMode.NewValue == ToolbarClockDisplayMode.Full;
+                bool showDigital12H = displayMode.NewValue == ToolbarClockDisplayMode.Digital12H || displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime12H || displayMode.NewValue == ToolbarClockDisplayMode.Full12H;
+                bool showRuntime = displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime || displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime12H || displayMode.NewValue == ToolbarClockDisplayMode.Full || displayMode.NewValue == ToolbarClockDisplayMode.Full12H;
 
                 digital.FadeTo(showDigital ? 1 : 0);
                 digital.ShowRuntime = showRuntime;
+
+                digital12h.FadeTo(showDigital12H ? 1 : 0);
+                digital12h.ShowRuntime = showRuntime;
 
                 analog.FadeTo(showAnalog ? 1 : 0);
             }, true);
@@ -128,14 +138,26 @@ namespace osu.Game.Overlays.Toolbar
                     break;
 
                 case ToolbarClockDisplayMode.Digital:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.Digital12H;
+                    break;
+
+                case ToolbarClockDisplayMode.Digital12H:
                     clockDisplayMode.Value = ToolbarClockDisplayMode.Analog;
                     break;
 
                 case ToolbarClockDisplayMode.DigitalWithRuntime:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.DigitalWithRuntime12H;
+                    break;
+
+                case ToolbarClockDisplayMode.DigitalWithRuntime12H:
                     clockDisplayMode.Value = ToolbarClockDisplayMode.Digital;
                     break;
 
                 case ToolbarClockDisplayMode.Full:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.Full12H;
+                    break;
+
+                case ToolbarClockDisplayMode.Full12H:
                     clockDisplayMode.Value = ToolbarClockDisplayMode.DigitalWithRuntime;
                     break;
             }

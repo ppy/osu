@@ -7,7 +7,10 @@ namespace osu.Game.Configuration
     {
         Analog,
         Digital,
+        Digital12H,
         DigitalWithRuntime,
-        Full
+        DigitalWithRuntime12H,
+        Full,
+        Full12H
     }
 }

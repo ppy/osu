@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class DigitalClockDisplay : ClockDisplay
     {
+        private bool format12Hour;
+
         private OsuSpriteText realTime;
         private OsuSpriteText gameTime;
 
@@ -27,6 +29,11 @@ namespace osu.Game.Overlays.Toolbar
                 showRuntime = value;
                 updateMetrics();
             }
+        }
+
+        public DigitalClockDisplay(bool format12Hour = false)
+        {
+            this.format12Hour = format12Hour;
         }
 
         [BackgroundDependencyLoader]
@@ -50,13 +57,13 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = $"{now:HH:mm:ss}";
+            realTime.Text = format12Hour ? $"{now:hh:mm:ss tt}" : $"{now:HH:mm:ss}";
             gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
         private void updateMetrics()
         {
-            Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+            Width = showRuntime || format12Hour ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
             gameTime.FadeTo(showRuntime ? 1 : 0);
         }
     }
