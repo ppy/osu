@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
-using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding(10),
                     Text = "Get started",
-                    Action = () => this.Push(new ScreenWelcome()),
+                    Action = () => this.Push(new ScreenSetupUIScale()),
                 }
             };
         }
@@ -46,13 +45,7 @@ namespace osu.Game.Overlays.FirstRunSetup
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            Overlay.MoveDisplayTo(new Vector2(RNG.NextSingle(), RNG.NextSingle()));
-        }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-            Overlay.MoveDisplayTo(new Vector2(RNG.NextSingle(), RNG.NextSingle()));
+            Overlay.MoveDisplayTo(new Vector2(0.5f));
         }
     }
 }

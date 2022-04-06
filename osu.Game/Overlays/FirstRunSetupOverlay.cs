@@ -57,7 +57,8 @@ namespace osu.Game.Overlays
                 {
                     Origin = Anchor.Centre,
                     RelativePositionAxes = Axes.Both,
-                    Size = new Vector2(400, 300),
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.5f),
                     Position = new Vector2(0.5f),
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -130,5 +131,8 @@ namespace osu.Game.Overlays
 
         public void MoveDisplayTo(Vector2 position) =>
             currentDisplayContainer.MoveTo(position, 1000, Easing.OutElasticQuarter);
+
+        public void ResizeDisplayTo(Vector2 scale) =>
+            currentDisplayContainer.ScaleTo(scale, 1000, Easing.OutElasticQuarter);
     }
 }
