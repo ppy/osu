@@ -6,18 +6,18 @@ using osu.Game.Rulesets.Osu.Mods;
 
 namespace osu.Game.Rulesets.Osu.Tests.Mods
 {
-    public class TestSceneOsuModAimAssist : OsuModTestScene
+    public class TestSceneOsuModMagnetised : OsuModTestScene
     {
         [TestCase(0.1f)]
         [TestCase(0.5f)]
         [TestCase(1)]
-        public void TestAimAssist(float strength)
+        public void TestMagnetised(float strength)
         {
             CreateModTest(new ModTestData
             {
-                Mod = new OsuModAimAssist
+                Mod = new OsuModMagnetised
                 {
-                    AssistStrength = { Value = strength },
+                    AttractionStrength = { Value = strength },
                 },
                 PassCondition = () => true,
                 Autoplay = false,

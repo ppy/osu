@@ -28,6 +28,12 @@ namespace osu.Game.Online.Multiplayer
         [Key(4)]
         public QueueMode QueueMode { get; set; } = QueueMode.HostOnly;
 
+        [Key(5)]
+        public TimeSpan AutoStartDuration { get; set; }
+
+        [IgnoreMember]
+        public bool AutoStartEnabled => AutoStartDuration != TimeSpan.Zero;
+
         public bool Equals(MultiplayerRoomSettings? other)
         {
             if (ReferenceEquals(this, other)) return true;
@@ -37,13 +43,15 @@ namespace osu.Game.Online.Multiplayer
                    && Name.Equals(other.Name, StringComparison.Ordinal)
                    && PlaylistItemId == other.PlaylistItemId
                    && MatchType == other.MatchType
-                   && QueueMode == other.QueueMode;
+                   && QueueMode == other.QueueMode
+                   && AutoStartDuration == other.AutoStartDuration;
         }
 
         public override string ToString() => $"Name:{Name}"
                                              + $" Password:{(string.IsNullOrEmpty(Password) ? "no" : "yes")}"
                                              + $" Type:{MatchType}"
                                              + $" Item:{PlaylistItemId}"
-                                             + $" Queue:{QueueMode}";
+                                             + $" Queue:{QueueMode}"
+                                             + $" Start:{AutoStartDuration}";
     }
 }

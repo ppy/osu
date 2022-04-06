@@ -16,6 +16,7 @@ using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
 using osu.Game.Online.Rooms.RoomStatuses;
 using osu.Game.Rulesets;
@@ -170,6 +171,8 @@ namespace osu.Game.Online.Multiplayer
                     Room = joinedRoom;
                     APIRoom = room;
 
+                    Debug.Assert(joinedRoom.Playlist.Count > 0);
+
                     APIRoom.Playlist.Clear();
                     APIRoom.Playlist.AddRange(joinedRoom.Playlist.Select(createPlaylistItem));
 
@@ -238,7 +241,9 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="password">The new password, if any.</param>
         /// <param name="matchType">The type of the match, if any.</param>
         /// <param name="queueMode">The new queue mode, if any.</param>
-        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default)
+        /// <param name="autoStartDuration">The new auto-start countdown duration, if any.</param>
+        public Task ChangeSettings(Optional<string> name = default, Optional<string> password = default, Optional<MatchType> matchType = default, Optional<QueueMode> queueMode = default,
+                                   Optional<TimeSpan> autoStartDuration = default)
         {
             if (Room == null)
                 throw new InvalidOperationException("Must be joined to a match to change settings.");
@@ -249,6 +254,7 @@ namespace osu.Game.Online.Multiplayer
                 Password = password.GetOr(Room.Settings.Password),
                 MatchType = matchType.GetOr(Room.Settings.MatchType),
                 QueueMode = queueMode.GetOr(Room.Settings.QueueMode),
+                AutoStartDuration = autoStartDuration.GetOr(Room.Settings.AutoStartDuration),
             });
         }
 
@@ -534,7 +540,24 @@ namespace osu.Game.Online.Multiplayer
 
         public Task MatchEvent(MatchServerEvent e)
         {
-            // not used by any match types just yet.
+            if (Room == null)
+                return Task.CompletedTask;
+
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                switch (e)
+                {
+                    case CountdownChangedEvent countdownChangedEvent:
+                        Room.Countdown = countdownChangedEvent.Countdown;
+                        break;
+                }
+
+                RoomUpdated?.Invoke();
+            }, false);
+
             return Task.CompletedTask;
         }
 
@@ -665,6 +688,8 @@ namespace osu.Game.Online.Multiplayer
                 Room.Playlist.Remove(Room.Playlist.Single(existing => existing.ID == playlistItemId));
                 APIRoom.Playlist.RemoveAll(existing => existing.ID == playlistItemId);
 
+                Debug.Assert(Room.Playlist.Count > 0);
+
                 ItemRemoved?.Invoke(playlistItemId);
                 RoomUpdated?.Invoke();
             });
@@ -723,6 +748,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.Password.Value = Room.Settings.Password;
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
+            APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
 
             RoomUpdated?.Invoke();
         }

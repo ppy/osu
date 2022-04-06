@@ -27,7 +27,7 @@ namespace osu.Game.Benchmarks
             storage = new TemporaryNativeStorage("realm-benchmark");
             storage.DeleteDirectory(string.Empty);
 
-            realm = new RealmAccess(storage, "client");
+            realm = new RealmAccess(storage, OsuGameBase.CLIENT_DATABASE_FILENAME);
 
             realm.Run(r =>
             {

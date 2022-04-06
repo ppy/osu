@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,12 +13,14 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -27,8 +31,6 @@ using osu.Game.Skinning;
 using osu.Game.Stores;
 using Realms;
 using Realms.Exceptions;
-
-#nullable enable
 
 namespace osu.Game.Database
 {
@@ -45,6 +47,8 @@ namespace osu.Game.Database
         public readonly string Filename;
 
         private readonly IDatabaseContextFactory? efContextFactory;
+
+        private readonly SynchronizationContext? updateThreadSyncContext;
 
         /// <summary>
         /// Version history:
@@ -143,11 +147,14 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="storage">The game storage which will be used to create the realm backing file.</param>
         /// <param name="filename">The filename to use for the realm backing file. A ".realm" extension will be added automatically if not specified.</param>
+        /// <param name="updateThread">The game update thread, used to post realm operations into a thread-safe context.</param>
         /// <param name="efContextFactory">An EF factory used only for migration purposes.</param>
-        public RealmAccess(Storage storage, string filename, IDatabaseContextFactory? efContextFactory = null)
+        public RealmAccess(Storage storage, string filename, GameThread? updateThread = null, IDatabaseContextFactory? efContextFactory = null)
         {
             this.storage = storage;
             this.efContextFactory = efContextFactory;
+
+            updateThreadSyncContext = updateThread?.SynchronizationContext ?? SynchronizationContext.Current;
 
             Filename = filename;
 
@@ -205,7 +212,7 @@ namespace osu.Game.Database
                     if (realm.All<ScoreInfo>().Any())
                     {
                         Logger.Log(@"Recovery aborted as the existing database has scores set already.", LoggingTarget.Database);
-                        Logger.Log(@"To perform recovery, delete client.realm while osu! is not running.", LoggingTarget.Database);
+                        Logger.Log($@"To perform recovery, delete {OsuGameBase.CLIENT_DATABASE_FILENAME} while osu! is not running.", LoggingTarget.Database);
                         return;
                     }
                 }
@@ -287,7 +294,18 @@ namespace osu.Game.Database
         /// Compact this realm.
         /// </summary>
         /// <returns></returns>
-        public bool Compact() => Realm.Compact(getConfiguration());
+        public bool Compact()
+        {
+            try
+            {
+                return Realm.Compact(getConfiguration());
+            }
+            // Catch can be removed along with entity framework. Is specifically to allow a failure message to arrive to the user (see similar catches in EFToRealmMigrator).
+            catch (AggregateException ae) when (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && ae.Flatten().InnerException is TypeInitializationException)
+            {
+                return true;
+            }
+        }
 
         /// <summary>
         /// Run work on realm with a return value.
@@ -379,9 +397,6 @@ namespace osu.Game.Database
         public IDisposable RegisterForNotifications<T>(Func<Realm, IQueryable<T>> query, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
-
             lock (realmLock)
             {
                 Func<Realm, IDisposable?> action = realm => query(realm).QueryAsyncWithNotifications(callback);
@@ -459,23 +474,24 @@ namespace osu.Game.Database
         /// <returns>An <see cref="IDisposable"/> which should be disposed to unsubscribe any inner subscription.</returns>
         public IDisposable RegisterCustomSubscription(Func<Realm, IDisposable?> action)
         {
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException(@$"{nameof(RegisterForNotifications)} must be called from the update thread.");
-
-            var syncContext = SynchronizationContext.Current;
+            if (updateThreadSyncContext == null)
+                throw new InvalidOperationException("Attempted to register a realm subscription before update thread registration.");
 
             total_subscriptions.Value++;
 
-            registerSubscription(action);
+            if (ThreadSafety.IsUpdateThread)
+                updateThreadSyncContext.Send(_ => registerSubscription(action), null);
+            else
+                updateThreadSyncContext.Post(_ => registerSubscription(action), null);
 
             // This token is returned to the consumer.
             // When disposed, it will cause the registration to be permanently ceased (unsubscribed with realm and unregistered by this class).
             return new InvokeOnDisposal(() =>
             {
                 if (ThreadSafety.IsUpdateThread)
-                    syncContext.Send(_ => unsubscribe(), null);
+                    updateThreadSyncContext.Send(_ => unsubscribe(), null);
                 else
-                    syncContext.Post(_ => unsubscribe(), null);
+                    updateThreadSyncContext.Post(_ => unsubscribe(), null);
 
                 void unsubscribe()
                 {
@@ -537,6 +553,11 @@ namespace osu.Game.Database
                 realm_instances_created.Value++;
 
                 return Realm.GetInstance(getConfiguration());
+            }
+            // Catch can be removed along with entity framework. Is specifically to allow a failure message to arrive to the user (see similar catches in EFToRealmMigrator).
+            catch (AggregateException ae) when (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && ae.Flatten().InnerException is TypeInitializationException)
+            {
+                return Realm.GetInstance();
             }
             finally
             {
