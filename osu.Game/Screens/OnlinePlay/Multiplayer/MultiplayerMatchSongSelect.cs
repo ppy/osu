@@ -77,7 +77,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     loadingLayer.Hide();
 
                     // If an error or server side trigger occurred this screen may have already exited by external means.
-                    if (!this.IsCurrentScreen())
+                    if (this.IsCurrentScreen())
                         this.Exit();
                 }), onError: _ => Schedule(() =>
                 {
