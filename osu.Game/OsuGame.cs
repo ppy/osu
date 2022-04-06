@@ -149,6 +149,8 @@ namespace osu.Game
 
         protected SettingsOverlay Settings;
 
+        private FirstRunSetupOverlay firstRunOverlay;
+
         private VolumeOverlay volume;
 
         private OsuLogo osuLogo;
@@ -791,6 +793,7 @@ namespace osu.Game
             loadComponentSingleFile(CreateUpdateManager(), Add, true);
 
             // overlay elements
+            loadComponentSingleFile(firstRunOverlay = new FirstRunSetupOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(new ManageCollectionsDialog(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapListing = new BeatmapListingOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(dashboard = new DashboardOverlay(), overlayContent.Add, true);
