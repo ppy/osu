@@ -15,6 +15,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -35,9 +36,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private List<BeatmapInfo> beatmaps;
+        private IList<BeatmapInfo> beatmaps => importedBeatmapSet?.PerformRead(s => s.Beatmaps) ?? new List<BeatmapInfo>();
 
         private TestMultiplayerMatchSongSelect songSelect;
+
+        private Live<BeatmapSetInfo> importedBeatmapSet;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -45,8 +48,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
-
-            beatmaps = new List<BeatmapInfo>();
 
             var metadata = new BeatmapMetadata
             {
@@ -79,11 +80,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Difficulty = new BeatmapDifficulty()
                 };
 
-                beatmaps.Add(beatmap);
                 beatmapSetInfo.Beatmaps.Add(beatmap);
             }
 
-            manager.Import(beatmapSetInfo);
+            importedBeatmapSet = manager.Import(beatmapSetInfo);
         }
 
         public override void SetUpSteps()
