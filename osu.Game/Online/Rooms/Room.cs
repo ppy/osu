@@ -93,6 +93,16 @@ namespace osu.Game.Online.Rooms
         }
 
         [Cached]
+        public readonly Bindable<TimeSpan> AutoStartDuration = new Bindable<TimeSpan>();
+
+        [JsonProperty("auto_start_duration")]
+        private ushort autoStartDuration
+        {
+            get => (ushort)AutoStartDuration.Value.TotalSeconds;
+            set => AutoStartDuration.Value = TimeSpan.FromSeconds(value);
+        }
+
+        [Cached]
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
         [Cached]
@@ -172,6 +182,7 @@ namespace osu.Game.Online.Rooms
             EndDate.Value = other.EndDate.Value;
             UserScore.Value = other.UserScore.Value;
             QueueMode.Value = other.QueueMode.Value;
+            AutoStartDuration.Value = other.AutoStartDuration.Value;
             DifficultyRange.Value = other.DifficultyRange.Value;
             PlaylistItemStats.Value = other.PlaylistItemStats.Value;
             CurrentPlaylistItem.Value = other.CurrentPlaylistItem.Value;

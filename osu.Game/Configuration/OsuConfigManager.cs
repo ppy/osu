@@ -10,6 +10,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -43,6 +44,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
+
+            SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
+
+            SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
@@ -295,6 +300,8 @@ namespace osu.Game.Configuration
         RandomSelectAlgorithm,
         ShowFpsDisplay,
         ChatDisplayHeight,
+        BeatmapListingCardSize,
+        ToolbarClockDisplayMode,
         Version,
         ShowConvertedBeatmaps,
         Skin,
