@@ -74,18 +74,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
                 task.FireAndForget(onSuccess: () => Schedule(() =>
                 {
+                    loadingLayer.Hide();
+
                     // If an error or server side trigger occurred this screen may have already exited by external means.
                     if (!this.IsCurrentScreen())
-                        return;
-
-                    loadingLayer.Hide();
-                    this.Exit();
+                        this.Exit();
                 }), onError: _ => Schedule(() =>
                 {
-                    // If an error or server side trigger occurred this screen may have already exited by external means.
-                    if (!this.IsCurrentScreen())
-                        return;
-
                     loadingLayer.Hide();
                     Carousel.AllowSelection = true;
                 }));
