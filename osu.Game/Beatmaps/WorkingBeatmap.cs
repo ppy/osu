@@ -17,7 +17,6 @@ using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
@@ -152,24 +151,7 @@ namespace osu.Game.Beatmaps
         {
             const double excess_length = 1000;
 
-            var lastObject = Beatmap?.HitObjects.LastOrDefault();
-
-            double length;
-
-            switch (lastObject)
-            {
-                case null:
-                    length = emptyLength;
-                    break;
-
-                case IHasDuration endTime:
-                    length = endTime.EndTime + excess_length;
-                    break;
-
-                default:
-                    length = lastObject.StartTime + excess_length;
-                    break;
-            }
+            double length = (BeatmapInfo?.Length + excess_length) ?? emptyLength;
 
             return audioManager.Tracks.GetVirtual(length);
         }
