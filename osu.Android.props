@@ -16,4 +16,9 @@
     <!-- SQLite fails to load without this package. -->
     <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.0.7" />
   </ItemGroup>
+  <PropertyGroup>
+    <!-- Fody does not handle Android build well, and warns when unchanged.
+         Since Realm objects are not declared directly in Android projects, simply disable Fody. -->
+    <DisableFody>true</DisableFody>
+  </PropertyGroup>
 </Project>
