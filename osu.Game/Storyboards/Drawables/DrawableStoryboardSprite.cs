@@ -110,7 +110,9 @@ namespace osu.Game.Storyboards.Drawables
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            skin.SourceChanged -= skinSourceChanged;
+
+            if (skin != null)
+                skin.SourceChanged -= skinSourceChanged;
         }
     }
 }
