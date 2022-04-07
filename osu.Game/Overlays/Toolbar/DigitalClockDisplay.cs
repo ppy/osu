@@ -72,10 +72,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void updateMetrics()
         {
-            if (use24HourDisplay)
-                Width = 70;
-            else
-                Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+            Width = showRuntime || use24HourDisplay ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
 
             gameTime.FadeTo(showRuntime ? 1 : 0);
         }
