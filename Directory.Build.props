@@ -34,7 +34,7 @@
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
     <Company>ppy Pty Ltd</Company>
-    <Copyright>Copyright (c) 2021 ppy Pty Ltd</Copyright>
+    <Copyright>Copyright (c) 2022 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
 </Project>
