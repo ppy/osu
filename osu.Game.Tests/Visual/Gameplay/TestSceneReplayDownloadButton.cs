@@ -150,10 +150,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)));
 
             AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
+            AddAssert("button is enabled", () => downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
 
             AddStep("delete score", () => scoreManager.Delete(imported.Value));
 
             AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         [Test]
