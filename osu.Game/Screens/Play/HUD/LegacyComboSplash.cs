@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -51,17 +50,18 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (!BurstCondition(combo)) return;
 
-            IEnumerable<Drawable> toShow = BurstsSide.Value == Side.Random ? new[] { InternalChildren[random.Next(0, InternalChildren.Count)] } : InternalChildren;
-
-            foreach (var x in toShow)
+            Container<Sprite> toShow = BurstsSide.Value switch
             {
-                var container = (Container<Sprite>)x;
-                if (container.Count == 0) continue;
+                Side.Left => left,
+                Side.Right => right,
+                _ => random.Next(0, 2) == 0 ? left : right
+            };
 
-                Sprite sprite = container[random.Next(0, container.Count)];
-                sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
-                sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
-            }
+            if (toShow.Count == 0) return;
+
+            Sprite sprite = toShow[random.Next(0, toShow.Count)];
+            sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
+            sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
         }
 
         [BackgroundDependencyLoader]
@@ -97,7 +97,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             switch (side)
             {
-                case Side.Both:
                 case Side.Random:
                     // when both sides are used, the component should cover the entire screen.
                     AutoSizeAxes = Axes.None;
@@ -106,8 +105,7 @@ namespace osu.Game.Screens.Play.HUD
                     Size = new Vector2(1, 1);
                     break;
 
-                case Side.Left:
-                case Side.Right:
+                default:
                     RelativeSizeAxes = Axes.None;
                     AutoSizeAxes = Axes.Both;
                     break;
@@ -115,7 +113,6 @@ namespace osu.Game.Screens.Play.HUD
 
             switch (side)
             {
-                case Side.Both:
                 case Side.Random:
                     left.FadeIn(500);
                     right.FadeIn(500);
@@ -149,7 +146,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             Left,
             Right,
-            Both,
             Random
         }
 
