@@ -443,7 +443,9 @@ namespace osu.Game.Skinning
                 string lookupName = name.Replace(@"@2x", string.Empty);
 
                 float ratio = 2;
-                var texture = Textures?.Get(@$"{lookupName}@2x", wrapModeS, wrapModeT);
+                string twoTimesFilename = $"{Path.ChangeExtension(lookupName, null)}@2x{Path.GetExtension(lookupName)}";
+
+                var texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
 
                 if (texture == null)
                 {
