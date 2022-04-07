@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Toolbar
                 analog.FadeTo(showAnalog ? 1 : 0);
             }, true);
 
-            prefer24HourTime.BindValueChanged(prefer24H => digital.Use24HourDisplay = !prefer24H.NewValue, true);
+            prefer24HourTime.BindValueChanged(prefer24H => digital.Use24HourDisplay = prefer24H.NewValue, true);
         }
 
         protected override bool OnClick(ClickEvent e)

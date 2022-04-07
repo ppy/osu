@@ -40,6 +40,7 @@ namespace osu.Game.Overlays.Toolbar
                     return;
 
                 use24HourDisplay = value;
+
                 updateMetrics();
                 UpdateDisplay(DateTimeOffset.Now); //Update realTime.Text immediately instead of waiting until next second
             }
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = use24HourDisplay ? $"{now:h:mm:ss tt}" : $"{now:HH:mm:ss}";
+            realTime.Text = use24HourDisplay ? $"{now:HH:mm:ss}" : $"{now:h:mm:ss tt}";
             gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
