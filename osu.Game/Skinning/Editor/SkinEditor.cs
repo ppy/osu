@@ -204,7 +204,7 @@ namespace osu.Game.Skinning.Editor
             SelectedComponents.Clear();
 
             // Immediately clear the previous blueprint container to ensure it doesn't try to interact with the old target.
-            content.Clear();
+            content?.Clear();
 
             Scheduler.AddOnce(loadBlueprintContainer);
             Scheduler.AddOnce(populateSettings);
