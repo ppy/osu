@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = GeneralSettingsStrings.Prefer24HourTime,
+                    LabelText = GeneralSettingsStrings.Prefer24HourTimeDisplay,
                     Current = config.GetBindable<bool>(OsuSetting.Prefer24HourTime)
                 },
             };
