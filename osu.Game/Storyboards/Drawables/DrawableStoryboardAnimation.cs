@@ -5,8 +5,10 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
+using osu.Game.Skinning;
 using osuTK;
 
 namespace osu.Game.Storyboards.Drawables
@@ -86,6 +88,14 @@ namespace osu.Game.Storyboards.Drawables
 
             LifetimeStart = animation.StartTime;
             LifetimeEnd = animation.EndTime;
+        }
+
+        protected override Vector2 GetCurrentDisplaySize()
+        {
+            Texture texture = (CurrentFrame as Sprite)?.Texture
+                              ?? ((CurrentFrame as SkinnableSprite)?.Drawable as Sprite)?.Texture;
+
+            return new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
         }
 
         [BackgroundDependencyLoader]
