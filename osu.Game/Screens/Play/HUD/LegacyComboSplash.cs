@@ -16,7 +16,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class LegacyComboSplash : Container<Container<Sprite>>, ISkinnableDrawable
+    public class LegacyComboSplash : Container, ISkinnableDrawable
     {
         [SettingSource("Side, where bursts will appear")]
         public Bindable<Side> BurstsSide { get; } = new Bindable<Side>(Side.Random);
