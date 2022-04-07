@@ -49,16 +49,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
-
             beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
 
-            selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
-            {
-                RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
-            };
+            SelectedRoom.Value.Playlist.Clear();
+            SelectedRoom.Value.Playlist.Add(new PlaylistItem(Beatmap.Value.BeatmapInfo) { RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID });
+
+            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
 
             Child = new PopoverContainer
             {
@@ -68,9 +66,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(250, 50),
+                    SelectedItem = { BindTarget = selectedItem }
                 }
             };
         });
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (RoomJoined)
+                selectedItem.Value = MultiplayerClient.APIRoom?.Playlist.SingleOrDefault(i => i.ID == MultiplayerClient.Room?.Settings.PlaylistItemId);
+        }
 
         [Test]
         public void TestStartWithCountdown()

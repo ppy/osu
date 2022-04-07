@@ -14,12 +14,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
+using osu.Game.Online.Rooms;
 using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MatchStartControl : MultiplayerRoomComposite
     {
+        public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
         [Resolved]
         private OngoingOperationTracker ongoingOperationTracker { get; set; }
 
@@ -83,8 +86,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            CurrentPlaylistItem.BindValueChanged(_ => updateState());
+            SelectedItem.BindValueChanged(_ => updateState());
         }
 
         protected override void OnRoomUpdated()
@@ -185,7 +187,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             readyButton.Enabled.Value = countdownButton.Enabled.Value =
                 Room.State == MultiplayerRoomState.Open
-                && CurrentPlaylistItem.Value?.ID == Room.Settings.PlaylistItemId
+                && SelectedItem.Value != null
+                && SelectedItem.Value.ID == Room.Settings.PlaylistItemId
                 && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
                 && !operationInProgress.Value;
 

@@ -137,7 +137,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                                     new MultiplayerPlaylist
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        RequestEdit = item => OpenSongSelection(item.ID)
+                                        RequestEdit = item => OpenSongSelection(item.ID),
+                                        SelectedItem = { BindTarget = SelectedItem }
                                     }
                                 },
                                 new[]
@@ -222,7 +223,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
-        protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
+        {
+            SelectedItem = { BindTarget = SelectedItem }
+        };
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 

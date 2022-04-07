@@ -19,6 +19,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
     {
         public readonly Bindable<MultiplayerPlaylistDisplayMode> DisplayMode = new Bindable<MultiplayerPlaylistDisplayMode>();
 
+        public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
         /// <summary>
         /// Invoked when an item requests to be edited.
         /// </summary>
@@ -52,14 +54,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
                         queueList = new MultiplayerQueueList
                         {
                             RelativeSizeAxes = Axes.Both,
-                            SelectedItem = { BindTarget = CurrentPlaylistItem },
+                            SelectedItem = { BindTarget = SelectedItem },
                             RequestEdit = item => RequestEdit?.Invoke(item)
                         },
                         historyList = new MultiplayerHistoryList
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
-                            SelectedItem = { BindTarget = CurrentPlaylistItem }
+                            SelectedItem = { BindTarget = SelectedItem }
                         }
                     }
                 }

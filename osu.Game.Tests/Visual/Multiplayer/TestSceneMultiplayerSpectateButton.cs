@@ -41,21 +41,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
-
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
         }
 
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
-
+            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
             importedSet = beatmaps.GetAllUsableBeatmapSets().First();
             Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
-            selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
-            {
-                RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID,
-            };
+
+            SelectedRoom.Value.Playlist.Clear();
+            SelectedRoom.Value.Playlist.Add(new PlaylistItem(Beatmap.Value.BeatmapInfo) { RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID });
+
+            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
 
             Child = new PopoverContainer
             {
@@ -77,11 +75,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(200, 50),
+                            SelectedItem = { BindTarget = selectedItem }
                         }
                     }
                 }
             };
         });
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (RoomJoined)
+                selectedItem.Value = MultiplayerClient.APIRoom?.Playlist.SingleOrDefault(i => i.ID == MultiplayerClient.Room?.Settings.PlaylistItemId);
+        }
 
         [TestCase(MultiplayerRoomState.Open)]
         [TestCase(MultiplayerRoomState.WaitingForLoad)]

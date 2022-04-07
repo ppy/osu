@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -276,7 +277,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             }
         }
 
-        protected virtual Drawable CreateBackground() => new OnlinePlayBackgroundSprite();
+        protected virtual Drawable CreateBackground() => new RoomBackgroundSprite();
 
         protected virtual IEnumerable<Drawable> CreateBottomDetails()
         {
@@ -334,6 +335,9 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [Resolved]
             private BeatmapLookupCache beatmapLookupCache { get; set; }
 
+            [Resolved(CanBeNull = true)]
+            private IBindable<PlaylistItem> selectedItem { get; set; }
+
             private SpriteText statusText;
             private LinkFlowContainer beatmapText;
 
@@ -388,12 +392,14 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                CurrentPlaylistItem.BindValueChanged(onSelectedItemChanged, true);
+
+                selectedItem?.BindValueChanged(_ => updateText());
+                CurrentPlaylistItem.BindValueChanged(_ => updateText(), true);
             }
 
             private CancellationTokenSource beatmapLookupCancellation;
 
-            private void onSelectedItemChanged(ValueChangedEvent<PlaylistItem> item)
+            private void updateText()
             {
                 beatmapLookupCancellation?.Cancel();
                 beatmapText.Clear();
@@ -404,7 +410,8 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     return;
                 }
 
-                var beatmap = item.NewValue?.Beatmap;
+                // Prefer the selected item from the sub screen.
+                var beatmap = selectedItem?.Value?.Beatmap ?? CurrentPlaylistItem.Value?.Beatmap;
                 if (beatmap == null)
                     return;
 
@@ -424,6 +431,35 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                                           creationParameters: s => s.Truncate = true);
                                   }), cancellationSource.Token);
             }
+        }
+
+        private class RoomBackgroundSprite : OnlinePlayComposite
+        {
+            protected readonly BeatmapSetCoverType BeatmapSetCoverType;
+            private UpdateableBeatmapBackgroundSprite sprite;
+
+            public RoomBackgroundSprite(BeatmapSetCoverType beatmapSetCoverType = BeatmapSetCoverType.Cover)
+            {
+                BeatmapSetCoverType = beatmapSetCoverType;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                InternalChild = sprite = CreateBackgroundSprite();
+
+                CurrentPlaylistItem.BindValueChanged(_ => updateBeatmap());
+                Playlist.CollectionChanged += (_, __) => updateBeatmap();
+
+                updateBeatmap();
+            }
+
+            private void updateBeatmap()
+            {
+                sprite.Beatmap.Value = CurrentPlaylistItem.Value?.Beatmap ?? Playlist.GetCurrentItem()?.Beatmap;
+            }
+
+            protected virtual UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new UpdateableBeatmapBackgroundSprite(BeatmapSetCoverType) { RelativeSizeAxes = Axes.Both };
         }
 
         public class PasswordProtectedIcon : CompositeDrawable

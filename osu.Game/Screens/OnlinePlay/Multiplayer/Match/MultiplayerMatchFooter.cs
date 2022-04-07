@@ -1,13 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.Rooms;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
     public class MultiplayerMatchFooter : CompositeDrawable
     {
+        public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
         private const float ready_button_width = 600;
         private const float spectate_button_width = 200;
 
@@ -31,6 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                         new MatchStartControl
                         {
                             RelativeSizeAxes = Axes.Both,
+                            SelectedItem = { BindTarget = SelectedItem }
                         },
                         null
                     }

@@ -4,6 +4,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -357,7 +358,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 base.LoadComplete();
 
                 drawablePlaylist.Items.BindTo(Playlist);
-                drawablePlaylist.SelectedItem.BindTo(CurrentPlaylistItem);
             }
 
             protected override void Update()
@@ -436,7 +436,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 if (text.StartsWith(not_found_prefix, StringComparison.Ordinal))
                 {
                     ErrorText.Text = "The selected beatmap is not available online.";
-                    CurrentPlaylistItem.Value.MarkInvalid();
+                    Playlist.Single().MarkInvalid();
                 }
                 else
                 {
