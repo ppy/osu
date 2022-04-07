@@ -749,6 +749,7 @@ namespace osu.Game.Online.Multiplayer
             APIRoom.Type.Value = Room.Settings.MatchType;
             APIRoom.QueueMode.Value = Room.Settings.QueueMode;
             APIRoom.AutoStartDuration.Value = Room.Settings.AutoStartDuration;
+            APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(i => i.ID == settings.PlaylistItemId);
 
             RoomUpdated?.Invoke();
         }
