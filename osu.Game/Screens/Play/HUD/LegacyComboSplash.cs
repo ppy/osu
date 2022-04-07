@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource("Side, where bursts will appear")]
         public Bindable<Side> BurstsSide { get; } = new Bindable<Side>(Side.Random);
 
-        public Bindable<int> Current { get; } = new BindableInt { MinValue = 0 };
+        private readonly Bindable<int> current = new BindableInt { MinValue = 0 };
 
         public bool UsesFixedAnchor { get; set; }
 
@@ -49,26 +49,25 @@ namespace osu.Game.Screens.Play.HUD
 
         private void OnNewCombo(int combo)
         {
-            if (BurstCondition(combo))
+            if (!BurstCondition(combo)) return;
+
+            IEnumerable<Drawable> toShow = BurstsSide.Value == Side.Random ? new[] { InternalChildren[random.Next(0, InternalChildren.Count)] } : InternalChildren;
+
+            foreach (var x in toShow)
             {
-                IEnumerable<Drawable> toShow = BurstsSide.Value == Side.Random ? new[] { InternalChildren[random.Next(0, InternalChildren.Count)] } : InternalChildren;
+                var container = (Container<Sprite>)x;
+                if (container.Count == 0) continue;
 
-                foreach (var x in toShow)
-                {
-                    var container = (Container<Sprite>)x;
-                    if (container.Count == 0) continue;
-
-                    Sprite sprite = container[random.Next(0, container.Count)];
-                    sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
-                    sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
-                }
+                Sprite sprite = container[random.Next(0, container.Count)];
+                sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
+                sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
             }
         }
 
         [BackgroundDependencyLoader]
         private void load(ScoreProcessor scoreProcessor, ISkinSource skin)
         {
-            Current.BindTo(scoreProcessor.Combo);
+            current.BindTo(scoreProcessor.Combo);
 
             var c = new LegacyComboSplashComponent();
 
@@ -137,7 +136,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Current.BindValueChanged(e => OnNewCombo(e.NewValue));
+            current.BindValueChanged(e => OnNewCombo(e.NewValue));
             BurstsSide.BindValueChanged(e => OnSideChanged(e.NewValue), true);
 
             if (Parent is SkinnableTargetComponentsContainer container)
