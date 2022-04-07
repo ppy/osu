@@ -30,9 +30,9 @@ namespace osu.Game.Localisation
         public static LocalisableString PreferOriginalMetadataLanguage => new TranslatableString(getKey(@"prefer_original"), @"Prefer metadata in original language");
 
         /// <summary>
-        /// "Prefer 24-hour time"
+        /// "Prefer 24-hour time display"
         /// </summary>
-        public static LocalisableString Prefer24HourTime => new TranslatableString(getKey(@"prefer_24_hour_time"), @"Prefer 24-hour time");
+        public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"Prefer 24-hour time display");
 
         /// <summary>
         /// "Updates"
