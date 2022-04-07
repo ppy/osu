@@ -77,6 +77,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Children = new Drawable[]
                     {
                         new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
+                        inputDrum = new InputDrum(HitObjectContainer)
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Y,
+                        },
                     }
                 },
                 mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
@@ -154,13 +161,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
-                inputDrum = new InputDrum(HitObjectContainer)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                },
             };
 
+            // to prioritise receiving key presses on input drum before objects, move input drum to the end of the hierarchy...
+            leftArea.Remove(inputDrum);
+            AddInternal(inputDrum);
+
+            // ...and create a proxy to keep the input drum displayed behind the playfield elements.
             leftArea.Add(inputDrum.CreateProxy());
 
             RegisterPool<Hit, DrawableHit>(50);
@@ -207,8 +214,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             // Padding is required to be updated for elements which are based on "absolute" X sized elements.
             // This is basically allowing for correct alignment as relative pieces move around them.
-            var inputDrumSize = inputDrum.Skinnable.Drawable.ToSpaceOfOtherDrawable(inputDrum.Skinnable.Drawable.DrawSize, this);
-            rightArea.Padding = new MarginPadding { Left = inputDrumSize.X };
+            rightArea.Padding = new MarginPadding { Left = inputDrum.Width };
             playfieldContent.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
             playfieldOverlay.Padding = new MarginPadding { Left = HitTarget.DrawWidth / 2 };
 
