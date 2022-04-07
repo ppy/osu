@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Mods
     {
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; } = new Bindable<IReadOnlyList<Mod>>();
 
+        public const float HEIGHT = 250;
+
         private readonly Box background;
         private readonly FillFlowContainer modSettingsFlow;
 
@@ -32,7 +34,7 @@ namespace osu.Game.Overlays.Mods
         public ModSettingsArea()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 250;
+            Height = HEIGHT;
 
             Anchor = Anchor.BottomRight;
             Origin = Anchor.BottomRight;
@@ -52,6 +54,7 @@ namespace osu.Game.Overlays.Mods
                     {
                         RelativeSizeAxes = Axes.Both,
                         ScrollbarOverlapsContent = false,
+                        ClampExtension = 100,
                         Child = modSettingsFlow = new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.X,
@@ -155,9 +158,10 @@ namespace osu.Game.Overlays.Mods
                         new[] { Empty() },
                         new Drawable[]
                         {
-                            new OsuScrollContainer(Direction.Vertical)
+                            new NestedVerticalScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                ClampExtension = 100,
                                 Child = new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
