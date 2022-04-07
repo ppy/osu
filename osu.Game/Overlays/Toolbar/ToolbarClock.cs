@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -21,7 +20,7 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarClock : OsuClickableContainer
     {
         private Bindable<ToolbarClockDisplayMode> clockDisplayMode;
-        private Bindable<bool> digitalPrefer24Hour;
+        private Bindable<bool> prefer24HourTime;
 
         private Box hoverBackground;
         private Box flashBackground;
@@ -40,7 +39,7 @@ namespace osu.Game.Overlays.Toolbar
         private void load(OsuConfigManager config)
         {
             clockDisplayMode = config.GetBindable<ToolbarClockDisplayMode>(OsuSetting.ToolbarClockDisplayMode);
-            digitalPrefer24Hour = config.GetBindable<bool>(OsuSetting.Prefer24HourTime);
+            prefer24HourTime = config.GetBindable<bool>(OsuSetting.Prefer24HourTime);
 
             Children = new Drawable[]
             {
@@ -98,8 +97,7 @@ namespace osu.Game.Overlays.Toolbar
                 analog.FadeTo(showAnalog ? 1 : 0);
             }, true);
 
-            digitalPrefer24Hour.BindValueChanged(prefer24H =>
-                digital.Use24HourDisplay = !prefer24H.NewValue && CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains("tt"), true);
+            prefer24HourTime.BindValueChanged(prefer24H => digital.Use24HourDisplay = !prefer24H.NewValue, true);
         }
 
         protected override bool OnClick(ClickEvent e)
