@@ -29,17 +29,17 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        private bool format12H = false;
+        private bool use24HourDisplay;
 
-        public bool Format12H
+        public bool Use24HourDisplay
         {
-            get => format12H;
+            get => use24HourDisplay;
             set
             {
-                if (format12H == value)
+                if (use24HourDisplay == value)
                     return;
 
-                format12H = value;
+                use24HourDisplay = value;
                 updateMetrics();
                 UpdateDisplay(DateTimeOffset.Now); //Update realTime.Text immediately instead of waiting until next second
             }
@@ -66,13 +66,13 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = format12H ? $"{now:h:mm:ss tt}" : $"{now:HH:mm:ss}";
+            realTime.Text = use24HourDisplay ? $"{now:h:mm:ss tt}" : $"{now:HH:mm:ss}";
             gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
         private void updateMetrics()
         {
-            if (format12H)
+            if (use24HourDisplay)
                 Width = 70;
             else
                 Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).

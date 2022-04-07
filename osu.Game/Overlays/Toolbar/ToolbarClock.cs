@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Toolbar
             }, true);
 
             digitalPrefer24Hour.BindValueChanged(prefer24H =>
-                digital.Format12H = prefer24H.NewValue ? false : CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains("tt"), true);
+                digital.Use24HourDisplay = !prefer24H.NewValue && CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains("tt"), true);
         }
 
         protected override bool OnClick(ClickEvent e)
