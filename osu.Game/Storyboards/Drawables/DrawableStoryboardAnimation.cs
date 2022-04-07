@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
@@ -98,17 +99,55 @@ namespace osu.Game.Storyboards.Drawables
             return new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
         }
 
+        [Resolved]
+        private ISkinSource skin { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textureStore, Storyboard storyboard)
         {
-            for (int frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
+            int frameIndex = 0;
+
+            Texture frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
+
+            if (frameTexture != null)
             {
-                string framePath = Animation.Path.Replace(".", frameIndex + ".");
-                Drawable frame = storyboard.CreateSpriteFromResourcePath(framePath, textureStore) ?? Empty();
-                AddFrame(frame, Animation.FrameDelay);
+                // sourcing from storyboard.
+                for (frameIndex = 0; frameIndex < Animation.FrameCount; frameIndex++)
+                {
+                    frameTexture = storyboard.GetTextureFromPath(getFramePath(frameIndex), textureStore);
+                    AddFrame(new Sprite { Texture = frameTexture }, Animation.FrameDelay);
+                }
+            }
+            else if (storyboard.UseSkinSprites)
+            {
+                // fallback to skin if required.
+                skin.SourceChanged += skinSourceChanged;
+                skinSourceChanged();
             }
 
             Animation.ApplyTransforms(this);
+        }
+
+        private void skinSourceChanged()
+        {
+            ClearFrames();
+
+            // ClearFrames doesn't clear the last displayed frame.
+            // Clear manually for now, in case the skin doesn't provide any frames.
+            DisplayFrame(Empty());
+
+            // When reading from a skin, we match stables weird behaviour where `FrameCount` is ignored
+            // and resources are retrieved until the end of the animation.
+            foreach (var texture in skin.GetTextures(Path.GetFileNameWithoutExtension(Animation.Path), default, default, true, string.Empty, out _))
+                AddFrame(new Sprite { Texture = texture }, Animation.FrameDelay);
+        }
+
+        private string getFramePath(int i) => Animation.Path.Replace(".", $"{i}.");
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            skin.SourceChanged -= skinSourceChanged;
         }
     }
 }
