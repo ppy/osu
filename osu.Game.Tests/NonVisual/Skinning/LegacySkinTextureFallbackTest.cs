@@ -69,6 +69,20 @@ namespace osu.Game.Tests.NonVisual.Skinning
                 "Gameplay/osu/followpoint",
                 "followpoint", 1
             },
+            new object[]
+            {
+                // Looking up a filename with extension specified should work.
+                new[] { "followpoint.png" },
+                "followpoint.png",
+                "followpoint.png", 1
+            },
+            new object[]
+            {
+                // Looking up a filename with extension specified should also work with @2x sprites.
+                new[] { "followpoint@2x.png" },
+                "followpoint.png",
+                "followpoint@2x.png", 2
+            },
         };
 
         [TestCaseSource(nameof(fallbackTestCases))]
