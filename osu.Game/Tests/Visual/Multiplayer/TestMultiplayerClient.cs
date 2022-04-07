@@ -416,15 +416,22 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private void stopCountdown() => countdownStopSource?.Cancel();
 
-        public override Task StartMatch()
+        public override async Task StartMatch()
         {
             Debug.Assert(Room != null);
 
-            ChangeRoomState(MultiplayerRoomState.WaitingForLoad);
+            if (Room.Users.Count(u => u.State == MultiplayerUserState.Ready) == 0)
+            {
+                await FinishCurrentItem();
+                return;
+            }
+
             foreach (var user in Room.Users.Where(u => u.State == MultiplayerUserState.Ready))
                 ChangeUserState(user.UserID, MultiplayerUserState.WaitingForLoad);
 
-            return ((IMultiplayerClient)this).LoadRequested();
+            ChangeRoomState(MultiplayerRoomState.WaitingForLoad);
+
+            await ((IMultiplayerClient)this).LoadRequested();
         }
 
         public override Task AbortGameplay()
