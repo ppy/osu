@@ -543,9 +543,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenEnterEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             this.FadeInFromZero(250);
             FilterControl.Activate();
@@ -591,9 +591,9 @@ namespace osu.Game.Screens.Select
             logo.FadeOut(logo_transition / 2, Easing.Out);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenResumeEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             ModSelect.SelectedMods.Disabled = false;
@@ -622,7 +622,7 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenSuspendEvent e)
         {
             // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
             // Without this, it's possible for a transfer to happen while we are not the current screen.
@@ -640,12 +640,12 @@ namespace osu.Game.Screens.Select
             this.FadeOut(250);
 
             FilterControl.Deactivate();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             beatmapInfoWedge.Hide();

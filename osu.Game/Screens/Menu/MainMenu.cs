@@ -176,12 +176,12 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private Storage storage { get; set; }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenEnterEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             buttons.FadeInFromZero(500);
 
-            if (last is IntroScreen && musicController.TrackLoaded)
+            if (e.Last is IntroScreen && musicController.TrackLoaded)
             {
                 var track = musicController.CurrentTrack;
 
@@ -249,9 +249,9 @@ namespace osu.Game.Screens.Menu
             seq.OnAbort(_ => buttons.SetOsuLogo(null));
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenSuspendEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             buttons.State = ButtonSystemState.EnteringMode;
 
@@ -261,9 +261,9 @@ namespace osu.Game.Screens.Menu
             sideFlashes.FadeOut(64, Easing.OutQuint);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenResumeEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             ApplyToBackground(b => (b as BackgroundScreenDefault)?.Next());
 
@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Menu
             musicController.EnsurePlayingSomething();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (!exitConfirmed && dialogOverlay != null)
             {
@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Menu
             songTicker.Hide();
 
             this.FadeOut(3000);
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         public void PresentBeatmap(WorkingBeatmap beatmap, RulesetInfo ruleset)

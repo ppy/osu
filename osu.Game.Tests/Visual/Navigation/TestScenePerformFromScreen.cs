@@ -187,7 +187,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public int ExitAttempts { get; private set; }
 
-            public override bool OnExiting(IScreen next)
+            public override bool OnExiting(ScreenExitEvent e)
             {
                 ExitAttempts++;
 
@@ -197,7 +197,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     return true;
                 }
 
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
         }
     }

@@ -164,9 +164,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenEnterEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             ensureEventuallyArrivingAtMenu();
         }
 
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Menu
             }, 5000);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenResumeEvent e)
         {
             this.FadeIn(300);
 
@@ -237,12 +237,12 @@ namespace osu.Game.Screens.Menu
             //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime).OnComplete(_ => this.Exit());
 
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenSuspendEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             initialBeatmap = null;
         }
 

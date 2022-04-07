@@ -18,10 +18,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenSuspendEvent e)
         {
-            base.OnSuspending(next);
-            player = (Player)next;
+            base.OnSuspending(e);
+            player = (Player)e.Next;
         }
     }
 }
