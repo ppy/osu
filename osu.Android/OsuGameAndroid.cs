@@ -4,6 +4,7 @@
 using System;
 using Android.App;
 using Android.Content;
+using Android.OS;
 using osu.Framework.Allocation;
 using osu.Game;
 using osu.Game.Updater;
@@ -88,16 +89,18 @@ namespace osu.Android
             {
                 get
                 {
-                    using (IntentFilter filter = new IntentFilter("android.intent.action.BATTERY_CHANGED"))
+                    using (IntentFilter filter = new IntentFilter(Intent.ActionBatteryChanged))
                     using (Intent battery = Application.Context.RegisterReceiver(null, filter))
                     {
-                        int level = battery.GetIntExtra("level", -1);
-                        int scale = battery.GetIntExtra("scale", -1);
-                        if (scale <= 0)
+                        int level = battery.GetIntExtra(BatteryManager.ExtraLevel, -1);
+                        int scale = battery.GetIntExtra(BatteryManager.ExtraScale, -1);
+
+                        if (level < 0 || scale <= 0)
                         {
                             return 1.0;
                         }
-                        return level / scale;
+
+                        return (double)level / scale;
                     }
                 }
             }
@@ -106,11 +109,10 @@ namespace osu.Android
             {
                 get
                 {
-                    using (IntentFilter filter = new IntentFilter("android.intent.action.BATTERY_CHANGED"))
+                    using (IntentFilter filter = new IntentFilter(Intent.ActionBatteryChanged))
                     using (Intent battery = Application.Context.RegisterReceiver(null, filter))
                     {
-                        int state = battery.GetIntExtra("plugged", -1);
-                        return state != 1 && state != 2 && state != 4;
+                        return battery.GetIntExtra(BatteryManager.ExtraPlugged, -1) != 0;
                     }
                 }
             }
