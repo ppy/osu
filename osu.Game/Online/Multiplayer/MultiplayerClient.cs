@@ -181,7 +181,7 @@ namespace osu.Game.Online.Multiplayer
                 await Task.WhenAll(joinedRoom.Users.Select(PopulateUser)).ConfigureAwait(false);
 
                 // Update the stored room (must be done on update thread for thread-safety).
-                await scheduleAsync(() =>
+                await runOnUpdateThreadAsync(() =>
                 {
                     Room = joinedRoom;
                     APIRoom = room;
@@ -228,7 +228,7 @@ namespace osu.Game.Online.Multiplayer
             // Leaving rooms is expected to occur instantaneously whilst the operation is finalised in the background.
             // However a few members need to be reset immediately to prevent other components from entering invalid states whilst the operation hasn't yet completed.
             // For example, if a room was left and the user immediately pressed the "create room" button, then the user could be taken into the lobby if the value of Room is not reset in time.
-            var scheduledReset = scheduleAsync(() =>
+            var scheduledReset = runOnUpdateThreadAsync(() =>
             {
                 APIRoom = null;
                 Room = null;
@@ -799,7 +799,7 @@ namespace osu.Game.Online.Multiplayer
                 PlayingUserIds.Remove(userId);
         }
 
-        private Task scheduleAsync(Action action, CancellationToken cancellationToken = default)
+        private Task runOnUpdateThreadAsync(Action action, CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<bool>();
 
