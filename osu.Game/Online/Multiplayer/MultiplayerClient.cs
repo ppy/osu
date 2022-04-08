@@ -142,7 +142,7 @@ namespace osu.Game.Online.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            IsConnected.BindValueChanged(connected =>
+            IsConnected.BindValueChanged(connected => Scheduler.Add(() =>
             {
                 // clean up local room state on server disconnect.
                 if (!connected.NewValue && Room != null)
@@ -150,7 +150,7 @@ namespace osu.Game.Online.Multiplayer
                     Logger.Log("Connection to multiplayer server was lost.", LoggingTarget.Runtime, LogLevel.Important);
                     LeaveRoom();
                 }
-            });
+            }));
         }
 
         private readonly TaskChain joinOrLeaveTaskChain = new TaskChain();
