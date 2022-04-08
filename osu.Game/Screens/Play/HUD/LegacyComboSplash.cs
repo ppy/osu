@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Play.HUD
         [SettingSource("Side, where bursts will appear")]
         public Bindable<Side> BurstsSide { get; } = new Bindable<Side>(Side.Random);
 
+        private IBindable<bool> randomOrder;
+
         private readonly Bindable<int> current = new BindableInt { MinValue = 0 };
 
         public bool UsesFixedAnchor { get; set; }
@@ -40,6 +42,11 @@ namespace osu.Game.Screens.Play.HUD
         private Container<Sprite> left;
         private Container<Sprite> right;
 
+        /// <summary>
+        /// Stores next burst sprite's index, when non-random order is used.
+        /// </summary>
+        private int spriteIndex;
+
         public LegacyComboSplash()
         {
             AutoSizeAxes = Axes.Both;
@@ -59,7 +66,17 @@ namespace osu.Game.Screens.Play.HUD
 
             if (toShow.Count == 0) return;
 
-            Sprite sprite = toShow[random.Next(0, toShow.Count)];
+            Sprite sprite;
+
+            if (randomOrder.Value)
+                sprite = toShow[random.Next(0, toShow.Count)];
+            else
+            {
+                if (spriteIndex >= toShow.Count) spriteIndex = 0;
+                sprite = toShow[spriteIndex];
+                spriteIndex++;
+            }
+
             sprite.MoveToX(-sprite.Width * 0.625f).Then().MoveToX(0, 700, Easing.Out);
             sprite.FadeTo(1).Delay(200).FadeOut(1000, Easing.In);
         }
@@ -68,6 +85,7 @@ namespace osu.Game.Screens.Play.HUD
         private void load(ScoreProcessor scoreProcessor, ISkinSource skin)
         {
             current.BindTo(scoreProcessor.Combo);
+            randomOrder = skin.GetConfig<SkinConfiguration.LegacySetting, bool>(SkinConfiguration.LegacySetting.ComboBurstRandom) ?? new Bindable<bool>();
 
             var c = new LegacyComboSplashComponent();
 
