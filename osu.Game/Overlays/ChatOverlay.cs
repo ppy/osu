@@ -317,7 +317,7 @@ namespace osu.Game.Overlays
 
             Debug.Assert(channel.Id == message.ChannelId);
 
-            if (currentChannel.Value.Id != channel.Id)
+            if (currentChannel.Value?.Id != channel.Id)
             {
                 if (!channel.Joined.Value)
                     channel = channelManager.JoinChannel(channel);
