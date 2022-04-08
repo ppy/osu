@@ -493,11 +493,13 @@ namespace osu.Game.Online.Multiplayer
         {
             Scheduler.Add(() =>
             {
-                if (Room == null)
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // TODO: user should NEVER be null here, see https://github.com/ppy/osu/issues/17713.
+                if (user == null)
                     return;
 
-                Room.Users.Single(u => u.UserID == userId).State = state;
-
+                user.State = state;
                 updateUserPlayingState(userId, state);
 
                 RoomUpdated?.Invoke();
@@ -510,10 +512,13 @@ namespace osu.Game.Online.Multiplayer
         {
             Scheduler.Add(() =>
             {
-                if (Room == null)
+                var user = Room?.Users.SingleOrDefault(u => u.UserID == userId);
+
+                // TODO: user should NEVER be null here, see https://github.com/ppy/osu/issues/17713.
+                if (user == null)
                     return;
 
-                Room.Users.Single(u => u.UserID == userId).MatchState = state;
+                user.MatchState = state;
                 RoomUpdated?.Invoke();
             }, false);
 
