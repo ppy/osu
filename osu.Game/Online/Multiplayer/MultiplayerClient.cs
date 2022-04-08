@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Database;
@@ -87,7 +88,21 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
         /// </summary>
-        public MultiplayerRoom? Room { get; private set; }
+        public MultiplayerRoom? Room
+        {
+            get
+            {
+                Debug.Assert(ThreadSafety.IsUpdateThread);
+                return room;
+            }
+            private set
+            {
+                Debug.Assert(ThreadSafety.IsUpdateThread);
+                room = value;
+            }
+        }
+
+        private MultiplayerRoom? room;
 
         /// <summary>
         /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
