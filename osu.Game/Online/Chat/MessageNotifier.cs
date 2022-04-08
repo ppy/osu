@@ -178,8 +178,6 @@ namespace osu.Game.Online.Chat
                 {
                     notificationOverlay.Hide();
                     chatOverlay.HighlightMessage(message, channel);
-                    chatOverlay.Show();
-
                     return true;
                 };
             }

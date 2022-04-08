@@ -313,6 +313,8 @@ namespace osu.Game.Overlays
         /// <param name="channel">The channel containing the message.</param>
         public void HighlightMessage(Message message, Channel channel)
         {
+            Show();
+
             Debug.Assert(channel.Id == message.ChannelId);
 
             if (currentChannel.Value.Id != channel.Id)
