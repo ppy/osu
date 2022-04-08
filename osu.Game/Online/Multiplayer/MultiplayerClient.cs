@@ -163,13 +163,13 @@ namespace osu.Game.Online.Multiplayer
         /// <param name="password">An optional password to use for the join operation.</param>
         public async Task JoinRoom(Room room, string? password = null)
         {
+            if (Room != null)
+                throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
+
             var cancellationSource = joinCancellationSource = new CancellationTokenSource();
 
             await joinOrLeaveTaskChain.Add(async () =>
             {
-                if (Room != null)
-                    throw new InvalidOperationException("Cannot join a multiplayer room while already in one.");
-
                 Debug.Assert(room.RoomID.Value != null);
 
                 // Join the server-side room.
@@ -183,6 +183,8 @@ namespace osu.Game.Online.Multiplayer
                 // Update the stored room (must be done on update thread for thread-safety).
                 await runOnUpdateThreadAsync(() =>
                 {
+                    Debug.Assert(Room == null);
+
                     Room = joinedRoom;
                     APIRoom = room;
 
