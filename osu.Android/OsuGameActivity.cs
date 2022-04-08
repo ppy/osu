@@ -138,9 +138,7 @@ namespace osu.Android
 
                 cursor.MoveToFirst();
 
-#pragma warning disable 618 // OpenableColumns is deprecated
-                int filenameColumn = cursor.GetColumnIndex(OpenableColumns.DisplayName);
-#pragma warning restore 618
+                int filenameColumn = cursor.GetColumnIndex(IOpenableColumns.DisplayName);
                 string filename = cursor.GetString(filenameColumn);
 
                 // SharpCompress requires archive streams to be seekable, which the stream opened by
