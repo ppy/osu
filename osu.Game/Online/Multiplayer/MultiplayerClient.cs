@@ -481,11 +481,7 @@ namespace osu.Game.Online.Multiplayer
 
         Task IMultiplayerClient.SettingsChanged(MultiplayerRoomSettings newSettings)
         {
-            Debug.Assert(APIRoom != null);
-            Debug.Assert(Room != null);
-
             Scheduler.Add(() => updateLocalRoomSettings(newSettings));
-
             return Task.CompletedTask;
         }
 
