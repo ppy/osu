@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Mods
                 private Vector2 flashlightSize;
                 private float flashlightDim;
 
-                private readonly VertexBatch<PositionAndColourVertex> quadBatch = new QuadBatch<PositionAndColourVertex>(1, 1);
+                private readonly VertexBatch<PositionAndColourVertex> quadBatch = new QuadBatch<PositionAndColourVertex>(1);
                 private readonly Func<TexturedVertex2D, PositionAndColourVertex> vertexFunc;
                 private VertexGroup<PositionAndColourVertex> vertices;
 
