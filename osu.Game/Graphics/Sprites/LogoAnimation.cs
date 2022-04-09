@@ -55,11 +55,11 @@ namespace osu.Game.Graphics.Sprites
                 progress = source.animationProgress;
             }
 
-            protected override void Blit(QuadBatch<TexturedVertex2D> batch)
+            protected override void Blit(ref VertexGroup<TexturedVertex2D> vertices)
             {
                 Shader.GetUniform<float>("progress").UpdateValue(ref progress);
 
-                base.Blit(batch);
+                base.Blit(ref vertices);
             }
 
             protected override bool CanDrawOpaqueInterior => false;

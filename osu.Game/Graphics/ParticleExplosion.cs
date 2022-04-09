@@ -88,7 +88,7 @@ namespace osu.Game.Graphics
                 currentTime = source.Time.Current;
             }
 
-            protected override void Blit(QuadBatch<TexturedVertex2D> batch)
+            protected override void Blit(ref VertexGroup<TexturedVertex2D> vertices)
             {
                 // double time = currentTime - startTime;
                 //

@@ -106,38 +106,35 @@ namespace osu.Game.Graphics
                 sourceSize = Source.DrawSize;
             }
 
-            protected override void Blit(QuadBatch<TexturedVertex2D> quadBatch)
+            protected override void Blit(ref VertexGroup<TexturedVertex2D> vertices)
             {
-                using (quadBatch.BeginGroup(ref Vertices, this))
+                foreach (var p in particles)
                 {
-                    foreach (var p in particles)
-                    {
-                        float timeSinceStart = currentTime - p.StartTime;
+                    float timeSinceStart = currentTime - p.StartTime;
 
-                        // ignore particles from the future.
-                        // these can appear when seeking in replays.
-                        if (timeSinceStart < 0) continue;
+                    // ignore particles from the future.
+                    // these can appear when seeking in replays.
+                    if (timeSinceStart < 0) continue;
 
-                        float alpha = p.AlphaAtTime(timeSinceStart);
-                        if (alpha <= 0) continue;
+                    float alpha = p.AlphaAtTime(timeSinceStart);
+                    if (alpha <= 0) continue;
 
-                        var pos = p.PositionAtTime(timeSinceStart, gravity, maxDuration);
-                        float scale = p.ScaleAtTime(timeSinceStart);
-                        float angle = p.AngleAtTime(timeSinceStart);
+                    var pos = p.PositionAtTime(timeSinceStart, gravity, maxDuration);
+                    float scale = p.ScaleAtTime(timeSinceStart);
+                    float angle = p.AngleAtTime(timeSinceStart);
 
-                        var rect = createDrawRect(pos, scale);
+                    var rect = createDrawRect(pos, scale);
 
-                        var quad = new Quad(
-                            transformPosition(rect.TopLeft, rect.Centre, angle),
-                            transformPosition(rect.TopRight, rect.Centre, angle),
-                            transformPosition(rect.BottomLeft, rect.Centre, angle),
-                            transformPosition(rect.BottomRight, rect.Centre, angle)
-                        );
+                    var quad = new Quad(
+                        transformPosition(rect.TopLeft, rect.Centre, angle),
+                        transformPosition(rect.TopRight, rect.Centre, angle),
+                        transformPosition(rect.BottomLeft, rect.Centre, angle),
+                        transformPosition(rect.BottomRight, rect.Centre, angle)
+                    );
 
-                        DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), ref Vertices,
-                            inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                            textureCoords: TextureCoords);
-                    }
+                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), ref vertices,
+                        inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        textureCoords: TextureCoords);
                 }
             }
 
