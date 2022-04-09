@@ -111,9 +111,9 @@ namespace osu.Game.Graphics
                         Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
                     );
 
-                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), ref vertices, null,
-                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                        null, TextureCoords);
+                    DrawQuad(ref vertices, Texture,
+                        quad,
+                        DrawColourInfo.Colour.MultiplyAlpha(alpha), null, new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height), null, TextureCoords);
                 }
             }
 

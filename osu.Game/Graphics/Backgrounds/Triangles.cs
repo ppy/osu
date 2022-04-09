@@ -299,12 +299,8 @@ namespace osu.Game.Graphics.Backgrounds
                         ColourInfo colourInfo = DrawColourInfo.Colour;
                         colourInfo.ApplyChild(particle.Colour);
 
-                        DrawTriangle(
-                            texture,
-                            triangle,
-                            colourInfo,
-                            ref vertices,
-                            inflationPercentage: Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
+                        DrawTriangle(ref vertices,
+                            texture, triangle, colourInfo, inflationPercentage: Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
                     }
 
                     shader.Unbind();

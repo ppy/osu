@@ -239,13 +239,9 @@ namespace osu.Game.Screens.Menu
                                     Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                                 );
 
-                                DrawQuad(
-                                    texture,
-                                    rectangle,
-                                    colourInfo,
-                                    ref vertices,
+                                DrawQuad(ref vertices,
                                     // barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
-                                    inflationPercentage: Vector2.Divide(inflation, barSize.Yx));
+                                    texture, rectangle, colourInfo, inflationPercentage: Vector2.Divide(inflation, barSize.Yx));
                             }
                         }
                     }
