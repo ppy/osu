@@ -108,7 +108,7 @@ namespace osu.Game.Graphics
 
             protected override void Blit(QuadBatch<TexturedVertex2D> quadBatch)
             {
-                using (quadBatch.BeginUsage(ref BatchUsage, this))
+                using (quadBatch.BeginGroup(ref Vertices, this))
                 {
                     foreach (var p in particles)
                     {
@@ -134,7 +134,7 @@ namespace osu.Game.Graphics
                             transformPosition(rect.BottomRight, rect.Centre, angle)
                         );
 
-                        DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), ref BatchUsage,
+                        DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), ref Vertices,
                             inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
                             textureCoords: TextureCoords);
                     }
