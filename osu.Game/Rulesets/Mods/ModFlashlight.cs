@@ -1,14 +1,17 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
+using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -209,16 +212,17 @@ namespace osu.Game.Rulesets.Mods
                 private float flashlightDim;
 
                 private readonly VertexBatch<PositionAndColourVertex> quadBatch = new QuadBatch<PositionAndColourVertex>(1, 1);
-                // private readonly Action<TexturedVertex2D> addAction;
+                private readonly Action<TexturedVertex2D> addAction;
+                private VertexGroup<PositionAndColourVertex> vertices;
 
                 public FlashlightDrawNode(Flashlight source)
                     : base(source)
                 {
-                    // addAction = v => quadBatch.Add(new PositionAndColourVertex
-                    // {
-                    //     Position = v.Position,
-                    //     Colour = v.Colour
-                    // });
+                    addAction = v => vertices.Add(new PositionAndColourVertex
+                    {
+                        Position = v.Position,
+                        Colour = v.Colour
+                    });
                 }
 
                 public override void ApplyState()
@@ -232,20 +236,24 @@ namespace osu.Game.Rulesets.Mods
                     flashlightDim = Source.FlashlightDim;
                 }
 
-                // public override void Draw(Action<TexturedVertex2D> vertexAction)
-                // {
-                //     base.Draw(vertexAction);
-                //
-                //     shader.Bind();
-                //
-                //     shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
-                //     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
-                //     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
-                //
-                //     DrawQuad(Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: addAction);
-                //
-                //     shader.Unbind();
-                // }
+                public override void Draw(in DrawState drawState)
+                {
+                    base.Draw(drawState);
+
+                    shader.Bind();
+
+                    shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref flashlightPosition);
+                    shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
+                    shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
+
+                    using (quadBatch.BeginGroup(ref vertices, this))
+                    {
+                        var delegatedVertices = new DelegatingVertexGroup<TexturedVertex2D>(addAction);
+                        DrawQuad(ref delegatedVertices, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
+                    }
+
+                    shader.Unbind();
+                }
 
                 protected override void Dispose(bool isDisposing)
                 {
