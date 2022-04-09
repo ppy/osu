@@ -90,31 +90,31 @@ namespace osu.Game.Graphics
 
             protected override void Blit(ref VertexGroup<TexturedVertex2D> vertices)
             {
-                // double time = currentTime - startTime;
-                //
-                // foreach (var p in parts)
-                // {
-                //     Vector2 pos = p.PositionAtTime(time);
-                //     float alpha = p.AlphaAtTime(time);
-                //
-                //     var rect = new RectangleF(
-                //         pos.X * sourceSize.X - Texture.DisplayWidth / 2,
-                //         pos.Y * sourceSize.Y - Texture.DisplayHeight / 2,
-                //         Texture.DisplayWidth,
-                //         Texture.DisplayHeight);
-                //
-                //     // convert to screen space.
-                //     var quad = new Quad(
-                //         Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
-                //         Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
-                //         Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
-                //         Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
-                //     );
-                //
-                //     DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), null, vertexAction,
-                //         new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
-                //         null, TextureCoords);
-                // }
+                double time = currentTime - startTime;
+
+                foreach (var p in parts)
+                {
+                    Vector2 pos = p.PositionAtTime(time);
+                    float alpha = p.AlphaAtTime(time);
+
+                    var rect = new RectangleF(
+                        pos.X * sourceSize.X - Texture.DisplayWidth / 2,
+                        pos.Y * sourceSize.Y - Texture.DisplayHeight / 2,
+                        Texture.DisplayWidth,
+                        Texture.DisplayHeight);
+
+                    // convert to screen space.
+                    var quad = new Quad(
+                        Vector2Extensions.Transform(rect.TopLeft, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(rect.TopRight, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(rect.BottomLeft, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
+                    );
+
+                    DrawQuad(Texture, quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), ref vertices, null,
+                        new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height),
+                        null, TextureCoords);
+                }
             }
 
             protected override bool CanDrawOpaqueInterior => false;
