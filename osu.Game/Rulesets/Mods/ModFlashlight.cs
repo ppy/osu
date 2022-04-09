@@ -212,17 +212,17 @@ namespace osu.Game.Rulesets.Mods
                 private float flashlightDim;
 
                 private readonly VertexBatch<PositionAndColourVertex> quadBatch = new QuadBatch<PositionAndColourVertex>(1, 1);
-                private readonly Action<TexturedVertex2D> addAction;
+                private readonly Func<TexturedVertex2D, PositionAndColourVertex> vertexFunc;
                 private VertexGroup<PositionAndColourVertex> vertices;
 
                 public FlashlightDrawNode(Flashlight source)
                     : base(source)
                 {
-                    addAction = v => vertices.Add(new PositionAndColourVertex
+                    vertexFunc = v => new PositionAndColourVertex
                     {
                         Position = v.Position,
                         Colour = v.Colour
-                    });
+                    };
                 }
 
                 public override void ApplyState()
@@ -248,8 +248,8 @@ namespace osu.Game.Rulesets.Mods
 
                     using (quadBatch.BeginGroup(ref vertices, this))
                     {
-                        var delegatedVertices = new DelegatingVertexGroup<TexturedVertex2D>(addAction);
-                        DrawQuad(ref delegatedVertices, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
+                        var transformer = new VertexGroupTransformer<TexturedVertex2D, PositionAndColourVertex>(ref vertices, vertexFunc);
+                        DrawQuad(ref transformer, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
                     }
 
                     shader.Unbind();
