@@ -246,7 +246,7 @@ namespace osu.Game.Rulesets.Mods
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
                     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
 
-                    using (quadBatch.BeginGroup(ref vertices, this))
+                    using (quadBatch.BeginVertices(this, ref vertices))
                     {
                         var transformer = new VertexGroupTransformer<TexturedVertex2D, PositionAndColourVertex>(ref vertices, vertexFunc);
                         DrawQuad(ref transformer, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);

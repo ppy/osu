@@ -280,7 +280,7 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount);
                 }
 
-                using (vertexBatch.BeginGroup(ref vertices, this))
+                using (vertexBatch.BeginVertices(this, ref vertices))
                 {
                     shader.Bind();
 

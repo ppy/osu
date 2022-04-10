@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.Draw(drawState);
 
-                using (vertexBatch.BeginGroup(ref vertices, this))
+                using (vertexBatch.BeginVertices(this, ref vertices))
                 {
                     shader.Bind();
                     shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
