@@ -28,9 +28,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
     public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
         protected readonly BindableList<MultiplayerRoomUser> MultiplayerUsers = new BindableList<MultiplayerRoomUser>();
-        private readonly BindableList<int> multiplayerUserIds = new BindableList<int>();
 
         protected MultiplayerGameplayLeaderboard Leaderboard { get; private set; }
+
+        protected virtual MultiplayerRoomUser CreateUser(int userId) => new MultiplayerRoomUser(userId);
+
+        protected abstract MultiplayerGameplayLeaderboard CreateLeaderboard(OsuScoreProcessor scoreProcessor);
+
+        private readonly BindableList<int> multiplayerUserIds = new BindableList<int>();
 
         private OsuConfigManager config;
 
@@ -81,7 +86,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
             {
-                Username = "local",
+                Id = 1,
             });
 
             AddStep("populate users", () =>
@@ -95,24 +100,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Leaderboard?.Expire();
 
-                OsuScoreProcessor scoreProcessor;
                 Beatmap.Value = CreateWorkingBeatmap(Ruleset.Value);
-
                 var playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Ruleset.Value);
-
-                Child = scoreProcessor = new OsuScoreProcessor();
-
+                OsuScoreProcessor scoreProcessor = new OsuScoreProcessor();
                 scoreProcessor.ApplyBeatmap(playableBeatmap);
+
+                Child = scoreProcessor;
 
                 LoadComponentAsync(Leaderboard = CreateLeaderboard(scoreProcessor), Add);
             });
 
             AddUntilStep("wait for load", () => Leaderboard.IsLoaded);
         }
-
-        protected virtual MultiplayerRoomUser CreateUser(int i) => new MultiplayerRoomUser(i);
-
-        protected abstract MultiplayerGameplayLeaderboard CreateLeaderboard(OsuScoreProcessor scoreProcessor);
 
         [Test]
         public void TestScoreUpdates()
