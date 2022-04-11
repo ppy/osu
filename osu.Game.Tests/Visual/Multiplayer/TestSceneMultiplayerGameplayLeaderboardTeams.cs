@@ -14,9 +14,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerGameplayLeaderboardTeams : MultiplayerGameplayLeaderboardTestScene
     {
-        protected override MultiplayerRoomUser CreateUser(int i)
+        protected override MultiplayerRoomUser CreateUser(int userId)
         {
-            var user = base.CreateUser(i);
+            var user = base.CreateUser(userId);
             user.MatchState = new TeamVersusUserState
             {
                 TeamID = RNG.Next(0, 2)
