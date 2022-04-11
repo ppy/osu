@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = leadIn }
             });
 
-            AddStep($"check first frame time", () =>
+            AddStep("check first frame time", () =>
             {
                 Assert.That(player.FirstFrameClockTime, Is.Not.Null);
                 Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddStep($"check first frame time", () =>
+            AddStep("check first frame time", () =>
             {
                 Assert.That(player.FirstFrameClockTime, Is.Not.Null);
                 Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddStep($"check first frame time", () =>
+            AddStep("check first frame time", () =>
             {
                 Assert.That(player.FirstFrameClockTime, Is.Not.Null);
                 Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
