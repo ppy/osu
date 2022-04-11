@@ -122,14 +122,14 @@ namespace osu.Game.Screens.Play
             if (gameplayStartTime != null)
                 StartTime = gameplayStartTime;
 
-            ensureSourceClockSet();
-            Seek(StartTime ?? 0);
-
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
 
             if (!IsPaused.Value || startClock)
                 Start();
+
+            ensureSourceClockSet();
+            Seek(StartTime ?? 0);
         }
 
         /// <summary>
