@@ -174,11 +174,11 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>The rotated vector.</returns>
         private static Vector2 rotateVector(Vector2 vector, float rotation)
         {
-            float angle = (float)Math.Atan2(vector.Y, vector.X) + rotation;
+            float angle = MathF.Atan2(vector.Y, vector.X) + rotation;
             float length = vector.Length;
             return new Vector2(
-                length * (float)Math.Cos(angle),
-                length * (float)Math.Sin(angle)
+                length * MathF.Cos(angle),
+                length * MathF.Sin(angle)
             );
         }
     }
