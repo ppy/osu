@@ -221,7 +221,7 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        public void WatchUser(int userId)
+        public virtual void WatchUser(int userId)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 

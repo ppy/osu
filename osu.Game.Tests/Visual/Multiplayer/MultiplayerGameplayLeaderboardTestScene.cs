@@ -84,6 +84,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public virtual void SetUpSteps()
         {
+            AddStep("reset counts", () => spectatorClient.Invocations.Clear());
+
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
             {
                 Id = 1,
@@ -111,6 +113,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => Leaderboard.IsLoaded);
+
+            AddStep("check watch requests were sent", () =>
+            {
+                foreach (var user in MultiplayerUsers)
+                    spectatorClient.Verify(s => s.WatchUser(user.UserID), Times.Once);
+            });
         }
 
         [Test]
@@ -130,6 +138,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 MultiplayerUsers.RemoveAt(0);
                 return false;
+            });
+
+            AddStep("check stop watching requests were sent", () =>
+            {
+                foreach (var user in MultiplayerUsers)
+                    spectatorClient.Verify(s => s.StopWatchingUser(user.UserID), Times.Once);
             });
         }
 
