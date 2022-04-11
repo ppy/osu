@@ -130,17 +130,32 @@ namespace osu.Game.Screens.Play
 
         protected override void OnIsPausedChanged(ValueChangedEvent<bool> isPaused)
         {
-            // The source is stopped by a frequency fade first.
-            if (isPaused.NewValue)
+            if (IsLoaded)
             {
-                this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ =>
+                // During normal operation, the source is stopped after performing a frequency ramp.
+                if (isPaused.NewValue)
                 {
-                    if (IsPaused.Value == isPaused.NewValue)
-                        AdjustableSource.Stop();
-                });
+                    this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ =>
+                    {
+                        if (IsPaused.Value == isPaused.NewValue)
+                            AdjustableSource.Stop();
+                    });
+                }
+                else
+                    this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
             }
             else
-                this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
+            {
+                if (isPaused.NewValue)
+                    AdjustableSource.Stop();
+
+                // If not yet loaded, we still want to ensure relevant state is correct, as it is used for offset calculations.
+                pauseFreqAdjust.Value = isPaused.NewValue ? 0 : 1;
+
+                // We must also process underlying gameplay clocks to update rate-adjusted offsets with the new frequency adjustment.
+                // Without doing this, an initial seek may be performed with the wrong offset.
+                GameplayClock.UnderlyingClock.ProcessFrame();
+            }
         }
 
         public override void Start()
