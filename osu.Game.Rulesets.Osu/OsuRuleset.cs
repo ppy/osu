@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModClassic(),
                         new OsuModRandom(),
                         new OsuModMirror(),
-                        new OsuModAlternate(),
+                        new MultiMod(new OsuModAlternate(), new OsuModSingleTap()),
                     };
 
                 case ModType.Automation:

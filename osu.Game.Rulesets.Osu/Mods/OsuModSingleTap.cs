@@ -16,16 +16,14 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModAlternate : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
+    public class OsuModSingleTap : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
-        public override string Name => @"Alternate";
-        public override string Acronym => @"AL";
-        public override string Description => @"Don't use the same key twice in a row!";
+        public override string Name => @"Single Tap";
+        public override string Acronym => @"ST";
+        public override string Description => @"Only use one key!";
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModSingleTap) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAlternate), typeof(OsuModRelax) };
         public override ModType Type => ModType.Conversion;
-        public override IconUsage? Icon => FontAwesome.Solid.Keyboard;
-
         private double firstObjectValidJudgementTime;
         private IBindable<bool> isBreakTime;
         private const double flash_duration = 1000;
@@ -48,11 +46,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToPlayer(Player player)
         {
             isBreakTime = player.IsBreakTime.GetBoundCopy();
-            isBreakTime.ValueChanged += e =>
-            {
-                if (e.NewValue)
-                    lastActionPressed = null;
-            };
         }
 
         private bool checkCorrectAction(OsuAction action)
@@ -74,10 +67,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                     return true;
             }
 
-            if (lastActionPressed != action)
+            if (lastActionPressed == null)
             {
-                // User alternated correctly.
                 lastActionPressed = action;
+                return true;
+            }
+            else if (lastActionPressed == action)
+            {
                 return true;
             }
 
@@ -87,9 +83,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
         {
-            private readonly OsuModAlternate mod;
+            private readonly OsuModSingleTap mod;
 
-            public InputInterceptor(OsuModAlternate mod)
+            public InputInterceptor(OsuModSingleTap mod)
             {
                 this.mod = mod;
             }
