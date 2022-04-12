@@ -1053,12 +1053,19 @@ namespace osu.Game.Screens.Play
             if (DrawableRuleset.ReplayScore != null)
                 return Task.CompletedTask;
 
-            LegacyByteArrayReader replayReader;
+            LegacyByteArrayReader replayReader = null;
 
-            using (var stream = new MemoryStream())
+            try
             {
-                new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
-                replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                using (var stream = new MemoryStream())
+                {
+                    new LegacyScoreEncoder(score, GameplayState.Beatmap).Encode(stream);
+                    replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
+                }
+            }
+            catch (ArgumentException ae)
+            {
+                Logger.Log($"Replay could not be constructed for score import ({ae})");
             }
 
             // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
