@@ -32,7 +32,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
         /// </summary>
-        public event Action? RoomUpdated;
+        public virtual event Action? RoomUpdated;
 
         /// <summary>
         /// Invoked when a new user joins the room.
@@ -88,7 +88,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
         /// </summary>
-        public MultiplayerRoom? Room
+        public virtual MultiplayerRoom? Room
         {
             get
             {
