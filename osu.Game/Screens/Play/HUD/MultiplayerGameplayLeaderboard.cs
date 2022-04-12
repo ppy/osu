@@ -89,10 +89,13 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var users = task.GetResultSafely();
 
-                foreach (var user in users)
+                for (int i = 0; i < users.Length; i++)
                 {
-                    if (user == null)
-                        continue;
+                    var user = users[i] ??= new APIUser
+                    {
+                        Id = playingUsers[i].UserID,
+                        Username = "Unknown user",
+                    };
 
                     var trackedUser = UserScores[user.Id];
 
