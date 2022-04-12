@@ -6,19 +6,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Play;
 
-namespace osu.Game.Rulesets.Mods
+namespace osu.Game.Rulesets.Osu.Mods
 {
 
-    public abstract class ModInputBlocker<TObject, TAction> : Mod, IApplicableToDrawableRuleset<TObject>, IApplicableToPlayer
-        where TObject : HitObject
-        where TAction : struct
+    public abstract class InputBlockingMod : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
-        public abstract bool checkCorrectAction(TAction action);
 
         public override double ScoreMultiplier => 1.0;
         public override ModType Type => ModType.Conversion;
@@ -28,16 +26,36 @@ namespace osu.Game.Rulesets.Mods
         protected double firstObjectValidJudgementTime;
         protected const double flash_duration = 1000;
 
-        protected TAction? lastActionPressed;
+        protected OsuAction? lastActionPressed;
 
-        protected DrawableRuleset<TObject> ruleset;
+        protected DrawableRuleset<OsuHitObject> ruleset;
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
+        public virtual bool checkCorrectAction(OsuAction action){
+            if (isBreakTime.Value)
+                return true;
+
+            if (gameplayClock.CurrentTime < firstObjectValidJudgementTime)
+                return true;
+
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    break;
+
+                // Any action which is not left or right button should be ignored.
+                default:
+                    return true;
+            }
+            return false;
+        }
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             ruleset = drawableRuleset;
             drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
 
-            TObject firstHitObject;
+            OsuHitObject firstHitObject;
             try
             {
                 firstHitObject = ruleset.Beatmap.HitObjects[0];
@@ -63,19 +81,19 @@ namespace osu.Game.Rulesets.Mods
         }
 
 
-        private class InputInterceptor : Component, IKeyBindingHandler<TAction>
+        private class InputInterceptor : Component, IKeyBindingHandler<OsuAction>
         {
-            private readonly ModInputBlocker<TObject, TAction> mod;
+            private readonly InputBlockingMod mod;
 
-            public InputInterceptor(ModInputBlocker<TObject, TAction> mod)
+            public InputInterceptor(InputBlockingMod mod)
             {
                 this.mod = mod;
             }
 
-            public bool OnPressed(KeyBindingPressEvent<TAction> e)
+            public bool OnPressed(KeyBindingPressEvent<OsuAction> e)
                 => !mod.checkCorrectAction(e.Action);
 
-            public void OnReleased(KeyBindingReleaseEvent<TAction> e)
+            public void OnReleased(KeyBindingReleaseEvent<OsuAction> e)
             {
             }
         }
