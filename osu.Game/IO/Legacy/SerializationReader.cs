@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 
 namespace osu.Game.IO.Legacy
@@ -22,15 +21,6 @@ namespace osu.Game.IO.Legacy
         }
 
         public int RemainingBytes => (int)(stream.Length - stream.Position);
-
-        /// <summary> Static method to take a SerializationInfo object (an input to an ISerializable constructor)
-        /// and produce a SerializationReader from which serialized objects can be read </summary>.
-        public static SerializationReader GetReader(SerializationInfo info)
-        {
-            byte[] byteArray = (byte[])info.GetValue("X", typeof(byte[]));
-            MemoryStream ms = new MemoryStream(byteArray);
-            return new SerializationReader(ms);
-        }
 
         /// <summary> Reads a string from the buffer.  Overrides the base implementation so it can cope with nulls. </summary>
         public override string ReadString()

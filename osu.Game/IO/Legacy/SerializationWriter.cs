@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse (we're allowing nulls to be passed to the writer where the underlying class doesn't).
@@ -220,13 +219,6 @@ namespace osu.Game.IO.Legacy
                 } // switch
             } // if obj==null
         } // WriteObject
-
-        /// <summary> Adds the SerializationWriter buffer to the SerializationInfo at the end of GetObjectData(). </summary>
-        public void AddToInfo(SerializationInfo info)
-        {
-            byte[] b = ((MemoryStream)BaseStream).ToArray();
-            info.AddValue("X", b, typeof(byte[]));
-        }
 
         public void WriteRawBytes(byte[] b)
         {
