@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 
@@ -17,9 +18,15 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.X,
-                Height = 50,
-                Child = new MultiplayerMatchFooter()
+                RelativeSizeAxes = Axes.Both,
+                Child = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 50,
+                    Child = new MultiplayerMatchFooter()
+                }
             };
         });
     }
