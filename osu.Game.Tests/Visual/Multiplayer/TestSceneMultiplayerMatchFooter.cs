@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
 
 namespace osu.Game.Tests.Visual.Multiplayer
@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUp]
         public new void Setup() => Schedule(() =>
         {
-            Child = new Container
+            Child = new PopoverContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
