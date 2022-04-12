@@ -48,7 +48,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Team1Score = { BindTarget = Leaderboard.TeamScores[0] },
-                    Team2Score = { BindTarget = Leaderboard.TeamScores[1] }
+                    Team2Score = { BindTarget = Leaderboard.TeamScores[1] },
+                    Expanded = { BindTarget = Leaderboard.Expanded },
                 }, Add);
             });
         }
