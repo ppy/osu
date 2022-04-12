@@ -86,7 +86,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public virtual void SetUpSteps()
         {
-            AddStep("reset counts", () => spectatorClient.Invocations.Clear());
+            AddStep("reset counts", () =>
+            {
+                spectatorClient.Invocations.Clear();
+                lastHeaders.Clear();
+            });
 
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
             {
