@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
-        public readonly SortedDictionary<int, BindableInt> TeamScores = new SortedDictionary<int, BindableInt>();
+        public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play.HUD
                 UserScores[user.UserID] = trackedUser;
 
                 if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
-                    TeamScores.Add(team, new BindableInt());
+                    TeamScores.Add(team, new BindableLong());
             }
 
             userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(task => Schedule(() =>
