@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Ranking
         {
             get
             {
-                if (State.Value == DownloadState.LocallyAvailable)
+                if (State.Value == DownloadState.LocallyAvailable && Score.Value.HasReplay)
                     return ReplayAvailability.Local;
 
                 if (!string.IsNullOrEmpty(Score.Value?.Hash))
