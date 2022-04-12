@@ -389,7 +389,10 @@ namespace osu.Game.Stores
                                 LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
                                 if (existing.DeletePending)
+                                {
+                                    LogForModel(item, $@"Existing {HumanisedModelName}'s deletion flag has been removed");
                                     UndeleteForReuse(existing);
+                                }
 
                                 transaction.Commit();
 
