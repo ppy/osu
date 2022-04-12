@@ -75,7 +75,10 @@ namespace osu.Game.Screens.Play.HUD
             foreach (var user in playingUsers)
             {
                 var trackedUser = CreateUserData(user, ruleset, scoreProcessor);
+
                 trackedUser.ScoringMode.BindTo(scoringMode);
+                trackedUser.Score.BindValueChanged(_ => Scheduler.AddOnce(updateTotals));
+
                 UserScores[user.UserID] = trackedUser;
 
                 if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
@@ -175,8 +178,6 @@ namespace osu.Game.Screens.Play.HUD
 
             trackedData.Frames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
             trackedData.UpdateScore();
-
-            updateTotals();
         });
 
         private void updateTotals()
