@@ -110,6 +110,6 @@ namespace osu.Game.Localisation
         // zh_hk,
 
         [Description(@"繁體中文（台灣）")]
-        zh_tw
+        zh_hant
     }
 }
