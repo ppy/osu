@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModAlternate : ModAlternate<OsuHitObject, OsuAction>
     {
+
         public override bool checkCorrectAction(OsuAction action)
         {
             if (isBreakTime.Value)

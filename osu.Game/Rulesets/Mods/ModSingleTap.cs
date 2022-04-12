@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
         where TAction : struct
     {
         public override string Name => "Single Tap";
-        public override string Acronym => "SL";
+        public override string Acronym => "ST";
         public override string Description => @"Alternate tapping!";
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModAlternate<TObject, TAction>) };
     }

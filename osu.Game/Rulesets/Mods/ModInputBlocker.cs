@@ -1,13 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
@@ -31,6 +32,26 @@ namespace osu.Game.Rulesets.Mods
 
         protected DrawableRuleset<TObject> ruleset;
 
+        public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset)
+        {
+            ruleset = drawableRuleset;
+            drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
+
+            TObject firstHitObject;
+            try
+            {
+                firstHitObject = ruleset.Beatmap.HitObjects[0];
+            }
+            catch(IndexOutOfRangeException)
+            {
+                firstHitObject = null;
+            }
+
+            firstObjectValidJudgementTime = (firstHitObject?.StartTime ?? 0) - (firstHitObject?.HitWindows.WindowFor(HitResult.Meh) ?? 0);
+
+            gameplayClock = drawableRuleset.FrameStableClock;
+        }
+
         public void ApplyToPlayer(Player player)
         {
             isBreakTime = player.IsBreakTime.GetBoundCopy();
@@ -41,15 +62,6 @@ namespace osu.Game.Rulesets.Mods
             };
         }
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<TObject> drawableRuleset){
-            ruleset = drawableRuleset;
-            drawableRuleset.KeyBindingInputManager.Add(new InputInterceptor(this));
-
-            var firstHitObject = ruleset.Objects.GetEnumerator().Current;
-            firstObjectValidJudgementTime = (firstHitObject?.StartTime ?? 0) - (firstHitObject?.HitWindows.WindowFor(HitResult.Meh) ?? 0);
-
-            gameplayClock = drawableRuleset.FrameStableClock;
-        }
 
         private class InputInterceptor : Component, IKeyBindingHandler<TAction>
         {
