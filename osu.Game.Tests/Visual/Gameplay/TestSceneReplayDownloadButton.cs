@@ -130,6 +130,28 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestLocallyAvailableWithoutReplay()
+        {
+            Live<ScoreInfo> imported = null;
+
+            AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(false, false)));
+
+            AddStep("create button without replay", () =>
+            {
+                Child = downloadButton = new TestReplayDownloadButton(imported.Value)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                };
+            });
+
+            AddUntilStep("wait for load", () => downloadButton.IsLoaded);
+
+            AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
+        }
+
+        [Test]
         public void TestScoreImportThenDelete()
         {
             Live<ScoreInfo> imported = null;
@@ -176,11 +198,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
-        private ScoreInfo getScoreInfo(bool replayAvailable)
+        private ScoreInfo getScoreInfo(bool replayAvailable, bool hasOnlineId = true)
         {
             return new APIScore
             {
-                OnlineID = 2553163309,
+                OnlineID = hasOnlineId ? (long)2553163309 : 0,
                 RulesetID = 0,
                 Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
                 HasReplay = replayAvailable,
