@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            // not used but required by the component.
+            // not used directly in component, but required due to it inheriting from OnlinePlayComposite.
             new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
