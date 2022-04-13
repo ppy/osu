@@ -281,9 +281,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 return readyButton.Enabled.Value;
             });
 
-            // TODO: AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+            AddStep("mark beatmap not available", () => beatmapAvailability.Value = BeatmapAvailability.NotDownloaded());
             AddUntilStep("ready button disabled", () => !readyButton.Enabled.Value);
-            // TODO: AddStep("undelete beatmap", () => beatmaps.Undelete(importedSet));
+            AddStep("mark beatmap available", () => beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable());
             AddUntilStep("ready button enabled back", () => readyButton.Enabled.Value);
         }
 
