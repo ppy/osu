@@ -63,27 +63,27 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Container leftArea;
+            inputDrum = new InputDrum(HitObjectContainer)
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+            };
 
             InternalChildren = new[]
             {
                 new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundRight), _ => new PlayfieldBackgroundRight()),
-                leftArea = new Container
+                new Container
                 {
                     Name = "Left overlay",
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
                     BorderColour = colours.Gray0,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.PlayfieldBackgroundLeft), _ => new PlayfieldBackgroundLeft()),
-                        inputDrum = new InputDrum(HitObjectContainer)
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.X,
-                            RelativeSizeAxes = Axes.Y,
-                        },
+                        inputDrum.CreateProxy(),
                     }
                 },
                 mascot = new SkinnableDrawable(new TaikoSkinComponent(TaikoSkinComponents.Mascot), _ => Empty())
@@ -161,14 +161,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 },
                 drumRollHitContainer.CreateProxy(),
+                // this is added at the end of the hierarchy to receive input before taiko objects.
+                // but is proxied below everything to not cover visual effects such as hit explosions.
+                inputDrum,
             };
-
-            // to prioritise receiving key presses on input drum before objects, move input drum to the end of the hierarchy...
-            leftArea.Remove(inputDrum);
-            AddInternal(inputDrum);
-
-            // ...and create a proxy to keep the input drum displayed behind the playfield elements.
-            leftArea.Add(inputDrum.CreateProxy());
 
             RegisterPool<Hit, DrawableHit>(50);
             RegisterPool<Hit.StrongNestedHit, DrawableHit.StrongNestedHit>(50);
