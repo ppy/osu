@@ -335,9 +335,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             [Resolved]
             private BeatmapLookupCache beatmapLookupCache { get; set; }
 
-            [Resolved(CanBeNull = true)]
-            private IBindable<PlaylistItem> selectedItem { get; set; }
-
             private SpriteText statusText;
             private LinkFlowContainer beatmapText;
 
@@ -393,7 +390,6 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
             {
                 base.LoadComplete();
 
-                selectedItem?.BindValueChanged(_ => updateText());
                 CurrentPlaylistItem.BindValueChanged(_ => updateText(), true);
             }
 
@@ -410,8 +406,7 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
                     return;
                 }
 
-                // Prefer the selected item from the sub screen.
-                var beatmap = selectedItem?.Value?.Beatmap ?? CurrentPlaylistItem.Value?.Beatmap;
+                var beatmap = CurrentPlaylistItem.Value?.Beatmap;
                 if (beatmap == null)
                     return;
 
