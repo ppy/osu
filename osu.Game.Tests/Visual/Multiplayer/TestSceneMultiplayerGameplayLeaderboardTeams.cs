@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Utils;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -14,12 +13,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMultiplayerGameplayLeaderboardTeams : MultiplayerGameplayLeaderboardTestScene
     {
+        private int team;
+
         protected override MultiplayerRoomUser CreateUser(int userId)
         {
             var user = base.CreateUser(userId);
             user.MatchState = new TeamVersusUserState
             {
-                TeamID = RNG.Next(0, 2)
+                TeamID = team++ % 2
             };
             return user;
         }

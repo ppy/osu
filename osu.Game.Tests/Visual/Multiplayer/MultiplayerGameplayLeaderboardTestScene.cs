@@ -27,6 +27,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public abstract class MultiplayerGameplayLeaderboardTestScene : OsuTestScene
     {
+        private const int total_users = 16;
+
         protected readonly BindableList<MultiplayerRoomUser> MultiplayerUsers = new BindableList<MultiplayerRoomUser>();
 
         protected MultiplayerGameplayLeaderboard Leaderboard { get; private set; }
@@ -84,7 +86,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [SetUpSteps]
         public virtual void SetUpSteps()
         {
-            AddStep("reset counts", () => spectatorClient.Invocations.Clear());
+            AddStep("reset counts", () =>
+            {
+                spectatorClient.Invocations.Clear();
+                lastHeaders.Clear();
+            });
 
             AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = new APIUser
             {
@@ -94,7 +100,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("populate users", () =>
             {
                 MultiplayerUsers.Clear();
-                for (int i = 0; i < 16; i++)
+                for (int i = 0; i < total_users; i++)
                     MultiplayerUsers.Add(CreateUser(i));
             });
 
