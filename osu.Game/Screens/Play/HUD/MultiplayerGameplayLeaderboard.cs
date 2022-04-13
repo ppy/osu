@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Play.HUD
 
                 for (int i = 0; i < users.Length; i++)
                 {
-                    var user = users[i] ??= new APIUser
+                    var user = users[i] ?? new APIUser
                     {
                         Id = playingUsers[i].UserID,
                         Username = "Unknown user",
