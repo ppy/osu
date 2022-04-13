@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             multiplayerClient.SetupGet(m => m.Room).Returns(() => multiplayerRoom);
 
             // By default, the local user is to be the host.
-            multiplayerClient.SetupGet(m => m.IsHost).Returns(true);
+            multiplayerClient.SetupGet(m => m.IsHost).Returns(() => ReferenceEquals(multiplayerRoom.Host, localUser));
 
             // Assume all state changes are accepted by the server.
             multiplayerClient.Setup(m => m.ChangeState(It.IsAny<MultiplayerUserState>()))
