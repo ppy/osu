@@ -100,9 +100,9 @@ namespace osu.Game.Screens.Play
             bool isStarted = !IsPaused.Value;
 
             // If a custom start time was not specified, calculate the best value to use.
-            double gameplayStartTime = StartTime ?? findEarliestStartTime();
+            StartTime ??= findEarliestStartTime();
 
-            Reset(startClock: isStarted, gameplayStartTime: gameplayStartTime);
+            Reset(startClock: isStarted);
         }
 
         private double findEarliestStartTime()
