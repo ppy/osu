@@ -133,6 +133,11 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     failAndBail();
                 }
             }), true);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Debug.Assert(client.Room != null);
         }

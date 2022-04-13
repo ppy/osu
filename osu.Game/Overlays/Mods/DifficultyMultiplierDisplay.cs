@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Mods
 {
     public class DifficultyMultiplierDisplay : CompositeDrawable, IHasCurrentValue<double>
     {
+        public const float HEIGHT = 42;
+
         public Bindable<double> Current
         {
             get => current.Current;
@@ -42,13 +44,12 @@ namespace osu.Game.Overlays.Mods
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
-        private const float height = 42;
         private const float multiplier_value_area_width = 56;
         private const float transition_duration = 200;
 
         public DifficultyMultiplierDisplay()
         {
-            Height = height;
+            Height = HEIGHT;
             AutoSizeAxes = Axes.X;
 
             InternalChild = new Container
@@ -145,8 +146,9 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             current.BindValueChanged(_ => updateState(), true);
-            FinishTransforms(true);
+
             // required to prevent the counter initially rolling up from 0 to 1
             // due to `Current.Value` having a nonstandard default value of 1.
             multiplierCounter.SetCountWithoutRolling(Current.Value);

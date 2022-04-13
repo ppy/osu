@@ -30,13 +30,15 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private MultiplayerRoom room => multiplayerClient.Room;
 
         private Sample countdownTickSample;
+        private Sample countdownWarnSample;
+        private Sample countdownWarnFinalSample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
-            // disabled for now pending further work on sound effect
-            // countdownTickFinalSample = audio.Samples.Get(@"Multiplayer/countdown-tick-final");
+            countdownWarnSample = audio.Samples.Get(@"Multiplayer/countdown-warn");
+            countdownWarnFinalSample = audio.Samples.Get(@"Multiplayer/countdown-warn-final");
         }
 
         protected override void LoadComplete()
@@ -102,8 +104,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
         private void playTickSound(int secondsRemaining)
         {
             if (secondsRemaining < 10) countdownTickSample?.Play();
-            // disabled for now pending further work on sound effect
-            // if (secondsRemaining <= 3) countdownTickFinalSample?.Play();
+
+            if (secondsRemaining <= 3)
+            {
+                if (secondsRemaining > 0)
+                    countdownWarnSample?.Play();
+                else
+                    countdownWarnFinalSample?.Play();
+            }
         }
 
         private void updateButtonText()

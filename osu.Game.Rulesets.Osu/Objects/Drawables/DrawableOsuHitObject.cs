@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly IBindable<float> ScaleBindable = new BindableFloat();
         public readonly IBindable<int> IndexInCurrentComboBindable = new Bindable<int>();
 
-        // Must be set to update IsHovered as it's used in relax mdo to detect osu hit objects.
+        // Must be set to update IsHovered as it's used in relax mod to detect osu hit objects.
         public override bool HandlePositionalInput => true;
 
         protected override float SamplePlaybackPosition => HitObject.X / OsuPlayfield.BASE_SIZE.X;

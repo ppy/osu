@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -101,6 +102,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.CursorRotation, true);
 
             SetDefault(OsuSetting.MenuParallax, true);
+
+            // See https://stackoverflow.com/a/63307411 for default sourcing.
+            SetDefault(OsuSetting.Prefer24HourTime, CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
 
             // Gameplay
             SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
@@ -287,6 +291,7 @@ namespace osu.Game.Configuration
         MenuVoice,
         CursorRotation,
         MenuParallax,
+        Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
         Username,

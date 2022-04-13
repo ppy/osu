@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Skinning;
@@ -106,6 +107,27 @@ namespace osu.Game.Tests.Skins.IO
             assertCorrectMetadata(import1, "name 1", "author 1", osu);
 
             var import2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("name 1", "author 1"), "name 1.oSK"));
+
+            assertImportedOnce(import1, import2);
+        });
+
+        [Test]
+        public Task TestImportExportedSkinFilename() => runSkinTest(async osu =>
+        {
+            MemoryStream exportStream = new MemoryStream();
+
+            var import1 = await loadSkinIntoOsu(osu, new ZipArchiveReader(createOskWithIni("name 1", "author 1"), "custom.osk"));
+            assertCorrectMetadata(import1, "name 1 [custom]", "author 1", osu);
+
+            import1.PerformRead(s =>
+            {
+                new LegacySkinExporter(osu.Dependencies.Get<Storage>()).ExportModelTo(s, exportStream);
+            });
+
+            string exportFilename = import1.GetDisplayString();
+
+            var import2 = await loadSkinIntoOsu(osu, new ZipArchiveReader(exportStream, $"{exportFilename}.osk"));
+            assertCorrectMetadata(import2, "name 1 [custom]", "author 1", osu);
 
             assertImportedOnce(import1, import2);
         });

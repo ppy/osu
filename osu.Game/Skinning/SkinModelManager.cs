@@ -104,7 +104,9 @@ namespace osu.Game.Skinning
                 // For imports, we want to use the archive or folder name as part of the metadata, in addition to any existing skin.ini metadata.
                 // In an ideal world, skin.ini would be the only source of metadata, but a lot of skin creators and users don't update it when making modifications.
                 // In both of these cases, the expectation from the user is that the filename or folder name is displayed somewhere to identify the skin.
-                if (archiveName != item.Name)
+                if (archiveName != item.Name
+                    // lazer exports use this format
+                    && archiveName != item.GetDisplayString())
                     item.Name = @$"{item.Name} [{archiveName}]";
             }
 

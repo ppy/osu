@@ -48,7 +48,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // If gameplay wasn't finished, then we have a simple path back to the idle state by aborting gameplay.
             if (!playerLoader.GameplayPassed)
             {
-                client.AbortGameplay();
+                client.AbortGameplay().FireAndForget();
                 return;
             }
 
