@@ -8,13 +8,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
@@ -27,6 +26,7 @@ using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer;
 using osu.Game.Screens.Select;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -35,9 +35,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        private List<BeatmapInfo> beatmaps;
+        private IList<BeatmapInfo> beatmaps => importedBeatmapSet?.PerformRead(s => s.Beatmaps) ?? new List<BeatmapInfo>();
 
         private TestMultiplayerMatchSongSelect songSelect;
+
+        private Live<BeatmapSetInfo> importedBeatmapSet;
 
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
@@ -46,44 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(Realm);
 
-            beatmaps = new List<BeatmapInfo>();
-
-            var metadata = new BeatmapMetadata
-            {
-                Artist = "Some Artist",
-                Title = "Some Beatmap",
-                Author = { Username = "Some Author" },
-            };
-
-            var beatmapSetInfo = new BeatmapSetInfo
-            {
-                OnlineID = 10,
-                Hash = Guid.NewGuid().ToString().ComputeMD5Hash(),
-                DateAdded = DateTimeOffset.UtcNow
-            };
-
-            for (int i = 0; i < 8; ++i)
-            {
-                int beatmapId = 10 * 10 + i;
-
-                int length = RNG.Next(30000, 200000);
-                double bpm = RNG.NextSingle(80, 200);
-
-                var beatmap = new BeatmapInfo
-                {
-                    Ruleset = rulesets.GetRuleset(i % 4) ?? throw new InvalidOperationException(),
-                    OnlineID = beatmapId,
-                    Length = length,
-                    BPM = bpm,
-                    Metadata = metadata,
-                    Difficulty = new BeatmapDifficulty()
-                };
-
-                beatmaps.Add(beatmap);
-                beatmapSetInfo.Beatmaps.Add(beatmap);
-            }
-
-            manager.Import(beatmapSetInfo);
+            importedBeatmapSet = manager.Import(TestResources.CreateTestBeatmapSetInfo(8, rulesets.AvailableRulesets.ToArray()));
         }
 
         public override void SetUpSteps()
