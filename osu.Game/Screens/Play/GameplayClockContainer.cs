@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
         /// If not set, a value of zero will be used.
         /// Importantly, the value will be inferred from the current ruleset in <see cref="MasterGameplayClockContainer"/> unless specified.
         /// </remarks>
-        protected double? StartTime { get; set; }
+        public double? StartTime { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="GameplayClockContainer"/>.
@@ -116,12 +116,8 @@ namespace osu.Game.Screens.Play
         /// Resets this <see cref="GameplayClockContainer"/> and the source to an initial state ready for gameplay.
         /// </summary>
         /// <param name="startClock">Whether to start the clock immediately, if not already started.</param>
-        /// <param name="gameplayStartTime">A time to use for future <see cref="Reset"/> calls as the definite start of gameplay.</param>
-        public void Reset(bool startClock = false, double? gameplayStartTime = null)
+        public void Reset(bool startClock = false)
         {
-            if (gameplayStartTime != null)
-                StartTime = gameplayStartTime;
-
             // Manually stop the source in order to not affect the IsPaused state.
             AdjustableSource.Stop();
 
