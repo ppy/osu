@@ -86,8 +86,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.Update();
 
+            // Check required because the room is null until SetUpSteps().
             if (RoomJoined)
+            {
+                // As gameplay get started, the current playlist item in the room changes. Ensure that the bindable changes with it by pulling out the selected item.
                 selectedItem.Value = MultiplayerClient.APIRoom?.Playlist.SingleOrDefault(i => i.ID == MultiplayerClient.Room?.Settings.PlaylistItemId);
+            }
         }
 
         [TestCase(MultiplayerRoomState.Open)]
