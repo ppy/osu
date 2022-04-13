@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
 
         private IDisposable beatmapOffsetSubscription;
 
-        private readonly double latestGameplayStartTime;
+        private readonly double skipTargetTime;
 
         [Resolved]
         private RealmAccess realm { get; set; }
@@ -70,17 +70,17 @@ namespace osu.Game.Screens.Play
         /// Create a new master gameplay clock container.
         /// </summary>
         /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
-        /// <param name="latestGameplayStartTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
-        /// <param name="startFromLatestStartTime">Whether to start from the provided latest start time rather than zero.</param>
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double latestGameplayStartTime, bool startFromLatestStartTime = false)
+        /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
+        /// <param name="startFromSkipTarget">Whether to start from the provided latest start time rather than zero.</param>
+        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime, bool startFromSkipTarget = false)
             : base(beatmap.Track)
         {
             this.beatmap = beatmap;
 
-            this.latestGameplayStartTime = latestGameplayStartTime;
+            this.skipTargetTime = skipTargetTime;
 
-            if (startFromLatestStartTime)
-                StartTime = latestGameplayStartTime;
+            if (startFromSkipTarget)
+                StartTime = skipTargetTime;
         }
 
         protected override void LoadComplete()
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Play
             // generally this is either zero, or some point earlier than zero in the case of storyboards, lead-ins etc.
 
             // start with the originally provided latest time (if before zero).
-            double time = Math.Min(0, latestGameplayStartTime);
+            double time = Math.Min(0, skipTargetTime);
 
             // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
             // this is commonly used to display an intro before the audio track start.
@@ -183,10 +183,10 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void Skip()
         {
-            if (GameplayClock.CurrentTime > latestGameplayStartTime - MINIMUM_SKIP_TIME)
+            if (GameplayClock.CurrentTime > skipTargetTime - MINIMUM_SKIP_TIME)
                 return;
 
-            double skipTarget = latestGameplayStartTime - MINIMUM_SKIP_TIME;
+            double skipTarget = skipTargetTime - MINIMUM_SKIP_TIME;
 
             if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
                 // double skip exception for storyboards with very long intros
