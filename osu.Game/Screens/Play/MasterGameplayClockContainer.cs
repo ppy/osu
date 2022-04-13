@@ -71,16 +71,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="beatmap">The beatmap to be used for time and metadata references.</param>
         /// <param name="skipTargetTime">The latest time which should be used when introducing gameplay. Will be used when skipping forward.</param>
-        /// <param name="startFromSkipTarget">Whether to start from the provided latest start time rather than zero.</param>
-        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime, bool startFromSkipTarget = false)
+        public MasterGameplayClockContainer(WorkingBeatmap beatmap, double skipTargetTime)
             : base(beatmap.Track)
         {
             this.beatmap = beatmap;
-
             this.skipTargetTime = skipTargetTime;
-
-            if (startFromSkipTarget)
-                StartTime = skipTargetTime;
         }
 
         protected override void LoadComplete()
