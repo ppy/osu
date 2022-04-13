@@ -610,7 +610,7 @@ namespace osu.Game.Screens.Play
         /// Specify and seek to a custom start time from which gameplay should be observed.
         /// </summary>
         /// <remarks>
-        /// This performance a non-frame-stable seek. Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
+        /// This performs a non-frame-stable seek. Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
         /// </remarks>
         /// <param name="time">The destination time to seek to.</param>
         protected void SetGameplayStartTime(double time)
