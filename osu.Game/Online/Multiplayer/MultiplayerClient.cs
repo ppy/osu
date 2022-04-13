@@ -714,6 +714,7 @@ namespace osu.Game.Online.Multiplayer
                 int existingIndex = APIRoom.Playlist.IndexOf(APIRoom.Playlist.Single(existing => existing.ID == item.ID));
                 APIRoom.Playlist.RemoveAt(existingIndex);
                 APIRoom.Playlist.Insert(existingIndex, createPlaylistItem(item));
+                APIRoom.CurrentPlaylistItem.Value = APIRoom.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId);
 
                 ItemChanged?.Invoke(item);
                 RoomUpdated?.Invoke();
