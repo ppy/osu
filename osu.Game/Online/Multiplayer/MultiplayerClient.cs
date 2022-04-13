@@ -67,7 +67,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when the multiplayer server requests the current beatmap to be loaded into play.
         /// </summary>
-        public event Action? LoadRequested;
+        public virtual event Action? LoadRequested;
 
         /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
