@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -69,9 +68,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                  raiseRoomUpdated();
                              });
 
-            // We don't want to have to handle entering into actual gameplay in this test.
-            // Returning a failed task should always allow the button to always stay in a clickable state.
-            multiplayerClient.Setup(m => m.StartMatch()).Returns(Task.FromException<InvalidOperationException>(new InvalidOperationException()));
+            multiplayerClient.Setup(m => m.StartMatch())
+                             .Callback(() => multiplayerClient.Raise(m => m.LoadRequested -= null));
 
             multiplayerClient.Setup(m => m.SendMatchRequest(It.IsAny<MatchUserRequest>()))
                              .Callback((MatchUserRequest request) =>
@@ -384,13 +382,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddUntilStep("user is ready", () => localUser.State == MultiplayerUserState.Ready);
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
+
+            AddStep("check start request received", () => multiplayerClient.Verify(m => m.StartMatch(), Times.Once));
             AddUntilStep("user waiting for load", () => localUser.State == MultiplayerUserState.WaitingForLoad);
 
-            AddStep("finish gameplay", () =>
-            {
-                changeUserState(localUser.UserID, MultiplayerUserState.Loaded);
-                changeUserState(localUser.UserID, MultiplayerUserState.FinishedPlay);
-            });
+            AddUntilStep("ready button disabled", () => !control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+
+            AddStep("finish gameplay", () => changeUserState(localUser.UserID, MultiplayerUserState.Idle));
 
             AddUntilStep("ready button enabled", () => control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
