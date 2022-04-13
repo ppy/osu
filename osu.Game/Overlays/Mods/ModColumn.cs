@@ -31,6 +31,10 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModColumn : CompositeDrawable
     {
+        public readonly Container TopLevelContent;
+
+        public readonly ModType ModType;
+
         private Func<Mod, bool>? filter;
 
         /// <summary>
@@ -48,7 +52,8 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private readonly ModType modType;
+        public Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
         private readonly Key[]? toggleKeys;
 
         private readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
@@ -69,95 +74,103 @@ namespace osu.Game.Overlays.Mods
 
         public ModColumn(ModType modType, bool allowBulkSelection, Key[]? toggleKeys = null)
         {
-            this.modType = modType;
+            ModType = modType;
             this.toggleKeys = toggleKeys;
 
             Width = 320;
             RelativeSizeAxes = Axes.Y;
             Shear = new Vector2(ModPanel.SHEAR_X, 0);
-            CornerRadius = ModPanel.CORNER_RADIUS;
-            Masking = true;
 
             Container controlContainer;
             InternalChildren = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = header_height + ModPanel.CORNER_RADIUS,
-                    Children = new Drawable[]
-                    {
-                        headerBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = header_height + ModPanel.CORNER_RADIUS
-                        },
-                        headerText = new OsuTextFlowContainer(t =>
-                        {
-                            t.Font = OsuFont.TorusAlternate.With(size: 17);
-                            t.Shadow = false;
-                            t.Colour = Colour4.Black;
-                        })
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Shear = new Vector2(-ModPanel.SHEAR_X, 0),
-                            Padding = new MarginPadding
-                            {
-                                Horizontal = 17,
-                                Bottom = ModPanel.CORNER_RADIUS
-                            }
-                        }
-                    }
-                },
-                new Container
+                TopLevelContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = header_height },
-                    Child = contentContainer = new Container
+                    CornerRadius = ModPanel.CORNER_RADIUS,
+                    Masking = true,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = ModPanel.CORNER_RADIUS,
-                        BorderThickness = 3,
-                        Children = new Drawable[]
+                        new Container
                         {
-                            contentBackground = new Box
+                            RelativeSizeAxes = Axes.X,
+                            Height = header_height + ModPanel.CORNER_RADIUS,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            new GridContainer
+                                headerBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = header_height + ModPanel.CORNER_RADIUS
+                                },
+                                headerText = new OsuTextFlowContainer(t =>
+                                {
+                                    t.Font = OsuFont.TorusAlternate.With(size: 17);
+                                    t.Shadow = false;
+                                    t.Colour = Colour4.Black;
+                                })
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Shear = new Vector2(-ModPanel.SHEAR_X, 0),
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = 17,
+                                        Bottom = ModPanel.CORNER_RADIUS
+                                    }
+                                }
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = header_height },
+                            Child = contentContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                RowDimensions = new[]
+                                Masking = true,
+                                CornerRadius = ModPanel.CORNER_RADIUS,
+                                BorderThickness = 3,
+                                Children = new Drawable[]
                                 {
-                                    new Dimension(GridSizeMode.AutoSize),
-                                    new Dimension()
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    contentBackground = new Box
                                     {
-                                        controlContainer = new Container
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Padding = new MarginPadding { Horizontal = 14 }
-                                        }
+                                        RelativeSizeAxes = Axes.Both
                                     },
-                                    new Drawable[]
+                                    new GridContainer
                                     {
-                                        new OsuScrollContainer
+                                        RelativeSizeAxes = Axes.Both,
+                                        RowDimensions = new[]
                                         {
-                                            RelativeSizeAxes = Axes.Both,
-                                            ScrollbarOverlapsContent = false,
-                                            Child = panelFlow = new FillFlowContainer<ModPanel>
+                                            new Dimension(GridSizeMode.AutoSize),
+                                            new Dimension()
+                                        },
+                                        Content = new[]
+                                        {
+                                            new Drawable[]
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Spacing = new Vector2(0, 7),
-                                                Padding = new MarginPadding(7)
+                                                controlContainer = new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Padding = new MarginPadding { Horizontal = 14 }
+                                                }
+                                            },
+                                            new Drawable[]
+                                            {
+                                                new NestedVerticalScrollContainer
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    ClampExtension = 100,
+                                                    ScrollbarOverlapsContent = false,
+                                                    Child = panelFlow = new FillFlowContainer<ModPanel>
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        AutoSizeAxes = Axes.Y,
+                                                        Spacing = new Vector2(0, 7),
+                                                        Padding = new MarginPadding(7)
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -193,7 +206,7 @@ namespace osu.Game.Overlays.Mods
 
         private void createHeaderText()
         {
-            IEnumerable<string> headerTextWords = modType.Humanize(LetterCasing.Title).Split(' ');
+            IEnumerable<string> headerTextWords = ModType.Humanize(LetterCasing.Title).Split(' ');
 
             if (headerTextWords.Count() > 1)
             {
@@ -209,7 +222,7 @@ namespace osu.Game.Overlays.Mods
         {
             availableMods.BindTo(game.AvailableMods);
 
-            headerBackground.Colour = accentColour = colours.ForModType(modType);
+            headerBackground.Colour = accentColour = colours.ForModType(ModType);
 
             if (toggleAllCheckbox != null)
             {
@@ -225,6 +238,12 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
             availableMods.BindValueChanged(_ => Scheduler.AddOnce(updateMods));
+            SelectedMods.BindValueChanged(_ =>
+            {
+                // if a load is in progress, don't try to update the selection - the load flow will do so.
+                if (latestLoadTask == null)
+                    updateActiveState();
+            });
             updateMods();
         }
 
@@ -232,7 +251,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(modType) ?? Array.Empty<Mod>()).ToList();
+            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>()).ToList();
 
             if (newMods.SequenceEqual(panelFlow.Children.Select(p => p.Mod)))
                 return;
@@ -250,17 +269,32 @@ namespace osu.Game.Overlays.Mods
             {
                 panelFlow.ChildrenEnumerable = loaded;
 
-                foreach (var panel in panelFlow)
-                    panel.Active.BindValueChanged(_ => updateToggleState());
-                updateToggleState();
-
+                updateActiveState();
+                updateToggleAllState();
                 updateFilter();
+
+                foreach (var panel in panelFlow)
+                {
+                    panel.Active.BindValueChanged(_ =>
+                    {
+                        updateToggleAllState();
+                        SelectedMods.Value = panel.Active.Value
+                            ? SelectedMods.Value.Append(panel.Mod).ToArray()
+                            : SelectedMods.Value.Except(new[] { panel.Mod }).ToArray();
+                    });
+                }
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
             loadTask.ContinueWith(_ =>
             {
                 if (loadTask == latestLoadTask)
                     latestLoadTask = null;
             });
+        }
+
+        private void updateActiveState()
+        {
+            foreach (var panel in panelFlow)
+                panel.Active.Value = SelectedMods.Value.Contains(panel.Mod, EqualityComparer<Mod>.Default);
         }
 
         #region Bulk select / deselect
@@ -297,7 +331,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private void updateToggleState()
+        private void updateToggleAllState()
         {
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
@@ -399,7 +433,7 @@ namespace osu.Game.Overlays.Mods
             foreach (var modPanel in panelFlow)
                 modPanel.ApplyFilter(Filter);
 
-            updateToggleState();
+            updateToggleAllState();
         }
 
         #endregion

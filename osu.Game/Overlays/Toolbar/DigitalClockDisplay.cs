@@ -29,6 +29,23 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
+        private bool use24HourDisplay;
+
+        public bool Use24HourDisplay
+        {
+            get => use24HourDisplay;
+            set
+            {
+                if (use24HourDisplay == value)
+                    return;
+
+                use24HourDisplay = value;
+
+                updateMetrics();
+                UpdateDisplay(DateTimeOffset.Now); //Update realTime.Text immediately instead of waiting until next second
+            }
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -50,13 +67,14 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void UpdateDisplay(DateTimeOffset now)
         {
-            realTime.Text = $"{now:HH:mm:ss}";
+            realTime.Text = use24HourDisplay ? $"{now:HH:mm:ss}" : $"{now:h:mm:ss tt}";
             gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
         private void updateMetrics()
         {
-            Width = showRuntime ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+            Width = showRuntime || !use24HourDisplay ? 66 : 45; // Allows for space for game time up to 99 days (in the padding area since this is quite rare).
+
             gameTime.FadeTo(showRuntime ? 1 : 0);
         }
     }
