@@ -66,6 +66,23 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                  raiseRoomUpdated();
                              });
 
+            multiplayerClient.Setup(m => m.SendMatchRequest(It.IsAny<MatchUserRequest>()))
+                             .Callback((MatchUserRequest request) =>
+                             {
+                                 switch (request)
+                                 {
+                                     case StartMatchCountdownRequest countdownStart:
+                                         multiplayerRoom.Countdown = new MatchStartCountdown { TimeRemaining = countdownStart.Duration };
+                                         raiseRoomUpdated();
+                                         break;
+
+                                     case StopCountdownRequest _:
+                                         multiplayerRoom.Countdown = null;
+                                         raiseRoomUpdated();
+                                         break;
+                                 }
+                             });
+
             Children = new Drawable[]
             {
                 ongoingOperationTracker,
@@ -151,6 +168,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
+            AddStep("check request received", () =>
+            {
+                multiplayerClient.Verify(m => m.SendMatchRequest(It.Is<StartMatchCountdownRequest>(req =>
+                    req.Duration == TimeSpan.FromSeconds(10)
+                )), Times.Once);
+            });
+
             ClickButtonWhenEnabled<MultiplayerCountdownButton>();
             AddStep("click the cancel button", () =>
             {
@@ -159,8 +183,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            // AddStep("finish countdown", skipToEndOfCountdown);
-            AddUntilStep("match not started", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            AddStep("check request received", () =>
+            {
+                multiplayerClient.Verify(m => m.SendMatchRequest(It.IsAny<StopCountdownRequest>()), Times.Once);
+            });
         }
 
         [Test]
