@@ -69,7 +69,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                              });
 
             multiplayerClient.Setup(m => m.StartMatch())
-                             .Callback(() => multiplayerClient.Raise(m => m.LoadRequested -= null));
+                             .Callback(() =>
+                             {
+                                 multiplayerClient.Raise(m => m.LoadRequested -= null);
+
+                                 // immediately "end" gameplay, as we don't care about that part of the process.
+                                 changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                             });
 
             multiplayerClient.Setup(m => m.SendMatchRequest(It.IsAny<MatchUserRequest>()))
                              .Callback((MatchUserRequest request) =>
@@ -244,13 +250,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
-        public void TestCountdownButtonVisibilityWithAutoStartEnablement()
+        public void TestCountdownButtonVisibilityWithAutoStart()
         {
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("local user became ready", () => multiplayerClient.Object.LocalUser?.State == MultiplayerUserState.Ready);
             AddUntilStep("countdown button visible", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
 
-            AddStep("enable auto start", () => multiplayerClient.Object.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
+            AddStep("enable auto start", () => changeRoomSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("local user became ready", () => multiplayerClient.Object.LocalUser?.State == MultiplayerUserState.Ready);
@@ -260,7 +266,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestClickingReadyButtonUnReadiesDuringAutoStart()
         {
-            AddStep("enable auto start", () => multiplayerClient.Object.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
+            AddStep("enable auto start", () => changeRoomSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("local user became ready", () => multiplayerClient.Object.LocalUser?.State == MultiplayerUserState.Ready);
 
@@ -384,13 +390,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             AddStep("check start request received", () => multiplayerClient.Verify(m => m.StartMatch(), Times.Once));
-            AddUntilStep("user waiting for load", () => localUser.State == MultiplayerUserState.WaitingForLoad);
-
-            AddUntilStep("ready button disabled", () => !control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
-
-            AddStep("finish gameplay", () => changeUserState(localUser.UserID, MultiplayerUserState.Idle));
-
-            AddUntilStep("ready button enabled", () => control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
         }
 
         private void setRoomCountdown(TimeSpan duration)
@@ -420,6 +419,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void transferHost(MultiplayerRoomUser user)
         {
             multiplayerRoom.Host = user;
+            raiseRoomUpdated();
+        }
+
+        private void changeRoomSettings(MultiplayerRoomSettings settings)
+        {
+            multiplayerRoom.Settings = settings;
+
+            // Changing settings should reset all user ready statuses.
+            foreach (var user in multiplayerRoom.Users)
+            {
+                if (user.State == MultiplayerUserState.Ready)
+                    user.State = MultiplayerUserState.Idle;
+            }
+
             raiseRoomUpdated();
         }
 
