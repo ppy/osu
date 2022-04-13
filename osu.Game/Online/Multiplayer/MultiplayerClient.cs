@@ -114,12 +114,12 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
         /// </summary>
-        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == API.LocalUser.Value.Id);
+        public virtual MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == API.LocalUser.Value.Id);
 
         /// <summary>
         /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
         /// </summary>
-        public bool IsHost
+        public virtual bool IsHost
         {
             get
             {
