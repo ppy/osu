@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play
                                 new Sprite
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Texture = beatmap?.Background,
+                                    Texture = beatmap.Background,
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.Centre,
                                     FillMode = FillMode.Fill,
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Play
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = beatmap?.BeatmapInfo?.DifficultyName,
+                                    Text = beatmap.BeatmapInfo.DifficultyName,
                                     Font = OsuFont.GetFont(size: 26, italics: true),
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
