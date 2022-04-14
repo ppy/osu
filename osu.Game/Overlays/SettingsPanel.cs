@@ -287,7 +287,10 @@ namespace osu.Game.Overlays
                 set
                 {
                     SearchContainer.SearchTerm = value;
-                    InvalidateScrollPosition();
+
+                    // Schedule required as search term takes a frame to update.
+                    // Without this sections may not be in the correct state to ascertain CurrentSection.
+                    Schedule(InvalidateScrollPosition);
                 }
             }
 
