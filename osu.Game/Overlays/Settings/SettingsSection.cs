@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.Settings
 
         private Box dim;
 
+        private const float inactive_alpha = 0.8f;
+
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
 
@@ -110,7 +112,7 @@ namespace osu.Game.Overlays.Settings
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = colourProvider.Background5,
-                            Alpha = 0f,
+                            Alpha = inactive_alpha,
                         },
                     }
                 },
@@ -152,7 +154,9 @@ namespace osu.Game.Overlays.Settings
             float dimFade = 0;
 
             if (!isCurrentSection)
-                dimFade = IsHovered ? 0.5f : 0.8f;
+            {
+                dimFade = IsHovered ? 0.5f : inactive_alpha;
+            }
 
             dim.FadeTo(dimFade, 300, Easing.OutQuint);
         }
