@@ -26,6 +26,12 @@ namespace osu.Game.Tests.Gameplay
             Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
         }
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("reset audio offset", () => localConfig.SetValue(OsuSetting.AudioOffset, 0.0));
+        }
+
         [Test]
         public void TestStartThenElapsedTime()
         {
