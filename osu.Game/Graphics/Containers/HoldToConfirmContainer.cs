@@ -70,7 +70,10 @@ namespace osu.Game.Graphics.Containers
             confirming = false;
             Fired = false;
 
-            this.TransformBindableTo(Progress, 0, fadeout_delay, Easing.Out);
+            this
+                .TransformBindableTo(Progress, Progress.Value)
+                .Delay(200)
+                .TransformBindableTo(Progress, 0, fadeout_delay, Easing.InSine);
         }
     }
 }
