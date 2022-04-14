@@ -49,7 +49,8 @@ namespace osu.Game.Tests.Visual.Settings
             AddAssert("ensure all items match filter", () => settings.SectionsContainer
                                                                      .ChildrenOfType<SettingsSection>().Where(f => f.IsPresent)
                                                                      .All(section =>
-                                                                         section.ChildrenOfType<Drawable>().Where(f => f.IsPresent)
+                                                                         section.Children.Where(f => f.IsPresent)
+                                                                                .OfType<ISettingsItem>()
                                                                                 .OfType<IFilterable>()
                                                                                 .Where(f => !(f is IHasFilterableChildren))
                                                                                 .All(f => f.FilterTerms.Any(t => t.Contains("scaling")))
