@@ -97,11 +97,14 @@ namespace osu.Game
                 // if this has a sub stack, recursively check the screens within it.
                 if (current is IHasSubScreenStack currentSubScreen)
                 {
-                    if (findValidTarget(currentSubScreen.SubScreenStack.CurrentScreen))
+                    var nestedCurrent = currentSubScreen.SubScreenStack.CurrentScreen;
+
+                    if (nestedCurrent != null)
                     {
                         // should be correct in theory, but currently untested/unused in existing implementations.
-                        current.MakeCurrent();
-                        return true;
+                        // note that calling findValidTarget actually performs the final operation.
+                        if (findValidTarget(nestedCurrent))
+                            return true;
                     }
                 }
 
