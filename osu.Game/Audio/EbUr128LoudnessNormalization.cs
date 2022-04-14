@@ -78,6 +78,13 @@ namespace osu.Game.Audio
             int decodeStream = Bass.CreateStream(filePath, 0, 0, BassFlags.Decode | BassFlags.Float);
             Bass.ChannelGetInfo(decodeStream, out info);
 
+            if(info.Channels == 0)
+            {
+                PeakAmp = 0;
+                Gain = 0;
+                return;
+            }
+
             //100 ms window
             int samplesPerWindow = (int)(info.Frequency * 0.1f * info.Channels);
             int bytesPerWindow = samplesPerWindow * TrackBass.BYTES_PER_SAMPLE;

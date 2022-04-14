@@ -183,7 +183,23 @@ namespace osu.Game.Beatmaps
         private void addFx(IEffectParameter effectParameter)
         {
             AudioMixer audioMixer = audioManager.TrackMixer;
+            //AudioMixer HitObjectsMixer = audioManager.GetMixer("HitMixer");
             IEffectParameter effect = audioMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+
+            /*if(HitObjectsMixer != null)
+            {
+                IEffectParameter hitEffect = HitObjectsMixer.Effects.SingleOrDefault(e => e.FXType == effectParameter.FXType);
+
+                if (hitEffect != null)
+                {
+                    int i = HitObjectsMixer.Effects.IndexOf(hitEffect);
+                    HitObjectsMixer.Effects[i] = effectParameter;
+                }
+                else
+                {
+                    HitObjectsMixer.Effects.Add(effectParameter);
+                }
+            }*/
 
             if (effect != null)
             {
