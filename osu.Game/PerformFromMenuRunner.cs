@@ -125,6 +125,18 @@ namespace osu.Game
         /// <returns>Whether a dialog blocked interaction.</returns>
         private bool checkForDialog(IScreen current)
         {
+            // An exit process may traverse multiple levels.
+            // When checking for dismissing dialogs, let's also consider sub screens.
+            while (current is IHasSubScreenStack currentWithSubScreenStack)
+            {
+                var nestedCurrent = currentWithSubScreenStack.SubScreenStack.CurrentScreen;
+
+                if (nestedCurrent == null)
+                    break;
+
+                current = nestedCurrent;
+            }
+
             var currentDialog = dialogOverlay.CurrentDialog;
 
             if (lastEncounteredDialog != null)
