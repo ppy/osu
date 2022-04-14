@@ -13,7 +13,6 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -25,8 +24,6 @@ namespace osu.Game.Overlays.Settings
         private IBindable<SettingsSection> selectedSection;
 
         private Box dim;
-
-        private OsuSpriteText header;
 
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
@@ -86,12 +83,6 @@ namespace osu.Game.Overlays.Settings
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        dim = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0f,
-                        },
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
@@ -103,7 +94,7 @@ namespace osu.Game.Overlays.Settings
                             },
                             Children = new Drawable[]
                             {
-                                header = new OsuSpriteText
+                                new OsuSpriteText
                                 {
                                     Font = OsuFont.TorusAlternate.With(size: header_size),
                                     Text = Header,
@@ -114,7 +105,13 @@ namespace osu.Game.Overlays.Settings
                                 },
                                 FlowContent
                             }
-                        }
+                        },
+                        dim = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background5,
+                            Alpha = 0f,
+                        },
                     }
                 },
             });
@@ -152,18 +149,12 @@ namespace osu.Game.Overlays.Settings
 
         private void updateContentFade()
         {
-            float contentFade = 1;
             float dimFade = 0;
 
             if (!isCurrentSection)
-            {
-                contentFade = IsHovered ? 0.5f : 0.25f;
-                dimFade = IsHovered ? 0.125f : 0.25f;
-            }
+                dimFade = IsHovered ? 0.5f : 0.8f;
 
-            dim.FadeTo(dimFade, 500, Easing.OutQuint);
-            header.FadeTo(contentFade, 500, Easing.OutQuint);
-            FlowContent.FadeTo(contentFade, 500, Easing.OutQuint);
+            dim.FadeTo(dimFade, 300, Easing.OutQuint);
         }
     }
 }
