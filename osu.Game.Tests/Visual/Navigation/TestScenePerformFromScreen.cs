@@ -10,7 +10,6 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Screens;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps.IO;
