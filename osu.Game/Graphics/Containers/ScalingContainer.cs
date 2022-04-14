@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.Containers
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
 
-            private readonly Bindable<float> currentScale = new Bindable<float>(1);
+            private float currentScale = 1;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -99,19 +99,14 @@ namespace osu.Game.Graphics.Containers
                 if (applyUIScale)
                 {
                     uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
-                    uiScale.BindValueChanged(scaleChanged, true);
+                    uiScale.BindValueChanged(args => this.TransformTo(nameof(currentScale), args.NewValue, duration, Easing.OutQuart), true);
                 }
-            }
-
-            private void scaleChanged(ValueChangedEvent<float> args)
-            {
-                this.TransformBindableTo(currentScale, args.NewValue, duration, Easing.OutQuart);
             }
 
             protected override void Update()
             {
-                Scale = new Vector2(currentScale.Value);
-                Size = new Vector2(1 / currentScale.Value);
+                Scale = new Vector2(currentScale);
+                Size = new Vector2(1 / currentScale);
 
                 base.Update();
             }
