@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Settings
 
         public override bool IsPresent => MatchingFilter;
 
-        public bool MatchingFilter { get; set; }
+        public bool MatchingFilter { get; set; } = true;
 
         public bool FilteringActive { get; set; }
 
