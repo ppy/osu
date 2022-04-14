@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("get variables", () =>
             {
                 sampleDisabler = Player;
-                slider = Player.ChildrenOfType<DrawableSlider>().OrderBy(s => s.HitObject.StartTime).FirstOrDefault();
+                slider = Player.ChildrenOfType<DrawableSlider>().MinBy(s => s.HitObject.StartTime);
                 samples = slider?.ChildrenOfType<PoolableSkinnableSample>().ToArray();
 
                 return slider != null;
