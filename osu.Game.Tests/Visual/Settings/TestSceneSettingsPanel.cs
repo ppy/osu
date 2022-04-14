@@ -54,6 +54,8 @@ namespace osu.Game.Tests.Visual.Settings
                                                                                 .Where(f => !(f is IHasFilterableChildren))
                                                                                 .All(f => f.FilterTerms.Any(t => t.Contains("scaling")))
                                                                      ));
+
+            AddAssert("ensure section is current", () => settings.CurrentSection.Value != null);
         }
 
         [Test]
