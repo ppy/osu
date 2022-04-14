@@ -163,6 +163,7 @@ namespace osu.Game.Overlays
             Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
 
+            searchTextBox.TakeFocus();
             searchTextBox.HoldFocus = true;
         }
 
@@ -213,7 +214,6 @@ namespace osu.Game.Overlays
                 loading.Hide();
 
                 searchTextBox.Current.BindValueChanged(term => SectionsContainer.SearchTerm = term.NewValue, true);
-                searchTextBox.TakeFocus();
 
                 loadSidebarButtons();
             });
