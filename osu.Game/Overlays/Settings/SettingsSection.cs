@@ -13,6 +13,7 @@ using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -22,6 +23,8 @@ namespace osu.Game.Overlays.Settings
         protected override Container<Drawable> Content => FlowContent;
 
         private IBindable<SettingsSection> selectedSection;
+
+        private Box dim;
 
         private OsuSpriteText header;
 
@@ -78,25 +81,40 @@ namespace osu.Game.Overlays.Settings
                 },
                 new Container
                 {
-                    Padding = new MarginPadding
-                    {
-                        Top = 28,
-                        Bottom = 40,
-                    },
+                    Padding = new MarginPadding { Top = border_size },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        header = new OsuSpriteText
+                        dim = new Box
                         {
-                            Font = OsuFont.TorusAlternate.With(size: header_size),
-                            Text = Header,
-                            Margin = new MarginPadding
-                            {
-                                Horizontal = SettingsPanel.CONTENT_MARGINS
-                            }
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0f,
                         },
-                        FlowContent
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding
+                            {
+                                Top = 24,
+                                Bottom = 40,
+                            },
+                            Children = new Drawable[]
+                            {
+                                header = new OsuSpriteText
+                                {
+                                    Font = OsuFont.TorusAlternate.With(size: header_size),
+                                    Text = Header,
+                                    Margin = new MarginPadding
+                                    {
+                                        Horizontal = SettingsPanel.CONTENT_MARGINS
+                                    }
+                                },
+                                FlowContent
+                            }
+                        }
                     }
                 },
             });
@@ -135,15 +153,16 @@ namespace osu.Game.Overlays.Settings
         private void updateContentFade()
         {
             float contentFade = 1;
-            float headerFade = 1;
+            float dimFade = 0;
 
             if (!isCurrentSection)
             {
-                contentFade = 0.25f;
-                headerFade = IsHovered ? 0.5f : 0.25f;
+                contentFade = IsHovered ? 0.5f : 0.25f;
+                dimFade = IsHovered ? 0.125f : 0.25f;
             }
 
-            header.FadeTo(headerFade, 500, Easing.OutQuint);
+            dim.FadeTo(dimFade, 500, Easing.OutQuint);
+            header.FadeTo(contentFade, 500, Easing.OutQuint);
             FlowContent.FadeTo(contentFade, 500, Easing.OutQuint);
         }
     }
