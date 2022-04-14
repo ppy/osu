@@ -28,8 +28,10 @@ namespace osu.Game.Audio
             PeakAmplitude = peakAmp;
         }
 
-        public LoudnessNormalizationInfo GenerateLoudnessNormalizationInfo(BeatmapInfo info, BeatmapSetInfo setInfo, RealmFileStore storage)
+        public LoudnessNormalizationInfo(BeatmapInfo info, BeatmapSetInfo setInfo, RealmFileStore storage)
         {
+            TrackGain = 0;
+            PeakAmplitude = 0;
             string audiofile = info.Metadata.AudioFile;
 
             if (!string.IsNullOrEmpty(audiofile))
@@ -45,16 +47,9 @@ namespace osu.Game.Audio
                         EbUr128LoudnessNormalization loudnessNormalization = new EbUr128LoudnessNormalization(filePath);
                         PeakAmplitude = (float)loudnessNormalization.PeakAmp;
                         TrackGain = (float)loudnessNormalization.Gain;
-                        return this;
                     }
                 }
             }
-
-            return new LoudnessNormalizationInfo
-            {
-                TrackGain = 0,
-                PeakAmplitude = 0,
-            };
         }
 
         internal BeatmapSetInfo PopulateSet(BeatmapInfo beatmapInfo, BeatmapSetInfo bSetInfo)

@@ -72,7 +72,7 @@ namespace osu.Game.Stores
             {
                 if (b.LoudnessNormalizationInfo == null || b.LoudnessNormalizationInfo.IsDefault())
                 {
-                    LoudnessNormalizationInfo info = new LoudnessNormalizationInfo().GenerateLoudnessNormalizationInfo(b, beatmapSet, Files);
+                    LoudnessNormalizationInfo info = new LoudnessNormalizationInfo(b, beatmapSet, Files);
                     b.LoudnessNormalizationInfo = info;
                     beatmapSet = b.LoudnessNormalizationInfo.PopulateSet(b, beatmapSet);
                 }
