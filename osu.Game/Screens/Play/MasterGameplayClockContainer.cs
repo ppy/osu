@@ -251,7 +251,6 @@ namespace osu.Game.Screens.Play
         }
 
         private class HardwareCorrectionOffsetClock : FramedOffsetClock
-
         {
             private readonly BindableDouble pauseRateAdjust;
 
@@ -297,7 +296,6 @@ namespace osu.Game.Screens.Play
         }
 
         private class MasterGameplayClock : GameplayClock
-
         {
             public readonly List<Bindable<double>> MutableNonGameplayAdjustments = new List<Bindable<double>>();
             public override IEnumerable<Bindable<double>> NonGameplayAdjustments => MutableNonGameplayAdjustments;
