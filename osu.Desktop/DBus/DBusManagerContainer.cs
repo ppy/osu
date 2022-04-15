@@ -86,10 +86,13 @@ namespace osu.Desktop.DBus
 
         #endregion
 
+        private readonly BindableBool trackLooping = new BindableBool();
+
         protected override void LoadComplete()
         {
             controlSource?.BindValueChanged(onControlSourceChanged, true);
             beatmap.DisabledChanged += b => mprisService.BeatmapDisabled = b;
+
             base.LoadComplete();
         }
 
@@ -97,6 +100,7 @@ namespace osu.Desktop.DBus
         {
             base.Update();
             mprisService.TrackRunning = musicController.CurrentTrack.IsRunning;
+            trackLooping.Value = musicController.CurrentTrack.Looping;
         }
 
         private Bindable<bool> enableTray;
@@ -161,6 +165,16 @@ namespace osu.Desktop.DBus
                 iconName.BindValueChanged(v =>
                 {
                     kdeTrayService.Set("IconName", v.NewValue);
+                });
+
+                //workaround: 过早设置这些属性会导致gnome出现异常
+                Schedule(() =>
+                {
+                    game.Audio.Volume.BindValueChanged(v => mprisService.Set("Volume", v.NewValue), true);
+                    trackLooping.BindValueChanged(v =>
+                    {
+                        mprisService.Set("LoopStatus", v.NewValue ? "Track" : "Playlist");
+                    }, true);
                 });
 
                 DBusManager.OnConnected -= onDBusFirstConnected;

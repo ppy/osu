@@ -16,6 +16,7 @@ namespace osu.Desktop.DBus
         public static readonly ObjectPath PATH = new ObjectPath("/org/mpris/MediaPlayer2");
 
         private readonly PlayerProperties playerProperties = new PlayerProperties();
+
         private readonly MediaPlayer2Properties mp2Properties = new MediaPlayer2Properties();
 
         internal Storage Storage { get; set; }
@@ -206,14 +207,15 @@ namespace osu.Desktop.DBus
                 ? mp2Properties.Get(prop)
                 : playerProperties.Get(prop));
 
-        public Task SetAsync(string prop, object val)
+        public Task SetAsync(string target, object val)
         {
-            if (prop == nameof(PlayerProperties.Volume))
-            {
-                playerProperties.Set(nameof(PlayerProperties.Volume), val);
-            }
-
             return Task.CompletedTask;
+        }
+
+        internal void Set(string target, object val)
+        {
+            if (playerProperties.Set(target, val))
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, val));
         }
 
         Task<MediaPlayer2Properties> IMediaPlayer2.GetAllAsync()

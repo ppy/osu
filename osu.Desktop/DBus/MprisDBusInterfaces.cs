@@ -133,19 +133,35 @@ namespace osu.Desktop.DBus
 
         internal string _PlaybackStatus = "Paused";
 
-        public string PlaybackStatus => _PlaybackStatus;
+        public string PlaybackStatus
+        {
+            get => _PlaybackStatus;
+            set => _PlaybackStatus = value;
+        }
 
         internal string _LoopStatus = "Single";
 
-        public string LoopStatus => _LoopStatus;
+        public string LoopStatus
+        {
+            get => _LoopStatus;
+            set => _LoopStatus = value;
+        }
 
-        private readonly double _Rate = 1.0;
+        private double _Rate = 1.0;
 
-        public double Rate => _Rate;
+        public double Rate
+        {
+            get => _Rate;
+            set => _Rate = value;
+        }
 
-        private readonly bool _Shuffle = false;
+        private bool _Shuffle = false;
 
-        public bool Shuffle => _Shuffle;
+        public bool Shuffle
+        {
+            get => _Shuffle;
+            set => _Shuffle = value;
+        }
 
         private readonly IDictionary<string, object> _Metadata = new Dictionary<string, object>
         {
@@ -159,7 +175,7 @@ namespace osu.Desktop.DBus
 
         public IDictionary<string, object> Metadata => _Metadata;
 
-        private double _Volume;
+        private double _Volume = 1.0;
 
         public double Volume
         {
