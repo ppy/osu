@@ -156,7 +156,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 private const float bar_size = 4;
                 private const float bar_margin = 7;
 
-                public ChannelListScrollBar(Direction scrollDir) : base(scrollDir)
+                public ChannelListScrollBar(Direction scrollDir)
+                    : base(scrollDir)
                 {
                     Size = new Vector2(bar_size);
                     Margin = new MarginPadding { Left = bar_margin };
