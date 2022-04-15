@@ -73,8 +73,8 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 return;
 
             ChannelListItem item = new ChannelListItem(channel);
-            item.OnRequestSelect += channel => this.OnRequestSelect?.Invoke(channel);
-            item.OnRequestLeave += channel => this.OnRequestLeave?.Invoke(channel);
+            item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
+            item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
 
             ChannelListItemFlow flow = getFlowForChannel(channel);
             channelMap.Add(channel, item);
@@ -153,19 +153,19 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
             protected class ChannelListScrollBar : OsuScrollbar
             {
-                private const float BAR_SIZE = 4;
-                private const float BAR_MARGIN = 7;
+                private const float bar_size = 4;
+                private const float bar_margin = 7;
 
                 public ChannelListScrollBar(Direction scrollDir) : base(scrollDir)
                 {
-                    Size = new Vector2(BAR_SIZE);
-                    Margin = new MarginPadding { Left = BAR_MARGIN };
+                    Size = new Vector2(bar_size);
+                    Margin = new MarginPadding { Left = bar_margin };
                     CornerRadius = 2;
                 }
 
                 public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
                 {
-                    Vector2 size = new Vector2(BAR_SIZE, val);
+                    Vector2 size = new Vector2(bar_size, val);
                     this.ResizeTo(size, duration, easing);
                 }
             }
