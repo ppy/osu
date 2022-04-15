@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
-        public override bool IsPresent => MatchingFilter;
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         private IBindable<SettingsSection> selectedSection;
 
