@@ -171,6 +171,46 @@ namespace osu.Game.Tests.Visual.Navigation
             }
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestPerformBlockedByDialogSubScreen(bool confirm)
+        {
+            TestScreenWithNestedStack screenWithNestedStack = null;
+
+            PushAndConfirm(() => screenWithNestedStack = new TestScreenWithNestedStack());
+
+            AddAssert("wait for nested screen", () => screenWithNestedStack.SubScreenStack.CurrentScreen == screenWithNestedStack.Blocker);
+
+            AddStep("try to perform", () => Game.PerformFromScreen(_ => actionPerformed = true));
+
+            AddUntilStep("wait for dialog", () => screenWithNestedStack.Blocker.ExitAttempts == 1);
+
+            AddWaitStep("wait a bit", 10);
+
+            AddUntilStep("wait for dialog display", () => Game.Dependencies.Get<DialogOverlay>().IsLoaded);
+
+            AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == screenWithNestedStack);
+            AddAssert("nested screen didn't change", () => screenWithNestedStack.SubScreenStack.CurrentScreen == screenWithNestedStack.Blocker);
+
+            AddAssert("did not perform", () => !actionPerformed);
+
+            AddAssert("only one exit attempt", () => screenWithNestedStack.Blocker.ExitAttempts == 1);
+
+            if (confirm)
+            {
+                AddStep("accept dialog", () => InputManager.Key(Key.Number1));
+                AddAssert("nested screen changed", () => screenWithNestedStack.SubScreenStack.CurrentScreen != screenWithNestedStack.Blocker);
+                AddUntilStep("did perform", () => actionPerformed);
+            }
+            else
+            {
+                AddStep("cancel dialog", () => InputManager.Key(Key.Number2));
+                AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == screenWithNestedStack);
+                AddAssert("nested screen didn't change", () => screenWithNestedStack.SubScreenStack.CurrentScreen == screenWithNestedStack.Blocker);
+                AddAssert("did not perform", () => !actionPerformed);
+            }
+        }
+
         private void importAndWaitForSongSelect()
         {
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
@@ -194,6 +234,31 @@ namespace osu.Game.Tests.Visual.Navigation
                 if (dialogDisplayCount++ < 1)
                 {
                     dialogOverlay.Push(new ConfirmExitDialog(this.Exit, () => { }));
+                    return true;
+                }
+
+                return base.OnExiting(next);
+            }
+        }
+
+        public class TestScreenWithNestedStack : OsuScreen, IHasSubScreenStack
+        {
+            public DialogBlockingScreen Blocker { get; private set; }
+
+            public ScreenStack SubScreenStack { get; } = new ScreenStack();
+
+            public TestScreenWithNestedStack()
+            {
+                AddInternal(SubScreenStack);
+
+                SubScreenStack.Push(Blocker = new DialogBlockingScreen());
+            }
+
+            public override bool OnExiting(IScreen next)
+            {
+                if (SubScreenStack.CurrentScreen != null)
+                {
+                    SubScreenStack.CurrentScreen.Exit();
                     return true;
                 }
 
