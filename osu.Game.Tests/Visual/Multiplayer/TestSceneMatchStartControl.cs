@@ -3,80 +3,155 @@
 
 using System;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Platform;
+using osu.Framework.Logging;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Rooms;
-using osu.Game.Rulesets;
+using osu.Game.Screens.OnlinePlay;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Match;
-using osu.Game.Tests.Resources;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchStartControl : MultiplayerTestScene
+    public class TestSceneMatchStartControl : OsuManualInputManagerTestScene
     {
+        private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
+        private readonly Mock<OnlinePlayBeatmapAvailabilityTracker> availabilityTracker = new Mock<OnlinePlayBeatmapAvailabilityTracker>();
+
+        private readonly Bindable<BeatmapAvailability> beatmapAvailability = new Bindable<BeatmapAvailability>();
+        private readonly Bindable<Room> room = new Bindable<Room>();
+
+        private MultiplayerRoom multiplayerRoom;
+        private MultiplayerRoomUser localUser;
+        private OngoingOperationTracker ongoingOperationTracker;
+
+        private PopoverContainer content;
         private MatchStartControl control;
-        private BeatmapSetInfo importedSet;
 
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
+        private OsuButton readyButton => control.ChildrenOfType<OsuButton>().Single();
 
-        private BeatmapManager beatmaps;
-        private RulesetStore rulesets;
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent)) { Model = { BindTarget = room } };
 
         [BackgroundDependencyLoader]
-        private void load(GameHost host, AudioManager audio)
+        private void load()
         {
-            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(Realm);
+            Dependencies.CacheAs(multiplayerClient.Object);
+            Dependencies.CacheAs(ongoingOperationTracker = new OngoingOperationTracker());
+            Dependencies.CacheAs(availabilityTracker.Object);
+
+            availabilityTracker.SetupGet(a => a.Availability).Returns(beatmapAvailability);
+
+            multiplayerClient.SetupGet(m => m.LocalUser).Returns(() => localUser);
+            multiplayerClient.SetupGet(m => m.Room).Returns(() => multiplayerRoom);
+
+            // By default, the local user is to be the host.
+            multiplayerClient.SetupGet(m => m.IsHost).Returns(() => ReferenceEquals(multiplayerRoom.Host, localUser));
+
+            // Assume all state changes are accepted by the server.
+            multiplayerClient.Setup(m => m.ChangeState(It.IsAny<MultiplayerUserState>()))
+                             .Callback((MultiplayerUserState r) =>
+                             {
+                                 Logger.Log($"Changing local user state from {localUser.State} to {r}");
+                                 localUser.State = r;
+                                 raiseRoomUpdated();
+                             });
+
+            multiplayerClient.Setup(m => m.StartMatch())
+                             .Callback(() =>
+                             {
+                                 multiplayerClient.Raise(m => m.LoadRequested -= null);
+
+                                 // immediately "end" gameplay, as we don't care about that part of the process.
+                                 changeUserState(localUser.UserID, MultiplayerUserState.Idle);
+                             });
+
+            multiplayerClient.Setup(m => m.SendMatchRequest(It.IsAny<MatchUserRequest>()))
+                             .Callback((MatchUserRequest request) =>
+                             {
+                                 switch (request)
+                                 {
+                                     case StartMatchCountdownRequest countdownStart:
+                                         setRoomCountdown(countdownStart.Duration);
+                                         break;
+
+                                     case StopCountdownRequest _:
+                                         multiplayerRoom.Countdown = null;
+                                         raiseRoomUpdated();
+                                         break;
+                                 }
+                             });
+
+            Children = new Drawable[]
+            {
+                ongoingOperationTracker,
+                content = new PopoverContainer { RelativeSizeAxes = Axes.Both }
+            };
         }
 
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            AvailabilityTracker.SelectedItem.BindTo(selectedItem);
-
-            beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
-            importedSet = beatmaps.GetAllUsableBeatmapSets().First();
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First());
-
-            selectedItem.Value = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+            AddStep("reset state", () =>
             {
-                RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
-            };
+                multiplayerClient.Invocations.Clear();
 
-            Child = new PopoverContainer
+                beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable();
+
+                var playlistItem = new PlaylistItem(Beatmap.Value.BeatmapInfo)
+                {
+                    RulesetID = Beatmap.Value.BeatmapInfo.Ruleset.OnlineID
+                };
+
+                room.Value = new Room
+                {
+                    Playlist = { playlistItem },
+                    CurrentPlaylistItem = { Value = playlistItem }
+                };
+
+                localUser = new MultiplayerRoomUser(API.LocalUser.Value.Id) { User = API.LocalUser.Value };
+
+                multiplayerRoom = new MultiplayerRoom(0)
+                {
+                    Playlist =
+                    {
+                        new MultiplayerPlaylistItem(playlistItem),
+                    },
+                    Users = { localUser },
+                    Host = localUser,
+                };
+            });
+
+            AddStep("create control", () =>
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = control = new MatchStartControl
+                content.Child = control = new MatchStartControl
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(250, 50),
-                }
-            };
-        });
+                };
+            });
+        }
 
         [Test]
         public void TestStartWithCountdown()
         {
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("countdown button shown", () => this.ChildrenOfType<MultiplayerCountdownButton>().SingleOrDefault()?.IsPresent == true);
+
             ClickButtonWhenEnabled<MultiplayerCountdownButton>();
             AddStep("click the first countdown button", () =>
             {
@@ -85,8 +160,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("finish countdown", () => MultiplayerClient.SkipToEndOfCountdown());
-            AddUntilStep("match started", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.WaitingForLoad);
+            AddStep("check request received", () =>
+            {
+                multiplayerClient.Verify(m => m.SendMatchRequest(It.Is<StartMatchCountdownRequest>(req =>
+                    req.Duration == TimeSpan.FromSeconds(10)
+                )), Times.Once);
+            });
         }
 
         [Test]
@@ -94,12 +173,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
             AddUntilStep("countdown button shown", () => this.ChildrenOfType<MultiplayerCountdownButton>().SingleOrDefault()?.IsPresent == true);
+
             ClickButtonWhenEnabled<MultiplayerCountdownButton>();
             AddStep("click the first countdown button", () =>
             {
                 var popoverButton = this.ChildrenOfType<Popover>().Single().ChildrenOfType<OsuButton>().First();
                 InputManager.MoveMouseTo(popoverButton);
                 InputManager.Click(MouseButton.Left);
+            });
+
+            AddStep("check request received", () =>
+            {
+                multiplayerClient.Verify(m => m.SendMatchRequest(It.Is<StartMatchCountdownRequest>(req =>
+                    req.Duration == TimeSpan.FromSeconds(10)
+                )), Times.Once);
             });
 
             ClickButtonWhenEnabled<MultiplayerCountdownButton>();
@@ -110,41 +197,39 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddStep("finish countdown", () => MultiplayerClient.SkipToEndOfCountdown());
-            AddUntilStep("match not started", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            AddStep("check request received", () =>
+            {
+                multiplayerClient.Verify(m => m.SendMatchRequest(It.IsAny<StopCountdownRequest>()), Times.Once);
+            });
         }
 
         [Test]
         public void TestReadyAndUnReadyDuringCountdown()
         {
-            AddStep("add second user as host", () =>
-            {
-                MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" });
-                MultiplayerClient.TransferHost(2);
-            });
+            AddStep("add second user as host", () => addUser(new APIUser { Id = 2, Username = "Another user" }, true));
 
-            AddStep("start with countdown", () => MultiplayerClient.SendMatchRequest(new StartMatchCountdownRequest { Duration = TimeSpan.FromMinutes(2) }).WaitSafely());
+            AddStep("start countdown", () => setRoomCountdown(TimeSpan.FromMinutes(1)));
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is idle", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Idle);
+            checkLocalUserState(MultiplayerUserState.Idle);
         }
 
         [Test]
         public void TestCountdownWhileSpectating()
         {
-            AddStep("set spectating", () => MultiplayerClient.ChangeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
-            AddUntilStep("local user is spectating", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
+            AddStep("set spectating", () => changeUserState(API.LocalUser.Value.OnlineID, MultiplayerUserState.Spectating));
+            checkLocalUserState(MultiplayerUserState.Spectating);
 
             AddAssert("countdown button is visible", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
             AddAssert("countdown button enabled", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
 
-            AddStep("add second user", () => MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" }));
+            AddStep("add second user", () => addUser(new APIUser { Id = 2, Username = "Another user" }));
             AddAssert("countdown button enabled", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
 
-            AddStep("set second user ready", () => MultiplayerClient.ChangeUserState(2, MultiplayerUserState.Ready));
+            AddStep("set second user ready", () => changeUserState(2, MultiplayerUserState.Ready));
             AddAssert("countdown button enabled", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().Enabled.Value);
         }
 
@@ -153,60 +238,54 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add second user as host", () =>
             {
-                MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" });
-                MultiplayerClient.TransferHost(2);
+                addUser(new APIUser { Id = 2, Username = "Another user" }, true);
             });
 
-            AddStep("start countdown", () => MultiplayerClient.SendMatchRequest(new StartMatchCountdownRequest { Duration = TimeSpan.FromMinutes(1) }).WaitSafely());
-            AddUntilStep("countdown started", () => MultiplayerClient.Room?.Countdown != null);
+            AddStep("start countdown", () => multiplayerClient.Object.SendMatchRequest(new StartMatchCountdownRequest { Duration = TimeSpan.FromMinutes(1) }).WaitSafely());
+            AddUntilStep("countdown started", () => multiplayerRoom.Countdown != null);
 
-            AddStep("transfer host to local user", () => MultiplayerClient.TransferHost(API.LocalUser.Value.OnlineID));
-            AddUntilStep("local user is host", () => MultiplayerClient.Room?.Host?.Equals(MultiplayerClient.LocalUser) == true);
+            AddStep("transfer host to local user", () => transferHost(localUser));
+            AddUntilStep("local user is host", () => multiplayerRoom.Host?.Equals(multiplayerClient.Object.LocalUser) == true);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
-            AddAssert("countdown still active", () => MultiplayerClient.Room?.Countdown != null);
+            checkLocalUserState(MultiplayerUserState.Ready);
+            AddAssert("countdown still active", () => multiplayerRoom.Countdown != null);
         }
 
         [Test]
-        public void TestCountdownButtonVisibilityWithAutoStartEnablement()
+        public void TestCountdownButtonVisibilityWithAutoStart()
         {
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
             AddUntilStep("countdown button visible", () => this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
 
-            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
+            AddStep("enable auto start", () => changeRoomSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
             AddUntilStep("countdown button not visible", () => !this.ChildrenOfType<MultiplayerCountdownButton>().Single().IsPresent);
         }
 
         [Test]
         public void TestClickingReadyButtonUnReadiesDuringAutoStart()
         {
-            AddStep("enable auto start", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }).WaitSafely());
+            AddStep("enable auto start", () => changeRoomSettings(new MultiplayerRoomSettings { AutoStartDuration = TimeSpan.FromMinutes(1) }));
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("local user became ready", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("local user became idle", () => MultiplayerClient.LocalUser?.State == MultiplayerUserState.Idle);
+            checkLocalUserState(MultiplayerUserState.Idle);
         }
 
         [Test]
         public void TestDeletedBeatmapDisableReady()
         {
-            OsuButton readyButton = null;
+            AddUntilStep("ready button enabled", () => readyButton.Enabled.Value);
 
-            AddUntilStep("ensure ready button enabled", () =>
-            {
-                readyButton = control.ChildrenOfType<OsuButton>().Single();
-                return readyButton.Enabled.Value;
-            });
-
-            AddStep("delete beatmap", () => beatmaps.Delete(importedSet));
+            AddStep("mark beatmap not available", () => beatmapAvailability.Value = BeatmapAvailability.NotDownloaded());
             AddUntilStep("ready button disabled", () => !readyButton.Enabled.Value);
-            AddStep("undelete beatmap", () => beatmaps.Undelete(importedSet));
+
+            AddStep("mark beatmap available", () => beatmapAvailability.Value = BeatmapAvailability.LocallyAvailable());
             AddUntilStep("ready button enabled back", () => readyButton.Enabled.Value);
         }
 
@@ -215,31 +294,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add second user as host", () =>
             {
-                MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" });
-                MultiplayerClient.TransferHost(2);
+                addUser(new APIUser { Id = 2, Username = "Another user" }, true);
             });
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is idle", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Idle);
+            checkLocalUserState(MultiplayerUserState.Idle);
         }
 
         [TestCase(true)]
         [TestCase(false)]
         public void TestToggleStateWhenHost(bool allReady)
         {
-            AddStep("setup", () =>
-            {
-                MultiplayerClient.TransferHost(MultiplayerClient.Room?.Users[0].UserID ?? 0);
-
-                if (!allReady)
-                    MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" });
-            });
+            if (!allReady)
+                AddStep("add other user", () => addUser(new APIUser { Id = 2, Username = "Another user" }));
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
 
             verifyGameplayStartFlow();
         }
@@ -249,12 +322,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("add host", () =>
             {
-                MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" });
-                MultiplayerClient.TransferHost(2);
+                addUser(new APIUser { Id = 2, Username = "Another user" }, true);
             });
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddStep("make user host", () => MultiplayerClient.TransferHost(MultiplayerClient.Room?.Users[0].UserID ?? 0));
+
+            AddStep("make local user host", () => transferHost(localUser));
 
             verifyGameplayStartFlow();
         }
@@ -264,18 +337,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("setup", () =>
             {
-                MultiplayerClient.TransferHost(MultiplayerClient.Room?.Users[0].UserID ?? 0);
-                MultiplayerClient.AddUser(new APIUser { Id = 2, Username = "Another user" });
+                addUser(new APIUser { Id = 2, Username = "Another user" });
             });
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
 
-            AddStep("transfer host", () => MultiplayerClient.TransferHost(MultiplayerClient.Room?.Users[1].UserID ?? 0));
+            AddStep("transfer host", () => transferHost(multiplayerRoom.Users[1]));
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user is idle (match not started)", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Idle);
-            AddUntilStep("ready button enabled", () => control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+            checkLocalUserState(MultiplayerUserState.Idle);
+            AddUntilStep("ready button enabled", () => readyButton.Enabled.Value);
         }
 
         [TestCase(true)]
@@ -283,44 +355,83 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestManyUsersChangingState(bool isHost)
         {
             const int users = 10;
-            AddStep("setup", () =>
-            {
-                MultiplayerClient.TransferHost(MultiplayerClient.Room?.Users[0].UserID ?? 0);
-                for (int i = 0; i < users; i++)
-                    MultiplayerClient.AddUser(new APIUser { Id = i, Username = "Another user" });
-            });
 
-            if (!isHost)
-                AddStep("transfer host", () => MultiplayerClient.TransferHost(2));
+            AddStep("add many users", () =>
+            {
+                for (int i = 0; i < users; i++)
+                    addUser(new APIUser { Id = i, Username = "Another user" }, !isHost && i == 2);
+            });
 
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
 
             AddRepeatStep("change user ready state", () =>
             {
-                MultiplayerClient.ChangeUserState(RNG.Next(0, users), RNG.NextBool() ? MultiplayerUserState.Ready : MultiplayerUserState.Idle);
+                changeUserState(RNG.Next(0, users), RNG.NextBool() ? MultiplayerUserState.Ready : MultiplayerUserState.Idle);
             }, 20);
 
             AddRepeatStep("ready all users", () =>
             {
-                var nextUnready = MultiplayerClient.Room?.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
+                var nextUnready = multiplayerRoom.Users.FirstOrDefault(c => c.State == MultiplayerUserState.Idle);
                 if (nextUnready != null)
-                    MultiplayerClient.ChangeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
+                    changeUserState(nextUnready.UserID, MultiplayerUserState.Ready);
             }, users);
         }
 
         private void verifyGameplayStartFlow()
         {
-            AddUntilStep("user is ready", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.Ready);
+            checkLocalUserState(MultiplayerUserState.Ready);
             ClickButtonWhenEnabled<MultiplayerReadyButton>();
-            AddUntilStep("user waiting for load", () => MultiplayerClient.Room?.Users[0].State == MultiplayerUserState.WaitingForLoad);
 
-            AddStep("finish gameplay", () =>
-            {
-                MultiplayerClient.ChangeUserState(MultiplayerClient.Room?.Users[0].UserID ?? 0, MultiplayerUserState.Loaded);
-                MultiplayerClient.ChangeUserState(MultiplayerClient.Room?.Users[0].UserID ?? 0, MultiplayerUserState.FinishedPlay);
-            });
-
-            AddUntilStep("ready button enabled", () => control.ChildrenOfType<OsuButton>().Single().Enabled.Value);
+            AddStep("check start request received", () => multiplayerClient.Verify(m => m.StartMatch(), Times.Once));
         }
+
+        private void checkLocalUserState(MultiplayerUserState state) =>
+            AddUntilStep($"local user is {state}", () => localUser.State == state);
+
+        private void setRoomCountdown(TimeSpan duration)
+        {
+            multiplayerRoom.Countdown = new MatchStartCountdown { TimeRemaining = duration };
+            raiseRoomUpdated();
+        }
+
+        private void changeUserState(int userId, MultiplayerUserState newState)
+        {
+            multiplayerRoom.Users.Single(u => u.UserID == userId).State = newState;
+            raiseRoomUpdated();
+        }
+
+        private void addUser(APIUser user, bool asHost = false)
+        {
+            var multiplayerRoomUser = new MultiplayerRoomUser(user.Id) { User = user };
+
+            multiplayerRoom.Users.Add(multiplayerRoomUser);
+
+            if (asHost)
+                transferHost(multiplayerRoomUser);
+
+            raiseRoomUpdated();
+        }
+
+        private void transferHost(MultiplayerRoomUser user)
+        {
+            multiplayerRoom.Host = user;
+            raiseRoomUpdated();
+        }
+
+        private void changeRoomSettings(MultiplayerRoomSettings settings)
+        {
+            multiplayerRoom.Settings = settings;
+
+            // Changing settings should reset all user ready statuses.
+            foreach (var user in multiplayerRoom.Users)
+            {
+                if (user.State == MultiplayerUserState.Ready)
+                    user.State = MultiplayerUserState.Idle;
+            }
+
+            raiseRoomUpdated();
+        }
+
+        private void raiseRoomUpdated() => multiplayerClient.Raise(m => m.RoomUpdated -= null);
     }
 }

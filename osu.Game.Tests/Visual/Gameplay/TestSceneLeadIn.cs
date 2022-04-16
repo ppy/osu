@@ -1,12 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
@@ -36,10 +34,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = leadIn }
             });
 
-            AddAssert($"first frame is {expectedStartTime}", () =>
+            AddStep("check first frame time", () =>
             {
-                Debug.Assert(player.FirstFrameClockTime != null);
-                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
+                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
             });
         }
 
@@ -59,10 +57,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddAssert($"first frame is {expectedStartTime}", () =>
+            AddStep("check first frame time", () =>
             {
-                Debug.Assert(player.FirstFrameClockTime != null);
-                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
+                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
             });
         }
 
@@ -97,10 +95,10 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
 
-            AddAssert($"first frame is {expectedStartTime}", () =>
+            AddStep("check first frame time", () =>
             {
-                Debug.Assert(player.FirstFrameClockTime != null);
-                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+                Assert.That(player.FirstFrameClockTime, Is.Not.Null);
+                Assert.That(player.FirstFrameClockTime.Value, Is.EqualTo(expectedStartTime).Within(lenience_ms));
             });
         }
 

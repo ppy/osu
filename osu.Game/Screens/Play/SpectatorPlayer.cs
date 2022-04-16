@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
             }
 
             if (isFirstBundle && score.Replay.Frames.Count > 0)
-                NonFrameStableSeek(score.Replay.Frames[0].Time);
+                SetGameplayStartTime(score.Replay.Frames[0].Time);
         }
 
         protected override Score CreateScore(IBeatmap beatmap) => score;
