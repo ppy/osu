@@ -86,6 +86,7 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.EnableTray, isLinuxPlatform);
             SetDefault(MSetting.EnableSystemNotifications, isLinuxPlatform);
             SetDefault(MSetting.TrayIconName, "mfosu-panel");
+            SetDefault(MSetting.DBusWaitOnline, 300d, 1d, 3000d);
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
@@ -145,6 +146,7 @@ namespace osu.Game.Configuration
         MvisCurrentFunctionBar,
         DBusIntegration,
         DBusAllowPost,
+        DBusWaitOnline,
         MprisUseAvatarlogoAsCover,
         EnableTray,
         EnableSystemNotifications,

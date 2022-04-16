@@ -101,10 +101,12 @@ namespace osu.Desktop.DBus
         }
     }
 
-    public class BeatmapInfoDBusService : IBeatmapInfoDBusService
+    public class BeatmapInfoDBusService : IMDBusObject, IBeatmapInfoDBusService
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/CurrentBeatmap");
+
+        public string CustomRegisterName { get; } = string.Empty;
 
         public WorkingBeatmap Beatmap
         {

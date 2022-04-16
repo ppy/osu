@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using M.DBus;
 using osu.Game.Beatmaps;
 using Tmds.DBus;
 
@@ -11,10 +12,12 @@ namespace osu.Desktop.DBus
         Task<double> GetTrackProgressAsync();
     }
 
-    public class AudioInfoDBusService : IAudioInfoDBusService
+    public class AudioInfoDBusService : IMDBusObject, IAudioInfoDBusService
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/Audio");
+
+        public string CustomRegisterName { get; } = string.Empty;
 
         public WorkingBeatmap Beatmap { get; set; }
 

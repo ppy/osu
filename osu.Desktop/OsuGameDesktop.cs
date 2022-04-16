@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using M.DBus;
 using Microsoft.Win32;
 using osu.Desktop.DBus;
 using osu.Desktop.Security;
@@ -133,13 +134,15 @@ namespace osu.Desktop
             if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                 LoadComponentAsync(new GameplayWinKeyBlocker(), Add);
 
-            dBusManagerContainer = new DBusManagerContainer(
+            LoadComponentAsync(new DBusManagerContainer(
                 true,
-                MConfig.GetBindable<bool>(MSetting.DBusIntegration));
-
-            dependencies.Cache(dBusManagerContainer.DBusManager);
-            Add(dBusManagerContainer);
-            dBusManagerContainer.NotificationAction += n => Notifications.Post(n);
+                MConfig.GetBindable<bool>(MSetting.DBusIntegration)), d =>
+            {
+                dBusManagerContainer = d;
+                dependencies.CacheAs<IDBusManagerContainer<IMDBusObject>>(d);
+                d.NotificationAction += n => Notifications.Post(n);
+                Add(d);
+            });
 
             LoadComponentAsync(new ElevatedPrivilegesChecker(), Add);
 

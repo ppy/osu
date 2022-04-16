@@ -146,19 +146,19 @@ namespace osu.Game.Overlays
         #region post通知到系统
 
         [Resolved(CanBeNull = true)]
-        private DBusManager dBusManager { get; set; }
+        private IDBusManagerContainer<IMDBusObject> dBusManagerContainer { get; set; }
 
         [Resolved]
         private GameHost host { get; set; }
 
         private void postToSystemIfPossible(Notification notification)
         {
-            if (dBusManager != null
+            if (dBusManagerContainer != null
                 && host.Window is SDL2DesktopWindow sdl2DesktopWindow
                 && !sdl2DesktopWindow.Visible
                 && notification is SimpleNotification sn)
             {
-                dBusManager.Notifications.PostAsync(new SystemNotification
+                dBusManagerContainer.PostSystemNotification(new SystemNotification
                 {
                     Title = "mfosu",
                     Description = sn.Text.ToString(),

@@ -4,6 +4,10 @@ using Tmds.DBus;
 
 namespace M.DBus.Services.Kde
 {
+    public interface IStatusNotifierWatcherWrapper : IStatusNotifierWatcher, IMDBusObject
+    {
+    }
+
     [DBusInterface("org.kde.StatusNotifierWatcher")]
     public interface IStatusNotifierWatcher : IDBusObject
     {
@@ -18,5 +22,4 @@ namespace M.DBus.Services.Kde
         Task SetAsync(string prop, object val);
         Task<IDisposable> WatchPropertiesAsync(Action<PropertyChanges> handler);
     }
-
 }

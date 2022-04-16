@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using M.DBus;
 using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -10,10 +11,12 @@ using Tmds.DBus;
 
 namespace osu.Desktop.DBus
 {
-    public class MprisPlayerService : IPlayer, IMediaPlayer2
+    public class MprisPlayerService : IMDBusObject, IPlayer, IMediaPlayer2
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/org/mpris/MediaPlayer2");
+
+        public string CustomRegisterName => "org.mpris.MediaPlayer2.mfosu";
 
         private readonly PlayerProperties playerProperties = new PlayerProperties();
 
@@ -34,6 +37,14 @@ namespace osu.Desktop.DBus
 
         public Action WindowRaise;
         public Action Quit;
+
+        public Action<double> OnVolumeSet;
+        public Action OnRandom;
+
+        /// <summary>
+        /// 是否允许通过DBus更改属性
+        /// </summary>
+        public bool AllowSet = false;
 
         #endregion
 
@@ -110,7 +121,7 @@ namespace osu.Desktop.DBus
         {
             const string head = "file://";
             string body;
-            var backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
+            string backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
 
             if (!string.IsNullOrEmpty(backgroundFilename) && !(UseAvatarLogoAsDefault?.Value ?? false))
             {
@@ -121,7 +132,7 @@ namespace osu.Desktop.DBus
             }
             else
             {
-                var target = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
+                string target = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
                 if (!string.IsNullOrEmpty(target))
                     body = Storage.GetFullPath(target);
                 else
@@ -209,13 +220,44 @@ namespace osu.Desktop.DBus
 
         public Task SetAsync(string target, object val)
         {
+            //暂时不接受外部设置
+            Set(target, val, true);
+
             return Task.CompletedTask;
         }
 
-        internal void Set(string target, object val)
+        internal void Set(string target, object val, bool isExternal = false)
         {
-            if (playerProperties.Set(target, val))
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, val));
+            if (!AllowSet && isExternal) return;
+
+            if (playerProperties.Set(target, val, isExternal))
+            {
+                bool abortInvoke = false;
+
+                if (isExternal)
+                {
+                    switch (target)
+                    {
+                        case nameof(playerProperties.Volume):
+                            OnVolumeSet?.Invoke(playerProperties.Volume);
+                            break;
+
+                        case nameof(playerProperties.Shuffle):
+                            if (val is bool v && v)
+                            {
+                                OnRandom?.Invoke();
+
+                                Set("Shuffle", false);
+                                abortInvoke = true;
+                            }
+
+                            break;
+                    }
+                }
+
+                if (!abortInvoke)
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, val));
+            }
         }
 
         Task<MediaPlayer2Properties> IMediaPlayer2.GetAllAsync()

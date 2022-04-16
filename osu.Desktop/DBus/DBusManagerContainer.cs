@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using M.DBus;
-using M.DBus.Services;
-using M.DBus.Services.Kde;
 using M.DBus.Services.Notifications;
 using M.DBus.Tray;
 using M.DBus.Utils;
@@ -15,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Utils;
 using osu.Game;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -24,13 +22,12 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Users;
-using Tmds.DBus;
 
 namespace osu.Desktop.DBus
 {
-    public class DBusManagerContainer : Component, IHandleTrayManagement, IHandleSystemNotifications
+    public class DBusManagerContainer : Component, IDBusManagerContainer<IMDBusObject>
     {
-        public DBusManager DBusManager;
+        public DBusManager<IMDBusObject> DBusManager;
 
         public Action<Notification> NotificationAction { get; set; }
         private readonly Bindable<bool> controlSource;
@@ -38,16 +35,25 @@ namespace osu.Desktop.DBus
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
         private readonly MprisPlayerService mprisService = new MprisPlayerService();
 
-        private readonly KdeStatusTrayService kdeTrayService = new KdeStatusTrayService();
-        private readonly CanonicalTrayService canonicalTrayService = new CanonicalTrayService();
+        private KdeStatusTrayService kdeTrayService => trayManager.KdeTrayService;
+        private CanonicalTrayService canonicalTrayService => trayManager.CanonicalTrayService;
+
         private SDL2DesktopWindow sdl2DesktopWindow => (SDL2DesktopWindow)host.Window;
 
         private BeatmapInfoDBusService beatmapService;
         private AudioInfoDBusService audioservice;
         private UserInfoDBusService userInfoService;
 
+        private readonly TrayManager trayManager = new TrayManager();
+        private readonly SystemNotificationManager systemNotificationManager = new SystemNotificationManager();
+
+        #region 依赖
+
         [Resolved]
-        private IBindable<WorkingBeatmap> beatmap { get; set; }
+        private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private Bindable<WorkingBeatmap> beatmap { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
@@ -67,24 +73,18 @@ namespace osu.Desktop.DBus
         [Resolved]
         private MConfigManager config { get; set; }
 
+        #endregion
+
         public DBusManagerContainer(bool autoStart = false, Bindable<bool> controlSource = null)
         {
             if (autoStart && controlSource != null)
                 this.controlSource = controlSource;
             else if (controlSource == null && autoStart) throw new InvalidOperationException("设置了自动启动但是控制源是null?");
 
-            DBusManager = new DBusManager(false, this, this);
+            DBusManager = new DBusManager<IMDBusObject>(false, trayManager, systemNotificationManager);
+            trayManager.SetDBusManager(DBusManager);
+            systemNotificationManager.SetDBusManager(DBusManager);
         }
-
-        #region Disposal
-
-        protected override void Dispose(bool isDisposing)
-        {
-            DBusManager.Dispose();
-            base.Dispose(isDisposing);
-        }
-
-        #endregion
 
         private readonly BindableBool trackLooping = new BindableBool();
 
@@ -108,10 +108,58 @@ namespace osu.Desktop.DBus
 
         private Bindable<string> iconName;
 
+        #region IDBusManagerContainer
+
+        public void Add(IMDBusObject obj)
+        {
+            if (!string.IsNullOrEmpty(obj.CustomRegisterName))
+                DBusManager.RegisterNewObject(obj, obj.CustomRegisterName);
+            else
+                DBusManager.RegisterNewObject(obj);
+        }
+
+        public void AddRange(IMDBusObject[] objects)
+        {
+            foreach (var obj in objects)
+            {
+                Add(obj);
+            }
+        }
+
+        public void Remove(IMDBusObject obj)
+        {
+            DBusManager.RemoveObject(obj);
+        }
+
+        public void RemoveRange(IMDBusObject[] objects)
+        {
+            foreach (var obj in objects)
+            {
+                Remove(obj);
+            }
+        }
+
+        public void PostSystemNotification(SystemNotification notification)
+        {
+            systemNotificationManager.PostAsync(notification).ConfigureAwait(false);
+        }
+
+        public void AddTrayEntry(SimpleEntry entry)
+        {
+            trayManager.AddEntry(entry);
+        }
+
+        public void RemoveTrayEntry(SimpleEntry entry)
+        {
+            trayManager.RemoveEntry(entry);
+        }
+
+        #endregion
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api, Storage storage)
         {
-            DBusManager.RegisterNewObjects(new IDBusObject[]
+            AddRange(new IMDBusObject[]
             {
                 beatmapService = new BeatmapInfoDBusService(),
                 audioservice = new AudioInfoDBusService(),
@@ -127,10 +175,12 @@ namespace osu.Desktop.DBus
 
             void onDBusFirstConnected()
             {
-                DBusManager.RegisterNewObject(mprisService,
-                    "org.mpris.MediaPlayer2.mfosu");
+                Schedule(() =>
+                {
+                    Add(mprisService);
+                });
 
-                canonicalTrayService.AddEntryRange(new[]
+                trayManager.AddEntryRange(new[]
                 {
                     new SimpleEntry
                     {
@@ -158,29 +208,33 @@ namespace osu.Desktop.DBus
                 });
 
                 enableTray.BindValueChanged(onEnableTrayChanged, true);
-                enableSystemNotifications.BindValueChanged(onEnableNotificationsChanged, true);
+                enableSystemNotifications.BindValueChanged(systemNotificationManager.OnEnableNotificationsChanged, true);
 
-                //bug: 一连接上就设置IconName会导致托盘图标不显示？
-                kdeTrayService.KdeProperties.IconName = iconName.Value;
-                iconName.BindValueChanged(v =>
+                //workaround: 执行到这里时一些dbus服务可能还没注册完成，因此延迟一些时间执行这些
+                Scheduler.AddDelayed(() =>
                 {
-                    kdeTrayService.Set("IconName", v.NewValue);
-                });
+                    game.Audio.Volume.BindValueChanged(v =>
+                        mprisService.Set("Volume", v.NewValue), true);
 
-                //workaround: 过早设置这些属性会导致gnome出现异常
-                Schedule(() =>
-                {
-                    game.Audio.Volume.BindValueChanged(v => mprisService.Set("Volume", v.NewValue), true);
                     trackLooping.BindValueChanged(v =>
                     {
                         mprisService.Set("LoopStatus", v.NewValue ? "Track" : "Playlist");
                     }, true);
-                });
 
-                DBusManager.OnConnected -= onDBusFirstConnected;
+                    iconName.BindValueChanged(v =>
+                    {
+                        kdeTrayService.Set(nameof(kdeTrayService.KdeProperties.IconName), v.NewValue);
+                    }, true);
+
+                    mprisService.AllowSet = true;
+                }, config.Get<double>(MSetting.DBusWaitOnline));
+
+                DBusManager.OnConnected -= scheduleFirstConnected;
             }
 
-            DBusManager.OnConnected += onDBusFirstConnected;
+            void scheduleFirstConnected() => Schedule(onDBusFirstConnected);
+
+            DBusManager.OnConnected += scheduleFirstConnected;
 
             api.LocalUser.BindValueChanged(onUserChanged, true);
             beatmap.BindValueChanged(onBeatmapChanged, true);
@@ -203,6 +257,23 @@ namespace osu.Desktop.DBus
             mprisService.PlayPause += () => Schedule(() => musicController.TogglePause());
             mprisService.OpenUri += s => Schedule(() => game.HandleLink(s));
             mprisService.WindowRaise += raiseWindow;
+            mprisService.OnVolumeSet += v => Schedule(() => game.Audio.Volume.Value = v);
+            mprisService.OnRandom += () =>
+            {
+                var usableBeatmapSets = beatmapManager.GetAllUsableBeatmapSets();
+                int num = RNG.Next(0, usableBeatmapSets.Count - 1);
+
+                var info = usableBeatmapSets[num].Beatmaps.FirstOrDefault();
+
+                if (info != null && !beatmap.Disabled)
+                {
+                    Schedule(() =>
+                    {
+                        beatmap.Value = beatmapManager.GetWorkingBeatmap(info);
+                        musicController.Play();
+                    });
+                }
+            };
 
             kdeTrayService.WindowRaise += raiseWindow;
         }
@@ -211,26 +282,26 @@ namespace osu.Desktop.DBus
         {
             if (v.NewValue)
             {
-                DBusManager.RegisterNewObject(canonicalTrayService,
-                    "io.matrix_feather.dbus.menu");
+                Add(canonicalTrayService);
+                Add(kdeTrayService);
 
-                DBusManager.RegisterNewObject(kdeTrayService,
-                    "org.kde.StatusNotifierItem.mfosu");
-
-                Task.Run(ConnectToWatcher);
+                Task.Run(trayManager.ConnectToWatcher);
             }
             else
             {
-                DBusManager.UnRegisterObject(kdeTrayService);
-                DBusManager.UnRegisterObject(canonicalTrayService);
+                Remove(canonicalTrayService);
+                Remove(kdeTrayService);
             }
         }
 
         private void raiseWindow()
         {
-            if (!sdl2DesktopWindow.Visible) sdl2DesktopWindow.Visible = true;
+            Schedule(() =>
+            {
+                if (!sdl2DesktopWindow.Visible) sdl2DesktopWindow.Visible = true;
 
-            Schedule(sdl2DesktopWindow.Raise);
+                sdl2DesktopWindow.Raise();
+            });
         }
 
         private void exitGame() => Schedule(game.GracefullyExit);
@@ -263,174 +334,16 @@ namespace osu.Desktop.DBus
         {
             if (v.NewValue)
                 DBusManager.Connect();
-            else
-                DBusManager.Disconnect();
+            //else
+            //    DBusManager.Disconnect();
         }
 
-        #region 托盘
+        #region Disposal
 
-        private IStatusNotifierWatcher trayWatcher;
-
-        public async Task<bool> ConnectToWatcher()
+        protected override void Dispose(bool isDisposing)
         {
-            try
-            {
-                trayWatcher = DBusManager.GetDBusObject<IStatusNotifierWatcher>(new ObjectPath("/StatusNotifierWatcher"), "org.kde.StatusNotifierWatcher");
-
-                await trayWatcher.RegisterStatusNotifierItemAsync("org.kde.StatusNotifierItem.mfosu").ConfigureAwait(false);
-            }
-            catch (Exception e)
-            {
-                trayWatcher = null;
-                Logger.Error(e, "未能连接到 org.kde.StatusNotifierWatcher, 请检查相关配置");
-                return false;
-            }
-
-            return true;
-        }
-
-        public void AddEntry(SimpleEntry entry)
-        {
-            canonicalTrayService.AddEntryToMenu(entry);
-        }
-
-        public void RemoveEntry(SimpleEntry entry)
-        {
-            canonicalTrayService.RemoveEntryFromMenu(entry);
-        }
-
-        #endregion
-
-        #region 通知
-
-        private void onEnableNotificationsChanged(ValueChangedEvent<bool> v)
-        {
-            if (v.NewValue)
-            {
-                connectToNotifications();
-            }
-            else
-            {
-                systemNotification = null;
-            }
-        }
-
-        private INotifications systemNotification;
-
-        private bool notificationWatched;
-        private readonly Dictionary<uint, SystemNotification> notifications = new Dictionary<uint, SystemNotification>();
-
-        private bool connectToNotifications()
-        {
-            try
-            {
-                var path = new ObjectPath("/org/freedesktop/Notifications");
-                systemNotification = DBusManager.GetDBusObject<INotifications>(path, path.ToServiceName());
-
-                if (!notificationWatched)
-                {
-                    //bug: 在gnome上会导致调用两次？
-                    systemNotification.WatchActionInvokedAsync(onActionInvoked);
-                    systemNotification.WatchNotificationClosedAsync(onNotificationClosed);
-                    notificationWatched = true;
-                }
-            }
-            catch (Exception e)
-            {
-                systemNotification = null;
-                notificationWatched = false;
-                Logger.Error(e, "未能连接到 org.freedesktop.Notifications, 请检查相关配置");
-                return false;
-            }
-
-            return true;
-        }
-
-        private void onNotificationClosed((uint id, uint reason) singal)
-        {
-            SystemNotification notification;
-
-            if (notifications.TryGetValue(singal.id, out notification))
-            {
-                notification.OnClosed?.Invoke(singal.reason.ToCloseReason());
-                notifications.Remove(singal.id);
-            }
-        }
-
-        private void onActionInvoked((uint id, string actionKey) obj)
-        {
-            SystemNotification notification;
-
-            if (notifications.TryGetValue(obj.id, out notification))
-            {
-                notification.Actions.FirstOrDefault(a => a.Id == obj.actionKey)?.OnInvoked?.Invoke();
-                notification.OnClosed?.Invoke(CloseReason.ActionInvoked);
-
-                notifications.Remove(obj.id);
-                Task.Run(async () => await CloseNotificationAsync(obj.id).ConfigureAwait(false));
-            }
-        }
-
-        public async Task<uint> PostAsync(SystemNotification notification)
-        {
-            try
-            {
-                if (systemNotification != null)
-                {
-                    var target = notification.ToDBusObject();
-
-                    var result = await systemNotification.NotifyAsync(target.appName,
-                        target.replacesID,
-                        target.appIcon,
-                        target.title,
-                        target.description,
-                        target.actions,
-                        target.hints,
-                        target.displayTime).ConfigureAwait(false);
-
-                    notifications[result] = notification;
-                    return result;
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "发送系统通知时出现了问题");
-            }
-
-            return 0;
-        }
-
-        public async Task<bool> CloseNotificationAsync(uint id)
-        {
-            if (systemNotification != null)
-            {
-                await systemNotification.CloseNotificationAsync(id).ConfigureAwait(false);
-                return true;
-            }
-
-            return false;
-        }
-
-        public async Task<string[]> GetCapabilitiesAsync()
-        {
-            if (systemNotification != null)
-            {
-                return await systemNotification.GetCapabilitiesAsync().ConfigureAwait(false);
-            }
-
-            return Array.Empty<string>();
-        }
-
-        private readonly (string name, string vendor, string version, string specVersion) defaultServerInfo = ("mfosu", "mfosu", "0", "0");
-
-        public async Task<(string name, string vendor, string version, string specVersion)> GetServerInformationAsync()
-        {
-            if (systemNotification != null)
-            {
-                return await systemNotification.GetServerInformationAsync().ConfigureAwait(false);
-            }
-
-            return defaultServerInfo;
+            DBusManager.Dispose();
+            base.Dispose(isDisposing);
         }
 
         #endregion

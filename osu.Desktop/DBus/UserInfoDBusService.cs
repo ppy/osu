@@ -104,10 +104,12 @@ namespace osu.Desktop.DBus
         }
     }
 
-    public class UserInfoDBusService : IUserInfoDBusService
+    public class UserInfoDBusService : IMDBusObject, IUserInfoDBusService
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mfosu/CurrentUser");
+
+        public string CustomRegisterName { get; } = string.Empty;
 
         public APIUser User
         {

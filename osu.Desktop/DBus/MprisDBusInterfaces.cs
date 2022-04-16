@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using M.DBus;
 using Tmds.DBus;
@@ -113,14 +114,22 @@ namespace osu.Desktop.DBus
     {
         private IDictionary<string, object> members;
 
+        private readonly string[] ignoreList =
+        {
+            nameof(PlaybackStatus),
+            nameof(LoopStatus)
+        };
+
         public object Get(string prop)
         {
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.GetValueFor(this, prop, members);
         }
 
-        internal bool Set(string name, object newValue)
+        internal bool Set(string name, object newValue, bool isExternal)
         {
+            if (isExternal && ignoreList.Contains(name)) return false;
+
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.SetValueFor(this, name, newValue, members);
         }
@@ -180,7 +189,10 @@ namespace osu.Desktop.DBus
         public double Volume
         {
             get => _Volume;
-            set => _Volume = value;
+            set
+            {
+                _Volume = value;
+            }
         }
 
         private readonly long _Position = 0;
