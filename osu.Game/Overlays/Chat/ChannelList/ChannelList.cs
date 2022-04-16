@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -136,18 +135,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private class ChannelListScrollContainer : OsuScrollContainer
         {
-            protected override bool OnHover(HoverEvent e)
-            {
-                ScrollbarVisible = true;
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                ScrollbarVisible = false;
-                base.OnHoverLost(e);
-            }
-
             protected override ScrollbarContainer CreateScrollbar(Direction direction)
                 => new ChannelListScrollBar(direction);
 
