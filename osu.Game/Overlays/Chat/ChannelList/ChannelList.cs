@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 {
                     Padding = new MarginPadding { Vertical = 7 },
                     RelativeSizeAxes = Axes.Both,
-                    ScrollbarAnchor = Anchor.TopLeft,
+                    ScrollbarAnchor = Anchor.TopRight,
                     ScrollDistance = 35f,
                     Child = new FillFlowContainer
                     {
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     : base(scrollDir)
                 {
                     Size = new Vector2(bar_size);
-                    Margin = new MarginPadding { Left = bar_margin };
+                    Margin = new MarginPadding { Horizontal = bar_margin };
                     CornerRadius = 2;
                 }
 
