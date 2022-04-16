@@ -90,7 +90,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
             channelMap.Remove(channel);
             flow.Remove(item);
-            item.Expire();
         }
 
         public ChannelListItem GetItem(Channel channel)
