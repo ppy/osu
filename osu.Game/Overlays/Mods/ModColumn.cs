@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,7 @@ using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -24,8 +27,6 @@ using osu.Game.Utils;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
-
-#nullable enable
 
 namespace osu.Game.Overlays.Mods
 {
@@ -256,7 +257,9 @@ namespace osu.Game.Overlays.Mods
 
         private void updateMods()
         {
-            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>()).ToList();
+            var newMods = ModUtils.FlattenMods(availableMods.Value.GetValueOrDefault(ModType) ?? Array.Empty<Mod>())
+                                  .Select(m => m.DeepClone())
+                                  .ToList();
 
             if (newMods.SequenceEqual(panelFlow.Children.Select(p => p.Mod)))
                 return;
@@ -280,9 +283,16 @@ namespace osu.Game.Overlays.Mods
                     panel.Active.BindValueChanged(_ =>
                     {
                         updateToggleAllState();
-                        SelectedMods.Value = panel.Active.Value
-                            ? SelectedMods.Value.Append(panel.Mod).ToArray()
-                            : SelectedMods.Value.Except(new[] { panel.Mod }).ToArray();
+
+                        var newSelectedMods = SelectedMods.Value;
+
+                        var matchingModInstance = SelectedMods.Value.SingleOrDefault(selected => selected.GetType() == panel.Mod.GetType());
+                        if (matchingModInstance != null && (matchingModInstance != panel.Mod || !panel.Active.Value))
+                            newSelectedMods = newSelectedMods.Except(matchingModInstance.Yield()).ToArray();
+                        if (panel.Active.Value)
+                            newSelectedMods = newSelectedMods.Append(panel.Mod).ToArray();
+
+                        SelectedMods.Value = newSelectedMods.ToArray();
                     });
                 }
             }, (cancellationTokenSource = new CancellationTokenSource()).Token);
@@ -296,7 +306,12 @@ namespace osu.Game.Overlays.Mods
         private void updateActiveState()
         {
             foreach (var panel in panelFlow)
-                panel.Active.Value = SelectedMods.Value.Any(selected => selected.GetType() == panel.Mod.GetType());
+            {
+                var matchingSelectedMod = SelectedMods.Value.SingleOrDefault(selected => selected.GetType() == panel.Mod.GetType());
+                panel.Active.Value = matchingSelectedMod != null;
+                if (matchingSelectedMod != null)
+                    panel.Mod.CopyFrom(matchingSelectedMod);
+            }
         }
 
         #region Bulk select / deselect
