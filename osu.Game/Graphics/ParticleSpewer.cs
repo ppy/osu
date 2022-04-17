@@ -106,7 +106,7 @@ namespace osu.Game.Graphics
                 sourceSize = Source.DrawSize;
             }
 
-            protected override void Blit(VertexGroup<TexturedVertex2D> vertices)
+            protected override void Blit(in VertexGroupUsage<TexturedVertex2D> usage)
             {
                 foreach (var p in particles)
                 {
@@ -135,7 +135,7 @@ namespace osu.Game.Graphics
                         transformPosition(rect.BottomRight, rect.Centre, angle)
                     );
 
-                    DrawQuad(vertices,
+                    DrawQuad(usage,
                         Texture,
                         quad, DrawColourInfo.Colour.MultiplyAlpha(alpha), inflationPercentage: new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height), textureCoords: TextureCoords);
                 }

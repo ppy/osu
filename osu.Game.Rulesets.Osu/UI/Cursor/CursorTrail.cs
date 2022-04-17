@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 base.Draw(drawState);
 
-                using (vertexBatch.BeginVertices(this, vertices))
+                using (var usage = vertexBatch.BeginVertices(this, vertices))
                 {
                     shader.Bind();
                     shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
@@ -276,7 +276,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         if (time - part.Time >= 1)
                             continue;
 
-                        vertices.Add(new TexturedTrailVertex
+                        usage.Add(new TexturedTrailVertex
                         {
                             Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y + size.Y * (1 - originPosition.Y)),
                             TexturePosition = textureRect.BottomLeft,
@@ -285,7 +285,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             Time = part.Time
                         });
 
-                        vertices.Add(new TexturedTrailVertex
+                        usage.Add(new TexturedTrailVertex
                         {
                             Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y + size.Y * (1 - originPosition.Y)),
                             TexturePosition = textureRect.BottomRight,
@@ -294,7 +294,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             Time = part.Time
                         });
 
-                        vertices.Add(new TexturedTrailVertex
+                        usage.Add(new TexturedTrailVertex
                         {
                             Position = new Vector2(part.Position.X + size.X * (1 - originPosition.X), part.Position.Y - size.Y * originPosition.Y),
                             TexturePosition = textureRect.TopRight,
@@ -303,7 +303,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             Time = part.Time
                         });
 
-                        vertices.Add(new TexturedTrailVertex
+                        usage.Add(new TexturedTrailVertex
                         {
                             Position = new Vector2(part.Position.X - size.X * originPosition.X, part.Position.Y - size.Y * originPosition.Y),
                             TexturePosition = textureRect.TopLeft,

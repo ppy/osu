@@ -280,7 +280,7 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount);
                 }
 
-                using (vertexBatch.BeginVertices(this, vertices))
+                using (var usage = vertexBatch.BeginVertices(this, vertices))
                 {
                     shader.Bind();
 
@@ -299,8 +299,7 @@ namespace osu.Game.Graphics.Backgrounds
                         ColourInfo colourInfo = DrawColourInfo.Colour;
                         colourInfo.ApplyChild(particle.Colour);
 
-                        DrawTriangle(vertices,
-                            texture, triangle, colourInfo, inflationPercentage: Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
+                        DrawTriangle(usage, texture, triangle, colourInfo, inflationPercentage: Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
                     }
 
                     shader.Unbind();

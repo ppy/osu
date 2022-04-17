@@ -88,7 +88,7 @@ namespace osu.Game.Graphics
                 currentTime = source.Time.Current;
             }
 
-            protected override void Blit(VertexGroup<TexturedVertex2D> vertices)
+            protected override void Blit(in VertexGroupUsage<TexturedVertex2D> usage)
             {
                 double time = currentTime - startTime;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Graphics
                         Vector2Extensions.Transform(rect.BottomRight, DrawInfo.Matrix)
                     );
 
-                    DrawQuad(vertices, Texture,
+                    DrawQuad(usage, Texture,
                         quad,
                         DrawColourInfo.Colour.MultiplyAlpha(alpha), null, new Vector2(InflationAmount.X / DrawRectangle.Width, InflationAmount.Y / DrawRectangle.Height), null, TextureCoords);
                 }

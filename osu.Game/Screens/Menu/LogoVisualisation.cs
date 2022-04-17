@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Menu
             {
                 base.Draw(drawState);
 
-                using (vertexBatch.BeginVertices(this, vertices))
+                using (var usage = vertexBatch.BeginVertices(this, vertices))
                 {
                     shader.Bind();
 
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Menu
                                     Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                                 );
 
-                                DrawQuad(vertices,
+                                DrawQuad(usage,
                                     // barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                     texture, rectangle, colourInfo, inflationPercentage: Vector2.Divide(inflation, barSize.Yx));
                             }
