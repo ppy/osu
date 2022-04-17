@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Mods
                 playStateChangeSamples();
                 UpdateState();
             });
-            Filtered.BindValueChanged(_ => updateFilterState());
+            Filtered.BindValueChanged(_ => updateFilterState(), true);
 
             UpdateState();
             FinishTransforms(true);
