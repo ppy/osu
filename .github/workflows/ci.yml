@@ -120,6 +120,12 @@ jobs:
       - name: Restore Packages
         run: dotnet restore
 
+      - name: Restore inspectcode cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/inspectcode
+          key: inspectcode-${{ hashFiles('.config/dotnet-tools.json') }}-${{ hashFiles('.github/workflows/ci.yml' ) }}
+
       - name: CodeFileSanity
         run: |
           # TODO: Add ignore filters and GitHub Workflow Command Reporting in CFS. That way we don't have to do this workaround.
@@ -138,7 +144,7 @@ jobs:
       #   run: dotnet format --dry-run --check
 
       - name: InspectCode
-        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --output=$(pwd)/inspectcodereport.xml --cachesDir=$(pwd)/inspectcode --verbosity=WARN
+        run: dotnet jb inspectcode $(pwd)/osu.Desktop.slnf --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
 
       - name: NVika
         run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
