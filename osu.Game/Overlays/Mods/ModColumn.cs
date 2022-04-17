@@ -309,8 +309,10 @@ namespace osu.Game.Overlays.Mods
             {
                 var matchingSelectedMod = SelectedMods.Value.SingleOrDefault(selected => selected.GetType() == panel.Mod.GetType());
                 panel.Active.Value = matchingSelectedMod != null;
-                if (matchingSelectedMod != null)
+                if (panel.Active.Value)
                     panel.Mod.CopyFrom(matchingSelectedMod);
+                else
+                    panel.Mod.ResetSettingsToDefaults();
             }
         }
 
