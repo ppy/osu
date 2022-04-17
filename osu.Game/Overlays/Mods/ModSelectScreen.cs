@@ -180,14 +180,6 @@ namespace osu.Game.Overlays.Mods
                                     Origin = Anchor.BottomCentre,
                                     Colour = colourProvider.Background5
                                 },
-                                new ShearedToggleButton(200)
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Margin = new MarginPadding { Vertical = 14, Left = 70 },
-                                    Text = "Mod Customisation",
-                                    Active = { BindTarget = customisationVisible }
-                                }
                             }
                         },
                         new ClickToReturnContainer
@@ -205,6 +197,18 @@ namespace osu.Game.Overlays.Mods
                     Height = 0
                 }
             };
+
+            if (AllowConfiguration)
+            {
+                footer.Add(new ShearedToggleButton(200)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding { Vertical = 14, Left = 70 },
+                    Text = "Mod Customisation",
+                    Active = { BindTarget = customisationVisible }
+                });
+            }
 
             if (ShowTotalMultiplier)
             {
