@@ -323,13 +323,19 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// <returns>The centre of mass of the slider.</returns>
         private static Vector2 calculateCentreOfMass(Slider slider)
         {
-            if (slider.Distance < 1) return Vector2.Zero;
+            const double sample_step = 50;
+
+            // just sample the start and end positions if the slider is too short
+            if (slider.Distance <= sample_step)
+            {
+                return Vector2.Divide(slider.Path.PositionAt(1), 2);
+            }
 
             int count = 0;
             Vector2 sum = Vector2.Zero;
             double pathDistance = slider.Distance;
 
-            for (double i = 0; i < pathDistance; i++)
+            for (double i = 0; i < pathDistance; i += sample_step)
             {
                 sum += slider.Path.PositionAt(i / pathDistance);
                 count++;
