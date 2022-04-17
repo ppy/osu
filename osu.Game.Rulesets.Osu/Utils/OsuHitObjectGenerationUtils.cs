@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Rotate a slider about its start position by the specified angle.
         /// </summary>
         /// <param name="slider">The slider to be rotated.</param>
-        /// <param name="rotation">The angle to rotate the slider by.</param>
+        /// <param name="rotation">The angle, measured in radians, to rotate the slider by.</param>
         public static void RotateSlider(Slider slider, float rotation)
         {
             void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         /// Rotate a vector by the specified angle.
         /// </summary>
         /// <param name="vector">The vector to be rotated.</param>
-        /// <param name="rotation">The angle to rotate the vector by.</param>
+        /// <param name="rotation">The angle, measured in radians, to rotate the vector by.</param>
         /// <returns>The rotated vector.</returns>
         private static Vector2 rotateVector(Vector2 vector, float rotation)
         {
