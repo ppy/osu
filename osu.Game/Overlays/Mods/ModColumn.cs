@@ -364,6 +364,15 @@ namespace osu.Game.Overlays.Mods
                 pendingSelectionOperations.Enqueue(() => button.Active.Value = false);
         }
 
+        /// <summary>
+        /// Play out all remaining animations immediately to leave mods in a good (final) state.
+        /// </summary>
+        public void FlushAnimation()
+        {
+            while (pendingSelectionOperations.TryDequeue(out var dequeuedAction))
+                dequeuedAction();
+        }
+
         private class ToggleAllCheckbox : OsuCheckbox
         {
             private Color4 accentColour;
