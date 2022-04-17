@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Menu
             {
                 base.Draw(drawState);
 
-                using (var usage = vertexBatch.BeginVertices(this, vertices))
+                using (var usage = vertexBatch.BeginUsage(this, vertices))
                 {
                     shader.Bind();
 

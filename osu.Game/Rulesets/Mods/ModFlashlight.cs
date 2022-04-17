@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Mods
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
                     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
 
-                    using (var usage = quadBatch.BeginVertices(this, vertices))
+                    using (var usage = quadBatch.BeginUsage(this, vertices))
                         DrawQuad(usage, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
 
                     shader.Unbind();
