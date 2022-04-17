@@ -28,9 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
                 // flying hits all land in one common scrolling container (and stay there for rewind purposes),
                 // so we need to manually get the latest one.
-                flyingHit = this.ChildrenOfType<DrawableFlyingHit>()
-                                .OrderByDescending(h => h.HitObject.StartTime)
-                                .FirstOrDefault();
+                flyingHit = this.ChildrenOfType<DrawableFlyingHit>().MaxBy(h => h.HitObject.StartTime);
             });
 
             AddAssert("hit type is correct", () => flyingHit.HitObject.Type == hitType);

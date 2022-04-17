@@ -88,9 +88,13 @@ namespace osu.Game.Overlays.Dialog
                         if (actionInvoked) return;
 
                         actionInvoked = true;
-                        action?.Invoke();
 
+                        // Hide the dialog before running the action.
+                        // This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
+                        // and we don't want it to see the already dismissed dialog.
                         Hide();
+
+                        action?.Invoke();
                     };
                 }
             }
