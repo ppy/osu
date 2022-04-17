@@ -296,7 +296,7 @@ namespace osu.Game.Overlays.Mods
         private void updateActiveState()
         {
             foreach (var panel in panelFlow)
-                panel.Active.Value = SelectedMods.Value.Contains(panel.Mod, EqualityComparer<Mod>.Default);
+                panel.Active.Value = SelectedMods.Value.Any(selected => selected.GetType() == panel.Mod.GetType());
         }
 
         #region Bulk select / deselect
