@@ -46,8 +46,8 @@ namespace osu.Game.Overlays.Mods
 
             if (incompatible.Value)
             {
-                Colour4 backgroundColour = ColourProvider.Background5;
-                Colour4 textBackgroundColour = ColourProvider.Background4;
+                Colour4 backgroundColour = ColourProvider.Background6;
+                Colour4 textBackgroundColour = ColourProvider.Background5;
 
                 Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(backgroundColour, textBackgroundColour), TRANSITION_DURATION, Easing.OutQuint);
                 Background.FadeColour(backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
