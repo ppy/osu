@@ -268,7 +268,7 @@ namespace osu.Game.Graphics.Backgrounds
                 parts.AddRange(Source.parts);
             }
 
-            private VertexGroup<TexturedVertex2D> vertices;
+            private readonly VertexGroup<TexturedVertex2D> vertices = new VertexGroup<TexturedVertex2D>();
 
             public override void Draw(in DrawState drawState)
             {
@@ -280,7 +280,7 @@ namespace osu.Game.Graphics.Backgrounds
                     vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount);
                 }
 
-                using (vertexBatch.BeginVertices(this, ref vertices))
+                using (vertexBatch.BeginVertices(this, vertices))
                 {
                     shader.Bind();
 
@@ -299,7 +299,7 @@ namespace osu.Game.Graphics.Backgrounds
                         ColourInfo colourInfo = DrawColourInfo.Colour;
                         colourInfo.ApplyChild(particle.Colour);
 
-                        DrawTriangle(ref vertices,
+                        DrawTriangle(vertices,
                             texture, triangle, colourInfo, inflationPercentage: Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
                     }
 

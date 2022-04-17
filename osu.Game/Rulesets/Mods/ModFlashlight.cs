@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -212,17 +211,17 @@ namespace osu.Game.Rulesets.Mods
                 private float flashlightDim;
 
                 private readonly VertexBatch<PositionAndColourVertex> quadBatch = new QuadBatch<PositionAndColourVertex>(1);
-                private readonly Func<TexturedVertex2D, PositionAndColourVertex> vertexFunc;
-                private VertexGroup<PositionAndColourVertex> vertices;
+                private readonly VertexGroup<PositionAndColourVertex> vertices = new VertexGroup<PositionAndColourVertex>();
+                private readonly VertexGroupTransformer<TexturedVertex2D, PositionAndColourVertex> vertexTransformer;
 
                 public FlashlightDrawNode(Flashlight source)
                     : base(source)
                 {
-                    vertexFunc = v => new PositionAndColourVertex
+                    vertexTransformer = new VertexGroupTransformer<TexturedVertex2D, PositionAndColourVertex>(vertices, v => new PositionAndColourVertex
                     {
                         Position = v.Position,
                         Colour = v.Colour
-                    };
+                    });
                 }
 
                 public override void ApplyState()
@@ -246,11 +245,8 @@ namespace osu.Game.Rulesets.Mods
                     shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref flashlightSize);
                     shader.GetUniform<float>("flashlightDim").UpdateValue(ref flashlightDim);
 
-                    using (quadBatch.BeginVertices(this, ref vertices))
-                    {
-                        var transformer = new VertexGroupTransformer<TexturedVertex2D, PositionAndColourVertex>(ref vertices, vertexFunc);
-                        DrawQuad(ref transformer, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
-                    }
+                    using (quadBatch.BeginVertices(this, vertices))
+                        DrawQuad(vertexTransformer, Texture.WhitePixel, screenSpaceDrawQuad, DrawColourInfo.Colour);
 
                     shader.Unbind();
                 }

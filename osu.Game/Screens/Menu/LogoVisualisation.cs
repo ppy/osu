@@ -196,13 +196,13 @@ namespace osu.Game.Screens.Menu
                 Source.frequencyAmplitudes.AsSpan().CopyTo(audioData);
             }
 
-            private VertexGroup<TexturedVertex2D> vertices;
+            private readonly VertexGroup<TexturedVertex2D> vertices = new VertexGroup<TexturedVertex2D>();
 
             public override void Draw(in DrawState drawState)
             {
                 base.Draw(drawState);
 
-                using (vertexBatch.BeginVertices(this, ref vertices))
+                using (vertexBatch.BeginVertices(this, vertices))
                 {
                     shader.Bind();
 
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Menu
                                     Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                                 );
 
-                                DrawQuad(ref vertices,
+                                DrawQuad(vertices,
                                     // barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
                                     texture, rectangle, colourInfo, inflationPercentage: Vector2.Divide(inflation, barSize.Yx));
                             }

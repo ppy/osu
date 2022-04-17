@@ -252,13 +252,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Source.parts.CopyTo(parts, 0);
             }
 
-            private VertexGroup<TexturedTrailVertex> vertices;
+            private readonly VertexGroup<TexturedTrailVertex> vertices = new VertexGroup<TexturedTrailVertex>();
 
             public override void Draw(in DrawState drawState)
             {
                 base.Draw(drawState);
 
-                using (vertexBatch.BeginVertices(this, ref vertices))
+                using (vertexBatch.BeginVertices(this, vertices))
                 {
                     shader.Bind();
                     shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
