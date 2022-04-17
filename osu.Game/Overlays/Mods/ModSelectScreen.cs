@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Mods
         private void updateAvailableMods()
         {
             foreach (var column in columnFlow.Columns)
-                column.Filter = isValidMod;
+                column.Filter = m => m.HasImplementation && isValidMod.Invoke(m);
         }
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
