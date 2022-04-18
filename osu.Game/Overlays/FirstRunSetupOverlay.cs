@@ -11,10 +11,10 @@ using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.FirstRunSetup;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osuTK.Graphics;
@@ -26,17 +26,16 @@ namespace osu.Game.Overlays
     {
         protected override bool StartHidden => true;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuGame osuGame { get; set; }
 
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         private ScreenWelcome welcomeScreen;
-
-        private Container currentDisplayContainer;
-
-        private PlayfieldBorder border;
 
         public FirstRunSetupOverlay()
         {
@@ -48,18 +47,12 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                border = new PlayfieldBorder
+                new Container
                 {
-                    PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Full },
-                    Colour = colours.Blue,
-                },
-                currentDisplayContainer = new Container
-                {
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(0.5f),
-                    Position = new Vector2(0.5f),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(0.95f),
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
@@ -73,12 +66,68 @@ namespace osu.Game.Overlays
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.8f,
+                            Colour = colourProvider.Background5,
                         },
-                        new ScreenStack(welcomeScreen = new ScreenWelcome())
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                Colour = colourProvider.Background6,
+                                                RelativeSizeAxes = Axes.Both,
+                                            },
+                                            new FillFlowContainer
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                Margin = new MarginPadding(10),
+                                                AutoSizeAxes = Axes.Y,
+                                                Direction = FillDirection.Vertical,
+                                                Children = new Drawable[]
+                                                {
+                                                    new OsuSpriteText
+                                                    {
+                                                        Text = "First run setup",
+                                                        Font = OsuFont.Default.With(size: 32),
+                                                        Colour = colourProvider.Content2,
+                                                        Anchor = Anchor.TopCentre,
+                                                        Origin = Anchor.TopCentre,
+                                                    },
+                                                    new OsuTextFlowContainer
+                                                    {
+                                                        Text = "Setup osu! to suit you",
+                                                        Colour = colourProvider.Content1,
+                                                        Anchor = Anchor.TopCentre,
+                                                        Origin = Anchor.TopCentre,
+                                                        AutoSizeAxes = Axes.Both,
+                                                    },
+                                                }
+                                            },
+                                        }
+                                    },
+                                },
+                                new Drawable[]
+                                {
+                                    new ScreenStack(welcomeScreen = new ScreenWelcome())
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                }
+                            }
                         },
                     }
                 }
@@ -89,24 +138,25 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            // if we are valid for display, only do so after reaching the main menu.
-            osuGame.PerformFromScreen(_ =>
+            if (osuGame != null)
+            {
+                // if we are valid for display, only do so after reaching the main menu.
+                osuGame.PerformFromScreen(_ =>
+                {
+                    Show();
+                }, new[] { typeof(MainMenu) });
+            }
+            else
             {
                 Show();
-            }, new[] { typeof(MainMenu) });
-
-            border
-                .FadeInFromZero(500)
-                .Delay(1000)
-                .FadeOut(500)
-                .Loop();
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (dialogOverlay.CurrentDialog == null)
+            if (dialogOverlay?.CurrentDialog == null)
             {
-                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to exit the setup process?",
+                dialogOverlay?.Push(new ConfirmDialog("Are you sure you want to exit the setup process?",
                     Hide,
                     () => { }));
             }
@@ -128,11 +178,5 @@ namespace osu.Game.Overlays
             base.PopOut();
             this.FadeOut(100);
         }
-
-        public void MoveDisplayTo(Vector2 position) =>
-            currentDisplayContainer.MoveTo(position, 1000, Easing.OutElasticQuarter);
-
-        public void ResizeDisplayTo(Vector2 scale) =>
-            currentDisplayContainer.ScaleTo(scale, 1000, Easing.OutElasticQuarter);
     }
 }
