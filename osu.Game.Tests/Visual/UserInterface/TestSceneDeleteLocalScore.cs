@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private BeatmapInfo beatmapInfo;
 
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneDeleteLocalScore()

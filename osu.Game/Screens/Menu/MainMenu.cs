@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Menu
         private IAPIProvider api { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private BackgroundScreenDefault background;
 
