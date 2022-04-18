@@ -54,14 +54,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected override void OnItemsReceived(List<APIScore> items)
         {
-            if (VisiblePages == 0)
+            if (CurrentPage == null || CurrentPage?.Offset == 0)
                 drawableItemIndex = 0;
 
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScore>> CreateRequest(int itemsPerPage, int initialItems) =>
-            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, itemsPerPage, initialItems);
+        protected override APIRequest<List<APIScore>> CreateRequest(Pagination pagination) =>
+            new GetUserScoresRequest(User.Value.Id, type, pagination);
 
         private int drawableItemIndex;
 

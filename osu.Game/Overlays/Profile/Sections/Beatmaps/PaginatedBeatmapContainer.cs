@@ -58,8 +58,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             }
         }
 
-        protected override APIRequest<List<APIBeatmapSet>> CreateRequest(int itemsPerPage, int initialItems) =>
-            new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, itemsPerPage, initialItems);
+        protected override APIRequest<List<APIBeatmapSet>> CreateRequest(Pagination pagination) =>
+            new GetUserBeatmapsRequest(User.Value.Id, type, pagination);
 
         protected override Drawable CreateDrawableItem(APIBeatmapSet model) => model.OnlineID > 0
             ? new BeatmapCardNormal(model)
