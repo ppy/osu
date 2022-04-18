@@ -41,13 +41,18 @@ namespace osu.Game.Overlays
 
         private ScreenStack stack = null!;
 
-        private PurpleTriangleButton nextButton = null!;
-        private DangerousTriangleButton backButton = null!;
+        public PurpleTriangleButton NextButton = null!;
+        public DangerousTriangleButton BackButton = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private int? currentStepIndex;
+
+        /// <summary>
+        /// The currently displayed screen, if any.
+        /// </summary>
+        public FirstRunSetupScreen? CurrentScreen => (FirstRunSetupScreen?)stack.CurrentScreen;
 
         private readonly FirstRunStep[] steps =
         {
@@ -176,7 +181,7 @@ namespace osu.Game.Overlays
                                             {
                                                 new[]
                                                 {
-                                                    backButton = new DangerousTriangleButton
+                                                    BackButton = new DangerousTriangleButton
                                                     {
                                                         Width = 200,
                                                         Text = "Back",
@@ -184,7 +189,7 @@ namespace osu.Game.Overlays
                                                         Enabled = { Value = false },
                                                     },
                                                     Empty(),
-                                                    nextButton = new PurpleTriangleButton
+                                                    NextButton = new PurpleTriangleButton
                                                     {
                                                         RelativeSizeAxes = Axes.X,
                                                         Width = 1,
@@ -249,7 +254,7 @@ namespace osu.Game.Overlays
             stack.CurrentScreen.Exit();
             currentStepIndex--;
 
-            backButton.Enabled.Value = currentStepIndex != 0;
+            BackButton.Enabled.Value = currentStepIndex != 0;
         }
 
         private void showNextStep()
@@ -260,7 +265,7 @@ namespace osu.Game.Overlays
                 currentStepIndex++;
 
             Debug.Assert(currentStepIndex != null);
-            backButton.Enabled.Value = currentStepIndex > 0;
+            BackButton.Enabled.Value = currentStepIndex > 0;
 
             if (currentStepIndex < steps.Length)
             {
@@ -272,7 +277,7 @@ namespace osu.Game.Overlays
                 Hide();
             }
 
-            nextButton.Text = currentStepIndex + 1 < steps.Length
+            NextButton.Text = currentStepIndex + 1 < steps.Length
                 ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
                 : "Finish";
         }
