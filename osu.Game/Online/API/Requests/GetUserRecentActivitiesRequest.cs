@@ -10,8 +10,8 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
 
-        public GetUserRecentActivitiesRequest(long userId, int page = 0, int itemsPerPage = 5)
-            : base(page, itemsPerPage)
+        public GetUserRecentActivitiesRequest(long userId, int page, int itemsPerPage, int initialItems)
+            : base(page, itemsPerPage, initialItems)
         {
             this.userId = userId;
         }
