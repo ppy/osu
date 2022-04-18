@@ -262,15 +262,16 @@ namespace osu.Game.Overlays
             {
                 var nextStep = steps[currentStepIndex.Value];
                 stack.Push((Screen)Activator.CreateInstance(nextStep.ScreenType));
+
+                NextButton.Text = currentStepIndex + 1 < steps.Length
+                    ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
+                    : "Finish";
             }
             else
             {
                 Hide();
+                currentStepIndex = null;
             }
-
-            NextButton.Text = currentStepIndex + 1 < steps.Length
-                ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
-                : "Finish";
         }
 
         protected override void PopOut()
