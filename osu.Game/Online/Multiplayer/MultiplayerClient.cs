@@ -32,7 +32,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when any change occurs to the multiplayer room.
         /// </summary>
-        public event Action? RoomUpdated;
+        public virtual event Action? RoomUpdated;
 
         /// <summary>
         /// Invoked when a new user joins the room.
@@ -42,7 +42,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when a user leaves the room of their own accord.
         /// </summary>
-        public event Action<MultiplayerRoomUser>? UserLeft;
+        public virtual event Action<MultiplayerRoomUser>? UserLeft;
 
         /// <summary>
         /// Invoked when a user was kicked from the room forcefully.
@@ -67,7 +67,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when the multiplayer server requests the current beatmap to be loaded into play.
         /// </summary>
-        public event Action? LoadRequested;
+        public virtual event Action? LoadRequested;
 
         /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
@@ -88,7 +88,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The joined <see cref="MultiplayerRoom"/>.
         /// </summary>
-        public MultiplayerRoom? Room
+        public virtual MultiplayerRoom? Room
         {
             get
             {
@@ -107,19 +107,19 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// The users in the joined <see cref="Room"/> which are participating in the current gameplay loop.
         /// </summary>
-        public IBindableList<int> CurrentMatchPlayingUserIds => PlayingUserIds;
+        public virtual IBindableList<int> CurrentMatchPlayingUserIds => PlayingUserIds;
 
         protected readonly BindableList<int> PlayingUserIds = new BindableList<int>();
 
         /// <summary>
         /// The <see cref="MultiplayerRoomUser"/> corresponding to the local player, if available.
         /// </summary>
-        public MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == API.LocalUser.Value.Id);
+        public virtual MultiplayerRoomUser? LocalUser => Room?.Users.SingleOrDefault(u => u.User?.Id == API.LocalUser.Value.Id);
 
         /// <summary>
         /// Whether the <see cref="LocalUser"/> is the host in <see cref="Room"/>.
         /// </summary>
-        public bool IsHost
+        public virtual bool IsHost
         {
             get
             {

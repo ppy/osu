@@ -9,7 +9,7 @@
       ]
     },
     "jetbrains.resharper.globaltools": {
-      "version": "2020.3.2",
+      "version": "2022.1.0-eap10",
       "commands": [
         "jb"
       ]
@@ -27,7 +27,7 @@
       ]
     },
     "ppy.localisationanalyser.tools": {
-      "version": "2022.320.0",
+      "version": "2022.417.0",
       "commands": [
         "localisation"
       ]

@@ -97,11 +97,14 @@ namespace osu.Game
                 // if this has a sub stack, recursively check the screens within it.
                 if (current is IHasSubScreenStack currentSubScreen)
                 {
-                    if (findValidTarget(currentSubScreen.SubScreenStack.CurrentScreen))
+                    var nestedCurrent = currentSubScreen.SubScreenStack.CurrentScreen;
+
+                    if (nestedCurrent != null)
                     {
                         // should be correct in theory, but currently untested/unused in existing implementations.
-                        current.MakeCurrent();
-                        return true;
+                        // note that calling findValidTarget actually performs the final operation.
+                        if (findValidTarget(nestedCurrent))
+                            return true;
                     }
                 }
 
@@ -125,6 +128,18 @@ namespace osu.Game
         /// <returns>Whether a dialog blocked interaction.</returns>
         private bool checkForDialog(IScreen current)
         {
+            // An exit process may traverse multiple levels.
+            // When checking for dismissing dialogs, let's also consider sub screens.
+            while (current is IHasSubScreenStack currentWithSubScreenStack)
+            {
+                var nestedCurrent = currentWithSubScreenStack.SubScreenStack.CurrentScreen;
+
+                if (nestedCurrent == null)
+                    break;
+
+                current = nestedCurrent;
+            }
+
             var currentDialog = dialogOverlay.CurrentDialog;
 
             if (lastEncounteredDialog != null)
