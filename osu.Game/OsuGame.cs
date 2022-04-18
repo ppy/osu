@@ -1117,12 +1117,12 @@ namespace osu.Game
         protected override bool OnExiting()
         {
             if (ScreenStack.CurrentScreen is Loader)
-                return false;
+                return true;
 
             if (introScreen?.DidLoadMenu == true && !(ScreenStack.CurrentScreen is IntroScreen))
             {
                 Scheduler.Add(introScreen.MakeCurrent);
-                return true;
+                return false;
             }
 
             return base.OnExiting();

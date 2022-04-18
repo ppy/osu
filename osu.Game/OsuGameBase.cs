@@ -416,7 +416,7 @@ namespace osu.Game
         /// </summary>
         public void GracefullyExit()
         {
-            if (!OnExiting())
+            if (OnExiting())
                 Exit();
             else
                 Scheduler.AddDelayed(GracefullyExit, 2000);
