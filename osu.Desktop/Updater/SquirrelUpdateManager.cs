@@ -25,7 +25,7 @@ namespace osu.Desktop.Updater
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
-        private NotificationOverlay notificationOverlay;
+        private INotificationOverlay notificationOverlay;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
