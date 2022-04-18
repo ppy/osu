@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("did not perform", () => !actionPerformed);
             AddAssert("only one exit attempt", () => blocker.ExitAttempts == 1);
 
-            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
+            waitForDialogOverlayLoad();
 
             if (confirmed)
             {
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddWaitStep("wait a bit", 10);
 
-            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
+            waitForDialogOverlayLoad();
 
             AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == blocker2);
             AddAssert("did not perform", () => !actionPerformed);
@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddWaitStep("wait a bit", 10);
 
-            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
+            waitForDialogOverlayLoad();
 
             AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == screenWithNestedStack);
             AddAssert("nested screen didn't change", () => screenWithNestedStack.SubScreenStack.CurrentScreen == screenWithNestedStack.Blocker);
@@ -211,6 +211,8 @@ namespace osu.Game.Tests.Visual.Navigation
                 AddAssert("did not perform", () => !actionPerformed);
             }
         }
+
+        private void waitForDialogOverlayLoad() => AddUntilStep("wait for dialog overlay loaded", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
 
         private void importAndWaitForSongSelect()
         {
