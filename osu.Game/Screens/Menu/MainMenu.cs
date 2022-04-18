@@ -148,14 +148,14 @@ namespace osu.Game.Screens.Menu
         }
 
         [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private IPerformFromScreenRunner performer { get; set; }
 
         private void confirmAndExit()
         {
             if (exitConfirmed) return;
 
             exitConfirmed = true;
-            game?.PerformFromScreen(menu => menu.Exit());
+            performer?.PerformFromScreen(menu => menu.Exit());
         }
 
         private void preloadSongSelect()
