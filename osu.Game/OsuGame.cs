@@ -825,7 +825,7 @@ namespace osu.Game
             }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
-            loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
+            loadComponentSingleFile<IDialogOverlay>(new DialogOverlay(), topMostOverlayContent.Add, true);
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
@@ -982,11 +982,14 @@ namespace osu.Game
         /// <param name="component">The component to load.</param>
         /// <param name="loadCompleteAction">An action to invoke on load completion (generally to add the component to the hierarchy).</param>
         /// <param name="cache">Whether to cache the component as type <typeparamref name="T"/> into the game dependencies before any scheduling.</param>
-        private T loadComponentSingleFile<T>(T component, Action<T> loadCompleteAction, bool cache = false)
-            where T : Drawable
+        private T loadComponentSingleFile<T>(T component, Action<Drawable> loadCompleteAction, bool cache = false)
+            where T : class
         {
             if (cache)
                 dependencies.CacheAs(component);
+
+            var drawableComponent = component as Drawable;
+            Debug.Assert(drawableComponent != null);
 
             if (component is OsuFocusedOverlayContainer overlay)
                 focusedOverlays.Add(overlay);
@@ -1011,7 +1014,7 @@ namespace osu.Game
                         // Since this is running in a separate thread, it is possible for OsuGame to be disposed after LoadComponentAsync has been called
                         // throwing an exception. To avoid this, the call is scheduled on the update thread, which does not run if IsDisposed = true
                         Task task = null;
-                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(component, loadCompleteAction));
+                        var del = new ScheduledDelegate(() => task = LoadComponentAsync(drawableComponent, loadCompleteAction));
                         Scheduler.Add(del);
 
                         // The delegate won't complete if OsuGame has been disposed in the meantime
