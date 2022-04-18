@@ -11,7 +11,7 @@ namespace osu.Game.Overlays
     /// <summary>
     /// A global overlay that can show popup dialogs.
     /// </summary>
-    [Cached]
+    [Cached(typeof(IDialogOverlay))]
     public interface IDialogOverlay
     {
         /// <summary>

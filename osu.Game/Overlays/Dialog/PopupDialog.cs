@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.Dialog
             };
 
             // It's important we start in a visible state so our state fires on hide, even before load.
-            // This is used by the IDialogOverlay to know when the dialog was dismissed.
+            // This is used by the dialog overlay to know when the dialog was dismissed.
             Show();
         }
 
