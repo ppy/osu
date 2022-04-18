@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -54,6 +55,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 return overlay.State.Value == Visibility.Hidden;
             });
+
+            AddUntilStep("wait for screens removed", () => !overlay.ChildrenOfType<Screen>().Any());
 
             AddStep("display again on demand", () => overlay.Show());
 
