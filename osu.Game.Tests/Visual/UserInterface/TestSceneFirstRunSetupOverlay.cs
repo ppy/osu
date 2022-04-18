@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Screens;
 using osuTK;
@@ -23,19 +22,14 @@ namespace osu.Game.Tests.Visual.UserInterface
         private FirstRunSetupOverlay overlay;
 
         private readonly Mock<IPerformFromScreenRunner> perfomer = new Mock<IPerformFromScreenRunner>();
-        private readonly Mock<IDialogOverlay> dialogOverlay = new Mock<IDialogOverlay>();
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Dependencies.CacheAs(perfomer.Object);
-            Dependencies.CacheAs(dialogOverlay.Object);
 
             perfomer.Setup(g => g.PerformFromScreen(It.IsAny<Action<IScreen>>(), It.IsAny<IEnumerable<Type>>()))
                     .Callback((Action<IScreen> action, IEnumerable<Type> types) => action(null));
-
-            dialogOverlay.Setup(d => d.Push(It.IsAny<PopupDialog>()))
-                         .Callback((PopupDialog dialog) => dialog.PerformOkAction());
         }
 
         [SetUpSteps]

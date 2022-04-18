@@ -222,13 +222,6 @@ namespace osu.Game.Overlays
             performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            dialogOverlay.Push(new ConfirmDialog("Are you sure you want to exit the setup process?", Hide, () => { }));
-
-            return base.OnClick(e);
-        }
-
         protected override void PopIn()
         {
             base.PopIn();
@@ -283,6 +276,20 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            if (currentStepIndex != null)
+            {
+                notificationOverlay?.Post(new SimpleNotification
+                {
+                    Text = "Click here to resume initial setup at any point",
+                    Icon = FontAwesome.Solid.Horse,
+                    Activated = () =>
+                    {
+                        Show();
+                        return true;
+                    },
+                });
+            }
+
             base.PopOut();
             this.FadeOut(100);
         }
