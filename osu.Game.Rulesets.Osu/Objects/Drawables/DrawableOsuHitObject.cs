@@ -6,10 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Osu.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -24,7 +24,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         // Must be set to update IsHovered as it's used in relax mod to detect osu hit objects.
         public override bool HandlePositionalInput => true;
 
-        protected override float SamplePlaybackPosition => HitObject.X / OsuPlayfield.BASE_SIZE.X;
+        protected override float SamplePlaybackPosition => (ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
+
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
 
         /// <summary>
         /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
