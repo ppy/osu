@@ -4,9 +4,9 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.OnlinePlay.Match.Components;
-using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -22,9 +22,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new OsuTextFlowContainer
+                        new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                         {
-                            Text = "Welcome to the first-run setup guide!\n\nThis will help you get osu! setup in a way that suits you.",
+                            Text =
+                                "Welcome to the first-run setup guide!\n\nosu! is a very configurable game, and diving straight into the settings can sometimes be overwhelming. This guide will help you get the important choices out of the way to ensure a great first experience!",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
                         },
@@ -40,12 +41,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Action = () => this.Push(new ScreenSetupUIScale()),
                 }
             };
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-            Overlay.MoveDisplayTo(new Vector2(0.5f));
         }
     }
 }
