@@ -21,6 +21,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.FirstRunSetup;
+using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
@@ -33,16 +34,17 @@ namespace osu.Game.Overlays
     {
         protected override bool StartHidden => true;
 
-        [Resolved(canBeNull: true)]
-        private DialogOverlay? dialogOverlay { get; set; }
+        [Resolved]
+        private IDialogOverlay dialogOverlay { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private OsuGame? osuGame { get; set; }
+        [Resolved]
+        private IPerformFromScreenRunner performer { get; set; } = null!;
 
         private ScreenStack stack = null!;
 
         public PurpleTriangleButton NextButton = null!;
         public DangerousTriangleButton BackButton = null!;
+        private Container mainContent = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -57,10 +59,8 @@ namespace osu.Game.Overlays
         private readonly FirstRunStep[] steps =
         {
             new FirstRunStep(typeof(ScreenWelcome), "Welcome"),
-            new FirstRunStep(typeof(ScreenSetupUIScale), "UI Scale"),
+            new FirstRunStep(typeof(ScreenUIScale), "UI Scale"),
         };
-
-        private Container mainContent;
 
         public FirstRunSetupOverlay()
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background5,
+                            Colour = colourProvider.Background6,
                         },
                         new GridContainer
                         {
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays
                                         {
                                             new Box
                                             {
-                                                Colour = colourProvider.Background6,
+                                                Colour = colourProvider.Background5,
                                                 RelativeSizeAxes = Axes.Both,
                                             },
                                             new FillFlowContainer
@@ -214,27 +214,15 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            if (osuGame != null)
-            {
-                // if we are valid for display, only do so after reaching the main menu.
-                osuGame.PerformFromScreen(_ =>
-                {
-                    Show();
-                }, new[] { typeof(MainMenu) });
-            }
-            else
-            {
-                Show();
-            }
+            // if we are valid for display, only do so after reaching the main menu.
+            performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!mainContent.IsHovered && dialogOverlay?.CurrentDialog == null)
+            if (!mainContent.IsHovered && dialogOverlay.CurrentDialog == null)
             {
-                dialogOverlay?.Push(new ConfirmDialog("Are you sure you want to exit the setup process?",
-                    Hide,
-                    () => { }));
+                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to exit the setup process?", Hide, () => { }));
             }
 
             return base.OnClick(e);
