@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        protected Pagination? CurrentPage { get; private set; }
+        protected PaginationParameters? CurrentPage { get; private set; }
 
         protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             loadCancellation = new CancellationTokenSource();
 
-            CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new Pagination(InitialItemsCount);
+            CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new PaginationParameters(InitialItemsCount);
 
             retrievalRequest = CreateRequest(CurrentPage.Value);
             retrievalRequest.Success += UpdateItems;
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest(Pagination pagination);
+        protected abstract APIRequest<List<TModel>> CreateRequest(PaginationParameters pagination);
 
         protected abstract Drawable CreateDrawableItem(TModel model);
 

@@ -14,7 +14,7 @@ namespace osu.Game.Online.API.Requests
         private readonly ScoreType type;
         private readonly RulesetInfo ruleset;
 
-        public GetUserScoresRequest(long userId, ScoreType type, Pagination pagination, RulesetInfo ruleset = null)
+        public GetUserScoresRequest(long userId, ScoreType type, PaginationParameters pagination, RulesetInfo ruleset = null)
             : base(pagination)
         {
             this.userId = userId;

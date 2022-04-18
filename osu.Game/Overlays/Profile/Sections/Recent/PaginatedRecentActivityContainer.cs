@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
-        protected override APIRequest<List<APIRecentActivity>> CreateRequest(Pagination pagination) =>
+        protected override APIRequest<List<APIRecentActivity>> CreateRequest(PaginationParameters pagination) =>
             new GetUserRecentActivitiesRequest(User.Value.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIRecentActivity model) => new DrawableRecentActivity(model);

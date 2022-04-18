@@ -10,7 +10,7 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
 
-        public GetUserMostPlayedBeatmapsRequest(long userId, Pagination pagination)
+        public GetUserMostPlayedBeatmapsRequest(long userId, PaginationParameters pagination)
             : base(pagination)
         {
             this.userId = userId;

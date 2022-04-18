@@ -10,7 +10,7 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
 
-        public GetUserRecentActivitiesRequest(long userId, Pagination pagination)
+        public GetUserRecentActivitiesRequest(long userId, PaginationParameters pagination)
             : base(pagination)
         {
             this.userId = userId;

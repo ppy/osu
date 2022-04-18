@@ -8,9 +8,9 @@ namespace osu.Game.Online.API.Requests
 {
     public abstract class PaginatedAPIRequest<T> : APIRequest<T> where T : class
     {
-        private readonly Pagination pagination;
+        private readonly PaginationParameters pagination;
 
-        protected PaginatedAPIRequest(Pagination pagination)
+        protected PaginatedAPIRequest(PaginationParameters pagination)
         {
             this.pagination = pagination;
         }
