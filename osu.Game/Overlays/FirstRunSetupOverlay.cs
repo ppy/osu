@@ -60,6 +60,8 @@ namespace osu.Game.Overlays
             new FirstRunStep(typeof(ScreenSetupUIScale), "UI Scale"),
         };
 
+        private Container mainContent;
+
         public FirstRunSetupOverlay()
         {
             RelativeSizeAxes = Axes.Both;
@@ -70,7 +72,7 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                new Container
+                mainContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -228,7 +230,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (dialogOverlay?.CurrentDialog == null)
+            if (!mainContent.IsHovered && dialogOverlay?.CurrentDialog == null)
             {
                 dialogOverlay?.Push(new ConfirmDialog("Are you sure you want to exit the setup process?",
                     Hide,
