@@ -36,8 +36,8 @@ namespace osu.Game.Overlays
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
 
-        [Resolved(canBeNull: true)]
-        private NotificationOverlay notificationOverlay { get; set; } = null!;
+        [Resolved]
+        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
         private ScreenStack stack = null!;
 
@@ -48,6 +48,8 @@ namespace osu.Game.Overlays
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         private int? currentStepIndex;
+
+        private const float scale_when_hidden = 0.9f;
 
         /// <summary>
         /// The currently displayed screen, if any.
@@ -212,15 +214,6 @@ namespace osu.Game.Overlays
             performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
         }
 
-        protected override void PopIn()
-        {
-            base.PopIn();
-            this.FadeIn(400, Easing.OutQuint);
-
-            if (currentStepIndex == null)
-                showNextStep();
-        }
-
         private void showLastStep()
         {
             Debug.Assert(currentStepIndex > 0);
@@ -257,9 +250,6 @@ namespace osu.Game.Overlays
             }
             else
             {
-                stack.FadeOut(500);
-                stack.Expire();
-
                 currentStepIndex = null;
                 Hide();
             }
@@ -274,11 +264,24 @@ namespace osu.Game.Overlays
                 : "Finish";
         }
 
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            this.ScaleTo(scale_when_hidden)
+                .ScaleTo(1, 400, Easing.OutElasticHalf);
+
+            this.FadeIn(400, Easing.OutQuint);
+
+            if (currentStepIndex == null)
+                showNextStep();
+        }
+
         protected override void PopOut()
         {
             if (currentStepIndex != null)
             {
-                notificationOverlay?.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = "Click here to resume initial setup at any point",
                     Icon = FontAwesome.Solid.Horse,
@@ -289,9 +292,17 @@ namespace osu.Game.Overlays
                     },
                 });
             }
+            else
+            {
+                stack?
+                    .FadeOut(100)
+                    .Expire();
+            }
 
             base.PopOut();
-            this.FadeOut(100);
+
+            this.ScaleTo(0.96f, 400, Easing.OutQuint);
+            this.FadeOut(200, Easing.OutQuint);
         }
 
         private class FirstRunStep
