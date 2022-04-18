@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play
         private EpilepsyWarning? epilepsyWarning;
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay? notificationOverlay { get; set; }
+        private INotificationOverlay? notificationOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private VolumeOverlay? volumeOverlay { get; set; }
