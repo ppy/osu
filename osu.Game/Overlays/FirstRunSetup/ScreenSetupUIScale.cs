@@ -5,13 +5,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Select;
 using osuTK;
@@ -22,6 +23,9 @@ namespace osu.Game.Overlays.FirstRunSetup
     {
         [Resolved]
         private OsuConfigManager osuConfig { get; set; }
+
+        [Cached]
+        private OsuLogo osuLogo = new OsuLogo();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -36,7 +40,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Spacing = new Vector2(20),
                     Children = new Drawable[]
                     {
-                        new OsuTextFlowContainer
+                        new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 32))
                         {
                             Text = "The osu! user interface size can be adjusted to your liking.",
                             RelativeSizeAxes = Axes.X,
@@ -49,12 +53,42 @@ namespace osu.Game.Overlays.FirstRunSetup
                             Current = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                             KeyboardStep = 0.01f,
                         },
-                        new DrawSizePreservingFillContainer
+                        new GridContainer
                         {
-                            Masking = true,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 300,
-                            Child = stack = new OsuScreenStack()
+                            RelativeSizeAxes = Axes.Both,
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new ScalingContainer(ScalingMode.Off)
+                                    {
+                                        Masking = true,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = stack = new OsuScreenStack()
+                                    },
+                                    new ScalingContainer(ScalingMode.Off)
+                                    {
+                                        Masking = true,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = stack = new OsuScreenStack()
+                                    }
+                                },
+                                new Drawable[]
+                                {
+                                    new ScalingContainer(ScalingMode.Off)
+                                    {
+                                        Masking = true,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = stack = new OsuScreenStack()
+                                    },
+                                    new ScalingContainer(ScalingMode.Off)
+                                    {
+                                        Masking = true,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = stack = new OsuScreenStack()
+                                    }
+                                }
+                            }
                         }
                     }
                 },
@@ -70,13 +104,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             };
 
             stack.Push(new PlaySongSelect());
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-            Overlay.MoveDisplayTo(new Vector2(0.5f));
-            Overlay.ResizeDisplayTo(new Vector2(0.8f));
         }
 
         private class UIScaleSlider : OsuSliderBar<float>
