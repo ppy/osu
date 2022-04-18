@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Lists;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -270,9 +271,9 @@ namespace osu.Game.Graphics.Backgrounds
 
             private readonly VertexGroup<TexturedVertex2D> vertices = new VertexGroup<TexturedVertex2D>();
 
-            public override void Draw(in DrawState drawState)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(drawState);
+                base.Draw(renderer);
 
                 if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
                 {

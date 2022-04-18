@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -254,9 +255,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             private readonly VertexGroup<TexturedTrailVertex> vertices = new VertexGroup<TexturedTrailVertex>();
 
-            public override void Draw(in DrawState drawState)
+            public override void Draw(IRenderer renderer)
             {
-                base.Draw(drawState);
+                base.Draw(renderer);
 
                 using (var usage = vertexBatch.BeginUsage(this, vertices))
                 {
