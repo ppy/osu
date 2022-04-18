@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osuTK;
 using osuTK.Input;
@@ -22,20 +23,34 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private FirstRunSetupOverlay overlay;
 
-        private readonly Mock<IPerformFromScreenRunner> perfomer = new Mock<IPerformFromScreenRunner>();
+        private readonly Mock<IPerformFromScreenRunner> performer = new Mock<IPerformFromScreenRunner>();
+
+        private readonly Mock<INotificationOverlay> notificationOverlay = new Mock<INotificationOverlay>();
+
+        private Notification lastNotification;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.CacheAs(perfomer.Object);
-
-            perfomer.Setup(g => g.PerformFromScreen(It.IsAny<Action<IScreen>>(), It.IsAny<IEnumerable<Type>>()))
-                    .Callback((Action<IScreen> action, IEnumerable<Type> types) => action(null));
+            Dependencies.CacheAs(performer.Object);
+            Dependencies.CacheAs(notificationOverlay.Object);
         }
 
         [SetUpSteps]
         public void SetUpSteps()
         {
+            AddStep("setup dependencies", () =>
+            {
+                performer.Reset();
+                notificationOverlay.Reset();
+
+                performer.Setup(g => g.PerformFromScreen(It.IsAny<Action<IScreen>>(), It.IsAny<IEnumerable<Type>>()))
+                         .Callback((Action<IScreen> action, IEnumerable<Type> types) => action(null));
+
+                notificationOverlay.Setup(n => n.Post(It.IsAny<Notification>()))
+                                   .Callback((Notification n) => lastNotification = n);
+            });
+
             AddStep("add overlay", () =>
             {
                 Child = overlay = new FirstRunSetupOverlay
@@ -57,6 +72,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddUntilStep("wait for screens removed", () => !overlay.ChildrenOfType<Screen>().Any());
+
+            AddStep("no notifications", () => notificationOverlay.VerifyNoOtherCalls());
 
             AddStep("display again on demand", () => overlay.Show());
 
@@ -107,6 +124,24 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
+        }
+
+        [Test]
+        public void TestResumeViaNotification()
+        {
+            AddStep("step to next", () => overlay.NextButton.TriggerClick());
+
+            AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenUIScale);
+
+            AddStep("hide", () => overlay.Hide());
+            AddAssert("overlay hidden", () => overlay.State.Value == Visibility.Hidden);
+
+            AddStep("notification arrived", () => notificationOverlay.Verify(n => n.Post(It.IsAny<Notification>()), Times.Once));
+
+            AddStep("run notification action", () => lastNotification.Activated());
+
+            AddAssert("overlay shown", () => overlay.State.Value == Visibility.Visible);
+            AddAssert("is resumed", () => overlay.CurrentScreen is ScreenUIScale);
         }
     }
 }
