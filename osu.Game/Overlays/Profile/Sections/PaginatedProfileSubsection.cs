@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        protected int VisiblePages;
+        protected Pagination? CurrentPage { get; private set; }
 
         protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; }
 
@@ -96,7 +97,7 @@ namespace osu.Game.Overlays.Profile.Sections
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
 
-            VisiblePages = 0;
+            CurrentPage = null;
             ItemsContainer.Clear();
 
             if (e.NewValue != null)
@@ -110,7 +111,9 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             loadCancellation = new CancellationTokenSource();
 
-            retrievalRequest = CreateRequest(ItemsPerPage, InitialItemsCount);
+            CurrentPage = CurrentPage?.TakeNext(ItemsPerPage) ?? new Pagination(InitialItemsCount);
+
+            retrievalRequest = CreateRequest(CurrentPage.Value);
             retrievalRequest.Success += UpdateItems;
 
             api.Queue(retrievalRequest);
@@ -120,7 +123,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             OnItemsReceived(items);
 
-            if (!items.Any() && VisiblePages == 1)
+            if (!items.Any() && CurrentPage?.Offset == 0)
             {
                 moreButton.Hide();
                 moreButton.IsLoading = false;
@@ -135,8 +138,7 @@ namespace osu.Game.Overlays.Profile.Sections
             {
                 missing.Hide();
 
-                int maxCount = VisiblePages == 1 ? InitialItemsCount : ItemsPerPage;
-                moreButton.FadeTo(items.Count == maxCount ? 1 : 0);
+                moreButton.FadeTo(items.Count == CurrentPage?.Limit ? 1 : 0);
                 moreButton.IsLoading = false;
 
                 ItemsContainer.AddRange(drawables);
@@ -149,7 +151,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest(int itemsPerPage, int initialItems);
+        protected abstract APIRequest<List<TModel>> CreateRequest(Pagination pagination);
 
         protected abstract Drawable CreateDrawableItem(TModel model);
 
