@@ -575,6 +575,19 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("test dispose doesn't crash", () => Game.Dispose());
         }
 
+        [Test]
+        public void TestExitIsBlocked()
+        {
+            DialogOverlay getDialogOverlay() => Game.ChildrenOfType<DialogOverlay>().FirstOrDefault();
+
+            AddUntilStep("wait for dialog overlay loaded", () => getDialogOverlay() != null);
+            AddAssert("confirmation notification not displayed", () => getDialogOverlay().State.Value == Visibility.Hidden);
+
+            AddStep("attempt exit", () => Game.GracefullyExit());
+
+            AddUntilStep("confirmation notification was displayed", () => getDialogOverlay().State.Value == Visibility.Visible);
+        }
+
         private Func<Player> playToResults()
         {
             Player player = null;
