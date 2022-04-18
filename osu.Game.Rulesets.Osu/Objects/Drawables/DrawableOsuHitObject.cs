@@ -24,9 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         // Must be set to update IsHovered as it's used in relax mod to detect osu hit objects.
         public override bool HandlePositionalInput => true;
 
-        protected override float SamplePlaybackPosition => (ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
-
-        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+        protected override float SamplePlaybackPosition => CalculateDrawableRelativePosition(this);
 
         /// <summary>
         /// Whether this <see cref="DrawableOsuHitObject"/> can be hit, given a time value.
@@ -90,6 +88,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Causes this <see cref="DrawableOsuHitObject"/> to get missed, disregarding all conditions in implementations of <see cref="DrawableHitObject.CheckForResult"/>.
         /// </summary>
         public void MissForcefully() => ApplyResult(r => r.Type = r.Judgement.MinResult);
+
+        private RectangleF parentScreenSpaceRectangle => ((DrawableOsuHitObject)ParentHitObject)?.parentScreenSpaceRectangle ?? Parent.ScreenSpaceDrawQuad.AABBFloat;
+
+        /// <summary>
+        /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.
+        /// </summary>
+        /// <param name="drawable">The drawable to calculate its relative position.</param>
+        protected float CalculateDrawableRelativePosition(Drawable drawable) => (drawable.ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
