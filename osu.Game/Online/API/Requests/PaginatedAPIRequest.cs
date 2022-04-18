@@ -9,11 +9,13 @@ namespace osu.Game.Online.API.Requests
     public abstract class PaginatedAPIRequest<T> : APIRequest<T> where T : class
     {
         private readonly int page;
+        private readonly int initialItems;
         private readonly int itemsPerPage;
 
-        protected PaginatedAPIRequest(int page, int itemsPerPage)
+        protected PaginatedAPIRequest(int page, int itemsPerPage, int initialItems)
         {
             this.page = page;
+            this.initialItems = initialItems;
             this.itemsPerPage = itemsPerPage;
         }
 
@@ -21,8 +23,13 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            req.AddParameter("offset", (page * itemsPerPage).ToString(CultureInfo.InvariantCulture));
-            req.AddParameter("limit", itemsPerPage.ToString(CultureInfo.InvariantCulture));
+            if (page == 0)
+                req.AddParameter("limit", initialItems.ToString(CultureInfo.InvariantCulture));
+            else
+            {
+                req.AddParameter("offset", (initialItems + (page - 1) * itemsPerPage).ToString(CultureInfo.InvariantCulture));
+                req.AddParameter("limit", itemsPerPage.ToString(CultureInfo.InvariantCulture));
+            }
 
             return req;
         }
