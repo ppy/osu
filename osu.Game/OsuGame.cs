@@ -988,8 +988,7 @@ namespace osu.Game
             if (cache)
                 dependencies.CacheAs(component);
 
-            var drawableComponent = component as Drawable;
-            Debug.Assert(drawableComponent != null);
+            var drawableComponent = component as Drawable ?? throw new ArgumentException($"Component must be a {nameof(Drawable)}", nameof(component));
 
             if (component is OsuFocusedOverlayContainer overlay)
                 focusedOverlays.Add(overlay);
