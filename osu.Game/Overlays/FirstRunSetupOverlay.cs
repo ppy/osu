@@ -18,7 +18,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Screens;
@@ -68,11 +67,11 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colours)
+        private void load()
         {
             Children = new Drawable[]
             {
-                mainContent = new Container
+                mainContent = new BlockingContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
@@ -210,6 +209,11 @@ namespace osu.Game.Overlays
             };
         }
 
+        private class BlockingContainer : Container
+        {
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -220,10 +224,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!mainContent.IsHovered && dialogOverlay.CurrentDialog == null)
-            {
-                dialogOverlay.Push(new ConfirmDialog("Are you sure you want to exit the setup process?", Hide, () => { }));
-            }
+            dialogOverlay.Push(new ConfirmDialog("Are you sure you want to exit the setup process?", Hide, () => { }));
 
             return base.OnClick(e);
         }
