@@ -1,6 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
+using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -8,14 +12,17 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,15 +34,26 @@ namespace osu.Game.Overlays
         protected override bool StartHidden => true;
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private DialogOverlay? dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
-        private OsuGame osuGame { get; set; }
+        private OsuGame? osuGame { get; set; }
+
+        private ScreenStack stack = null!;
+
+        private PurpleTriangleButton nextButton = null!;
+        private DangerousTriangleButton backButton = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        private ScreenWelcome welcomeScreen;
+        private int? currentStepIndex;
+
+        private readonly FirstRunStep[] steps =
+        {
+            new FirstRunStep(typeof(ScreenWelcome), "Welcome"),
+            new FirstRunStep(typeof(ScreenSetupUIScale), "UI Scale"),
+        };
 
         public FirstRunSetupOverlay()
         {
@@ -75,6 +93,7 @@ namespace osu.Game.Overlays
                             {
                                 new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
+                                new Dimension(GridSizeMode.AutoSize),
                             },
                             Content = new[]
                             {
@@ -122,10 +141,60 @@ namespace osu.Game.Overlays
                                 },
                                 new Drawable[]
                                 {
-                                    new ScreenStack(welcomeScreen = new ScreenWelcome())
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding(20),
+                                        Child = stack = new ScreenStack
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
                                     },
+                                },
+                                new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding(20),
+                                        Child = new GridContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            ColumnDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.AutoSize),
+                                                new Dimension(GridSizeMode.Absolute, 10),
+                                                new Dimension(),
+                                            },
+                                            RowDimensions = new[]
+                                            {
+                                                new Dimension(GridSizeMode.AutoSize),
+                                            },
+                                            Content = new[]
+                                            {
+                                                new[]
+                                                {
+                                                    backButton = new DangerousTriangleButton
+                                                    {
+                                                        Width = 200,
+                                                        Text = "Back",
+                                                        Action = showLastStep,
+                                                        Enabled = { Value = false },
+                                                    },
+                                                    Empty(),
+                                                    nextButton = new PurpleTriangleButton
+                                                    {
+                                                        RelativeSizeAxes = Axes.X,
+                                                        Width = 1,
+                                                        Text = "Get started",
+                                                        Action = showNextStep
+                                                    }
+                                                },
+                                            }
+                                        },
+                                    }
                                 }
                             }
                         },
@@ -169,14 +238,61 @@ namespace osu.Game.Overlays
             base.PopIn();
             this.FadeIn(400, Easing.OutQuint);
 
-            if (welcomeScreen.GetChildScreen() != null)
-                welcomeScreen.MakeCurrent();
+            if (currentStepIndex == null)
+                showNextStep();
+        }
+
+        private void showLastStep()
+        {
+            Debug.Assert(currentStepIndex > 0);
+
+            stack.CurrentScreen.Exit();
+            currentStepIndex--;
+
+            backButton.Enabled.Value = currentStepIndex != 0;
+        }
+
+        private void showNextStep()
+        {
+            if (currentStepIndex == null)
+                currentStepIndex = 0;
+            else
+                currentStepIndex++;
+
+            Debug.Assert(currentStepIndex != null);
+            backButton.Enabled.Value = currentStepIndex > 0;
+
+            if (currentStepIndex < steps.Length)
+            {
+                var nextStep = steps[currentStepIndex.Value];
+                stack.Push((Screen)Activator.CreateInstance(nextStep.ScreenType));
+            }
+            else
+            {
+                Hide();
+            }
+
+            nextButton.Text = currentStepIndex + 1 < steps.Length
+                ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
+                : "Finish";
         }
 
         protected override void PopOut()
         {
             base.PopOut();
             this.FadeOut(100);
+        }
+
+        private class FirstRunStep
+        {
+            public readonly Type ScreenType;
+            public readonly LocalisableString Description;
+
+            public FirstRunStep(Type screenType, LocalisableString description)
+            {
+                ScreenType = screenType;
+                Description = description;
+            }
         }
     }
 }
