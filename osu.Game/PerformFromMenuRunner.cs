@@ -26,7 +26,7 @@ namespace osu.Game
         private NotificationOverlay notifications { get; set; }
 
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         private OsuGame game { get; set; }

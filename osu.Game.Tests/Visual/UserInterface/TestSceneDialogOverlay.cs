@@ -11,7 +11,7 @@ using osu.Game.Overlays.Dialog;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneDialogOverlay : OsuTestScene
+    public class TestSceneIDialogOverlay : OsuTestScene
     {
         private DialogOverlay overlay;
 

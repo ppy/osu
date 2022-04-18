@@ -5,6 +5,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
@@ -113,12 +114,12 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("did not perform", () => !actionPerformed);
             AddAssert("only one exit attempt", () => blocker.ExitAttempts == 1);
 
-            AddUntilStep("wait for dialog display", () => Game.Dependencies.Get<DialogOverlay>().IsLoaded);
+            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
 
             if (confirmed)
             {
                 AddStep("accept dialog", () => InputManager.Key(Key.Number1));
-                AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
+                AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog == null);
                 AddUntilStep("did perform", () => actionPerformed);
             }
             else
@@ -145,7 +146,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddWaitStep("wait a bit", 10);
 
-            AddUntilStep("wait for dialog display", () => Game.Dependencies.Get<DialogOverlay>().IsLoaded);
+            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
 
             AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == blocker2);
             AddAssert("did not perform", () => !actionPerformed);
@@ -187,7 +188,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddWaitStep("wait a bit", 10);
 
-            AddUntilStep("wait for dialog display", () => Game.Dependencies.Get<DialogOverlay>().IsLoaded);
+            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
 
             AddAssert("screen didn't change", () => Game.ScreenStack.CurrentScreen == screenWithNestedStack);
             AddAssert("nested screen didn't change", () => screenWithNestedStack.SubScreenStack.CurrentScreen == screenWithNestedStack.Blocker);
@@ -221,7 +222,7 @@ namespace osu.Game.Tests.Visual.Navigation
         public class DialogBlockingScreen : OsuScreen
         {
             [Resolved]
-            private DialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay dialogOverlay { get; set; }
 
             private int dialogDisplayCount;
 
