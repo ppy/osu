@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class StableDirectoryLocationDialog : PopupDialog
     {
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private IPerformFromScreenRunner performer { get; set; }
 
         public StableDirectoryLocationDialog(TaskCompletionSource<string> taskCompletionSource)
