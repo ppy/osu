@@ -60,6 +60,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 return overlay.State.Value == Visibility.Hidden;
             });
+
+            AddStep("display again on demand", () => overlay.Show());
+
+            AddUntilStep("back at start", () => overlay.CurrentScreen is ScreenWelcome);
         }
 
         [Test]
