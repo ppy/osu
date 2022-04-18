@@ -6,6 +6,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
@@ -200,10 +201,10 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddStep("choose clear all scores", () => InputManager.Key(Key.Number4));
 
-            AddUntilStep("wait for dialog display", () => Game.Dependencies.Get<DialogOverlay>().IsLoaded);
-            AddUntilStep("wait for dialog", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog != null);
+            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
+            AddUntilStep("wait for dialog", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
             AddStep("confirm deletion", () => InputManager.Key(Key.Number1));
-            AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
+            AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog == null);
 
             AddUntilStep("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 
@@ -246,10 +247,10 @@ namespace osu.Game.Tests.Visual.Navigation
                 InputManager.Click(MouseButton.Left);
             });
 
-            AddUntilStep("wait for dialog display", () => Game.Dependencies.Get<DialogOverlay>().IsLoaded);
-            AddUntilStep("wait for dialog", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog != null);
+            AddUntilStep("wait for dialog display", () => ((Drawable)Game.Dependencies.Get<IDialogOverlay>()).IsLoaded);
+            AddUntilStep("wait for dialog", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog != null);
             AddStep("confirm deletion", () => InputManager.Key(Key.Number1));
-            AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<DialogOverlay>().CurrentDialog == null);
+            AddUntilStep("wait for dialog dismissed", () => Game.Dependencies.Get<IDialogOverlay>().CurrentDialog == null);
 
             AddUntilStep("ensure score is pending deletion", () => Game.Realm.Run(r => r.Find<ScoreInfo>(score.ID)?.DeletePending == true));
 

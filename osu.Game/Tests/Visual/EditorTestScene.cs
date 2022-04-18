@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual
         {
             [Resolved(canBeNull: true)]
             [CanBeNull]
-            private DialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay dialogOverlay { get; set; }
 
             public new void Undo() => base.Undo();
 

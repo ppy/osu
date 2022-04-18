@@ -238,7 +238,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private bool exitConfirmed;
 

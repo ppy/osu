@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
         private NotificationOverlay notifications { get; set; }
