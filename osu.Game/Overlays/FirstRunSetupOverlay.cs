@@ -246,6 +246,8 @@ namespace osu.Game.Overlays
             currentStepIndex--;
 
             BackButton.Enabled.Value = currentStepIndex != 0;
+
+            updateButtonText();
         }
 
         private void showNextStep()
@@ -260,18 +262,23 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Length)
             {
-                var nextStep = steps[currentStepIndex.Value];
-                stack.Push((Screen)Activator.CreateInstance(nextStep.ScreenType));
-
-                NextButton.Text = currentStepIndex + 1 < steps.Length
-                    ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
-                    : "Finish";
+                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value].ScreenType));
+                updateButtonText();
             }
             else
             {
                 Hide();
                 currentStepIndex = null;
             }
+        }
+
+        private void updateButtonText()
+        {
+            Debug.Assert(currentStepIndex != null);
+
+            NextButton.Text = currentStepIndex + 1 < steps.Length
+                ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
+                : "Finish";
         }
 
         protected override void PopOut()
