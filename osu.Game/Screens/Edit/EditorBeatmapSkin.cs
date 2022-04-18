@@ -22,12 +22,17 @@ namespace osu.Game.Screens.Edit
         public event Action BeatmapSkinChanged;
 
         /// <summary>
+        /// The underlying beatmap skin.
+        /// </summary>
+        protected internal ISkin Skin => skin;
+
+        private readonly Skin skin;
+
+        /// <summary>
         /// The combo colours of this skin.
         /// If empty, the default combo colours will be used.
         /// </summary>
-        public readonly BindableList<Colour4> ComboColours;
-
-        private readonly Skin skin;
+        public BindableList<Colour4> ComboColours { get; }
 
         public EditorBeatmapSkin(Skin skin)
         {
