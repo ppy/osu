@@ -11,15 +11,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.FirstRunSetup;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
@@ -34,16 +34,15 @@ namespace osu.Game.Overlays
         protected override bool StartHidden => true;
 
         [Resolved]
-        private IDialogOverlay dialogOverlay { get; set; } = null!;
-
-        [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
+
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay notificationOverlay { get; set; } = null!;
 
         private ScreenStack stack = null!;
 
         public PurpleTriangleButton NextButton = null!;
         public DangerousTriangleButton BackButton = null!;
-        private Container mainContent = null!;
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
@@ -61,6 +60,8 @@ namespace osu.Game.Overlays
             new FirstRunStep(typeof(ScreenUIScale), "UI Scale"),
         };
 
+        private Container stackContainer = null!;
+
         public FirstRunSetupOverlay()
         {
             RelativeSizeAxes = Axes.Both;
@@ -69,149 +70,138 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(0.95f);
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Radius = 5,
+                Colour = Color4.Black.Opacity(0.2f),
+            };
+
+            Masking = true;
+            CornerRadius = 10;
+
             Children = new Drawable[]
             {
-                mainContent = new BlockingContainer
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(0.95f),
-                    EdgeEffect = new EdgeEffectParameters
+                    Colour = colourProvider.Background6,
+                },
+                new GridContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    RowDimensions = new[]
                     {
-                        Type = EdgeEffectType.Shadow,
-                        Radius = 5,
-                        Colour = Color4.Black.Opacity(0.2f),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
                     },
-                    Masking = true,
-                    CornerRadius = 10,
-                    Children = new Drawable[]
+                    Content = new[]
                     {
-                        new Box
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colourProvider.Background6,
-                        },
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            RowDimensions = new[]
+                            new Container
                             {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(),
-                                new Dimension(GridSizeMode.AutoSize),
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
                                 {
-                                    new Container
+                                    new Box
+                                    {
+                                        Colour = colourProvider.Background5,
+                                        RelativeSizeAxes = Axes.Both,
+                                    },
+                                    new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
+                                        Margin = new MarginPadding(10),
                                         AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
                                         Children = new Drawable[]
                                         {
-                                            new Box
+                                            new OsuSpriteText
                                             {
-                                                Colour = colourProvider.Background5,
-                                                RelativeSizeAxes = Axes.Both,
+                                                Text = "First run setup",
+                                                Font = OsuFont.Default.With(size: 32),
+                                                Colour = colourProvider.Content2,
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre,
                                             },
-                                            new FillFlowContainer
+                                            new OsuTextFlowContainer
                                             {
-                                                RelativeSizeAxes = Axes.X,
-                                                Margin = new MarginPadding(10),
-                                                AutoSizeAxes = Axes.Y,
-                                                Direction = FillDirection.Vertical,
-                                                Children = new Drawable[]
-                                                {
-                                                    new OsuSpriteText
-                                                    {
-                                                        Text = "First run setup",
-                                                        Font = OsuFont.Default.With(size: 32),
-                                                        Colour = colourProvider.Content2,
-                                                        Anchor = Anchor.TopCentre,
-                                                        Origin = Anchor.TopCentre,
-                                                    },
-                                                    new OsuTextFlowContainer
-                                                    {
-                                                        Text = "Setup osu! to suit you",
-                                                        Colour = colourProvider.Content1,
-                                                        Anchor = Anchor.TopCentre,
-                                                        Origin = Anchor.TopCentre,
-                                                        AutoSizeAxes = Axes.Both,
-                                                    },
-                                                }
+                                                Text = "Setup osu! to suit you",
+                                                Colour = colourProvider.Content1,
+                                                Anchor = Anchor.TopCentre,
+                                                Origin = Anchor.TopCentre,
+                                                AutoSizeAxes = Axes.Both,
                                             },
                                         }
                                     },
-                                },
-                                new Drawable[]
+                                }
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            stackContainer = new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(20),
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Padding = new MarginPadding(20),
+                                Child = new GridContainer
                                 {
-                                    new Container
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    ColumnDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding(20),
-                                        Child = stack = new ScreenStack
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(GridSizeMode.Absolute, 10),
+                                        new Dimension(),
                                     },
-                                },
-                                new Drawable[]
-                                {
-                                    new Container
+                                    RowDimensions = new[]
                                     {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Padding = new MarginPadding(20),
-                                        Child = new GridContainer
+                                        new Dimension(GridSizeMode.AutoSize),
+                                    },
+                                    Content = new[]
+                                    {
+                                        new[]
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            ColumnDimensions = new[]
+                                            BackButton = new DangerousTriangleButton
                                             {
-                                                new Dimension(GridSizeMode.AutoSize),
-                                                new Dimension(GridSizeMode.Absolute, 10),
-                                                new Dimension(),
+                                                Width = 200,
+                                                Text = "Back",
+                                                Action = showLastStep,
+                                                Enabled = { Value = false },
                                             },
-                                            RowDimensions = new[]
+                                            Empty(),
+                                            NextButton = new PurpleTriangleButton
                                             {
-                                                new Dimension(GridSizeMode.AutoSize),
-                                            },
-                                            Content = new[]
-                                            {
-                                                new[]
-                                                {
-                                                    BackButton = new DangerousTriangleButton
-                                                    {
-                                                        Width = 200,
-                                                        Text = "Back",
-                                                        Action = showLastStep,
-                                                        Enabled = { Value = false },
-                                                    },
-                                                    Empty(),
-                                                    NextButton = new PurpleTriangleButton
-                                                    {
-                                                        RelativeSizeAxes = Axes.X,
-                                                        Width = 1,
-                                                        Text = "Get started",
-                                                        Action = showNextStep
-                                                    }
-                                                },
+                                                RelativeSizeAxes = Axes.X,
+                                                Width = 1,
+                                                Text = "Get started",
+                                                Action = showNextStep
                                             }
                                         },
                                     }
-                                }
+                                },
                             }
-                        },
+                        }
                     }
-                }
+                },
             };
-        }
-
-        private class BlockingContainer : Container
-        {
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
         }
 
         protected override void LoadComplete()
@@ -246,7 +236,14 @@ namespace osu.Game.Overlays
         private void showNextStep()
         {
             if (currentStepIndex == null)
+            {
+                stackContainer.Child = stack = new ScreenStack
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+
                 currentStepIndex = 0;
+            }
             else
                 currentStepIndex++;
 
@@ -260,8 +257,11 @@ namespace osu.Game.Overlays
             }
             else
             {
-                Hide();
+                stack.FadeOut(500);
+                stack.Expire();
+
                 currentStepIndex = null;
+                Hide();
             }
         }
 
