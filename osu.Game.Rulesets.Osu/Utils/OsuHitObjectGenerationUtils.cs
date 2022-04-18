@@ -116,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (!(osuObject is Slider slider))
                 return;
 
+            // No need to update the head and tail circles, since slider handles that when the new slider path is set
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(OsuPlayfield.BASE_SIZE.X - h.Position.X, h.Position.Y));
 
@@ -137,6 +138,7 @@ namespace osu.Game.Rulesets.Osu.Utils
             if (!(osuObject is Slider slider))
                 return;
 
+            // No need to update the head and tail circles, since slider handles that when the new slider path is set
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));
 
@@ -156,6 +158,7 @@ namespace osu.Game.Rulesets.Osu.Utils
         {
             void rotateNestedObject(OsuHitObject nested) => nested.Position = rotateVector(nested.Position - slider.Position, rotation) + slider.Position;
 
+            // No need to update the head and tail circles, since slider handles that when the new slider path is set
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(rotateNestedObject);
             slider.NestedHitObjects.OfType<SliderRepeat>().ForEach(rotateNestedObject);
 
