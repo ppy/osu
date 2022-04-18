@@ -17,11 +17,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         public PaginatedKudosuHistoryContainer(Bindable<APIUser> user)
             : base(user, missingText: UsersStrings.ShowExtraKudosuEntryEmpty)
         {
-            ItemsPerPage = 5;
         }
 
-        protected override APIRequest<List<APIKudosuHistory>> CreateRequest()
-            => new GetUserKudosuHistoryRequest(User.Value.Id, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIKudosuHistory>> CreateRequest(int itemsPerPage, int initialItems)
+            => new GetUserKudosuHistoryRequest(User.Value.Id, VisiblePages++, itemsPerPage, initialItems);
 
         protected override Drawable CreateDrawableItem(APIKudosuHistory item) => new DrawableKudosuHistoryItem(item);
     }

@@ -21,11 +21,20 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedProfileSubsection<TModel> : ProfileSubsection
     {
+        /// <summary>
+        /// The number of items displayed per page.
+        /// </summary>
+        protected virtual int ItemsPerPage => 50;
+
+        /// <summary>
+        /// The number of items displayed initially.
+        /// </summary>
+        protected virtual int InitialItemsCount => 5;
+
         [Resolved]
         private IAPIProvider api { get; set; }
 
         protected int VisiblePages;
-        protected int ItemsPerPage;
 
         protected ReverseChildIDFillFlowContainer<Drawable> ItemsContainer { get; private set; }
 
@@ -101,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             loadCancellation = new CancellationTokenSource();
 
-            retrievalRequest = CreateRequest();
+            retrievalRequest = CreateRequest(ItemsPerPage, InitialItemsCount);
             retrievalRequest.Success += UpdateItems;
 
             api.Queue(retrievalRequest);
@@ -125,7 +134,9 @@ namespace osu.Game.Overlays.Profile.Sections
             LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
             {
                 missing.Hide();
-                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+
+                int maxCount = VisiblePages == 1 ? InitialItemsCount : ItemsPerPage;
+                moreButton.FadeTo(items.Count == maxCount ? 1 : 0);
                 moreButton.IsLoading = false;
 
                 ItemsContainer.AddRange(drawables);
@@ -138,7 +149,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
         }
 
-        protected abstract APIRequest<List<TModel>> CreateRequest();
+        protected abstract APIRequest<List<TModel>> CreateRequest(int itemsPerPage, int initialItems);
 
         protected abstract Drawable CreateDrawableItem(TModel model);
 

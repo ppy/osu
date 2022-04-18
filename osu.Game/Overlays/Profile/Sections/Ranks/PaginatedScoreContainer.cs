@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             : base(user, headerText)
         {
             this.type = type;
-
-            ItemsPerPage = 5;
         }
 
         [BackgroundDependencyLoader]
@@ -62,8 +60,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             base.OnItemsReceived(items);
         }
 
-        protected override APIRequest<List<APIScore>> CreateRequest() =>
-            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+        protected override APIRequest<List<APIScore>> CreateRequest(int itemsPerPage, int initialItems) =>
+            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, itemsPerPage, initialItems);
 
         private int drawableItemIndex;
 
