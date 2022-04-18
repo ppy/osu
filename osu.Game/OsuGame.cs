@@ -63,7 +63,7 @@ namespace osu.Game
     /// The full osu! experience. Builds on top of <see cref="OsuGameBase"/> to add menus and binding logic
     /// for initial components that are generally retrieved via DI.
     /// </summary>
-    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>, ILocalUserPlayInfo, IPerformFromScreenRunner
     {
         /// <summary>
         /// The amount of global offset to apply when a left/right anchored overlay is displayed (ie. settings or notifications).
@@ -586,12 +586,6 @@ namespace osu.Game
 
         private PerformFromMenuRunner performFromMainMenuTask;
 
-        /// <summary>
-        /// Perform an action only after returning to a specific screen as indicated by <paramref name="validScreens"/>.
-        /// Eagerly tries to exit the current screen until it succeeds.
-        /// </summary>
-        /// <param name="action">The action to perform once we are in the correct state.</param>
-        /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
         public void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
