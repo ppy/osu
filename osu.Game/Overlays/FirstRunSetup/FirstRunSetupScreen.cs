@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 
@@ -14,38 +13,31 @@ namespace osu.Game.Overlays.FirstRunSetup
         [Resolved]
         protected FirstRunSetupOverlay Overlay { get; private set; }
 
-        protected Container Content { get; private set; }
-
-        protected FirstRunSetupScreen()
-        {
-            InternalChildren = new Drawable[]
-            {
-                Content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(20),
-                },
-            };
-        }
-
         protected override bool OnClick(ClickEvent e) => true;
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            this.FadeOut().Delay(200).FadeIn(200);
+            this
+                .FadeInFromZero(500)
+                .MoveToX(100)
+                .MoveToX(0, 500, Easing.OutQuint);
         }
 
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            this.FadeIn(200);
+            this
+                .FadeInFromZero(500)
+                .MoveToX(0, 500, Easing.OutQuint);
         }
 
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-            this.FadeOut(200);
+            this
+                .FadeOut(100)
+                .MoveToX(-100, 500, Easing.OutQuint);
         }
     }
 }

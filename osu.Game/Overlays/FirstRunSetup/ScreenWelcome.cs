@@ -3,10 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -14,7 +12,7 @@ namespace osu.Game.Overlays.FirstRunSetup
     {
         public ScreenWelcome()
         {
-            Content.Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
                 {
@@ -31,15 +29,6 @@ namespace osu.Game.Overlays.FirstRunSetup
                         },
                     }
                 },
-                new PurpleTriangleButton
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding(10),
-                    Text = "Get started",
-                    Action = () => this.Push(new ScreenSetupUIScale()),
-                }
             };
         }
     }
