@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
         }
 
-        protected override APIRequest<List<APIKudosuHistory>> CreateRequest(Pagination pagination)
+        protected override APIRequest<List<APIKudosuHistory>> CreateRequest(PaginationParameters pagination)
             => new GetUserKudosuHistoryRequest(User.Value.Id, pagination);
 
         protected override Drawable CreateDrawableItem(APIKudosuHistory item) => new DrawableKudosuHistoryItem(item);
