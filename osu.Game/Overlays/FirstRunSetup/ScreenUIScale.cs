@@ -29,11 +29,8 @@ namespace osu.Game.Overlays.FirstRunSetup
 {
     public class ScreenUIScale : FirstRunSetupScreen
     {
-        [Resolved]
-        private OsuConfigManager osuConfig { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, BeatmapManager beatmaps)
+        private void load(OsuConfigManager config)
         {
             Content.Children = new Drawable[]
             {
@@ -46,7 +43,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new SettingsSlider<float, UIScaleSlider>
                 {
                     LabelText = GraphicsSettingsStrings.UIScaling,
-                    Current = osuConfig.GetBindable<float>(OsuSetting.UIScale),
+                    Current = config.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f,
                 },
                 new InverseScalingDrawSizePreservingFillContainer
