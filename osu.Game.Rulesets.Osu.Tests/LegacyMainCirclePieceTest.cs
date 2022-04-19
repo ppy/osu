@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 // available textures
                 new[] { @"hitcircle", @"hitcircleoverlay" },
-                // priority lookup
+                // priority lookup prefix
                 null,
                 // expected circle and overlay
                 @"hitcircle", @"hitcircleoverlay",
@@ -66,8 +66,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCaseSource(nameof(texture_priority_cases))]
         public void TestTexturePriorities(string[] textureFilenames, string priorityLookup, string? expectedCircle, string? expectedOverlay)
         {
-            Sprite? circleSprite = null;
-            Sprite? overlaySprite = null;
+            TestLegacyMainCirclePiece piece = null!;
 
             AddStep("load circle piece", () =>
             {
@@ -80,18 +79,26 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Child = new DependencyProvidingContainer
                 {
                     CachedDependencies = new (Type, object)[] { (typeof(ISkinSource), skin.Object) },
-                    Child = new LegacyMainCirclePiece(priorityLookup, false),
+                    Child = piece = new TestLegacyMainCirclePiece(priorityLookup),
                 };
 
                 var sprites = this.ChildrenOfType<Sprite>().Where(s => s.Texture.AssetName != null).DistinctBy(s => s.Texture.AssetName).ToArray();
                 Debug.Assert(sprites.Length <= 2);
-
-                circleSprite = sprites.ElementAtOrDefault(0);
-                overlaySprite = sprites.ElementAtOrDefault(1);
             });
 
-            AddAssert("check circle sprite", () => circleSprite?.Texture?.AssetName == expectedCircle);
-            AddAssert("check overlay sprite", () => overlaySprite?.Texture?.AssetName == expectedOverlay);
+            AddAssert("check circle sprite", () => piece.CircleSprite?.Texture?.AssetName == expectedCircle);
+            AddAssert("check overlay sprite", () => piece.OverlaySprite?.Texture?.AssetName == expectedOverlay);
+        }
+
+        private class TestLegacyMainCirclePiece : LegacyMainCirclePiece
+        {
+            public new Sprite? CircleSprite => base.CircleSprite.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).SingleOrDefault();
+            public new Sprite? OverlaySprite => base.OverlaySprite.ChildrenOfType<Sprite>().DistinctBy(s => s.Texture.AssetName).SingleOrDefault();
+
+            public TestLegacyMainCirclePiece(string? priorityLookupPrefix)
+                : base(priorityLookupPrefix, false)
+            {
+            }
         }
     }
 }

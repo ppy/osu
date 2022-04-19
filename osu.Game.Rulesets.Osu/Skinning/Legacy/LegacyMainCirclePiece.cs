@@ -31,11 +31,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly bool hasNumber;
 
-        private Drawable hitCircleSprite = null!;
+        protected Drawable CircleSprite = null!;
+        protected Drawable OverlaySprite = null!;
 
         protected Container OverlayLayer { get; private set; } = null!;
 
-        private Drawable hitCircleOverlay = null!;
         private SkinnableSpriteText hitCircleText = null!;
 
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
             InternalChildren = new[]
             {
-                hitCircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
+                CircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
+                    Child = OverlaySprite = new KiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             bool overlayAboveNumber = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.HitCircleOverlayAboveNumber)?.Value ?? true;
 
             if (overlayAboveNumber)
-                OverlayLayer.ChangeChildDepth(hitCircleOverlay, float.MinValue);
+                OverlayLayer.ChangeChildDepth(OverlaySprite, float.MinValue);
 
             if (drawableOsuObject != null)
             {
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             base.LoadComplete();
 
-            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
+            accentColour.BindValueChanged(colour => CircleSprite.Colour = LegacyColourCompatibility.DisallowZeroAlpha(colour.NewValue), true);
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
@@ -136,11 +136,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 switch (state)
                 {
                     case ArmedState.Hit:
-                        hitCircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
-                        hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        CircleSprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        CircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                        hitCircleOverlay.FadeOut(legacy_fade_duration, Easing.Out);
-                        hitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                        OverlaySprite.FadeOut(legacy_fade_duration, Easing.Out);
+                        OverlaySprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                         if (hasNumber)
                         {
