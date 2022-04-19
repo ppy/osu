@@ -1,7 +1,7 @@
+#nullable enable
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ObjectExtensions;
@@ -33,9 +33,25 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         /// If the "circle" texture could not be found with this prefix,
         /// then it is nullified and the default prefix "hitcircle" is used instead.
         /// </remarks>
-        private string priorityLookupPrefix;
+        private string? priorityLookupPrefix;
 
-        public LegacyMainCirclePiece(string priorityLookupPrefix = null, bool hasNumber = true)
+        private Drawable hitCircleSprite = null!;
+
+        protected Container OverlayLayer { get; private set; } = null!;
+
+        private Drawable hitCircleOverlay = null!;
+        private SkinnableSpriteText hitCircleText = null!;
+
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+
+        [Resolved(canBeNull: true)]
+        private DrawableHitObject? drawableObject { get; set; }
+
+        [Resolved]
+        private ISkinSource skin { get; set; } = null!;
+
+        public LegacyMainCirclePiece(string? priorityLookupPrefix = null, bool hasNumber = true)
         {
             this.priorityLookupPrefix = priorityLookupPrefix;
             this.hasNumber = hasNumber;
@@ -43,30 +59,13 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
-        private Drawable hitCircleSprite;
-
-        protected Container OverlayLayer { get; private set; }
-
-        private Drawable hitCircleOverlay;
-        private SkinnableSpriteText hitCircleText;
-
-        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
-        private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
-
-        [Resolved(canBeNull: true)]
-        [CanBeNull]
-        private DrawableHitObject drawableObject { get; set; }
-
-        [Resolved]
-        private ISkinSource skin { get; set; }
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
+            var drawableOsuObject = (DrawableOsuHitObject?)drawableObject;
 
             // attempt lookup using priority specification
-            Texture baseTexture = getTexture(string.Empty);
+            Texture? baseTexture = getTexture(string.Empty);
 
             // if the base texture was not found using the priority specification, nullify the specification and fall back to "hitcircle".
             if (baseTexture == null)
@@ -122,10 +121,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
             }
 
-            Texture getTexture(string name)
+            Texture? getTexture(string name)
                 => skin.GetTexture($"{priorityLookupPrefix ?? @"hitcircle"}{name}");
 
-            Drawable getAnimation(string name, double frameLength)
+            Drawable? getAnimation(string name, double frameLength)
                 => skin.GetAnimation($"{priorityLookupPrefix ?? @"hitcircle"}{name}", true, true, frameLength: frameLength);
         }
 
