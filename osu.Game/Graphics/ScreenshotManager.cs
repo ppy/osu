@@ -43,7 +43,7 @@ namespace osu.Game.Graphics
         private Storage storage;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
 
