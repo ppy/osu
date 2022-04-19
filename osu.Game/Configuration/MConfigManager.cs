@@ -90,6 +90,7 @@ namespace osu.Game.Configuration
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
+            SetDefault(MSetting.MprisUpdateInterval, 500d, 100d, 1000d);
 
             //排行榜
             SetDefault(MSetting.InGameLeaderboardState, LeaderboardState.Fold);
@@ -148,6 +149,7 @@ namespace osu.Game.Configuration
         DBusAllowPost,
         DBusWaitOnline,
         MprisUseAvatarlogoAsCover,
+        MprisUpdateInterval,
         EnableTray,
         EnableSystemNotifications,
         TrayIconName,

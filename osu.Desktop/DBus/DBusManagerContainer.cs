@@ -31,6 +31,7 @@ namespace osu.Desktop.DBus
 
         public Action<Notification> NotificationAction { get; set; }
         private readonly Bindable<bool> controlSource;
+        private readonly BindableDouble mprisUpdateInterval = new BindableDouble();
 
         private readonly Bindable<UserActivity> bindableActivity = new Bindable<UserActivity>();
         private readonly MprisPlayerService mprisService = new MprisPlayerService();
@@ -172,6 +173,7 @@ namespace osu.Desktop.DBus
             iconName = config.GetBindable<string>(MSetting.TrayIconName);
             enableTray = config.GetBindable<bool>(MSetting.EnableTray);
             enableSystemNotifications = config.GetBindable<bool>(MSetting.EnableSystemNotifications);
+            config.BindWith(MSetting.MprisUpdateInterval, mprisUpdateInterval);
 
             void onDBusFirstConnected()
             {
@@ -227,6 +229,8 @@ namespace osu.Desktop.DBus
                     }, true);
 
                     mprisService.AllowSet = true;
+
+                    updateMprisProgress();
                 }, config.Get<double>(MSetting.DBusWaitOnline));
 
                 DBusManager.OnConnected -= scheduleFirstConnected;
@@ -336,6 +340,14 @@ namespace osu.Desktop.DBus
                 DBusManager.Connect();
             //else
             //    DBusManager.Disconnect();
+        }
+
+        private void updateMprisProgress()
+        {
+            mprisService.Progress = (long)(musicController.CurrentTrack.CurrentTime * 1000);
+            mprisService.TrackLength = (long)(musicController.CurrentTrack.Length * 1000);
+
+            Scheduler.AddDelayed(updateMprisProgress, mprisUpdateInterval.Value);
         }
 
         #region Disposal

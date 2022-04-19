@@ -33,6 +33,12 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                     LabelText = "总是使用avatarlogo作为mpris封面",
                     Current = config.GetBindable<bool>(MSetting.MprisUseAvatarlogoAsCover)
                 },
+                new SettingsSlider<double, TimeSlider>
+                {
+                    LabelText = "Mpris更新间隔",
+                    TooltipText = "要间隔多久向Mpris更新当前歌曲的播放进度",
+                    Current = config.GetBindable<double>(MSetting.MprisUpdateInterval)
+                },
                 dbusWaitOnlineSlider = new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = "DBus初始化等待时间",

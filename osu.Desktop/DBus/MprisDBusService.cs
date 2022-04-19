@@ -77,6 +77,28 @@ namespace osu.Desktop.DBus
             }
         }
 
+        internal long Progress
+        {
+            set => Set(nameof(playerProperties.Position), value);
+        }
+
+        //Position可以直接调用OnPropertiesChanged
+        //但Length是在Metadata中的，无法直接调用
+        //因此手动调用对Metadata的OnPropertiesChanged
+        internal long TrackLength
+        {
+            set
+            {
+                long oldval = (long)playerProperties.Metadata["mpris:length"];
+
+                if (oldval != value)
+                {
+                    playerProperties.Metadata["mpris:length"] = value;
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
+                }
+            }
+        }
+
         /// <summary>
         /// 元数据
         /// </summary>
@@ -94,7 +116,7 @@ namespace osu.Desktop.DBus
                 playerProperties.Metadata["xesam:title"] = info.Metadata?.TitleUnicode ?? info.Metadata?.Title ?? string.Empty;
                 playerProperties.Metadata["mpris:artUrl"] = resolveBeatmapCoverUrl(value);
 
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("Metadata", playerProperties.Metadata));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
             }
         }
 
@@ -247,7 +269,7 @@ namespace osu.Desktop.DBus
                             {
                                 OnRandom?.Invoke();
 
-                                Set("Shuffle", false);
+                                Set("Shuffle", true);
                                 abortInvoke = true;
                             }
 

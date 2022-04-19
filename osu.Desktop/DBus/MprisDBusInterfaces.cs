@@ -164,7 +164,7 @@ namespace osu.Desktop.DBus
             set => _Rate = value;
         }
 
-        private bool _Shuffle = false;
+        private bool _Shuffle = true;
 
         public bool Shuffle
         {
@@ -180,6 +180,7 @@ namespace osu.Desktop.DBus
             },
             ["xesam:title"] = "标题",
             ["xesam:trackNumber"] = 1,
+            ["mpris:length"] = (long)1
         };
 
         public IDictionary<string, object> Metadata => _Metadata;
@@ -189,15 +190,21 @@ namespace osu.Desktop.DBus
         public double Volume
         {
             get => _Volume;
-            set
-            {
-                _Volume = value;
-            }
+            set => _Volume = value;
         }
 
-        private readonly long _Position = 0;
+        private long _Position;
 
-        public long Position => _Position;
+        public long Position
+        {
+            get => _Position;
+            set => _Position = value;
+        }
+
+        internal long TrackLength
+        {
+            set => _Metadata["mpris:length"] = value;
+        }
 
         private readonly double _MinimumRate = 1;
 
