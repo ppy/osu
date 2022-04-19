@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Localisation;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -22,8 +23,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     {
                         new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                         {
-                            Text =
-                                "Welcome to the first-run setup guide!\n\nosu! is a very configurable game, and diving straight into the settings can sometimes be overwhelming. This guide will help you get the important choices out of the way to ensure a great first experience!",
+                            Text = FirstRunSetupOverlayStrings.WelcomeDescription,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
                         },

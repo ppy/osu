@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 {
                                     new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24))
                                     {
-                                        Text = "The osu! user interface size can be adjusted to your liking.",
+                                        Text = FirstRunSetupOverlayStrings.UIScaleDescription,
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y
                                     },

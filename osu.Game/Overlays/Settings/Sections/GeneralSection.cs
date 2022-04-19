@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 new SettingsButton
                 {
-                    Text = "Run setup wizard",
+                    Text = GeneralSettingsStrings.RunSetupWizard,
                     Action = () => firstRunSetupOverlay?.Show(),
                 },
                 new LanguageSettings(),

@@ -20,6 +20,16 @@ namespace osu.Game.Localisation
         public static LocalisableString Clear => new TranslatableString(getKey(@"clear"), @"Clear");
 
         /// <summary>
+        /// "Back"
+        /// </summary>
+        public static LocalisableString Back => new TranslatableString(getKey(@"back"), @"Back");
+
+        /// <summary>
+        /// "Finish"
+        /// </summary>
+        public static LocalisableString Finish => new TranslatableString(getKey(@"finish"), @"Finish");
+
+        /// <summary>
         /// "Enabled"
         /// </summary>
         public static LocalisableString Enabled => new TranslatableString(getKey(@"enabled"), @"Enabled");
