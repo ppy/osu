@@ -12,12 +12,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
@@ -215,57 +217,30 @@ namespace osu.Game.Overlays
             performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
         }
 
-        private void showLastStep()
+        public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            Debug.Assert(currentStepIndex > 0);
-            Debug.Assert(stack != null);
-
-            stack.CurrentScreen.Exit();
-            currentStepIndex--;
-
-            BackButton.Enabled.Value = currentStepIndex != 0;
-
-            updateButtonText();
-        }
-
-        private void showNextStep()
-        {
-            if (currentStepIndex == null)
+            if (!e.Repeat)
             {
-                stackContainer.Child = stack = new ScreenStack
+                switch (e.Action)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                };
+                    case GlobalAction.Select:
+                        NextButton.TriggerClick();
+                        return true;
 
-                currentStepIndex = 0;
+                    case GlobalAction.Back:
+                        if (BackButton.Enabled.Value)
+                        {
+                            BackButton.TriggerClick();
+                            return true;
+                        }
+
+                        // If back button is disabled, we are at the first step.
+                        // The base call will handle dismissal of the overlay.
+                        break;
+                }
             }
-            else
-                currentStepIndex++;
 
-            Debug.Assert(currentStepIndex != null);
-            Debug.Assert(stack != null);
-
-            BackButton.Enabled.Value = currentStepIndex > 0;
-
-            if (currentStepIndex < steps.Length)
-            {
-                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value].ScreenType));
-                updateButtonText();
-            }
-            else
-            {
-                currentStepIndex = null;
-                Hide();
-            }
-        }
-
-        private void updateButtonText()
-        {
-            Debug.Assert(currentStepIndex != null);
-
-            NextButton.Text = currentStepIndex + 1 < steps.Length
-                ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
-                : CommonStrings.Finish;
+            return base.OnPressed(e);
         }
 
         protected override void PopIn()
@@ -278,7 +253,7 @@ namespace osu.Game.Overlays
             this.FadeIn(400, Easing.OutQuint);
 
             if (currentStepIndex == null)
-                showNextStep();
+                showFirstStep();
         }
 
         protected override void PopOut()
@@ -306,6 +281,64 @@ namespace osu.Game.Overlays
 
             this.ScaleTo(0.96f, 400, Easing.OutQuint);
             this.FadeOut(200, Easing.OutQuint);
+        }
+
+        private void showFirstStep()
+        {
+            Debug.Assert(currentStepIndex == null);
+
+            stackContainer.Child = stack = new ScreenStack
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            currentStepIndex = -1;
+            showNextStep();
+        }
+
+        private void showLastStep()
+        {
+            if (currentStepIndex == 0)
+                return;
+
+            Debug.Assert(stack != null);
+
+            stack.CurrentScreen.Exit();
+            currentStepIndex--;
+
+            BackButton.Enabled.Value = currentStepIndex != 0;
+
+            updateButtonText();
+        }
+
+        private void showNextStep()
+        {
+            Debug.Assert(currentStepIndex != null);
+            Debug.Assert(stack != null);
+
+            currentStepIndex++;
+
+            BackButton.Enabled.Value = currentStepIndex > 0;
+
+            if (currentStepIndex < steps.Length)
+            {
+                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value].ScreenType));
+                updateButtonText();
+            }
+            else
+            {
+                currentStepIndex = null;
+                Hide();
+            }
+        }
+
+        private void updateButtonText()
+        {
+            Debug.Assert(currentStepIndex != null);
+
+            NextButton.Text = currentStepIndex + 1 < steps.Length
+                ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
+                : CommonStrings.Finish;
         }
 
         private class FirstRunStep
