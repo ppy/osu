@@ -99,7 +99,9 @@ namespace osu.Game.Overlays
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
-        public readonly BindableInt UnreadCount = new BindableInt();
+        public IBindable<int> UnreadCount => unreadCount;
+
+        private readonly BindableInt unreadCount = new BindableInt();
 
         private int runningDepth;
 
@@ -180,7 +182,7 @@ namespace osu.Game.Overlays
 
         private void updateCounts()
         {
-            UnreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
         }
 
         private void markAllRead()
