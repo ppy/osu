@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 // available textures
                 new[] { @"hitcircle", @"hitcircleoverlay" },
                 // priority lookup
-                @"",
+                null,
                 // expected circle and overlay
                 @"hitcircle", @"hitcircleoverlay",
             },
