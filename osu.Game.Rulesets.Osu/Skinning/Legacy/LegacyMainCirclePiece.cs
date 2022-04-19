@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -43,7 +44,8 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
         private DrawableHitObject drawableObject { get; set; }
 
         [Resolved]
@@ -107,8 +109,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (overlayAboveNumber)
                 OverlayLayer.ChangeChildDepth(hitCircleOverlay, float.MinValue);
 
-            accentColour.BindTo(drawableObject.AccentColour);
-            indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+            if (drawableOsuObject != null)
+            {
+                accentColour.BindTo(drawableOsuObject.AccentColour);
+                indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
+            }
 
             Texture getTextureWithFallback(string name)
             {
@@ -149,15 +154,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             if (hasNumber)
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
-            drawableObject.ApplyCustomUpdateState += updateStateTransforms;
-            updateStateTransforms(drawableObject, drawableObject.State.Value);
+            if (drawableObject != null)
+                drawableObject.ApplyCustomUpdateState += updateStateTransforms;
+
+            updateStateTransforms(drawableObject, drawableObject?.State.Value ?? ArmedState.Idle);
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
 
-            using (BeginAbsoluteSequence(drawableObject.HitStateUpdateTime))
+            using (BeginAbsoluteSequence(drawableObject?.HitStateUpdateTime ?? 0))
             {
                 switch (state)
                 {
