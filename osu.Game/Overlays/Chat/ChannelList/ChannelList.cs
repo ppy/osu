@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background6,
                 },
-                new ChannelListScrollContainer
+                new OsuScrollContainer
                 {
                     Padding = new MarginPadding { Vertical = 7 },
                     RelativeSizeAxes = Axes.Both,
@@ -129,32 +129,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     Margin = new MarginPadding { Left = 18, Bottom = 5 },
                     Font = OsuFont.Torus.With(size: 12, weight: FontWeight.SemiBold),
                 });
-            }
-        }
-
-        private class ChannelListScrollContainer : OsuScrollContainer
-        {
-            protected override ScrollbarContainer CreateScrollbar(Direction direction)
-                => new ChannelListScrollBar(direction);
-
-            protected class ChannelListScrollBar : OsuScrollbar
-            {
-                private const float bar_size = 4;
-                private const float bar_margin = 7;
-
-                public ChannelListScrollBar(Direction scrollDir)
-                    : base(scrollDir)
-                {
-                    Size = new Vector2(bar_size);
-                    Margin = new MarginPadding { Horizontal = bar_margin };
-                    CornerRadius = 2;
-                }
-
-                public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
-                {
-                    Vector2 size = new Vector2(bar_size, val);
-                    this.ResizeTo(size, duration, easing);
-                }
             }
         }
     }
