@@ -39,7 +39,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private INotificationOverlay notificationOverlay { get; set; } = null!;
 
-        private ScreenStack stack = null!;
+        private ScreenStack? stack;
 
         public PurpleTriangleButton NextButton = null!;
         public DangerousTriangleButton BackButton = null!;
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// The currently displayed screen, if any.
         /// </summary>
-        public FirstRunSetupScreen? CurrentScreen => (FirstRunSetupScreen?)stack.CurrentScreen;
+        public FirstRunSetupScreen? CurrentScreen => (FirstRunSetupScreen?)stack?.CurrentScreen;
 
         private readonly FirstRunStep[] steps =
         {
@@ -217,6 +217,7 @@ namespace osu.Game.Overlays
         private void showLastStep()
         {
             Debug.Assert(currentStepIndex > 0);
+            Debug.Assert(stack != null);
 
             stack.CurrentScreen.Exit();
             currentStepIndex--;
@@ -241,6 +242,8 @@ namespace osu.Game.Overlays
                 currentStepIndex++;
 
             Debug.Assert(currentStepIndex != null);
+            Debug.Assert(stack != null);
+
             BackButton.Enabled.Value = currentStepIndex > 0;
 
             if (currentStepIndex < steps.Length)
@@ -294,9 +297,8 @@ namespace osu.Game.Overlays
             }
             else
             {
-                stack?
-                    .FadeOut(100)
-                    .Expire();
+                stack?.FadeOut(100)
+                     .Expire();
             }
 
             base.PopOut();
