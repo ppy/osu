@@ -1,24 +1,20 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Osu.Skinning.Legacy;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
-
-#nullable enable
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -75,12 +71,15 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("load circle piece", () =>
             {
+                var skin = new Mock<ISkinSource>();
+
+                skin.Setup(s => s.GetTexture(It.IsAny<string>())).CallBase();
+                skin.Setup(s => s.GetTexture(It.IsIn(textureFilenames), It.IsAny<WrapMode>(), It.IsAny<WrapMode>()))
+                    .Returns((string componentName, WrapMode _, WrapMode __) => new Texture(1, 1) { AssetName = componentName });
+
                 Child = new DependencyProvidingContainer
                 {
-                    CachedDependencies = new (Type, object)[]
-                    {
-                        (typeof(ISkinSource), new TestSkin(textureFilenames))
-                    },
+                    CachedDependencies = new (Type, object)[] { (typeof(ISkinSource), skin.Object) },
                     Child = new LegacyMainCirclePiece(priorityLookup, false),
                 };
 
@@ -93,41 +92,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddAssert("check circle sprite", () => circleSprite?.Texture?.AssetName == expectedCircle);
             AddAssert("check overlay sprite", () => overlaySprite?.Texture?.AssetName == expectedOverlay);
-        }
-
-        private class TestSkin : ISkinSource
-        {
-            private readonly string[] textureFilenames;
-
-            public TestSkin(string[] textureFilenames)
-            {
-                this.textureFilenames = textureFilenames;
-            }
-
-            public Texture? GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT)
-            {
-                if (textureFilenames.Contains(componentName))
-                    return new Texture(1, 1) { AssetName = componentName };
-
-                return null;
-            }
-
-            public event Action SourceChanged
-            {
-                add { }
-                remove { }
-            }
-
-            public IEnumerable<ISkin> AllSources { get; } = Enumerable.Empty<ISkin>();
-            public Drawable? GetDrawableComponent(ISkinComponent component) => null;
-            public ISample? GetSample(ISampleInfo sampleInfo) => null;
-
-            public IBindable<TValue>? GetConfig<TLookup, TValue>(TLookup lookup)
-                where TLookup : notnull
-                where TValue : notnull
-                => null;
-
-            public ISkin? FindProvider(Func<ISkin, bool> lookupFunction) => lookupFunction(this) ? this : null;
         }
     }
 }
