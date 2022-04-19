@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -21,6 +22,7 @@ using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
@@ -56,7 +58,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             public Action SettingsApplied;
 
             public OsuTextBox NameField, MaxParticipantsField;
-            public RoomAvailabilityPicker AvailabilityPicker;
             public MatchTypePicker TypePicker;
             public OsuEnumDropdown<QueueMode> QueueModeDropdown;
             public OsuTextBox PasswordTextBox;
@@ -64,6 +65,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
             public OsuSpriteText ErrorText;
 
+            private OsuEnumDropdown<StartMode> startModeDropdown;
             private OsuSpriteText typeLabel;
             private LoadingLayer loadingLayer;
 
@@ -163,14 +165,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         LengthLimit = 100,
                                                                     },
                                                                 },
-                                                                new Section("Room visibility")
-                                                                {
-                                                                    Alpha = disabled_alpha,
-                                                                    Child = AvailabilityPicker = new RoomAvailabilityPicker
-                                                                    {
-                                                                        Enabled = { Value = false }
-                                                                    },
-                                                                },
+                                                                // new Section("Room visibility")
+                                                                // {
+                                                                //     Alpha = disabled_alpha,
+                                                                //     Child = AvailabilityPicker = new RoomAvailabilityPicker
+                                                                //     {
+                                                                //         Enabled = { Value = false }
+                                                                //     },
+                                                                // },
                                                                 new Section("Game type")
                                                                 {
                                                                     Child = new FillFlowContainer
@@ -200,6 +202,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                                                                         RelativeSizeAxes = Axes.X,
                                                                         Height = 40,
                                                                         Child = QueueModeDropdown = new OsuEnumDropdown<QueueMode>
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X
+                                                                        }
+                                                                    }
+                                                                },
+                                                                new Section("Auto start")
+                                                                {
+                                                                    Child = new Container
+                                                                    {
+                                                                        RelativeSizeAxes = Axes.X,
+                                                                        Height = 40,
+                                                                        Child = startModeDropdown = new OsuEnumDropdown<StartMode>
                                                                         {
                                                                             RelativeSizeAxes = Axes.X
                                                                         }
@@ -321,12 +335,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 
                 TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue.GetLocalisableDescription(), true);
                 RoomName.BindValueChanged(name => NameField.Text = name.NewValue, true);
-                Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 RoomID.BindValueChanged(roomId => playlistContainer.Alpha = roomId.NewValue == null ? 1 : 0, true);
                 Password.BindValueChanged(password => PasswordTextBox.Text = password.NewValue ?? string.Empty, true);
                 QueueMode.BindValueChanged(mode => QueueModeDropdown.Current.Value = mode.NewValue, true);
+                AutoStartDuration.BindValueChanged(duration => startModeDropdown.Current.Value = (StartMode)(int)duration.NewValue.TotalSeconds, true);
 
                 operationInProgress.BindTo(ongoingOperationTracker.InProgress);
                 operationInProgress.BindValueChanged(v =>
@@ -363,6 +377,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Debug.Assert(applyingSettingsOperation == null);
                 applyingSettingsOperation = ongoingOperationTracker.BeginOperation();
 
+                TimeSpan autoStartDuration = TimeSpan.FromSeconds((int)startModeDropdown.Current.Value);
+
                 // If the client is already in a room, update via the client.
                 // Otherwise, update the room directly in preparation for it to be submitted to the API on match creation.
                 if (client.Room != null)
@@ -371,7 +387,8 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                               name: NameField.Text,
                               password: PasswordTextBox.Text,
                               matchType: TypePicker.Current.Value,
-                              queueMode: QueueModeDropdown.Current.Value)
+                              queueMode: QueueModeDropdown.Current.Value,
+                              autoStartDuration: autoStartDuration)
                           .ContinueWith(t => Schedule(() =>
                           {
                               if (t.IsCompletedSuccessfully)
@@ -383,10 +400,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 else
                 {
                     room.Name.Value = NameField.Text;
-                    room.Availability.Value = AvailabilityPicker.Current.Value;
                     room.Type.Value = TypePicker.Current.Value;
                     room.Password.Value = PasswordTextBox.Current.Value;
                     room.QueueMode.Value = QueueModeDropdown.Current.Value;
+                    room.AutoStartDuration.Value = autoStartDuration;
 
                     if (int.TryParse(MaxParticipantsField.Text, out int max))
                         room.MaxParticipants.Value = max;
@@ -451,6 +468,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
                 Triangles.ColourLight = colours.YellowLight;
                 Triangles.ColourDark = colours.YellowDark;
             }
+        }
+
+        private enum StartMode
+        {
+            [Description("Off")]
+            Off = 0,
+
+            [Description("30 seconds")]
+            Seconds_30 = 30,
+
+            [Description("1 minute")]
+            Seconds_60 = 60,
+
+            [Description("3 minutes")]
+            Seconds_180 = 180,
+
+            [Description("5 minutes")]
+            Seconds_300 = 300
         }
     }
 }

@@ -21,6 +21,8 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class ScalingContainer : Container
     {
+        private const float duration = 500;
+
         private Bindable<float> sizeX;
         private Bindable<float> sizeY;
         private Bindable<float> posX;
@@ -82,6 +84,8 @@ namespace osu.Game.Graphics.Containers
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
 
+            private float currentScale = 1;
+
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public ScalingDrawSizePreservingFillContainer(bool applyUIScale)
@@ -95,14 +99,16 @@ namespace osu.Game.Graphics.Containers
                 if (applyUIScale)
                 {
                     uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
-                    uiScale.BindValueChanged(scaleChanged, true);
+                    uiScale.BindValueChanged(args => this.TransformTo(nameof(currentScale), args.NewValue, duration, Easing.OutQuart), true);
                 }
             }
 
-            private void scaleChanged(ValueChangedEvent<float> args)
+            protected override void Update()
             {
-                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
-                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
+                Scale = new Vector2(currentScale);
+                Size = new Vector2(1 / currentScale);
+
+                base.Update();
             }
         }
 
@@ -140,8 +146,6 @@ namespace osu.Game.Graphics.Containers
 
         private void updateSize()
         {
-            const float duration = 500;
-
             if (targetMode == ScalingMode.Everything)
             {
                 // the top level scaling container manages the background to be displayed while scaling.

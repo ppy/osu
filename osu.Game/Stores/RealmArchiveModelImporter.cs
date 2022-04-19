@@ -351,8 +351,7 @@ namespace osu.Game.Stores
 
                             using (var transaction = realm.BeginWrite())
                             {
-                                if (existing.DeletePending)
-                                    UndeleteForReuse(existing);
+                                UndeleteForReuse(existing);
                                 transaction.Commit();
                             }
 
@@ -388,9 +387,7 @@ namespace osu.Game.Stores
                             {
                                 LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
-                                if (existing.DeletePending)
-                                    UndeleteForReuse(existing);
-
+                                UndeleteForReuse(existing);
                                 transaction.Commit();
 
                                 return existing.ToLive(Realm);
@@ -536,6 +533,10 @@ namespace osu.Game.Stores
         /// <param name="existing">The existing model.</param>
         protected virtual void UndeleteForReuse(TModel existing)
         {
+            if (!existing.DeletePending)
+                return;
+
+            LogForModel(existing, $@"Existing {HumanisedModelName}'s deletion flag has been removed to allow for reuse.");
             existing.DeletePending = false;
         }
 

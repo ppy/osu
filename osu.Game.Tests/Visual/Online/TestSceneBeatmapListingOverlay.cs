@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -28,6 +30,14 @@ namespace osu.Game.Tests.Visual.Online
         private BeatmapListingOverlay overlay;
 
         private BeatmapListingSearchControl searchControl => overlay.ChildrenOfType<BeatmapListingSearchControl>().Single();
+
+        private OsuConfigManager localConfig;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(localConfig = new OsuConfigManager(LocalStorage));
+        }
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -61,6 +71,8 @@ namespace osu.Game.Tests.Visual.Online
                     Id = API.LocalUser.Value.Id + 1,
                 };
             });
+
+            AddStep("reset size", () => localConfig.SetValue(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal));
         }
 
         [Test]
@@ -121,23 +133,23 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestCardSizeSwitching()
+        public void TestCardSizeSwitching([Values] bool viaConfig)
         {
             AddAssert("is visible", () => overlay.State.Value == Visibility.Visible);
 
             AddStep("show many results", () => fetchFor(Enumerable.Repeat(CreateAPIBeatmapSet(Ruleset.Value), 100).ToArray()));
             assertAllCardsOfType<BeatmapCardNormal>(100);
 
-            setCardSize(BeatmapCardSize.Extra);
+            setCardSize(BeatmapCardSize.Extra, viaConfig);
             assertAllCardsOfType<BeatmapCardExtra>(100);
 
-            setCardSize(BeatmapCardSize.Normal);
+            setCardSize(BeatmapCardSize.Normal, viaConfig);
             assertAllCardsOfType<BeatmapCardNormal>(100);
 
             AddStep("fetch for 0 beatmaps", () => fetchFor());
             AddUntilStep("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
 
-            setCardSize(BeatmapCardSize.Extra);
+            setCardSize(BeatmapCardSize.Extra, viaConfig);
             AddAssert("placeholder shown", () => overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().SingleOrDefault()?.IsPresent == true);
         }
 
@@ -361,7 +373,13 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("\"no maps found\" placeholder not shown", () => !overlay.ChildrenOfType<BeatmapListingOverlay.NotFoundDrawable>().Any(d => d.IsPresent));
         }
 
-        private void setCardSize(BeatmapCardSize cardSize) => AddStep($"set card size to {cardSize}", () => overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize);
+        private void setCardSize(BeatmapCardSize cardSize, bool viaConfig) => AddStep($"set card size to {cardSize}", () =>
+        {
+            if (viaConfig)
+                localConfig.SetValue(OsuSetting.BeatmapListingCardSize, cardSize);
+            else
+                overlay.ChildrenOfType<BeatmapListingCardSizeTabControl>().Single().Current.Value = cardSize;
+        });
 
         private void assertAllCardsOfType<T>(int expectedCount)
             where T : BeatmapCard =>
@@ -370,5 +388,11 @@ namespace osu.Game.Tests.Visual.Online
                 int loadedCorrectCount = this.ChildrenOfType<BeatmapCard>().Count(card => card.IsLoaded && card.GetType() == typeof(T));
                 return loadedCorrectCount > 0 && loadedCorrectCount == expectedCount;
             });
+
+        protected override void Dispose(bool isDisposing)
+        {
+            localConfig?.Dispose();
+            base.Dispose(isDisposing);
+        }
     }
 }

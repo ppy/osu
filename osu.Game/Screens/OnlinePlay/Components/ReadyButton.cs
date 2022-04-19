@@ -15,12 +15,12 @@ namespace osu.Game.Screens.OnlinePlay.Components
     {
         public new readonly BindableBool Enabled = new BindableBool();
 
-        private IBindable<BeatmapAvailability> availability;
+        private readonly IBindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>();
 
         [BackgroundDependencyLoader]
         private void load(OnlinePlayBeatmapAvailabilityTracker beatmapTracker)
         {
-            availability = beatmapTracker.Availability.GetBoundCopy();
+            availability.BindTo(beatmapTracker.Availability);
 
             availability.BindValueChanged(_ => updateState());
             Enabled.BindValueChanged(_ => updateState(), true);

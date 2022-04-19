@@ -2,210 +2,241 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
-using osuTK;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
 {
-    public class MultiplayerReadyButton : MultiplayerRoomComposite
+    public class MultiplayerReadyButton : ReadyButton
     {
+        public new Triangles Triangles => base.Triangles;
+
+        [Resolved]
+        private MultiplayerClient multiplayerClient { get; set; }
+
         [Resolved]
         private OsuColour colours { get; set; }
 
-        [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
-
         [CanBeNull]
-        private IDisposable clickOperation;
+        private MultiplayerRoom room => multiplayerClient.Room;
 
-        private Sample sampleReady;
-        private Sample sampleReadyAll;
-        private Sample sampleUnready;
-
-        private readonly ButtonWithTrianglesExposed button;
-        private int countReady;
-        private ScheduledDelegate readySampleDelegate;
-        private IBindable<bool> operationInProgress;
-
-        public MultiplayerReadyButton()
-        {
-            InternalChild = button = new ButtonWithTrianglesExposed
-            {
-                RelativeSizeAxes = Axes.Both,
-                Size = Vector2.One,
-                Action = onReadyClick,
-                Enabled = { Value = true },
-            };
-        }
+        private Sample countdownTickSample;
+        private Sample countdownWarnSample;
+        private Sample countdownWarnFinalSample;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            operationInProgress = ongoingOperationTracker.InProgress.GetBoundCopy();
-            operationInProgress.BindValueChanged(_ => updateState());
-
-            sampleReady = audio.Samples.Get(@"Multiplayer/player-ready");
-            sampleReadyAll = audio.Samples.Get(@"Multiplayer/player-ready-all");
-            sampleUnready = audio.Samples.Get(@"Multiplayer/player-unready");
+            countdownTickSample = audio.Samples.Get(@"Multiplayer/countdown-tick");
+            countdownWarnSample = audio.Samples.Get(@"Multiplayer/countdown-warn");
+            countdownWarnFinalSample = audio.Samples.Get(@"Multiplayer/countdown-warn-final");
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            CurrentPlaylistItem.BindValueChanged(_ => updateState());
+            multiplayerClient.RoomUpdated += onRoomUpdated;
+            onRoomUpdated();
         }
 
-        protected override void OnRoomUpdated()
+        private MultiplayerCountdown countdown;
+        private double countdownChangeTime;
+        private ScheduledDelegate countdownUpdateDelegate;
+
+        private void onRoomUpdated() => Scheduler.AddOnce(() =>
         {
-            base.OnRoomUpdated();
-            updateState();
-        }
-
-        protected override void OnRoomLoadRequested()
-        {
-            base.OnRoomLoadRequested();
-            endOperation();
-        }
-
-        private void onReadyClick()
-        {
-            if (Room == null)
-                return;
-
-            Debug.Assert(clickOperation == null);
-            clickOperation = ongoingOperationTracker.BeginOperation();
-
-            // Ensure the current user becomes ready before being able to do anything else (start match, stop countdown, unready).
-            if (!isReady() || !Client.IsHost)
+            if (countdown != room?.Countdown)
             {
-                toggleReady();
+                countdown = room?.Countdown;
+                countdownChangeTime = Time.Current;
+            }
+
+            scheduleNextCountdownUpdate();
+
+            updateButtonText();
+            updateButtonColour();
+        });
+
+        private void scheduleNextCountdownUpdate()
+        {
+            countdownUpdateDelegate?.Cancel();
+
+            if (countdown != null)
+            {
+                // The remaining time on a countdown may be at a fractional portion between two seconds.
+                // We want to align certain audio/visual cues to the point at which integer seconds change.
+                // To do so, we schedule to the next whole second. Note that scheduler invocation isn't
+                // guaranteed to be accurate, so this may still occur slightly late, but even in such a case
+                // the next invocation will be roughly correct.
+                double timeToNextSecond = countdownTimeRemaining.TotalMilliseconds % 1000;
+
+                countdownUpdateDelegate = Scheduler.AddDelayed(onCountdownTick, timeToNextSecond);
+            }
+            else
+            {
+                countdownUpdateDelegate?.Cancel();
+                countdownUpdateDelegate = null;
+            }
+
+            void onCountdownTick()
+            {
+                updateButtonText();
+
+                int secondsRemaining = countdownTimeRemaining.Seconds;
+
+                playTickSound(secondsRemaining);
+
+                if (secondsRemaining > 0)
+                    scheduleNextCountdownUpdate();
+            }
+        }
+
+        private void playTickSound(int secondsRemaining)
+        {
+            if (secondsRemaining < 10) countdownTickSample?.Play();
+
+            if (secondsRemaining <= 3)
+            {
+                if (secondsRemaining > 0)
+                    countdownWarnSample?.Play();
+                else
+                    countdownWarnFinalSample?.Play();
+            }
+        }
+
+        private void updateButtonText()
+        {
+            if (room == null)
+            {
+                Text = "Ready";
                 return;
             }
 
-            // And if a countdown isn't running, start the match.
-            startMatch();
+            var localUser = multiplayerClient.LocalUser;
 
-            bool isReady() => Client.LocalUser?.State == MultiplayerUserState.Ready || Client.LocalUser?.State == MultiplayerUserState.Spectating;
+            int countReady = room.Users.Count(u => u.State == MultiplayerUserState.Ready);
+            int countTotal = room.Users.Count(u => u.State != MultiplayerUserState.Spectating);
+            string countText = $"({countReady} / {countTotal} ready)";
 
-            void toggleReady() => Client.ToggleReady().ContinueWith(_ => endOperation());
-
-            void startMatch() => Client.StartMatch().ContinueWith(t =>
+            if (countdown != null)
             {
-                // accessing Exception here silences any potential errors from the antecedent task
-                if (t.Exception != null)
+                string countdownText = $"Starting in {countdownTimeRemaining:mm\\:ss}";
+
+                switch (localUser?.State)
                 {
-                    // gameplay was not started due to an exception; unblock button.
-                    endOperation();
+                    default:
+                        Text = $"Ready ({countdownText.ToLowerInvariant()})";
+                        break;
+
+                    case MultiplayerUserState.Spectating:
+                    case MultiplayerUserState.Ready:
+                        Text = $"{countdownText} {countText}";
+                        break;
                 }
+            }
+            else
+            {
+                switch (localUser?.State)
+                {
+                    default:
+                        Text = "Ready";
+                        break;
 
-                // gameplay is starting, the button will be unblocked on load requested.
-            });
+                    case MultiplayerUserState.Spectating:
+                    case MultiplayerUserState.Ready:
+                        Text = room.Host?.Equals(localUser) == true
+                            ? $"Start match {countText}"
+                            : $"Waiting for host... {countText}";
+
+                        break;
+                }
+            }
         }
 
-        private void endOperation()
+        private TimeSpan countdownTimeRemaining
         {
-            clickOperation?.Dispose();
-            clickOperation = null;
+            get
+            {
+                double timeElapsed = Time.Current - countdownChangeTime;
+                TimeSpan remaining;
+
+                if (timeElapsed > countdown.TimeRemaining.TotalMilliseconds)
+                    remaining = TimeSpan.Zero;
+                else
+                    remaining = countdown.TimeRemaining - TimeSpan.FromMilliseconds(timeElapsed);
+
+                return remaining;
+            }
         }
 
-        private void updateState()
+        private void updateButtonColour()
         {
-            var localUser = Client.LocalUser;
+            if (room == null)
+            {
+                setGreen();
+                return;
+            }
 
-            int newCountReady = Room?.Users.Count(u => u.State == MultiplayerUserState.Ready) ?? 0;
-            int newCountTotal = Room?.Users.Count(u => u.State != MultiplayerUserState.Spectating) ?? 0;
+            var localUser = multiplayerClient.LocalUser;
 
             switch (localUser?.State)
             {
                 default:
-                    button.Text = "Ready";
-                    updateButtonColour(true);
+                    setGreen();
                     break;
 
                 case MultiplayerUserState.Spectating:
                 case MultiplayerUserState.Ready:
-                    string countText = $"({newCountReady} / {newCountTotal} ready)";
-
-                    if (Room?.Host?.Equals(localUser) == true)
-                    {
-                        button.Text = $"Start match {countText}";
-                        updateButtonColour(true);
-                    }
+                    if (room?.Host?.Equals(localUser) == true && room.Countdown == null)
+                        setGreen();
                     else
-                    {
-                        button.Text = $"Waiting for host... {countText}";
-                        updateButtonColour(false);
-                    }
+                        setYellow();
 
                     break;
             }
 
-            bool enableButton =
-                Room?.State == MultiplayerRoomState.Open
-                && CurrentPlaylistItem.Value?.ID == Room.Settings.PlaylistItemId
-                && !Room.Playlist.Single(i => i.ID == Room.Settings.PlaylistItemId).Expired
-                && !operationInProgress.Value;
-
-            // When the local user is the host and spectating the match, the "start match" state should be enabled if any users are ready.
-            if (localUser?.State == MultiplayerUserState.Spectating)
-                enableButton &= Room?.Host?.Equals(localUser) == true && newCountReady > 0;
-
-            button.Enabled.Value = enableButton;
-
-            if (newCountReady == countReady)
-                return;
-
-            readySampleDelegate?.Cancel();
-            readySampleDelegate = Schedule(() =>
+            void setYellow()
             {
-                if (newCountReady > countReady)
-                {
-                    if (newCountReady == newCountTotal)
-                        sampleReadyAll?.Play();
-                    else
-                        sampleReady?.Play();
-                }
-                else if (newCountReady < countReady)
-                {
-                    sampleUnready?.Play();
-                }
-
-                countReady = newCountReady;
-            });
-        }
-
-        private void updateButtonColour(bool green)
-        {
-            if (green)
-            {
-                button.BackgroundColour = colours.Green;
-                button.Triangles.ColourDark = colours.Green;
-                button.Triangles.ColourLight = colours.GreenLight;
+                BackgroundColour = colours.YellowDark;
+                Triangles.ColourDark = colours.YellowDark;
+                Triangles.ColourLight = colours.Yellow;
             }
-            else
+
+            void setGreen()
             {
-                button.BackgroundColour = colours.YellowDark;
-                button.Triangles.ColourDark = colours.YellowDark;
-                button.Triangles.ColourLight = colours.Yellow;
+                BackgroundColour = colours.Green;
+                Triangles.ColourDark = colours.Green;
+                Triangles.ColourLight = colours.GreenLight;
             }
         }
 
-        private class ButtonWithTrianglesExposed : ReadyButton
+        protected override void Dispose(bool isDisposing)
         {
-            public new Triangles Triangles => base.Triangles;
+            base.Dispose(isDisposing);
+
+            if (multiplayerClient != null)
+                multiplayerClient.RoomUpdated -= onRoomUpdated;
+        }
+
+        public override LocalisableString TooltipText
+        {
+            get
+            {
+                if (room?.Countdown != null && multiplayerClient.IsHost && multiplayerClient.LocalUser?.State == MultiplayerUserState.Ready && !room.Settings.AutoStartEnabled)
+                    return "Cancel countdown";
+
+                return base.TooltipText;
+            }
         }
     }
 }

@@ -36,11 +36,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             bool progressionToRight = q2.TopLeft.X > q1.TopLeft.X;
 
             if (!progressionToRight)
-            {
-                var temp = q2;
-                q2 = q1;
-                q1 = temp;
-            }
+                (q2, q1) = (q1, q2);
 
             var c1 = getCenteredVector(q1.TopRight, q1.BottomRight) + new Vector2(padding, 0);
             var c2 = getCenteredVector(q2.TopLeft, q2.BottomLeft) - new Vector2(padding, 0);
