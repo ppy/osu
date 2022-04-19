@@ -25,11 +25,18 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private readonly bool hasNumber;
 
-        private string priorityLookup;
+        /// <summary>
+        /// A prioritised prefix to perform texture lookups with.
+        /// </summary>
+        /// <remarks>
+        /// If the "circle" texture could not be found with this prefix,
+        /// then it is nullified and the default prefix "hitcircle" is used instead.
+        /// </remarks>
+        private string priorityLookupPrefix;
 
-        public LegacyMainCirclePiece(string priorityLookup = null, bool hasNumber = true)
+        public LegacyMainCirclePiece(string priorityLookupPrefix = null, bool hasNumber = true)
         {
-            this.priorityLookup = priorityLookup;
+            this.priorityLookupPrefix = priorityLookupPrefix;
             this.hasNumber = hasNumber;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -63,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             // if the base texture was not found using the priority specification, nullify the specification and fall back to "hitcircle".
             if (baseTexture == null)
             {
-                priorityLookup = null;
+                priorityLookupPrefix = null;
                 baseTexture = getTexture(string.Empty);
             }
 
@@ -115,10 +122,10 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
             }
 
             Texture getTexture(string name)
-                => skin.GetTexture($"{priorityLookup ?? @"hitcircle"}{name}");
+                => skin.GetTexture($"{priorityLookupPrefix ?? @"hitcircle"}{name}");
 
             Drawable getAnimation(string name, double frameLength)
-                => skin.GetAnimation($"{priorityLookup ?? @"hitcircle"}{name}", true, true, frameLength: frameLength);
+                => skin.GetAnimation($"{priorityLookupPrefix ?? @"hitcircle"}{name}", true, true, frameLength: frameLength);
         }
 
         protected override void LoadComplete()
