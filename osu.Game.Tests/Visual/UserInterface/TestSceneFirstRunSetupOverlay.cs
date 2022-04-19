@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
@@ -29,9 +30,12 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private Notification lastNotification;
 
+        protected OsuConfigManager LocalConfig;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            Dependencies.Cache(LocalConfig = new OsuConfigManager(LocalStorage));
             Dependencies.CacheAs(performer.Object);
             Dependencies.CacheAs(notificationOverlay.Object);
         }
@@ -58,6 +62,29 @@ namespace osu.Game.Tests.Visual.UserInterface
                     State = { Value = Visibility.Visible }
                 };
             });
+        }
+
+        [Test]
+        public void TestDoesntOpenOnSecondRun()
+        {
+            AddStep("set first run", () => LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, true));
+
+            AddUntilStep("step through", () =>
+            {
+                if (overlay.CurrentScreen?.IsLoaded != false) overlay.NextButton.TriggerClick();
+                return overlay.State.Value == Visibility.Hidden;
+            });
+
+            AddAssert("first run false", () => !LocalConfig.Get<bool>(OsuSetting.ShowFirstRunSetup));
+
+            AddStep("add overlay", () =>
+            {
+                Child = overlay = new FirstRunSetupOverlay();
+            });
+
+            AddWaitStep("wait some", 5);
+
+            AddAssert("overlay didn't show", () => overlay.State.Value == Visibility.Hidden);
         }
 
         [TestCase(false)]
