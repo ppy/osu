@@ -110,6 +110,11 @@ namespace osu.Game.Localisation
         // zh_hk,
 
         [Description(@"繁體中文（台灣）")]
-        zh_hant
+        zh_hant,
+
+#if DEBUG
+        [Description(@"Debug (show raw keys)")]
+        debug
+#endif
     }
 }
