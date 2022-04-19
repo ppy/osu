@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Overlays
@@ -22,5 +23,10 @@ namespace osu.Game.Overlays
         /// Hide the overlay, if it is currently visible.
         /// </summary>
         void Hide();
+
+        /// <summary>
+        /// Current number of unread notifications.
+        /// </summary>
+        IBindable<int> UnreadCount { get; }
     }
 }
