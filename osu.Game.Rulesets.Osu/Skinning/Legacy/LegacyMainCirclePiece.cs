@@ -4,6 +4,7 @@
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -137,16 +138,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
 
             if (drawableObject != null)
+            {
                 drawableObject.ApplyCustomUpdateState += updateStateTransforms;
-
-            updateStateTransforms(drawableObject, drawableObject?.State.Value ?? ArmedState.Idle);
+                updateStateTransforms(drawableObject, drawableObject.State.Value);
+            }
         }
 
         private void updateStateTransforms(DrawableHitObject drawableHitObject, ArmedState state)
         {
             const double legacy_fade_duration = 240;
 
-            using (BeginAbsoluteSequence(drawableObject?.HitStateUpdateTime ?? 0))
+            using (BeginAbsoluteSequence(drawableObject.AsNonNull().HitStateUpdateTime))
             {
                 switch (state)
                 {
