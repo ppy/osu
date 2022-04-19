@@ -165,7 +165,10 @@ namespace osu.Game.Overlays
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding(20),
+                                Padding = new MarginPadding(20)
+                                {
+                                    Top = 0 // provided by the stack container above.
+                                },
                                 Child = new GridContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
