@@ -628,6 +628,14 @@ namespace osu.Game
 
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
+#if DEBUG
+                if (language == Language.DebugLocalisation)
+                {
+                    Localisation.AddLanguage(Language.DebugLocalisation.ToString(), new DebugLocalisationStore());
+                    continue;
+                }
+#endif
+
                 string cultureCode = language.ToCultureCode();
 
                 try
