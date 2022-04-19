@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual.Online
             Dependencies.Cache(chatManager);
 
             Dependencies.Cache(new ChatOverlay());
-            Dependencies.Cache(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
 
         [SetUp]

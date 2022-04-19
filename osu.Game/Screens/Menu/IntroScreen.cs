@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         private void ensureEventuallyArrivingAtMenu()
         {
