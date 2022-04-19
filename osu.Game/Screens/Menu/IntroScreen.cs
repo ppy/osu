@@ -9,7 +9,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -17,11 +16,9 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
 using osuTK;
@@ -76,9 +73,6 @@ namespace osu.Game.Screens.Menu
         [CanBeNull]
         private readonly Func<OsuScreen> createNextScreen;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
         /// <summary>
         /// Whether the <see cref="Track"/> is provided by osu! resources, rather than a user beatmap.
         /// Only valid during or after <see cref="LogoArriving"/>.
@@ -129,38 +123,8 @@ namespace osu.Game.Screens.Menu
             // we generally want a song to be playing on startup, so use the intro music even if a user has specified not to if no other track is available.
             if (initialBeatmap == null)
             {
-                // Intro beatmaps are generally made using the osu! ruleset.
-                // It might not be present in test projects for other rulesets.
-                bool osuRulesetPresent = rulesets.GetRuleset(0) != null;
-
-                if (!loadThemedIntro() && osuRulesetPresent)
-                {
-                    // if we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
-                    // this could happen if a user has nuked their files store. for now, reimport to repair this.
-                    var import = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).GetResultSafely();
-
-                    import?.PerformWrite(b => b.Protected = true);
-
-                    loadThemedIntro();
-                }
-            }
-
-            bool loadThemedIntro()
-            {
-                var setInfo = beatmaps.QueryBeatmapSet(b => b.Protected && b.Hash == BeatmapHash);
-
-                if (setInfo == null)
-                    return false;
-
-                setInfo.PerformRead(s =>
-                {
-                    if (s.Beatmaps.Count == 0)
-                        return;
-
-                    initialBeatmap = beatmaps.GetWorkingBeatmap(s.Beatmaps.First());
-                });
-
-                return UsingThemedIntro = initialBeatmap != null;
+                initialBeatmap = beatmaps.ImportFromGameResources($"Tracks/{BeatmapFile}", BeatmapHash);
+                UsingThemedIntro = initialBeatmap != null;
             }
         }
 

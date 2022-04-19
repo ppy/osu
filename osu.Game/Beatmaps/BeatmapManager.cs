@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -23,8 +26,6 @@ using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Stores;
 using osu.Game.Utils;
-
-#nullable enable
 
 namespace osu.Game.Beatmaps
 {
@@ -42,10 +43,15 @@ namespace osu.Game.Beatmaps
         private readonly BeatmapOnlineLookupQueue? onlineBeatmapLookupQueue;
 
         private readonly RealmAccess realm;
+        private readonly RulesetStore rulesets;
+        private readonly IResourceStore<byte[]> gameResources;
 
-        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null, WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
+        public BeatmapManager(Storage storage, RealmAccess realm, RulesetStore rulesets, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
+                              WorkingBeatmap? defaultBeatmap = null, bool performOnlineLookups = false)
         {
             this.realm = realm;
+            this.rulesets = rulesets;
+            this.gameResources = gameResources;
 
             if (performOnlineLookups)
             {
@@ -65,7 +71,8 @@ namespace osu.Game.Beatmaps
             beatmapModelManager.WorkingBeatmapCache = workingBeatmapCache;
         }
 
-        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap, GameHost? host)
+        protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
+                                                                        GameHost? host)
         {
             return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host);
         }
@@ -442,5 +449,53 @@ namespace osu.Game.Beatmaps
         }
 
         #endregion
+
+        /// <summary>
+        /// Import a beatmap directly from game resources.
+        /// </summary>
+        /// <remarks>
+        /// Will mark as protected.
+        /// </remarks>
+        /// <param name="beatmapFile"></param>
+        /// <param name="beatmapHash"></param>
+        /// <returns></returns>
+        public WorkingBeatmap? ImportFromGameResources(string beatmapFile, string beatmapHash)
+        {
+            WorkingBeatmap? beatmap = null;
+
+            // First check if the beatmap is already imported and in a good state.
+            var setInfo = QueryBeatmapSet(b => b.Protected && b.Hash == beatmapHash);
+
+            if (setInfo != null)
+            {
+                setInfo.PerformRead(s =>
+                {
+                    if (s.Beatmaps.Count == 0)
+                        return;
+
+                    beatmap = GetWorkingBeatmap(s.Beatmaps.First());
+                });
+
+                if (beatmap != null)
+                    return beatmap;
+            }
+
+            // Intro beatmaps are generally made using the osu! ruleset.
+            // It might not be present in test projects for other rulesets.
+            // To avoid import errors / failures, skip import if we don't have an osu! ruleset.
+            if (rulesets.GetRuleset(0) == null)
+                return null;
+
+            // If we detect that the theme track or beatmap is unavailable this is either first startup or things are in a bad state.
+            // This could happen if a user has nuked their files store. for now, reimport to repair this.
+            var import = Import(new ZipArchiveReader(gameResources.GetStream(beatmapFile), Path.GetFileName(beatmapFile))).GetResultSafely();
+
+            if (import == null)
+                return null;
+
+            import.PerformWrite(b => b.Protected = true);
+
+            return GetWorkingBeatmap(import.Value.Beatmaps.First());
+        }
     }
 }
