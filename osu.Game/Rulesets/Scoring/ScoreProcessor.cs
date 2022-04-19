@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current total score.
         /// </summary>
-        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
+        public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
 
         /// <summary>
         /// The current accuracy.
@@ -246,7 +246,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="mode">The <see cref="ScoringMode"/> to represent the score as.</param>
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
-        public double ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
+        public long ComputeFinalScore(ScoringMode mode, ScoreInfo scoreInfo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
@@ -305,7 +305,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="scoreInfo">The <see cref="ScoreInfo"/> to compute the total score of.</param>
         /// <param name="maxAchievableCombo">The maximum achievable combo for the provided beatmap.</param>
         /// <returns>The total score in the given <see cref="ScoringMode"/>.</returns>
-        public double ComputeFinalLegacyScore(ScoringMode mode, ScoreInfo scoreInfo, int maxAchievableCombo)
+        public long ComputeFinalLegacyScore(ScoringMode mode, ScoreInfo scoreInfo, int maxAchievableCombo)
         {
             if (!ruleset.RulesetInfo.Equals(scoreInfo.Ruleset))
                 throw new ArgumentException($"Unexpected score ruleset. Expected \"{ruleset.RulesetInfo.ShortName}\" but was \"{scoreInfo.Ruleset.ShortName}\".");
@@ -434,7 +434,7 @@ namespace osu.Game.Rulesets.Scoring
                 score.Statistics[result] = GetStatistic(result);
 
             // Populate total score after everything else.
-            score.TotalScore = (long)Math.Round(ComputeFinalScore(ScoringMode.Standardised, score));
+            score.TotalScore = ComputeFinalScore(ScoringMode.Standardised, score);
         }
 
         public override void ResetFromReplayFrame(Ruleset ruleset, ReplayFrame frame)
