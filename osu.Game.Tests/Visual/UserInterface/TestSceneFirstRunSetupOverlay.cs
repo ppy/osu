@@ -60,13 +60,19 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [Test]
-        public void TestOverlayRunsToFinish()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestOverlayRunsToFinish(bool keyboard)
         {
             AddUntilStep("step through", () =>
             {
                 if (overlay.CurrentScreen?.IsLoaded != false)
-                    overlay.NextButton.TriggerClick();
+                {
+                    if (keyboard)
+                        InputManager.Key(Key.Enter);
+                    else
+                        overlay.NextButton.TriggerClick();
+                }
 
                 return overlay.State.Value == Visibility.Hidden;
             });
@@ -80,8 +86,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("back at start", () => overlay.CurrentScreen is ScreenWelcome);
         }
 
-        [Test]
-        public void TestBackButton()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestBackButton(bool keyboard)
         {
             AddAssert("back button disabled", () => !overlay.BackButton.Enabled.Value);
 
@@ -98,12 +105,23 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("step back to start", () =>
             {
                 if (overlay.CurrentScreen?.IsLoaded != false)
-                    overlay.BackButton.TriggerClick();
+                {
+                    if (keyboard)
+                        InputManager.Key(Key.Escape);
+                    else
+                        overlay.BackButton.TriggerClick();
+                }
 
                 return overlay.CurrentScreen is ScreenWelcome;
             });
 
             AddAssert("back button disabled", () => !overlay.BackButton.Enabled.Value);
+
+            if (keyboard)
+            {
+                AddStep("exit via keyboard", () => InputManager.Key(Key.Escape));
+                AddAssert("overlay dismissed", () => overlay.State.Value == Visibility.Hidden);
+            }
         }
 
         [Test]
