@@ -629,9 +629,9 @@ namespace osu.Game
             foreach (var language in Enum.GetValues(typeof(Language)).OfType<Language>())
             {
 #if DEBUG
-                if (language == Language.DebugLocalisation)
+                if (language == Language.debug)
                 {
-                    Localisation.AddLanguage(Language.DebugLocalisation.ToString(), new DebugLocalisationStore());
+                    Localisation.AddLanguage(Language.debug.ToString(), new DebugLocalisationStore());
                     continue;
                 }
 #endif

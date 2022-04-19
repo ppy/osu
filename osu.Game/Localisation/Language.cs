@@ -114,7 +114,7 @@ namespace osu.Game.Localisation
 
 #if DEBUG
         [Description(@"Debug (show raw keys)")]
-        DebugLocalisation
+        debug
 #endif
     }
 }
