@@ -8,7 +8,6 @@ using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -24,16 +23,12 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         public override bool RemoveCompletedTransforms => false;
 
-        private readonly bool hasNumber;
-
         /// <summary>
         /// A prioritised prefix to perform texture lookups with.
         /// </summary>
-        /// <remarks>
-        /// If the "circle" texture could not be found with this prefix,
-        /// then it is nullified and the default prefix "hitcircle" is used instead.
-        /// </remarks>
-        private string? priorityLookupPrefix;
+        private readonly string? priorityLookupPrefix;
+
+        private readonly bool hasNumber;
 
         private Drawable hitCircleSprite = null!;
 
@@ -64,23 +59,17 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             var drawableOsuObject = (DrawableOsuHitObject?)drawableObject;
 
-            // attempt lookup using priority specification
-            Texture? baseTexture = getTexture(string.Empty);
-
-            // if the base texture was not found using the priority specification, nullify the specification and fall back to "hitcircle".
-            if (baseTexture == null)
-            {
-                priorityLookupPrefix = null;
-                baseTexture = getTexture(string.Empty);
-            }
+            // if a base texture for the specified prefix exists, continue using it for subsequent lookups.
+            // otherwise fall back to the default prefix "hitcircle".
+            string circleName = (priorityLookupPrefix != null && skin.GetTexture(priorityLookupPrefix) != null) ? priorityLookupPrefix : @"hitcircle";
 
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
-            // the flow above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
+            // the conditional above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
             // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
 
             InternalChildren = new[]
             {
-                hitCircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = baseTexture })
+                hitCircleSprite = new KiaiFlashingDrawable(() => new Sprite { Texture = skin.GetTexture(circleName) })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -89,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => getAnimation(@"overlay", 1000 / 2d))
+                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => skin.GetAnimation(@$"{circleName}overlay", true, true, frameLength: 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -120,12 +109,6 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 accentColour.BindTo(drawableOsuObject.AccentColour);
                 indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
             }
-
-            Texture? getTexture(string name)
-                => skin.GetTexture($"{priorityLookupPrefix ?? @"hitcircle"}{name}");
-
-            Drawable? getAnimation(string name, double frameLength)
-                => skin.GetAnimation($"{priorityLookupPrefix ?? @"hitcircle"}{name}", true, true, frameLength: frameLength);
         }
 
         protected override void LoadComplete()
