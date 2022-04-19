@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current total score.
         /// </summary>
-        public readonly BindableLong TotalScore = new BindableLong { MinValue = 0 };
+        public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
 
         /// <summary>
         /// The current accuracy.
