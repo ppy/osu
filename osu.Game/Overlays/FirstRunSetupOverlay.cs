@@ -74,6 +74,8 @@ namespace osu.Game.Overlays
 
         private Container stackContainer = null!;
 
+        private Bindable<OverlayActivation>? overlayActivationMode;
+
         public FirstRunSetupOverlay()
         {
             RelativeSizeAxes = Axes.Both;
@@ -225,11 +227,7 @@ namespace osu.Game.Overlays
 
             config.BindWith(OsuSetting.ShowFirstRunSetup, showFirstRunSetup);
 
-            if (showFirstRunSetup.Value)
-            {
-                // if we are valid for display, only do so after reaching the main menu.
-                performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
-            }
+            if (showFirstRunSetup.Value) Show();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -258,6 +256,26 @@ namespace osu.Game.Overlays
             return base.OnPressed(e);
         }
 
+        public override void Show()
+        {
+            // if we are valid for display, only do so after reaching the main menu.
+            performer.PerformFromScreen(screen =>
+            {
+                MainMenu menu = (MainMenu)screen;
+
+                // Eventually I'd like to replace this with a better method that doesn't access the screen.
+                // Either this dialog would be converted to its own screen, or at very least be "hosted" by a screen pushed to the main menu.
+                // Alternatively, another method of disabling notifications could be added to `INotificationOverlay`.
+                if (menu != null)
+                {
+                    overlayActivationMode = menu.OverlayActivationMode.GetBoundCopy();
+                    overlayActivationMode.Value = OverlayActivation.UserTriggered;
+                }
+
+                base.Show();
+            }, new[] { typeof(MainMenu) });
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -273,6 +291,13 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            if (overlayActivationMode != null)
+            {
+                // If this is non-null we are guaranteed to have come from the main menu.
+                overlayActivationMode.Value = OverlayActivation.All;
+                overlayActivationMode = null;
+            }
+
             if (currentStepIndex != null)
             {
                 notificationOverlay.Post(new SimpleNotification
