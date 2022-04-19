@@ -6,6 +6,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,6 +16,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -42,6 +44,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private INotificationOverlay notificationOverlay { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         private ScreenStack? stack;
 
         public PurpleTriangleButton NextButton = null!;
@@ -49,6 +54,8 @@ namespace osu.Game.Overlays
 
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
+        private readonly Bindable<bool> showFirstRunSetup = new Bindable<bool>();
 
         private int? currentStepIndex;
 
@@ -216,8 +223,13 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            // if we are valid for display, only do so after reaching the main menu.
-            performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
+            config.BindWith(OsuSetting.ShowFirstRunSetup, showFirstRunSetup);
+
+            if (showFirstRunSetup.Value)
+            {
+                // if we are valid for display, only do so after reaching the main menu.
+                performer.PerformFromScreen(_ => { Show(); }, new[] { typeof(MainMenu) });
+            }
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -330,6 +342,7 @@ namespace osu.Game.Overlays
             }
             else
             {
+                showFirstRunSetup.Value = false;
                 currentStepIndex = null;
                 Hide();
             }
