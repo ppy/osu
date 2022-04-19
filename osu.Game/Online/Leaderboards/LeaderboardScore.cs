@@ -64,7 +64,7 @@ namespace osu.Game.Online.Leaderboards
         private List<ScoreComponentLabel> statisticsLabels;
 
         [Resolved(CanBeNull = true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private SongSelect songSelect { get; set; }
