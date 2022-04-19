@@ -2,13 +2,36 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
     public abstract class FirstRunSetupScreen : Screen
     {
         private const float offset = 100;
+
+        protected FillFlowContainer Content { get; private set; }
+
+        protected FirstRunSetupScreen()
+        {
+            InternalChildren = new Drawable[]
+            {
+                new OsuScrollContainer(Direction.Vertical)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Content = new FillFlowContainer
+                    {
+                        Spacing = new Vector2(20),
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                    },
+                }
+            };
+        }
 
         public override void OnEntering(IScreen last)
         {
