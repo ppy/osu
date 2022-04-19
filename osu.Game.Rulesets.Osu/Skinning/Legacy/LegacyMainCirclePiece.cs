@@ -23,8 +23,9 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
     {
         public override bool RemoveCompletedTransforms => false;
 
-        private readonly string priorityLookup;
         private readonly bool hasNumber;
+
+        private string priorityLookup;
 
         public LegacyMainCirclePiece(string priorityLookup = null, bool hasNumber = true)
         {
@@ -56,21 +57,19 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
         {
             var drawableOsuObject = (DrawableOsuHitObject)drawableObject;
 
-            bool allowFallback = false;
-
             // attempt lookup using priority specification
-            Texture baseTexture = getTextureWithFallback(string.Empty);
+            Texture baseTexture = getTexture(string.Empty);
 
-            // if the base texture was not found without a fallback, switch on fallback mode and re-perform the lookup.
+            // if the base texture was not found using the priority specification, nullify the specification and fall back to "hitcircle".
             if (baseTexture == null)
             {
-                allowFallback = true;
-                baseTexture = getTextureWithFallback(string.Empty);
+                priorityLookup = null;
+                baseTexture = getTexture(string.Empty);
             }
 
             // at this point, any further texture fetches should be correctly using the priority source if the base texture was retrieved using it.
             // the flow above handles the case where a sliderendcircle.png is retrieved from the skin, but sliderendcircleoverlay.png doesn't exist.
-            // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png (potentially from the default/fall-through skin).
+            // expected behaviour in this scenario is not showing the overlay, rather than using hitcircleoverlay.png.
 
             InternalChildren = new[]
             {
@@ -83,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => getAnimationWithFallback(@"overlay", 1000 / 2d))
+                    Child = hitCircleOverlay = new KiaiFlashingDrawable(() => getAnimation(@"overlay", 1000 / 2d))
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -115,35 +114,11 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
                 indexInCurrentCombo.BindTo(drawableOsuObject.IndexInCurrentComboBindable);
             }
 
-            Texture getTextureWithFallback(string name)
-            {
-                Texture tex = null;
+            Texture getTexture(string name)
+                => skin.GetTexture($"{priorityLookup ?? @"hitcircle"}{name}");
 
-                if (!string.IsNullOrEmpty(priorityLookup))
-                {
-                    tex = skin.GetTexture($"{priorityLookup}{name}");
-
-                    if (!allowFallback)
-                        return tex;
-                }
-
-                return tex ?? skin.GetTexture($"hitcircle{name}");
-            }
-
-            Drawable getAnimationWithFallback(string name, double frameLength)
-            {
-                Drawable animation = null;
-
-                if (!string.IsNullOrEmpty(priorityLookup))
-                {
-                    animation = skin.GetAnimation($"{priorityLookup}{name}", true, true, frameLength: frameLength);
-
-                    if (!allowFallback)
-                        return animation;
-                }
-
-                return animation ?? skin.GetAnimation($"hitcircle{name}", true, true, frameLength: frameLength);
-            }
+            Drawable getAnimation(string name, double frameLength)
+                => skin.GetAnimation($"{priorityLookup ?? @"hitcircle"}{name}", true, true, frameLength: frameLength);
         }
 
         protected override void LoadComplete()
