@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Localisation;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
@@ -58,8 +59,8 @@ namespace osu.Game.Overlays
 
         private readonly FirstRunStep[] steps =
         {
-            new FirstRunStep(typeof(ScreenWelcome), "Welcome"),
-            new FirstRunStep(typeof(ScreenUIScale), "UI Scale"),
+            new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.Welcome),
+            new FirstRunStep(typeof(ScreenUIScale), GraphicsSettingsStrings.UIScaling),
         };
 
         private Container stackContainer = null!;
@@ -129,7 +130,7 @@ namespace osu.Game.Overlays
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = "First run setup",
+                                                Text = FirstRunSetupOverlayStrings.FirstRunSetup,
                                                 Font = OsuFont.Default.With(size: 32),
                                                 Colour = colourProvider.Content2,
                                                 Anchor = Anchor.TopCentre,
@@ -137,7 +138,7 @@ namespace osu.Game.Overlays
                                             },
                                             new OsuTextFlowContainer
                                             {
-                                                Text = "Setup osu! to suit you",
+                                                Text = FirstRunSetupOverlayStrings.SetupOsuToSuitYou,
                                                 Colour = colourProvider.Content1,
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
@@ -184,7 +185,7 @@ namespace osu.Game.Overlays
                                             BackButton = new DangerousTriangleButton
                                             {
                                                 Width = 200,
-                                                Text = "Back",
+                                                Text = CommonStrings.Back,
                                                 Action = showLastStep,
                                                 Enabled = { Value = false },
                                             },
@@ -193,7 +194,7 @@ namespace osu.Game.Overlays
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 Width = 1,
-                                                Text = "Get started",
+                                                Text = FirstRunSetupOverlayStrings.GetStarted,
                                                 Action = showNextStep
                                             }
                                         },
@@ -263,8 +264,8 @@ namespace osu.Game.Overlays
             Debug.Assert(currentStepIndex != null);
 
             NextButton.Text = currentStepIndex + 1 < steps.Length
-                ? $"Next ({steps[currentStepIndex.Value + 1].Description})"
-                : "Finish";
+                ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
+                : CommonStrings.Finish;
         }
 
         protected override void PopIn()
@@ -286,7 +287,7 @@ namespace osu.Game.Overlays
             {
                 notificationOverlay.Post(new SimpleNotification
                 {
-                    Text = "Click here to resume initial setup at any point",
+                    Text = FirstRunSetupOverlayStrings.ClickToResumeFirstRunSetupAtAnyPoint,
                     Icon = FontAwesome.Solid.Horse,
                     Activated = () =>
                     {
