@@ -164,7 +164,7 @@ namespace osu.Desktop.DBus
             set => _Rate = value;
         }
 
-        private bool _Shuffle = true;
+        private bool _Shuffle = false;
 
         public bool Shuffle
         {
@@ -238,7 +238,7 @@ namespace osu.Desktop.DBus
 
         public bool CanPause => _CanPause;
 
-        private readonly bool _CanSeek = false;
+        private readonly bool _CanSeek = true;
 
         public bool CanSeek => _CanSeek;
 

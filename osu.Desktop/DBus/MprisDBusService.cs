@@ -32,7 +32,8 @@ namespace osu.Desktop.DBus
         public Action PlayPause;
         public Action Stop;
         public Action Play;
-        public Action<double> Seek;
+        public Action<long> Seek;
+        public Action<long> SetPosition;
         public Action<string> OpenUri;
 
         public Action WindowRaise;
@@ -164,6 +165,8 @@ namespace osu.Desktop.DBus
             return head + body;
         }
 
+        #region 实现Mpris接口
+
         public Task NextAsync()
         {
             Next?.Invoke();
@@ -209,6 +212,7 @@ namespace osu.Desktop.DBus
 
         public Task SetPositionAsync(ObjectPath trackId, long position)
         {
+            SetPosition?.Invoke(position);
             return Task.CompletedTask;
         }
 
@@ -235,10 +239,14 @@ namespace osu.Desktop.DBus
             return Task.CompletedTask;
         }
 
+        #endregion
+
         public Task<object> GetAsync(string prop)
-            => Task.FromResult(mp2Properties.Contains(prop)
-                ? mp2Properties.Get(prop)
-                : playerProperties.Get(prop));
+            => Task.FromResult(get(prop));
+
+        private object get(string prop) => mp2Properties.Contains(prop)
+            ? mp2Properties.Get(prop)
+            : playerProperties.Get(prop);
 
         public Task SetAsync(string target, object val)
         {
@@ -248,13 +256,20 @@ namespace osu.Desktop.DBus
             return Task.CompletedTask;
         }
 
+        internal void TriggerPropertyChangeFor(string target)
+        {
+            var value = get(target);
+
+            OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
+        }
+
         internal void Set(string target, object val, bool isExternal = false)
         {
             if (!AllowSet && isExternal) return;
 
             if (playerProperties.Set(target, val, isExternal))
             {
-                bool abortInvoke = false;
+                //bool abortInvoke = false;
 
                 if (isExternal)
                 {
@@ -269,15 +284,16 @@ namespace osu.Desktop.DBus
                             {
                                 OnRandom?.Invoke();
 
-                                Set("Shuffle", true);
-                                abortInvoke = true;
+                                Set("Shuffle", false);
+                                val = false; //中断Shuffle操作
+                                //abortInvoke = true;
                             }
 
                             break;
                     }
                 }
 
-                if (!abortInvoke)
+                //if (!abortInvoke)
                     OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, val));
             }
         }

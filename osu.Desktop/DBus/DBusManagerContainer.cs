@@ -230,6 +230,9 @@ namespace osu.Desktop.DBus
 
                     mprisService.AllowSet = true;
 
+                    //workaround: 让GNOME插件Mpris Indicator Button能触发Shuffle
+                    mprisService.TriggerPropertyChangeFor("Shuffle");
+
                     updateMprisProgress();
                 }, config.Get<double>(MSetting.DBusWaitOnline));
 
@@ -256,12 +259,30 @@ namespace osu.Desktop.DBus
             mprisService.Play += () => Schedule(() => musicController.Play(requestedByUser: true));
             mprisService.Pause += () => Schedule(() => musicController.Stop(true));
             mprisService.Quit += exitGame;
-            mprisService.Seek += t => Schedule(() => musicController.SeekTo(t));
             mprisService.Stop += () => Schedule(() => musicController.Stop(true));
             mprisService.PlayPause += () => Schedule(() => musicController.TogglePause());
             mprisService.OpenUri += s => Schedule(() => game.HandleLink(s));
             mprisService.WindowRaise += raiseWindow;
             mprisService.OnVolumeSet += v => Schedule(() => game.Audio.Volume.Value = v);
+            mprisService.Seek += t => Schedule(() =>
+            {
+                double target = musicController.CurrentTrack.CurrentTime + (t / 1000d);
+
+                if (target <= 0)
+                {
+                    musicController.SeekTo(0);
+                    return;
+                }
+
+                if (target >= musicController.CurrentTrack.Length)
+                    musicController.NextTrack();
+                else
+                    musicController.SeekTo(target);
+            });
+            mprisService.SetPosition += pos => Schedule(() =>
+            {
+                musicController.SeekTo(pos / 1000d);
+            });
             mprisService.OnRandom += () =>
             {
                 var usableBeatmapSets = beatmapManager.GetAllUsableBeatmapSets();
