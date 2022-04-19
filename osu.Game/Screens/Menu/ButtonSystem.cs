@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Menu
         private IAPIProvider api { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved(CanBeNull = true)]
         private LoginOverlay loginOverlay { get; set; }
