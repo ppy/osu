@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
@@ -13,21 +12,13 @@ namespace osu.Game.Overlays.FirstRunSetup
     {
         public ScreenWelcome()
         {
-            InternalChildren = new Drawable[]
+            Content.Children = new Drawable[]
             {
-                new FillFlowContainer
+                new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
-                        {
-                            Text = FirstRunSetupOverlayStrings.WelcomeDescription,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        },
-                    }
+                    Text = FirstRunSetupOverlayStrings.WelcomeDescription,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
                 },
             };
         }
