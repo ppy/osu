@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using osuTK;
 
 namespace osu.Game.Overlays.Chat.ChannelList
 {
@@ -57,7 +56,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             new ChannelListSelector
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
-                                SelectorActive = { BindTarget = SelectorActive },
                             },
                             privateChannelFlow = new ChannelListItemFlow("DIRECT MESSAGES"),
                         },
@@ -131,5 +129,11 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 });
             }
         }
+    }
+
+    public enum ChannelSelectorState
+    {
+        Visibile,
+        Hidden,
     }
 }
