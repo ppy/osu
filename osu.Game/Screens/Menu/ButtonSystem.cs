@@ -26,7 +26,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -118,9 +117,6 @@ namespace osu.Game.Screens.Menu
         private IAPIProvider api { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private INotificationOverlay notifications { get; set; }
-
-        [Resolved(CanBeNull = true)]
         private LoginOverlay loginOverlay { get; set; }
 
         [BackgroundDependencyLoader(true)]
@@ -161,17 +157,7 @@ namespace osu.Game.Screens.Menu
         {
             if (api.State.Value != APIState.Online)
             {
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = "You gotta be online to multi 'yo!",
-                    Icon = FontAwesome.Solid.Globe,
-                    Activated = () =>
-                    {
-                        loginOverlay?.Show();
-                        return true;
-                    }
-                });
-
+                loginOverlay?.Show();
                 return;
             }
 
@@ -182,17 +168,7 @@ namespace osu.Game.Screens.Menu
         {
             if (api.State.Value != APIState.Online)
             {
-                notifications?.Post(new SimpleNotification
-                {
-                    Text = "You gotta be online to view playlists 'yo!",
-                    Icon = FontAwesome.Solid.Globe,
-                    Activated = () =>
-                    {
-                        loginOverlay?.Show();
-                        return true;
-                    }
-                });
-
+                loginOverlay?.Show();
                 return;
             }
 
