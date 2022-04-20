@@ -36,6 +36,9 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load()
         {
+            Header.Title = "Mod Select";
+            Header.Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.";
+
             AddRange(new Drawable[]
             {
                 new ClickToReturnContainer

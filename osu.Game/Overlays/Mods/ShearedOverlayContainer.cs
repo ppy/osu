@@ -73,8 +73,6 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.TopCentre,
                         Depth = float.MinValue,
                         Origin = Anchor.TopCentre,
-                        Title = "Mod Select",
-                        Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.",
                         Close = Hide
                     },
                     MainAreaContent = new Container
