@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click outside content", () =>
             {
-                InputManager.MoveMouseTo(overlay.ScreenSpaceDrawQuad.TopLeft - new Vector2(1));
+                InputManager.MoveMouseTo(new Vector2(overlay.ScreenSpaceDrawQuad.TopLeft.X, overlay.ScreenSpaceDrawQuad.Centre.Y));
                 InputManager.Click(MouseButton.Left);
             });
 
