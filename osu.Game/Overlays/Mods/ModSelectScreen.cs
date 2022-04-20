@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
 using osu.Game.Configuration;
@@ -21,15 +20,12 @@ using osuTK.Input;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelectScreen : OsuFocusedOverlayContainer
+    public class ModSelectScreen : ShearedOverlayContainer
     {
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+        protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
 
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        protected override bool StartHidden => true;
 
         private readonly BindableBool customisationVisible = new BindableBool();
 
@@ -37,23 +33,14 @@ namespace osu.Game.Overlays.Mods
         private ModSettingsArea modSettingsArea;
         private FillFlowContainer<ModColumn> columnFlow;
         private GridContainer grid;
-        private Container mainContent;
-
-        private PopupScreenTitle header;
-        private Container footer;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            RelativeSizeAxes = Axes.Both;
-            RelativePositionAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
+            MainAreaContent.AddRange(new Drawable[]
             {
-                mainContent = new Container
+                new Container
                 {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -63,23 +50,10 @@ namespace osu.Game.Overlays.Mods
                             RowDimensions = new[]
                             {
                                 new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(GridSizeMode.AutoSize),
                                 new Dimension(),
-                                new Dimension(GridSizeMode.Absolute, 75),
                             },
                             Content = new[]
                             {
-                                new Drawable[]
-                                {
-                                    header = new PopupScreenTitle
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        Title = "Mod Select",
-                                        Description = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play. Others are just for fun.",
-                                        Close = Hide
-                                    }
-                                },
                                 new Drawable[]
                                 {
                                     new Container
@@ -120,6 +94,7 @@ namespace osu.Game.Overlays.Mods
                                                 Child = columnFlow = new ModColumnContainer
                                                 {
                                                     Direction = FillDirection.Horizontal,
+                                                    Shear = new Vector2(ModPanel.SHEAR_X, 0),
                                                     RelativeSizeAxes = Axes.Y,
                                                     AutoSizeAxes = Axes.X,
                                                     Spacing = new Vector2(10, 0),
@@ -137,42 +112,28 @@ namespace osu.Game.Overlays.Mods
                                         }
                                     }
                                 },
-                                new[] { Empty() }
                             }
                         },
-                        footer = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 50,
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    Colour = colourProvider.Background5
-                                },
-                                new ShearedToggleButton(200)
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Margin = new MarginPadding { Vertical = 14, Left = 70 },
-                                    Text = "Mod Customisation",
-                                    Active = { BindTarget = customisationVisible }
-                                }
-                            }
-                        },
-                        new ClickToReturnContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            HandleMouse = { BindTarget = customisationVisible },
-                            OnClicked = () => customisationVisible.Value = false
-                        }
                     }
+                },
+            });
+
+            Footer.Add(new ShearedToggleButton(200)
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                Margin = new MarginPadding { Vertical = 14, Left = 70 },
+                Text = "Mod Customisation",
+                Active = { BindTarget = customisationVisible }
+            });
+
+            AddRange(new Drawable[]
+            {
+                new ClickToReturnContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    HandleMouse = { BindTarget = customisationVisible },
+                    OnClicked = () => customisationVisible.Value = false
                 },
                 modSettingsArea = new ModSettingsArea
                 {
@@ -180,9 +141,7 @@ namespace osu.Game.Overlays.Mods
                     Origin = Anchor.BottomCentre,
                     Height = 0
                 }
-            };
-
-            columnFlow.Shear = new Vector2(ModPanel.SHEAR_X, 0);
+            });
         }
 
         protected override void LoadComplete()
@@ -252,7 +211,7 @@ namespace osu.Game.Overlays.Mods
             float modAreaHeight = customisationVisible.Value ? ModSettingsArea.HEIGHT : 0;
 
             modSettingsArea.ResizeHeightTo(modAreaHeight, transition_duration, Easing.InOutCubic);
-            mainContent.TransformTo(nameof(Margin), new MarginPadding { Bottom = modAreaHeight }, transition_duration, Easing.InOutCubic);
+            TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
         }
 
         private bool selectionBindableSyncInProgress;
@@ -287,10 +246,6 @@ namespace osu.Game.Overlays.Mods
             const double fade_in_duration = 400;
 
             base.PopIn();
-            this.FadeIn(fade_in_duration, Easing.OutQuint);
-
-            header.MoveToY(0, fade_in_duration, Easing.OutQuint);
-            footer.MoveToY(0, fade_in_duration, Easing.OutQuint);
 
             multiplierDisplay
                 .Delay(fade_in_duration * 0.65f)
@@ -311,14 +266,10 @@ namespace osu.Game.Overlays.Mods
             const double fade_out_duration = 500;
 
             base.PopOut();
-            this.FadeOut(fade_out_duration, Easing.OutQuint);
 
             multiplierDisplay
                 .FadeOut(fade_out_duration / 2, Easing.OutQuint)
                 .ScaleTo(0.75f, fade_out_duration, Easing.OutQuint);
-
-            header.MoveToY(-header.DrawHeight, fade_out_duration, Easing.OutQuint);
-            footer.MoveToY(footer.DrawHeight, fade_out_duration, Easing.OutQuint);
 
             for (int i = 0; i < columnFlow.Count; i++)
             {
