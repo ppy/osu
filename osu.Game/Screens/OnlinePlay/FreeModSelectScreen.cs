@@ -10,7 +10,7 @@ namespace osu.Game.Screens.OnlinePlay
 {
     public class FreeModSelectScreen : ModSelectScreen
     {
-        protected override bool AllowConfiguration => false;
+        protected override bool AllowCustomisation => false;
         protected override bool ShowTotalMultiplier => false;
 
         public new Func<Mod, bool> IsValidMod
