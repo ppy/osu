@@ -16,6 +16,8 @@ namespace osu.Game.Overlays.Mods
     /// </summary>
     public abstract class ShearedOverlayContainer : OsuFocusedOverlayContainer
     {
+        protected const float PADDING = 14;
+
         [Cached]
         protected readonly OverlayColourProvider ColourProvider;
 
@@ -81,7 +83,7 @@ namespace osu.Game.Overlays.Mods
                         Padding = new MarginPadding
                         {
                             Top = ShearedOverlayHeader.HEIGHT,
-                            Bottom = footer_height,
+                            Bottom = footer_height + PADDING,
                         }
                     },
                     Footer = new Container
@@ -89,7 +91,7 @@ namespace osu.Game.Overlays.Mods
                         RelativeSizeAxes = Axes.X,
                         Depth = float.MinValue,
                         Height = footer_height,
-                        Margin = new MarginPadding { Top = 10 },
+                        Margin = new MarginPadding { Top = PADDING },
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Children = new Drawable[]

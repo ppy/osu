@@ -75,9 +75,9 @@ namespace osu.Game.Overlays.Mods
                 },
                 new Container
                 {
-                    Margin = new MarginPadding
+                    Padding = new MarginPadding
                     {
-                        Vertical = DifficultyMultiplierDisplay.HEIGHT + 10,
+                        Top = DifficultyMultiplierDisplay.HEIGHT + PADDING,
                     },
                     Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Mods
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Margin = new MarginPadding { Vertical = 14, Left = 70 },
+                Margin = new MarginPadding { Vertical = PADDING, Left = 70 },
                 Text = "Mod Customisation",
                 Active = { BindTarget = customisationVisible }
             });
