@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (overlay.CurrentScreen?.IsLoaded != false)
                     nextButton.TriggerClick();
 
-                return nextButton.Text.ToString() == CommonStrings.Finish;
+                return nextButton.Text == CommonStrings.Finish;
             });
 
             AddUntilStep("step back to start", () =>
