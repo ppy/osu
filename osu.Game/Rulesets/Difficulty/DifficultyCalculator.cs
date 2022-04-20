@@ -62,19 +62,20 @@ namespace osu.Game.Rulesets.Difficulty
             if (!Beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
 
-            DifficultyHitObject lastObject = null;
+            List<DifficultyHitObject> hitObjects = getDifficultyHitObjects().ToList();
 
-            foreach (var hitObject in getDifficultyHitObjects())
+            for (int i = 0; i < hitObjects.Count; i++)
             {
-                hitObject.PreviousBacking = new ObjectLink<DifficultyHitObject>(hitObject, lastObject?.PreviousBacking);
+                var last = i > 0 ? hitObjects[i - 1] : null;
+                var current = hitObjects[i];
+
+                current.PreviousBacking = new ObjectLink<DifficultyHitObject>(current, last?.PreviousBacking);
 
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.ProcessInternal(current);
                 }
-
-                lastObject = hitObject;
             }
 
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
@@ -107,22 +108,23 @@ namespace osu.Game.Rulesets.Difficulty
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var progressiveBeatmap = new ProgressiveCalculationBeatmap(Beatmap);
 
-            DifficultyHitObject lastObject = null;
+            List<DifficultyHitObject> hitObjects = getDifficultyHitObjects().ToList();
 
-            foreach (var hitObject in getDifficultyHitObjects())
+            for (int i = 0; i < hitObjects.Count; i++)
             {
-                hitObject.PreviousBacking = new ObjectLink<DifficultyHitObject>(hitObject, lastObject?.PreviousBacking);
+                var last = i > 0 ? hitObjects[i - 1] : null;
+                var current = hitObjects[i];
+
+                current.PreviousBacking = new ObjectLink<DifficultyHitObject>(current, last?.PreviousBacking);
 
                 foreach (var skill in skills)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    skill.ProcessInternal(hitObject);
+                    skill.ProcessInternal(current);
                 }
 
-                progressiveBeatmap.HitObjects.Add(hitObject.BaseObject);
-                attribs.Add(new TimedDifficultyAttributes(hitObject.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
-
-                lastObject = hitObject;
+                progressiveBeatmap.HitObjects.Add(current.BaseObject);
+                attribs.Add(new TimedDifficultyAttributes(current.EndTime * clockRate, CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
             return attribs;
