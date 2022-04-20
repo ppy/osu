@@ -346,7 +346,7 @@ namespace osu.Game.Overlays
             stack.CurrentScreen.Exit();
             currentStepIndex--;
 
-            updateButtonText();
+            updateButtons();
         }
 
         private void showNextStep()
@@ -359,7 +359,6 @@ namespace osu.Game.Overlays
             if (currentStepIndex < steps.Length)
             {
                 stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value].ScreenType));
-                updateButtonText();
             }
             else
             {
@@ -367,17 +366,21 @@ namespace osu.Game.Overlays
                 currentStepIndex = null;
                 Hide();
             }
+
+            updateButtons();
         }
 
-        private void updateButtonText()
+        private void updateButtons()
         {
-            Debug.Assert(currentStepIndex != null);
+            BackButton.Enabled.Value = currentStepIndex > 0;
+            NextButton.Enabled.Value = currentStepIndex != null;
 
-            BackButton.Enabled.Value = currentStepIndex != 0;
-
-            NextButton.Text = currentStepIndex + 1 < steps.Length
-                ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
-                : CommonStrings.Finish;
+            if (currentStepIndex != null)
+            {
+                NextButton.Text = currentStepIndex + 1 < steps.Length
+                    ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
+                    : CommonStrings.Finish;
+            }
         }
 
         private class FirstRunStep
