@@ -19,7 +19,7 @@ using osu.Game.Localisation;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
         public string IconTexture => "Icons/Hexacons/notification";
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
@@ -99,7 +99,9 @@ namespace osu.Game.Overlays
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
-        public readonly BindableInt UnreadCount = new BindableInt();
+        public IBindable<int> UnreadCount => unreadCount;
+
+        private readonly BindableInt unreadCount = new BindableInt();
 
         private int runningDepth;
 
@@ -111,10 +113,6 @@ namespace osu.Game.Overlays
 
         private double? lastSamplePlayback;
 
-        /// <summary>
-        /// Post a new notification for display.
-        /// </summary>
-        /// <param name="notification">The notification to display.</param>
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
@@ -184,7 +182,7 @@ namespace osu.Game.Overlays
 
         private void updateCounts()
         {
-            UnreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
         }
 
         private void markAllRead()

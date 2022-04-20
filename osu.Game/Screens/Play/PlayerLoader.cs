@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play
         private EpilepsyWarning? epilepsyWarning;
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay? notificationOverlay { get; set; }
+        private INotificationOverlay? notificationOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private VolumeOverlay? volumeOverlay { get; set; }
@@ -515,7 +515,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
+            private void load(OsuColour colours, AudioManager audioManager, INotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
                 IconBackground.Colour = colours.RedDark;
@@ -567,7 +567,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, INotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.BatteryQuarter;
                 IconBackground.Colour = colours.RedDark;

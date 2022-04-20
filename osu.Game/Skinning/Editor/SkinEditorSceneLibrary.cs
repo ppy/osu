@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osuTK;
@@ -28,7 +29,7 @@ namespace osu.Game.Skinning.Editor
         private const float padding = 10;
 
         [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private IPerformFromScreenRunner performer { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
@@ -75,7 +76,7 @@ namespace osu.Game.Skinning.Editor
                                     Text = "Song Select",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Action = () => game?.PerformFromScreen(screen =>
+                                    Action = () => performer?.PerformFromScreen(screen =>
                                     {
                                         if (screen is SongSelect)
                                             return;
@@ -88,7 +89,7 @@ namespace osu.Game.Skinning.Editor
                                     Text = "Gameplay",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Action = () => game?.PerformFromScreen(screen =>
+                                    Action = () => performer?.PerformFromScreen(screen =>
                                     {
                                         if (screen is Player)
                                             return;
