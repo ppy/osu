@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Mods
                             Child = columnFlow = new ModColumnContainer
                             {
                                 Direction = FillDirection.Horizontal,
-                                Shear = new Vector2(ModPanel.SHEAR_X, 0),
+                                Shear = new Vector2(SHEAR, 0),
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
                                 Spacing = new Vector2(10, 0),
@@ -284,7 +284,7 @@ namespace osu.Game.Overlays.Mods
                 {
                     Padding = new MarginPadding
                     {
-                        Left = DrawHeight * ModPanel.SHEAR_X,
+                        Left = DrawHeight * SHEAR,
                         Bottom = 10
                     };
 
