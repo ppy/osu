@@ -346,8 +346,6 @@ namespace osu.Game.Overlays
             stack.CurrentScreen.Exit();
             currentStepIndex--;
 
-            BackButton.Enabled.Value = currentStepIndex != 0;
-
             updateButtonText();
         }
 
@@ -357,8 +355,6 @@ namespace osu.Game.Overlays
             Debug.Assert(stack != null);
 
             currentStepIndex++;
-
-            BackButton.Enabled.Value = currentStepIndex > 0;
 
             if (currentStepIndex < steps.Length)
             {
@@ -376,6 +372,8 @@ namespace osu.Game.Overlays
         private void updateButtonText()
         {
             Debug.Assert(currentStepIndex != null);
+
+            BackButton.Enabled.Value = currentStepIndex != 0;
 
             NextButton.Text = currentStepIndex + 1 < steps.Length
                 ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
