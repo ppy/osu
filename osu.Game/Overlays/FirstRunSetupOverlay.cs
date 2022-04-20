@@ -200,7 +200,7 @@ namespace osu.Game.Overlays
                                             {
                                                 Width = 200,
                                                 Text = CommonStrings.Back,
-                                                Action = showLastStep,
+                                                Action = showPreviousStep,
                                                 Enabled = { Value = false },
                                             },
                                             Empty(),
@@ -336,7 +336,7 @@ namespace osu.Game.Overlays
             showNextStep();
         }
 
-        private void showLastStep()
+        private void showPreviousStep()
         {
             if (currentStepIndex == 0)
                 return;
