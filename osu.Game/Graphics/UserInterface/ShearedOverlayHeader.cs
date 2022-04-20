@@ -19,8 +19,10 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class PopupScreenTitle : CompositeDrawable
+    public class ShearedOverlayHeader : CompositeDrawable
     {
+        public const float HEIGHT = main_area_height + 2 * corner_radius;
+
         public LocalisableString Title
         {
             set => titleSpriteText.Text = value;
@@ -48,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly OsuTextFlowContainer descriptionText;
         private readonly IconButton closeButton;
 
-        public PopupScreenTitle()
+        public ShearedOverlayHeader()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -67,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                     underlayContainer = new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = main_area_height + 2 * corner_radius,
+                        Height = HEIGHT,
                         CornerRadius = corner_radius,
                         Masking = true,
                         BorderThickness = 2,
