@@ -21,6 +21,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class PopupScreenTitle : CompositeDrawable
     {
+        public const float HEIGHT = main_area_height + 2 * corner_radius;
+
         public LocalisableString Title
         {
             set => titleSpriteText.Text = value;
@@ -67,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
                     underlayContainer = new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = main_area_height + 2 * corner_radius,
+                        Height = HEIGHT,
                         CornerRadius = corner_radius,
                         Masking = true,
                         BorderThickness = 2,
