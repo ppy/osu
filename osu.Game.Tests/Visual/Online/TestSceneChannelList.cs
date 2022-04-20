@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly Bindable<Channel> selected = new Bindable<Channel>();
 
+        [Cached]
+        private readonly Bindable<ChannelSelectorState> selector = new Bindable<ChannelSelectorState>();
+
         private OsuSpriteText selectorText;
         private OsuSpriteText selectedText;
         private OsuSpriteText leaveText;
@@ -89,7 +92,7 @@ namespace osu.Game.Tests.Visual.Online
 
                 channelList.OnRequestSelect += channel =>
                 {
-                    channelList.SelectorActive.Value = false;
+                    selector.Value = ChannelSelectorState.Hidden;
                     selected.Value = channel;
                 };
 
@@ -101,9 +104,9 @@ namespace osu.Game.Tests.Visual.Online
                     channelList.RemoveChannel(channel);
                 };
 
-                channelList.SelectorActive.BindValueChanged(change =>
+                selector.BindValueChanged(change =>
                 {
-                    selectorText.Text = $"Channel Selector Active: {change.NewValue}";
+                    selectorText.Text = $"Channel Selector State: {change.NewValue}";
                 }, true);
 
                 selected.BindValueChanged(change =>
