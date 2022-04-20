@@ -196,11 +196,8 @@ namespace osu.Game.Screens.Menu
 
             if (State == ButtonSystemState.Initial)
             {
-                if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
-                {
-                    logo?.TriggerClick();
-                    return true;
-                }
+                logo?.TriggerClick();
+                return true;
             }
 
             return base.OnKeyDown(e);
