@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// Whether configurable <see cref="Mod"/>s can be configured by the local user.
         /// </summary>
-        protected virtual bool AllowConfiguration => true;
+        protected virtual bool AllowCustomisation => true;
 
         /// <summary>
         /// Whether the total score multiplier calculated from the current selected set of mods should be shown.
@@ -87,27 +87,10 @@ namespace osu.Game.Overlays.Mods
             {
                 new Container
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.X,
-                    Height = DifficultyMultiplierDisplay.HEIGHT,
-                    Margin = new MarginPadding
-                    {
-                        Horizontal = 100,
-                    },
-                    Child = multiplierDisplay = new DifficultyMultiplierDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
-                    }
-                },
-                new Container
-                {
                     Padding = new MarginPadding
                     {
-                        Top = DifficultyMultiplierDisplay.HEIGHT + PADDING,
+                        Top = (ShowTotalMultiplier ? DifficultyMultiplierDisplay.HEIGHT : 0) + PADDING,
                     },
-                    Depth = float.MaxValue,
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
                     Children = new Drawable[]
@@ -140,14 +123,34 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            Footer.Add(new ShearedToggleButton(200)
+            if (ShowTotalMultiplier)
             {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                Margin = new MarginPadding { Vertical = PADDING, Left = 70 },
-                Text = "Mod Customisation",
-                Active = { BindTarget = customisationVisible }
-            });
+                MainAreaContent.Add(new Container
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.X,
+                    Height = DifficultyMultiplierDisplay.HEIGHT,
+                    Margin = new MarginPadding { Horizontal = 100 },
+                    Child = multiplierDisplay = new DifficultyMultiplierDisplay
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre
+                    },
+                });
+            }
+
+            if (AllowCustomisation)
+            {
+                Footer.Add(new ShearedToggleButton(200)
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Margin = new MarginPadding { Vertical = PADDING, Left = 70 },
+                    Text = "Mod Customisation",
+                    Active = { BindTarget = customisationVisible }
+                });
+            }
         }
 
         protected override void LoadComplete()
@@ -194,7 +197,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
         {
-            if (!AllowConfiguration)
+            if (!AllowCustomisation)
                 return;
 
             bool anyCustomisableMod = false;
