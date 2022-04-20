@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private OsuGame game { get; set; }
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved]
         private Storage storage { get; set; }
