@@ -56,6 +56,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                             new ChannelListSelector
                             {
                                 Margin = new MarginPadding { Bottom = 10 },
+                                SelectorActive = { BindTarget = SelectorActive },
                             },
                             privateChannelFlow = new ChannelListItemFlow("DIRECT MESSAGES"),
                         },
@@ -72,6 +73,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
             ChannelListItem item = new ChannelListItem(channel);
             item.OnRequestSelect += chan => OnRequestSelect?.Invoke(chan);
             item.OnRequestLeave += chan => OnRequestLeave?.Invoke(chan);
+            item.SelectorActive.BindTarget = SelectorActive;
 
             ChannelListItemFlow flow = getFlowForChannel(channel);
             channelMap.Add(channel, item);
@@ -129,11 +131,5 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 });
             }
         }
-    }
-
-    public enum ChannelSelectorState
-    {
-        Visibile,
-        Hidden,
     }
 }

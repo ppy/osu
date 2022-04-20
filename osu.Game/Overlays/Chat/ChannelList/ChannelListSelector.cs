@@ -22,9 +22,6 @@ namespace osu.Game.Overlays.Chat.ChannelList
         private Box hoverBox = null!;
         private Box selectBox = null!;
 
-        [Resolved]
-        private Bindable<ChannelSelectorState> selectorState { get; set; } = null!;
-
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -68,15 +65,15 @@ namespace osu.Game.Overlays.Chat.ChannelList
         {
             base.LoadComplete();
 
-            selectorState.BindValueChanged(selector =>
+            SelectorActive.BindValueChanged(selector =>
             {
-                if (selector.NewValue == ChannelSelectorState.Visibile)
+                if (selector.NewValue)
                     selectBox.FadeIn(300, Easing.OutQuint);
                 else
                     selectBox.FadeOut(200, Easing.OutQuint);
             }, true);
 
-            Action = () => selectorState.Value = ChannelSelectorState.Visibile;
+            Action = () => SelectorActive.Value = true;
         }
 
         protected override bool OnHover(HoverEvent e)
