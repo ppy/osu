@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToPlayer
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModAimAssist) }).ToArray();
 
         /// <summary>
         /// How early before a hitobject's start time to trigger a hit.
@@ -87,8 +87,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                         requiresHold |= slider.Ball.IsHovered || h.IsHovered;
                         break;
 
-                    case DrawableSpinner _:
-                        requiresHold = true;
+                    case DrawableSpinner spinner:
+                        requiresHold |= spinner.HitObject.SpinsRequired > 0;
                         break;
                 }
             }

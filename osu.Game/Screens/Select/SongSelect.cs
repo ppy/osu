@@ -37,6 +37,7 @@ using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -235,6 +236,10 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 },
+                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
             });
 
             if (ShowFooter)
@@ -295,7 +300,7 @@ namespace osu.Game.Screens.Select
                 Schedule(() =>
                 {
                     // if we have no beatmaps, let's prompt the user to import from over a stable install if he has one.
-                    if (!beatmaps.GetAllUsableBeatmapSetsEnumerable(IncludedDetails.Minimal).Any() && DisplayStableImportPrompt)
+                    if (beatmaps.QueryBeatmapSet(s => !s.Protected && !s.DeletePending) == null && DisplayStableImportPrompt)
                     {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
@@ -421,7 +426,7 @@ namespace osu.Game.Screens.Select
                 // A selection may not have been possible with filters applied.
 
                 // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
-                if (e.NewValue.BeatmapInfo.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
+                if (!e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
                     Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
                     transferRulesetValue();
@@ -482,11 +487,11 @@ namespace osu.Game.Screens.Select
             else
                 selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
 
-            if (beatmap != beatmapInfoPrevious)
+            if (beatmap?.Equals(beatmapInfoPrevious) != true)
             {
                 if (beatmap != null && beatmapInfoPrevious != null && Time.Current - audioFeedbackLastPlaybackTime >= 50)
                 {
-                    if (beatmap.BeatmapSetInfoID == beatmapInfoPrevious.BeatmapSetInfoID)
+                    if (beatmap.BeatmapSet?.ID == beatmapInfoPrevious.BeatmapSet?.ID)
                         sampleChangeDifficulty.Play();
                     else
                         sampleChangeBeatmap.Play();
@@ -502,7 +507,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -619,6 +624,10 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
+            // Without this, it's possible for a transfer to happen while we are not the current screen.
+            transferRulesetValue();
+
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 
@@ -807,14 +816,14 @@ namespace osu.Game.Screens.Select
 
         private void delete(BeatmapSetInfo beatmap)
         {
-            if (beatmap == null || !beatmap.IsManaged) return;
+            if (beatmap == null) return;
 
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
         private void clearScores(BeatmapInfo beatmapInfo)
         {
-            if (beatmapInfo == null || !beatmapInfo.IsManaged) return;
+            if (beatmapInfo == null) return;
 
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmapInfo, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.

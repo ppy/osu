@@ -35,7 +35,13 @@ namespace osu.Game.Tests.Editing
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    editorBeatmap = new EditorBeatmap(new OsuBeatmap()),
+                    editorBeatmap = new EditorBeatmap(new OsuBeatmap
+                    {
+                        BeatmapInfo =
+                        {
+                            Ruleset = new OsuRuleset().RulesetInfo,
+                        },
+                    }),
                     Content = new Container
                     {
                         RelativeSizeAxes = Axes.Both,

@@ -65,6 +65,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 scoreTable.ClearScores();
                 scoreTable.Hide();
 
+                loading.Hide();
+                loading.FinishTransforms();
+
                 if (value?.Scores.Any() != true)
                     return;
 
@@ -75,8 +78,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 // TODO: temporary. should be removed once `OrderByTotalScore` can accept `IScoreInfo`.
                 var beatmapInfo = new BeatmapInfo
                 {
+#pragma warning disable 618
                     MaxCombo = apiBeatmap.MaxCombo,
-                    Status = apiBeatmap.Status
+#pragma warning restore 618
+                    Status = apiBeatmap.Status,
+                    MD5Hash = apiBeatmap.MD5Hash
                 };
 
                 scoreManager.OrderByTotalScoreAsync(value.Scores.Select(s => s.CreateScoreInfo(rulesets, beatmapInfo)).ToArray(), loadCancellationSource.Token)
@@ -258,9 +264,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 Scores = null;
                 notSupporterPlaceholder.Show();
-
-                loading.Hide();
-                loading.FinishTransforms();
                 return;
             }
 
@@ -272,9 +275,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
             {
-                loading.Hide();
-                loading.FinishTransforms();
-
                 Scores = scores;
 
                 if (!scores.Scores.Any())

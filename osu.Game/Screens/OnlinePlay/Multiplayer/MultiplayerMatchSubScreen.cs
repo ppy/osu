@@ -1,12 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -47,13 +44,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         [Resolved]
         private MultiplayerClient client { get; set; }
 
-        [Resolved]
-        private OngoingOperationTracker ongoingOperationTracker { get; set; }
-
         private readonly IBindable<bool> isConnected = new Bindable<bool>();
-
-        [CanBeNull]
-        private IDisposable readyClickOperation;
 
         private AddItemButton addItemButton;
 
@@ -231,11 +222,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             this.Push(new MultiplayerMatchSongSelect(Room, itemToEdit));
         }
 
-        protected override Drawable CreateFooter() => new MultiplayerMatchFooter
-        {
-            OnReadyClick = onReadyClick,
-            OnSpectateClick = onSpectateClick
-        };
+        protected override Drawable CreateFooter() => new MultiplayerMatchFooter();
 
         protected override RoomSettingsOverlay CreateRoomSettingsOverlay(Room room) => new MultiplayerMatchSettingsOverlay(room);
 
@@ -247,7 +234,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // update local mods based on room's reported status for the local user (omitting the base call implementation).
             // this makes the server authoritative, and avoids the local user potentially setting mods that the server is not aware of (ie. if the match was started during the selection being changed).
             var ruleset = Ruleset.Value.CreateInstance();
-            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods).ToList();
+            Mods.Value = client.LocalUser.Mods.Select(m => m.ToMod(ruleset)).Concat(SelectedItem.Value.RequiredMods.Select(m => m.ToMod(ruleset))).ToList();
         }
 
         [Resolved(canBeNull: true)]
@@ -333,52 +320,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
-        private void onReadyClick()
-        {
-            Debug.Assert(readyClickOperation == null);
-            readyClickOperation = ongoingOperationTracker.BeginOperation();
-
-            if (client.IsHost && (client.LocalUser?.State == MultiplayerUserState.Ready || client.LocalUser?.State == MultiplayerUserState.Spectating))
-            {
-                client.StartMatch()
-                      .ContinueWith(t =>
-                      {
-                          // accessing Exception here silences any potential errors from the antecedent task
-                          if (t.Exception != null)
-                          {
-                              // gameplay was not started due to an exception; unblock button.
-                              endOperation();
-                          }
-
-                          // gameplay is starting, the button will be unblocked on load requested.
-                      });
-                return;
-            }
-
-            client.ToggleReady()
-                  .ContinueWith(t => endOperation());
-
-            void endOperation()
-            {
-                readyClickOperation?.Dispose();
-                readyClickOperation = null;
-            }
-        }
-
-        private void onSpectateClick()
-        {
-            Debug.Assert(readyClickOperation == null);
-            readyClickOperation = ongoingOperationTracker.BeginOperation();
-
-            client.ToggleSpectate().ContinueWith(t => endOperation());
-
-            void endOperation()
-            {
-                readyClickOperation?.Dispose();
-                readyClickOperation = null;
-            }
-        }
-
         private void onRoomUpdated()
         {
             // may happen if the client is kicked or otherwise removed from the room.
@@ -398,38 +339,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         private void updateCurrentItem()
         {
             Debug.Assert(client.Room != null);
-
-            var expectedSelectedItem = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
-
-            if (expectedSelectedItem == null)
-                return;
-
-            // There's no reason to renew the selected item if its content hasn't changed.
-            if (SelectedItem.Value?.Equals(expectedSelectedItem) == true && expectedSelectedItem.Beatmap.Value != null)
-                return;
-
-            // Clear the selected item while the lookup is performed, so components like the ready button can enter their disabled states.
-            SelectedItem.Value = null;
-
-            if (expectedSelectedItem.Beatmap.Value == null)
-            {
-                Task.Run(async () =>
-                {
-                    var beatmap = await client.GetAPIBeatmap(expectedSelectedItem.BeatmapID).ConfigureAwait(false);
-
-                    Schedule(() =>
-                    {
-                        expectedSelectedItem.Beatmap.Value = beatmap;
-
-                        if (Room.Playlist.SingleOrDefault(i => i.ID == client.Room?.Settings.PlaylistItemId)?.Equals(expectedSelectedItem) == true)
-                            applyCurrentItem();
-                    });
-                });
-            }
-            else
-                applyCurrentItem();
-
-            void applyCurrentItem() => SelectedItem.Value = expectedSelectedItem;
+            SelectedItem.Value = Room.Playlist.SingleOrDefault(i => i.ID == client.Room.Settings.PlaylistItemId);
         }
 
         private void handleRoomLost() => Schedule(() =>
@@ -457,10 +367,14 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return;
             }
 
-            StartPlay();
+            // The beatmap is queried asynchronously when the selected item changes.
+            // This is an issue with MultiSpectatorScreen which is effectively in an always "ready" state and receives LoadRequested() callbacks
+            // even when it is not truly ready (i.e. the beatmap hasn't been selected by the client yet). For the time being, a simple fix to this is to ignore the callback.
+            // Note that spectator will be entered automatically when the client is capable of doing so via beatmap availability callbacks (see: updateBeatmapAvailability()).
+            if (client.LocalUser?.State == MultiplayerUserState.Spectating && (SelectedItem.Value == null || Beatmap.IsDefault))
+                return;
 
-            readyClickOperation?.Dispose();
-            readyClickOperation = null;
+            StartPlay();
         }
 
         protected override Screen CreateGameplayScreen()
@@ -474,7 +388,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             switch (client.LocalUser.State)
             {
                 case MultiplayerUserState.Spectating:
-                    return new MultiSpectatorScreen(users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
+                    return new MultiSpectatorScreen(Room, users.Take(PlayerGrid.MAX_PLAYERS).ToArray());
 
                 default:
                     return new MultiplayerPlayerLoader(() => new MultiplayerPlayer(Room, SelectedItem.Value, users));

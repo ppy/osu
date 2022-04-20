@@ -9,10 +9,12 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Solo;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
@@ -22,6 +24,20 @@ namespace osu.Game.Tests.Online
     [TestFixture]
     public class TestAPIModJsonSerialization
     {
+        [Test]
+        public void TestUnknownMod()
+        {
+            var apiMod = new APIMod { Acronym = "WNG" };
+
+            var deserialized = JsonConvert.DeserializeObject<APIMod>(JsonConvert.SerializeObject(apiMod));
+
+            var converted = deserialized?.ToMod(new TestRuleset());
+
+            Assert.That(converted, Is.TypeOf(typeof(UnknownMod)));
+            Assert.That(converted?.Type, Is.EqualTo(ModType.System));
+            Assert.That(converted?.Acronym, Is.EqualTo("WNG??"));
+        }
+
         [Test]
         public void TestAcronymIsPreserved()
         {
@@ -93,7 +109,11 @@ namespace osu.Game.Tests.Online
         [Test]
         public void TestDeserialiseSubmittableScoreWithEmptyMods()
         {
-            var score = new SubmittableScore(new ScoreInfo());
+            var score = new SubmittableScore(new ScoreInfo
+            {
+                User = new APIUser(),
+                Ruleset = new OsuRuleset().RulesetInfo,
+            });
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
@@ -105,12 +125,25 @@ namespace osu.Game.Tests.Online
         {
             var score = new SubmittableScore(new ScoreInfo
             {
-                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } }
+                Mods = new Mod[] { new OsuModDoubleTime { SpeedChange = { Value = 2 } } },
+                User = new APIUser(),
+                Ruleset = new OsuRuleset().RulesetInfo,
             });
 
             var deserialised = JsonConvert.DeserializeObject<SubmittableScore>(JsonConvert.SerializeObject(score));
 
             Assert.That((deserialised?.Mods[0])?.Settings["speed_change"], Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TestAPIModDetachedFromSource()
+        {
+            var mod = new OsuModDoubleTime { SpeedChange = { Value = 1.01 } };
+            var apiMod = new APIMod(mod);
+
+            mod.SpeedChange.Value = 1.5;
+
+            Assert.That(apiMod.Settings["speed_change"], Is.EqualTo(1.01d));
         }
 
         private class TestRuleset : Ruleset

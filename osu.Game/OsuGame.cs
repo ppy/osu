@@ -150,9 +150,12 @@ namespace osu.Game
         protected SettingsOverlay Settings;
 
         private VolumeOverlay volume;
+
         private OsuLogo osuLogo;
 
         private MainMenu menuScreen;
+
+        private VersionManager versionManager;
 
         [CanBeNull]
         private IntroScreen introScreen;
@@ -247,7 +250,7 @@ namespace osu.Game
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID.ToString();
             configSkin.ValueChanged += skinId =>
             {
-                ILive<SkinInfo> skinInfo = null;
+                Live<SkinInfo> skinInfo = null;
 
                 if (Guid.TryParse(skinId.NewValue, out var guid))
                     skinInfo = SkinManager.Query(s => s.ID == guid);
@@ -355,12 +358,12 @@ namespace osu.Game
             }
         });
 
-        public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
+        public void OpenUrlExternally(string url, bool bypassExternalUrlWarning = false) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith('/'))
                 url = $"{API.APIEndpointUrl}{url}";
 
-            externalLinkOpener.OpenUrlExternally(url);
+            externalLinkOpener.OpenUrlExternally(url, bypassExternalUrlWarning);
         });
 
         /// <summary>
@@ -437,7 +440,7 @@ namespace osu.Game
         /// </remarks>
         public void PresentBeatmap(IBeatmapSetInfo beatmap, Predicate<BeatmapInfo> difficultyCriteria = null)
         {
-            BeatmapSetInfo databasedSet = null;
+            Live<BeatmapSetInfo> databasedSet = null;
 
             if (beatmap.OnlineID > 0)
                 databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineID == beatmap.OnlineID);
@@ -451,14 +454,16 @@ namespace osu.Game
                 return;
             }
 
+            var detachedSet = databasedSet.PerformRead(s => s.Detach());
+
             PerformFromScreen(screen =>
             {
                 // Find beatmaps that match our predicate.
-                var beatmaps = databasedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
+                var beatmaps = detachedSet.Beatmaps.Where(b => difficultyCriteria?.Invoke(b) ?? true).ToList();
 
                 // Use all beatmaps if predicate matched nothing
                 if (beatmaps.Count == 0)
-                    beatmaps = databasedSet.Beatmaps;
+                    beatmaps = detachedSet.Beatmaps.ToList();
 
                 // Prefer recommended beatmap if recommendations are available, else fallback to a sane selection.
                 var selection = difficultyRecommender.GetRecommendedBeatmap(beatmaps)
@@ -481,7 +486,7 @@ namespace osu.Game
         /// Present a score's replay immediately.
         /// The user should have already requested this interactively.
         /// </summary>
-        public void PresentScore(ScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
+        public void PresentScore(IScoreInfo score, ScorePresentType presentType = ScorePresentType.Results)
         {
             // The given ScoreInfo may have missing properties if it was retrieved from online data. Re-retrieve it from the database
             // to ensure all the required data for presenting a replay are present.
@@ -490,7 +495,8 @@ namespace osu.Game
             if (score.OnlineID > 0)
                 databasedScoreInfo = ScoreManager.Query(s => s.OnlineID == score.OnlineID);
 
-            databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == score.Hash);
+            if (score is ScoreInfo scoreInfo)
+                databasedScoreInfo ??= ScoreManager.Query(s => s.Hash == scoreInfo.Hash);
 
             if (databasedScoreInfo == null)
             {
@@ -743,6 +749,9 @@ namespace osu.Game
             ScreenStack.ScreenPushed += screenPushed;
             ScreenStack.ScreenExited += screenExited;
 
+            if (!args?.Any(a => a == @"--no-version-overlay") ?? true)
+                loadComponentSingleFile(versionManager = new VersionManager { Depth = int.MinValue }, ScreenContainer.Add);
+
             loadComponentSingleFile(osuLogo, logo =>
             {
                 logoContainer.Add(logo);
@@ -820,7 +829,18 @@ namespace osu.Game
 
             loadComponentSingleFile(CreateHighPerformanceSession(), Add);
 
-            chatOverlay.State.ValueChanged += state => channelManager.HighPollRate.Value = state.NewValue == Visibility.Visible;
+            chatOverlay.State.BindValueChanged(_ => updateChatPollRate());
+            // Multiplayer modes need to increase poll rate temporarily.
+            API.Activity.BindValueChanged(_ => updateChatPollRate(), true);
+
+            void updateChatPollRate()
+            {
+                channelManager.HighPollRate.Value =
+                    chatOverlay.State.Value == Visibility.Visible
+                    || API.Activity.Value is UserActivity.InLobby
+                    || API.Activity.Value is UserActivity.InMultiplayerGame
+                    || API.Activity.Value is UserActivity.SpectatingMultiplayerGame;
+            }
 
             Add(difficultyRecommender);
             Add(externalLinkOpener = new ExternalLinkOpener());
@@ -880,8 +900,20 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 string[] paths = args.Where(a => !a.StartsWith('-')).ToArray();
+
                 if (paths.Length > 0)
-                    Task.Run(() => Import(paths));
+                {
+                    string firstPath = paths.First();
+
+                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    {
+                        HandleLink(firstPath);
+                    }
+                    else
+                    {
+                        Task.Run(() => Import(paths));
+                    }
+                }
             }
         }
 
@@ -1014,6 +1046,10 @@ namespace osu.Game
 
             switch (e.Action)
             {
+                case GlobalAction.ToggleSkinEditor:
+                    skinEditor.ToggleVisibility();
+                    return true;
+
                 case GlobalAction.ResetInputSettings:
                     Host.ResetInputHandlers();
                     frameworkConfig.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode).SetDefault();
@@ -1108,18 +1144,22 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
+        private void screenChanged(IScreen current, IScreen newScreen)
         {
-            skinEditor.Reset();
-
             switch (newScreen)
             {
                 case IntroScreen intro:
                     introScreen = intro;
+                    versionManager?.Show();
                     break;
 
                 case MainMenu menu:
                     menuScreen = menu;
+                    versionManager?.Show();
+                    break;
+
+                default:
+                    versionManager?.Hide();
                     break;
             }
 
@@ -1147,13 +1187,15 @@ namespace osu.Game
                 else
                     BackButton.Hide();
             }
+
+            skinEditor.SetTarget((OsuScreen)newScreen);
         }
 
-        private void screenPushed(IScreen lastScreen, IScreen newScreen) => ScreenChanged(lastScreen, newScreen);
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => screenChanged(lastScreen, newScreen);
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            ScreenChanged(lastScreen, newScreen);
+            screenChanged(lastScreen, newScreen);
 
             if (newScreen == null)
                 Exit();

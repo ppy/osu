@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             base.SetUpSteps();
 
-            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = LookupCache.GetUserAsync(1).GetResultSafely());
+            AddStep("set local user", () => ((DummyAPIAccess)API).LocalUser.Value = UserLookupCache.GetUserAsync(1).GetResultSafely());
 
             AddStep("create leaderboard", () =>
             {
@@ -62,8 +62,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 foreach (int user in users)
                 {
-                    SpectatorClient.StartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID ?? 0);
-                    var roomUser = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = user }, true);
+                    SpectatorClient.SendStartPlay(user, Beatmap.Value.BeatmapInfo.OnlineID);
+                    var roomUser = OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = user }, true);
 
                     roomUser.MatchState = new TeamVersusUserState
                     {
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 scoreProcessor.ApplyBeatmap(playableBeatmap);
 
-                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(scoreProcessor, multiplayerUsers.ToArray())
+                LoadComponentAsync(leaderboard = new MultiplayerGameplayLeaderboard(Ruleset.Value, scoreProcessor, multiplayerUsers.ToArray())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddUntilStep("wait for load", () => leaderboard.IsLoaded);
-            AddUntilStep("wait for user population", () => Client.CurrentMatchPlayingUserIds.Count > 0);
+            AddUntilStep("wait for user population", () => MultiplayerClient.CurrentMatchPlayingUserIds.Count > 0);
         }
 
         [Test]

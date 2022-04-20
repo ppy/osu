@@ -8,10 +8,12 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Mania;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
@@ -51,11 +53,72 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.AreEqual(829_931, score.ScoreInfo.TotalScore);
                 Assert.AreEqual(3, score.ScoreInfo.MaxCombo);
+
+                Assert.IsTrue(score.ScoreInfo.Mods.Any(m => m is ManiaModClassic));
+                Assert.IsTrue(score.ScoreInfo.APIMods.Any(m => m.Acronym == "CL"));
+                Assert.IsTrue(score.ScoreInfo.ModsJson.Contains("CL"));
+
                 Assert.IsTrue(Precision.AlmostEquals(0.8889, score.ScoreInfo.Accuracy, 0.0001));
                 Assert.AreEqual(ScoreRank.B, score.ScoreInfo.Rank);
 
                 Assert.That(score.Replay.Frames, Is.Not.Empty);
             }
+        }
+
+        [TestCase(3, true)]
+        [TestCase(6, false)]
+        [TestCase(LegacyBeatmapDecoder.LATEST_VERSION, false)]
+        public void TestLegacyBeatmapReplayOffsetsDecode(int beatmapVersion, bool offsetApplied)
+        {
+            const double first_frame_time = 48;
+            const double second_frame_time = 65;
+
+            var decoder = new TestLegacyScoreDecoder(beatmapVersion);
+
+            using (var resourceStream = TestResources.OpenResource("Replays/mania-replay.osr"))
+            {
+                var score = decoder.Parse(resourceStream);
+
+                Assert.That(score.Replay.Frames[0].Time, Is.EqualTo(first_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
+                Assert.That(score.Replay.Frames[1].Time, Is.EqualTo(second_frame_time + (offsetApplied ? LegacyBeatmapDecoder.EARLY_VERSION_TIMING_OFFSET : 0)));
+            }
+        }
+
+        [TestCase(3)]
+        [TestCase(6)]
+        [TestCase(LegacyBeatmapDecoder.LATEST_VERSION)]
+        public void TestLegacyBeatmapReplayOffsetsEncodeDecode(int beatmapVersion)
+        {
+            const double first_frame_time = 2000;
+            const double second_frame_time = 3000;
+
+            var ruleset = new OsuRuleset().RulesetInfo;
+            var scoreInfo = TestResources.CreateTestScoreInfo(ruleset);
+            var beatmap = new TestBeatmap(ruleset)
+            {
+                BeatmapInfo =
+                {
+                    BeatmapVersion = beatmapVersion
+                }
+            };
+
+            var score = new Score
+            {
+                ScoreInfo = scoreInfo,
+                Replay = new Replay
+                {
+                    Frames = new List<ReplayFrame>
+                    {
+                        new OsuReplayFrame(first_frame_time, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton),
+                        new OsuReplayFrame(second_frame_time, OsuPlayfield.BASE_SIZE / 2, OsuAction.LeftButton)
+                    }
+                }
+            };
+
+            var decodedAfterEncode = encodeThenDecode(beatmapVersion, score, beatmap);
+
+            Assert.That(decodedAfterEncode.Replay.Frames[0].Time, Is.EqualTo(first_frame_time));
+            Assert.That(decodedAfterEncode.Replay.Frames[1].Time, Is.EqualTo(second_frame_time));
         }
 
         [Test]
@@ -80,15 +143,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             // rather than the classic ASCII U+002D HYPHEN-MINUS.
             CultureInfo.CurrentCulture = new CultureInfo("se");
 
-            var encodeStream = new MemoryStream();
-
-            var encoder = new LegacyScoreEncoder(score, beatmap);
-            encoder.Encode(encodeStream);
-
-            var decodeStream = new MemoryStream(encodeStream.GetBuffer());
-
-            var decoder = new TestLegacyScoreDecoder();
-            var decodedAfterEncode = decoder.Parse(decodeStream);
+            var decodedAfterEncode = encodeThenDecode(LegacyBeatmapDecoder.LATEST_VERSION, score, beatmap);
 
             Assert.Multiple(() =>
             {
@@ -104,6 +159,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
             });
         }
 
+        private static Score encodeThenDecode(int beatmapVersion, Score score, TestBeatmap beatmap)
+        {
+            var encodeStream = new MemoryStream();
+
+            var encoder = new LegacyScoreEncoder(score, beatmap);
+            encoder.Encode(encodeStream);
+
+            var decodeStream = new MemoryStream(encodeStream.GetBuffer());
+
+            var decoder = new TestLegacyScoreDecoder(beatmapVersion);
+            var decodedAfterEncode = decoder.Parse(decodeStream);
+            return decodedAfterEncode;
+        }
+
         [TearDown]
         public void TearDown()
         {
@@ -112,6 +181,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
         private class TestLegacyScoreDecoder : LegacyScoreDecoder
         {
+            private readonly int beatmapVersion;
+
             private static readonly Dictionary<int, Ruleset> rulesets = new Ruleset[]
             {
                 new OsuRuleset(),
@@ -119,6 +190,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 new CatchRuleset(),
                 new ManiaRuleset()
             }.ToDictionary(ruleset => ((ILegacyRuleset)ruleset).LegacyID);
+
+            public TestLegacyScoreDecoder(int beatmapVersion = LegacyBeatmapDecoder.LATEST_VERSION)
+            {
+                this.beatmapVersion = beatmapVersion;
+            }
 
             protected override Ruleset GetRuleset(int rulesetId) => rulesets[rulesetId];
 
@@ -128,7 +204,8 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 {
                     MD5Hash = md5Hash,
                     Ruleset = new OsuRuleset().RulesetInfo,
-                    BaseDifficulty = new BeatmapDifficulty()
+                    Difficulty = new BeatmapDifficulty(),
+                    BeatmapVersion = beatmapVersion,
                 }
             });
         }

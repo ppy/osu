@@ -45,6 +45,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public const double RESULTS_DISPLAY_DELAY = 1000.0;
 
+        /// <summary>
+        /// Raised after <see cref="StartGameplay"/> is called.
+        /// </summary>
+        public event Action OnGameplayStarted;
+
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
         protected override UserActivity InitialActivity => new UserActivity.InSoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
@@ -67,14 +72,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual bool PauseOnFocusLost => true;
 
-        /// <summary>
-        /// Whether gameplay has completed without the user having failed.
-        /// </summary>
-        public bool GameplayPassed { get; private set; }
-
         public Action RestartRequested;
-
-        public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
 
@@ -138,7 +136,11 @@ namespace osu.Game.Screens.Play
 
         public readonly PlayerConfiguration Configuration;
 
-        protected Score Score { get; private set; }
+        /// <summary>
+        /// The score for the current play session.
+        /// Available only after the player is loaded.
+        /// </summary>
+        public Score Score { get; private set; }
 
         /// <summary>
         /// Create a new player instance.
@@ -165,6 +167,7 @@ namespace osu.Game.Screens.Play
             PrepareReplay();
 
             ScoreProcessor.NewJudgement += result => ScoreProcessor.PopulateScore(Score.ScoreInfo);
+            ScoreProcessor.OnResetFromReplayFrame += () => ScoreProcessor.PopulateScore(Score.ScoreInfo);
 
             gameActive.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
         }
@@ -181,6 +184,12 @@ namespace osu.Game.Screens.Play
         private void load(AudioManager audio, OsuConfigManager config, OsuGameBase game)
         {
             var gameplayMods = Mods.Value.Select(m => m.DeepClone()).ToArray();
+
+            if (gameplayMods.Any(m => m is UnknownMod))
+            {
+                Logger.Log("Gameplay was started with an unknown mod applied.", level: LogLevel.Important);
+                return;
+            }
 
             if (Beatmap.Value is DummyWorkingBeatmap)
                 return;
@@ -226,8 +235,6 @@ namespace osu.Game.Screens.Play
             // ensure the score is in a consistent state with the current player.
             Score.ScoreInfo.BeatmapInfo = Beatmap.Value.BeatmapInfo;
             Score.ScoreInfo.Ruleset = ruleset.RulesetInfo;
-            if (ruleset.RulesetInfo.ID != null)
-                Score.ScoreInfo.RulesetID = ruleset.RulesetInfo.ID.Value;
             Score.ScoreInfo.Mods = gameplayMods;
 
             dependencies.CacheAs(GameplayState = new GameplayState(playableBeatmap, ruleset, gameplayMods, Score));
@@ -247,7 +254,7 @@ namespace osu.Game.Screens.Play
                     {
                         // underlay and gameplay should have access to the skinning sources.
                         createUnderlayComponents(),
-                        createGameplayComponents(Beatmap.Value, playableBeatmap)
+                        createGameplayComponents(Beatmap.Value)
                     }
                 },
                 FailOverlay = new FailOverlay
@@ -358,9 +365,9 @@ namespace osu.Game.Screens.Play
         protected virtual GameplayClockContainer CreateGameplayClockContainer(WorkingBeatmap beatmap, double gameplayStart) => new MasterGameplayClockContainer(beatmap, gameplayStart);
 
         private Drawable createUnderlayComponents() =>
-            DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both };
+            DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard, GameplayState.Mods) { RelativeSizeAxes = Axes.Both };
 
-        private Drawable createGameplayComponents(IWorkingBeatmap working, IBeatmap playableBeatmap) => new ScalingContainer(ScalingMode.Gameplay)
+        private Drawable createGameplayComponents(IWorkingBeatmap working) => new ScalingContainer(ScalingMode.Gameplay)
         {
             Children = new Drawable[]
             {
@@ -488,6 +495,9 @@ namespace osu.Game.Screens.Play
                 var rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
 
+                if (ruleset == null)
+                    throw new RulesetLoadException("Instantiation failure");
+
                 try
                 {
                     playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, gameplayMods);
@@ -553,7 +563,7 @@ namespace osu.Game.Screens.Play
             if (showDialogFirst && !pauseOrFailDialogVisible)
             {
                 // if the fail animation is currently in progress, accelerate it (it will show the pause dialog on completion).
-                if (ValidForResume && HasFailed)
+                if (ValidForResume && GameplayState.HasFailed)
                 {
                     failAnimationLayer.FinishTransforms(true);
                     return;
@@ -605,16 +615,22 @@ namespace osu.Game.Screens.Play
         /// <param name="time">The destination time to seek to.</param>
         internal void NonFrameStableSeek(double time)
         {
-            if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
-                frameStablePlaybackResetDelegate.RunTask();
+            // TODO: This schedule should not be required and is a temporary hotfix.
+            // See https://github.com/ppy/osu/issues/17267 for the issue.
+            // See https://github.com/ppy/osu/pull/17302 for a better fix which needs some more time.
+            ScheduleAfterChildren(() =>
+            {
+                if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
+                    frameStablePlaybackResetDelegate.RunTask();
 
-            bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
-            DrawableRuleset.FrameStablePlayback = false;
+                bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
+                DrawableRuleset.FrameStablePlayback = false;
 
-            Seek(time);
+                Seek(time);
 
-            // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
-            frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+                // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
+                frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
+            });
         }
 
         /// <summary>
@@ -672,7 +688,7 @@ namespace osu.Game.Screens.Play
                 resultsDisplayDelegate?.Cancel();
                 resultsDisplayDelegate = null;
 
-                GameplayPassed = false;
+                GameplayState.HasPassed = false;
                 ValidForResume = true;
                 skipOutroOverlay.Hide();
                 return;
@@ -682,7 +698,7 @@ namespace osu.Game.Screens.Play
             if (HealthProcessor.HasFailed)
                 return;
 
-            GameplayPassed = true;
+            GameplayState.HasPassed = true;
 
             // Setting this early in the process means that even if something were to go wrong in the order of events following, there
             // is no chance that a user could return to the (already completed) Player instance from a child screen.
@@ -798,7 +814,7 @@ namespace osu.Game.Screens.Play
             if (!CheckModsAllowFailure())
                 return false;
 
-            HasFailed = true;
+            GameplayState.HasFailed = true;
             Score.ScoreInfo.Passed = false;
 
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
@@ -853,13 +869,13 @@ namespace osu.Game.Screens.Play
             // replays cannot be paused and exit immediately
             && !DrawableRuleset.HasReplayLoaded.Value
             // cannot pause if we are already in a fail state
-            && !HasFailed;
+            && !GameplayState.HasFailed;
 
         private bool canResume =>
             // cannot resume from a non-paused state
             GameplayClockContainer.IsPaused.Value
             // cannot resume if we are already in a fail state
-            && !HasFailed
+            && !GameplayState.HasFailed
             // already resuming
             && !IsResuming;
 
@@ -957,7 +973,9 @@ namespace osu.Game.Screens.Play
             updateGameplayState();
 
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
             StartGameplay();
+            OnGameplayStarted?.Invoke();
         }
 
         /// <summary>
@@ -985,18 +1003,24 @@ namespace osu.Game.Screens.Play
             screenSuspension?.RemoveAndDisposeImmediately();
             failAnimationLayer?.RemoveFilters();
 
-            // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
-            if (prepareScoreForDisplayTask == null)
+            if (LoadedBeatmapSuccessfully)
             {
-                Score.ScoreInfo.Passed = false;
-                // potentially should be ScoreRank.F instead? this is the best alternative for now.
-                Score.ScoreInfo.Rank = ScoreRank.D;
-            }
+                if (!GameplayState.HasPassed && !GameplayState.HasFailed)
+                    GameplayState.HasQuit = true;
 
-            // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
-            // To resolve test failures, forcefully end playing synchronously when this screen exits.
-            // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
-            spectatorClient.EndPlaying();
+                // if arriving here and the results screen preparation task hasn't run, it's safe to say the user has not completed the beatmap.
+                if (prepareScoreForDisplayTask == null)
+                {
+                    Score.ScoreInfo.Passed = false;
+                    // potentially should be ScoreRank.F instead? this is the best alternative for now.
+                    Score.ScoreInfo.Rank = ScoreRank.D;
+                }
+
+                // EndPlaying() is typically called from ReplayRecorder.Dispose(). Disposal is currently asynchronous.
+                // To resolve test failures, forcefully end playing synchronously when this screen exits.
+                // Todo: Replace this with a more permanent solution once osu-framework has a synchronous cleanup method.
+                spectatorClient.EndPlaying(GameplayState);
+            }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
@@ -1023,11 +1047,11 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
         /// <returns>The imported score.</returns>
-        protected virtual async Task ImportScore(Score score)
+        protected virtual Task ImportScore(Score score)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
             if (DrawableRuleset.ReplayScore != null)
-                return;
+                return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;
 
@@ -1037,18 +1061,26 @@ namespace osu.Game.Screens.Play
                 replayReader = new LegacyByteArrayReader(stream.ToArray(), "replay.osr");
             }
 
+            // the import process will re-attach managed beatmap/rulesets to this score. we don't want this for now, so create a temporary copy to import.
+            var importableScore = score.ScoreInfo.DeepClone();
+
             // For the time being, online ID responses are not really useful for anything.
             // In addition, the IDs provided via new (lazer) endpoints are based on a different autoincrement from legacy (stable) scores.
             //
             // Until we better define the server-side logic behind this, let's not store the online ID to avoid potential unique constraint
             // conflicts across various systems (ie. solo and multiplayer).
-            long? onlineScoreId = score.ScoreInfo.OnlineID;
-            score.ScoreInfo.OnlineID = -1;
+            importableScore.OnlineID = -1;
 
-            await scoreManager.Import(score.ScoreInfo, replayReader).ConfigureAwait(false);
+            var imported = scoreManager.Import(importableScore, replayReader);
 
-            // ... And restore the online ID for other processes to handle correctly (e.g. de-duplication for the results screen).
-            score.ScoreInfo.OnlineID = onlineScoreId;
+            imported.PerformRead(s =>
+            {
+                // because of the clone above, it's required that we copy back the post-import hash/ID to use for availability matching.
+                score.ScoreInfo.Hash = s.Hash;
+                score.ScoreInfo.ID = s.ID;
+            });
+
+            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -40,7 +40,13 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
 
         public TestSceneOsuDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            });
         }
 
         [SetUp]

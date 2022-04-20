@@ -8,7 +8,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
@@ -17,7 +16,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Models;
+using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
@@ -30,21 +30,19 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneDrawableRoomPlaylist : OsuManualInputManagerTestScene
+    public class TestSceneDrawableRoomPlaylist : MultiplayerTestScene
     {
         private TestPlaylist playlist;
 
         private BeatmapManager manager;
         private RulesetStore rulesets;
 
-        [Cached(typeof(UserLookupCache))]
-        private readonly TestUserLookupCache userLookupCache = new TestUserLookupCache();
-
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         [Test]
@@ -153,21 +151,24 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
+            Live<BeatmapSetInfo> imported = null;
 
-            AddStep("import beatmap", () => manager.Import(beatmap.BeatmapSet).WaitSafely());
+            Debug.Assert(beatmap.BeatmapSet != null);
 
-            createPlaylistWithBeatmaps(beatmap);
+            AddStep("import beatmap", () => imported = manager.Import(beatmap.BeatmapSet));
+
+            createPlaylistWithBeatmaps(() => imported.PerformRead(s => s.Beatmaps.Detach()));
 
             assertDownloadButtonVisible(false);
 
-            AddStep("delete beatmap set", () => manager.Delete(manager.QueryBeatmapSets(_ => true).Single()));
+            AddStep("delete beatmap set", () => imported.PerformWrite(s => s.DeletePending = true));
             assertDownloadButtonVisible(true);
 
-            AddStep("undelete beatmap set", () => manager.Undelete(manager.QueryBeatmapSets(_ => true).Single()));
+            AddStep("undelete beatmap set", () => imported.PerformWrite(s => s.DeletePending = false));
             assertDownloadButtonVisible(false);
 
             void assertDownloadButtonVisible(bool visible) => AddUntilStep($"download button {(visible ? "shown" : "hidden")}",
-                () => playlist.ChildrenOfType<BeatmapDownloadButton>().Single().Alpha == (visible ? 1 : 0));
+                () => playlist.ChildrenOfType<BeatmapDownloadButton>().SingleOrDefault()?.Alpha == (visible ? 1 : 0));
         }
 
         [Test]
@@ -179,7 +180,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             var byChecksum = CreateAPIBeatmap();
             byChecksum.Checksum = "1337"; // Some random checksum that does not exist locally.
 
-            createPlaylistWithBeatmaps(byOnlineId, byChecksum);
+            createPlaylistWithBeatmaps(() => new[] { byOnlineId, byChecksum });
 
             AddAssert("download buttons shown", () => playlist.ChildrenOfType<BeatmapDownloadButton>().All(d => d.IsPresent));
         }
@@ -193,7 +194,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             beatmap.BeatmapSet.HasExplicitContent = true;
 
-            createPlaylistWithBeatmaps(beatmap);
+            createPlaylistWithBeatmaps(() => new[] { beatmap });
         }
 
         [Test]
@@ -208,29 +209,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Size = new Vector2(500, 300),
                     Items =
                     {
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                         {
                             ID = 0,
-                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
+                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
                             Expired = true,
-                            RequiredMods =
+                            RequiredMods = new[]
                             {
-                                new OsuModHardRock(),
-                                new OsuModDoubleTime(),
-                                new OsuModAutoplay()
+                                new APIMod(new OsuModHardRock()),
+                                new APIMod(new OsuModDoubleTime()),
+                                new APIMod(new OsuModAutoplay())
                             }
                         },
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo)
                         {
                             ID = 1,
-                            Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
-                            Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                            RequiredMods =
+                            RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                            RequiredMods = new[]
                             {
-                                new OsuModHardRock(),
-                                new OsuModDoubleTime(),
-                                new OsuModAutoplay()
+                                new APIMod(new OsuModHardRock()),
+                                new APIMod(new OsuModDoubleTime()),
+                                new APIMod(new OsuModAutoplay())
                             }
                         }
                     }
@@ -261,7 +260,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         private void moveToItem(int index, Vector2? offset = null)
-            => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DifficultyIcon>().ElementAt(index), offset));
+            => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<DrawableRoomPlaylistItem>().ElementAt(index), offset));
 
         private void moveToDragger(int index, Vector2? offset = null) => AddStep($"move mouse to dragger {index}", () =>
         {
@@ -292,31 +291,27 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 for (int i = 0; i < 20; i++)
                 {
-                    playlist.Items.Add(new PlaylistItem
+                    playlist.Items.Add(new PlaylistItem(i % 2 == 1
+                        ? new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
+                        : new BeatmapInfo
+                        {
+                            Metadata = new BeatmapMetadata
+                            {
+                                Artist = "Artist",
+                                Author = new RealmUser { Username = "Creator name here" },
+                                Title = "Long title used to check background colour",
+                            },
+                            BeatmapSet = new BeatmapSetInfo()
+                        })
                     {
                         ID = i,
                         OwnerID = 2,
-                        Beatmap =
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods = new[]
                         {
-                            Value = i % 2 == 1
-                                ? new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo
-                                : new BeatmapInfo
-                                {
-                                    Metadata = new BeatmapMetadata
-                                    {
-                                        Artist = "Artist",
-                                        Author = new APIUser { Username = "Creator name here" },
-                                        Title = "Long title used to check background colour",
-                                    },
-                                    BeatmapSet = new BeatmapSetInfo()
-                                }
-                        },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        RequiredMods =
-                        {
-                            new OsuModHardRock(),
-                            new OsuModDoubleTime(),
-                            new OsuModAutoplay()
+                            new APIMod(new OsuModHardRock()),
+                            new APIMod(new OsuModDoubleTime()),
+                            new APIMod(new OsuModAutoplay())
                         }
                     });
                 }
@@ -325,7 +320,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("wait for items to load", () => playlist.ItemMap.Values.All(i => i.IsLoaded));
         }
 
-        private void createPlaylistWithBeatmaps(params IBeatmapInfo[] beatmaps)
+        private void createPlaylistWithBeatmaps(Func<IEnumerable<IBeatmapInfo>> beatmaps)
         {
             AddStep("create playlist", () =>
             {
@@ -338,19 +333,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 int index = 0;
 
-                foreach (var b in beatmaps)
+                foreach (var b in beatmaps())
                 {
-                    playlist.Items.Add(new PlaylistItem
+                    playlist.Items.Add(new PlaylistItem(b)
                     {
                         ID = index++,
                         OwnerID = 2,
-                        Beatmap = { Value = b },
-                        Ruleset = { Value = new OsuRuleset().RulesetInfo },
-                        RequiredMods =
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                        RequiredMods = new[]
                         {
-                            new OsuModHardRock(),
-                            new OsuModDoubleTime(),
-                            new OsuModAutoplay()
+                            new APIMod(new OsuModHardRock()),
+                            new APIMod(new OsuModDoubleTime()),
+                            new APIMod(new OsuModAutoplay())
                         }
                     });
                 }

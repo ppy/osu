@@ -20,10 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install .NET 5.0.x
+      - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.x"
+          dotnet-version: "6.0.x"
 
       # FIXME: libavformat is not included in Ubuntu. Let's fix that.
       # https://github.com/ppy/osu-framework/issues/4349
@@ -65,10 +65,10 @@ jobs:
         run: |
             $VM_ASSETS/select-xamarin-sdk-v2.sh --mono=6.12 --android=11.2
 
-      - name: Install .NET 5.0.x
+      - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.x"
+          dotnet-version: "6.0.x"
 
       # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
       # cannot accept .sln(f) files as arguments.
@@ -84,10 +84,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install .NET 5.0.x
+      - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.x"
+          dotnet-version: "6.0.x"
 
       # Contrary to seemingly any other msbuild, msbuild running on macOS/Mono
       # cannot accept .sln(f) files as arguments.
@@ -102,17 +102,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      # FIXME: Tools won't run in .NET 5.0 unless you install 3.1.x LTS side by side.
+      # FIXME: Tools won't run in .NET 6.0 unless you install 3.1.x LTS side by side.
       # https://itnext.io/how-to-support-multiple-net-sdks-in-github-actions-workflows-b988daa884e
       - name: Install .NET 3.1.x LTS
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "3.1.x"
 
-      - name: Install .NET 5.0.x
+      - name: Install .NET 6.0.x
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "5.0.x"
+          dotnet-version: "6.0.x"
 
       - name: Restore Tools
         run: dotnet tool restore

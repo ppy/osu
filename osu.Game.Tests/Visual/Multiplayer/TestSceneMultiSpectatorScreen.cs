@@ -15,6 +15,7 @@ using osu.Game.Configuration;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
+using osu.Game.Online.Rooms;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.OnlinePlay.Multiplayer.Spectate;
 using osu.Game.Screens.Play;
@@ -47,9 +48,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load()
         {
-            importedSet = ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
-            importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
-            importedBeatmapId = importedBeatmap.OnlineID ?? -1;
+            importedSet = BeatmapImportHelper.LoadOszIntoOsu(game, virtualTrack: true).GetResultSafely();
+            importedBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
+            importedBeatmapId = importedBeatmap.OnlineID;
         }
 
         [SetUp]
@@ -60,8 +61,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players silently", () =>
             {
-                OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
-                OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
+                OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
+                OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
 
                 playingUsers.Add(new MultiplayerRoomUser(PLAYER_1_ID));
                 playingUsers.Add(new MultiplayerRoomUser(PLAYER_2_ID));
@@ -70,11 +71,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             loadSpectateScreen(false);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player first_player_id", () => SpectatorClient.StartPlay(PLAYER_1_ID, importedBeatmapId));
+            AddStep("load player first_player_id", () => SpectatorClient.SendStartPlay(PLAYER_1_ID, importedBeatmapId));
             AddUntilStep("one player added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 1);
 
             AddWaitStep("wait a bit", 10);
-            AddStep("load player second_player_id", () => SpectatorClient.StartPlay(PLAYER_2_ID, importedBeatmapId));
+            AddStep("load player second_player_id", () => SpectatorClient.SendStartPlay(PLAYER_2_ID, importedBeatmapId));
             AddUntilStep("two players added", () => spectatorScreen.ChildrenOfType<Player>().Count() == 2);
         }
 
@@ -121,20 +122,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             AddStep("start players", () =>
             {
-                var player1 = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
+                var player1 = OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_1_ID }, true);
                 player1.MatchState = new TeamVersusUserState
                 {
                     TeamID = 0,
                 };
 
-                var player2 = OnlinePlayDependencies.Client.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
+                var player2 = OnlinePlayDependencies.MultiplayerClient.AddUser(new APIUser { Id = PLAYER_2_ID }, true);
                 player2.MatchState = new TeamVersusUserState
                 {
                     TeamID = 1,
                 };
 
-                SpectatorClient.StartPlay(player1.UserID, importedBeatmapId);
-                SpectatorClient.StartPlay(player2.UserID, importedBeatmapId);
+                SpectatorClient.SendStartPlay(player1.UserID, importedBeatmapId);
+                SpectatorClient.SendStartPlay(player2.UserID, importedBeatmapId);
 
                 playingUsers.Add(player1);
                 playingUsers.Add(player2);
@@ -347,18 +348,43 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert($"{PLAYER_1_ID} score quit still set", () => getLeaderboardScore(PLAYER_1_ID).HasQuit.Value);
         }
 
-        private void loadSpectateScreen(bool waitForPlayerLoad = true)
+        /// <summary>
+        /// Tests spectating with a gameplay start time set to a negative value.
+        /// Simulating beatmaps with high <see cref="BeatmapInfo.AudioLeadIn"/> or negative time storyboard elements.
+        /// </summary>
+        [Test]
+        public void TestNegativeGameplayStartTime()
         {
-            AddStep("load screen", () =>
+            start(PLAYER_1_ID);
+
+            loadSpectateScreen(false, -500);
+
+            // to ensure negative gameplay start time does not affect spectator, send frames exactly after StartGameplay().
+            // (similar to real spectating sessions in which the first frames get sent between StartGameplay() and player load complete)
+            AddStep("send frames at gameplay start", () => getInstance(PLAYER_1_ID).OnGameplayStarted += () => SpectatorClient.SendFramesFromUser(PLAYER_1_ID, 100));
+
+            AddUntilStep("wait for player load", () => spectatorScreen.AllPlayersLoaded);
+
+            AddWaitStep("wait for progression", 3);
+
+            assertNotCatchingUp(PLAYER_1_ID);
+            assertRunning(PLAYER_1_ID);
+        }
+
+        private void loadSpectateScreen(bool waitForPlayerLoad = true, double? gameplayStartTime = null)
+        {
+            AddStep(!gameplayStartTime.HasValue ? "load screen" : $"load screen (start = {gameplayStartTime}ms)", () =>
             {
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(importedBeatmap);
                 Ruleset.Value = importedBeatmap.Ruleset;
 
-                LoadScreen(spectatorScreen = new MultiSpectatorScreen(playingUsers.ToArray()));
+                LoadScreen(spectatorScreen = new TestMultiSpectatorScreen(SelectedRoom.Value, playingUsers.ToArray(), gameplayStartTime));
             });
 
             AddUntilStep("wait for screen load", () => spectatorScreen.LoadState == LoadState.Loaded && (!waitForPlayerLoad || spectatorScreen.AllPlayersLoaded));
         }
+
+        private void start(int userId, int? beatmapId = null) => start(new[] { userId }, beatmapId);
 
         private void start(int[] userIds, int? beatmapId = null)
         {
@@ -371,8 +397,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
                         User = new APIUser { Id = id },
                     };
 
-                    OnlinePlayDependencies.Client.AddUser(user.User, true);
-                    SpectatorClient.StartPlay(id, beatmapId ?? importedBeatmapId);
+                    OnlinePlayDependencies.MultiplayerClient.AddUser(user.User, true);
+                    SpectatorClient.SendStartPlay(id, beatmapId ?? importedBeatmapId);
 
                     playingUsers.Add(user);
                 }
@@ -385,8 +411,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 var user = playingUsers.Single(u => u.UserID == userId);
 
-                OnlinePlayDependencies.Client.RemoveUser(user.User.AsNonNull());
-                SpectatorClient.EndPlay(userId);
+                OnlinePlayDependencies.MultiplayerClient.RemoveUser(user.User.AsNonNull());
+                SpectatorClient.SendEndPlay(userId);
 
                 playingUsers.Remove(user);
             });
@@ -399,7 +425,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("send frames", () =>
             {
                 foreach (int id in userIds)
-                    SpectatorClient.SendFrames(id, count);
+                    SpectatorClient.SendFramesFromUser(id, count);
             });
         }
 
@@ -419,6 +445,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private void assertMuted(int userId, bool muted)
             => AddAssert($"{userId} {(muted ? "is" : "is not")} muted", () => getInstance(userId).Mute == muted);
 
+        private void assertRunning(int userId)
+            => AddAssert($"{userId} clock running", () => getInstance(userId).GameplayClock.IsRunning);
+
+        private void assertNotCatchingUp(int userId)
+            => AddAssert($"{userId} in sync", () => !getInstance(userId).GameplayClock.IsCatchingUp);
+
         private void waitForCatchup(int userId)
             => AddUntilStep($"{userId} not catching up", () => !getInstance(userId).GameplayClock.IsCatchingUp);
 
@@ -429,5 +461,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private GameplayLeaderboardScore getLeaderboardScore(int userId) => spectatorScreen.ChildrenOfType<GameplayLeaderboardScore>().Single(s => s.User?.Id == userId);
 
         private int[] getPlayerIds(int count) => Enumerable.Range(PLAYER_1_ID, count).ToArray();
+
+        private class TestMultiSpectatorScreen : MultiSpectatorScreen
+        {
+            private readonly double? gameplayStartTime;
+
+            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? gameplayStartTime = null)
+                : base(room, users)
+            {
+                this.gameplayStartTime = gameplayStartTime;
+            }
+
+            protected override MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap)
+                => new MasterGameplayClockContainer(beatmap, gameplayStartTime ?? 0, gameplayStartTime.HasValue);
+        }
     }
 }

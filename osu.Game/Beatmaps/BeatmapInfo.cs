@@ -2,102 +2,122 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Models;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
+using Realms;
+
+#nullable enable
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// A single beatmap difficulty.
+    /// </summary>
     [ExcludeFromDynamicCompile]
     [Serializable]
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IHasPrimaryKey, IBeatmapInfo
+    [MapTo("Beatmap")]
+    public class BeatmapInfo : RealmObject, IHasGuidPrimaryKey, IBeatmapInfo, IEquatable<BeatmapInfo>
     {
-        public int ID { get; set; }
+        [PrimaryKey]
+        public Guid ID { get; set; }
 
-        public bool IsManaged => ID > 0;
+        public string DifficultyName { get; set; } = string.Empty;
 
-        public int BeatmapVersion;
+        public RulesetInfo Ruleset { get; set; } = null!;
 
-        private int? onlineID;
+        public BeatmapDifficulty Difficulty { get; set; } = null!;
 
-        [JsonProperty("id")]
-        [Column("OnlineBeatmapID")]
-        public int? OnlineID
+        public BeatmapMetadata Metadata { get; set; } = null!;
+
+        [JsonIgnore]
+        [Backlink(nameof(ScoreInfo.BeatmapInfo))]
+        public IQueryable<ScoreInfo> Scores { get; } = null!;
+
+        public BeatmapUserSettings UserSettings { get; set; } = null!;
+
+        public BeatmapInfo(RulesetInfo? ruleset = null, BeatmapDifficulty? difficulty = null, BeatmapMetadata? metadata = null)
         {
-            get => onlineID;
-            set => onlineID = value > 0 ? value : null;
+            ID = Guid.NewGuid();
+            Ruleset = ruleset ?? new RulesetInfo
+            {
+                OnlineID = 0,
+                ShortName = @"osu",
+                Name = @"null placeholder ruleset"
+            };
+            Difficulty = difficulty ?? new BeatmapDifficulty();
+            Metadata = metadata ?? new BeatmapMetadata();
+            UserSettings = new BeatmapUserSettings();
         }
 
-        [JsonIgnore]
-        public int BeatmapSetInfoID { get; set; }
+        [UsedImplicitly]
+        private BeatmapInfo()
+        {
+        }
 
-        public BeatmapOnlineStatus Status { get; set; } = BeatmapOnlineStatus.None;
+        public BeatmapSetInfo? BeatmapSet { get; set; }
 
-        [Required]
-        public BeatmapSetInfo BeatmapSet { get; set; }
+        [Ignored]
+        public RealmNamedFileUsage? File => BeatmapSet?.Files.FirstOrDefault(f => f.File.Hash == Hash);
 
-        public BeatmapMetadata Metadata { get; set; }
+        [Ignored]
+        public BeatmapOnlineStatus Status
+        {
+            get => (BeatmapOnlineStatus)StatusInt;
+            set => StatusInt = (int)value;
+        }
 
-        [JsonIgnore]
-        public int BaseDifficultyID { get; set; }
+        [MapTo(nameof(Status))]
+        public int StatusInt { get; set; } = (int)BeatmapOnlineStatus.None;
 
-        public BeatmapDifficulty BaseDifficulty { get; set; }
+        [Indexed]
+        public int OnlineID { get; set; } = -1;
 
-        [NotMapped]
-        public APIBeatmap OnlineInfo { get; set; }
-
-        [NotMapped]
-        public int? MaxCombo { get; set; }
-
-        /// <summary>
-        /// The playable length in milliseconds of this beatmap.
-        /// </summary>
         public double Length { get; set; }
 
-        /// <summary>
-        /// The most common BPM of this beatmap.
-        /// </summary>
         public double BPM { get; set; }
 
-        public string Path { get; set; }
+        public string Hash { get; set; } = string.Empty;
 
-        [JsonProperty("file_sha2")]
-        public string Hash { get; set; }
+        public double StarRating { get; set; }
+
+        public string MD5Hash { get; set; } = string.Empty;
 
         [JsonIgnore]
         public bool Hidden { get; set; }
 
-        /// <summary>
-        /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
-        /// </summary>
-        [JsonProperty("file_md5")]
-        public string MD5Hash { get; set; }
+        #region Properties we may not want persisted (but also maybe no harm?)
 
-        // General
         public double AudioLeadIn { get; set; }
+
         public float StackLeniency { get; set; } = 0.7f;
+
         public bool SpecialStyle { get; set; }
 
-        public int RulesetID { get; set; }
-
-        public RulesetInfo Ruleset { get; set; }
-
         public bool LetterboxInBreaks { get; set; }
-        public bool WidescreenStoryboard { get; set; }
+
+        public bool WidescreenStoryboard { get; set; } = true;
+
         public bool EpilepsyWarning { get; set; }
 
-        /// <summary>
-        /// Whether or not sound samples should change rate when playing with speed-changing mods.
-        /// TODO: only read/write supported for now, requires implementation in gameplay.
-        /// </summary>
-        public bool SamplesMatchPlaybackRate { get; set; }
+        public bool SamplesMatchPlaybackRate { get; set; } = true;
 
+        public double DistanceSpacing { get; set; }
+
+        public int BeatDivisor { get; set; }
+
+        public int GridSize { get; set; }
+
+        public double TimelineZoom { get; set; } = 1.0;
+
+        [Ignored]
         public CountdownType Countdown { get; set; } = CountdownType.Normal;
 
         /// <summary>
@@ -105,77 +125,67 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public int CountdownOffset { get; set; }
 
-        [NotMapped]
-        public int[] Bookmarks { get; set; } = Array.Empty<int>();
+        #endregion
 
-        public double DistanceSpacing { get; set; }
-        public int BeatDivisor { get; set; }
-        public int GridSize { get; set; }
-        public double TimelineZoom { get; set; }
-
-        // Metadata
-        [Column("Version")]
-        public string DifficultyName { get; set; }
-
-        [JsonProperty("difficulty_rating")]
-        [Column("StarDifficulty")]
-        public double StarRating { get; set; }
-
-        /// <summary>
-        /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
-        /// </summary>
-        public List<ScoreInfo> Scores { get; set; }
-
-        [JsonIgnore]
-        public DifficultyRating DifficultyRating => BeatmapDifficultyCache.GetDifficultyRating(StarRating);
-
-        public override string ToString() => this.GetDisplayTitle();
-
-        public bool Equals(BeatmapInfo other)
+        public bool Equals(BeatmapInfo? other)
         {
             if (ReferenceEquals(this, other)) return true;
             if (other == null) return false;
 
-            if (ID != 0 && other.ID != 0)
-                return ID == other.ID;
-
-            return false;
+            return ID == other.ID;
         }
 
-        public bool Equals(IBeatmapInfo other) => other is BeatmapInfo b && Equals(b);
+        public bool Equals(IBeatmapInfo? other) => other is BeatmapInfo b && Equals(b);
 
-        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                      (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
+        public bool AudioEquals(BeatmapInfo? other) => other != null
+                                                       && BeatmapSet != null
+                                                       && other.BeatmapSet != null
+                                                       && BeatmapSet.Hash == other.BeatmapSet.Hash
+                                                       && Metadata.AudioFile == other.Metadata.AudioFile;
 
-        public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                           BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                           (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+        public bool BackgroundEquals(BeatmapInfo? other) => other != null
+                                                            && BeatmapSet != null
+                                                            && other.BeatmapSet != null
+                                                            && BeatmapSet.Hash == other.BeatmapSet.Hash
+                                                            && Metadata.BackgroundFile == other.Metadata.BackgroundFile;
+
+        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata;
+        IBeatmapSetInfo? IBeatmapInfo.BeatmapSet => BeatmapSet;
+        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => Difficulty;
+
+        #region Compatibility properties
+
+        [Ignored]
+        [Obsolete("Use BeatmapInfo.Difficulty instead.")] // can be removed 20220719
+        public BeatmapDifficulty BaseDifficulty
+        {
+            get => Difficulty;
+            set => Difficulty = value;
+        }
+
+        [Ignored]
+        public string? Path => File?.Filename;
+
+        [Ignored]
+        public APIBeatmap? OnlineInfo { get; set; }
 
         /// <summary>
-        /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
+        /// The maximum achievable combo on this beatmap, populated for online info purposes only.
+        /// Todo: This should never be used nor exist, but is still relied on in <see cref="ScoresContainer.Scores"/> since <see cref="IBeatmapInfo"/> can't be used yet. For now this is obsoleted until it is removed.
         /// </summary>
-        public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
+        [Ignored]
+        [Obsolete("Use ScoreManager.GetMaximumAchievableComboAsync instead.")]
+        public int? MaxCombo { get; set; }
 
-        #region Implementation of IHasOnlineID
+        [Ignored]
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
-        int IHasOnlineID<int>.OnlineID => OnlineID ?? -1;
+        public int BeatmapVersion;
 
-        #endregion
+        public BeatmapInfo Clone() => (BeatmapInfo)this.Detach().MemberwiseClone();
 
-        #region Implementation of IBeatmapInfo
-
-        [JsonIgnore]
-        IBeatmapMetadataInfo IBeatmapInfo.Metadata => Metadata ?? BeatmapSet?.Metadata ?? new BeatmapMetadata();
-
-        [JsonIgnore]
-        IBeatmapDifficultyInfo IBeatmapInfo.Difficulty => BaseDifficulty;
-
-        [JsonIgnore]
-        IBeatmapSetInfo IBeatmapInfo.BeatmapSet => BeatmapSet;
-
-        [JsonIgnore]
-        IRulesetInfo IBeatmapInfo.Ruleset => Ruleset;
+        public override string ToString() => this.GetDisplayTitle();
 
         #endregion
     }

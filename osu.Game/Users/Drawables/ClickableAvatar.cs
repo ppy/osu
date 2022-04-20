@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
@@ -58,14 +57,14 @@ namespace osu.Game.Users.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        private void load()
         {
             LoadComponentAsync(new DrawableAvatar(user), clickableArea.Add);
         }
 
         private void openProfile()
         {
-            if (user?.Id > 1)
+            if (user?.Id > 1 || !string.IsNullOrEmpty(user?.Username))
                 game?.ShowUser(user);
         }
 
