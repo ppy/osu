@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Mods
         /// <summary>
         /// The overlay's header.
         /// </summary>
-        protected PopupScreenTitle Header { get; private set; }
+        protected ShearedOverlayHeader Header { get; private set; }
 
         /// <summary>
         /// The overlay's footer.
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Mods
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    Header = new PopupScreenTitle
+                    Header = new ShearedOverlayHeader
                     {
                         Anchor = Anchor.TopCentre,
                         Depth = float.MinValue,
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Mods
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding
                         {
-                            Top = PopupScreenTitle.HEIGHT,
+                            Top = ShearedOverlayHeader.HEIGHT,
                             Bottom = footer_height,
                         }
                     },
