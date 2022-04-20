@@ -143,14 +143,14 @@ namespace osu.Game.Overlays
                                             {
                                                 Text = FirstRunSetupOverlayStrings.FirstRunSetup,
                                                 Font = OsuFont.Default.With(size: 32),
-                                                Colour = colourProvider.Content2,
+                                                Colour = colourProvider.Content1,
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
                                             },
                                             new OsuTextFlowContainer
                                             {
                                                 Text = FirstRunSetupOverlayStrings.SetupOsuToSuitYou,
-                                                Colour = colourProvider.Content1,
+                                                Colour = colourProvider.Content2,
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
                                                 AutoSizeAxes = Axes.Both,
