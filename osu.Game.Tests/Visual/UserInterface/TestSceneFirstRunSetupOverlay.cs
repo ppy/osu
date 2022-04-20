@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Configuration;
+using osu.Game.Localisation;
 using osu.Game.Overlays;
 using osu.Game.Overlays.FirstRunSetup;
 using osu.Game.Overlays.Notifications;
@@ -126,7 +127,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (overlay.CurrentScreen?.IsLoaded != false)
                     nextButton.TriggerClick();
 
-                return nextButton.Text.ToString() == "Finish";
+                return nextButton.Text.ToString() == CommonStrings.Finish;
             });
 
             AddUntilStep("step back to start", () =>
