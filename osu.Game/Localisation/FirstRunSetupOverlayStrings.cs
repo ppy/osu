@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Welcome"
         /// </summary>
-        public static LocalisableString Welcome => new TranslatableString(getKey(@"welcome"), @"Welcome");
+        public static LocalisableString WelcomeTitle => new TranslatableString(getKey(@"welcome_title"), @"Welcome");
 
         /// <summary>
         /// "Welcome to the first-run setup guide!
