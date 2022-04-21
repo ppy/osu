@@ -10,16 +10,6 @@ namespace osu.Game.Localisation
         private const string prefix = @"osu.Game.Resources.Localisation.Common";
 
         /// <summary>
-        /// "Cancel"
-        /// </summary>
-        public static LocalisableString Cancel => new TranslatableString(getKey(@"cancel"), @"Cancel");
-
-        /// <summary>
-        /// "Clear"
-        /// </summary>
-        public static LocalisableString Clear => new TranslatableString(getKey(@"clear"), @"Clear");
-
-        /// <summary>
         /// "Back"
         /// </summary>
         public static LocalisableString Back => new TranslatableString(getKey(@"back"), @"Back");

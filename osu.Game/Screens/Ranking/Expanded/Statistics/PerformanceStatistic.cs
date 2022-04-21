@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking.Expanded.Statistics
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Ranking.Expanded.Statistics
         private RollingCounter<int> counter;
 
         public PerformanceStatistic(ScoreInfo score)
-            : base("PP")
+            : base(BeatmapsetsStrings.ShowScoreboardHeaderspp)
         {
             this.score = score;
         }
