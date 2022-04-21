@@ -389,9 +389,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public void ExitViaQuickExit() => PerformExit(false);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
                 GameplayClockContainer.Stop();
             }
         }

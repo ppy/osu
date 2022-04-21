@@ -118,20 +118,20 @@ namespace osu.Game.Screens.Import
             fileSelector.CurrentPath.BindValueChanged(directoryChanged);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             contentContainer.ScaleTo(0.95f).ScaleTo(1, duration, Easing.OutQuint);
             this.FadeInFromZero(duration);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             contentContainer.ScaleTo(0.95f, duration, Easing.OutQuint);
             this.FadeOut(duration, Easing.OutQuint);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         private void directoryChanged(ValueChangedEvent<DirectoryInfo> _)
