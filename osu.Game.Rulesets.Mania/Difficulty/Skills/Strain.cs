@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             var maniaCurrent = (ManiaDifficultyHitObject)current;
             double endTime = maniaCurrent.EndTime;
             int column = maniaCurrent.BaseObject.Column;
+            double closestEndTime = 100;
 
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
@@ -44,23 +45,25 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             // Fill up the holdEndTimes array
             for (int i = 0; i < holdEndTimes.Length; ++i)
             {
-                // If there is at least one other overlapping end or note, then we get an addition, buuuuuut...
+                // If there is at least one other overlapping end or note, then we get an addition
                 if (Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1))
                     holdAddition = 1.0;
-
-                // ... this addition only is valid if there is _no_ other note with the same ending. Releasing multiple notes at the same time is just as easy as releasing 1
-                if (Precision.AlmostEquals(endTime, holdEndTimes[i], 1))
-                    holdAddition = 0;
 
                 // We give a slight bonus to everything if something is held meanwhile
                 if (Precision.DefinitelyBigger(holdEndTimes[i], endTime, 1))
                     holdFactor = 1.25;
+
+                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - holdEndTimes[i]));
 
                 // Decay individual strains
                 individualStrains[i] = applyDecay(individualStrains[i], current.DeltaTime, individual_decay_base);
             }
 
             holdEndTimes[column] = endTime;
+
+            // The hold addition only is valid if there is _no_ other note with the same ending. Releasing multiple notes at the same time is just as easy as releasing 1
+            if (closestEndTime < 1)
+                holdAddition = 0;
 
             // Increase individual strain in own column
             individualStrains[column] += 2.0 * holdFactor;
