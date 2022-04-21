@@ -16,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -68,7 +69,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         usernameTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "username",
+                            PlaceholderText = UsersStrings.LoginUsername,
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },

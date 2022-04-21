@@ -42,7 +42,6 @@ namespace osu.Game.Overlays.Mods
 
         protected const double TRANSITION_DURATION = 150;
 
-        public const float SHEAR_X = 0.2f;
         public const float CORNER_RADIUS = 7;
 
         protected const float HEIGHT = 42;
@@ -67,7 +66,7 @@ namespace osu.Game.Overlays.Mods
             Content.Masking = true;
             Content.CornerRadius = CORNER_RADIUS;
             Content.BorderThickness = 2;
-            Content.Shear = new Vector2(SHEAR_X, 0);
+            Content.Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
             Children = new Drawable[]
             {
@@ -83,7 +82,7 @@ namespace osu.Game.Overlays.Mods
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Active = { BindTarget = Active },
-                        Shear = new Vector2(-SHEAR_X, 0),
+                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                         Scale = new Vector2(HEIGHT / ModSwitchSmall.DEFAULT_SIZE)
                     }
                 },
@@ -116,10 +115,10 @@ namespace osu.Game.Overlays.Mods
                                     {
                                         Text = mod.Name,
                                         Font = OsuFont.TorusAlternate.With(size: 18, weight: FontWeight.SemiBold),
-                                        Shear = new Vector2(-SHEAR_X, 0),
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0),
                                         Margin = new MarginPadding
                                         {
-                                            Left = -18 * SHEAR_X
+                                            Left = -18 * ShearedOverlayContainer.SHEAR
                                         }
                                     },
                                     new OsuSpriteText
@@ -128,7 +127,7 @@ namespace osu.Game.Overlays.Mods
                                         Font = OsuFont.Default.With(size: 12),
                                         RelativeSizeAxes = Axes.X,
                                         Truncate = true,
-                                        Shear = new Vector2(-SHEAR_X, 0)
+                                        Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0)
                                     }
                                 }
                             }
@@ -159,7 +158,7 @@ namespace osu.Game.Overlays.Mods
                 playStateChangeSamples();
                 UpdateState();
             });
-            Filtered.BindValueChanged(_ => updateFilterState());
+            Filtered.BindValueChanged(_ => updateFilterState(), true);
 
             UpdateState();
             FinishTransforms(true);

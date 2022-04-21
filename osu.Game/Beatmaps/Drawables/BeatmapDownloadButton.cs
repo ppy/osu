@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -104,7 +105,7 @@ namespace osu.Game.Beatmaps.Drawables
                         if ((beatmapSet as IBeatmapSetOnlineInfo)?.Availability.DownloadDisabled == true)
                         {
                             button.Enabled.Value = false;
-                            button.TooltipText = "this beatmap is currently not available for download.";
+                            button.TooltipText = BeatmapsetsStrings.AvailabilityDisabled;
                         }
 
                         break;

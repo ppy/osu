@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Resolved]
         private RulesetStore rulesetStore { get; set; }
 
-        private ModSelectScreen modSelectScreen;
+        private UserModSelectScreen modSelectScreen;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void createScreen()
         {
-            AddStep("create screen", () => Child = modSelectScreen = new ModSelectScreen
+            AddStep("create screen", () => Child = modSelectScreen = new UserModSelectScreen
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Visibility.Visible },

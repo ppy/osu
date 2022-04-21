@@ -30,6 +30,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Utils;
 
 namespace osu.Game.Online.Leaderboards
@@ -64,7 +65,7 @@ namespace osu.Game.Online.Leaderboards
         private List<ScoreComponentLabel> statisticsLabels;
 
         [Resolved(CanBeNull = true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private SongSelect songSelect { get; set; }
@@ -291,8 +292,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy)
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, BeatmapsetsStrings.ShowScoreboardHeadersCombo, model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, BeatmapsetsStrings.ShowScoreboardHeadersAccuracy, model.DisplayAccuracy)
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -403,9 +404,9 @@ namespace osu.Game.Online.Leaderboards
         {
             public IconUsage Icon;
             public LocalisableString Value;
-            public string Name;
+            public LocalisableString Name;
 
-            public LeaderboardScoreStatistic(IconUsage icon, string name, LocalisableString value)
+            public LeaderboardScoreStatistic(IconUsage icon, LocalisableString name, LocalisableString value)
             {
                 Icon = icon;
                 Name = name;
@@ -426,7 +427,7 @@ namespace osu.Game.Online.Leaderboards
                     items.Add(new OsuMenuItem("Export", MenuItemType.Standard, () => new LegacyScoreExporter(storage).Export(Score)));
 
                 if (!isOnlineScope)
-                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
+                    items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(Score))));
 
                 return items.ToArray();
             }
