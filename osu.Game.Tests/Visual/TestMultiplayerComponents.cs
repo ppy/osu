@@ -80,10 +80,10 @@ namespace osu.Game.Tests.Visual
 
         public override bool OnBackButton() => (screenStack.CurrentScreen as OsuScreen)?.OnBackButton() ?? base.OnBackButton();
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (screenStack.CurrentScreen == null)
-                return base.OnExiting(next);
+                return base.OnExiting(e);
 
             screenStack.Exit();
             return true;

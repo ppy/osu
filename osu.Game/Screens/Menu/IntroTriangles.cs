@@ -89,9 +89,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             // ensure the background is shown, even if the TriangleIntroSequence failed to do so.
             background.ApplyToBackground(b => b.Show());
@@ -100,9 +100,9 @@ namespace osu.Game.Screens.Menu
             intro.Expire();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             background.FadeOut(100);
         }
 
