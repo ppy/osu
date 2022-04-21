@@ -29,12 +29,14 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         public readonly BindableBool Unread = new BindableBool();
 
+        public readonly BindableBool SelectorActive = new BindableBool();
+
         private readonly Channel channel;
 
-        private Box? hoverBox;
-        private Box? selectBox;
-        private OsuSpriteText? text;
-        private ChannelListItemCloseButton? close;
+        private Box hoverBox = null!;
+        private Box selectBox = null!;
+        private OsuSpriteText text = null!;
+        private ChannelListItemCloseButton close = null!;
 
         [Resolved]
         private Bindable<Channel> selectedChannel { get; set; } = null!;
@@ -124,31 +126,26 @@ namespace osu.Game.Overlays.Chat.ChannelList
         {
             base.LoadComplete();
 
-            selectedChannel.BindValueChanged(change =>
-            {
-                if (change.NewValue == channel)
-                    selectBox?.FadeIn(300, Easing.OutQuint);
-                else
-                    selectBox?.FadeOut(200, Easing.OutQuint);
-            }, true);
+            selectedChannel.BindValueChanged(_ => updateSelectState(), true);
+            SelectorActive.BindValueChanged(_ => updateSelectState(), true);
 
             Unread.BindValueChanged(change =>
             {
-                text!.FadeColour(change.NewValue ? colourProvider.Content1 : colourProvider.Light3, 300, Easing.OutQuint);
+                text.FadeColour(change.NewValue ? colourProvider.Content1 : colourProvider.Light3, 300, Easing.OutQuint);
             }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            hoverBox?.FadeIn(300, Easing.OutQuint);
-            close?.FadeIn(300, Easing.OutQuint);
+            hoverBox.FadeIn(300, Easing.OutQuint);
+            close.FadeIn(300, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            hoverBox?.FadeOut(200, Easing.OutQuint);
-            close?.FadeOut(200, Easing.OutQuint);
+            hoverBox.FadeOut(200, Easing.OutQuint);
+            close.FadeOut(200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -166,6 +163,14 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 CornerRadius = 10,
                 Masking = true,
             };
+        }
+
+        private void updateSelectState()
+        {
+            if (selectedChannel.Value == channel && !SelectorActive.Value)
+                selectBox.FadeIn(300, Easing.OutQuint);
+            else
+                selectBox.FadeOut(200, Easing.OutQuint);
         }
     }
 }
