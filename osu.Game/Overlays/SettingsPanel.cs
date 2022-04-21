@@ -284,14 +284,7 @@ namespace osu.Game.Overlays
             public string SearchTerm
             {
                 get => SearchContainer.SearchTerm;
-                set
-                {
-                    SearchContainer.SearchTerm = value;
-
-                    // Schedule required as search term takes a frame to update.
-                    // Without this sections may not be in the correct state to ascertain CurrentSection.
-                    Schedule(InvalidateScrollPosition);
-                }
+                set => SearchContainer.SearchTerm = value;
             }
 
             protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
@@ -310,6 +303,8 @@ namespace osu.Game.Overlays
                     Colour = colourProvider.Background4,
                     RelativeSizeAxes = Axes.Both
                 };
+
+                SearchContainer.FilterCompleted += InvalidateScrollPosition;
             }
 
             protected override void UpdateAfterChildren()
