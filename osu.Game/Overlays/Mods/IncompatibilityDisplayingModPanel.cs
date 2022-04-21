@@ -37,7 +37,9 @@ namespace osu.Game.Overlays.Mods
 
         private void updateIncompatibility()
         {
-            incompatible.Value = selectedMods.Value.Count > 0 && !selectedMods.Value.Contains(Mod) && !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(Mod));
+            incompatible.Value = selectedMods.Value.Count > 0
+                                 && selectedMods.Value.All(selected => selected.GetType() != Mod.GetType())
+                                 && !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(Mod));
         }
 
         protected override void UpdateState()
@@ -46,8 +48,8 @@ namespace osu.Game.Overlays.Mods
 
             if (incompatible.Value)
             {
-                Colour4 backgroundColour = ColourProvider.Background5;
-                Colour4 textBackgroundColour = ColourProvider.Background4;
+                Colour4 backgroundColour = ColourProvider.Background6;
+                Colour4 textBackgroundColour = ColourProvider.Background5;
 
                 Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(backgroundColour, textBackgroundColour), TRANSITION_DURATION, Easing.OutQuint);
                 Background.FadeColour(backgroundColour, TRANSITION_DURATION, Easing.OutQuint);

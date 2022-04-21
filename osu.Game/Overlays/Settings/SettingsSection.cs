@@ -23,7 +23,9 @@ namespace osu.Game.Overlays.Settings
 
         private IBindable<SettingsSection> selectedSection;
 
-        private OsuSpriteText header;
+        private Box dim;
+
+        private const float inactive_alpha = 0.8f;
 
         public abstract Drawable CreateIcon();
         public abstract LocalisableString Header { get; }
@@ -78,25 +80,40 @@ namespace osu.Game.Overlays.Settings
                 },
                 new Container
                 {
-                    Padding = new MarginPadding
-                    {
-                        Top = 28,
-                        Bottom = 40,
-                    },
+                    Padding = new MarginPadding { Top = border_size },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        header = new OsuSpriteText
+                        new Container
                         {
-                            Font = OsuFont.TorusAlternate.With(size: header_size),
-                            Text = Header,
-                            Margin = new MarginPadding
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding
                             {
-                                Horizontal = SettingsPanel.CONTENT_MARGINS
+                                Top = 24,
+                                Bottom = 40,
+                            },
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Font = OsuFont.TorusAlternate.With(size: header_size),
+                                    Text = Header,
+                                    Margin = new MarginPadding
+                                    {
+                                        Horizontal = SettingsPanel.CONTENT_MARGINS
+                                    }
+                                },
+                                FlowContent
                             }
                         },
-                        FlowContent
+                        dim = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colourProvider.Background5,
+                            Alpha = inactive_alpha,
+                        },
                     }
                 },
             });
@@ -134,17 +151,14 @@ namespace osu.Game.Overlays.Settings
 
         private void updateContentFade()
         {
-            float contentFade = 1;
-            float headerFade = 1;
+            float dimFade = 0;
 
             if (!isCurrentSection)
             {
-                contentFade = 0.25f;
-                headerFade = IsHovered ? 0.5f : 0.25f;
+                dimFade = IsHovered ? 0.5f : inactive_alpha;
             }
 
-            header.FadeTo(headerFade, 500, Easing.OutQuint);
-            FlowContent.FadeTo(contentFade, 500, Easing.OutQuint);
+            dim.FadeTo(dimFade, 300, Easing.OutQuint);
         }
     }
 }

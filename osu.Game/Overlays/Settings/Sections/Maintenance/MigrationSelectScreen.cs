@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         private OsuGameBase game { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         protected override DirectoryInfo InitialPath => new DirectoryInfo(storage.GetFullPath(string.Empty)).Parent;
 

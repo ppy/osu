@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -11,10 +10,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 
@@ -83,7 +84,7 @@ namespace osu.Game.Overlays.Profile.Header
             if (user == null) return;
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
-                topLinkContainer.AddText("Here since the beginning");
+                topLinkContainer.AddText(UsersStrings.ShowFirstMembers);
             else
             {
                 topLinkContainer.AddText("Joined ");
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user.IsOnline)
             {
-                topLinkContainer.AddText("Currently online");
+                topLinkContainer.AddText(UsersStrings.ShowLastvisitOnline);
                 addSpacer(topLinkContainer);
             }
             else if (user.LastVisit.HasValue)
@@ -108,7 +109,16 @@ namespace osu.Game.Overlays.Profile.Header
             if (user.PlayStyles?.Length > 0)
             {
                 topLinkContainer.AddText("Plays with ");
-                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
+
+                LocalisableString playStylesString = user.PlayStyles[0].GetLocalisableDescription();
+
+                for (int i = 1; i < user.PlayStyles.Length; i++)
+                {
+                    playStylesString = new TranslatableString(@"_", @"{0}{1}", playStylesString, CommonStrings.ArrayAndWordsConnector);
+                    playStylesString = new TranslatableString(@"_", @"{0}{1}", playStylesString, user.PlayStyles[i].GetLocalisableDescription());
+                }
+
+                topLinkContainer.AddText(playStylesString, embolden);
 
                 addSpacer(topLinkContainer);
             }

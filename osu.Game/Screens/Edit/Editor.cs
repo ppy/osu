@@ -29,6 +29,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -84,10 +85,10 @@ namespace osu.Game.Screens.Edit
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -252,7 +253,7 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = createFileMenuItems()
                                     },
-                                    new MenuItem("Edit")
+                                    new MenuItem(CommonStrings.ButtonsEdit)
                                     {
                                         Items = new[]
                                         {
