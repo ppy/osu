@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             foreach (var u in Room.Users.Where(u => u.State == MultiplayerUserState.Loaded))
                                 ChangeUserState(u.UserID, MultiplayerUserState.Playing);
 
-                            ((IMultiplayerClient)this).MatchStarted();
+                            ((IMultiplayerClient)this).GameplayStarted();
 
                             ChangeRoomState(MultiplayerRoomState.Playing);
                         }
