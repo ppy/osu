@@ -104,6 +104,7 @@ namespace osu.Game.Tests.Visual.Online
                 channelList.SelectorActive.BindValueChanged(change =>
                 {
                     selectorText.Text = $"Channel Selector Active: {change.NewValue}";
+                    selected.Value = null;
                 }, true);
 
                 selected.BindValueChanged(change =>
