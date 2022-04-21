@@ -33,39 +33,39 @@ namespace osu.Game.Overlays.FirstRunSetup
             };
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             this
                 .FadeInFromZero(500)
                 .MoveToX(offset)
                 .MoveToX(0, 500, Easing.OutQuint);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             this
                 .FadeInFromZero(500)
                 .MoveToX(0, 500, Easing.OutQuint);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             this
                 .FadeOut(100)
                 .MoveToX(offset, 500, Easing.OutQuint);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             this
                 .FadeOut(100)
                 .MoveToX(-offset, 500, Easing.OutQuint);
 
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
     }
 }
