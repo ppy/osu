@@ -209,7 +209,7 @@ namespace osu.Game.Graphics.Containers
         {
             protected override bool AllowStoryboardBackground => false;
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
                 this.FadeInFromZero(4000, Easing.OutQuint);
             }
