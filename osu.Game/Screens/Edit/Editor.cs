@@ -560,16 +560,16 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             dimBackground();
             resetTrack(true);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             dimBackground();
         }
 
@@ -585,7 +585,7 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (!ExitConfirmed)
             {
@@ -613,12 +613,12 @@ namespace osu.Game.Screens.Edit
 
             refetchBeatmap();
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
         }

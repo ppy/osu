@@ -249,10 +249,10 @@ namespace osu.Game.Screens.Play
             beatmapDownloader.Download(beatmapSet);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             previewTrackManager.StopAnyPlaying(this);
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
     }
 }
