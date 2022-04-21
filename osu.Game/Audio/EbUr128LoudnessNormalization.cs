@@ -14,7 +14,6 @@ namespace osu.Game.Audio
     {
         /*
          * references links:
-         * 
          * ITU-R BS.1770-4, Algorithms to measure audio programme loudness and true-peak audio level (https://www.itu.int/rec/R-REC-BS.1770-4-201510-I)
          * EBU R 128, Loudness normalisation and permitted maximum level of audio signals (https://tech.ebu.ch/publications/e128)
          * EBU TECH 3341, Loudness Metering: ‘EBU Mode’ metering to supplement loudness normalisation in accordance with EBU R 128 (https://tech.ebu.ch/publications/tech3341)
@@ -78,7 +77,7 @@ namespace osu.Game.Audio
             int decodeStream = Bass.CreateStream(filePath, 0, 0, BassFlags.Decode | BassFlags.Float);
             Bass.ChannelGetInfo(decodeStream, out info);
 
-            if(info.Channels == 0)
+            if (info.Channels == 0)
             {
                 PeakAmp = 0;
                 Gain = 0;
