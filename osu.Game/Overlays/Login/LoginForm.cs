@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Settings;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 
 namespace osu.Game.Overlays.Login
@@ -50,14 +51,14 @@ namespace osu.Game.Overlays.Login
             {
                 username = new OsuTextBox
                 {
-                    PlaceholderText = "username",
+                    PlaceholderText = UsersStrings.LoginUsername,
                     RelativeSizeAxes = Axes.X,
                     Text = api?.ProvidedUsername ?? string.Empty,
                     TabbableContentContainer = this
                 },
                 password = new OsuPasswordTextBox
                 {
-                    PlaceholderText = "password",
+                    PlaceholderText = UsersStrings.LoginPassword,
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.Login
                             AutoSizeAxes = Axes.Y,
                             Child = new SettingsButton
                             {
-                                Text = "Sign in",
+                                Text = UsersStrings.LoginButton,
                                 Action = performLogin
                             },
                         }
