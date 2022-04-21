@@ -10,9 +10,6 @@
     <EnableLLVM>false</EnableLLVM>
   </PropertyGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\drawable\lazer.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
