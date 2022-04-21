@@ -5,17 +5,17 @@ using osu.Game.Graphics;
 
 
 
-namespace osu.Game.Rulesets.Mania.Mods
+namespace osu.Game.Rulesets.Mods
 {
-    public class ManiaModNoDrain : Mod, IApplicableToDifficulty
+    public class ModNoDrain : Mod, IApplicableToDifficulty
     {
         public override string Name => "No Drain";
 
         public override string Acronym => "ND";
 
-        public override double ScoreMultiplier => 0.5;
+        public override double ScoreMultiplier => 1;
 
-        public override string Description => "No drain for mania!";
+        public override string Description => "Disables Drain!";
 
         public override ModType Type => ModType.DifficultyReduction;
         public virtual void ReadFromDifficulty(BeatmapDifficulty difficulty)
