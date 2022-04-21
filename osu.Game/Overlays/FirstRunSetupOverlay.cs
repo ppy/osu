@@ -68,7 +68,7 @@ namespace osu.Game.Overlays
 
         private readonly FirstRunStep[] steps =
         {
-            new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.Welcome),
+            new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.WelcomeTitle),
             new FirstRunStep(typeof(ScreenUIScale), GraphicsSettingsStrings.UIScaling),
         };
 
