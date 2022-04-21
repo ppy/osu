@@ -17,6 +17,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Edit;
 using osuTK;
 using osuTK.Input;
@@ -358,7 +359,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (SelectedBlueprints.Count == 1)
                     items.AddRange(SelectedBlueprints[0].ContextMenuItems);
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, DeleteSelected));
+                items.Add(new OsuMenuItem(CommonStrings.ButtonsDelete, MenuItemType.Destructive, DeleteSelected));
 
                 return items.ToArray();
             }
