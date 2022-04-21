@@ -44,6 +44,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             return new Room
             {
                 Name = { Value = "test name" },
+                Type = { Value = MatchType.HeadToHead },
                 Playlist =
                 {
                     new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)

@@ -90,12 +90,7 @@ namespace osu.Game.Scoring
         /// </remarks>
         /// <param name="score">The <see cref="ScoreInfo"/> to retrieve the bindable for.</param>
         /// <returns>The bindable containing the total score.</returns>
-        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score)
-        {
-            var bindable = new TotalScoreBindable(score, this);
-            configManager?.BindWith(OsuSetting.ScoreDisplayMode, bindable.ScoringMode);
-            return bindable;
-        }
+        public Bindable<long> GetBindableTotalScore([NotNull] ScoreInfo score) => new TotalScoreBindable(score, this, configManager);
 
         /// <summary>
         /// Retrieves a bindable that represents the formatted total score string of a <see cref="ScoreInfo"/>.
@@ -118,7 +113,11 @@ namespace osu.Game.Scoring
         public void GetTotalScore([NotNull] ScoreInfo score, [NotNull] Action<long> callback, ScoringMode mode = ScoringMode.Standardised, CancellationToken cancellationToken = default)
         {
             GetTotalScoreAsync(score, mode, cancellationToken)
-                .ContinueWith(task => scheduler.Add(() => callback(task.GetResultSafely())), TaskContinuationOptions.OnlyOnRanToCompletion);
+                .ContinueWith(task => scheduler.Add(() =>
+                {
+                    if (!cancellationToken.IsCancellationRequested)
+                        callback(task.GetResultSafely());
+                }), TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         /// <summary>
@@ -183,8 +182,7 @@ namespace osu.Game.Scoring
         /// </summary>
         private class TotalScoreBindable : Bindable<long>
         {
-            public readonly Bindable<ScoringMode> ScoringMode = new Bindable<ScoringMode>();
-
+            private readonly Bindable<ScoringMode> scoringMode = new Bindable<ScoringMode>();
             private readonly ScoreInfo score;
             private readonly ScoreManager scoreManager;
 
@@ -195,12 +193,14 @@ namespace osu.Game.Scoring
             /// </summary>
             /// <param name="score">The <see cref="ScoreInfo"/> to provide the total score of.</param>
             /// <param name="scoreManager">The <see cref="ScoreManager"/>.</param>
-            public TotalScoreBindable(ScoreInfo score, ScoreManager scoreManager)
+            /// <param name="configManager">The config.</param>
+            public TotalScoreBindable(ScoreInfo score, ScoreManager scoreManager, OsuConfigManager configManager)
             {
                 this.score = score;
                 this.scoreManager = scoreManager;
 
-                ScoringMode.BindValueChanged(onScoringModeChanged, true);
+                configManager?.BindWith(OsuSetting.ScoreDisplayMode, scoringMode);
+                scoringMode.BindValueChanged(onScoringModeChanged, true);
             }
 
             private void onScoringModeChanged(ValueChangedEvent<ScoringMode> mode)

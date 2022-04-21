@@ -197,7 +197,7 @@ namespace osu.Game.Overlays
             ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
         }
 
-        private const double fade_in_duration = 1000;
+        private const double fade_in_duration = 500;
 
         private void loadSections()
         {

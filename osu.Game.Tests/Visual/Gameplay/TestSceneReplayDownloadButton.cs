@@ -26,6 +26,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneReplayDownloadButton : OsuManualInputManagerTestScene
     {
+        private const long online_score_id = 2553163309;
+
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
@@ -41,6 +43,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void load()
         {
             beatmapManager.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
+        }
+
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("delete previous imports", () =>
+            {
+                scoreManager.Delete(s => s.OnlineID == online_score_id);
+            });
         }
 
         [Test]
@@ -150,10 +161,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("import score", () => imported = scoreManager.Import(getScoreInfo(true)));
 
             AddUntilStep("state is available", () => downloadButton.State.Value == DownloadState.LocallyAvailable);
+            AddAssert("button is enabled", () => downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
 
             AddStep("delete score", () => scoreManager.Delete(imported.Value));
 
             AddUntilStep("state is not downloaded", () => downloadButton.State.Value == DownloadState.NotDownloaded);
+            AddAssert("button is not enabled", () => !downloadButton.ChildrenOfType<DownloadButton>().First().Enabled.Value);
         }
 
         [Test]
@@ -178,7 +191,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             return new APIScore
             {
-                OnlineID = 2553163309,
+                OnlineID = online_score_id,
                 RulesetID = 0,
                 Beatmap = CreateAPIBeatmapSet(new OsuRuleset().RulesetInfo).Beatmaps.First(),
                 HasReplay = replayAvailable,

@@ -19,7 +19,7 @@ namespace osu.Desktop.Security
     public class ElevatedPrivilegesChecker : Component
     {
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         private bool elevated;
 

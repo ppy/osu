@@ -12,7 +12,9 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -91,7 +93,7 @@ namespace osu.Game.Overlays.Comments
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
-                            Text = @"Show deleted"
+                            Text = CommonStrings.ButtonsShowDeleted
                         }
                     },
                 });
@@ -126,9 +128,13 @@ namespace osu.Game.Overlays.Comments
 
     public enum CommentsSortCriteria
     {
-        [System.ComponentModel.Description(@"Recent")]
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.New))]
         New,
+
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Old))]
         Old,
+
+        [LocalisableDescription(typeof(SortStrings), nameof(SortStrings.Top))]
         Top
     }
 }

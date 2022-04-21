@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Alpha = Comment.IsDeleted ? 1 : 0,
                                                             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                            Text = "deleted"
+                                                            Text = CommentsStrings.Deleted
                                                         }
                                                     }
                                                 },

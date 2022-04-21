@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!allowImmediateFocus)
                 return;
 
-            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this), false);
+            Scheduler.Add(() => GetContainingInputManager().ChangeFocus(this));
         }
 
         public new void KillFocus() => base.KillFocus();

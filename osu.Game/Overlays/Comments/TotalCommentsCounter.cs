@@ -9,6 +9,7 @@ using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.Comments
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 20, italics: true),
                         Colour = colourProvider.Light1,
-                        Text = @"Comments"
+                        Text = CommentsStrings.Title
                     },
                     new CircularContainer
                     {
