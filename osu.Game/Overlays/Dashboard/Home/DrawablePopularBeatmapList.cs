@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Localisation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Dashboard.Home
 {
@@ -15,6 +17,6 @@ namespace osu.Game.Overlays.Dashboard.Home
 
         protected override DashboardBeatmapPanel CreateBeatmapPanel(APIBeatmapSet beatmapSet) => new DashboardPopularBeatmapPanel(beatmapSet);
 
-        protected override string Title => "Popular Beatmaps";
+        protected override LocalisableString Title => HomeStrings.UserBeatmapsPopular;
     }
 }

@@ -160,7 +160,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Height = 1,
-                                                    PlaceholderText = "type your message",
+                                                    PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder,
                                                     ReleaseFocusOnCommit = false,
                                                     HoldFocus = true,
                                                 }
