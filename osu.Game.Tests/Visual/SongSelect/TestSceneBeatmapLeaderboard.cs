@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         private readonly FailableLeaderboard leaderboard;
 
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
         private ScoreManager scoreManager;

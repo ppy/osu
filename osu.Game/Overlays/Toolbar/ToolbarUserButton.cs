@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.Toolbar
             switch (state.NewValue)
             {
                 default:
-                    Text = @"Guest";
+                    Text = UsersStrings.AnonymousUsername;
                     avatar.User = new APIUser();
                     break;
 

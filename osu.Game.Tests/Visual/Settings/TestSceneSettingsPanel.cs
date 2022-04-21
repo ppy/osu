@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual.Settings
                 Depth = -1
             });
 
-            Dependencies.Cache(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace osu.Desktop.Updater
     public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
-        private NotificationOverlay notificationOverlay;
+        private INotificationOverlay notificationOverlay;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
 
@@ -39,9 +39,9 @@ namespace osu.Desktop.Updater
         private readonly SquirrelLogger squirrelLogger = new SquirrelLogger();
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification)
+        private void load(INotificationOverlay notifications)
         {
-            notificationOverlay = notification;
+            notificationOverlay = notifications;
 
             SquirrelLocator.CurrentMutable.Register(() => squirrelLogger, typeof(ILogger));
         }

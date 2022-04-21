@@ -146,8 +146,10 @@ namespace osu.Game.Skinning.Editor
             {
                 anchorLine = new Box
                 {
-                    Colour = Color4.Yellow,
                     Height = 2,
+                    Origin = Anchor.CentreLeft,
+                    Colour = Color4.Yellow,
+                    EdgeSmoothness = Vector2.One
                 },
                 originBox = new Box
                 {

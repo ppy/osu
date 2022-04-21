@@ -110,7 +110,7 @@ namespace osu.Game.Screens.OnlinePlay
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             this.FadeIn();
             waves.Show();
@@ -118,35 +118,35 @@ namespace osu.Game.Screens.OnlinePlay
             Mods.SetDefault();
 
             if (loungeSubScreen.IsCurrentScreen())
-                loungeSubScreen.OnEntering(last);
+                loungeSubScreen.OnEntering(e);
             else
                 loungeSubScreen.MakeCurrent();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
             Debug.Assert(screenStack.CurrentScreen != null);
-            screenStack.CurrentScreen.OnResuming(last);
+            screenStack.CurrentScreen.OnResuming(e);
 
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
             Debug.Assert(screenStack.CurrentScreen != null);
-            screenStack.CurrentScreen.OnSuspending(next);
+            screenStack.CurrentScreen.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             var subScreen = screenStack.CurrentScreen as Drawable;
-            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(next))
+            if (subScreen?.IsLoaded == true && screenStack.CurrentScreen.OnExiting(e))
                 return true;
 
             RoomManager.PartRoom();
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.OnlinePlay
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            base.OnExiting(next);
+            base.OnExiting(e);
             return false;
         }
 

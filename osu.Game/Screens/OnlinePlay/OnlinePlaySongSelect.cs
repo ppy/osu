@@ -141,7 +141,7 @@ namespace osu.Game.Screens.OnlinePlay
             return base.OnBackButton();
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (!itemSelected)
             {
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.OnlinePlay
                 Mods.Value = initialMods;
             }
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay
