@@ -226,10 +226,10 @@ namespace osu.Game.Screens.Play
 
         private class MetadataLineInfo : OsuSpriteText
         {
-            public MetadataLineInfo(LocalisableString text)
+            public MetadataLineInfo(string text)
             {
                 Margin = new MarginPadding { Left = 5 };
-                Text = string.IsNullOrEmpty(text.ToString()) ? @"-" : text;
+                Text = string.IsNullOrEmpty(text) ? @"-" : text;
             }
         }
     }
