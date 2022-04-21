@@ -106,9 +106,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             background.FadeOut(100);
         }
 

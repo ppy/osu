@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
 
         protected override Container<Drawable> Content => content;
 
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         protected DialogOverlay DialogOverlay { get; private set; }
 
         protected ScreenTestScene()

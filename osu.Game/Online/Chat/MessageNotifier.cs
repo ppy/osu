@@ -24,7 +24,7 @@ namespace osu.Game.Online.Chat
     public class MessageNotifier : Component
     {
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved]
         private ChatOverlay chatOverlay { get; set; }
@@ -170,7 +170,7 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, INotificationOverlay notificationOverlay)
             {
                 IconBackground.Colour = colours.PurpleDark;
 
