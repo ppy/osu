@@ -303,7 +303,7 @@ namespace osu.Game.Overlays
                 notificationOverlay.Post(new SimpleNotification
                 {
                     Text = FirstRunSetupOverlayStrings.ClickToResumeFirstRunSetupAtAnyPoint,
-                    Icon = FontAwesome.Solid.Horse,
+                    Icon = FontAwesome.Solid.Redo,
                     Activated = () =>
                     {
                         Show();
