@@ -292,11 +292,6 @@ namespace osu.Game.Overlays
 
             if (!audioEquals || CurrentTrack.IsDummyDevice)
             {
-                if (!CurrentTrack.IsDummyDevice)
-                {
-                    current.AddLoudnessNormalization();
-                }
-
                 changeTrack();
             }
             else

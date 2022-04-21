@@ -474,30 +474,15 @@ namespace osu.Game.Skinning
                 lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackNames);
             }
 
-            /*if(sampleInfo is HitSampleInfo)
+            foreach (string lookup in lookupNames)
             {
-                foreach (string lookup in lookupNames)
-                {
-                    var sample = HitObjectSamples?.Get(lookup);
+                var sample = Samples?.Get(lookup);
 
-                    if (sample != null)
-                    {
-                        return sample;
-                    }
+                if (sample != null)
+                {
+                    return sample;
                 }
             }
-            else
-            {*/
-                foreach (string lookup in lookupNames)
-                {
-                    var sample = Samples?.Get(lookup);
-
-                    if (sample != null)
-                    {
-                        return sample;
-                    }
-                }
-            //}
 
             return null;
         }

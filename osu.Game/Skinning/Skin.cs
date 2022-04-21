@@ -35,7 +35,6 @@ namespace osu.Game.Skinning
         /// A sample store which can be used to perform user file lookups for this skin.
         /// </summary>
         protected ISampleStore? Samples { get; }
-        //protected ISampleStore? HitObjectSamples { get; }
 
         public readonly Live<SkinInfo> SkinInfo;
 
@@ -78,11 +77,6 @@ namespace osu.Game.Skinning
                 if (samples != null)
                     samples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;
 
-                /*var hitobjectSamples = resources.AudioManager?.GetSampleStore(storage, resources.AudioManager.GetMixer("HitMixer"));
-                if (hitobjectSamples != null)
-                    hitobjectSamples.PlaybackConcurrency = OsuGameBase.SAMPLE_CONCURRENCY;*/
-
-                //HitObjectSamples = hitobjectSamples;
                 Samples = samples;
                 Textures = new TextureStore(resources.CreateTextureLoaderStore(storage));
             }
@@ -200,7 +194,6 @@ namespace osu.Game.Skinning
             isDisposed = true;
 
             Textures?.Dispose();
-            //HitObjectSamples?.Dispose();
             Samples?.Dispose();
 
             realmBackedStorage?.Dispose();

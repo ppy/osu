@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Extensions;
@@ -43,7 +42,7 @@ namespace osu.Game.Skinning
 
         [UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature)]
         public DefaultSkin(SkinInfo skin, IStorageResourceProvider resources)
-            : base(skin, resources, skin.Protected ? new NamespacedResourceStore<byte[]>(resources?.Resources, @"Samples") : null)
+            : base(skin, resources)
         {
             this.resources = resources;
         }
@@ -52,24 +51,12 @@ namespace osu.Game.Skinning
 
         public override ISample GetSample(ISampleInfo sampleInfo)
         {
-            /*if (sampleInfo is HitSampleInfo)
+            foreach (string lookup in sampleInfo.LookupNames)
             {
-                foreach (string lookup in sampleInfo.LookupNames)
-                {
-                    var sample = HitObjectSamples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
-                    if (sample != null)
-                        return sample;
-                }
+                var sample = Samples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
+                if (sample != null)
+                    return sample;
             }
-            else
-            {*/
-                foreach (string lookup in sampleInfo.LookupNames)
-                {
-                    var sample = Samples?.Get(lookup) ?? resources.AudioManager.Samples.Get(lookup);
-                    if (sample != null)
-                        return sample;
-                }
-            //}
 
             return null;
         }

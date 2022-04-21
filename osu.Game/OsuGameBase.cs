@@ -246,7 +246,6 @@ namespace osu.Game
             InitialiseFonts();
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
-            //Audio.CreateAudioMixer("HitMixer");
             dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
