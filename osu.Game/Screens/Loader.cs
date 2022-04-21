@@ -69,9 +69,9 @@ namespace osu.Game.Screens
 
         private EFToRealmMigrator realmMigrator;
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
 
