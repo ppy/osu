@@ -141,7 +141,7 @@ namespace osu.Game.Overlays
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = FirstRunSetupOverlayStrings.FirstRunSetup,
+                                                Text = FirstRunSetupOverlayStrings.FirstRunSetupTitle,
                                                 Font = OsuFont.Default.With(size: 32),
                                                 Colour = colourProvider.Content1,
                                                 Anchor = Anchor.TopCentre,
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays
                                             },
                                             new OsuTextFlowContainer
                                             {
-                                                Text = FirstRunSetupOverlayStrings.SetupOsuToSuitYou,
+                                                Text = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
                                                 Colour = colourProvider.Content2,
                                                 Anchor = Anchor.TopCentre,
                                                 Origin = Anchor.TopCentre,
