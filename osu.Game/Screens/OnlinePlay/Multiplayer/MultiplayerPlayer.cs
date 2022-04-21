@@ -133,6 +133,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     failAndBail();
                 }
             }), true);
+
+            client.ChangeState(MultiplayerUserState.Loaded)
+                  .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
         }
 
         protected override void LoadComplete()
@@ -144,10 +147,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void StartGameplay()
         {
-            // block base call, but let the server know we are ready to start.
-            loadingDisplay.Show();
-
-            client.ChangeState(MultiplayerUserState.Loaded).ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
+            if (client.LocalUser?.State == MultiplayerUserState.Loaded)
+            {
+                // block base call, but let the server know we are ready to start.
+                loadingDisplay.Show();
+                client.ChangeState(MultiplayerUserState.ReadyForGameplay);
+            }
         }
 
         private void failAndBail(string message = null)
