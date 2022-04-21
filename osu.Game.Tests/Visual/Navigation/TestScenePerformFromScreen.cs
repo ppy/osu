@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             public int ExitAttempts { get; private set; }
 
-            public override bool OnExiting(IScreen next)
+            public override bool OnExiting(ScreenExitEvent e)
             {
                 ExitAttempts++;
 
@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     return true;
                 }
 
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
         }
 
@@ -257,7 +257,7 @@ namespace osu.Game.Tests.Visual.Navigation
                 SubScreenStack.Push(Blocker = new DialogBlockingScreen());
             }
 
-            public override bool OnExiting(IScreen next)
+            public override bool OnExiting(ScreenExitEvent e)
             {
                 if (SubScreenStack.CurrentScreen != null)
                 {
@@ -265,7 +265,7 @@ namespace osu.Game.Tests.Visual.Navigation
                     return true;
                 }
 
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
         }
     }
