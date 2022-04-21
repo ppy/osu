@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Dashboard
                             new PurpleTriangleButton
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Text = CommonStrings.ButtonsWatchTo1,
+                                Text = "Spectate",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
