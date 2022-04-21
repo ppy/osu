@@ -72,7 +72,7 @@ namespace osu.Game.Online.Multiplayer
         /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
         /// </summary>
-        public event Action? MatchStarted;
+        public event Action? GameplayStarted;
 
         /// <summary>
         /// Invoked when the multiplayer server has finished collating results.
@@ -604,14 +604,14 @@ namespace osu.Game.Online.Multiplayer
             return Task.CompletedTask;
         }
 
-        Task IMultiplayerClient.MatchStarted()
+        Task IMultiplayerClient.GameplayStarted()
         {
             Scheduler.Add(() =>
             {
                 if (Room == null)
                     return;
 
-                MatchStarted?.Invoke();
+                GameplayStarted?.Invoke();
             }, false);
 
             return Task.CompletedTask;
