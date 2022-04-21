@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.OnlinePlay.Components
         private readonly Circle line;
         private readonly OsuSpriteText details;
 
-        public OverlinedHeader(string title)
+        public OverlinedHeader(LocalisableString title)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
