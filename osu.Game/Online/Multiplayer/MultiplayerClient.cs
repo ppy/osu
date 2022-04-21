@@ -70,6 +70,11 @@ namespace osu.Game.Online.Multiplayer
         public virtual event Action? LoadRequested;
 
         /// <summary>
+        /// Invoked when the multiplayer server requests loading of play to be aborted.
+        /// </summary>
+        public event Action? LoadAborted;
+
+        /// <summary>
         /// Invoked when the multiplayer server requests gameplay to be started.
         /// </summary>
         public event Action? GameplayStarted;
@@ -599,6 +604,19 @@ namespace osu.Game.Online.Multiplayer
                     return;
 
                 LoadRequested?.Invoke();
+            }, false);
+
+            return Task.CompletedTask;
+        }
+
+        Task IMultiplayerClient.LoadAborted()
+        {
+            Scheduler.Add(() =>
+            {
+                if (Room == null)
+                    return;
+
+                LoadAborted?.Invoke();
             }, false);
 
             return Task.CompletedTask;
