@@ -24,77 +24,80 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {
-            if (component is SkinnableTargetComponent targetComponent)
+            switch (component)
             {
-                switch (targetComponent.Target)
-                {
-                    case SkinnableTarget.MainHUDComponents:
-                        var components = base.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
+                case SkinnableTargetComponent targetComponent:
+                    switch (targetComponent.Target)
+                    {
+                        case SkinnableTarget.MainHUDComponents:
+                            var components = base.GetDrawableComponent(component) as SkinnableTargetComponentsContainer;
 
-                        if (providesComboCounter && components != null)
-                        {
-                            // catch may provide its own combo counter; hide the default.
-                            // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
-                            foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
-                                legacyComboCounter.HiddenByRulesetImplementation = false;
-                        }
+                            if (providesComboCounter && components != null)
+                            {
+                                // catch may provide its own combo counter; hide the default.
+                                // todo: this should be done in an elegant way per ruleset, defining which HUD skin components should be displayed.
+                                foreach (var legacyComboCounter in components.OfType<LegacyComboCounter>())
+                                    legacyComboCounter.HiddenByRulesetImplementation = false;
+                            }
 
-                        return components;
-                }
+                            return components;
+                    }
+
+                    break;
+
+                case CatchSkinComponent catchSkinComponent:
+                    switch (catchSkinComponent.Component)
+                    {
+                        case CatchSkinComponents.Fruit:
+                            if (GetTexture("fruit-pear") != null)
+                                return new LegacyFruitPiece();
+
+                            return null;
+
+                        case CatchSkinComponents.Banana:
+                            if (GetTexture("fruit-bananas") != null)
+                                return new LegacyBananaPiece();
+
+                            return null;
+
+                        case CatchSkinComponents.Droplet:
+                            if (GetTexture("fruit-drop") != null)
+                                return new LegacyDropletPiece();
+
+                            return null;
+
+                        case CatchSkinComponents.Catcher:
+                            decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
+
+                            if (version < 2.3m)
+                            {
+                                if (hasOldStyleCatcherSprite())
+                                    return new LegacyCatcherOld();
+                            }
+
+                            if (hasNewStyleCatcherSprite())
+                                return new LegacyCatcherNew();
+
+                            return null;
+
+                        case CatchSkinComponents.CatchComboCounter:
+                            if (providesComboCounter)
+                                return new LegacyCatchComboCounter();
+
+                            return null;
+
+                        case CatchSkinComponents.HitExplosion:
+                            if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
+                                return new LegacyHitExplosion();
+
+                            return null;
+                    }
+
+                    break;
+
+                case LegacyComboSplash.LegacyComboSplashComponent _:
+                    return new LegacyComboSplash.LegacyComboSplashSide("comboburst-fruits");
             }
-
-            if (component is CatchSkinComponent catchSkinComponent)
-            {
-                switch (catchSkinComponent.Component)
-                {
-                    case CatchSkinComponents.Fruit:
-                        if (GetTexture("fruit-pear") != null)
-                            return new LegacyFruitPiece();
-
-                        return null;
-
-                    case CatchSkinComponents.Banana:
-                        if (GetTexture("fruit-bananas") != null)
-                            return new LegacyBananaPiece();
-
-                        return null;
-
-                    case CatchSkinComponents.Droplet:
-                        if (GetTexture("fruit-drop") != null)
-                            return new LegacyDropletPiece();
-
-                        return null;
-
-                    case CatchSkinComponents.Catcher:
-                        decimal version = GetConfig<SkinConfiguration.LegacySetting, decimal>(SkinConfiguration.LegacySetting.Version)?.Value ?? 1;
-
-                        if (version < 2.3m)
-                        {
-                            if (hasOldStyleCatcherSprite())
-                                return new LegacyCatcherOld();
-                        }
-
-                        if (hasNewStyleCatcherSprite())
-                            return new LegacyCatcherNew();
-
-                        return null;
-
-                    case CatchSkinComponents.CatchComboCounter:
-                        if (providesComboCounter)
-                            return new LegacyCatchComboCounter();
-
-                        return null;
-
-                    case CatchSkinComponents.HitExplosion:
-                        if (hasOldStyleCatcherSprite() || hasNewStyleCatcherSprite())
-                            return new LegacyHitExplosion();
-
-                        return null;
-                }
-            }
-
-            if (component is LegacyComboSplash.LegacyComboSplashComponent)
-                return new LegacyComboSplash.LegacyComboSplashSide("comboburst-fruits");
 
             return base.GetDrawableComponent(component);
         }
