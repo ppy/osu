@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override string Description => "No drain for mania!";
 
-        //public override IconUsage? Icon => FontAwesome.Solid.Equals;
-
         public override ModType Type => ModType.DifficultyReduction;
         public virtual void ReadFromDifficulty(BeatmapDifficulty difficulty)
         {
