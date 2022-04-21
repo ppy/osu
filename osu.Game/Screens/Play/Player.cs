@@ -917,9 +917,9 @@ namespace osu.Game.Screens.Play
 
         #region Screen Logic
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             if (!LoadedBeatmapSuccessfully)
                 return;
@@ -985,15 +985,15 @@ namespace osu.Game.Screens.Play
             GameplayClockContainer.Reset(true);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
 
             fadeOut();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
             failAnimationLayer?.RemoveFilters();
@@ -1024,7 +1024,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             fadeOut();
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         /// <summary>
