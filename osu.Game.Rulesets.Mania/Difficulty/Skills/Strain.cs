@@ -62,7 +62,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             holdEndTimes[column] = endTime;
 
             // The hold addition only is valid if there is _no_ other note with the same ending. Releasing multiple notes at the same time is just as easy as releasing 1
-            holdAddition *= 1 / (1 + Math.Exp(0.5 * (24 - closestEndTime)));
+            // Nerfs the hold addition by half if the closest release is 24ms away
+            if (holdAddition > 0)
+                holdAddition *= 1 / (1 + Math.Exp(0.5 * (24 - closestEndTime)));
 
             // Increase individual strain in own column
             individualStrains[column] += 2.0 * holdFactor;
