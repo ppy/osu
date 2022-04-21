@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.OnlinePlay.Components;
@@ -20,6 +21,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.LoadComplete();
 
             client.RoomUpdated += onRoomUpdated;
+            client.LoadAborted += onLoadAborted;
             onRoomUpdated();
         }
 
@@ -35,6 +37,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 transitionFromResults();
         }
 
+        private void onLoadAborted()
+        {
+            // If the server aborts gameplay for this user (due to loading too slow), exit gameplay screens.
+            if (!this.IsCurrentScreen())
+            {
+                Logger.Log("Gameplay aborted because loading the beatmap took too long.", LoggingTarget.Runtime, LogLevel.Important);
+                this.MakeCurrent();
+            }
+        }
+
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
@@ -42,7 +54,13 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null)
                 return;
 
+            Debug.Assert(client.LocalUser != null);
+
             if (!(last is MultiplayerPlayerLoader playerLoader))
+                return;
+
+            // Nothing needs to be done if already in the idle state (e.g. via load being aborted by the server).
+            if (client.LocalUser.State == MultiplayerUserState.Idle)
                 return;
 
             // If gameplay wasn't finished, then we have a simple path back to the idle state by aborting gameplay.
