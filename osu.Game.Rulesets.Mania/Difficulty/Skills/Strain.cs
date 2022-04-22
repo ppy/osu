@@ -41,13 +41,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
+            bool isOverlapping = false;
 
             // Fill up the holdEndTimes array
             for (int i = 0; i < holdEndTimes.Length; ++i)
             {
-                // If there is at least one other overlapping end or note, then we get an addition
-                if (Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1))
-                    holdAddition = 1.0;
+                // The current note is overlapped if a previous note or end is overlapping the current note body
+                isOverlapping |= Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1);
 
                 // We give a slight bonus to everything if something is held meanwhile
                 if (Precision.DefinitelyBigger(holdEndTimes[i], endTime, 1))
@@ -61,10 +61,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 
             holdEndTimes[column] = endTime;
 
-            // The hold addition only is valid if there is _no_ other note with the same ending. Releasing multiple notes at the same time is just as easy as releasing 1
-            // Nerfs the hold addition by half if the closest release is 24ms away
-            if (holdAddition > 0)
-                holdAddition *= 1 / (1 + Math.Exp(0.5 * (24 - closestEndTime)));
+            // The hold addition is given if there was an overlap, however it is only valid if there are no other note with a similar ending.
+            // Releasing multiple notes is just as easy as releasing 1. Nerfs the hold addition by half if the closest release is 24ms away.
+            if (isOverlapping)
+                holdAddition = 1 / (1 + Math.Exp(0.5 * (24 - closestEndTime)));
 
             // Increase individual strain in own column
             individualStrains[column] += 2.0 * holdFactor;
