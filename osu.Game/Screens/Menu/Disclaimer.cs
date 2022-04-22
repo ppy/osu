@@ -171,9 +171,9 @@ namespace osu.Game.Screens.Menu
             ((IBindable<APIUser>)currentUser).BindTo(api.LocalUser);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             icon.RotateTo(10);
             icon.FadeOut();

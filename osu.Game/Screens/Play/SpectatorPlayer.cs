@@ -91,11 +91,11 @@ namespace osu.Game.Screens.Play
             DrawableRuleset?.SetReplayScore(score);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             SpectatorClient.OnNewFrames -= userSentFrames;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override void Dispose(bool isDisposing)
