@@ -147,9 +147,9 @@ namespace osu.Game.Overlays.AccountCreation
                 d.Colour = password.Length == 0 ? Color4.White : Interpolation.ValueAt(password.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In);
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             loadingLayer.Hide();
 
             if (host?.OnScreenKeyboardOverlapsGameWindow != true)

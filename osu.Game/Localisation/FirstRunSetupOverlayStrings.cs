@@ -22,17 +22,17 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "First-run setup"
         /// </summary>
-        public static LocalisableString FirstRunSetup => new TranslatableString(getKey(@"first_run_setup"), @"First-run setup");
+        public static LocalisableString FirstRunSetupTitle => new TranslatableString(getKey(@"first_run_setup_title"), @"First-run setup");
 
         /// <summary>
-        /// "Setup osu! to suit you"
+        /// "Set up osu! to suit you"
         /// </summary>
-        public static LocalisableString SetupOsuToSuitYou => new TranslatableString(getKey(@"setup_osu_to_suit_you"), @"Setup osu! to suit you");
+        public static LocalisableString FirstRunSetupDescription => new TranslatableString(getKey(@"first_run_setup_description"), @"Set up osu! to suit you");
 
         /// <summary>
         /// "Welcome"
         /// </summary>
-        public static LocalisableString Welcome => new TranslatableString(getKey(@"welcome"), @"Welcome");
+        public static LocalisableString WelcomeTitle => new TranslatableString(getKey(@"welcome_title"), @"Welcome");
 
         /// <summary>
         /// "Welcome to the first-run setup guide!
@@ -44,9 +44,9 @@ namespace osu.Game.Localisation
 osu! is a very configurable game, and diving straight into the settings can sometimes be overwhelming. This guide will help you get the important choices out of the way to ensure a great first experience!");
 
         /// <summary>
-        /// "The size of the osu! user interface size can be adjusted to your liking."
+        /// "The size of the osu! user interface can be adjusted to your liking."
         /// </summary>
-        public static LocalisableString UIScaleDescription => new TranslatableString(getKey(@"ui_scale_description"), @"The size of the osu! user interface size can be adjusted to your liking.");
+        public static LocalisableString UIScaleDescription => new TranslatableString(getKey(@"ui_scale_description"), @"The size of the osu! user interface can be adjusted to your liking.");
 
         /// <summary>
         /// "Next ({0})"

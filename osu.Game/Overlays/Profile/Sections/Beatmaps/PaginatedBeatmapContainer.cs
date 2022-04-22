@@ -53,6 +53,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 case BeatmapSetType.Pending:
                     return user.PendingBeatmapsetCount;
 
+                case BeatmapSetType.Guest:
+                    return user.GuestBeatmapsetCount;
+
                 default:
                     return 0;
             }

@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
 
         private readonly FirstRunStep[] steps =
         {
-            new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.Welcome),
+            new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.WelcomeTitle),
             new FirstRunStep(typeof(ScreenUIScale), GraphicsSettingsStrings.UIScaling),
         };
 
@@ -71,8 +71,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            Header.Title = FirstRunSetupOverlayStrings.FirstRunSetup;
-            Header.Description = FirstRunSetupOverlayStrings.SetupOsuToSuitYou;
+            Header.Title = FirstRunSetupOverlayStrings.FirstRunSetupTitle;
+            Header.Description = FirstRunSetupOverlayStrings.FirstRunSetupDescription;
 
             MainAreaContent.AddRange(new Drawable[]
             {
