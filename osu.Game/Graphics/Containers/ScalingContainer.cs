@@ -79,12 +79,12 @@ namespace osu.Game.Graphics.Containers
             };
         }
 
-        private class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        public class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
 
-            private float currentScale = 1;
+            protected float CurrentScale { get; private set; } = 1;
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -99,14 +99,14 @@ namespace osu.Game.Graphics.Containers
                 if (applyUIScale)
                 {
                     uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
-                    uiScale.BindValueChanged(args => this.TransformTo(nameof(currentScale), args.NewValue, duration, Easing.OutQuart), true);
+                    uiScale.BindValueChanged(args => this.TransformTo(nameof(CurrentScale), args.NewValue, duration, Easing.OutQuart), true);
                 }
             }
 
             protected override void Update()
             {
-                Scale = new Vector2(currentScale);
-                Size = new Vector2(1 / currentScale);
+                Scale = new Vector2(CurrentScale);
+                Size = new Vector2(1 / CurrentScale);
 
                 base.Update();
             }
@@ -209,7 +209,7 @@ namespace osu.Game.Graphics.Containers
         {
             protected override bool AllowStoryboardBackground => false;
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
                 this.FadeInFromZero(4000, Easing.OutQuint);
             }

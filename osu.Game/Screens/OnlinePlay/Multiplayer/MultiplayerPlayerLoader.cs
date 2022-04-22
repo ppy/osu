@@ -28,10 +28,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             // The server is forcefully starting gameplay.
             || multiplayerClient.LocalUser?.State == MultiplayerUserState.Playing;
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
-            player = (Player)next;
+            base.OnSuspending(e);
+            player = (Player)e.Next;
         }
     }
 }
