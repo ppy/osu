@@ -70,6 +70,7 @@ namespace osu.Game.Overlays
         {
             new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.WelcomeTitle),
             new FirstRunStep(typeof(ScreenUIScale), GraphicsSettingsStrings.UIScaling),
+            new FirstRunStep(typeof(ScreenBehaviour), FirstRunSetupOverlayStrings.Behaviour),
         };
 
         private Container stackContainer = null!;
