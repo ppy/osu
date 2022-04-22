@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Settings
         private const int header_size = 24;
         private const int border_size = 4;
 
-        private bool matchingFilter;
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
