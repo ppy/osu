@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var column in columnFlow)
             {
-                column.SelectedMods.BindValueChanged(_ => updateBindableFromSelection());
+                column.SelectedMods.BindValueChanged(updateBindableFromSelection);
             }
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
@@ -237,32 +237,35 @@ namespace osu.Game.Overlays.Mods
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
         }
 
-        private bool selectionBindableSyncInProgress;
-
         private void updateSelectionFromBindable()
         {
-            if (selectionBindableSyncInProgress)
-                return;
-
-            selectionBindableSyncInProgress = true;
-
+            // note that selectionBindableSyncInProgress is purposefully not checked here.
+            // this is because in the case of mod selection in solo gameplay, a user selection of a mod can actually lead to deselection of other incompatible mods.
+            // to synchronise state correctly, updateBindableFromSelection() computes the final mods (including incompatibility rules) and updates SelectedMods,
+            // and this method then runs unconditionally again to make sure the new visual selection accurately reflects the final set of selected mods.
+            // selectionBindableSyncInProgress ensures that mutual infinite recursion does not happen after that unconditional call.
             foreach (var column in columnFlow)
                 column.SelectedMods.Value = SelectedMods.Value.Where(mod => mod.Type == column.ModType).ToArray();
-
-            selectionBindableSyncInProgress = false;
         }
 
-        private void updateBindableFromSelection()
+        private bool selectionBindableSyncInProgress;
+
+        private void updateBindableFromSelection(ValueChangedEvent<IReadOnlyList<Mod>> modSelectionChange)
         {
             if (selectionBindableSyncInProgress)
                 return;
 
             selectionBindableSyncInProgress = true;
 
-            SelectedMods.Value = columnFlow.SelectMany(column => column.SelectedMods.Value).ToArray();
+            SelectedMods.Value = ComputeNewModsFromSelection(
+                modSelectionChange.NewValue.Except(modSelectionChange.OldValue),
+                modSelectionChange.OldValue.Except(modSelectionChange.NewValue));
 
             selectionBindableSyncInProgress = false;
         }
+
+        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IEnumerable<Mod> addedMods, IEnumerable<Mod> removedMods)
+            => columnFlow.SelectMany(column => column.SelectedMods.Value).ToArray();
 
         protected override void PopIn()
         {
