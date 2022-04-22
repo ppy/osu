@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<string> Keywords { get; set; }
 
-        private bool matchingFilter;
+        private bool matchingFilter = true;
 
         public bool MatchingFilter
         {
