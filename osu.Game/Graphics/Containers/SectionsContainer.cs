@@ -195,8 +195,11 @@ namespace osu.Game.Graphics.Containers
 
         protected void InvalidateScrollPosition()
         {
-            lastKnownScroll = null;
-            lastClickedSection = null;
+            Schedule(() =>
+            {
+                lastKnownScroll = null;
+                lastClickedSection = null;
+            });
         }
 
         protected override void UpdateAfterChildren()
