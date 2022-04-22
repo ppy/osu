@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -144,6 +145,12 @@ namespace osu.Game.Online
             var builder = new HubConnectionBuilder()
                 .WithUrl(endpoint, options =>
                 {
+                    // Use HttpClient.DefaultProxy once on net6 everywhere.
+                    // The credential setter can also be removed at this point.
+                    options.Proxy = WebRequest.DefaultWebProxy;
+                    if (options.Proxy != null)
+                        options.Proxy.Credentials = CredentialCache.DefaultCredentials;
+
                     options.Headers.Add("Authorization", $"Bearer {api.AccessToken}");
                     options.Headers.Add("OsuVersionHash", versionHash);
                 });

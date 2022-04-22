@@ -97,9 +97,9 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private class PinnedMainMenu : MainMenu
         {
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
 
                 Buttons.ReturnToTopOnIdle = false;
                 Buttons.State = ButtonSystemState.TopLevel;
