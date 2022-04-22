@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Settings
         /// </summary>
         public object SettingSourceObject { get; internal set; }
 
+        public const string CLASSIC_DEFAULT_SEARCH_TERM = @"has-classic-default";
+
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
         protected override Container<Drawable> Content => FlowContent;
@@ -96,7 +98,23 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
+        public virtual IEnumerable<string> FilterTerms
+        {
+            get
+            {
+                var keywords = new List<string>(Keywords ?? Array.Empty<string>())
+                {
+                    LabelText.ToString()
+                };
+
+                if (GetClassicDefault != null)
+                {
+                    keywords.Add(CLASSIC_DEFAULT_SEARCH_TERM);
+                }
+
+                return keywords;
+            }
+        }
 
         public IEnumerable<string> Keywords { get; set; }
 
@@ -107,6 +125,22 @@ namespace osu.Game.Overlays.Settings
         public bool FilteringActive { get; set; }
 
         public event Action SettingChanged;
+
+        /// <summary>
+        /// An action which when invoked will apply a classic default value to this setting.
+        /// </summary>
+        public Func<T> GetClassicDefault { get; set; }
+
+        public void ApplyClassicDefault(bool useClassicDefault)
+        {
+            if (GetClassicDefault != null)
+            {
+                if (useClassicDefault)
+                    Current.Value = GetClassicDefault();
+                else
+                    Current.SetDefault();
+            }
+        }
 
         protected SettingsItem()
         {
