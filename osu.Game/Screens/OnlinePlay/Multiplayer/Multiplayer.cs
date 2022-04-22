@@ -47,16 +47,16 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             }
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             if (client.Room == null)
                 return;
 
             Debug.Assert(client.LocalUser != null);
 
-            if (!(last is MultiplayerPlayerLoader playerLoader))
+            if (!(e.Last is MultiplayerPlayerLoader playerLoader))
                 return;
 
             // Nothing needs to be done if already in the idle state (e.g. via load being aborted by the server).

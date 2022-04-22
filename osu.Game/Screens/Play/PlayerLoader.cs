@@ -214,9 +214,9 @@ namespace osu.Game.Screens.Play
 
         #region Screen handling
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -240,9 +240,9 @@ namespace osu.Game.Screens.Play
             showBatteryWarningIfNeeded();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             Debug.Assert(CurrentPlayer != null);
 
@@ -258,9 +258,9 @@ namespace osu.Game.Screens.Play
             contentIn();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             BackgroundBrightnessReduction = false;
 
@@ -272,7 +272,7 @@ namespace osu.Game.Screens.Play
             highPassFilter.CutoffTo(0);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             cancelLoad();
             ContentOut();
@@ -288,7 +288,7 @@ namespace osu.Game.Screens.Play
             BackgroundBrightnessReduction = false;
             Beatmap.Value.Track.RemoveAdjustment(AdjustableProperty.Volume, volumeAdjustment);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
