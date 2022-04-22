@@ -21,8 +21,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 State = { Value = Visibility.Visible }
             });
+            AddUntilStep("all column content loaded",
+                () => freeModSelectScreen.ChildrenOfType<ModColumn>().Any()
+                      && freeModSelectScreen.ChildrenOfType<ModColumn>().All(column => column.IsLoaded && column.ItemsLoaded));
 
-            AddAssert("all visible mods are playable",
+            AddUntilStep("all visible mods are playable",
                 () => this.ChildrenOfType<ModPanel>()
                           .Where(panel => panel.IsPresent)
                           .All(panel => panel.Mod.HasImplementation && panel.Mod.UserPlayable));

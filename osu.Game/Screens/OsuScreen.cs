@@ -48,7 +48,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode;
+        public readonly Bindable<OverlayActivation> OverlayActivationMode;
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
