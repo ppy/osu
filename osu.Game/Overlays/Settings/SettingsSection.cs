@@ -21,8 +21,6 @@ namespace osu.Game.Overlays.Settings
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
-        public override bool IsPresent => base.IsPresent && MatchingFilter;
-
         private IBindable<SettingsSection> selectedSection;
 
         private Box dim;
@@ -40,7 +38,23 @@ namespace osu.Game.Overlays.Settings
         private const int header_size = 24;
         private const int border_size = 4;
 
-        public bool MatchingFilter { get; set; } = true;
+        private bool matchingFilter;
+
+        public bool MatchingFilter
+        {
+            get => matchingFilter;
+            set
+            {
+                bool wasPresent = IsPresent;
+
+                matchingFilter = value;
+
+                if (IsPresent != wasPresent)
+                    Invalidate(Invalidation.Presence);
+            }
+        }
+
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
 
         public bool FilteringActive { get; set; }
 
