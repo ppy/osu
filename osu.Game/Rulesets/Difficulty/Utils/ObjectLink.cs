@@ -31,10 +31,19 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         {
             get
             {
-                if (previous == null)
+                ObjectLink<T>? node = previous;
+                int depth = 0;
+
+                while (depth < index)
+                {
+                    node = node?.previous;
+                    depth++;
+                }
+
+                if (node == null)
                     throw new InvalidOperationException("Cannot index when there are no previous objects.");
 
-                return index == 0 ? previous.obj : previous[index - 1];
+                return node.obj;
             }
         }
 
