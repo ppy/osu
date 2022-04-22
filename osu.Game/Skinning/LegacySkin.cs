@@ -391,9 +391,10 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
-            }
 
-            return this.GetAnimation(component.LookupName, false, false);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(component));
+            }
         }
 
         private Texture? getParticleTexture(HitResult result)
