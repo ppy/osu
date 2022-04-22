@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.Settings
                                                                                 .All(f => f.FilterTerms.Any(t => t.Contains("scaling")))
                                                                      ));
 
-            AddAssert("ensure section is current", () => settings.CurrentSection.Value != null);
+            AddAssert("ensure section is current", () => settings.CurrentSection.Value is GraphicsSection);
         }
 
         [Test]
