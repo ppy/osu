@@ -12,6 +12,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -21,9 +22,9 @@ namespace osu.Game.Graphics.UserInterface
     public class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
     {
         private const float icon_container_width = 50;
-        private const float corner_radius = 10;
+        private const float corner_radius = 7;
         private const float height = 42;
-        private readonly Vector2 shear = new Vector2(0.2f, 0);
+        private readonly Vector2 shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
 
         public FocusedTextBox TextBox;
 
@@ -78,7 +79,7 @@ namespace osu.Game.Graphics.UserInterface
                                             RelativeSizeAxes = Axes.X,
                                             Padding = new MarginPadding
                                             {
-                                                Horizontal = corner_radius
+                                                Horizontal = corner_radius + shear.X
                                             }
                                         }
                                     }
