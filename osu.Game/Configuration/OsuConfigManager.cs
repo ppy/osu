@@ -134,6 +134,8 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.Version, string.Empty);
 
+            SetDefault(OsuSetting.ShowFirstRunSetup, true);
+
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
             SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
@@ -308,6 +310,7 @@ namespace osu.Game.Configuration
         BeatmapListingCardSize,
         ToolbarClockDisplayMode,
         Version,
+        ShowFirstRunSetup,
         ShowConvertedBeatmaps,
         Skin,
         ScreenshotFormat,
