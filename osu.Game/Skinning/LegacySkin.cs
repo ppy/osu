@@ -392,8 +392,11 @@ namespace osu.Game.Skinning
 
                     return null;
 
+                case SkinnableSprite.SpriteComponent sprite:
+                    return this.GetAnimation(sprite.LookupName, false, false);
+
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(component));
+                    throw new UnsupportedSkinComponentException(component);
             }
         }
 
