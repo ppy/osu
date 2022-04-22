@@ -100,10 +100,9 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<string> Keywords { get; set; }
 
-        public bool MatchingFilter
-        {
-            set => Alpha = value ? 1 : 0;
-        }
+        public override bool IsPresent => base.IsPresent && MatchingFilter;
+
+        public bool MatchingFilter { get; set; } = true;
 
         public bool FilteringActive { get; set; }
 
