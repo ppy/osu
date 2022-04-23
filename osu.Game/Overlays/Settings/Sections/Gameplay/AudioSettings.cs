@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    GetClassicDefault = () => false,
                     LabelText = GameplaySettingsStrings.AlwaysPlayFirstComboBreak,
                     Current = config.GetBindable<bool>(OsuSetting.AlwaysPlayFirstComboBreak)
                 }
