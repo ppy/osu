@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.IO.Stores;
 using osu.Framework.Text;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -78,6 +79,8 @@ namespace osu.Game.Skinning
             }
 
             public Task<ITexturedCharacterGlyph> GetAsync(string fontName, char character) => Task.Run(() => Get(fontName, character));
+
+            public IGlyphStore GetFont(string name) => null;
         }
     }
 }
