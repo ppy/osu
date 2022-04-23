@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     {
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
+        private const double release_threshold = 24;
 
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
@@ -62,9 +63,17 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             holdEndTimes[column] = endTime;
 
             // The hold addition is given if there was an overlap, however it is only valid if there are no other note with a similar ending.
-            // Releasing multiple notes is just as easy as releasing 1. Nerfs the hold addition by half if the closest release is 24ms away.
+            // Releasing multiple notes is just as easy as releasing 1. Nerfs the hold addition by half if the closest release is release_threshold away.
+            // holdAddition
+            //     ^
+            // 1.0 + - - - - - -+-----------
+            //     |           /
+            // 0.5 + - - - - -/   Sigmoid Curve
+            //     |         /|
+            // 0.0 +--------+-+---------------> Release Difference / ms
+            //         release_threshold
             if (isOverlapping)
-                holdAddition = 1 / (1 + Math.Exp(0.5 * (24 - closestEndTime)));
+                holdAddition = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
 
             // Increase individual strain in own column
             individualStrains[column] += 2.0 * holdFactor;
