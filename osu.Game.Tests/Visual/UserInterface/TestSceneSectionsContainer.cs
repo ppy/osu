@@ -134,6 +134,35 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep("correct section selected", () => container.SelectedSection.Value == container.Children[sections_count - 1]);
         }
 
+        [Test]
+        public void TestNavigation()
+        {
+            AddRepeatStep("add sections", () => append(1f), 3);
+            AddUntilStep("wait for load", () => container.Children.Any());
+
+            AddStep("hover sections container", () => InputManager.MoveMouseTo(container));
+            AddStep("press page down", () => InputManager.Key(Key.PageDown));
+            AddUntilStep("scrolled one page down", () =>
+            {
+                var scroll = container.ChildrenOfType<UserTrackingScrollContainer>().First();
+                return Precision.AlmostEquals(scroll.Current, Content.DrawHeight - header_fixed_height, 1f);
+            });
+
+            AddStep("press page down", () => InputManager.Key(Key.PageDown));
+            AddUntilStep("scrolled two pages down", () =>
+            {
+                var scroll = container.ChildrenOfType<UserTrackingScrollContainer>().First();
+                return Precision.AlmostEquals(scroll.Current, (Content.DrawHeight - header_fixed_height) * 2, 1f);
+            });
+
+            AddStep("press page up", () => InputManager.Key(Key.PageUp));
+            AddUntilStep("scrolled one page up", () =>
+            {
+                var scroll = container.ChildrenOfType<UserTrackingScrollContainer>().First();
+                return Precision.AlmostEquals(scroll.Current, Content.DrawHeight - header_fixed_height, 1f);
+            });
+        }
+
         private static readonly ColourInfo selected_colour = ColourInfo.GradientVertical(new OsuColour().Orange2, new OsuColour().Orange3);
         private static readonly ColourInfo default_colour = ColourInfo.GradientVertical(Color4.White, Color4.DarkGray);
 
