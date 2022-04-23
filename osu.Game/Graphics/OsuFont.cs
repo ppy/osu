@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.IO.Stores;
 
 namespace osu.Game.Graphics
 {
@@ -33,9 +34,13 @@ namespace osu.Game.Graphics
         /// <param name="weight">The font weight.</param>
         /// <param name="italics">Whether the font is italic.</param>
         /// <param name="fixedWidth">Whether all characters should be spaced the same distance apart.</param>
+        /// <param name="css">
+        /// Whether the text glyphs should scale according to their respective <see cref="IGlyphStore.Metrics"/>, matching CSS.
+        /// It is recommended to enable this for better alignment with other fonts.
+        /// </param>
         /// <returns>The <see cref="FontUsage"/>.</returns>
-        public static FontUsage GetFont(Typeface typeface = Typeface.Torus, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
-            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), getItalics(italics), fixedWidth);
+        public static FontUsage GetFont(Typeface typeface = Typeface.Torus, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false, bool css = false)
+            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), getItalics(italics), fixedWidth, css);
 
         private static bool getItalics(in bool italicsRequested)
         {
@@ -104,13 +109,17 @@ namespace osu.Game.Graphics
         /// <param name="weight">The font weight. If null, the value is copied from this <see cref="FontUsage"/>.</param>
         /// <param name="italics">Whether the font is italic. If null, the value is copied from this <see cref="FontUsage"/>.</param>
         /// <param name="fixedWidth">Whether all characters should be spaced apart the same distance. If null, the value is copied from this <see cref="FontUsage"/>.</param>
+        /// <param name="css">
+        /// Whether the text glyphs should scale according to their respective <see cref="IGlyphStore.Metrics"/>, matching CSS.
+        /// It is recommended to enable this for better alignment with other fonts.
+        /// </param>
         /// <returns>The resulting <see cref="FontUsage"/>.</returns>
-        public static FontUsage With(this FontUsage usage, Typeface? typeface = null, float? size = null, FontWeight? weight = null, bool? italics = null, bool? fixedWidth = null)
+        public static FontUsage With(this FontUsage usage, Typeface? typeface = null, float? size = null, FontWeight? weight = null, bool? italics = null, bool? fixedWidth = null, bool? css = null)
         {
             string familyString = typeface != null ? OsuFont.GetFamilyString(typeface.Value) : usage.Family;
             string weightString = weight != null ? OsuFont.GetWeightString(familyString, weight.Value) : usage.Weight;
 
-            return usage.With(familyString, size, weightString, italics, fixedWidth);
+            return usage.With(familyString, size, weightString, italics, fixedWidth, css);
         }
     }
 
