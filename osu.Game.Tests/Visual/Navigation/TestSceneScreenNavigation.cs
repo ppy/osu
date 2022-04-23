@@ -155,8 +155,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for player", () =>
             {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
+                DismissAnyNotifications();
                 return (player = Game.ScreenStack.CurrentScreen as Player) != null;
             });
 
@@ -280,8 +279,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for player", () =>
             {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
+                DismissAnyNotifications();
                 return (player = Game.ScreenStack.CurrentScreen as Player) != null;
             });
 
@@ -596,8 +594,7 @@ namespace osu.Game.Tests.Visual.Navigation
 
             AddUntilStep("wait for player", () =>
             {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
+                DismissAnyNotifications();
                 return (player = Game.ScreenStack.CurrentScreen as Player) != null;
             });
 
@@ -605,12 +602,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("seek to near end", () => player.ChildrenOfType<GameplayClockContainer>().First().Seek(beatmap().Beatmap.HitObjects[^1].StartTime - 1000));
             AddUntilStep("wait for pass", () => (Game.ScreenStack.CurrentScreen as ResultsScreen)?.IsLoaded == true);
             return () => player;
-        }
-
-        private void clickMouseInCentre()
-        {
-            InputManager.MoveMouseTo(Game.ScreenSpaceDrawQuad.Centre);
-            InputManager.Click(MouseButton.Left);
         }
 
         private void pushEscape() =>
