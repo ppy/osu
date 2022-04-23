@@ -17,10 +17,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override LocalisableString Header => JoystickSettingsStrings.JoystickGamepad;
         private readonly BindableNumber<float> deadzoneThreshold = new BindableNumber<float>();
         private readonly Bindable<bool> enabled = new BindableBool(true);
+
         public JoystickSettings(JoystickHandler joystickHandler)
         {
             this.joystickHandler = joystickHandler;
         }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -55,6 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 TransferValueOnCommit = true;
             }
         }
+
         private class DeadzoneSlider : OsuSliderBar<float>
         {
             public override LocalisableString TooltipText => Current.Disabled ? "" : base.TooltipText;
