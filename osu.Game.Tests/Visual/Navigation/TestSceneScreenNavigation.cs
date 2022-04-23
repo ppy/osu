@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -16,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
@@ -24,12 +22,10 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Lounge;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Play.HUD.HitErrorMeters;
 using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
-using osu.Game.Skinning.Editor;
 using osu.Game.Tests.Beatmaps.IO;
 using osuTK;
 using osuTK.Input;
@@ -69,73 +65,6 @@ namespace osu.Game.Tests.Visual.Navigation
             PushAndConfirm(() => songSelect = new TestPlaySongSelect());
             AddStep("Show mods overlay", () => InputManager.Key(Key.F1));
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
-        }
-
-        [Test]
-        public void TestEditComponentDuringGameplay()
-        {
-            Screens.Select.SongSelect songSelect = null;
-            PushAndConfirm(() => songSelect = new TestPlaySongSelect());
-            AddUntilStep("wait for song select", () => songSelect.BeatmapSetsLoaded);
-
-            AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
-
-            AddUntilStep("wait for selected", () => !Game.Beatmap.IsDefault);
-
-            SkinEditor skinEditor = null;
-
-            AddStep("open skin editor", () =>
-            {
-                InputManager.PressKey(Key.ControlLeft);
-                InputManager.PressKey(Key.ShiftLeft);
-                InputManager.Key(Key.S);
-                InputManager.ReleaseKey(Key.ControlLeft);
-                InputManager.ReleaseKey(Key.ShiftLeft);
-            });
-
-            AddUntilStep("get skin editor", () => (skinEditor = Game.ChildrenOfType<SkinEditor>().FirstOrDefault()) != null);
-
-            AddStep("Click gameplay scene button", () =>
-            {
-                skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay").TriggerClick();
-            });
-
-            AddUntilStep("wait for player", () =>
-            {
-                // dismiss any notifications that may appear (ie. muted notification).
-                clickMouseInCentre();
-                return Game.ScreenStack.CurrentScreen is Player;
-            });
-
-            BarHitErrorMeter hitErrorMeter = null;
-
-            AddUntilStep("select bar hit error blueprint", () =>
-            {
-                var blueprint = skinEditor.ChildrenOfType<SkinBlueprint>().FirstOrDefault(b => b.Item is BarHitErrorMeter);
-
-                if (blueprint == null)
-                    return false;
-
-                hitErrorMeter = (BarHitErrorMeter)blueprint.Item;
-                skinEditor.SelectedComponents.Clear();
-                skinEditor.SelectedComponents.Add(blueprint.Item);
-                return true;
-            });
-
-            AddAssert("value is default", () => hitErrorMeter.JudgementLineThickness.IsDefault);
-
-            AddStep("hover first slider", () =>
-            {
-                InputManager.MoveMouseTo(
-                    skinEditor.ChildrenOfType<SkinSettingsToolbox>().First()
-                              .ChildrenOfType<SettingsSlider<float>>().First()
-                              .ChildrenOfType<SliderBar<float>>().First()
-                );
-            });
-
-            AddStep("adjust slider via keyboard", () => InputManager.Key(Key.Left));
-
-            AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
         }
 
         [Test]
