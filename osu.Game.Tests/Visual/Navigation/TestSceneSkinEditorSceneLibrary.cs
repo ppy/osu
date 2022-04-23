@@ -83,6 +83,46 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("value is less than default", () => hitErrorMeter.JudgementLineThickness.Value < hitErrorMeter.JudgementLineThickness.Default);
         }
 
+        [Test]
+        public void TestAutoplayCompatibleModsRetainedOnEnteringGameplay()
+        {
+            AddStep("select DT", () => Game.SelectedMods.Value = new Mod[] { new OsuModDoubleTime() });
+
+            switchToGameplayScene();
+
+            AddAssert("DT still selected", () => ((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Single() is OsuModDoubleTime);
+        }
+
+        [Test]
+        public void TestAutoplayIncompatibleModsRemovedOnEnteringGameplay()
+        {
+            AddStep("select no fail and spun out", () => Game.SelectedMods.Value = new Mod[] { new OsuModNoFail(), new OsuModSpunOut() });
+
+            switchToGameplayScene();
+
+            AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
+        }
+
+        [Test]
+        public void TestDuplicateAutoplayModRemovedOnEnteringGameplay()
+        {
+            AddStep("select autoplay", () => Game.SelectedMods.Value = new Mod[] { new OsuModAutoplay() });
+
+            switchToGameplayScene();
+
+            AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
+        }
+
+        [Test]
+        public void TestCinemaModRemovedOnEnteringGameplay()
+        {
+            AddStep("select cinema", () => Game.SelectedMods.Value = new Mod[] { new OsuModCinema() });
+
+            switchToGameplayScene();
+
+            AddAssert("no mod selected", () => !((Player)Game.ScreenStack.CurrentScreen).Mods.Value.Any());
+        }
+
         private void switchToGameplayScene()
         {
             AddStep("Click gameplay scene button", () => skinEditor.ChildrenOfType<SkinEditorSceneLibrary.SceneButton>().First(b => b.Text == "Gameplay").TriggerClick());
