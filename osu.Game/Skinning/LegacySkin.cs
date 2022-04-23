@@ -390,7 +390,7 @@ namespace osu.Game.Skinning
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
-                    break;
+                    return null;
             }
 
             return this.GetAnimation(component.LookupName, false, false);
