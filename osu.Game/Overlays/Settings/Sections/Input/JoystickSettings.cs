@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public DeadzoneSetting()
             {
-                KeyboardStep = 0.005f;
+                KeyboardStep = 0.01f;
                 TransferValueOnCommit = true;
             }
         }
