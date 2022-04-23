@@ -17,7 +17,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Deadzone Threshold"
         /// </summary>
-        public static LocalisableString DeadzoneThreshold => new TranslatableString(getKey(@"deadzone_threshold"), @"Deadzone Threshold");
+        public static LocalisableString DeadzoneThreshold => new TranslatableString(getKey(@"deadzone_threshold"), @"Deadzone");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
