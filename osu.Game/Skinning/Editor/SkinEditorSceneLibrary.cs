@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -18,6 +20,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
@@ -33,6 +36,9 @@ namespace osu.Game.Skinning.Editor
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; }
 
         public SkinEditorSceneLibrary()
         {
@@ -95,6 +101,10 @@ namespace osu.Game.Skinning.Editor
                                             return;
 
                                         var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+
+                                        if (!ModUtils.CheckCompatibleSet(mods.Value.Append(replayGeneratingMod), out var invalid))
+                                            mods.Value = mods.Value.Except(invalid).ToArray();
+
                                         if (replayGeneratingMod != null)
                                             screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
                                     }, new[] { typeof(Player), typeof(SongSelect) })
