@@ -20,6 +20,7 @@ using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Framework.Text;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
@@ -352,34 +353,40 @@ namespace osu.Game
         {
             AddFont(Resources, @"Fonts/osuFont");
 
-            AddFont(Resources, @"Fonts/Torus/Torus-Regular");
-            AddFont(Resources, @"Fonts/Torus/Torus-Light");
-            AddFont(Resources, @"Fonts/Torus/Torus-SemiBold");
-            AddFont(Resources, @"Fonts/Torus/Torus-Bold");
+            var torusMetrics = new FontMetrics(ascent: 800, descent: 200, emSize: 1000, lineGap: 200);
+            var interMetrics = new FontMetrics(ascent: 2728, descent: 680, emSize: 2816, lineGap: 0);
+            var notoCjkMetrics = new FontMetrics(ascent: 880, descent: 120, emSize: 1000, lineGap: 0);
+            var notoThaiMetrics = new FontMetrics(ascent: 1061, descent: 450, emSize: 1000, lineGap: 0);
+            var veneraMetrics = new FontMetrics(ascent: 750, descent: 250, emSize: 1000, lineGap: 200);
 
-            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Regular");
-            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Light");
-            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-SemiBold");
-            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Bold");
+            AddFont(Resources, @"Fonts/Torus/Torus-Regular", metrics: torusMetrics);
+            AddFont(Resources, @"Fonts/Torus/Torus-Light", metrics: torusMetrics);
+            AddFont(Resources, @"Fonts/Torus/Torus-SemiBold", metrics: torusMetrics);
+            AddFont(Resources, @"Fonts/Torus/Torus-Bold", metrics: torusMetrics);
 
-            AddFont(Resources, @"Fonts/Inter/Inter-Regular");
-            AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic");
-            AddFont(Resources, @"Fonts/Inter/Inter-Light");
-            AddFont(Resources, @"Fonts/Inter/Inter-LightItalic");
-            AddFont(Resources, @"Fonts/Inter/Inter-SemiBold");
-            AddFont(Resources, @"Fonts/Inter/Inter-SemiBoldItalic");
-            AddFont(Resources, @"Fonts/Inter/Inter-Bold");
-            AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic");
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Regular", metrics: torusMetrics);
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Light", metrics: torusMetrics);
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-SemiBold", metrics: torusMetrics);
+            AddFont(Resources, @"Fonts/Torus-Alternate/Torus-Alternate-Bold", metrics: torusMetrics);
 
-            AddFont(Resources, @"Fonts/Noto/Noto-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-Hangul");
-            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic");
-            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility");
-            AddFont(Resources, @"Fonts/Noto/Noto-Thai");
+            AddFont(Resources, @"Fonts/Inter/Inter-Regular", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-RegularItalic", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-Light", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-LightItalic", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBold", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-SemiBoldItalic", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-Bold", metrics: interMetrics);
+            AddFont(Resources, @"Fonts/Inter/Inter-BoldItalic", metrics: interMetrics);
 
-            AddFont(Resources, @"Fonts/Venera/Venera-Light");
-            AddFont(Resources, @"Fonts/Venera/Venera-Bold");
-            AddFont(Resources, @"Fonts/Venera/Venera-Black");
+            AddFont(Resources, @"Fonts/Noto/Noto-Basic", metrics: notoCjkMetrics);
+            AddFont(Resources, @"Fonts/Noto/Noto-Hangul", metrics: notoCjkMetrics);
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Basic", metrics: notoCjkMetrics);
+            AddFont(Resources, @"Fonts/Noto/Noto-CJK-Compatibility", metrics: notoCjkMetrics);
+            AddFont(Resources, @"Fonts/Noto/Noto-Thai", metrics: notoThaiMetrics);
+
+            AddFont(Resources, @"Fonts/Venera/Venera-Light", metrics: veneraMetrics);
+            AddFont(Resources, @"Fonts/Venera/Venera-Bold", metrics: veneraMetrics);
+            AddFont(Resources, @"Fonts/Venera/Venera-Black", metrics: veneraMetrics);
         }
 
         protected override void LoadComplete()
