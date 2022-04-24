@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Editing
         [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;
 
-        [Cached(typeof(IPositionSnapProvider))]
+        [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         public TestSceneDistanceSnapGrid()
@@ -160,7 +160,7 @@ namespace osu.Game.Tests.Visual.Editing
                 => (Vector2.Zero, 0);
         }
 
-        private class SnapProvider : IPositionSnapProvider
+        private class SnapProvider : IDistanceSnapProvider
         {
             public SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
                 new SnapResult(screenSpacePosition, null);
