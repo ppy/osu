@@ -106,6 +106,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         private class ExpandingToolboxContainer : ExpandingContainer
         {
+            protected override double HoverExpansionDelay => 250;
+
             public ExpandingToolboxContainer()
                 : base(130, 250)
             {
