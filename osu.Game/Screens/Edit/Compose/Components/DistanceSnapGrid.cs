@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IPositionSnapProvider SnapProvider { get; private set; }
+        protected IDistanceSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }

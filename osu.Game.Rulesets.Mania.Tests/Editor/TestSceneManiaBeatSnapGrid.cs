@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
@@ -98,8 +97,6 @@ namespace osu.Game.Rulesets.Mania.Tests.Editor
         {
             set => InternalChild = value;
         }
-
-        public override IBindable<double> DistanceSpacingMultiplier => throw new System.NotImplementedException();
 
         public override SnapResult SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition)
         {

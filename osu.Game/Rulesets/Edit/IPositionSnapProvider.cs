@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -10,12 +8,6 @@ namespace osu.Game.Rulesets.Edit
 {
     public interface IPositionSnapProvider
     {
-        /// <summary>
-        /// The spacing multiplier applied to beat snap distances.
-        /// </summary>
-        /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
-        IBindable<double> DistanceSpacingMultiplier { get; }
-
         /// <summary>
         /// Given a position, find a valid time and position snap.
         /// </summary>
@@ -38,6 +30,8 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         /// <param name="referenceObject">An object to be used as a reference point for this operation.</param>
         /// <returns>The distance between two points residing in the timing point that are one beat length apart.</returns>
+        // todo: this, and other distance-related methods below it, should move to IDistanceSnapProvider.
+        // needs thought on how to properly share implementation, since not all composers inherit IDistanceSnapProvider.
         float GetBeatSnapDistanceAt(HitObject referenceObject);
 
         /// <summary>
