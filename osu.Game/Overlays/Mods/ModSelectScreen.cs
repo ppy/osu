@@ -408,7 +408,7 @@ namespace osu.Game.Overlays.Mods
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 if (!isFullyOnScreen.Value)
-                    parentScroll.ScrollTo(DrawPosition.X - 70);
+                    parentScroll.ScrollTo(Math.Clamp(DrawPosition.X - 70, 0, parentScroll.ScrollableExtent));
 
                 return true;
             }
