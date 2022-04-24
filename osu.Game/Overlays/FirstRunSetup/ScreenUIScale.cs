@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                                 new Drawable[]
                                 {
                                     new SampleScreenContainer(new PinnedMainMenu()),
-                                    new SampleScreenContainer(new PlaySongSelect()),
+                                    new SampleScreenContainer(new NestedSongSelect()),
                                 },
                                 // TODO: add more screens here in the future (gameplay / results)
                                 // requires a bit more consideration to isolate their behaviour from the "parent" game.
@@ -93,6 +93,11 @@ namespace osu.Game.Overlays.FirstRunSetup
             {
                 Size = initialSize / CurrentScale;
             }
+        }
+
+        private class NestedSongSelect : PlaySongSelect
+        {
+            protected override bool ControlGlobalMusic => false;
         }
 
         private class PinnedMainMenu : MainMenu
