@@ -29,6 +29,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -84,10 +85,12 @@ namespace osu.Game.Screens.Edit
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
+
+        public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
         public IBindable<bool> SamplePlaybackDisabled => samplePlaybackDisabled;
 
@@ -95,7 +98,7 @@ namespace osu.Game.Screens.Edit
 
         private bool canSave;
 
-        private bool exitConfirmed;
+        protected bool ExitConfirmed { get; private set; }
 
         private string lastSavedHash;
 
@@ -114,8 +117,6 @@ namespace osu.Game.Screens.Edit
 
         [CanBeNull] // Should be non-null once it can support custom rulesets.
         private EditorChangeHandler changeHandler;
-
-        private EditorMenuBar menuBar;
 
         private DependencyContainer dependencies;
 
@@ -239,40 +240,49 @@ namespace osu.Game.Screens.Edit
                         Name = "Top bar",
                         RelativeSizeAxes = Axes.X,
                         Height = 40,
-                        Child = menuBar = new EditorMenuBar
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Mode = { Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose },
-                            Items = new[]
+                            new EditorMenuBar
                             {
-                                new MenuItem("File")
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.Both,
+                                Items = new[]
                                 {
-                                    Items = createFileMenuItems()
-                                },
-                                new MenuItem("Edit")
-                                {
-                                    Items = new[]
+                                    new MenuItem("File")
                                     {
-                                        undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
-                                        redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo),
-                                        new EditorMenuItemSpacer(),
-                                        cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
-                                        copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
-                                        pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
-                                    }
-                                },
-                                new MenuItem("View")
-                                {
-                                    Items = new MenuItem[]
+                                        Items = createFileMenuItems()
+                                    },
+                                    new MenuItem(CommonStrings.ButtonsEdit)
                                     {
-                                        new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
-                                        new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
+                                        Items = new[]
+                                        {
+                                            undoMenuItem = new EditorMenuItem("Undo", MenuItemType.Standard, Undo),
+                                            redoMenuItem = new EditorMenuItem("Redo", MenuItemType.Standard, Redo),
+                                            new EditorMenuItemSpacer(),
+                                            cutMenuItem = new EditorMenuItem("Cut", MenuItemType.Standard, Cut),
+                                            copyMenuItem = new EditorMenuItem("Copy", MenuItemType.Standard, Copy),
+                                            pasteMenuItem = new EditorMenuItem("Paste", MenuItemType.Standard, Paste),
+                                        }
+                                    },
+                                    new MenuItem("View")
+                                    {
+                                        Items = new MenuItem[]
+                                        {
+                                            new WaveformOpacityMenuItem(config.GetBindable<float>(OsuSetting.EditorWaveformOpacity)),
+                                            new HitAnimationsMenuItem(config.GetBindable<bool>(OsuSetting.EditorHitAnimations))
+                                        }
                                     }
                                 }
-                            }
-                        }
+                            },
+                            new ScreenSelectionTabControl
+                            {
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                                X = -15,
+                                Current = Mode,
+                            },
+                        },
                     },
                     new Container
                     {
@@ -340,14 +350,15 @@ namespace osu.Game.Screens.Edit
 
             changeHandler?.CanUndo.BindValueChanged(v => undoMenuItem.Action.Disabled = !v.NewValue, true);
             changeHandler?.CanRedo.BindValueChanged(v => redoMenuItem.Action.Disabled = !v.NewValue, true);
-
-            menuBar.Mode.ValueChanged += onModeChanged;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             setUpClipboardActionAvailability();
+
+            Mode.Value = isNewBeatmap ? EditorScreenMode.SongSetup : EditorScreenMode.Compose;
+            Mode.BindValueChanged(onModeChanged, true);
         }
 
         /// <summary>
@@ -358,14 +369,14 @@ namespace osu.Game.Screens.Edit
         /// <summary>
         /// Creates an <see cref="EditorState"/> instance representing the current state of the editor.
         /// </summary>
-        /// <param name="nextBeatmap">
-        /// The next beatmap to be shown, in the case of difficulty switch.
+        /// <param name="nextRuleset">
+        /// The ruleset of the next beatmap to be shown, in the case of difficulty switch.
         /// <see langword="null"/> indicates that the beatmap will not be changing.
         /// </param>
-        public EditorState GetState([CanBeNull] BeatmapInfo nextBeatmap = null) => new EditorState
+        public EditorState GetState([CanBeNull] RulesetInfo nextRuleset = null) => new EditorState
         {
             Time = clock.CurrentTimeAccurate,
-            ClipboardContent = nextBeatmap == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextBeatmap.Ruleset.ShortName ? Clipboard.Content.Value : string.Empty
+            ClipboardContent = nextRuleset == null || editorBeatmap.BeatmapInfo.Ruleset.ShortName == nextRuleset.ShortName ? Clipboard.Content.Value : string.Empty
         };
 
         /// <summary>
@@ -517,23 +528,23 @@ namespace osu.Game.Screens.Edit
                     return true;
 
                 case GlobalAction.EditorComposeMode:
-                    menuBar.Mode.Value = EditorScreenMode.Compose;
+                    Mode.Value = EditorScreenMode.Compose;
                     return true;
 
                 case GlobalAction.EditorDesignMode:
-                    menuBar.Mode.Value = EditorScreenMode.Design;
+                    Mode.Value = EditorScreenMode.Design;
                     return true;
 
                 case GlobalAction.EditorTimingMode:
-                    menuBar.Mode.Value = EditorScreenMode.Timing;
+                    Mode.Value = EditorScreenMode.Timing;
                     return true;
 
                 case GlobalAction.EditorSetupMode:
-                    menuBar.Mode.Value = EditorScreenMode.SongSetup;
+                    Mode.Value = EditorScreenMode.SongSetup;
                     return true;
 
                 case GlobalAction.EditorVerifyMode:
-                    menuBar.Mode.Value = EditorScreenMode.Verify;
+                    Mode.Value = EditorScreenMode.Verify;
                     return true;
 
                 case GlobalAction.EditorTestGameplay:
@@ -549,16 +560,16 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             dimBackground();
             resetTrack(true);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             dimBackground();
         }
 
@@ -574,9 +585,9 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (!exitConfirmed)
+            if (!ExitConfirmed)
             {
                 // dialog overlay may not be available in visual tests.
                 if (dialogOverlay == null)
@@ -585,12 +596,9 @@ namespace osu.Game.Screens.Edit
                     return true;
                 }
 
-                // if the dialog is already displayed, confirm exit with no save.
-                if (dialogOverlay.CurrentDialog is PromptForSaveDialog saveDialog)
-                {
-                    saveDialog.PerformOkAction();
+                // if the dialog is already displayed, block exiting until the user explicitly makes a decision.
+                if (dialogOverlay.CurrentDialog is PromptForSaveDialog)
                     return true;
-                }
 
                 if (isNewBeatmap || HasUnsavedChanges)
                 {
@@ -605,12 +613,12 @@ namespace osu.Game.Screens.Edit
 
             refetchBeatmap();
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
         }
@@ -635,7 +643,7 @@ namespace osu.Game.Screens.Edit
         {
             Save();
 
-            exitConfirmed = true;
+            ExitConfirmed = true;
             this.Exit();
         }
 
@@ -658,7 +666,7 @@ namespace osu.Game.Screens.Edit
                 Beatmap.SetDefault();
             }
 
-            exitConfirmed = true;
+            ExitConfirmed = true;
             this.Exit();
         }
 
@@ -841,7 +849,18 @@ namespace osu.Game.Screens.Edit
         }
 
         protected void CreateNewDifficulty(RulesetInfo rulesetInfo)
-            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo.BeatmapSet, rulesetInfo, GetState());
+        {
+            if (!rulesetInfo.Equals(editorBeatmap.BeatmapInfo.Ruleset))
+            {
+                switchToNewDifficulty(rulesetInfo, false);
+                return;
+            }
+
+            dialogOverlay.Push(new CreateNewDifficultyDialog(createCopy => switchToNewDifficulty(rulesetInfo, createCopy)));
+        }
+
+        private void switchToNewDifficulty(RulesetInfo rulesetInfo, bool createCopy)
+            => loader?.ScheduleSwitchToNewDifficulty(editorBeatmap.BeatmapInfo, rulesetInfo, createCopy, GetState(rulesetInfo));
 
         private EditorMenuItem createDifficultySwitchMenu()
         {
@@ -866,7 +885,7 @@ namespace osu.Game.Screens.Edit
             return new EditorMenuItem("Change difficulty") { Items = difficultyItems };
         }
 
-        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap));
+        protected void SwitchToDifficulty(BeatmapInfo nextBeatmap) => loader?.ScheduleSwitchToExistingDifficulty(nextBeatmap, GetState(nextBeatmap.Ruleset));
 
         private void cancelExit()
         {

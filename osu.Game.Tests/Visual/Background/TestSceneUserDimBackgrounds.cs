@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Background
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(Realm));
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
             Dependencies.Cache(new OsuConfigManager(LocalStorage));
             Dependencies.Cache(Realm);
@@ -359,9 +359,9 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() =>
                 new FadeAccessibleBackground(Beatmap.Value);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
 
                 ApplyToBackground(b => ReplacesBackground.BindTo(b.StoryboardReplacesBackground));
             }

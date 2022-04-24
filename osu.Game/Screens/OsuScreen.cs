@@ -48,7 +48,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode;
+        public readonly Bindable<OverlayActivation> OverlayActivationMode;
 
         IBindable<OverlayActivation> IOsuScreen.OverlayActivationMode => OverlayActivationMode;
 
@@ -171,7 +171,7 @@ namespace osu.Game.Screens
             background.ApplyToBackground(action);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             if (PlayResumeSound)
                 sampleExit?.Play();
@@ -183,19 +183,19 @@ namespace osu.Game.Screens
             if (trackAdjustmentStateAtSuspend != null)
                 musicController.AllowTrackAdjustments = trackAdjustmentStateAtSuspend.Value;
 
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
 
             trackAdjustmentStateAtSuspend = musicController.AllowTrackAdjustments;
 
             onSuspendingLogo();
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             applyArrivingDefaults(false);
 
@@ -210,15 +210,15 @@ namespace osu.Game.Screens
             }
 
             background = backgroundStack?.CurrentScreen as BackgroundScreen;
-            base.OnEntering(last);
+            base.OnEntering(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (ValidForResume && logo != null)
                 onExitingLogo();
 
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             if (ownedBackground != null && backgroundStack?.CurrentScreen == ownedBackground)

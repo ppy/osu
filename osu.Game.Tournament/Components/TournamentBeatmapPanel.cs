@@ -24,9 +24,6 @@ namespace osu.Game.Tournament.Components
 
         private readonly string mod;
 
-        private const float horizontal_padding = 10;
-        private const float vertical_padding = 10;
-
         public const float HEIGHT = 50;
 
         private readonly Bindable<TournamentMatch> currentMatch = new Bindable<TournamentMatch>();

@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
@@ -34,9 +35,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestMultipleStatuses()
         {
+            FillFlowContainer rooms = null;
+
             AddStep("create rooms", () =>
             {
-                Child = new FillFlowContainer
+                Child = rooms = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -53,19 +56,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Type = { Value = MatchType.HeadToHead },
                             Playlist =
                             {
-                                new PlaylistItem
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                        {
-                                            BeatmapInfo =
-                                            {
-                                                StarRating = 2.5
-                                            }
-                                        }.BeatmapInfo,
+                                        StarRating = 2.5
                                     }
-                                }
+                                }.BeatmapInfo)
                             }
                         }),
                         createLoungeRoom(new Room
@@ -76,26 +73,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             Type = { Value = MatchType.HeadToHead },
                             Playlist =
                             {
-                                new PlaylistItem
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
+                                        StarRating = 2.5,
+                                        Metadata =
                                         {
-                                            BeatmapInfo =
-                                            {
-                                                StarRating = 2.5,
-                                                Metadata =
-                                                {
-                                                    Artist = "very very very very very very very very very long artist",
-                                                    ArtistUnicode = "very very very very very very very very very long artist",
-                                                    Title = "very very very very very very very very very very very long title",
-                                                    TitleUnicode = "very very very very very very very very very very very long title",
-                                                }
-                                            }
-                                        }.BeatmapInfo,
+                                            Artist = "very very very very very very very very very long artist",
+                                            ArtistUnicode = "very very very very very very very very very long artist",
+                                            Title = "very very very very very very very very very very very long title",
+                                            TitleUnicode = "very very very very very very very very very very very long title",
+                                        }
                                     }
-                                }
+                                }.BeatmapInfo)
                             }
                         }),
                         createLoungeRoom(new Room
@@ -105,32 +96,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
                             EndDate = { Value = DateTimeOffset.Now.AddDays(1) },
                             Playlist =
                             {
-                                new PlaylistItem
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                        {
-                                            BeatmapInfo =
-                                            {
-                                                StarRating = 2.5
-                                            }
-                                        }.BeatmapInfo,
+                                        StarRating = 2.5
                                     }
-                                },
-                                new PlaylistItem
+                                }.BeatmapInfo),
+                                new PlaylistItem(new TestBeatmap(new OsuRuleset().RulesetInfo)
                                 {
-                                    Beatmap =
+                                    BeatmapInfo =
                                     {
-                                        Value = new TestBeatmap(new OsuRuleset().RulesetInfo)
-                                        {
-                                            BeatmapInfo =
-                                            {
-                                                StarRating = 4.5
-                                            }
-                                        }.BeatmapInfo,
+                                        StarRating = 4.5
                                     }
-                                }
+                                }.BeatmapInfo)
                             }
                         }),
                         createLoungeRoom(new Room
@@ -148,6 +127,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     }
                 };
             });
+
+            AddUntilStep("wait for panel load", () => rooms.Count == 5);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Currently playing", StringComparison.Ordinal)) == 2);
+            AddUntilStep("correct status text", () => rooms.ChildrenOfType<OsuSpriteText>().Count(s => s.Text.ToString().StartsWith("Ready to play", StringComparison.Ordinal)) == 3);
         }
 
         [Test]

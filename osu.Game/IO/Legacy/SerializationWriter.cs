@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
 // ReSharper disable ConditionIsAlwaysTrueOrFalse (we're allowing nulls to be passed to the writer where the underlying class doesn't).
@@ -218,24 +215,10 @@ namespace osu.Game.IO.Legacy
                         break;
 
                     default:
-                        Write((byte)ObjType.otherType);
-                        BinaryFormatter b = new BinaryFormatter
-                        {
-                            // AssemblyFormat = FormatterAssemblyStyle.Simple,
-                            TypeFormat = FormatterTypeStyle.TypesWhenNeeded
-                        };
-                        b.Serialize(BaseStream, obj);
-                        break;
+                        throw new IOException("Serialization of arbitrary type is not supported.");
                 } // switch
             } // if obj==null
         } // WriteObject
-
-        /// <summary> Adds the SerializationWriter buffer to the SerializationInfo at the end of GetObjectData(). </summary>
-        public void AddToInfo(SerializationInfo info)
-        {
-            byte[] b = ((MemoryStream)BaseStream).ToArray();
-            info.AddValue("X", b, typeof(byte[]));
-        }
 
         public void WriteRawBytes(byte[] b)
         {
