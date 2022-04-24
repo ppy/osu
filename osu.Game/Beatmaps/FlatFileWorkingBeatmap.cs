@@ -7,7 +7,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
-using osu.Game.Rulesets;
 using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
@@ -20,17 +19,15 @@ namespace osu.Game.Beatmaps
     {
         private readonly Beatmap beatmap;
 
-        public FlatFileWorkingBeatmap(string file, Func<int, Ruleset> rulesetProvider, int? beatmapId = null)
-            : this(readFromFile(file), rulesetProvider, beatmapId)
+        public FlatFileWorkingBeatmap(string file, int? beatmapId = null)
+            : this(readFromFile(file), beatmapId)
         {
         }
 
-        private FlatFileWorkingBeatmap(Beatmap beatmap, Func<int, Ruleset> rulesetProvider, int? beatmapId = null)
+        private FlatFileWorkingBeatmap(Beatmap beatmap, int? beatmapId = null)
             : base(beatmap.BeatmapInfo, null)
         {
             this.beatmap = beatmap;
-
-            beatmap.BeatmapInfo.Ruleset = rulesetProvider(beatmap.BeatmapInfo.Ruleset.OnlineID).RulesetInfo;
 
             if (beatmapId.HasValue)
                 beatmap.BeatmapInfo.OnlineID = beatmapId.Value;

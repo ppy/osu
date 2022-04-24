@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    previousPageButton = new PageSelectorPrevNextButton(false, "prev")
+                    previousPageButton = new PageSelectorPrevNextButton(false, CommonStrings.PaginationPrevious)
                     {
                         Action = () => CurrentPage.Value -= 1,
                     },
@@ -38,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                     },
-                    nextPageButton = new PageSelectorPrevNextButton(true, "next")
+                    nextPageButton = new PageSelectorPrevNextButton(true, CommonStrings.PaginationNext)
                     {
                         Action = () => CurrentPage.Value += 1
                     }

@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps.Drawables.Cards;
+using osu.Game.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -53,7 +54,9 @@ namespace osu.Game.Overlays.BeatmapListing
         /// <summary>
         /// The currently selected <see cref="BeatmapCardSize"/>.
         /// </summary>
-        public IBindable<BeatmapCardSize> CardSize { get; } = new Bindable<BeatmapCardSize>();
+        public IBindable<BeatmapCardSize> CardSize => cardSize;
+
+        private readonly Bindable<BeatmapCardSize> cardSize = new Bindable<BeatmapCardSize>();
 
         private readonly BeatmapListingSearchControl searchControl;
         private readonly BeatmapListingSortTabControl sortControl;
@@ -66,6 +69,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        private IBindable<APIUser> apiUser;
 
         public BeatmapListingFilterControl()
         {
@@ -126,8 +131,11 @@ namespace osu.Game.Overlays.BeatmapListing
             };
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider, IAPIProvider api)
         {
             sortControlBackground.Colour = colourProvider.Background4;
         }
@@ -138,6 +146,8 @@ namespace osu.Game.Overlays.BeatmapListing
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            config.BindWith(OsuSetting.BeatmapListingCardSize, cardSize);
 
             var sortCriteria = sortControl.Current;
             var sortDirection = sortControl.SortDirection;
@@ -161,6 +171,9 @@ namespace osu.Game.Overlays.BeatmapListing
 
             sortCriteria.BindValueChanged(_ => queueUpdateSearch());
             sortDirection.BindValueChanged(_ => queueUpdateSearch());
+
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ => queueUpdateSearch());
         }
 
         public void TakeFocus() => searchControl.TakeFocus();
@@ -189,6 +202,9 @@ namespace osu.Game.Overlays.BeatmapListing
             SearchStarted?.Invoke();
 
             resetSearch();
+
+            if (!api.IsLoggedIn)
+                return;
 
             queryChangedDebounce = Scheduler.AddDelayed(() =>
             {

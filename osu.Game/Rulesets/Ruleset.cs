@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets
         /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>
-        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
+        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(this);
 
         /// <summary>
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
@@ -228,25 +228,9 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
         /// </summary>
-        /// <param name="attributes">Difficulty attributes for the beatmap related to the provided score.</param>
-        /// <param name="score">The score to be processed.</param>
         /// <returns>A performance calculator instance for the provided score.</returns>
         [CanBeNull]
-        public virtual PerformanceCalculator CreatePerformanceCalculator(DifficultyAttributes attributes, ScoreInfo score) => null;
-
-        /// <summary>
-        /// Optionally creates a <see cref="PerformanceCalculator"/> to generate performance data from the provided score.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to use as a source for generating <see cref="DifficultyAttributes"/>.</param>
-        /// <param name="score">The score to be processed.</param>
-        /// <returns>A performance calculator instance for the provided score.</returns>
-        [CanBeNull]
-        public PerformanceCalculator CreatePerformanceCalculator(IWorkingBeatmap beatmap, ScoreInfo score)
-        {
-            var difficultyCalculator = CreateDifficultyCalculator(beatmap);
-            var difficultyAttributes = difficultyCalculator.Calculate(score.Mods);
-            return CreatePerformanceCalculator(difficultyAttributes, score);
-        }
+        public virtual PerformanceCalculator CreatePerformanceCalculator() => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 

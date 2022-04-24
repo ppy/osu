@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Rooms;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osuTK;
@@ -49,7 +50,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
                 {
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(100, 1),
-                    Text = "Edit",
+                    Text = CommonStrings.ButtonsEdit,
                     Action = () => OnEdit?.Invoke()
                 });
             }
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.OnlinePlay.Match
             if (editButton != null)
                 host.BindValueChanged(h => editButton.Alpha = h.NewValue?.Equals(api.LocalUser.Value) == true ? 1 : 0, true);
 
-            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap.Value, true);
+            SelectedItem.BindValueChanged(item => background.Beatmap.Value = item.NewValue?.Beatmap, true);
         }
 
         protected override Drawable CreateBackground() => background = new BackgroundSprite();

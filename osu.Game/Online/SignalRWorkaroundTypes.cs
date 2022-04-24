@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.Countdown;
 using osu.Game.Online.Multiplayer.MatchTypes.TeamVersus;
 
 namespace osu.Game.Online
@@ -18,8 +19,12 @@ namespace osu.Game.Online
         internal static readonly IReadOnlyList<(Type derivedType, Type baseType)> BASE_TYPE_MAPPING = new[]
         {
             (typeof(ChangeTeamRequest), typeof(MatchUserRequest)),
+            (typeof(StartMatchCountdownRequest), typeof(MatchUserRequest)),
+            (typeof(StopCountdownRequest), typeof(MatchUserRequest)),
+            (typeof(CountdownChangedEvent), typeof(MatchServerEvent)),
             (typeof(TeamVersusRoomState), typeof(MatchRoomState)),
             (typeof(TeamVersusUserState), typeof(MatchUserState)),
+            (typeof(MatchStartCountdown), typeof(MultiplayerCountdown))
         };
     }
 }

@@ -27,7 +27,7 @@ namespace osu.Game.Online
 
             // This should not be required. The fallback should work. But something is weird with the way caching is done.
             // For future adventurers, I would not advise looking into this further. It's likely not worth the effort.
-            baseMap = baseMap.Concat(baseMap.Select(t => (t.baseType, t.baseType)));
+            baseMap = baseMap.Concat(baseMap.Select(t => (t.baseType, t.baseType)).Distinct());
 
             return new Dictionary<Type, IMessagePackFormatter>(baseMap.Select(t =>
             {

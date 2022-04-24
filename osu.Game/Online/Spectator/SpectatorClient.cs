@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Replays.Legacy;
@@ -46,6 +47,26 @@ namespace osu.Game.Online.Spectator
         public IBindableList<int> PlayingUsers => playingUsers;
 
         /// <summary>
+        /// Whether the local user is playing.
+        /// </summary>
+        protected bool IsPlaying { get; private set; }
+
+        /// <summary>
+        /// Called whenever new frames arrive from the server.
+        /// </summary>
+        public virtual event Action<int, FrameDataBundle>? OnNewFrames;
+
+        /// <summary>
+        /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
+        /// </summary>
+        public virtual event Action<int, SpectatorState>? OnUserBeganPlaying;
+
+        /// <summary>
+        /// Called whenever a user finishes a play session.
+        /// </summary>
+        public virtual event Action<int, SpectatorState>? OnUserFinishedPlaying;
+
+        /// <summary>
         /// All users currently being watched.
         /// </summary>
         private readonly List<int> watchedUsers = new List<int>();
@@ -57,25 +78,15 @@ namespace osu.Game.Online.Spectator
         private IBeatmap? currentBeatmap;
         private Score? currentScore;
 
-        /// <summary>
-        /// Whether the local user is playing.
-        /// </summary>
-        protected bool IsPlaying { get; private set; }
+        private readonly Queue<FrameDataBundle> pendingFrameBundles = new Queue<FrameDataBundle>();
 
-        /// <summary>
-        /// Called whenever new frames arrive from the server.
-        /// </summary>
-        public event Action<int, FrameDataBundle>? OnNewFrames;
+        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
 
-        /// <summary>
-        /// Called whenever a user starts a play session, or immediately if the user is being watched and currently in a play session.
-        /// </summary>
-        public event Action<int, SpectatorState>? OnUserBeganPlaying;
+        private double lastPurgeTime;
 
-        /// <summary>
-        /// Called whenever a user finishes a play session.
-        /// </summary>
-        public event Action<int, SpectatorState>? OnUserFinishedPlaying;
+        private Task? lastSend;
+
+        private const int max_pending_frames = 30;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -94,6 +105,7 @@ namespace osu.Game.Online.Spectator
 
                     // re-send state in case it wasn't received
                     if (IsPlaying)
+                        // TODO: this is likely sent out of order after a reconnect scenario. needs further consideration.
                         BeginPlayingInternal(currentState);
                 }
                 else
@@ -168,7 +180,20 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        public void SendFrames(FrameDataBundle data) => lastSend = SendFramesInternal(data);
+        public void HandleFrame(ReplayFrame frame) => Schedule(() =>
+        {
+            if (!IsPlaying)
+            {
+                Logger.Log($"Frames arrived at {nameof(SpectatorClient)} outside of gameplay scope and will be ignored.");
+                return;
+            }
+
+            if (frame is IConvertibleReplayFrame convertible)
+                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
+
+            if (pendingFrames.Count > max_pending_frames)
+                purgePendingFrames();
+        });
 
         public void EndPlaying(GameplayState state)
         {
@@ -180,7 +205,7 @@ namespace osu.Game.Online.Spectator
                     return;
 
                 if (pendingFrames.Count > 0)
-                    purgePendingFrames(true);
+                    purgePendingFrames();
 
                 IsPlaying = false;
                 currentBeatmap = null;
@@ -196,7 +221,7 @@ namespace osu.Game.Online.Spectator
             });
         }
 
-        public void WatchUser(int userId)
+        public virtual void WatchUser(int userId)
         {
             Debug.Assert(ThreadSafety.IsUpdateThread);
 
@@ -222,7 +247,7 @@ namespace osu.Game.Online.Spectator
 
         protected abstract Task BeginPlayingInternal(SpectatorState state);
 
-        protected abstract Task SendFramesInternal(FrameDataBundle data);
+        protected abstract Task SendFramesInternal(FrameDataBundle bundle);
 
         protected abstract Task EndPlayingInternal(SpectatorState state);
 
@@ -230,53 +255,57 @@ namespace osu.Game.Online.Spectator
 
         protected abstract Task StopWatchingUserInternal(int userId);
 
-        private readonly Queue<LegacyReplayFrame> pendingFrames = new Queue<LegacyReplayFrame>();
-
-        private double lastSendTime;
-
-        private Task? lastSend;
-
-        private const int max_pending_frames = 30;
-
         protected override void Update()
         {
             base.Update();
 
-            if (pendingFrames.Count > 0 && Time.Current - lastSendTime > TIME_BETWEEN_SENDS)
+            if (pendingFrames.Count > 0 && Time.Current - lastPurgeTime > TIME_BETWEEN_SENDS)
                 purgePendingFrames();
         }
 
-        public void HandleFrame(ReplayFrame frame)
+        private void purgePendingFrames()
         {
-            Debug.Assert(ThreadSafety.IsUpdateThread);
-
-            if (!IsPlaying)
-                return;
-
-            if (frame is IConvertibleReplayFrame convertible)
-                pendingFrames.Enqueue(convertible.ToLegacy(currentBeatmap));
-
-            if (pendingFrames.Count > max_pending_frames)
-                purgePendingFrames();
-        }
-
-        private void purgePendingFrames(bool force = false)
-        {
-            if (lastSend?.IsCompleted == false && !force)
-                return;
-
             if (pendingFrames.Count == 0)
                 return;
 
-            var frames = pendingFrames.ToArray();
-
-            pendingFrames.Clear();
-
             Debug.Assert(currentScore != null);
 
-            SendFrames(new FrameDataBundle(currentScore.ScoreInfo, frames));
+            var frames = pendingFrames.ToArray();
+            var bundle = new FrameDataBundle(currentScore.ScoreInfo, frames);
 
-            lastSendTime = Time.Current;
+            pendingFrames.Clear();
+            lastPurgeTime = Time.Current;
+
+            pendingFrameBundles.Enqueue(bundle);
+
+            sendNextBundleIfRequired();
+        }
+
+        private void sendNextBundleIfRequired()
+        {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
+            if (lastSend?.IsCompleted == false)
+                return;
+
+            if (!pendingFrameBundles.TryPeek(out var bundle))
+                return;
+
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+
+            lastSend = tcs.Task;
+
+            SendFramesInternal(bundle).ContinueWith(t => Schedule(() =>
+            {
+                bool wasSuccessful = t.Exception == null;
+
+                // If the last bundle send wasn't successful, try again without dequeuing.
+                if (wasSuccessful)
+                    pendingFrameBundles.Dequeue();
+
+                tcs.SetResult(wasSuccessful);
+                sendNextBundleIfRequired();
+            }));
         }
     }
 }

@@ -20,13 +20,13 @@ namespace osu.Game.Screens.Play
             Score = score.ScoreInfo;
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
             // these will be reverted thanks to PlayerLoader's lease.
             Mods.Value = Score.Mods;
             Ruleset.Value = Score.Ruleset;
 
-            base.OnEntering(last);
+            base.OnEntering(e);
         }
     }
 }

@@ -22,8 +22,9 @@ namespace osu.Game.Overlays
 {
     public class SettingsToolboxGroup : Container, IExpandable
     {
+        public const int CONTAINER_WIDTH = 270;
+
         private const float transition_duration = 250;
-        private const int container_width = 270;
         private const int border_thickness = 2;
         private const int header_height = 30;
         private const int corner_radius = 5;
@@ -49,7 +50,7 @@ namespace osu.Game.Overlays
         public SettingsToolboxGroup(string title)
         {
             AutoSizeAxes = Axes.Y;
-            Width = container_width;
+            Width = CONTAINER_WIDTH;
             Masking = true;
             CornerRadius = corner_radius;
             BorderColour = Color4.Black;
@@ -161,7 +162,9 @@ namespace osu.Game.Overlays
 
             Expanded.BindValueChanged(v =>
             {
-                content.ClearTransforms();
+                // clearing transforms can break autosizing, see: https://github.com/ppy/osu-framework/issues/5064
+                if (v.NewValue != v.OldValue)
+                    content.ClearTransforms();
 
                 if (v.NewValue)
                     content.AutoSizeAxes = Axes.Y;
@@ -201,7 +204,5 @@ namespace osu.Game.Overlays
         }
 
         protected override Container<Drawable> Content => content;
-
-        protected override bool OnMouseDown(MouseDownEvent e) => true;
     }
 }

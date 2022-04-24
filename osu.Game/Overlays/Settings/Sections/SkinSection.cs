@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.Toggle(),
+                    Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
             };
@@ -134,6 +134,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void updateSelectedSkinFromConfig()
         {
+            if (!skinDropdown.Items.Any())
+                return;
+
             Live<SkinInfo> skin = null;
 
             if (Guid.TryParse(configBindable.Value, out var configId))

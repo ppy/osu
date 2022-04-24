@@ -114,7 +114,7 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private class CircularBorderContainer : CircularContainer
         {
-            public void TransformBorderTo(SRGBColour colour)
+            public void TransformBorderTo(ColourInfo colour)
                 => this.TransformTo(nameof(BorderColour), colour, 250, Easing.OutQuint);
         }
     }

@@ -7,7 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Graphics;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Wiki.Markdown
 {
@@ -46,14 +48,14 @@ namespace osu.Game.Overlays.Wiki.Markdown
             {
                 Add(new NoticeBox
                 {
-                    Text = "The content on this page is incomplete or outdated. If you are able to help out, please consider updating the article!",
+                    Text = WikiStrings.ShowIncompleteOrOutdated,
                 });
             }
             else if (needsCleanup)
             {
                 Add(new NoticeBox
                 {
-                    Text = "This page does not meet the standards of the osu! wiki and needs to be cleaned up or rewritten. If you are able to help out, please consider updating the article!",
+                    Text = WikiStrings.ShowNeedsCleanupOrRewrite,
                 });
             }
         }
@@ -63,7 +65,7 @@ namespace osu.Game.Overlays.Wiki.Markdown
             [Resolved]
             private IMarkdownTextFlowComponent parentFlowComponent { get; set; }
 
-            public string Text { get; set; }
+            public LocalisableString Text { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider, OsuColour colour)

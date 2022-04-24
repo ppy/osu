@@ -21,20 +21,19 @@ namespace osu.Game.Skinning.Editor
 
         private readonly List<BindableList<ISkinnableDrawable>> targetComponents = new List<BindableList<ISkinnableDrawable>>();
 
+        [Resolved]
+        private SkinEditor editor { get; set; }
+
         public SkinBlueprintContainer(Drawable target)
         {
             this.target = target;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(SkinEditor editor)
-        {
-            SelectedItems.BindTo(editor.SelectedComponents);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            SelectedItems.BindTo(editor.SelectedComponents);
 
             // track each target container on the current screen.
             var targetContainers = target.ChildrenOfType<ISkinnableTarget>().ToArray();
@@ -56,7 +55,7 @@ namespace osu.Game.Skinning.Editor
             }
         }
 
-        private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void componentsChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
@@ -79,7 +78,7 @@ namespace osu.Game.Skinning.Editor
                         AddBlueprintFor(item);
                     break;
             }
-        }
+        });
 
         protected override void AddBlueprintFor(ISkinnableDrawable item)
         {
@@ -93,5 +92,13 @@ namespace osu.Game.Skinning.Editor
 
         protected override SelectionBlueprint<ISkinnableDrawable> CreateBlueprintFor(ISkinnableDrawable component)
             => new SkinBlueprint(component);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            foreach (var list in targetComponents)
+                list.UnbindAll();
+        }
     }
 }

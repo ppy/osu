@@ -63,11 +63,11 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Bindable<float> activationDelay;
+        private Bindable<double> activationDelay;
 
         protected override void LoadComplete()
         {
-            activationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            activationDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            positionalAdjust = Vector2.Distance(e.ScreenSpaceMousePosition, button.ScreenSpaceDrawQuad.Centre) / 200;
+            positionalAdjust = Vector2.Distance(e.MousePosition, button.ToSpaceOfOtherDrawable(button.DrawRectangle.Centre, Parent)) / 100;
             return base.OnMouseMove(e);
         }
 

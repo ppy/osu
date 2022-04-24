@@ -11,6 +11,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Extensions;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Leaderboards;
@@ -98,6 +99,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         protected override APIRequest FetchScores(CancellationToken cancellationToken)
         {
             var fetchBeatmapInfo = BeatmapInfo;
+            var fetchRuleset = ruleset.Value ?? fetchBeatmapInfo.Ruleset;
 
             if (fetchBeatmapInfo == null)
             {
@@ -117,9 +119,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                 return null;
             }
 
+            if (!fetchRuleset.IsLegacyRuleset())
+            {
+                SetErrorState(LeaderboardState.RulesetUnavailable);
+                return null;
+            }
+
             if (fetchBeatmapInfo.OnlineID <= 0 || fetchBeatmapInfo.Status <= BeatmapOnlineStatus.Pending)
             {
-                SetErrorState(LeaderboardState.Unavailable);
+                SetErrorState(LeaderboardState.BeatmapUnavailable);
                 return null;
             }
 
@@ -137,7 +145,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             else if (filterMods)
                 requestMods = mods.Value;
 
-            var req = new GetScoresRequest(fetchBeatmapInfo, ruleset.Value ?? fetchBeatmapInfo.Ruleset, Scope, requestMods);
+            var req = new GetScoresRequest(fetchBeatmapInfo, fetchRuleset, Scope, requestMods);
 
             req.Success += r =>
             {
@@ -181,6 +189,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             void localScoresChanged(IRealmCollection<ScoreInfo> sender, ChangeSet changes, Exception exception)
             {
                 if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                // This subscription may fire from changes to linked beatmaps, which we don't care about.
+                // It's currently not possible for a score to be modified after insertion, so we can safely ignore callbacks with only modifications.
+                if (changes?.HasCollectionChanges() == false)
                     return;
 
                 var scores = sender.AsEnumerable();

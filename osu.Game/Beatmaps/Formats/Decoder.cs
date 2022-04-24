@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Game.IO;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -35,6 +37,15 @@ namespace osu.Game.Beatmaps.Formats
             LegacyBeatmapDecoder.Register();
             JsonBeatmapDecoder.Register();
             LegacyStoryboardDecoder.Register();
+        }
+
+        /// <summary>
+        /// Register dependencies for use with static decoder classes.
+        /// </summary>
+        /// <param name="rulesets">A store containing all available rulesets (used by <see cref="LegacyBeatmapDecoder"/>).</param>
+        public static void RegisterDependencies([NotNull] RulesetStore rulesets)
+        {
+            LegacyBeatmapDecoder.RulesetStore = rulesets ?? throw new ArgumentNullException(nameof(rulesets));
         }
 
         /// <summary>

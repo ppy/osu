@@ -236,8 +236,7 @@ namespace osu.Game.Online.Chat
                             break;
 
                         default:
-                            linkType = LinkAction.External;
-                            break;
+                            return new LinkDetails(LinkAction.External, url);
                     }
 
                     return new LinkDetails(linkType, args[2]);
@@ -269,10 +268,10 @@ namespace osu.Game.Online.Chat
             handleAdvanced(advanced_link_regex, result, startIndex);
 
             // handle editor times
-            handleMatches(time_regex, "{0}", "osu://edit/{0}", result, startIndex, LinkAction.OpenEditorTimestamp);
+            handleMatches(time_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}edit/{{0}}", result, startIndex, LinkAction.OpenEditorTimestamp);
 
             // handle channels
-            handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex, LinkAction.OpenChannel);
+            handleMatches(channel_regex, "{0}", $@"{OsuGameBase.OSU_PROTOCOL}chan/{{0}}", result, startIndex, LinkAction.OpenChannel);
 
             string empty = "";
             while (space-- > 0)

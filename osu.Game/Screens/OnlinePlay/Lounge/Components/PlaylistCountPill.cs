@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Specialized;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.LocalisationExtensions;
@@ -41,15 +41,22 @@ namespace osu.Game.Screens.OnlinePlay.Lounge.Components
         {
             base.LoadComplete();
 
-            Playlist.BindCollectionChanged(updateCount, true);
+            PlaylistItemStats.BindValueChanged(_ => updateCount());
+            Playlist.BindCollectionChanged((_, __) => updateCount(), true);
         }
 
-        private void updateCount(object sender, NotifyCollectionChangedEventArgs e)
+        private void updateCount()
         {
+            int activeItems = Playlist.Count > 0 || PlaylistItemStats.Value == null
+                // For now, use the playlist as the source of truth if it has any items.
+                // This allows the count to display correctly on the room screen (after joining a room).
+                ? Playlist.Count(i => !i.Expired)
+                : PlaylistItemStats.Value.CountActive;
+
             count.Clear();
-            count.AddText(Playlist.Count.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
+            count.AddText(activeItems.ToLocalisableString(), s => s.Font = s.Font.With(weight: FontWeight.Bold));
             count.AddText(" ");
-            count.AddText("Beatmap".ToQuantity(Playlist.Count, ShowQuantityAs.None));
+            count.AddText("Beatmap".ToQuantity(activeItems, ShowQuantityAs.None));
         }
     }
 }

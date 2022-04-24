@@ -4,12 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
-using osu.Game.Skinning;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
@@ -78,7 +76,7 @@ namespace osu.Game.Storyboards
         {
             get
             {
-                string backgroundPath = BeatmapInfo.BeatmapSet?.Metadata.BackgroundFile;
+                string backgroundPath = BeatmapInfo.Metadata.BackgroundFile;
 
                 if (string.IsNullOrEmpty(backgroundPath))
                     return false;
@@ -90,22 +88,17 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public DrawableStoryboard CreateDrawable(IWorkingBeatmap working = null) =>
-            new DrawableStoryboard(this);
+        public DrawableStoryboard CreateDrawable(IReadOnlyList<Mod> mods = null) =>
+            new DrawableStoryboard(this, mods);
 
-        public Drawable CreateSpriteFromResourcePath(string path, TextureStore textureStore)
+        public Texture GetTextureFromPath(string path, TextureStore textureStore)
         {
-            Drawable drawable = null;
-
             string storyboardPath = BeatmapInfo.BeatmapSet?.Files.FirstOrDefault(f => f.Filename.Equals(path, StringComparison.OrdinalIgnoreCase))?.File.GetStoragePath();
 
             if (!string.IsNullOrEmpty(storyboardPath))
-                drawable = new Sprite { Texture = textureStore.Get(storyboardPath) };
-            // if the texture isn't available locally in the beatmap, some storyboards choose to source from the underlying skin lookup hierarchy.
-            else if (UseSkinSprites)
-                drawable = new SkinnableSprite(path);
+                return textureStore.Get(storyboardPath);
 
-            return drawable;
+            return null;
         }
     }
 }

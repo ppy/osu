@@ -35,18 +35,14 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.Parallax,
                     Current = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsSlider<float, TimeSlider>
+                new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
-                    Current = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
+                    Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
+                    Keywords = new[] { @"delay" },
                     KeyboardStep = 50
                 },
             };
-        }
-
-        private class TimeSlider : OsuSliderBar<float>
-        {
-            public override LocalisableString TooltipText => Current.Value.ToString(@"N0") + "ms";
         }
     }
 }

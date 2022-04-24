@@ -43,7 +43,7 @@ namespace osu.Game.Graphics
         private Storage storage;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private Sample shutter;
 
@@ -111,6 +111,8 @@ namespace osu.Game.Graphics
             {
                 if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
                     cursorVisibility.Value = true;
+
+                host.GetClipboard()?.SetImage(image);
 
                 string filename = getFilename();
 

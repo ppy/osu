@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -66,6 +67,12 @@ namespace osu.Game.Rulesets.Objects
                 SamplesBindable.AddRange(value);
             }
         }
+
+        /// <summary>
+        /// Any samples which may be used by this hit object that are non-standard.
+        /// This is used only to preload these samples ahead of time.
+        /// </summary>
+        public virtual IList<HitSampleInfo> AuxiliarySamples => ImmutableList<HitSampleInfo>.Empty;
 
         public SampleControlPoint SampleControlPoint = SampleControlPoint.DEFAULT;
         public DifficultyControlPoint DifficultyControlPoint = DifficultyControlPoint.DEFAULT;

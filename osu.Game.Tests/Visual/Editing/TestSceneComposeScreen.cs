@@ -1,44 +1,71 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.ObjectExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
+using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Visual.Editing
 {
     [TestFixture]
     public class TestSceneComposeScreen : EditorClockTestScene
     {
-        [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
-        private readonly EditorBeatmap editorBeatmap =
-            new EditorBeatmap(new OsuBeatmap
-            {
-                BeatmapInfo =
-                {
-                    Ruleset = new OsuRuleset().RulesetInfo
-                }
-            });
+        private EditorBeatmap editorBeatmap;
 
         [Cached]
         private EditorClipboard clipboard = new EditorClipboard();
 
-        protected override void LoadComplete()
+        [SetUpSteps]
+        public void SetUpSteps()
         {
-            base.LoadComplete();
-
-            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
-
-            Child = new ComposeScreen
+            AddStep("setup compose screen", () =>
             {
-                State = { Value = Visibility.Visible },
-            };
+                var beatmap = new OsuBeatmap
+                {
+                    BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo }
+                };
+
+                editorBeatmap = new EditorBeatmap(beatmap, new LegacyBeatmapSkin(beatmap.BeatmapInfo, null));
+
+                Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+
+                Child = new DependencyProvidingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CachedDependencies = new (Type, object)[]
+                    {
+                        (typeof(EditorBeatmap), editorBeatmap),
+                        (typeof(IBeatSnapProvider), editorBeatmap),
+                    },
+                    Child = new ComposeScreen { State = { Value = Visibility.Visible } },
+                };
+            });
+
+            AddUntilStep("wait for composer", () => this.ChildrenOfType<HitObjectComposer>().SingleOrDefault()?.IsLoaded == true);
+        }
+
+        /// <summary>
+        /// Ensures that the skin of the edited beatmap is properly wrapped in a <see cref="LegacySkinTransformer"/>.
+        /// </summary>
+        [Test]
+        public void TestLegacyBeatmapSkinHasTransformer()
+        {
+            AddAssert("legacy beatmap skin has transformer", () =>
+            {
+                var sources = this.ChildrenOfType<BeatmapSkinProvidingContainer>().First().AllSources;
+                return sources.OfType<LegacySkinTransformer>().Count(t => t.Skin == editorBeatmap.BeatmapSkin.AsNonNull().Skin) == 1;
+            });
         }
     }
 }

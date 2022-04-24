@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +15,9 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
     public class ParticipantsList : MultiplayerRoomComposite
     {
         private FillFlowContainer<ParticipantPanel> panels;
+
+        [CanBeNull]
+        private ParticipantPanel currentHostPanel;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -55,6 +59,24 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                 // Add panels for all users new to the room.
                 foreach (var user in Room.Users.Except(panels.Select(p => p.User)))
                     panels.Add(new ParticipantPanel(user));
+
+                if (currentHostPanel == null || !currentHostPanel.User.Equals(Room.Host))
+                {
+                    // Reset position of previous host back to normal, if one existing.
+                    if (currentHostPanel != null && panels.Contains(currentHostPanel))
+                        panels.SetLayoutPosition(currentHostPanel, 0);
+
+                    currentHostPanel = null;
+
+                    // Change position of new host to display above all participants.
+                    if (Room.Host != null)
+                    {
+                        currentHostPanel = panels.SingleOrDefault(u => u.User.Equals(Room.Host));
+
+                        if (currentHostPanel != null)
+                            panels.SetLayoutPosition(currentHostPanel, -1);
+                    }
+                }
             }
         }
     }

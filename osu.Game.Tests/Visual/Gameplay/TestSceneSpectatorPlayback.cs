@@ -41,7 +41,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Replay replay;
 
+        private TestSpectatorClient spectatorClient;
+
         private ManualClock manualClock;
+
+        private TestReplayRecorder recorder;
 
         private OsuSpriteText latencyDisplay;
 
@@ -54,7 +58,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 replay = new Replay();
                 manualClock = new ManualClock();
-                SpectatorClient spectatorClient;
 
                 Child = new DependencyProvidingContainer
                 {
@@ -76,7 +79,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                                 {
                                     recordingManager = new TestRulesetInputManager(TestSceneModSettings.CreateTestRulesetInfo(), 0, SimultaneousBindingMode.Unique)
                                     {
-                                        Recorder = new TestReplayRecorder
+                                        Recorder = recorder = new TestReplayRecorder
                                         {
                                             ScreenSpaceToGamefield = pos => recordingManager.ToLocalSpace(pos),
                                         },
@@ -143,22 +146,52 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
+        [Test]
+        public void TestBasic()
+        {
+            AddUntilStep("received frames", () => replay.Frames.Count > 50);
+            AddStep("stop sending frames", () => recorder.Expire());
+            AddUntilStep("wait for all frames received", () => replay.Frames.Count == recorder.SentFrames.Count);
+        }
+
+        [Test]
+        public void TestWithSendFailure()
+        {
+            AddUntilStep("received frames", () => replay.Frames.Count > 50);
+
+            int framesReceivedSoFar = 0;
+            int frameSendAttemptsSoFar = 0;
+
+            AddStep("start failing sends", () =>
+            {
+                spectatorClient.ShouldFailSendingFrames = true;
+                framesReceivedSoFar = replay.Frames.Count;
+                frameSendAttemptsSoFar = spectatorClient.FrameSendAttempts;
+            });
+
+            AddUntilStep("wait for send attempts", () => spectatorClient.FrameSendAttempts > frameSendAttemptsSoFar + 5);
+            AddAssert("frames did not increase", () => framesReceivedSoFar == replay.Frames.Count);
+
+            AddStep("stop failing sends", () => spectatorClient.ShouldFailSendingFrames = false);
+
+            AddUntilStep("wait for next frames", () => framesReceivedSoFar < replay.Frames.Count);
+
+            AddStep("stop sending frames", () => recorder.Expire());
+
+            AddUntilStep("wait for all frames received", () => replay.Frames.Count == recorder.SentFrames.Count);
+            AddAssert("ensure frames were received in the correct sequence", () => replay.Frames.Select(f => f.Time).SequenceEqual(recorder.SentFrames.Select(f => f.Time)));
+        }
+
         private void onNewFrames(int userId, FrameDataBundle frames)
         {
-            Logger.Log($"Received {frames.Frames.Count} new frames ({string.Join(',', frames.Frames.Select(f => ((int)f.Time).ToString()))})");
-
             foreach (var legacyFrame in frames.Frames)
             {
                 var frame = new TestReplayFrame();
                 frame.FromLegacy(legacyFrame, null);
                 replay.Frames.Add(frame);
             }
-        }
 
-        [Test]
-        public void TestBasic()
-        {
-            AddStep("Wait for user input", () => { });
+            Logger.Log($"Received {frames.Frames.Count} new frames (total {replay.Frames.Count} of {recorder.SentFrames.Count})");
         }
 
         private double latency = SpectatorClient.TIME_BETWEEN_SENDS;
@@ -318,6 +351,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         internal class TestReplayRecorder : ReplayRecorder<TestAction>
         {
+            public List<ReplayFrame> SentFrames = new List<ReplayFrame>();
+
             public TestReplayRecorder()
                 : base(new Score
                 {
@@ -332,7 +367,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             protected override ReplayFrame HandleFrame(Vector2 mousePosition, List<TestAction> actions, ReplayFrame previousFrame)
             {
-                return new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
+                var testReplayFrame = new TestReplayFrame(Time.Current, mousePosition, actions.ToArray());
+                SentFrames.Add(testReplayFrame);
+                return testReplayFrame;
             }
         }
     }

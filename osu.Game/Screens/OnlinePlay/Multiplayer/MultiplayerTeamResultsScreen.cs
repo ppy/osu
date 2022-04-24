@@ -24,12 +24,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerTeamResultsScreen : MultiplayerResultsScreen
     {
-        private readonly SortedDictionary<int, BindableInt> teamScores;
+        private readonly SortedDictionary<int, BindableLong> teamScores;
 
         private Container winnerBackground;
         private Drawable winnerText;
 
-        public MultiplayerTeamResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, SortedDictionary<int, BindableInt> teamScores)
+        public MultiplayerTeamResultsScreen(ScoreInfo score, long roomId, PlaylistItem playlistItem, SortedDictionary<int, BindableLong> teamScores)
             : base(score, roomId, playlistItem)
         {
             if (teamScores.Count != 2)
