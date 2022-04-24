@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Mods
             Height = HEIGHT;
             AutoSizeAxes = Axes.X;
 
-            InternalChild = new Container
+            InternalChild = new InputBlockingContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,

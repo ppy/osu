@@ -66,6 +66,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        [Ignore("Enable when first run setup is being displayed on first run.")]
         public void TestDoesntOpenOnSecondRun()
         {
             AddStep("set first run", () => LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, true));
@@ -165,7 +166,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("click outside content", () =>
             {
-                InputManager.MoveMouseTo(overlay.ScreenSpaceDrawQuad.TopLeft - new Vector2(1));
+                InputManager.MoveMouseTo(new Vector2(overlay.ScreenSpaceDrawQuad.TopLeft.X, overlay.ScreenSpaceDrawQuad.Centre.Y));
                 InputManager.Click(MouseButton.Left);
             });
 
