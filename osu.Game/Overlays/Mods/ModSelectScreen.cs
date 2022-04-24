@@ -396,13 +396,13 @@ namespace osu.Game.Overlays.Mods
 
             protected override void Update()
             {
-                float leftX = DrawPosition.X;
-                // DrawWidth does not include shear effects, and we want to know the full extents of the columns post-shear,
+                // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
                 // so we have to manually compensate.
-                float rightX = DrawPosition.X + DrawWidth + DrawHeight * SHEAR;
+                var topLeft = ToSpaceOfOtherDrawable(new Vector2(-DrawHeight * SHEAR, 0), parentScroll);
+                var topRight = ToSpaceOfOtherDrawable(new Vector2(DrawWidth, 0), parentScroll);
 
-                isFullyOnScreen.Value = Precision.AlmostBigger(leftX, parentScroll.Current)
-                                        && Precision.DefinitelyBigger(parentScroll.Current + parentScroll.DrawWidth, rightX);
+                isFullyOnScreen.Value = Precision.AlmostBigger(topLeft.X, 0)
+                                        && Precision.DefinitelyBigger(parentScroll.DrawWidth, topRight.X);
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
