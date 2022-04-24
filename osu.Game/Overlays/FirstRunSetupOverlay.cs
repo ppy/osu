@@ -7,10 +7,8 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -18,25 +16,22 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
 using osu.Game.Overlays.FirstRunSetup;
+using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.OnlinePlay.Match.Components;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     [Cached]
-    public class FirstRunSetupOverlay : OsuFocusedOverlayContainer
+    public class FirstRunSetupOverlay : ShearedOverlayContainer
     {
-        protected override bool StartHidden => true;
+        protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Purple;
 
         [Resolved]
         private IPerformFromScreenRunner performer { get; set; } = null!;
@@ -52,14 +47,9 @@ namespace osu.Game.Overlays
         public PurpleTriangleButton NextButton = null!;
         public DangerousTriangleButton BackButton = null!;
 
-        [Cached]
-        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
-
         private readonly Bindable<bool> showFirstRunSetup = new Bindable<bool>();
 
         private int? currentStepIndex;
-
-        private const float scale_when_hidden = 0.9f;
 
         /// <summary>
         /// The currently displayed screen, if any.
@@ -76,149 +66,89 @@ namespace osu.Game.Overlays
 
         private Bindable<OverlayActivation>? overlayActivationMode;
 
-        public FirstRunSetupOverlay()
-        {
-            RelativeSizeAxes = Axes.Both;
-        }
+        private Container content = null!;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            Header.Title = FirstRunSetupOverlayStrings.FirstRunSetupTitle;
+            Header.Description = FirstRunSetupOverlayStrings.FirstRunSetupDescription;
 
-            RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(0.95f);
-
-            EdgeEffect = new EdgeEffectParameters
+            MainAreaContent.AddRange(new Drawable[]
             {
-                Type = EdgeEffectType.Shadow,
-                Radius = 5,
-                Colour = Color4.Black.Opacity(0.2f),
-            };
-
-            Masking = true;
-            CornerRadius = 10;
-
-            Children = new Drawable[]
-            {
-                new Box
+                content = new Container
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colourProvider.Background6,
-                },
-                new GridContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
+                    Padding = new MarginPadding { Horizontal = 50 },
+                    Child = new InputBlockingContainer
                     {
-                        new Dimension(GridSizeMode.AutoSize),
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
+                        Masking = true,
+                        CornerRadius = 14,
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
-                                {
-                                    new Box
-                                    {
-                                        Colour = colourProvider.Background5,
-                                        RelativeSizeAxes = Axes.Both,
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding(10),
-                                        AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
-                                        Children = new Drawable[]
-                                        {
-                                            new OsuSpriteText
-                                            {
-                                                Text = FirstRunSetupOverlayStrings.FirstRunSetupTitle,
-                                                Font = OsuFont.Default.With(size: 32),
-                                                Colour = colourProvider.Content1,
-                                                Anchor = Anchor.TopCentre,
-                                                Origin = Anchor.TopCentre,
-                                            },
-                                            new OsuTextFlowContainer
-                                            {
-                                                Text = FirstRunSetupOverlayStrings.FirstRunSetupDescription,
-                                                Colour = colourProvider.Content2,
-                                                Anchor = Anchor.TopCentre,
-                                                Origin = Anchor.TopCentre,
-                                                AutoSizeAxes = Axes.Both,
-                                            },
-                                        }
-                                    },
-                                }
-                            },
-                        },
-                        new Drawable[]
-                        {
-                            stackContainer = new Container
+                            new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding(20),
+                                Colour = ColourProvider.Background6,
                             },
-                        },
-                        new Drawable[]
-                        {
-                            new Container
+                            stackContainer = new Container
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Padding = new MarginPadding(20)
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding
                                 {
-                                    Top = 0 // provided by the stack container above.
-                                },
-                                Child = new GridContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                        new Dimension(GridSizeMode.Absolute, 10),
-                                        new Dimension(),
-                                    },
-                                    RowDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.AutoSize),
-                                    },
-                                    Content = new[]
-                                    {
-                                        new[]
-                                        {
-                                            BackButton = new DangerousTriangleButton
-                                            {
-                                                Width = 200,
-                                                Text = CommonStrings.Back,
-                                                Action = showPreviousStep,
-                                                Enabled = { Value = false },
-                                            },
-                                            Empty(),
-                                            NextButton = new PurpleTriangleButton
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                Width = 1,
-                                                Text = FirstRunSetupOverlayStrings.GetStarted,
-                                                Action = showNextStep
-                                            }
-                                        },
-                                    }
+                                    Vertical = 20,
+                                    Horizontal = 20,
                                 },
                             }
-                        }
-                    }
+                        },
+                    },
                 },
-            };
+            });
+
+            FooterContent.Add(new GridContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Width = 0.98f,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize),
+                    new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(),
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize),
+                },
+                Content = new[]
+                {
+                    new[]
+                    {
+                        BackButton = new DangerousTriangleButton
+                        {
+                            Width = 200,
+                            Text = CommonStrings.Back,
+                            Action = showPreviousStep,
+                            Enabled = { Value = false },
+                        },
+                        Empty(),
+                        NextButton = new PurpleTriangleButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Width = 1,
+                            Text = FirstRunSetupOverlayStrings.GetStarted,
+                            Action = showNextStep
+                        }
+                    },
+                }
+            });
         }
 
         protected override void LoadComplete()
@@ -227,7 +157,8 @@ namespace osu.Game.Overlays
 
             config.BindWith(OsuSetting.ShowFirstRunSetup, showFirstRunSetup);
 
-            if (showFirstRunSetup.Value) Show();
+            // TODO: uncomment when happy with the whole flow.
+            // if (showFirstRunSetup.Value) Show();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
@@ -280,10 +211,8 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            this.ScaleTo(scale_when_hidden)
-                .ScaleTo(1, 400, Easing.OutElasticHalf);
-
-            this.FadeIn(400, Easing.OutQuint);
+            content.ScaleTo(0.99f)
+                   .ScaleTo(1, 400, Easing.OutQuint);
 
             if (currentStepIndex == null)
                 showFirstStep();
@@ -291,6 +220,10 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
+            base.PopOut();
+
+            content.ScaleTo(0.99f, 400, Easing.OutQuint);
+
             if (overlayActivationMode != null)
             {
                 // If this is non-null we are guaranteed to have come from the main menu.
@@ -316,11 +249,6 @@ namespace osu.Game.Overlays
                 stack?.FadeOut(100)
                      .Expire();
             }
-
-            base.PopOut();
-
-            this.ScaleTo(0.96f, 400, Easing.OutQuint);
-            this.FadeOut(200, Easing.OutQuint);
         }
 
         private void showFirstStep()
@@ -362,7 +290,8 @@ namespace osu.Game.Overlays
             }
             else
             {
-                showFirstRunSetup.Value = false;
+                // TODO: uncomment when happy with the whole flow.
+                // showFirstRunSetup.Value = false;
                 currentStepIndex = null;
                 Hide();
             }
