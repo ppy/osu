@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Mania.Edit
         private ManiaBeatSnapGrid beatSnapGrid;
         private InputManager inputManager;
 
-        protected override bool SupportsDistanceSpacing => false;
-
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
