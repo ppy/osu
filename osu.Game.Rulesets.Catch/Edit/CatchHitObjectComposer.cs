@@ -24,6 +24,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Edit
 {
+    /// <remarks>
+    /// todo: should inherit <see cref="IDistanceSnapProvider"/> once it supports distance spacing properly.
+    /// </remarks>
     public class CatchHitObjectComposer : HitObjectComposer<CatchHitObject>
     {
         private const float distance_snap_radius = 50;
@@ -31,8 +34,6 @@ namespace osu.Game.Rulesets.Catch.Edit
         private CatchDistanceSnapGrid distanceSnapGrid;
 
         private readonly Bindable<TernaryState> distanceSnapToggle = new Bindable<TernaryState>();
-
-        protected override bool SupportsDistanceSpacing => false;
 
         private InputManager inputManager;
 
