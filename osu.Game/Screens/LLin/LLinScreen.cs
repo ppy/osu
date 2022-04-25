@@ -62,10 +62,10 @@ namespace osu.Game.Screens.LLin
         private LLinPluginManager pluginManager { get; set; }
 
         [Resolved]
-        private DialogOverlay dialog { get; set; }
+        private IDialogOverlay dialog { get; set; }
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -918,9 +918,9 @@ namespace osu.Game.Screens.LLin
 
         private IReadOnlyList<Mod> lastScreenMods;
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             //保存上个屏幕的Mods
             lastScreenMods = Mods.Value;
@@ -937,7 +937,7 @@ namespace osu.Game.Screens.LLin
             OnTrackRunningToggle?.Invoke(CurrentTrack.IsRunning);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             //重置Track
             CurrentTrack.ResetSpeedAdjustments();
@@ -961,12 +961,12 @@ namespace osu.Game.Screens.LLin
 
             pluginManager.RemoveDBusMenuEntry(dbusEntry);
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         private WorkingBeatmap suspendBeatmap;
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             CurrentTrack.ResetSpeedAdjustments();
             Beatmap.Disabled = false;
@@ -984,15 +984,15 @@ namespace osu.Game.Screens.LLin
             Beatmap.UnbindEvents();
             Suspending?.Invoke();
 
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             //更新Mod
-            lastScreenMods = ((OsuScreen)last).Mods.Value;
+            lastScreenMods = ((OsuScreen)e.Last).Mods.Value;
 
             Mods.Value = new List<Mod> { modRateAdjust };
 

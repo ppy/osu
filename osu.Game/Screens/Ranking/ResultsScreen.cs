@@ -232,9 +232,9 @@ namespace osu.Game.Screens.Ranking
             lastFetchCompleted = true;
         });
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             ApplyToBackground(b =>
             {
@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             bool useOriginalAnimation = mConfig.Get<bool>(MSetting.OptUI);
 
@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Ranking
 
             this.FadeOut(100);
 
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             return false;

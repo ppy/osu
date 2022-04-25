@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using M.DBus;
 using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -10,12 +11,15 @@ using Tmds.DBus;
 
 namespace osu.Desktop.DBus
 {
-    public class MprisPlayerService : IPlayer, IMediaPlayer2
+    public class MprisPlayerService : IMDBusObject, IPlayer, IMediaPlayer2
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/org/mpris/MediaPlayer2");
 
+        public string CustomRegisterName => "org.mpris.MediaPlayer2.mfosu";
+
         private readonly PlayerProperties playerProperties = new PlayerProperties();
+
         private readonly MediaPlayer2Properties mp2Properties = new MediaPlayer2Properties();
 
         internal Storage Storage { get; set; }
@@ -28,11 +32,20 @@ namespace osu.Desktop.DBus
         public Action PlayPause;
         public Action Stop;
         public Action Play;
-        public Action<double> Seek;
+        public Action<long> Seek;
+        public Action<long> SetPosition;
         public Action<string> OpenUri;
 
         public Action WindowRaise;
         public Action Quit;
+
+        public Action<double> OnVolumeSet;
+        public Action OnRandom;
+
+        /// <summary>
+        /// 是否允许通过DBus更改属性
+        /// </summary>
+        public bool AllowSet = false;
 
         #endregion
 
@@ -65,6 +78,28 @@ namespace osu.Desktop.DBus
             }
         }
 
+        internal long Progress
+        {
+            set => Set(nameof(playerProperties.Position), value);
+        }
+
+        //Position可以直接调用OnPropertiesChanged
+        //但Length是在Metadata中的，无法直接调用
+        //因此手动调用对Metadata的OnPropertiesChanged
+        internal long TrackLength
+        {
+            set
+            {
+                long oldval = (long)playerProperties.Metadata["mpris:length"];
+
+                if (oldval != value)
+                {
+                    playerProperties.Metadata["mpris:length"] = value;
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
+                }
+            }
+        }
+
         /// <summary>
         /// 元数据
         /// </summary>
@@ -82,7 +117,7 @@ namespace osu.Desktop.DBus
                 playerProperties.Metadata["xesam:title"] = info.Metadata?.TitleUnicode ?? info.Metadata?.Title ?? string.Empty;
                 playerProperties.Metadata["mpris:artUrl"] = resolveBeatmapCoverUrl(value);
 
-                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty("Metadata", playerProperties.Metadata));
+                OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(nameof(playerProperties.Metadata), playerProperties.Metadata));
             }
         }
 
@@ -109,7 +144,7 @@ namespace osu.Desktop.DBus
         {
             const string head = "file://";
             string body;
-            var backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
+            string backgroundFilename = beatmap?.BeatmapInfo.Metadata?.BackgroundFile;
 
             if (!string.IsNullOrEmpty(backgroundFilename) && !(UseAvatarLogoAsDefault?.Value ?? false))
             {
@@ -120,7 +155,7 @@ namespace osu.Desktop.DBus
             }
             else
             {
-                var target = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
+                string target = Storage?.GetFiles("custom", "avatarlogo*").FirstOrDefault(s => s.Contains("avatarlogo"));
                 if (!string.IsNullOrEmpty(target))
                     body = Storage.GetFullPath(target);
                 else
@@ -129,6 +164,8 @@ namespace osu.Desktop.DBus
 
             return head + body;
         }
+
+        #region 实现Mpris接口
 
         public Task NextAsync()
         {
@@ -175,6 +212,7 @@ namespace osu.Desktop.DBus
 
         public Task SetPositionAsync(ObjectPath trackId, long position)
         {
+            SetPosition?.Invoke(position);
             return Task.CompletedTask;
         }
 
@@ -201,19 +239,63 @@ namespace osu.Desktop.DBus
             return Task.CompletedTask;
         }
 
-        public Task<object> GetAsync(string prop)
-            => Task.FromResult(mp2Properties.Contains(prop)
-                ? mp2Properties.Get(prop)
-                : playerProperties.Get(prop));
+        #endregion
 
-        public Task SetAsync(string prop, object val)
+        public Task<object> GetAsync(string prop)
+            => Task.FromResult(get(prop));
+
+        private object get(string prop) => mp2Properties.Contains(prop)
+            ? mp2Properties.Get(prop)
+            : playerProperties.Get(prop);
+
+        public Task SetAsync(string target, object val)
         {
-            if (prop == nameof(PlayerProperties.Volume))
-            {
-                playerProperties.Set(nameof(PlayerProperties.Volume), val);
-            }
+            //暂时不接受外部设置
+            Set(target, val, true);
 
             return Task.CompletedTask;
+        }
+
+        internal void TriggerPropertyChangeFor(string target)
+        {
+            object value = get(target);
+
+            OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
+        }
+
+        internal void Set(string target, object val, bool isExternal = false)
+        {
+            if (!AllowSet && isExternal) return;
+
+            if (playerProperties.Set(target, val, isExternal))
+            {
+                //bool abortInvoke = false;
+
+                if (isExternal)
+                {
+                    switch (target)
+                    {
+                        case nameof(playerProperties.Volume):
+                            OnVolumeSet?.Invoke(playerProperties.Volume);
+                            break;
+
+                        case nameof(playerProperties.Shuffle):
+                            if (val is bool v && v)
+                            {
+                                OnRandom?.Invoke();
+
+                                Set("Shuffle", false);
+                                val = false; //中断Shuffle操作
+                                //abortInvoke = true;
+                            }
+
+                            break;
+                    }
+                }
+
+                //if (!abortInvoke)
+                    OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, val));
+            }
         }
 
         Task<MediaPlayer2Properties> IMediaPlayer2.GetAllAsync()

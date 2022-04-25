@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api, NotificationOverlay notifications)
+        private void load(IAPIProvider api, INotificationOverlay notifications)
         {
             SpriteIcon icon;
 

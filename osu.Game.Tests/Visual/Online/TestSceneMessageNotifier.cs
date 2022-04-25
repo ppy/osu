@@ -200,7 +200,7 @@ namespace osu.Game.Tests.Visual.Online
             [Cached]
             public ChannelManager ChannelManager { get; } = new ChannelManager();
 
-            [Cached]
+            [Cached(typeof(INotificationOverlay))]
             public NotificationOverlay NotificationOverlay { get; } = new NotificationOverlay
             {
                 Anchor = Anchor.TopRight,

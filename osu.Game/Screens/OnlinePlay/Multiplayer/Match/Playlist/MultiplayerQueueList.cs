@@ -62,7 +62,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match.Playlist
             {
                 base.LoadComplete();
 
-                RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID);
+                RequestDeletion = item => multiplayerClient.RemovePlaylistItem(item.ID).FireAndForget();
 
                 multiplayerClient.RoomUpdated += onRoomUpdated;
                 onRoomUpdated();

@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Configuration;
@@ -16,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModStrictTracking) };
+
         [SettingSource("去除滑条头的准确率要求", "滑条分数与其命中的滑条刻成比例。")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);
 

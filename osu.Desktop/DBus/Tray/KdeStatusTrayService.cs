@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using M.DBus;
 using M.DBus.Services.Kde;
 using Tmds.DBus;
 
@@ -8,10 +9,12 @@ namespace osu.Desktop.DBus.Tray
     /// <summary>
     ///     WIP
     /// </summary>
-    public class KdeStatusTrayService : IStatusNotifierItem
+    public class KdeStatusTrayService : IMDBusObject, IStatusNotifierItem
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/StatusNotifierItem");
+
+        public string CustomRegisterName => "org.kde.StatusNotifierItem.mfosu";
 
         public Action WindowRaise { get; set; }
 

@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -10,6 +11,7 @@ using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Localisation;
@@ -45,6 +47,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.RandomSelectAlgorithm, RandomSelectAlgorithm.RandomPermutation);
 
             SetDefault(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2f, 1f);
+
+            SetDefault(OsuSetting.BeatmapListingCardSize, BeatmapCardSize.Normal);
+
+            SetDefault(OsuSetting.ToolbarClockDisplayMode, ToolbarClockDisplayMode.Full);
 
             // Online settings
             SetDefault(OsuSetting.Username, string.Empty);
@@ -99,6 +105,9 @@ namespace osu.Game.Configuration
 
             SetDefault(OsuSetting.MenuParallax, true);
 
+            // See https://stackoverflow.com/a/63307411 for default sourcing.
+            SetDefault(OsuSetting.Prefer24HourTime, CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains(@"tt"));
+
             // Gameplay
             SetDefault(OsuSetting.PositionalHitsounds, true); // replaced by level setting below, can be removed 20220703.
             SetDefault(OsuSetting.PositionalHitsoundsLevel, 0.2f, 0, 1);
@@ -126,6 +135,8 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ReleaseStream, ReleaseStream.M);
 
             SetDefault(OsuSetting.Version, string.Empty);
+
+            SetDefault(OsuSetting.ShowFirstRunSetup, true);
 
             SetDefault(OsuSetting.ScreenshotFormat, ScreenshotFormat.Jpg);
             SetDefault(OsuSetting.ScreenshotCaptureMenuCursor, false);
@@ -285,6 +296,7 @@ namespace osu.Game.Configuration
         MenuVoice,
         CursorRotation,
         MenuParallax,
+        Prefer24HourTime,
         BeatmapDetailTab,
         BeatmapDetailModsFilter,
         Username,
@@ -298,7 +310,10 @@ namespace osu.Game.Configuration
         RandomSelectAlgorithm,
         ShowFpsDisplay,
         ChatDisplayHeight,
+        BeatmapListingCardSize,
+        ToolbarClockDisplayMode,
         Version,
+        ShowFirstRunSetup,
         ShowConvertedBeatmaps,
         Skin,
         ScreenshotFormat,

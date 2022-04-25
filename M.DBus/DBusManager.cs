@@ -11,7 +11,16 @@ using Tmds.DBus;
 
 namespace M.DBus
 {
-    public class DBusManager : IDisposable
+    public class DBusManager : DBusManager<IDBusObject>
+    {
+        public DBusManager(bool startOnLoad, IHandleTrayManagement trayManagement, IHandleSystemNotifications systemNotifications)
+            : base(startOnLoad, trayManagement, systemNotifications)
+        {
+        }
+    }
+
+    public class DBusManager<T> : IDisposable
+        where T : IDBusObject
     {
         public Action OnConnected;
 
@@ -42,7 +51,7 @@ namespace M.DBus
 
         public void Dispose()
         {
-            Disconnect();
+            //Disconnect();
 
             isDisposed = true;
             GC.SuppressFinalize(this);
@@ -50,6 +59,7 @@ namespace M.DBus
 
         #endregion
 
+/*
         #region 断开连接
 
         public bool Disconnect()
@@ -66,13 +76,14 @@ namespace M.DBus
                         //反注册物件
                         currentConnection.UnregisterObjects(registerDictionary.Keys);
 
-                        //反注册服务
-                        foreach (var dBusObject in registerDictionary.Keys)
-                            unRegisterFromConnection(dBusObject).ConfigureAwait(false);
+                        //foreach (var dBusObject in registerDictionary.Keys)
+                        //    unRegisterFromConnection(dBusObject).ConfigureAwait(false);
 
                         //清除当前连接目标
                         currentConnectTarget = string.Empty;
 
+                        currentConnection.Dispose();
+                        currentConnection = null;
                         break;
 
                     case ConnectionState.Connecting:
@@ -83,14 +94,16 @@ namespace M.DBus
                     case ConnectionState.Faulted:
                         currentConnection.Dispose();
                         currentConnection = null;
-                        connectionState = ConnectionState.NotConnected;
                         Logger.Log("DBus服务已经出现过一次错误, 将处理此次连接。");
                         break;
                 }
+
+                connectionState = ConnectionState.NotConnected;
             }
             catch (Exception e)
             {
                 Logger.Error(e, "停止DBus服务时出现了错误");
+                connectionState = ConnectionState.Faulted;
 
                 return false;
             }
@@ -99,6 +112,7 @@ namespace M.DBus
         }
 
         #endregion
+*/
 
         #region 工具
 
@@ -132,8 +146,8 @@ namespace M.DBus
             return registerDictionary.Any(o => o.Key.ObjectPath.Equals(objectPath));
         }
 
-        public T GetDBusObject<T>(ObjectPath path, string name = null)
-            where T : IDBusObject
+        public S GetDBusObject<S>(ObjectPath path, string name = null)
+            where S : IDBusObject
         {
             if (connectionState != ConnectionState.Connected || currentConnection == null)
                 throw new NotSupportedException("未连接");
@@ -141,7 +155,7 @@ namespace M.DBus
             if (string.IsNullOrEmpty(name))
                 name = path.ToServiceName();
 
-            return currentConnection.CreateProxy<T>(name, path);
+            return currentConnection.CreateProxy<S>(name, path);
         }
 
         #endregion
@@ -212,7 +226,7 @@ namespace M.DBus
 
         #region 反注册对象
 
-        public void UnRegisterObject(IDBusObject dBusObject)
+        public void RemoveObject(IDBusObject dBusObject)
         {
             var target = registerDictionary.FirstOrDefault(o => o.Key.ObjectPath.Equals(dBusObject.ObjectPath)).Key;
 
@@ -256,7 +270,7 @@ namespace M.DBus
             currentConnectTarget = target;
 
             //先停止服务
-            Disconnect();
+            //Disconnect();
 
             Logger.Log($"正在连接到 {target} 上的DBus服务!");
 
@@ -291,19 +305,22 @@ namespace M.DBus
                         GreetService.SwitchState(true, "");
                         break;
 
-                    case ConnectionState.Connected:
-                        Logger.Log($"已经连接到{currentConnectTarget}，直接注册!");
-
-                        //直接注册
-                        await registerObjects().ConfigureAwait(false);
-                        OnConnected?.Invoke();
-                        GreetService.SwitchState(true, "");
-                        break;
+                    //case ConnectionState.Connected:
+                    //    Logger.Log($"已经连接到{currentConnectTarget}，直接注册!");
+                    //
+                    //    //直接注册
+                    //    await registerObjects().ConfigureAwait(false);
+                    //    OnConnected?.Invoke();
+                    //    GreetService.SwitchState(true, "");
+                    //    break;
                 }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "连接到DBus时出现错误");
+                connectionState = ConnectionState.Faulted;
+
+                //Disconnect();
             }
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using M.DBus;
 using Tmds.DBus;
@@ -113,14 +114,22 @@ namespace osu.Desktop.DBus
     {
         private IDictionary<string, object> members;
 
+        private readonly string[] ignoreList =
+        {
+            nameof(PlaybackStatus),
+            nameof(LoopStatus)
+        };
+
         public object Get(string prop)
         {
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.GetValueFor(this, prop, members);
         }
 
-        internal bool Set(string name, object newValue)
+        internal bool Set(string name, object newValue, bool isExternal)
         {
+            if (isExternal && ignoreList.Contains(name)) return false;
+
             ServiceUtils.CheckIfDirectoryNotReady(this, members, out members);
             return ServiceUtils.SetValueFor(this, name, newValue, members);
         }
@@ -133,19 +142,35 @@ namespace osu.Desktop.DBus
 
         internal string _PlaybackStatus = "Paused";
 
-        public string PlaybackStatus => _PlaybackStatus;
+        public string PlaybackStatus
+        {
+            get => _PlaybackStatus;
+            set => _PlaybackStatus = value;
+        }
 
         internal string _LoopStatus = "Single";
 
-        public string LoopStatus => _LoopStatus;
+        public string LoopStatus
+        {
+            get => _LoopStatus;
+            set => _LoopStatus = value;
+        }
 
-        private readonly double _Rate = 1.0;
+        private double _Rate = 1.0;
 
-        public double Rate => _Rate;
+        public double Rate
+        {
+            get => _Rate;
+            set => _Rate = value;
+        }
 
-        private readonly bool _Shuffle = false;
+        private bool _Shuffle = false;
 
-        public bool Shuffle => _Shuffle;
+        public bool Shuffle
+        {
+            get => _Shuffle;
+            set => _Shuffle = value;
+        }
 
         private readonly IDictionary<string, object> _Metadata = new Dictionary<string, object>
         {
@@ -155,11 +180,12 @@ namespace osu.Desktop.DBus
             },
             ["xesam:title"] = "标题",
             ["xesam:trackNumber"] = 1,
+            ["mpris:length"] = (long)1
         };
 
         public IDictionary<string, object> Metadata => _Metadata;
 
-        private double _Volume;
+        private double _Volume = 1.0;
 
         public double Volume
         {
@@ -167,9 +193,18 @@ namespace osu.Desktop.DBus
             set => _Volume = value;
         }
 
-        private readonly long _Position = 0;
+        private long _Position;
 
-        public long Position => _Position;
+        public long Position
+        {
+            get => _Position;
+            set => _Position = value;
+        }
+
+        internal long TrackLength
+        {
+            set => _Metadata["mpris:length"] = value;
+        }
 
         private readonly double _MinimumRate = 1;
 
@@ -203,7 +238,7 @@ namespace osu.Desktop.DBus
 
         public bool CanPause => _CanPause;
 
-        private readonly bool _CanSeek = false;
+        private readonly bool _CanSeek = true;
 
         public bool CanSeek => _CanSeek;
 

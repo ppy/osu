@@ -1,0 +1,58 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Localisation;
+
+namespace osu.Game.Localisation
+{
+    public static class FirstRunSetupOverlayStrings
+    {
+        private const string prefix = @"osu.Game.Resources.Localisation.FirstRunSetupOverlay";
+
+        /// <summary>
+        /// "Get started"
+        /// </summary>
+        public static LocalisableString GetStarted => new TranslatableString(getKey(@"get_started"), @"开始");
+
+        /// <summary>
+        /// "Click to resume first-run setup at any point"
+        /// </summary>
+        public static LocalisableString ClickToResumeFirstRunSetupAtAnyPoint => new TranslatableString(getKey(@"click_to_resume_first_run_setup_at_any_point"), @"点击这里即可继续设置");
+
+        /// <summary>
+        /// "First-run setup"
+        /// </summary>
+        public static LocalisableString FirstRunSetupTitle => new TranslatableString(getKey(@"first_run_setup_title"), @"设置向导");
+
+        /// <summary>
+        /// "Set up osu! to suit you"
+        /// </summary>
+        public static LocalisableString FirstRunSetupDescription => new TranslatableString(getKey(@"first_run_setup_description"), @"让osu!符合你的风格");
+
+        /// <summary>
+        /// "Welcome"
+        /// </summary>
+        public static LocalisableString WelcomeTitle => new TranslatableString(getKey(@"welcome_title"), @"欢迎");
+
+        /// <summary>
+        /// "Welcome to the first-run setup guide!
+        ///
+        /// osu! is a very configurable game, and diving straight into the settings can sometimes be overwhelming. This guide will help you get the important choices out of the way to ensure a great first experience!"
+        /// </summary>
+        public static LocalisableString WelcomeDescription => new TranslatableString(getKey(@"welcome_description"), @"欢迎来到设置向导！
+
+osu!是一款高度可自定义的游戏，直接点开设置有时可能会让你不知所措, 因此此向导会帮助你优化你的初次体验!");
+
+        /// <summary>
+        /// "The size of the osu! user interface can be adjusted to your liking."
+        /// </summary>
+        public static LocalisableString UIScaleDescription => new TranslatableString(getKey(@"ui_scale_description"), @"osu!的界面大小可以根据你的喜好自由调整");
+
+        /// <summary>
+        /// "Next ({0})"
+        /// </summary>
+        public static LocalisableString Next(LocalisableString nextStepDescription) => new TranslatableString(getKey(@"next"), @"下一步 ({0})", nextStepDescription);
+
+        private static string getKey(string key) => $@"{prefix}:{key}";
+    }
+}

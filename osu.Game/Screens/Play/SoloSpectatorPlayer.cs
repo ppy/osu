@@ -24,11 +24,11 @@ namespace osu.Game.Screens.Play
             SpectatorClient.OnUserBeganPlaying += userBeganPlaying;
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             SpectatorClient.OnUserBeganPlaying -= userBeganPlaying;
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         private void userBeganPlaying(int userId, SpectatorState state)

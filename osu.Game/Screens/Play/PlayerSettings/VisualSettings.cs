@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Localisation;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 new OsuSpriteText
                 {
-                    Text = "背景暗化:"
+                    Text = GameplaySettingsStrings.BackgroundDim
                 },
                 dimSliderBar = new PlayerSliderBar<double>
                 {
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 new OsuSpriteText
                 {
-                    Text = "背景模糊:"
+                    Text = GameplaySettingsStrings.BackgroundBlur
                 },
                 blurSliderBar = new PlayerSliderBar<double>
                 {
@@ -41,9 +42,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Text = "切换:"
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = "故事版 / 背景视频" },
-                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "谱面皮肤" },
-                beatmapColorsToggle = new PlayerCheckbox { LabelText = "谱面颜色" }
+                showStoryboardToggle = new PlayerCheckbox { LabelText = GraphicsSettingsStrings.StoryboardVideo },
+                beatmapSkinsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapSkins },
+                beatmapColorsToggle = new PlayerCheckbox { LabelText = SkinSettingsStrings.BeatmapColours },
             };
         }
 

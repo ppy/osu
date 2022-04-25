@@ -36,7 +36,7 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
         }
 
         [Resolved]
-        private DialogOverlay dialog { get; set; }
+        private IDialogOverlay dialog { get; set; }
 
         private readonly BindableBool disabled = new BindableBool();
         private GridContainer buttonsGrid;
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.LLin.SideBar.PluginsPage
                 },
                 textureWrapper = new DelayedLoadUnloadWrapper(() =>
                 {
-                    var coverName = Plugin.GetType().Namespace?.Replace(".", "") ?? "Plugin";
+                    string coverName = Plugin.GetType().Namespace?.Replace(".", "") ?? "Plugin";
                     var s = new PluginBackgroundSprite($"{coverName}/{Plugin.GetType().Name}")
                     {
                         Anchor = Anchor.CentreLeft,

@@ -18,11 +18,12 @@ using osu.Framework.Platform;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
+using NotificationsStrings = osu.Game.Localisation.NotificationsStrings;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent
+    public class NotificationOverlay : OsuFocusedOverlayContainer, INamedOverlayComponent, INotificationOverlay
     {
         public string IconTexture => "Icons/Hexacons/notification";
         public LocalisableString Title => NotificationsStrings.HeaderTitle;
@@ -64,7 +65,7 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.X,
                             Children = new[]
                             {
-                                new NotificationSection(@"通知", @"清除所有")
+                                new NotificationSection(AccountsStrings.NotificationsTitle, "清除所有")
                                 {
                                     AcceptTypes = new[] { typeof(SimpleNotification) }
                                 },
@@ -102,7 +103,9 @@ namespace osu.Game.Overlays
             OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
-        public readonly BindableInt UnreadCount = new BindableInt();
+        public IBindable<int> UnreadCount => unreadCount;
+
+        private readonly BindableInt unreadCount = new BindableInt();
 
         private int runningDepth;
 
@@ -114,10 +117,6 @@ namespace osu.Game.Overlays
 
         private double? lastSamplePlayback;
 
-        /// <summary>
-        /// Post a new notification for display.
-        /// </summary>
-        /// <param name="notification">The notification to display.</param>
         public void Post(Notification notification) => postScheduler.Add(() =>
         {
             ++runningDepth;
@@ -146,19 +145,19 @@ namespace osu.Game.Overlays
         #region post通知到系统
 
         [Resolved(CanBeNull = true)]
-        private DBusManager dBusManager { get; set; }
+        private IDBusManagerContainer<IMDBusObject> dBusManagerContainer { get; set; }
 
         [Resolved]
         private GameHost host { get; set; }
 
         private void postToSystemIfPossible(Notification notification)
         {
-            if (dBusManager != null
+            if (dBusManagerContainer != null
                 && host.Window is SDL2DesktopWindow sdl2DesktopWindow
                 && !sdl2DesktopWindow.Visible
                 && notification is SimpleNotification sn)
             {
-                dBusManager.Notifications.PostAsync(new SystemNotification
+                dBusManagerContainer.PostSystemNotification(new SystemNotification
                 {
                     Title = "mfosu",
                     Description = sn.Text.ToString(),
@@ -215,7 +214,7 @@ namespace osu.Game.Overlays
 
         private void updateCounts()
         {
-            UnreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
+            unreadCount.Value = sections.Select(c => c.UnreadCount).Sum();
         }
 
         private void markAllRead()

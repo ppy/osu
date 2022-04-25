@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, OsuGame game, NotificationOverlay notifications)
+        private void load(MConfigManager config, OsuGame game)
         {
             optUI = config.GetBindable<bool>(MSetting.OptUI);
             Children = new Drawable[]

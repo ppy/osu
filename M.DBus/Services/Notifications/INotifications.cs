@@ -5,6 +5,10 @@ using Tmds.DBus;
 
 namespace M.DBus.Services.Notifications
 {
+    public interface INotificationsWrapper : IMDBusObject, INotifications
+    {
+    }
+
     [DBusInterface("org.freedesktop.Notifications")]
     public interface INotifications : IDBusObject
     {

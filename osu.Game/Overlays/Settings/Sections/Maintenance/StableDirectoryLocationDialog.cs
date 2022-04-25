@@ -6,13 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Screens;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class StableDirectoryLocationDialog : PopupDialog
     {
         [Resolved]
-        private OsuGame game { get; set; }
+        private IPerformFromScreenRunner performer { get; set; }
 
         public StableDirectoryLocationDialog(TaskCompletionSource<string> taskCompletionSource)
         {
@@ -25,11 +26,11 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 new PopupDialogOkButton
                 {
                     Text = "我当然知道它在哪！",
-                    Action = () => Schedule(() => game.PerformFromScreen(screen => screen.Push(new StableDirectorySelectScreen(taskCompletionSource))))
+                    Action = () => Schedule(() => performer.PerformFromScreen(screen => screen.Push(new StableDirectorySelectScreen(taskCompletionSource))))
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = "我其实没有装",
+                    Text = "其实我没有装stable",
                     Action = () => taskCompletionSource.TrySetCanceled()
                 }
             };

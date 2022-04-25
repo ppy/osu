@@ -19,7 +19,6 @@ using osu.Game.Screens.LLin.Misc.PluginResolvers;
 using osu.Game.Screens.LLin.Plugins.Config;
 using osu.Game.Screens.LLin.Plugins.Internal;
 using osu.Game.Screens.LLin.Plugins.Types;
-using Tmds.DBus;
 
 namespace osu.Game.Screens.LLin.Plugins
 {
@@ -37,7 +36,7 @@ namespace osu.Game.Screens.LLin.Plugins
 
         [Resolved(canBeNull: true)]
         [CanBeNull]
-        private DBusManager dBusManager { get; set; }
+        private IDBusManagerContainer<IMDBusObject> dBusManagerContainer { get; set; }
 
         internal Action<LLinPlugin> OnPluginAdd;
         internal Action<LLinPlugin> OnPluginUnLoad;
@@ -121,34 +120,34 @@ namespace osu.Game.Screens.LLin.Plugins
         public IPluginConfigManager GetConfigManager(LLinPlugin pl) =>
             configManagers.GetOrAdd(pl.GetType(), _ => pl.CreateConfigManager(storage));
 
-        public void RegisterDBusObject(IDBusObject target)
+        public void RegisterDBusObject(IMDBusObject target)
         {
             if (platformSupportsDBus)
-                dBusManager?.RegisterNewObject(target);
+                dBusManagerContainer?.Add(target);
         }
 
-        public void UnRegisterDBusObject(IDBusObject target)
+        public void UnRegisterDBusObject(IMDBusObject target)
         {
             if (platformSupportsDBus)
-                dBusManager?.UnRegisterObject(target);
+                dBusManagerContainer?.Remove(target);
         }
 
         public void AddDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
-                dBusManager?.TrayManager.AddEntry(entry);
+                dBusManagerContainer?.AddTrayEntry(entry);
         }
 
         public void RemoveDBusMenuEntry(SimpleEntry entry)
         {
             if (platformSupportsDBus)
-                dBusManager?.TrayManager.RemoveEntry(entry);
+                dBusManagerContainer?.RemoveTrayEntry(entry);
         }
 
         public void PostSystemNotification(SystemNotification notification)
         {
             if (platformSupportsDBus)
-                dBusManager?.Notifications.PostAsync(notification);
+                dBusManagerContainer?.PostSystemNotification(notification);
         }
 
         private bool platformSupportsDBus => RuntimeInfo.OS == RuntimeInfo.Platform.Linux;

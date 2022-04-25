@@ -7,9 +7,11 @@ namespace M.DBus
 {
     public class ServiceUtils
     {
-        private static readonly Dictionary<string, string> private_zone = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> not_available = new Dictionary<string, string>
         {
-            ["???"] = "PRIVATE ZONE!"
+            ["0"] = "Oops",
+            ["1"] = "此属性对外不可用或获取时发生异常",
+            ["2"] = "请检查runtime.log以获取更多信息",
         };
 
         public static Dictionary<string, object> GetMembers(object target)
@@ -26,7 +28,10 @@ namespace M.DBus
         public static object GetValueFor(object source, string name, IDictionary<string, object> members)
         {
             if (name == "members")
-                return private_zone;
+            {
+                Logger.Log("members属性对外不可用。");
+                return not_available;
+            }
 
             try
             {
@@ -41,10 +46,11 @@ namespace M.DBus
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"未能在{source}中查找 {name}: {e.Message}");
+                Logger.Log($"未能在{source}中查找 {name}: {e.Message}");
+                Logger.Log(e.StackTrace);
             }
 
-            return null;
+            return not_available;
         }
 
         public static bool SetValueFor(object source, string name, object newValue, IDictionary<string, object> members)

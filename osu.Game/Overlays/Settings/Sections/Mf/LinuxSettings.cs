@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using M.DBus;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -14,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
         protected override LocalisableString Header => "Linux集成";
 
         [BackgroundDependencyLoader]
-        private void load(MConfigManager config, DBusManager dBusManager)
+        private void load(MConfigManager config)
         {
             SettingsCheckbox trayCheckbox;
 
@@ -43,7 +42,7 @@ namespace osu.Game.Overlays.Settings.Sections.Mf
                 },
             };
 
-            trayCheckbox.WarningText = "由于未知原因, 启用再禁用托盘功能可能不会使托盘图标消失。";
+            trayCheckbox.WarningText = "启用再禁用托盘功能可能不会使托盘图标消失，正在设法解决中><";
         }
     }
 }

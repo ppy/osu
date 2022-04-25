@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Extensions;
 using osu.Game.Skinning;
@@ -84,9 +85,17 @@ namespace osu.Game.Screens.Play.HUD
         /// <returns>The new instance.</returns>
         public Drawable CreateInstance()
         {
-            Drawable d = (Drawable)Activator.CreateInstance(Type);
-            d.ApplySkinnableInfo(this);
-            return d;
+            try
+            {
+                Drawable d = (Drawable)Activator.CreateInstance(Type);
+                d.ApplySkinnableInfo(this);
+                return d;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Unable to create skin component {Type.Name}");
+                return Drawable.Empty();
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneUserTopScoreContainer : OsuTestScene
     {
-        [Cached]
+        [Cached(typeof(IDialogOverlay))]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneUserTopScoreContainer()

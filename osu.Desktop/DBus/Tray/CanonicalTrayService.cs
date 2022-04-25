@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using M.DBus;
 using M.DBus.Services.Canonical;
 using M.DBus.Tray;
 using M.DBus.Utils.Canonical.DBusMenuFlags;
@@ -17,10 +18,12 @@ namespace osu.Desktop.DBus.Tray
     /// 似乎dde不支持com.canonical.dbusmenu?<br/>
     /// https://github.com/linuxdeepin/dtkwidget/issues/85
     /// </summary>
-    public class CanonicalTrayService : IDBusMenu
+    public class CanonicalTrayService : IMDBusObject, IDBusMenu
     {
         public ObjectPath ObjectPath => PATH;
         public static readonly ObjectPath PATH = new ObjectPath("/MenuBar");
+
+        public string CustomRegisterName => "io.matrix_feather.dbus.menu";
 
         #region Canonical DBus
 

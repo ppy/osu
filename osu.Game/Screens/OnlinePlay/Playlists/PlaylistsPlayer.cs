@@ -45,9 +45,9 @@ namespace osu.Game.Screens.OnlinePlay.Playlists
                 throw new InvalidOperationException("当前Mods与游玩列表所需要的不匹配");
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             Exited?.Invoke();

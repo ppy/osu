@@ -157,13 +157,13 @@ namespace osu.Game.Skinning.Editor
 
                 if (item.UsesFixedAnchor) continue;
 
-                applyClosestAnchor(drawable);
+                ApplyClosestAnchor(drawable);
             }
 
             return true;
         }
 
-        private static void applyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
+        public static void ApplyClosestAnchor(Drawable drawable) => applyAnchor(drawable, getClosestAnchor(drawable));
 
         protected override void OnSelectionChanged()
         {
@@ -252,7 +252,7 @@ namespace osu.Game.Skinning.Editor
 
                 if (item.UsesFixedAnchor) continue;
 
-                applyClosestAnchor(drawable);
+                ApplyClosestAnchor(drawable);
             }
         }
 
@@ -279,7 +279,7 @@ namespace osu.Game.Skinning.Editor
             foreach (var item in SelectedItems)
             {
                 item.UsesFixedAnchor = false;
-                applyClosestAnchor((Drawable)item);
+                ApplyClosestAnchor((Drawable)item);
             }
         }
 

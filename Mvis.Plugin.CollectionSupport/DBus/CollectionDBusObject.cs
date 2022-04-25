@@ -8,7 +8,7 @@ using Tmds.DBus;
 namespace Mvis.Plugin.CollectionSupport.DBus
 {
     [DBusInterface("io.matrix_feather.mvis.collection")]
-    public interface ICollectionDBusObject : IDBusObject
+    public interface ICollectionDBusObject : IMDBusObject
     {
         Task<CollectionProperties> GetAllAsync();
         Task<object> GetAsync(string prop);
@@ -60,6 +60,8 @@ namespace Mvis.Plugin.CollectionSupport.DBus
     {
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mvis/collection");
         public ObjectPath ObjectPath => PATH;
+
+        public string CustomRegisterName { get; } = string.Empty;
 
         internal string CollectionName
         {

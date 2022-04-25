@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+#nullable enable
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Development;
 using osu.Framework.Graphics;
@@ -14,6 +18,7 @@ using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Models;
@@ -28,8 +33,6 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
 using SharpCompress.Writers.Zip;
-
-#nullable enable
 
 namespace osu.Game.Database
 {
@@ -49,7 +52,7 @@ namespace osu.Game.Database
         private OsuConfigManager config { get; set; } = null!;
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; } = null!;
+        private INotificationOverlay notificationOverlay { get; set; } = null!;
 
         [Resolved]
         private OsuGame game { get; set; } = null!;
@@ -57,7 +60,7 @@ namespace osu.Game.Database
         [Resolved]
         private Storage storage { get; set; } = null!;
 
-        private readonly OsuSpriteText currentOperationText;
+        private readonly OsuTextFlowContainer currentOperationText;
 
         private readonly bool clearData;
 
@@ -102,11 +105,13 @@ namespace osu.Game.Database
                         {
                             State = { Value = Visibility.Visible }
                         },
-                        currentOperationText = new OsuSpriteText
+                        currentOperationText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 30))
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.Default.With(size: 30)
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            TextAnchor = Anchor.TopCentre,
                         },
                     }
                 },
@@ -153,12 +158,24 @@ namespace osu.Game.Database
                     log("合并完成！");
 
                     if (DebugUtils.IsDebugBuild)
-                        Logger.Log("Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.", level: LogLevel.Important);
+                    {
+                        Logger.Log(
+                            "Your development database has been fully migrated to realm. If you switch back to a pre-realm branch and need your previous database, rename the backup file back to \"client.db\".\n\nNote that doing this can potentially leave your file store in a bad state.",
+                            level: LogLevel.Important);
+                    }
                 }
                 else
                 {
                     log("合并失败！");
                     Logger.Log(t.Exception.ToString(), LoggingTarget.Database);
+
+                    if (RuntimeInfo.OS == RuntimeInfo.Platform.macOS && t.Exception.Flatten().InnerException is TypeInitializationException)
+                    {
+                        // Not guaranteed to be the only cause of exception, but let's roll with it for now.
+                        log("Please download and run the intel version of osu! once\nto allow data migration to complete!");
+                        efContextFactory.SetMigrationCompletion();
+                        return;
+                    }
 
                     notificationOverlay.Post(new SimpleErrorNotification
                     {
@@ -302,7 +319,6 @@ namespace osu.Game.Database
                                 TimelineZoom = beatmap.TimelineZoom,
                                 Countdown = beatmap.Countdown,
                                 CountdownOffset = beatmap.CountdownOffset,
-                                MaxCombo = beatmap.MaxCombo,
                                 Bookmarks = beatmap.Bookmarks,
                                 BeatmapSet = realmBeatmapSet,
                             };

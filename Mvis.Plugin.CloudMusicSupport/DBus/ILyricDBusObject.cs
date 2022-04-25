@@ -8,7 +8,7 @@ using Tmds.DBus;
 namespace Mvis.Plugin.CloudMusicSupport.DBus
 {
     [DBusInterface("io.matrix_feather.mvis.lyric")]
-    public interface ILyricDBusObject : IDBusObject
+    public interface ILyricDBusObject : IMDBusObject
     {
         Task<LyricProperties> GetAllAsync();
         Task<object> GetAsync(string prop);
@@ -60,6 +60,8 @@ namespace Mvis.Plugin.CloudMusicSupport.DBus
     {
         public static readonly ObjectPath PATH = new ObjectPath("/io/matrix_feather/mvis/lyric");
         public ObjectPath ObjectPath => PATH;
+
+        public string CustomRegisterName { get; } = string.Empty;
 
         internal string RawLyric
         {

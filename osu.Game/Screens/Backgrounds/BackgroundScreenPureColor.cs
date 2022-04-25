@@ -37,18 +37,18 @@ namespace osu.Game.Screens.Backgrounds
             return BackgroundColor == otherBeatmapBackground.BackgroundColor;
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             //如果：
             //背景源不是加载页背景
             //下一个屏幕不是IntroSkipped
             //则淡出此屏幕, 因为我希望屏幕能在Intro为跳过时，背景可以无缝切换到BackgroundScreenDefault, 其他时间则正常淡出
             if (config.Get<BackgroundSource>(OsuSetting.MenuBackgroundSource) != BackgroundSource.LoaderBackground
-                || !(next is IntroSkipped))
+                || !(e.Next is IntroSkipped))
                 this.FadeOut(500, Easing.OutExpo);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             //如果：
             //背景源是加载页背景

@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Select
             HeaderText = "请确认是否删除这个成绩?";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = "是的",
                     Action = () => scoreManager?.Delete(score)

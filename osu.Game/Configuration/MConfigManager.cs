@@ -86,9 +86,11 @@ namespace osu.Game.Configuration
             SetDefault(MSetting.EnableTray, isLinuxPlatform);
             SetDefault(MSetting.EnableSystemNotifications, isLinuxPlatform);
             SetDefault(MSetting.TrayIconName, "mfosu-panel");
+            SetDefault(MSetting.DBusWaitOnline, 300d, 1d, 3000d);
 
             //Mpris
             SetDefault(MSetting.MprisUseAvatarlogoAsCover, true);
+            SetDefault(MSetting.MprisUpdateInterval, 500d, 100d, 1000d);
 
             //排行榜
             SetDefault(MSetting.InGameLeaderboardState, LeaderboardState.Fold);
@@ -145,7 +147,9 @@ namespace osu.Game.Configuration
         MvisCurrentFunctionBar,
         DBusIntegration,
         DBusAllowPost,
+        DBusWaitOnline,
         MprisUseAvatarlogoAsCover,
+        MprisUpdateInterval,
         EnableTray,
         EnableSystemNotifications,
         TrayIconName,

@@ -68,6 +68,16 @@ namespace osu.Game.Tournament
             Textures.AddStore(new TextureLoaderStore(new StorageBackedResourceStore(storage)));
 
             dependencies.CacheAs(new StableInfo(storage));
+        }
+
+        protected override void LoadComplete()
+        {
+            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
+
+            // we don't want to show the menu cursor as it would appear on stream output.
+            MenuCursorContainer.Cursor.Alpha = 0;
+
+            base.LoadComplete();
 
             Task.Run(readBracket);
         }
@@ -85,9 +95,13 @@ namespace osu.Game.Tournament
 
                 ladder ??= new LadderInfo();
 
-                ladder.Ruleset.Value = ladder.Ruleset.Value != null
+                var resolvedRuleset = ladder.Ruleset.Value != null
                     ? RulesetStore.GetRuleset(ladder.Ruleset.Value.ShortName)
                     : RulesetStore.AvailableRulesets.First();
+
+                // Must set to null initially to avoid the following re-fetch hitting `ShortName` based equality check.
+                ladder.Ruleset.Value = null;
+                ladder.Ruleset.Value = resolvedRuleset;
 
                 bool addedInfo = false;
 
@@ -284,16 +298,6 @@ namespace osu.Game.Tournament
 
                 success?.Invoke();
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            MenuCursorContainer.Cursor.AlwaysPresent = true; // required for tooltip display
-
-            // we don't want to show the menu cursor as it would appear on stream output.
-            MenuCursorContainer.Cursor.Alpha = 0;
-
-            base.LoadComplete();
         }
 
         protected virtual void SaveChanges()

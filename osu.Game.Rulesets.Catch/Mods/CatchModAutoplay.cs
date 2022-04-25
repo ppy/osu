@@ -3,19 +3,14 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModAutoplay : ModAutoplay
     {
-        public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
-        {
-            ScoreInfo = new ScoreInfo { User = new APIUser { Username = "osu!salad" } },
-            Replay = new CatchAutoGenerator(beatmap).Generate(),
-        };
+        public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+            => new ModReplayData(new CatchAutoGenerator(beatmap).Generate(), new ModCreatedUser { Username = "osu!salad" });
     }
 }
