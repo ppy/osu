@@ -160,7 +160,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
                                                     Height = 1,
-                                                    PlaceholderText = "在这输入你要发送的消息",
+                                                    PlaceholderText = Resources.Localisation.Web.ChatStrings.InputPlaceholder,
                                                     ReleaseFocusOnCommit = false,
                                                     HoldFocus = true,
                                                 }
@@ -314,7 +314,7 @@ namespace osu.Game.Overlays
         {
             Debug.Assert(channel.Id == message.ChannelId);
 
-            if (currentChannel.Value.Id != channel.Id)
+            if (currentChannel.Value?.Id != channel.Id)
             {
                 if (!channel.Joined.Value)
                     channel = channelManager.JoinChannel(channel);
@@ -323,6 +323,8 @@ namespace osu.Game.Overlays
             }
 
             channel.HighlightedMessage.Value = message;
+
+            Show();
         }
 
         private float startDragChatHeight;

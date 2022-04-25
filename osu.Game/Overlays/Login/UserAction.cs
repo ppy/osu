@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using osu.Framework.Localisation;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Login
 {
     public enum UserAction
     {
-        [Description("在线")]
+        [LocalisableDescription(typeof(UsersStrings), nameof(UsersStrings.StatusOnline))]
         Online,
 
         [Description(@"请勿打扰")]

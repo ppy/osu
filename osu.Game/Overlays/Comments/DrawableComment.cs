@@ -149,8 +149,8 @@ namespace osu.Game.Overlays.Comments
                                                         new OsuSpriteText
                                                         {
                                                             Alpha = Comment.IsDeleted ? 1 : 0,
-                                                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
-                                                            Text = @"已删除",
+                                                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                                                            Text = CommentsStrings.Deleted
                                                         }
                                                     }
                                                 },

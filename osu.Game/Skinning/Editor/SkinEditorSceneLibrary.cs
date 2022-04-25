@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -14,8 +16,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Skinning.Editor
@@ -27,10 +32,13 @@ namespace osu.Game.Skinning.Editor
         private const float padding = 10;
 
         [Resolved(canBeNull: true)]
-        private OsuGame game { get; set; }
+        private IPerformFromScreenRunner performer { get; set; }
 
         [Resolved]
         private IBindable<RulesetInfo> ruleset { get; set; }
+
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> mods { get; set; }
 
         public SkinEditorSceneLibrary()
         {
@@ -74,7 +82,7 @@ namespace osu.Game.Skinning.Editor
                                     Text = "歌曲选择",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Action = () => game?.PerformFromScreen(screen =>
+                                    Action = () => performer?.PerformFromScreen(screen =>
                                     {
                                         if (screen is SongSelect)
                                             return;
@@ -87,14 +95,18 @@ namespace osu.Game.Skinning.Editor
                                     Text = "游戏内",
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Action = () => game?.PerformFromScreen(screen =>
+                                    Action = () => performer?.PerformFromScreen(screen =>
                                     {
                                         if (screen is Player)
                                             return;
 
                                         var replayGeneratingMod = ruleset.Value.CreateInstance().GetAutoplayMod();
+
+                                        if (!ModUtils.CheckCompatibleSet(mods.Value.Append(replayGeneratingMod), out var invalid))
+                                            mods.Value = mods.Value.Except(invalid).ToArray();
+
                                         if (replayGeneratingMod != null)
-                                            screen.Push(new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateReplayScore(beatmap, mods)));
+                                            screen.Push(new PlayerLoader(() => new ReplayPlayer((beatmap, mods) => replayGeneratingMod.CreateScoreFromReplayData(beatmap, mods))));
                                     }, new[] { typeof(Player), typeof(SongSelect) })
                                 },
                             }
@@ -104,7 +116,7 @@ namespace osu.Game.Skinning.Editor
             };
         }
 
-        private class SceneButton : OsuButton
+        public class SceneButton : OsuButton
         {
             public SceneButton()
             {

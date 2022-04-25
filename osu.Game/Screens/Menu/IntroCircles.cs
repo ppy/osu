@@ -62,10 +62,10 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             this.FadeOut(300);
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
     }
 }

@@ -21,6 +21,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select.Details
@@ -62,11 +63,11 @@ namespace osu.Game.Screens.Select.Details
                 AutoSizeAxes = Axes.Y,
                 Children = new[]
                 {
-                    FirstValue = new StatisticRow(), //circle size/key amount
-                    HpDrain = new StatisticRow { Title = "掉血速度" },
-                    Accuracy = new StatisticRow { Title = "整体难度" },
-                    ApproachRate = new StatisticRow { Title = "缩圈速度" },
-                    starDifficulty = new StatisticRow(10, true) { Title = "难度星级" },
+                    FirstValue = new StatisticRow(), // circle size/key amount
+                    HpDrain = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsDrain },
+                    Accuracy = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAccuracy },
+                    ApproachRate = new StatisticRow { Title = BeatmapsetsStrings.ShowStatsAr },
+                    starDifficulty = new StatisticRow(10, true) { Title = BeatmapsetsStrings.ShowStatsStars },
                 },
             };
         }
@@ -120,12 +121,12 @@ namespace osu.Game.Screens.Select.Details
                 case 3:
                     // Account for mania differences locally for now
                     // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes
-                    FirstValue.Title = "键位数量";
+                    FirstValue.Title = BeatmapsetsStrings.ShowStatsCsMania;
                     FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, null);
                     break;
 
                 default:
-                    FirstValue.Title = "圆圈大小";
+                    FirstValue.Title = BeatmapsetsStrings.ShowStatsCs;
                     FirstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
                     break;
             }

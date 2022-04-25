@@ -17,12 +17,12 @@ namespace osu.Game.Screens.Edit
 
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogCancelButton
+                new PopupDialogOkButton
                 {
                     Text = @"是的，保存。",
                     Action = saveAndExit
                 },
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = @"忘了这事吧，不保存。",
                     Action = exit

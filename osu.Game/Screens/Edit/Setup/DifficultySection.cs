@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterfaceV2;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Screens.Edit.Setup
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Edit.Setup
             {
                 circleSizeSlider = new LabelledSliderBar<float>
                 {
-                    Label = "物件大小(CS)",
+                    Label = BeatmapsetsStrings.ShowStatsCs,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定所有物件的大小, 数值越大, 物件越小",
                     Current = new BindableFloat(Beatmap.Difficulty.CircleSize)
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 healthDrainSlider = new LabelledSliderBar<float>
                 {
-                    Label = "掉血速度(HP)",
+                    Label = BeatmapsetsStrings.ShowStatsDrain,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定掉血的速度, 数值越大, 掉血越快",
                     Current = new BindableFloat(Beatmap.Difficulty.DrainRate)
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 approachRateSlider = new LabelledSliderBar<float>
                 {
-                    Label = "缩圈速度(AR)",
+                    Label = BeatmapsetsStrings.ShowStatsAr,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定缩圈速度, 数值越大, 缩圈越快",
                     Current = new BindableFloat(Beatmap.Difficulty.ApproachRate)
@@ -66,7 +67,7 @@ namespace osu.Game.Screens.Edit.Setup
                 },
                 overallDifficultySlider = new LabelledSliderBar<float>
                 {
-                    Label = "整体难度(OD)",
+                    Label = BeatmapsetsStrings.ShowStatsAccuracy,
                     FixedLabelWidth = LABEL_WIDTH,
                     Description = "这将决定该谱面的整体难度(准确率要求, 转盘难度等), 数值越大, 难度越高",
                     Current = new BindableFloat(Beatmap.Difficulty.OverallDifficulty)

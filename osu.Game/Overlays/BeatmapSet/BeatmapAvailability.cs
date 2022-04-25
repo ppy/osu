@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Resources.Localisation.Web;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
@@ -69,14 +70,14 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             textContainer.Clear();
             textContainer.AddParagraph(downloadDisabled
-                ? "该谱面目前无法被下载"
-                : "应创建者或第三方权利所有者的要求，已删除了该谱面的部分内容。", t => t.Colour = Color4.Orange);
+                ? BeatmapsetsStrings.AvailabilityDisabled
+                : BeatmapsetsStrings.AvailabilityPartsRemoved, t => t.Colour = Color4.Orange);
 
             if (hasExternalLink)
             {
                 textContainer.NewParagraph();
                 textContainer.NewParagraph();
-                textContainer.AddLink("点击这里查看更多信息。", BeatmapSet.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
+                textContainer.AddLink(BeatmapsetsStrings.AvailabilityMoreInfo, BeatmapSet.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
             }
         }
     }

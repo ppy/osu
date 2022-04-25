@@ -70,7 +70,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 var tintingSkin = skinManager.GetSkin(DefaultLegacySkin.CreateInfo());
                 tintingSkin.Configuration.ConfigDictionary["AllowSliderBallTint"] = "1";
 
-                Child = new SkinProvidingContainer(tintingSkin)
+                var provider = Ruleset.Value.CreateInstance().CreateLegacySkinProvider(tintingSkin, Beatmap.Value.Beatmap);
+
+                Child = new SkinProvidingContainer(provider)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = dho = new DrawableSlider(prepareObject(new Slider

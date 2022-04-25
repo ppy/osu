@@ -7,6 +7,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -28,8 +29,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = @"你需要成为一名osu!supporter来查看好友和国内/区内排名!",
-                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
+                        Text = BeatmapsetsStrings.ShowScoreboardSupporterOnly,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                     },
                     text = new LinkFlowContainer(t => t.Font = t.Font.With(size: 18))
                     {

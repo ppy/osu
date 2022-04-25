@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
             HeaderText = @"是否删除";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = @"是的。完全，删掉他。",
                     Action = () => manager?.Delete(beatmap),

@@ -14,6 +14,7 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
@@ -106,7 +107,7 @@ namespace osu.Game.Overlays.Dashboard
             public readonly APIUser User;
 
             [Resolved(canBeNull: true)]
-            private OsuGame game { get; set; }
+            private IPerformFromScreenRunner performer { get; set; }
 
             public PlayingUserPanel(APIUser user)
             {
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays.Dashboard
                                 Text = "观看",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => game?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
+                                Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
                                 Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }

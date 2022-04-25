@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<int> viewDetails;
 
         [Resolved(CanBeNull = true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private CollectionManager collectionManager { get; set; }
