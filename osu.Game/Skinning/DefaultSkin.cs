@@ -155,7 +155,7 @@ namespace osu.Game.Skinning
                             return skinnableTargetWrapper;
                     }
 
-                    break;
+                    return null;
             }
 
             switch (component.LookupName)
