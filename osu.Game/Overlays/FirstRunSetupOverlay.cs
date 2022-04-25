@@ -304,12 +304,15 @@ namespace osu.Game.Overlays
             BackButton.Enabled.Value = currentStepIndex > 0;
             NextButton.Enabled.Value = currentStepIndex != null;
 
-            if (currentStepIndex != null)
-            {
-                NextButton.Text = currentStepIndex + 1 < steps.Length
-                    ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description)
-                    : CommonStrings.Finish;
-            }
+            if (currentStepIndex == null)
+                return;
+
+            if (currentStepIndex == 0)
+                NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
+            else if (currentStepIndex < steps.Length - 1)
+                NextButton.Text = FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description);
+            else
+                NextButton.Text = CommonStrings.Finish;
         }
 
         private class FirstRunStep
