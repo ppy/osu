@@ -65,7 +65,7 @@ namespace osu.Game.Skinning
 
         public bool UsesFixedAnchor { get; set; }
 
-        private class SpriteComponent : ISkinComponent
+        internal class SpriteComponent : ISkinComponent
         {
             public string LookupName { get; set; }
 
