@@ -33,17 +33,20 @@ namespace osu.Game.Tests.Visual.Settings
                     State = { Value = Visibility.Visible }
                 });
             });
+
+            AddStep("reset mouse", () => InputManager.MoveMouseTo(settings));
         }
 
         [Test]
-        public void TestQuickFiltering()
+        public void TestFiltering([Values] bool beforeLoad)
         {
-            AddStep("set filter", () =>
-            {
-                settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling";
-            });
+            if (beforeLoad)
+                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
 
             AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
+
+            if (!beforeLoad)
+                AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
 
             AddAssert("ensure all items match filter", () => settings.SectionsContainer
                                                                      .ChildrenOfType<SettingsSection>().Where(f => f.IsPresent)
@@ -56,6 +59,15 @@ namespace osu.Game.Tests.Visual.Settings
                                                                      ));
 
             AddAssert("ensure section is current", () => settings.CurrentSection.Value is GraphicsSection);
+            AddAssert("ensure section is placed first", () => settings.CurrentSection.Value.Y == 0);
+        }
+
+        [Test]
+        public void TestFilterAfterLoad()
+        {
+            AddUntilStep("wait for items to load", () => settings.SectionsContainer.ChildrenOfType<IFilterable>().Any());
+
+            AddStep("set filter", () => settings.SectionsContainer.ChildrenOfType<SearchTextBox>().First().Current.Value = "scaling");
         }
 
         [Test]

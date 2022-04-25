@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -51,14 +52,14 @@ namespace osu.Game.Overlays.Login
             {
                 username = new OsuTextBox
                 {
-                    PlaceholderText = UsersStrings.LoginUsername,
+                    PlaceholderText = UsersStrings.LoginUsername.ToLower(),
                     RelativeSizeAxes = Axes.X,
                     Text = api?.ProvidedUsername ?? string.Empty,
                     TabbableContentContainer = this
                 },
                 password = new OsuPasswordTextBox
                 {
-                    PlaceholderText = UsersStrings.LoginPassword,
+                    PlaceholderText = UsersStrings.LoginPassword.ToLower(),
                     RelativeSizeAxes = Axes.X,
                     TabbableContentContainer = this,
                 },
