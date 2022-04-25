@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private DigitalClockDisplay digital;
         private AnalogClockDisplay analog;
+        private LegacyMfClockDisplay legacy;
 
         public ToolbarClock()
             : base(HoverSampleSet.Toolbar)
@@ -75,6 +76,11 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
+                        },
+                        legacy = new LegacyMfClockDisplay()
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft
                         }
                     }
                 }
@@ -87,14 +93,20 @@ namespace osu.Game.Overlays.Toolbar
 
             clockDisplayMode.BindValueChanged(displayMode =>
             {
-                bool showAnalog = displayMode.NewValue == ToolbarClockDisplayMode.Analog || displayMode.NewValue == ToolbarClockDisplayMode.Full;
-                bool showDigital = displayMode.NewValue != ToolbarClockDisplayMode.Analog;
+                bool showAnalog = displayMode.NewValue == ToolbarClockDisplayMode.Analog
+                                  || displayMode.NewValue == ToolbarClockDisplayMode.Full
+                                  || displayMode.NewValue == ToolbarClockDisplayMode.LegacyMfStyleWithAnalog;
+                bool showDigital = displayMode.NewValue != ToolbarClockDisplayMode.Analog
+                                   && displayMode.NewValue != ToolbarClockDisplayMode.LegacyMfStyle
+                                   && displayMode.NewValue != ToolbarClockDisplayMode.LegacyMfStyleWithAnalog;
                 bool showRuntime = displayMode.NewValue == ToolbarClockDisplayMode.DigitalWithRuntime || displayMode.NewValue == ToolbarClockDisplayMode.Full;
+                bool showLegacy = displayMode.NewValue == ToolbarClockDisplayMode.LegacyMfStyle || displayMode.NewValue == ToolbarClockDisplayMode.LegacyMfStyleWithAnalog;
 
                 digital.FadeTo(showDigital ? 1 : 0);
                 digital.ShowRuntime = showRuntime;
 
                 analog.FadeTo(showAnalog ? 1 : 0);
+                legacy.FadeTo(showLegacy ? 1 : 0);
             }, true);
 
             prefer24HourTime.BindValueChanged(prefer24H => digital.Use24HourDisplay = prefer24H.NewValue, true);
@@ -131,8 +143,16 @@ namespace osu.Game.Overlays.Toolbar
                     clockDisplayMode.Value = ToolbarClockDisplayMode.Full;
                     break;
 
-                case ToolbarClockDisplayMode.Digital:
+                case ToolbarClockDisplayMode.LegacyMfStyleWithAnalog:
                     clockDisplayMode.Value = ToolbarClockDisplayMode.Analog;
+                    break;
+
+                case ToolbarClockDisplayMode.LegacyMfStyle:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.LegacyMfStyleWithAnalog;
+                    break;
+
+                case ToolbarClockDisplayMode.Digital:
+                    clockDisplayMode.Value = ToolbarClockDisplayMode.LegacyMfStyle;
                     break;
 
                 case ToolbarClockDisplayMode.DigitalWithRuntime:

@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override void UpdateDisplay(DateTimeOffset now)
         {
             realTime.Text = use24HourDisplay ? $"{now:HH:mm:ss}" : $"{now:h:mm:ss tt}";
-            gameTime.Text = $"running {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
+            gameTime.Text = $"已运行 {new TimeSpan(TimeSpan.TicksPerSecond * (int)(Clock.CurrentTime / 1000)):c}";
         }
 
         private void updateMetrics()

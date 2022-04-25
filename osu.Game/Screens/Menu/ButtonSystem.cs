@@ -83,13 +83,13 @@ namespace osu.Game.Screens.Menu
         private readonly ButtonArea buttonArea;
 
         private readonly MainMenuButton backButton;
-        private readonly Button backButton1;
+        private readonly MainMenuButton backButtonCustom;
 
         private readonly Bindable<bool> optui = new Bindable<bool>();
         private readonly List<MainMenuButton> buttonsTopLevel = new List<MainMenuButton>();
         private readonly List<MainMenuButton> buttonsPlay = new List<MainMenuButton>();
-        private readonly List<Button> buttonsP2C = new List<Button>();
-        private readonly List<Button> buttonsCustom = new List<Button>();
+        private readonly List<MainMenuButton> buttonsP2C = new List<MainMenuButton>();
+        private readonly List<MainMenuButton> buttonsCustom = new List<MainMenuButton>();
 
         private Sample sampleBack;
 
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Menu
                 {
                     VisibleState = ButtonSystemState.Play,
                 },
-                backButton1 = new Button(@"返回", @"button-back-select", OsuIcon.LeftCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Play, -WEDGE_WIDTH)
+                backButtonCustom = new MainMenuButton(@"返回", @"button-back-select", OsuIcon.LeftCircle, new Color4(0, 86, 73, 255), () => State = ButtonSystemState.Play, -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Custom,
                 },
@@ -197,7 +197,7 @@ namespace osu.Game.Screens.Menu
                 case false:
                     buttonsP2C.ForEach(b => b.FadeOut(250));
                     if (state == ButtonSystemState.Custom)
-                        backButton1.TriggerClick();
+                        backButtonCustom.TriggerClick();
                     break;
             }
         }
@@ -284,7 +284,7 @@ namespace osu.Game.Screens.Menu
                     return true;
 
                 case ButtonSystemState.Custom:
-                    backButton1.TriggerClick();
+                    backButtonCustom.TriggerClick();
                     return true;
 
                 default:

@@ -33,7 +33,6 @@ namespace osu.Game.Overlays.Toolbar
         public Action OnHome;
 
         private Bindable<bool> optUI { get; set; }
-        protected ToolbarTimeButton ToolbarTimeButton { get; private set; }
         protected ToolbarMfButton ToolbarMfButton { get; private set; }
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
@@ -100,7 +99,6 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        ToolbarTimeButton = new ToolbarTimeButton(),
                         new ToolbarNewsButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarRankingsButton(),
@@ -132,12 +130,10 @@ namespace osu.Game.Overlays.Toolbar
             {
                 case true:
                     ToolbarMfButton.FadeTo(1f, 250);
-                    ToolbarTimeButton.FadeTo(1f, 250);
                     break;
 
                 case false:
                     ToolbarMfButton.FadeTo(0f, 250);
-                    ToolbarTimeButton.FadeTo(0f, 250);
                     break;
             }
         }

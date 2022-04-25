@@ -8,6 +8,8 @@ namespace osu.Game.Configuration
         Analog,
         Digital,
         DigitalWithRuntime,
-        Full
+        Full,
+        LegacyMfStyle,
+        LegacyMfStyleWithAnalog,
     }
 }

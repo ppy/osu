@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Menu
         private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
-        private void load(ReleaseNoteDialog releaseNoteDialog, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
+        private void load(ReleaseNoteDialog releaseNoteDialog, BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, OsuGame game)
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);

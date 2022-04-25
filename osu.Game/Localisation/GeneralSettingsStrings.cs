@@ -32,7 +32,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Prefer 24-hour time display"
         /// </summary>
-        public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"Prefer 24-hour time display");
+        public static LocalisableString Prefer24HourTimeDisplay => new TranslatableString(getKey(@"prefer_24_hour_time_display"), @"使用24小时制");
 
         /// <summary>
         /// "Updates"

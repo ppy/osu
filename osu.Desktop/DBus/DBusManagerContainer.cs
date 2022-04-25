@@ -278,6 +278,8 @@ namespace osu.Desktop.DBus
                     musicController.NextTrack();
                 else
                     musicController.SeekTo(target);
+
+                mprisService.Progress = (long)(target * 1000);
             });
             mprisService.SetPosition += pos => Schedule(() =>
             {

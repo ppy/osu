@@ -23,6 +23,13 @@ namespace osu.Game.Rulesets.Mods
 
     public abstract class ModDance : Mod
     {
+        public override Type[] IncompatibleMods => new[]
+        {
+            typeof(ModRelax),
+            typeof(ModFailCondition),
+            typeof(ModNoFail)
+        };
+
         [SettingSource("保存Dance回放")]
         public Bindable<bool> SaveScore { get; } = new BindableBool();
 

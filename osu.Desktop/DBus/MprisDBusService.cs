@@ -258,7 +258,7 @@ namespace osu.Desktop.DBus
 
         internal void TriggerPropertyChangeFor(string target)
         {
-            var value = get(target);
+            object value = get(target);
 
             OnPropertiesChanged?.Invoke(PropertyChanges.ForProperty(target, value));
         }

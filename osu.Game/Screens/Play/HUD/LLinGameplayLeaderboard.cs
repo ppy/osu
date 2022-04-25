@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -14,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
-using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -220,7 +218,7 @@ namespace osu.Game.Screens.Play.HUD
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
         [Resolved]
-        private NotificationOverlay notificationOverlay { get; set; }
+        private INotificationOverlay notificationOverlay { get; set; }
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private IDisposable scoreSubscription;
