@@ -25,7 +25,6 @@ using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osuTK.Graphics;
-using osuTK.Input;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Tests.Visual
