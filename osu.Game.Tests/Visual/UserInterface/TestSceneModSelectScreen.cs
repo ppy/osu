@@ -119,25 +119,23 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddUntilStep("any column dimmed", () => this.ChildrenOfType<ModColumn>().Any(column => !column.Active.Value));
 
-            ModColumn firstDimmed = null;
-            ModPanel firstPanel = null;
+            ModColumn lastColumn = null;
 
-            AddStep("click first panel on dimmed column", () =>
+            AddAssert("last column dimmed", () => !this.ChildrenOfType<ModColumn>().Last().Active.Value);
+            AddStep("request scroll to last column", () =>
             {
-                firstDimmed = this.ChildrenOfType<ModColumn>().First(column => !column.Active.Value);
-                firstPanel = firstDimmed.ChildrenOfType<ModPanel>().First();
-                InputManager.MoveMouseTo(firstPanel);
+                var lastDimContainer = this.ChildrenOfType<ModSelectScreen.ColumnDimContainer>().Last();
+                lastColumn = lastDimContainer.Column;
+                lastDimContainer.RequestScroll?.Invoke(lastDimContainer);
+            });
+            AddUntilStep("column undimmed", () => lastColumn.Active.Value);
+
+            AddStep("click panel", () =>
+            {
+                InputManager.MoveMouseTo(lastColumn.ChildrenOfType<ModPanel>().First());
                 InputManager.Click(MouseButton.Left);
             });
-            AddUntilStep("column undimmed", () => firstDimmed.Active.Value);
-            AddAssert("panel not selected", () => !firstPanel.Active.Value);
-
-            AddStep("click panel again", () =>
-            {
-                InputManager.MoveMouseTo(firstPanel);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddUntilStep("panel selected", () => firstPanel.Active.Value);
+            AddUntilStep("panel selected", () => lastColumn.ChildrenOfType<ModPanel>().First().Active.Value);
         }
 
         [Test]
