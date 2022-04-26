@@ -141,7 +141,10 @@ namespace osu.Game.Overlays.Settings
 
         public void ApplyClassicDefault(bool useClassicDefault)
         {
-            if (hasClassicDefault && useClassicDefault)
+            if (!hasClassicDefault)
+                return;
+
+            if (useClassicDefault)
                 Current.Value = classicDefault;
             else
                 Current.SetDefault();
