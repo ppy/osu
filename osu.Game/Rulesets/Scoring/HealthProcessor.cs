@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Scoring
 
             Health.Value += GetHealthIncreaseFor(result);
 
-            if (meetsFailConditions(result))
+            if (meetsAnyFailCondition(result))
             {
                 if (Failed?.Invoke() != false)
                     HasFailed = true;
@@ -70,10 +70,10 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         /// <summary>
-        /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets the fail conditions.
+        /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
         /// </summary>
         /// <param name="result">The judgement result.</param>
-        private bool meetsFailConditions(JudgementResult result)
+        private bool meetsAnyFailCondition(JudgementResult result)
         {
             if (DefaultFailCondition)
                 return true;
