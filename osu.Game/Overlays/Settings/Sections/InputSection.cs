@@ -68,7 +68,10 @@ namespace osu.Game.Overlays.Settings.Sections
                     break;
 
                 // whitelist the handlers which should be displayed to avoid any weird cases of users touching settings they shouldn't.
-                case JoystickHandler _:
+                case JoystickHandler jh:
+                    section = new JoystickSettings(jh);
+                    break;
+
                 case MidiHandler _:
                     section = new HandlerSection(handler);
                     break;
