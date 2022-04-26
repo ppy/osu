@@ -27,6 +27,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
+    [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.UIScaling))]
     public class ScreenUIScale : FirstRunSetupScreen
     {
         [BackgroundDependencyLoader]
