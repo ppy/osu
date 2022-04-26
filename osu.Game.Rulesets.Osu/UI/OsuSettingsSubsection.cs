@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
-                    GetClassicDefault = () => false,
+                    ClassicDefault = false,
                     LabelText = "Snaking out sliders",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
