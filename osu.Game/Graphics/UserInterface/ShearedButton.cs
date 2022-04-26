@@ -62,6 +62,8 @@ namespace osu.Game.Graphics.UserInterface
         private Colour4? lighterColour;
         private Colour4? textColour;
 
+        private readonly Box flashLayer;
+
         /// <summary>
         /// Creates a new <see cref="ShearedToggleButton"/>
         /// </summary>
@@ -95,7 +97,14 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.Centre,
                     Font = OsuFont.TorusAlternate.With(size: 17),
                     Shear = new Vector2(-shear, 0)
-                }
+                },
+                flashLayer = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Colour4.White.Opacity(0.9f),
+                    Blending = BlendingParameters.Additive,
+                    Alpha = 0,
+                },
             };
 
             if (width != null)
@@ -119,6 +128,14 @@ namespace osu.Game.Graphics.UserInterface
 
             updateState();
             FinishTransforms(true);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Enabled.Value)
+                flashLayer.FadeOutFromOne(800, Easing.OutQuint);
+
+            return base.OnClick(e);
         }
 
         protected override bool OnHover(HoverEvent e)
