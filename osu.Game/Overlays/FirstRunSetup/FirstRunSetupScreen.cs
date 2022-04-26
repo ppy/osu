@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ScrollbarOverlapsContent = false,
                     Child = Content = new FillFlowContainer
                     {
                         Spacing = new Vector2(20),
