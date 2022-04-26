@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsEnumDropdown<ScoringMode>
                 {
-                    GetClassicDefault = () => ScoringMode.Classic,
+                    ClassicDefault = ScoringMode.Classic,
                     LabelText = GameplaySettingsStrings.ScoreDisplayMode,
                     Current = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode),
                     Keywords = new[] { "scoring" }

@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
             {
                 new SettingsCheckbox
                 {
-                    GetClassicDefault = () => true,
+                    ClassicDefault = true,
                     LabelText = UserInterfaceStrings.RightMouseScroll,
                     Current = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },

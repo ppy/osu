@@ -107,10 +107,8 @@ namespace osu.Game.Overlays.Settings
                     LabelText.ToString()
                 };
 
-                if (GetClassicDefault != null)
-                {
+                if (hasClassicDefault)
                     keywords.Add(CLASSIC_DEFAULT_SEARCH_TERM);
-                }
 
                 return keywords;
             }
@@ -126,20 +124,27 @@ namespace osu.Game.Overlays.Settings
 
         public event Action SettingChanged;
 
+        private T classicDefault;
+        private bool hasClassicDefault;
+
         /// <summary>
-        /// An action which when invoked will apply a classic default value to this setting.
+        /// A "classic" default value for this setting.
         /// </summary>
-        public Func<T> GetClassicDefault { get; set; }
+        public T ClassicDefault
+        {
+            set
+            {
+                classicDefault = value;
+                hasClassicDefault = true;
+            }
+        }
 
         public void ApplyClassicDefault(bool useClassicDefault)
         {
-            if (GetClassicDefault != null)
-            {
-                if (useClassicDefault)
-                    Current.Value = GetClassicDefault();
-                else
-                    Current.SetDefault();
-            }
+            if (hasClassicDefault && useClassicDefault)
+                Current.Value = classicDefault;
+            else
+                Current.SetDefault();
         }
 
         protected SettingsItem()
