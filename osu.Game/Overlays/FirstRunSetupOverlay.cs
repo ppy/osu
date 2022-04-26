@@ -133,7 +133,7 @@ namespace osu.Game.Overlays
                     {
                         BackButton = new DangerousTriangleButton
                         {
-                            Width = 200,
+                            Width = 300,
                             Text = CommonStrings.Back,
                             Action = showPreviousStep,
                             Enabled = { Value = false },
@@ -307,12 +307,22 @@ namespace osu.Game.Overlays
             if (currentStepIndex == null)
                 return;
 
-            if (currentStepIndex == 0)
+            bool isFirstStep = currentStepIndex == 0;
+            bool isLastStep = currentStepIndex == steps.Length - 1;
+
+            if (isFirstStep)
+            {
+                BackButton.Text = CommonStrings.Back;
                 NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
-            else if (currentStepIndex < steps.Length - 1)
-                NextButton.Text = new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Next, steps[currentStepIndex.Value + 1].Description);
+            }
             else
-                NextButton.Text = CommonStrings.Finish;
+            {
+                BackButton.Text = new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Back, steps[currentStepIndex.Value - 1].Description);
+
+                NextButton.Text = isLastStep
+                    ? CommonStrings.Finish
+                    : new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Next, steps[currentStepIndex.Value + 1].Description);
+            }
         }
 
         private class FirstRunStep
