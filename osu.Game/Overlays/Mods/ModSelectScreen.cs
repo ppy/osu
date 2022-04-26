@@ -86,9 +86,6 @@ namespace osu.Game.Overlays.Mods
                 }
             });
 
-            // initialise the scroll early, as we will want to pass it to its children in the hierarchy initialisation below.
-            columnScroll = new OsuScrollContainer(Direction.Horizontal);
-
             MainAreaContent.AddRange(new Drawable[]
             {
                 new Container
@@ -101,13 +98,13 @@ namespace osu.Game.Overlays.Mods
                     RelativePositionAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        columnScroll.With(col =>
+                        columnScroll = new OsuScrollContainer(Direction.Horizontal)
                         {
-                            col.RelativeSizeAxes = Axes.Both;
-                            col.Masking = false;
-                            col.ClampExtension = 100;
-                            col.ScrollbarOverlapsContent = false;
-                            col.Child = columnFlow = new ColumnFlowContainer
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = false,
+                            ClampExtension = 100,
+                            ScrollbarOverlapsContent = false,
+                            Child = columnFlow = new ColumnFlowContainer
                             {
                                 Direction = FillDirection.Horizontal,
                                 Shear = new Vector2(SHEAR, 0),
@@ -117,14 +114,14 @@ namespace osu.Game.Overlays.Mods
                                 Margin = new MarginPadding { Horizontal = 70 },
                                 Children = new[]
                                 {
-                                    createModColumnContent(columnScroll, ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
-                                    createModColumnContent(columnScroll, ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
-                                    createModColumnContent(columnScroll, ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
-                                    createModColumnContent(columnScroll, ModType.Conversion),
-                                    createModColumnContent(columnScroll, ModType.Fun)
+                                    createModColumnContent(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
+                                    createModColumnContent(ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
+                                    createModColumnContent(ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
+                                    createModColumnContent(ModType.Conversion),
+                                    createModColumnContent(ModType.Fun)
                                 }
-                            };
-                        })
+                            }
+                        }
                     }
                 }
             });
@@ -159,11 +156,12 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private ColumnDimContainer createModColumnContent(OsuScrollContainer scroll, ModType modType, Key[]? toggleKeys = null)
-            => new ColumnDimContainer(scroll, CreateModColumn(modType, toggleKeys))
+        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
+            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys))
             {
                 AutoSizeAxes = Axes.X,
-                RelativeSizeAxes = Axes.Y
+                RelativeSizeAxes = Axes.Y,
+                RequestScroll = column => columnScroll.ScrollTo(Math.Clamp(column.DrawPosition.X - 70, 0, columnScroll.ScrollableExtent))
             };
 
         protected override void LoadComplete()
@@ -322,6 +320,22 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            foreach (var column in columnFlow)
+            {
+                // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
+                // so we have to manually compensate.
+                var topLeft = column.ToSpaceOfOtherDrawable(new Vector2(-column.DrawHeight * SHEAR, 0), columnScroll);
+                var topRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth, 0), columnScroll);
+
+                column.Active.Value = Precision.AlmostBigger(topLeft.X, 0)
+                                      && Precision.DefinitelyBigger(columnScroll.DrawWidth, topRight.X);
+            }
+        }
+
         private class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
             public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
@@ -362,23 +376,22 @@ namespace osu.Game.Overlays.Mods
         {
             public ModColumn Column { get; }
 
-            private readonly ScrollContainer<Drawable> parentScroll;
-            private readonly Bindable<bool> isFullyOnScreen = new BindableBool(true);
+            public readonly Bindable<bool> Active = new BindableBool();
+            public Action<ColumnDimContainer>? RequestScroll { get; set; }
 
             [Resolved]
             private OsuColour colours { get; set; } = null!;
 
-            public ColumnDimContainer(ScrollContainer<Drawable> parentScroll, ModColumn column)
+            public ColumnDimContainer(ModColumn column)
             {
-                this.parentScroll = parentScroll;
                 Child = Column = column;
-                column.Active.BindTo(isFullyOnScreen);
+                column.Active.BindTo(Active);
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                isFullyOnScreen.BindValueChanged(_ => updateDim(), true);
+                Active.BindValueChanged(_ => updateDim(), true);
                 FinishTransforms();
             }
 
@@ -386,7 +399,7 @@ namespace osu.Game.Overlays.Mods
             {
                 Colour4 targetColour;
 
-                if (isFullyOnScreen.Value)
+                if (Active.Value)
                     targetColour = Colour4.White;
                 else
                     targetColour = IsHovered ? colours.GrayC : colours.Gray8;
@@ -394,21 +407,10 @@ namespace osu.Game.Overlays.Mods
                 this.FadeColour(targetColour, 300, Easing.OutQuint);
             }
 
-            protected override void Update()
-            {
-                // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
-                // so we have to manually compensate.
-                var topLeft = ToSpaceOfOtherDrawable(new Vector2(-DrawHeight * SHEAR, 0), parentScroll);
-                var topRight = ToSpaceOfOtherDrawable(new Vector2(DrawWidth, 0), parentScroll);
-
-                isFullyOnScreen.Value = Precision.AlmostBigger(topLeft.X, 0)
-                                        && Precision.DefinitelyBigger(parentScroll.DrawWidth, topRight.X);
-            }
-
             protected override bool OnMouseDown(MouseDownEvent e)
             {
-                if (!isFullyOnScreen.Value)
-                    parentScroll.ScrollTo(Math.Clamp(DrawPosition.X - 70, 0, parentScroll.ScrollableExtent));
+                if (!Active.Value)
+                    RequestScroll?.Invoke(this);
 
                 return true;
             }
@@ -417,7 +419,7 @@ namespace osu.Game.Overlays.Mods
             {
                 base.OnHover(e);
                 updateDim();
-                return isFullyOnScreen.Value;
+                return Active.Value;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
