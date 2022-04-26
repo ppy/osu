@@ -175,8 +175,8 @@ namespace osu.Game.Graphics.UserInterface
             }
             else if (IsHovered)
             {
-                colourDark = colourDark.Lighten(0.3f);
-                colourLight = colourLight.Lighten(0.3f);
+                colourDark = colourDark.Lighten(0.2f);
+                colourLight = colourLight.Lighten(0.2f);
             }
 
             background.FadeColour(colourDark, 150, Easing.OutQuint);
