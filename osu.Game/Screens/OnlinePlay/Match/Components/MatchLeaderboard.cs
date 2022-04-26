@@ -1,8 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Game.Online.API;
@@ -25,14 +24,14 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
                 if (id.NewValue == null)
                     return;
 
-                Scores = null;
-                UpdateScores();
+                SetScores(null);
+                RefetchScores();
             }, true);
         }
 
         protected override bool IsOnlineScope => true;
 
-        protected override APIRequest FetchScores(Action<IEnumerable<APIUserScoreAggregate>> scoresCallback)
+        protected override APIRequest FetchScores(CancellationToken cancellationToken)
         {
             if (roomId.Value == null)
                 return null;
@@ -41,8 +40,10 @@ namespace osu.Game.Screens.OnlinePlay.Match.Components
 
             req.Success += r =>
             {
-                scoresCallback?.Invoke(r.Leaderboard);
-                TopScore = r.UserScore;
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
+                SetScores(r.Leaderboard, r.UserScore);
             };
 
             return req;

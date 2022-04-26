@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override double ScoreMultiplier => 1.12;
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModFlashlight) };
+
         private DrawableOsuBlinds blinds;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)

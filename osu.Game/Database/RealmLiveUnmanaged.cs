@@ -13,34 +13,32 @@ namespace osu.Game.Database
     /// Usually used for testing purposes where the instance is never required to be managed.
     /// </summary>
     /// <typeparam name="T">The underlying object type.</typeparam>
-    public class RealmLiveUnmanaged<T> : ILive<T> where T : RealmObjectBase, IHasGuidPrimaryKey
+    public class RealmLiveUnmanaged<T> : Live<T> where T : RealmObjectBase, IHasGuidPrimaryKey
     {
+        /// <summary>
+        /// The original live data used to create this instance.
+        /// </summary>
+        public override T Value { get; }
+
         /// <summary>
         /// Construct a new instance of live realm data.
         /// </summary>
         /// <param name="data">The realm data.</param>
         public RealmLiveUnmanaged(T data)
+            : base(data.ID)
         {
+            if (data.IsManaged)
+                throw new InvalidOperationException($"Cannot use {nameof(RealmLiveUnmanaged<T>)} with managed instances");
+
             Value = data;
         }
 
-        public bool Equals(ILive<T>? other) => ID == other?.ID;
+        public override void PerformRead(Action<T> perform) => perform(Value);
 
-        public override string ToString() => Value.ToString();
+        public override TReturn PerformRead<TReturn>(Func<T, TReturn> perform) => perform(Value);
 
-        public Guid ID => Value.ID;
+        public override void PerformWrite(Action<T> perform) => throw new InvalidOperationException(@"Can't perform writes on a non-managed underlying value");
 
-        public void PerformRead(Action<T> perform) => perform(Value);
-
-        public TReturn PerformRead<TReturn>(Func<T, TReturn> perform) => perform(Value);
-
-        public void PerformWrite(Action<T> perform) => throw new InvalidOperationException(@"Can't perform writes on a non-managed underlying value");
-
-        public bool IsManaged => false;
-
-        /// <summary>
-        /// The original live data used to create this instance.
-        /// </summary>
-        public T Value { get; }
+        public override bool IsManaged => false;
     }
 }

@@ -8,6 +8,8 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Login;
+using osu.Game.Users.Drawables;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Menus
 {
@@ -15,6 +17,7 @@ namespace osu.Game.Tests.Visual.Menus
     public class TestSceneLoginPanel : OsuManualInputManagerTestScene
     {
         private LoginPanel loginPanel;
+        private int hideCount;
 
         [SetUpSteps]
         public void SetUpSteps()
@@ -26,6 +29,7 @@ namespace osu.Game.Tests.Visual.Menus
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Width = 0.5f,
+                    RequestHide = () => hideCount++,
                 });
             });
         }
@@ -50,6 +54,23 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("enter password", () => loginPanel.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
             AddStep("submit", () => loginPanel.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
+        }
+
+        [Test]
+        public void TestClickingOnFlagClosesPanel()
+        {
+            AddStep("reset hide count", () => hideCount = 0);
+
+            AddStep("logout", () => API.Logout());
+            AddStep("enter password", () => loginPanel.ChildrenOfType<OsuPasswordTextBox>().First().Text = "password");
+            AddStep("submit", () => loginPanel.ChildrenOfType<OsuButton>().First(b => b.Text.ToString() == "Sign in").TriggerClick());
+
+            AddStep("click on flag", () =>
+            {
+                InputManager.MoveMouseTo(loginPanel.ChildrenOfType<UpdateableFlag>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("hide requested", () => hideCount == 1);
         }
     }
 }

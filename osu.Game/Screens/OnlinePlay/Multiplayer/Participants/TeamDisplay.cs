@@ -83,7 +83,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
             Client.SendMatchRequest(new ChangeTeamRequest
             {
                 TeamID = ((Client.LocalUser?.MatchState as TeamVersusUserState)?.TeamID + 1) % 2 ?? 0,
-            });
+            }).FireAndForget();
         }
 
         public int? DisplayedTeam { get; private set; }

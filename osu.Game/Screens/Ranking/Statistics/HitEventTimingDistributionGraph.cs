@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking.Statistics
 {
@@ -40,6 +41,9 @@ namespace osu.Game.Screens.Ranking.Statistics
         /// </summary>
         private const float axis_points = 5;
 
+        /// <summary>
+        /// The currently displayed hit events.
+        /// </summary>
         private readonly IReadOnlyList<HitEvent> hitEvents;
 
         /// <summary>
@@ -51,122 +55,222 @@ namespace osu.Game.Screens.Ranking.Statistics
             this.hitEvents = hitEvents.Where(e => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit()).ToList();
         }
 
+        private int[] bins;
+        private double binSize;
+        private double hitOffset;
+
+        private Bar[] barDrawables;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             if (hitEvents == null || hitEvents.Count == 0)
                 return;
 
-            int[] bins = new int[total_timing_distribution_bins];
+            bins = new int[total_timing_distribution_bins];
 
-            double binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
+            binSize = Math.Ceiling(hitEvents.Max(e => Math.Abs(e.TimeOffset)) / timing_distribution_bins);
 
             // Prevent div-by-0 by enforcing a minimum bin size
             binSize = Math.Max(1, binSize);
 
+            Scheduler.AddOnce(updateDisplay);
+        }
+
+        public void UpdateOffset(double hitOffset)
+        {
+            this.hitOffset = hitOffset;
+            Scheduler.AddOnce(updateDisplay);
+        }
+
+        private void updateDisplay()
+        {
+            bool roundUp = true;
+
+            Array.Clear(bins, 0, bins.Length);
+
             foreach (var e in hitEvents)
             {
-                int binOffset = (int)Math.Round(e.TimeOffset / binSize, MidpointRounding.AwayFromZero);
-                bins[timing_distribution_centre_bin_index + binOffset]++;
+                double time = e.TimeOffset + hitOffset;
+
+                double binOffset = time / binSize;
+
+                // .NET's round midpoint handling doesn't provide a behaviour that works amazingly for display
+                // purposes here. We want midpoint rounding to roughly distribute evenly to each adjacent bucket
+                // so the easiest way is to cycle between downwards and upwards rounding as we process events.
+                if (Math.Abs(binOffset - (int)binOffset) == 0.5)
+                {
+                    binOffset = (int)binOffset + Math.Sign(binOffset) * (roundUp ? 1 : 0);
+                    roundUp = !roundUp;
+                }
+
+                int index = timing_distribution_centre_bin_index + (int)Math.Round(binOffset, MidpointRounding.AwayFromZero);
+
+                // may be out of range when applying an offset. for such cases we can just drop the results.
+                if (index >= 0 && index < bins.Length)
+                    bins[index]++;
             }
 
-            int maxCount = bins.Max();
-            var bars = new Drawable[total_timing_distribution_bins];
-            for (int i = 0; i < bars.Length; i++)
-                bars[i] = new Bar { Height = Math.Max(0.05f, (float)bins[i] / maxCount) };
-
-            Container axisFlow;
-
-            InternalChild = new GridContainer
+            if (barDrawables != null)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Width = 0.8f,
-                Content = new[]
+                for (int i = 0; i < barDrawables.Length; i++)
                 {
-                    new Drawable[]
-                    {
-                        new GridContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Content = new[] { bars }
-                        }
-                    },
-                    new Drawable[]
-                    {
-                        axisFlow = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y
-                        }
-                    },
-                },
-                RowDimensions = new[]
-                {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize),
+                    barDrawables[i].UpdateOffset(bins[i]);
                 }
-            };
-
-            // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
-            double maxValue = timing_distribution_bins * binSize;
-            double axisValueStep = maxValue / axis_points;
-
-            axisFlow.Add(new OsuSpriteText
+            }
+            else
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = "0",
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
-            });
+                int maxCount = bins.Max();
+                barDrawables = new Bar[total_timing_distribution_bins];
 
-            for (int i = 1; i <= axis_points; i++)
-            {
-                double axisValue = i * axisValueStep;
-                float position = (float)(axisValue / maxValue);
-                float alpha = 1f - position * 0.8f;
+                for (int i = 0; i < barDrawables.Length; i++)
+                    barDrawables[i] = new Bar(bins[i], maxCount, i == timing_distribution_centre_bin_index);
+
+                Container axisFlow;
+
+                const float axis_font_size = 12;
+
+                InternalChild = new GridContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.8f,
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Content = new[] { barDrawables }
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            axisFlow = new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = axis_font_size,
+                            }
+                        },
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    }
+                };
+
+                // Our axis will contain one centre element + 5 points on each side, each with a value depending on the number of bins * bin size.
+                double maxValue = timing_distribution_bins * binSize;
+                double axisValueStep = maxValue / axis_points;
 
                 axisFlow.Add(new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = -position / 2,
-                    Alpha = alpha,
-                    Text = axisValue.ToString("-0"),
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
+                    Text = "0",
+                    Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
                 });
 
-                axisFlow.Add(new OsuSpriteText
+                for (int i = 1; i <= axis_points; i++)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = position / 2,
-                    Alpha = alpha,
-                    Text = axisValue.ToString("+0"),
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold)
-                });
+                    double axisValue = i * axisValueStep;
+                    float position = (float)(axisValue / maxValue);
+                    float alpha = 1f - position * 0.8f;
+
+                    axisFlow.Add(new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = -position / 2,
+                        Alpha = alpha,
+                        Text = axisValue.ToString("-0"),
+                        Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
+                    });
+
+                    axisFlow.Add(new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = position / 2,
+                        Alpha = alpha,
+                        Text = axisValue.ToString("+0"),
+                        Font = OsuFont.GetFont(size: axis_font_size, weight: FontWeight.SemiBold)
+                    });
+                }
             }
         }
 
         private class Bar : CompositeDrawable
         {
-            public Bar()
+            private readonly float value;
+            private readonly float maxValue;
+
+            private readonly Circle boxOriginal;
+            private Circle boxAdjustment;
+
+            private const float minimum_height = 0.05f;
+
+            public Bar(float value, float maxValue, bool isCentre)
             {
-                Anchor = Anchor.BottomCentre;
-                Origin = Anchor.BottomCentre;
+                this.value = value;
+                this.maxValue = maxValue;
 
                 RelativeSizeAxes = Axes.Both;
+                Masking = true;
 
-                Padding = new MarginPadding { Horizontal = 1 };
-
-                InternalChild = new Circle
+                InternalChildren = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4Extensions.FromHex("#66FFCC")
+                    boxOriginal = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = isCentre ? Color4.White : Color4Extensions.FromHex("#66FFCC"),
+                        Height = minimum_height,
+                    },
                 };
+            }
+
+            private const double duration = 300;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                float height = Math.Clamp(value / maxValue, minimum_height, 1);
+
+                if (height > minimum_height)
+                    boxOriginal.ResizeHeightTo(height, duration, Easing.OutQuint);
+            }
+
+            public void UpdateOffset(float adjustment)
+            {
+                bool hasAdjustment = adjustment != value && adjustment / maxValue >= minimum_height;
+
+                if (boxAdjustment == null)
+                {
+                    if (!hasAdjustment)
+                        return;
+
+                    AddInternal(boxAdjustment = new Circle
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Colour = Color4.Yellow,
+                        Blending = BlendingParameters.Additive,
+                        Alpha = 0.6f,
+                        Height = 0,
+                    });
+                }
+
+                boxAdjustment.ResizeHeightTo(Math.Clamp(adjustment / maxValue, minimum_height, 1), duration, Easing.OutQuint);
+                boxAdjustment.FadeTo(!hasAdjustment ? 0 : 1, duration, Easing.OutQuint);
             }
         }
     }

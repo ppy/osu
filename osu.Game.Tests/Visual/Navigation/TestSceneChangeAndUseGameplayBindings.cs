@@ -50,9 +50,18 @@ namespace osu.Game.Tests.Visual.Navigation
             AddStep("close settings", () => Game.Settings.Hide());
 
             AddStep("import beatmap", () => BeatmapImportHelper.LoadQuickOszIntoOsu(Game).WaitSafely());
+
             PushAndConfirm(() => new PlaySongSelect());
 
+            AddUntilStep("wait for selection", () => !Game.Beatmap.IsDefault);
+
             AddStep("enter gameplay", () => InputManager.Key(Key.Enter));
+
+            AddUntilStep("wait for player", () =>
+            {
+                DismissAnyNotifications();
+                return player != null;
+            });
 
             AddUntilStep("wait for gameplay", () => player?.IsBreakTime.Value == false);
 
@@ -76,7 +85,7 @@ namespace osu.Game.Tests.Visual.Navigation
                                                        .ChildrenOfType<KeyBindingPanel>().SingleOrDefault();
 
         private RealmKeyBinding firstOsuRulesetKeyBindings => Game.Dependencies
-                                                                  .Get<RealmContextFactory>().Context
+                                                                  .Get<RealmAccess>().Realm
                                                                   .All<RealmKeyBinding>()
                                                                   .AsEnumerable()
                                                                   .First(k => k.RulesetName == "osu" && k.ActionInt == 0);

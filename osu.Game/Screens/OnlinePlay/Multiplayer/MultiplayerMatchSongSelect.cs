@@ -1,17 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR;
 using osu.Framework.Allocation;
-using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -68,45 +63,27 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 var multiplayerItem = new MultiplayerPlaylistItem
                 {
                     ID = itemToEdit ?? 0,
-                    BeatmapID = item.BeatmapID,
-                    BeatmapChecksum = item.Beatmap.Value.MD5Hash,
+                    BeatmapID = item.Beatmap.OnlineID,
+                    BeatmapChecksum = item.Beatmap.MD5Hash,
                     RulesetID = item.RulesetID,
-                    RequiredMods = item.RequiredMods.Select(m => new APIMod(m)).ToArray(),
-                    AllowedMods = item.AllowedMods.Select(m => new APIMod(m)).ToArray()
+                    RequiredMods = item.RequiredMods.ToArray(),
+                    AllowedMods = item.AllowedMods.ToArray()
                 };
 
                 Task task = itemToEdit != null ? client.EditPlaylistItem(multiplayerItem) : client.AddPlaylistItem(multiplayerItem);
 
-                task.ContinueWith(t =>
+                task.FireAndForget(onSuccess: () => Schedule(() =>
                 {
-                    Schedule(() =>
-                    {
-                        loadingLayer.Hide();
+                    loadingLayer.Hide();
 
-                        if (t.IsFaulted)
-                        {
-                            Exception exception = t.Exception;
-
-                            if (exception is AggregateException ae)
-                                exception = ae.InnerException;
-
-                            Debug.Assert(exception != null);
-
-                            string message = exception is HubException
-                                // HubExceptions arrive with additional message context added, but we want to display the human readable message:
-                                // "An unexpected error occurred invoking 'AddPlaylistItem' on the server.InvalidStateException: Can't enqueue more than 3 items at once."
-                                // We generally use the message field for a user-parseable error (eventually to be replaced), so drop the first part for now.
-                                ? exception.Message.Substring(exception.Message.IndexOf(':') + 1).Trim()
-                                : exception.Message;
-
-                            Logger.Log(message, level: LogLevel.Important);
-                            Carousel.AllowSelection = true;
-                            return;
-                        }
-
+                    // If an error or server side trigger occurred this screen may have already exited by external means.
+                    if (this.IsCurrentScreen())
                         this.Exit();
-                    });
-                });
+                }), onError: _ => Schedule(() =>
+                {
+                    loadingLayer.Hide();
+                    Carousel.AllowSelection = true;
+                }));
             }
             else
             {

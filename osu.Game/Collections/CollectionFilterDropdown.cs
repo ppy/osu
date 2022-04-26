@@ -38,7 +38,7 @@ namespace osu.Game.Collections
         }
 
         private readonly IBindableList<BeatmapCollection> collections = new BindableList<BeatmapCollection>();
-        private readonly IBindableList<IBeatmapInfo> beatmaps = new BindableList<IBeatmapInfo>();
+        private readonly IBindableList<BeatmapInfo> beatmaps = new BindableList<BeatmapInfo>();
         private readonly BindableList<CollectionFilterMenuItem> filters = new BindableList<CollectionFilterMenuItem>();
 
         [Resolved(CanBeNull = true)]
@@ -196,7 +196,7 @@ namespace osu.Game.Collections
             private IBindable<WorkingBeatmap> beatmap { get; set; }
 
             [CanBeNull]
-            private readonly BindableList<IBeatmapInfo> collectionBeatmaps;
+            private readonly BindableList<BeatmapInfo> collectionBeatmaps;
 
             [NotNull]
             private readonly Bindable<string> collectionName;

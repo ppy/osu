@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania
 
         public bool Matches(BeatmapInfo beatmapInfo)
         {
-            return !keys.HasFilter || (beatmapInfo.RulesetID == new ManiaRuleset().LegacyID && keys.IsInRange(ManiaBeatmapConverter.GetColumnCountForNonConvert(beatmapInfo)));
+            return !keys.HasFilter || (beatmapInfo.Ruleset.OnlineID == new ManiaRuleset().LegacyID && keys.IsInRange(ManiaBeatmapConverter.GetColumnCountForNonConvert(beatmapInfo)));
         }
 
         public bool TryParseCustomKeywordCriteria(string key, Operator op, string value)

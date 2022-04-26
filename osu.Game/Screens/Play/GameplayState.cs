@@ -40,6 +40,21 @@ namespace osu.Game.Screens.Play
         public readonly Score Score;
 
         /// <summary>
+        /// Whether gameplay completed without the user failing.
+        /// </summary>
+        public bool HasPassed { get; set; }
+
+        /// <summary>
+        /// Whether the user failed during gameplay.
+        /// </summary>
+        public bool HasFailed { get; set; }
+
+        /// <summary>
+        /// Whether the user quit gameplay without having either passed or failed.
+        /// </summary>
+        public bool HasQuit { get; set; }
+
+        /// <summary>
         /// A bindable tracking the last judgement result applied to any hit object.
         /// </summary>
         public IBindable<JudgementResult> LastJudgementResult => lastJudgementResult;

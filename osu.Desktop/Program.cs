@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Desktop.LegacyIpc;
@@ -12,6 +13,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Game.Tournament;
+using Squirrel;
 
 namespace osu.Desktop
 {
@@ -24,6 +26,10 @@ namespace osu.Desktop
         [STAThread]
         public static void Main(string[] args)
         {
+            // run Squirrel first, as the app may exit after these run
+            if (OperatingSystem.IsWindows())
+                setupSquirrel();
+
             // Back up the cwd before DesktopGameHost changes it
             string cwd = Environment.CurrentDirectory;
 
@@ -55,7 +61,7 @@ namespace osu.Desktop
                 }
             }
 
-            using (DesktopGameHost host = Host.GetSuitableHost(gameName, true))
+            using (DesktopGameHost host = Host.GetSuitableDesktopHost(gameName, new HostOptions { BindIPC = true }))
             {
                 host.ExceptionThrown += handleException;
 
@@ -102,6 +108,28 @@ namespace osu.Desktop
                 else
                     host.Run(new OsuGameDesktop(args));
             }
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static void setupSquirrel()
+        {
+            SquirrelAwareApp.HandleEvents(onInitialInstall: (version, tools) =>
+            {
+                tools.CreateShortcutForThisExe();
+                tools.CreateUninstallerRegistryEntry();
+            }, onAppUninstall: (version, tools) =>
+            {
+                tools.RemoveShortcutForThisExe();
+                tools.RemoveUninstallerRegistryEntry();
+            }, onEveryRun: (version, tools, firstRun) =>
+            {
+                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
+                // causes the right-click context menu to function incorrectly.
+                //
+                // This may turn out to be non-required after an alternative solution is implemented.
+                // see https://github.com/clowd/Clowd.Squirrel/issues/24
+                // tools.SetProcessAppUserModelId();
+            });
         }
 
         private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;

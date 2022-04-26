@@ -53,9 +53,6 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public APIBeatmap OnlineInfo { get; set; }
 
-        [NotMapped]
-        public int? MaxCombo { get; set; }
-
         /// <summary>
         /// The playable length in milliseconds of this beatmap.
         /// </summary>

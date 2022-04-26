@@ -53,10 +53,9 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)
         {
-            var realmContextFactory = osu.Dependencies.Get<RealmContextFactory>();
+            var realm = osu.Dependencies.Get<RealmAccess>();
 
-            using (var realm = realmContextFactory.CreateContext())
-                BeatmapImporterTests.EnsureLoaded(realm, timeout);
+            realm.Run(r => BeatmapImporterTests.EnsureLoaded(r, timeout));
 
             // TODO: add back some extra checks outside of the realm ones?
             // var set = queryBeatmapSets().First();

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     public class TestSceneSkinnableComboCounter : SkinnableHUDComponentTestScene
     {
         [Cached]
-        private ScoreProcessor scoreProcessor = new ScoreProcessor();
+        private ScoreProcessor scoreProcessor = new ScoreProcessor(new OsuRuleset());
 
         protected override Drawable CreateDefaultImplementation() => new DefaultComboCounter();
         protected override Drawable CreateLegacyImplementation() => new LegacyComboCounter();

@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Resolved]
         private SessionStatics sessionStatics { get; set; }
 
-        [Cached]
+        [Cached(typeof(INotificationOverlay))]
         private readonly NotificationOverlay notificationOverlay;
 
         [Cached]

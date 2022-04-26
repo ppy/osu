@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using osu.Framework;
 using osu.Framework.Testing;
 
 namespace osu.Game.Tests
@@ -20,7 +21,10 @@ namespace osu.Game.Tests
         /// <param name="bypassCleanup">Whether to bypass directory cleanup on host disposal. Should be used only if a subsequent test relies on the files still existing.</param>
         /// <param name="callingMethodName">The name of the calling method, used for test file isolation and clean-up.</param>
         public CleanRunHeadlessGameHost(bool bindIPC = false, bool realtime = true, bool bypassCleanup = false, [CallerMemberName] string callingMethodName = @"")
-            : base($"{callingMethodName}-{Guid.NewGuid()}", bindIPC, realtime, bypassCleanup: bypassCleanup)
+            : base($"{callingMethodName}-{Guid.NewGuid()}", new HostOptions
+            {
+                BindIPC = bindIPC,
+            }, bypassCleanup: bypassCleanup, realtime: realtime)
         {
         }
 

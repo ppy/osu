@@ -37,6 +37,7 @@ using osu.Game.Graphics.UserInterface;
 using System.Diagnostics;
 using osu.Game.Screens.Play;
 using osu.Game.Database;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -48,6 +49,12 @@ namespace osu.Game.Screens.Select
         private const float left_area_padding = 20;
 
         public FilterControl FilterControl { get; private set; }
+
+        /// <summary>
+        /// Whether this song select instance should take control of the global track,
+        /// applying looping and preview offsets.
+        /// </summary>
+        protected virtual bool ControlGlobalMusic => true;
 
         protected virtual bool ShowFooter => true;
 
@@ -86,7 +93,7 @@ namespace osu.Game.Screens.Select
         protected Container LeftArea { get; private set; }
 
         private BeatmapInfoWedge beatmapInfoWedge;
-        private DialogOverlay dialogOverlay;
+        private IDialogOverlay dialogOverlay;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -113,7 +120,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
+        private void load(AudioManager audio, IDialogOverlay dialog, OsuColour colours, ManageCollectionsDialog manageCollectionsDialog, DifficultyRecommender recommender)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -234,6 +241,10 @@ namespace osu.Game.Screens.Select
                             }
                         }
                     }
+                },
+                new SkinnableTargetContainer(SkinnableTarget.SongSelect)
+                {
+                    RelativeSizeAxes = Axes.Both,
                 },
             });
 
@@ -502,7 +513,7 @@ namespace osu.Game.Screens.Select
                 // clear pending task immediately to track any potential nested debounce operation.
                 selectionChangedDebounce = null;
 
-                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ShortName ?? "null"}");
 
                 if (transferRulesetValue())
                 {
@@ -538,9 +549,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             this.FadeInFromZero(250);
             FilterControl.Activate();
@@ -586,9 +597,9 @@ namespace osu.Game.Screens.Select
             logo.FadeOut(logo_transition / 2, Easing.Out);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             // required due to https://github.com/ppy/osu-framework/issues/3218
             ModSelect.SelectedMods.Disabled = false;
@@ -599,15 +610,18 @@ namespace osu.Game.Screens.Select
             BeatmapDetails.Refresh();
 
             beginLooping();
-            music.ResetTrackAdjustments();
 
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 updateComponentFromBeatmap(Beatmap.Value);
 
-                // restart playback on returning to song select, regardless.
-                // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
-                music.Play(requestedByUser: true);
+                if (ControlGlobalMusic)
+                {
+                    // restart playback on returning to song select, regardless.
+                    // not sure this should be a permanent thing (we may want to leave a user pause paused even on returning)
+                    music.ResetTrackAdjustments();
+                    music.Play(requestedByUser: true);
+                }
             }
 
             this.FadeIn(250);
@@ -617,8 +631,12 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
+            // Handle the case where FinaliseSelection is never called (ie. when a screen is pushed externally).
+            // Without this, it's possible for a transfer to happen while we are not the current screen.
+            transferRulesetValue();
+
             ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 
@@ -631,12 +649,12 @@ namespace osu.Game.Screens.Select
             this.FadeOut(250);
 
             FilterControl.Deactivate();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            if (base.OnExiting(next))
+            if (base.OnExiting(e))
                 return true;
 
             beatmapInfoWedge.Hide();
@@ -654,6 +672,9 @@ namespace osu.Game.Screens.Select
 
         private void beginLooping()
         {
+            if (!ControlGlobalMusic)
+                return;
+
             Debug.Assert(!isHandlingLooping);
 
             isHandlingLooping = true;
@@ -724,6 +745,9 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void ensurePlayingSelected()
         {
+            if (!ControlGlobalMusic)
+                return;
+
             ITrack track = music.CurrentTrack;
 
             bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets
 {
     [ExcludeFromDynamicCompile]
     [MapTo("Ruleset")]
-    public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IRulesetInfo
+    public class RulesetInfo : RealmObject, IEquatable<RulesetInfo>, IComparable<RulesetInfo>, IRulesetInfo
     {
         [PrimaryKey]
         public string ShortName { get; set; } = string.Empty;
@@ -37,14 +37,6 @@ namespace osu.Game.Rulesets
         {
         }
 
-        public RulesetInfo(int? onlineID, string name, string shortName, bool available)
-        {
-            OnlineID = onlineID ?? -1;
-            Name = name;
-            ShortName = shortName;
-            Available = available;
-        }
-
         public bool Available { get; set; }
 
         public bool Equals(RulesetInfo? other)
@@ -55,7 +47,29 @@ namespace osu.Game.Rulesets
             return ShortName == other.ShortName;
         }
 
-        public bool Equals(IRulesetInfo? other) => other is RulesetInfo b && Equals(b);
+        public bool Equals(IRulesetInfo? other) => other is RulesetInfo r && Equals(r);
+
+        public int CompareTo(RulesetInfo other)
+        {
+            if (OnlineID >= 0 && other.OnlineID >= 0)
+                return OnlineID.CompareTo(other.OnlineID);
+
+            // Official rulesets are always given precedence for the time being.
+            if (OnlineID >= 0)
+                return -1;
+            if (other.OnlineID >= 0)
+                return 1;
+
+            return string.Compare(ShortName, other.ShortName, StringComparison.Ordinal);
+        }
+
+        public int CompareTo(IRulesetInfo other)
+        {
+            if (!(other is RulesetInfo ruleset))
+                throw new ArgumentException($@"Object is not of type {nameof(RulesetInfo)}.", nameof(other));
+
+            return CompareTo(ruleset);
+        }
 
         public override int GetHashCode()
         {
@@ -98,11 +112,5 @@ namespace osu.Game.Rulesets
 
             return ruleset;
         }
-
-        #region Compatibility properties
-
-        public int ID => OnlineID;
-
-        #endregion
     }
 }

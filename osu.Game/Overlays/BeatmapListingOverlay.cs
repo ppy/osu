@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics;
@@ -19,6 +20,7 @@ using osu.Game.Beatmaps.Drawables.Cards;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapListing;
 using osu.Game.Resources.Localisation.Web;
@@ -31,6 +33,11 @@ namespace osu.Game.Overlays
     {
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private IBindable<APIUser> apiUser;
 
         private Drawable currentContent;
         private Container panelTarget;
@@ -93,6 +100,13 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
             filterControl.CardSize.BindValueChanged(_ => onCardSizeChanged());
+
+            apiUser = api.LocalUser.GetBoundCopy();
+            apiUser.BindValueChanged(_ =>
+            {
+                if (api.IsLoggedIn)
+                    addContentToResultsArea(Drawable.Empty());
+            });
         }
 
         public void ShowWithSearch(string query)
@@ -187,8 +201,10 @@ namespace osu.Game.Overlays
                 Alpha = 0,
                 Margin = new MarginPadding
                 {
-                    Vertical = 15,
-                    Bottom = ExpandedContentScrollContainer.HEIGHT
+                    Top = 15,
+                    // the + 20 adjustment is roughly eyeballed in order to fit all of the expanded content height after it's scaled
+                    // as well as provide visual balance to the top margin.
+                    Bottom = ExpandedContentScrollContainer.HEIGHT + 20
                 },
                 ChildrenEnumerable = newCards
             };

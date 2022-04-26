@@ -48,7 +48,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             {
                 StarRating = skills[0].DifficultyValue() * star_scaling_factor,
                 Mods = mods,
-                GreatHitWindow = Math.Ceiling(getHitWindow300(mods) / clockRate),
+                // In osu-stable mania, rate-adjustment mods don't affect the hit window.
+                // This is done the way it is to introduce fractional differences in order to match osu-stable for the time being.
+                GreatHitWindow = Math.Ceiling((int)(getHitWindow300(mods) * clockRate) / clockRate),
                 ScoreMultiplier = getScoreMultiplier(mods),
                 MaxCombo = beatmap.HitObjects.Sum(h => h is HoldNote ? 2 : 1),
             };
@@ -108,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
         }
 
-        private int getHitWindow300(Mod[] mods)
+        private double getHitWindow300(Mod[] mods)
         {
             if (isForCurrentRuleset)
             {
@@ -121,19 +123,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             return applyModAdjustments(47, mods);
 
-            static int applyModAdjustments(double value, Mod[] mods)
+            static double applyModAdjustments(double value, Mod[] mods)
             {
                 if (mods.Any(m => m is ManiaModHardRock))
                     value /= 1.4;
                 else if (mods.Any(m => m is ManiaModEasy))
                     value *= 1.4;
 
-                if (mods.Any(m => m is ManiaModDoubleTime))
-                    value *= 1.5;
-                else if (mods.Any(m => m is ManiaModHalfTime))
-                    value *= 0.75;
-
-                return (int)value;
+                return value;
             }
         }
 

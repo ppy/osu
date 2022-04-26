@@ -24,7 +24,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     [Cached]
     public class Timeline : ZoomableScrollContainer, IPositionSnapProvider
     {
+        private const float timeline_height = 72;
+        private const float timeline_expanded_height = 94;
+
         private readonly Drawable userContent;
+
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
 
         public readonly Bindable<bool> ControlPointsVisible = new Bindable<bool>();
@@ -58,8 +62,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private Track track;
 
-        private const float timeline_height = 72;
-        private const float timeline_expanded_height = 94;
+        /// <summary>
+        /// The timeline zoom level at a 1x zoom scale.
+        /// </summary>
+        private float defaultTimelineZoom;
+
+        private readonly Bindable<double> timelineZoomScale = new BindableDouble(1.0);
 
         public Timeline(Drawable userContent)
         {
@@ -84,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private Bindable<float> waveformOpacity;
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours, OsuConfigManager config)
+        private void load(IBindable<WorkingBeatmap> beatmap, EditorBeatmap editorBeatmap, OsuColour colours, OsuConfigManager config)
         {
             CentreMarker centreMarker;
 
@@ -141,8 +149,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     MaxZoom = getZoomLevelForVisibleMilliseconds(500);
                     MinZoom = getZoomLevelForVisibleMilliseconds(10000);
-                    Zoom = getZoomLevelForVisibleMilliseconds(2000);
+                    defaultTimelineZoom = getZoomLevelForVisibleMilliseconds(6000);
                 }
+            }, true);
+
+            timelineZoomScale.Value = editorBeatmap.BeatmapInfo.TimelineZoom;
+            timelineZoomScale.BindValueChanged(scale =>
+            {
+                Zoom = (float)(defaultTimelineZoom * scale.NewValue);
+                editorBeatmap.BeatmapInfo.TimelineZoom = scale.NewValue;
             }, true);
         }
 
@@ -199,6 +214,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 return false;
 
             return base.OnScroll(e);
+        }
+
+        protected override void OnZoomChanged()
+        {
+            base.OnZoomChanged();
+            timelineZoomScale.Value = Zoom / defaultTimelineZoom;
         }
 
         protected override void UpdateAfterChildren()

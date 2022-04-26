@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -38,6 +39,98 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        [Test]
+        public void TestExternalRulesetChange()
+        {
+            createCarousel(new List<BeatmapSetInfo>());
+
+            AddStep("filter to ruleset 0", () => carousel.Filter(new FilterCriteria
+            {
+                Ruleset = rulesets.AvailableRulesets.ElementAt(0),
+                AllowConvertedBeatmaps = true,
+            }, false));
+
+            AddStep("add mixed ruleset beatmapset", () =>
+            {
+                var testMixed = TestResources.CreateTestBeatmapSetInfo(3);
+
+                for (int i = 0; i <= 2; i++)
+                {
+                    testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
+                }
+
+                carousel.UpdateBeatmapSet(testMixed);
+            });
+
+            AddUntilStep("wait for filtered difficulties", () =>
+            {
+                var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
+
+                return visibleBeatmapPanels.Length == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1;
+            });
+
+            AddStep("filter to ruleset 1", () => carousel.Filter(new FilterCriteria
+            {
+                Ruleset = rulesets.AvailableRulesets.ElementAt(1),
+                AllowConvertedBeatmaps = true,
+            }, false));
+
+            AddUntilStep("wait for filtered difficulties", () =>
+            {
+                var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
+
+                return visibleBeatmapPanels.Length == 2
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 1) == 1;
+            });
+
+            AddStep("filter to ruleset 2", () => carousel.Filter(new FilterCriteria
+            {
+                Ruleset = rulesets.AvailableRulesets.ElementAt(2),
+                AllowConvertedBeatmaps = true,
+            }, false));
+
+            AddUntilStep("wait for filtered difficulties", () =>
+            {
+                var visibleBeatmapPanels = carousel.Items.OfType<DrawableCarouselBeatmap>().Where(p => p.IsPresent).ToArray();
+
+                return visibleBeatmapPanels.Length == 2
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 0) == 1
+                       && visibleBeatmapPanels.Count(p => ((CarouselBeatmap)p.Item).BeatmapInfo.Ruleset.OnlineID == 2) == 1;
+            });
+        }
+
+        [Test]
+        public void TestScrollPositionMaintainedOnAdd()
+        {
+            loadBeatmaps(count: 1, randomDifficulties: false);
+
+            for (int i = 0; i < 10; i++)
+            {
+                AddRepeatStep("Add some sets", () => carousel.UpdateBeatmapSet(TestResources.CreateTestBeatmapSetInfo()), 4);
+
+                checkSelectionIsCentered();
+            }
+        }
+
+        [Test]
+        public void TestScrollPositionMaintainedOnDelete()
+        {
+            loadBeatmaps(count: 50, randomDifficulties: false);
+
+            for (int i = 0; i < 10; i++)
+            {
+                AddRepeatStep("Remove some sets", () =>
+                    carousel.RemoveBeatmapSet(carousel.Items.Select(item => item.Item)
+                                                      .OfType<CarouselBeatmapSet>()
+                                                      .OrderBy(item => item.GetHashCode())
+                                                      .First(item => item.State.Value != CarouselItemState.Selected && item.Visible).BeatmapSet), 4);
+
+                checkSelectionIsCentered();
+            }
         }
 
         [Test]
@@ -570,7 +663,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             BeatmapSetInfo testMixed = null;
 
-            createCarousel();
+            createCarousel(new List<BeatmapSetInfo>());
 
             AddStep("add mixed ruleset beatmapset", () =>
             {
@@ -586,7 +679,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("filter to ruleset 0", () =>
                 carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo.RulesetID == 0);
+            AddAssert("unfiltered beatmap not selected", () => carousel.SelectedBeatmapInfo.Ruleset.OnlineID == 0);
 
             AddStep("remove mixed set", () =>
             {
@@ -734,21 +827,21 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             bool changed = false;
 
-            createCarousel(c =>
+            if (beatmapSets == null)
+            {
+                beatmapSets = new List<BeatmapSetInfo>();
+
+                for (int i = 1; i <= (count ?? set_count); i++)
+                {
+                    beatmapSets.Add(randomDifficulties
+                        ? TestResources.CreateTestBeatmapSetInfo()
+                        : TestResources.CreateTestBeatmapSetInfo(3));
+                }
+            }
+
+            createCarousel(beatmapSets, c =>
             {
                 carouselAdjust?.Invoke(c);
-
-                if (beatmapSets == null)
-                {
-                    beatmapSets = new List<BeatmapSetInfo>();
-
-                    for (int i = 1; i <= (count ?? set_count); i++)
-                    {
-                        beatmapSets.Add(randomDifficulties
-                            ? TestResources.CreateTestBeatmapSetInfo()
-                            : TestResources.CreateTestBeatmapSetInfo(3));
-                    }
-                }
 
                 carousel.Filter(initialCriteria?.Invoke() ?? new FilterCriteria());
                 carousel.BeatmapSetsChanged = () => changed = true;
@@ -758,7 +851,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddUntilStep("Wait for load", () => changed);
         }
 
-        private void createCarousel(Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
+        private void createCarousel(List<BeatmapSetInfo> beatmapSets, Action<BeatmapCarousel> carouselAdjust = null, Container target = null)
         {
             AddStep("Create carousel", () =>
             {
@@ -771,6 +864,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 };
 
                 carouselAdjust?.Invoke(carousel);
+
+                carousel.BeatmapSets = beatmapSets;
 
                 (target ?? this).Child = carousel;
             });
@@ -811,6 +906,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             // until step required as we are querying against alive items, which are loaded asynchronously inside DrawableCarouselBeatmapSet.
             AddUntilStep($"{count} {(diff ? "diffs" : "sets")} visible", () =>
                 carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+        }
+
+        private void checkSelectionIsCentered()
+        {
+            AddAssert("Selected panel is centered", () =>
+            {
+                return Precision.AlmostEquals(
+                    carousel.ScreenSpaceDrawQuad.Centre,
+                    carousel.Items
+                            .First(i => i.Item.State.Value == CarouselItemState.Selected)
+                            .ScreenSpaceDrawQuad.Centre, 100);
+            });
         }
 
         private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);

@@ -22,7 +22,7 @@ namespace osu.Game.Online
         private IDisposable? realmSubscription;
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; } = null!;
+        private RealmAccess realm { get; set; } = null!;
 
         public BeatmapDownloadTracker(IBeatmapSetInfo trackedItem)
             : base(trackedItem)
@@ -42,7 +42,7 @@ namespace osu.Game.Online
             // Used to interact with manager classes that don't support interface types. Will eventually be replaced.
             var beatmapSetInfo = new BeatmapSetInfo { OnlineID = TrackedItem.OnlineID };
 
-            realmSubscription = realmContextFactory.Context.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID && !s.DeletePending).QueryAsyncWithNotifications((items, changes, ___) =>
+            realmSubscription = realm.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => s.OnlineID == TrackedItem.OnlineID && !s.DeletePending), (items, changes, ___) =>
             {
                 if (items.Any())
                     Schedule(() => UpdateState(DownloadState.LocallyAvailable));

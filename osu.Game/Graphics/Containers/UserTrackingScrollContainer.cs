@@ -25,8 +25,6 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool UserScrolling { get; private set; }
 
-        public void CancelUserScroll() => UserScrolling = false;
-
         public UserTrackingScrollContainer()
         {
         }

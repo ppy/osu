@@ -73,8 +73,11 @@ namespace osu.Game.Screens.Play
         [Resolved(canBeNull: true)]
         private Player player { get; set; }
 
-        [Resolved(canBeNull: true)]
+        [Resolved]
         private GameplayClock gameplayClock { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private DrawableRuleset drawableRuleset { get; set; }
 
         private IClock referenceClock;
 
@@ -113,7 +116,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, OsuConfigManager config, DrawableRuleset drawableRuleset)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             base.LoadComplete();
 

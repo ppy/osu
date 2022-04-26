@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Bindables;
+using osu.Framework.Development;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 
@@ -66,6 +68,8 @@ namespace osu.Game.Online
 
         private void doPoll()
         {
+            Debug.Assert(ThreadSafety.IsUpdateThread);
+
             scheduledPoll = null;
             pollingActive = true;
             Poll().ContinueWith(_ => pollComplete());
@@ -96,13 +100,13 @@ namespace osu.Game.Online
 
             if (!lastTimePolled.HasValue)
             {
-                doPoll();
+                Scheduler.AddOnce(doPoll);
                 return;
             }
 
             if (Time.Current - lastTimePolled.Value > TimeBetweenPolls.Value)
             {
-                doPoll();
+                Scheduler.AddOnce(doPoll);
                 return;
             }
 

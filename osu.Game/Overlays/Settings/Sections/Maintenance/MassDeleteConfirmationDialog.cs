@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {
-                new PopupDialogOkButton
+                new PopupDialogDangerousButton
                 {
                     Text = @"Yes. Go for it.",
                     Action = deleteAction

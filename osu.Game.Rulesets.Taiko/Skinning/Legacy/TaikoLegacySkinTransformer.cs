@@ -57,6 +57,10 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
                     case TaikoSkinComponents.DrumRollTick:
                         return this.GetAnimation("sliderscorepoint", false, false);
 
+                    case TaikoSkinComponents.Swell:
+                        // todo: support taiko legacy swell (https://github.com/ppy/osu/issues/13601).
+                        return null;
+
                     case TaikoSkinComponents.HitTarget:
                         if (GetTexture("taikobigcircle") != null)
                             return new TaikoLegacyHitTarget();
@@ -119,6 +123,9 @@ namespace osu.Game.Rulesets.Taiko.Skinning.Legacy
 
                     case TaikoSkinComponents.Mascot:
                         return new DrawableTaikoMascot();
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 

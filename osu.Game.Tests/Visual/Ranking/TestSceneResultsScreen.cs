@@ -17,10 +17,13 @@ using osu.Game.Database;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Ranking.Expanded.Statistics;
 using osu.Game.Screens.Ranking.Statistics;
 using osu.Game.Tests.Resources;
 using osuTK;
@@ -36,21 +39,21 @@ namespace osu.Game.Tests.Visual.Ranking
         private BeatmapManager beatmaps { get; set; }
 
         [Resolved]
-        private RealmContextFactory realmContextFactory { get; set; }
+        private RealmAccess realm { get; set; }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            using (var realm = realmContextFactory.CreateContext())
+            realm.Run(r =>
             {
-                var beatmapInfo = realm.All<BeatmapInfo>()
-                                       .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
-                                       .FirstOrDefault();
+                var beatmapInfo = r.All<BeatmapInfo>()
+                                   .Filter($"{nameof(BeatmapInfo.Ruleset)}.{nameof(RulesetInfo.OnlineID)} = $0", 0)
+                                   .FirstOrDefault();
 
                 if (beatmapInfo != null)
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
-            }
+            });
         }
 
         [Test]
@@ -130,7 +133,7 @@ namespace osu.Game.Tests.Visual.Ranking
             AddStep("click to right of panel", () =>
             {
                 var expandedPanel = this.ChildrenOfType<ScorePanel>().Single(p => p.State == PanelState.Expanded);
-                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(100, 0));
+                InputManager.MoveMouseTo(expandedPanel.ScreenSpaceDrawQuad.TopRight + new Vector2(50, 0));
                 InputManager.Click(MouseButton.Left);
             });
 
@@ -256,6 +259,23 @@ namespace osu.Game.Tests.Visual.Ranking
             AddAssert("download button is enabled", () => screen.ChildrenOfType<DownloadButton>().Last().Enabled.Value);
         }
 
+        [Test]
+        public void TestRulesetWithNoPerformanceCalculator()
+        {
+            var ruleset = new RulesetWithNoPerformanceCalculator();
+            var score = TestResources.CreateTestScoreInfo(ruleset.RulesetInfo);
+
+            AddStep("load results", () => Child = new TestResultsContainer(createResultsScreen(score)));
+            AddUntilStep("wait for load", () => this.ChildrenOfType<ScorePanelList>().Single().AllPanelsVisible);
+
+            AddAssert("PP displayed as 0", () =>
+            {
+                var performance = this.ChildrenOfType<PerformanceStatistic>().Single();
+                var counter = performance.ChildrenOfType<StatisticCounter>().Single();
+                return counter.Current.Value == 0;
+            });
+        }
+
         private TestResultsScreen createResultsScreen(ScoreInfo score = null) => new TestResultsScreen(score ?? TestResources.CreateTestScoreInfo());
 
         private UnrankedSoloResultsScreen createUnrankedSoloResultsScreen() => new UnrankedSoloResultsScreen(TestResources.CreateTestScoreInfo());
@@ -366,6 +386,11 @@ namespace osu.Game.Tests.Visual.Ranking
 
                 RetryOverlay = InternalChildren.OfType<HotkeyRetryOverlay>().SingleOrDefault();
             }
+        }
+
+        private class RulesetWithNoPerformanceCalculator : OsuRuleset
+        {
+            public override PerformanceCalculator CreatePerformanceCalculator() => null;
         }
     }
 }

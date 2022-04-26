@@ -37,7 +37,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestCustomDirectory()
         {
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestCustomDirectory))) // don't use clean run as we are writing a config file.
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestCustomDirectory), null)) // don't use clean run as we are writing a config file.
             {
                 string osuDesktopStorage = Path.Combine(host.UserStoragePaths.First(), nameof(TestCustomDirectory));
                 const string custom_tournament = "custom";
@@ -68,7 +68,7 @@ namespace osu.Game.Tournament.Tests.NonVisual
         [Test]
         public void TestMigration()
         {
-            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestMigration))) // don't use clean run as we are writing test files for migration.
+            using (HeadlessGameHost host = new TestRunHeadlessGameHost(nameof(TestMigration), null)) // don't use clean run as we are writing test files for migration.
             {
                 string osuRoot = Path.Combine(host.UserStoragePaths.First(), nameof(TestMigration));
                 string configFile = Path.Combine(osuRoot, "tournament.ini");

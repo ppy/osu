@@ -107,6 +107,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             set
             {
+                if (score == null && value == null)
+                    return;
+
                 if (score?.Equals(value) == true)
                     return;
 

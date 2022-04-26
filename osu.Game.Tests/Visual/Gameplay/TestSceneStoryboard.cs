@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
+            storyboard = working.Storyboard.CreateDrawable(SelectedMods.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 sb = decoder.Decode(bfr);
             }
 
-            storyboard = sb.CreateDrawable(Beatmap.Value);
+            storyboard = sb.CreateDrawable(SelectedMods.Value);
 
             storyboardContainer.Add(storyboard);
             decoupledClock.ChangeSource(Beatmap.Value.Track);

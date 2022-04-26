@@ -16,6 +16,9 @@ namespace osu.Game.Screens.Select.Carousel
 {
     public class SetPanelContent : CompositeDrawable
     {
+        // Disallow interacting with difficulty icons on a panel until the panel has been selected.
+        public override bool PropagatePositionalInputSubTree => carouselSet.State.Value == CarouselItemState.Selected;
+
         private readonly CarouselBeatmapSet carouselSet;
 
         public SetPanelContent(CarouselBeatmapSet carouselSet)
@@ -87,7 +90,7 @@ namespace osu.Game.Screens.Select.Carousel
             var beatmaps = carouselSet.Beatmaps.ToList();
 
             return beatmaps.Count > maximum_difficulty_icons
-                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.BeatmapInfo.RulesetID)
+                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.BeatmapInfo.Ruleset)
                                                        .Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Last().BeatmapInfo.Ruleset))
                 : beatmaps.Select(b => new FilterableDifficultyIcon(b));
         }

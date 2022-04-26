@@ -118,7 +118,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             public Drawable GetDrawableComponent(ISkinComponent component) => null;
             public Texture GetTexture(string componentName, WrapMode wrapModeS, WrapMode wrapModeT) => null;
             public ISample GetSample(ISampleInfo sampleInfo) => null;
-            public ISkin FindProvider(Func<ISkin, bool> lookupFunction) => null;
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
             {
