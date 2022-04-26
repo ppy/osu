@@ -16,8 +16,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
-        [Test]
-        public void TestShearedButton()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestShearedButton(bool bigButton)
         {
             ShearedButton button = null;
             bool actionFired = false;
@@ -26,17 +27,35 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 actionFired = false;
 
-                Child = button = new ShearedButton(200)
+                if (bigButton)
                 {
-                    LighterColour = Colour4.FromHex("#FF86DD"),
-                    DarkerColour = Colour4.FromHex("#DE31AE"),
-                    TextColour = Colour4.White,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = "Press me",
-                    Height = 80,
-                    Action = () => actionFired = true,
-                };
+                    Child = button = new ShearedButton(400)
+                    {
+                        LighterColour = Colour4.FromHex("#FFFFFF"),
+                        DarkerColour = Colour4.FromHex("#FFCC22"),
+                        TextColour = Colour4.Black,
+                        TextSize = 36,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "Let's GO!",
+                        Height = 80,
+                        Action = () => actionFired = true,
+                    };
+                }
+                else
+                {
+                    Child = button = new ShearedButton(200)
+                    {
+                        LighterColour = Colour4.FromHex("#FF86DD"),
+                        DarkerColour = Colour4.FromHex("#DE31AE"),
+                        TextColour = Colour4.White,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "Press me",
+                        Height = 80,
+                        Action = () => actionFired = true,
+                    };
+                }
             });
 
             AddStep("set disabled", () => button.Enabled.Value = false);
