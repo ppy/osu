@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
@@ -14,6 +16,11 @@ namespace osu.Game.Overlays.Dialog
     {
         private Box progressBox;
         private DangerousConfirmContainer confirmContainer;
+
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        private readonly BindableDouble speedChange = new BindableDouble();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -31,6 +38,10 @@ namespace osu.Game.Overlays.Dialog
                 Action = () => Action(),
                 RelativeSizeAxes = Axes.Both,
             });
+
+            confirmContainer.Progress.BindValueChanged(progress => speedChange.Value = 1d - progress.NewValue, true);
+
+            audioManager.Tracks.AddAdjustment(AdjustableProperty.Frequency, speedChange);
         }
 
         protected override void LoadComplete()
@@ -38,6 +49,12 @@ namespace osu.Game.Overlays.Dialog
             base.LoadComplete();
 
             confirmContainer.Progress.BindValueChanged(progress => progressBox.Width = (float)progress.NewValue, true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            audioManager?.Tracks.RemoveAdjustment(AdjustableProperty.Frequency, speedChange);
+            base.Dispose(isDisposing);
         }
 
         private class DangerousConfirmContainer : HoldToConfirmContainer
