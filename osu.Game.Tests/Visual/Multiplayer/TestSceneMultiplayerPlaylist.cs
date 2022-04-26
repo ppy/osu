@@ -11,6 +11,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Rooms;
 using osu.Game.Rulesets;
@@ -33,9 +36,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(beatmaps = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
         }
 
         [SetUp]
@@ -57,10 +60,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
             {
                 beatmaps.Import(TestResources.GetQuickTestBeatmapForImport()).WaitSafely();
                 importedSet = beatmaps.GetAllUsableBeatmapSets().First();
-                importedBeatmap = importedSet.Beatmaps.First(b => b.RulesetID == 0);
+                importedBeatmap = importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0);
             });
 
-            AddStep("change to all players mode", () => Client.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }));
+            AddStep("change to all players mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayers }).WaitSafely());
         }
 
         [Test]
@@ -97,19 +100,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
             addItemStep();
             addItemStep();
 
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             assertItemInHistoryListStep(1, 0);
             assertItemInQueueListStep(2, 0);
             assertItemInQueueListStep(3, 1);
 
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             assertItemInHistoryListStep(2, 0);
             assertItemInHistoryListStep(1, 1);
             assertItemInQueueListStep(3, 0);
 
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             assertItemInHistoryListStep(3, 0);
             assertItemInHistoryListStep(2, 1);
@@ -120,13 +123,32 @@ namespace osu.Game.Tests.Visual.Multiplayer
         public void TestListsClearedWhenRoomLeft()
         {
             addItemStep();
-            AddStep("finish current item", () => Client.FinishCurrentItem());
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
 
             AddStep("leave room", () => RoomManager.PartRoom());
             AddUntilStep("wait for room part", () => !RoomJoined);
 
             AddUntilStep("item 0 not in lists", () => !inHistoryList(0) && !inQueueList(0));
             AddUntilStep("item 1 not in lists", () => !inHistoryList(0) && !inQueueList(0));
+        }
+
+        [Test]
+        public void TestQueueTabCount()
+        {
+            assertQueueTabCount(1);
+
+            addItemStep();
+            assertQueueTabCount(2);
+
+            addItemStep();
+            assertQueueTabCount(3);
+
+            AddStep("finish current item", () => MultiplayerClient.FinishCurrentItem().WaitSafely());
+            assertQueueTabCount(2);
+
+            AddStep("leave room", () => RoomManager.PartRoom());
+            AddUntilStep("wait for room part", () => !RoomJoined);
+            assertQueueTabCount(0);
         }
 
         [Ignore("Expired items are initially removed from the room.")]
@@ -143,15 +165,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     Name = { Value = "test name" },
                     Playlist =
                     {
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                         {
-                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value }
+                            RulesetID = Ruleset.Value.OnlineID
                         },
-                        new PlaylistItem
+                        new PlaylistItem(new TestBeatmap(Ruleset.Value).BeatmapInfo)
                         {
-                            Beatmap = { Value = new TestBeatmap(Ruleset.Value).BeatmapInfo },
-                            Ruleset = { Value = Ruleset.Value },
+                            RulesetID = Ruleset.Value.OnlineID,
                             Expired = true
                         }
                     }
@@ -164,16 +184,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
             assertItemInHistoryListStep(2, 0);
         }
 
+        [Test]
+        public void TestInsertedItemDoesNotRefreshAllOthers()
+        {
+            AddStep("change to round robin queue mode", () => MultiplayerClient.ChangeSettings(new MultiplayerRoomSettings { QueueMode = QueueMode.AllPlayersRoundRobin }).WaitSafely());
+
+            // Add a few items for the local user.
+            addItemStep();
+            addItemStep();
+            addItemStep();
+            addItemStep();
+            addItemStep();
+
+            DrawableRoomPlaylistItem[] drawableItems = null;
+            AddStep("get drawable items", () => drawableItems = this.ChildrenOfType<DrawableRoomPlaylistItem>().ToArray());
+
+            // Add 1 item for another user.
+            AddStep("join second user", () => MultiplayerClient.AddUser(new APIUser { Id = 10 }));
+            addItemStep(userId: 10);
+
+            // New item inserted towards the top of the list.
+            assertItemInQueueListStep(7, 1);
+            AddAssert("all previous playlist items remained", () => drawableItems.All(this.ChildrenOfType<DrawableRoomPlaylistItem>().Contains));
+        }
+
         /// <summary>
         /// Adds a step to create a new playlist item.
         /// </summary>
-        private void addItemStep(bool expired = false) => AddStep("add item", () => Client.AddPlaylistItem(new MultiplayerPlaylistItem(new PlaylistItem
+        private void addItemStep(bool expired = false, int? userId = null) => AddStep("add item", () =>
         {
-            Beatmap = { Value = importedBeatmap },
-            BeatmapID = importedBeatmap.OnlineID,
-            Expired = expired,
-            PlayedAt = DateTimeOffset.Now
-        })));
+            MultiplayerClient.AddUserPlaylistItem(userId ?? API.LocalUser.Value.OnlineID, new MultiplayerPlaylistItem(new PlaylistItem(importedBeatmap)
+            {
+                Expired = expired,
+                PlayedAt = DateTimeOffset.Now
+            })).WaitSafely();
+        });
 
         /// <summary>
         /// Asserts the position of a given playlist item in the queue list.
@@ -214,6 +259,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
                               .OrderBy(drawable => drawable.Position.Y)
                               .TakeWhile(drawable => drawable.Item.ID != playlistItemId)
                               .Count() == visualIndex;
+            });
+        }
+
+        private void assertQueueTabCount(int count)
+        {
+            string queueTabText = count > 0 ? $"Queue ({count})" : "Queue";
+            AddUntilStep($"Queue tab shows \"{queueTabText}\"", () =>
+            {
+                return this.ChildrenOfType<OsuTabControl<MultiplayerPlaylistDisplayMode>.OsuTabItem>()
+                           .Single(t => t.Value == MultiplayerPlaylistDisplayMode.Queue)
+                           .ChildrenOfType<OsuSpriteText>().Single().Text == queueTabText;
             });
         }
 

@@ -9,7 +9,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 {
     public class MultiplayerPlayerLoader : PlayerLoader
     {
-        public bool GameplayPassed => player?.GameplayPassed == true;
+        public bool GameplayPassed => player?.GameplayState.HasPassed == true;
 
         private Player player;
 
@@ -18,10 +18,10 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         {
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
-            player = (Player)next;
+            base.OnSuspending(e);
+            player = (Player)e.Next;
         }
     }
 }

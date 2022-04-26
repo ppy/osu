@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Utils;
@@ -34,13 +33,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [BackgroundDependencyLoader]
         private void load(GameHost host, AudioManager audio)
         {
-            Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, Resources, host, Beatmap.Default));
-            Dependencies.Cache(ContextFactory);
+            Dependencies.Cache(rulesets = new RealmRulesetStore(Realm));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, Realm, rulesets, null, audio, Resources, host, Beatmap.Default));
+            Dependencies.Cache(Realm);
 
             var beatmapSet = TestResources.CreateTestBeatmapSetInfo();
 
-            manager.Import(beatmapSet).WaitSafely();
+            manager.Import(beatmapSet);
         }
 
         public override void SetUpSteps()
@@ -116,8 +115,17 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("change mod rate", () => ((OsuModDoubleTime)SelectedMods.Value[0]).SpeedChange.Value = 2);
             AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
 
-            AddAssert("item 1 has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0]).SpeedChange.Value));
-            AddAssert("item 2 has rate 2", () => Precision.AlmostEquals(2, ((OsuModDoubleTime)SelectedRoom.Value.Playlist.Last().RequiredMods[0]).SpeedChange.Value));
+            AddAssert("item 1 has rate 1.5", () =>
+            {
+                var mod = (OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0].ToMod(new OsuRuleset());
+                return Precision.AlmostEquals(1.5, mod.SpeedChange.Value);
+            });
+
+            AddAssert("item 2 has rate 2", () =>
+            {
+                var mod = (OsuModDoubleTime)SelectedRoom.Value.Playlist.Last().RequiredMods[0].ToMod(new OsuRuleset());
+                return Precision.AlmostEquals(2, mod.SpeedChange.Value);
+            });
         }
 
         /// <summary>
@@ -139,7 +147,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddStep("create item", () => songSelect.BeatmapDetails.CreateNewItem());
 
             AddStep("change stored mod rate", () => mod.SpeedChange.Value = 2);
-            AddAssert("item has rate 1.5", () => Precision.AlmostEquals(1.5, ((OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0]).SpeedChange.Value));
+            AddAssert("item has rate 1.5", () =>
+            {
+                var m = (OsuModDoubleTime)SelectedRoom.Value.Playlist.First().RequiredMods[0].ToMod(new OsuRuleset());
+                return Precision.AlmostEquals(1.5, m.SpeedChange.Value);
+            });
         }
 
         private class TestPlaylistsSongSelect : PlaylistsSongSelect

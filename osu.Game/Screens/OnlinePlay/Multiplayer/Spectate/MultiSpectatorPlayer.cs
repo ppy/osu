@@ -59,6 +59,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Spectate
 
             protected override void Update()
             {
+                // The SourceClock here is always a CatchUpSpectatorPlayerClock.
                 // The player clock's running state is controlled externally, but the local pausing state needs to be updated to stop gameplay.
                 if (SourceClock.IsRunning)
                     Start();

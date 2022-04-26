@@ -33,8 +33,8 @@ namespace osu.Game.Beatmaps
 
         protected override string[] HashableFileTypes => new[] { ".osu" };
 
-        public BeatmapModelManager(RealmContextFactory contextFactory, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
-            : base(contextFactory, storage, onlineLookupQueue)
+        public BeatmapModelManager(RealmAccess realm, Storage storage, BeatmapOnlineLookupQueue? onlineLookupQueue = null)
+            : base(realm, storage, onlineLookupQueue)
         {
         }
 
@@ -46,10 +46,9 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapInfo">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
         /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
         /// <param name="beatmapSkin">The beatmap <see cref="ISkin"/> content to write, null if to be omitted.</param>
-        public virtual void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
+        public void Save(BeatmapInfo beatmapInfo, IBeatmap beatmapContent, ISkin? beatmapSkin = null)
         {
             var setInfo = beatmapInfo.BeatmapSet;
-
             Debug.Assert(setInfo != null);
 
             // Difficulty settings must be copied first due to the clone in `Beatmap<>.BeatmapInfo_Set`.
@@ -72,6 +71,12 @@ namespace osu.Game.Beatmaps
 
                 // AddFile generally handles updating/replacing files, but this is a case where the filename may have also changed so let's delete for simplicity.
                 var existingFileInfo = setInfo.Files.SingleOrDefault(f => string.Equals(f.Filename, beatmapInfo.Path, StringComparison.OrdinalIgnoreCase));
+                string targetFilename = getFilename(beatmapInfo);
+
+                // ensure that two difficulties from the set don't point at the same beatmap file.
+                if (setInfo.Beatmaps.Any(b => b.ID != beatmapInfo.ID && string.Equals(b.Path, targetFilename, StringComparison.OrdinalIgnoreCase)))
+                    throw new InvalidOperationException($"{setInfo.GetDisplayString()} already has a difficulty with the name of '{beatmapInfo.DifficultyName}'.");
+
                 if (existingFileInfo != null)
                     DeleteFile(setInfo, existingFileInfo);
 
@@ -88,7 +93,7 @@ namespace osu.Game.Beatmaps
         private static string getFilename(BeatmapInfo beatmapInfo)
         {
             var metadata = beatmapInfo.Metadata;
-            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
+            return $"{metadata.Artist} - {metadata.Title} ({metadata.Author.Username}) [{beatmapInfo.DifficultyName}].osu".GetValidArchiveContentFilename();
         }
 
         /// <summary>
@@ -98,17 +103,16 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo? QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query)
         {
-            using (var context = ContextFactory.CreateContext())
-                return context.All<BeatmapInfo>().FirstOrDefault(query)?.Detach();
+            return Realm.Run(realm => realm.All<BeatmapInfo>().FirstOrDefault(query)?.Detach());
         }
 
         public void Update(BeatmapSetInfo item)
         {
-            using (var realm = ContextFactory.CreateContext())
+            Realm.Write(r =>
             {
-                var existing = realm.Find<BeatmapSetInfo>(item.ID);
-                realm.Write(r => item.CopyChangesToRealm(existing));
-            }
+                var existing = r.Find<BeatmapSetInfo>(item.ID);
+                item.CopyChangesToRealm(existing);
+            });
         }
     }
 }

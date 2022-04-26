@@ -36,6 +36,8 @@ namespace osu.Game.Online.API
 
         public string WebsiteRootUrl { get; }
 
+        public int APIVersion => 20220217; // We may want to pull this from the game version eventually.
+
         public Exception LastLoginError { get; private set; }
 
         public string ProvidedUsername { get; private set; }
@@ -399,7 +401,10 @@ namespace osu.Game.Online.API
             lock (queue)
             {
                 if (state.Value == APIState.Offline)
+                {
+                    request.Fail(new WebException(@"User not logged in"));
                     return;
+                }
 
                 queue.Enqueue(request);
             }
@@ -416,7 +421,7 @@ namespace osu.Game.Online.API
                 if (failOldRequests)
                 {
                     foreach (var req in oldQueueRequests)
-                        req.Fail(new WebException(@"Disconnected from server"));
+                        req.Fail(new WebException($@"Request failed from flush operation (state {state.Value})"));
                 }
             }
         }

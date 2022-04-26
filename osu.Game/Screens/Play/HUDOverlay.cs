@@ -17,6 +17,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Skinning;
@@ -65,7 +66,7 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
         private bool holdingForHUD;
 
@@ -83,10 +84,7 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 CreateFailingLayer(),
-                mainComponents = new SkinnableTargetContainer(SkinnableTarget.MainHUDComponents)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                mainComponents = new MainComponentsContainer(),
                 topRightElements = new FillFlowContainer
                 {
                     Anchor = Anchor.TopRight,
@@ -121,7 +119,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
         {
             if (drawableRuleset != null)
             {
@@ -154,7 +152,7 @@ namespace osu.Game.Screens.Play
 
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
-            IsBreakTime.BindValueChanged(_ => updateVisibility());
+            IsPlaying.BindValueChanged(_ => updateVisibility());
             configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
@@ -220,7 +218,7 @@ namespace osu.Game.Screens.Play
 
                 case HUDVisibilityMode.HideDuringGameplay:
                     // always show during replay as we want the seek bar to be visible.
-                    ShowHud.Value = replayLoaded.Value || IsBreakTime.Value;
+                    ShowHud.Value = replayLoaded.Value || !IsPlaying.Value;
                     break;
 
                 case HUDVisibilityMode.Always:
@@ -323,6 +321,30 @@ namespace osu.Game.Screens.Play
                     holdingForHUD = false;
                     updateVisibility();
                     break;
+            }
+        }
+
+        private class MainComponentsContainer : SkinnableTargetContainer
+        {
+            private Bindable<ScoringMode> scoringMode;
+
+            [Resolved]
+            private OsuConfigManager config { get; set; }
+
+            public MainComponentsContainer()
+                : base(SkinnableTarget.MainHUDComponents)
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                // When the scoring mode changes, relative positions of elements may change (see DefaultSkin.GetDrawableComponent).
+                // This is a best effort implementation for cases where users haven't customised layouts.
+                scoringMode = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode);
+                scoringMode.BindValueChanged(val => Reload());
             }
         }
     }

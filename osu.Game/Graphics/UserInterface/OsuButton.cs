@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.UserInterface
             if (Enabled.Value)
             {
                 Debug.Assert(backgroundColour != null);
-                Background.FlashColour(backgroundColour.Value, 200);
+                Background.FlashColour(backgroundColour.Value.Lighten(0.4f), 200);
             }
 
             return base.OnClick(e);

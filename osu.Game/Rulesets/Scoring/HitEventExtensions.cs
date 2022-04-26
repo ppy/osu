@@ -22,6 +22,23 @@ namespace osu.Game.Rulesets.Scoring
             return 10 * standardDeviation(timeOffsets);
         }
 
+        /// <summary>
+        /// Calculates the average hit offset/error for a sequence of <see cref="HitEvent"/>s, where negative numbers mean the user hit too early on average.
+        /// </summary>
+        /// <returns>
+        /// A non-null <see langword="double"/> value if unstable rate could be calculated,
+        /// and <see langword="null"/> if unstable rate cannot be calculated due to <paramref name="hitEvents"/> being empty.
+        /// </returns>
+        public static double? CalculateAverageHitError(this IEnumerable<HitEvent> hitEvents)
+        {
+            double[] timeOffsets = hitEvents.Where(affectsUnstableRate).Select(ev => ev.TimeOffset).ToArray();
+
+            if (timeOffsets.Length == 0)
+                return null;
+
+            return timeOffsets.Average();
+        }
+
         private static bool affectsUnstableRate(HitEvent e) => !(e.HitObject.HitWindows is HitWindows.EmptyHitWindows) && e.Result.IsHit();
 
         private static double? standardDeviation(double[] timeOffsets)

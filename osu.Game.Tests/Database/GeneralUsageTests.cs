@@ -21,15 +21,15 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestConstructRealm()
         {
-            RunTestWithRealm((realmFactory, _) => { realmFactory.CreateContext().Refresh(); });
+            RunTestWithRealm((realm, _) => { realm.Run(r => r.Refresh()); });
         }
 
         [Test]
         public void TestBlockOperations()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
-                using (realmFactory.BlockAllOperations())
+                using (realm.BlockAllOperations())
                 {
                 }
             });
@@ -42,27 +42,26 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestNestedContextCreationWithSubscription()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
                 bool callbackRan = false;
 
-                using (var context = realmFactory.CreateContext())
+                realm.RegisterCustomSubscription(r =>
                 {
-                    var subscription = context.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
+                    var subscription = r.All<BeatmapInfo>().QueryAsyncWithNotifications((sender, changes, error) =>
                     {
-                        using (realmFactory.CreateContext())
+                        realm.Run(_ =>
                         {
                             callbackRan = true;
-                        }
+                        });
                     });
 
                     // Force the callback above to run.
-                    using (realmFactory.CreateContext())
-                    {
-                    }
+                    realm.Run(rr => rr.Refresh());
 
                     subscription?.Dispose();
-                }
+                    return null;
+                });
 
                 Assert.IsTrue(callbackRan);
             });
@@ -71,31 +70,36 @@ namespace osu.Game.Tests.Database
         [Test]
         public void TestBlockOperationsWithContention()
         {
-            RunTestWithRealm((realmFactory, _) =>
+            RunTestWithRealm((realm, _) =>
             {
                 ManualResetEventSlim stopThreadedUsage = new ManualResetEventSlim();
                 ManualResetEventSlim hasThreadedUsage = new ManualResetEventSlim();
 
                 Task.Factory.StartNew(() =>
                 {
-                    using (realmFactory.CreateContext())
+                    realm.Run(_ =>
                     {
                         hasThreadedUsage.Set();
 
                         stopThreadedUsage.Wait();
-                    }
+                    });
                 }, TaskCreationOptions.LongRunning | TaskCreationOptions.HideScheduler);
 
                 hasThreadedUsage.Wait();
 
                 Assert.Throws<TimeoutException>(() =>
                 {
-                    using (realmFactory.BlockAllOperations())
+                    using (realm.BlockAllOperations())
                     {
                     }
                 });
 
                 stopThreadedUsage.Set();
+
+                // Ensure we can block a second time after the usage has ended.
+                using (realm.BlockAllOperations())
+                {
+                }
             });
         }
     }

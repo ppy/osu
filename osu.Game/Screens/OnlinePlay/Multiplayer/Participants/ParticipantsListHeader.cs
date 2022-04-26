@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Screens.OnlinePlay.Components;
 
 namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
@@ -13,7 +14,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
         private MultiplayerClient client { get; set; }
 
         public ParticipantsListHeader()
-            : base("Participants")
+            : base(RankingsStrings.SpotlightParticipants)
         {
         }
 

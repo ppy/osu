@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override void AddCheckSteps()
         {
-            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddUntilStep("wait for fail", () => Player.GameplayState.HasFailed);
             AddUntilStep("wait for fail overlay", () => ((FailPlayer)Player).FailOverlay.State.Value == Visibility.Visible);
 
             // The pause screen and fail animation both ramp frequency.
@@ -56,10 +56,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             private double lastFrequency = double.MaxValue;
 
-            protected override void Update()
+            protected override void UpdateAfterChildren()
             {
-                base.Update();
+                base.UpdateAfterChildren();
 
+                // This must be done in UpdateAfterChildren to allow the gameplay clock to have updated before checking values.
                 double freq = Beatmap.Value.Track.AggregateFrequency.Value;
 
                 FrequencyIncreased |= freq > lastFrequency;

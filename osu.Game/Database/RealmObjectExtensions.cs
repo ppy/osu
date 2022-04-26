@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using AutoMapper;
 using AutoMapper.Internal;
-using osu.Framework.Development;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.Models;
@@ -39,6 +38,7 @@ namespace osu.Game.Database
             c.CreateMap<BeatmapInfo, BeatmapInfo>()
              .ForMember(s => s.Ruleset, cc => cc.Ignore())
              .ForMember(s => s.Metadata, cc => cc.Ignore())
+             .ForMember(s => s.UserSettings, cc => cc.Ignore())
              .ForMember(s => s.Difficulty, cc => cc.Ignore())
              .ForMember(s => s.BeatmapSet, cc => cc.Ignore())
              .AfterMap((s, d) =>
@@ -48,6 +48,7 @@ namespace osu.Game.Database
                  copyChangesToRealm(s.Metadata, d.Metadata);
              });
             c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ConstructUsing(_ => new BeatmapSetInfo(null))
              .ForMember(s => s.Beatmaps, cc => cc.Ignore())
              .AfterMap((s, d) =>
              {
@@ -58,7 +59,16 @@ namespace osu.Game.Database
                      if (existing != null)
                          copyChangesToRealm(beatmap, existing);
                      else
-                         d.Beatmaps.Add(beatmap);
+                     {
+                         var newBeatmap = new BeatmapInfo
+                         {
+                             ID = beatmap.ID,
+                             BeatmapSet = d,
+                             Ruleset = d.Realm.Find<RulesetInfo>(beatmap.Ruleset.ShortName)
+                         };
+                         d.Beatmaps.Add(newBeatmap);
+                         copyChangesToRealm(beatmap, newBeatmap);
+                     }
                  }
              });
 
@@ -77,6 +87,7 @@ namespace osu.Game.Database
             applyCommonConfiguration(c);
 
             c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ConstructUsing(_ => new BeatmapSetInfo(null))
              .MaxDepth(2)
              .AfterMap((s, d) =>
              {
@@ -109,6 +120,7 @@ namespace osu.Game.Database
             applyCommonConfiguration(c);
 
             c.CreateMap<BeatmapSetInfo, BeatmapSetInfo>()
+             .ConstructUsing(_ => new BeatmapSetInfo(null))
              .MaxDepth(2)
              .ForMember(b => b.Files, cc => cc.Ignore())
              .AfterMap((s, d) =>
@@ -143,6 +155,7 @@ namespace osu.Game.Database
 
             c.CreateMap<RealmKeyBinding, RealmKeyBinding>();
             c.CreateMap<BeatmapMetadata, BeatmapMetadata>();
+            c.CreateMap<BeatmapUserSettings, BeatmapUserSettings>();
             c.CreateMap<BeatmapDifficulty, BeatmapDifficulty>();
             c.CreateMap<RulesetInfo, RulesetInfo>();
             c.CreateMap<ScoreInfo, ScoreInfo>();
@@ -202,28 +215,22 @@ namespace osu.Game.Database
         private static void copyChangesToRealm<T>(T source, T destination) where T : RealmObjectBase
             => write_mapper.Map(source, destination);
 
-        public static List<ILive<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
+        public static List<Live<T>> ToLiveUnmanaged<T>(this IEnumerable<T> realmList)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<ILive<T>>().ToList();
+            return realmList.Select(l => new RealmLiveUnmanaged<T>(l)).Cast<Live<T>>().ToList();
         }
 
-        public static ILive<T> ToLiveUnmanaged<T>(this T realmObject)
+        public static Live<T> ToLiveUnmanaged<T>(this T realmObject)
             where T : RealmObject, IHasGuidPrimaryKey
         {
             return new RealmLiveUnmanaged<T>(realmObject);
         }
 
-        public static List<ILive<T>> ToLive<T>(this IEnumerable<T> realmList, RealmContextFactory realmContextFactory)
+        public static Live<T> ToLive<T>(this T realmObject, RealmAccess realm)
             where T : RealmObject, IHasGuidPrimaryKey
         {
-            return realmList.Select(l => new RealmLive<T>(l, realmContextFactory)).Cast<ILive<T>>().ToList();
-        }
-
-        public static ILive<T> ToLive<T>(this T realmObject, RealmContextFactory realmContextFactory)
-            where T : RealmObject, IHasGuidPrimaryKey
-        {
-            return new RealmLive<T>(realmObject, realmContextFactory);
+            return new RealmLive<T>(realmObject, realm);
         }
 
         /// <summary>
@@ -269,9 +276,8 @@ namespace osu.Game.Database
         public static IDisposable? QueryAsyncWithNotifications<T>(this IRealmCollection<T> collection, NotificationCallbackDelegate<T> callback)
             where T : RealmObjectBase
         {
-            // Subscriptions can only work on the main thread.
-            if (!ThreadSafety.IsUpdateThread)
-                throw new InvalidOperationException("Cannot subscribe for realm notifications from a non-update thread.");
+            if (!RealmAccess.CurrentThreadSubscriptionsAllowed)
+                throw new InvalidOperationException($"Make sure to call {nameof(RealmAccess)}.{nameof(RealmAccess.RegisterForNotifications)}");
 
             return collection.SubscribeForNotifications(callback);
         }

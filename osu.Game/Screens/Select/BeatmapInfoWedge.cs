@@ -152,7 +152,6 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
-            public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
             public FillFlowContainer MapperContainer { get; private set; }
 
             private Container difficultyColourBar;
@@ -169,6 +168,12 @@ namespace osu.Game.Screens.Select
             [Resolved]
             private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
+            [Resolved]
+            private BeatmapDifficultyCache difficultyCache { get; set; }
+
+            [Resolved]
+            private OsuColour colours { get; set; }
+
             private ModSettingChangeTracker settingChangeTracker;
 
             public WedgeInfoText(WorkingBeatmap working, RulesetInfo userRuleset)
@@ -181,7 +186,7 @@ namespace osu.Game.Screens.Select
             private IBindable<StarDifficulty?> starDifficulty;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, LocalisationManager localisation, BeatmapDifficultyCache difficultyCache)
+            private void load(LocalisationManager localisation)
             {
                 var beatmapInfo = working.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata;
@@ -255,7 +260,7 @@ namespace osu.Game.Screens.Select
                                 Shear = -wedged_container_shear,
                                 Alpha = 0f,
                             },
-                            StatusPill = new BeatmapSetOnlineStatusPill
+                            new BeatmapSetOnlineStatusPill
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopRight,
@@ -264,6 +269,7 @@ namespace osu.Game.Screens.Select
                                 TextSize = 11,
                                 TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
+                                Alpha = string.IsNullOrEmpty(beatmapInfo.DifficultyName) ? 0 : 1
                             }
                         }
                     },
@@ -281,12 +287,14 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
+                                Current = { BindTarget = titleBinding },
                                 Font = OsuFont.GetFont(size: 28, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
                             },
                             ArtistLabel = new OsuSpriteText
                             {
+                                Current = { BindTarget = artistBinding },
                                 Font = OsuFont.GetFont(size: 17, italics: true),
                                 RelativeSizeAxes = Axes.X,
                                 Truncate = true,
@@ -308,31 +316,29 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
-
-                starRatingDisplay.DisplayedStars.BindValueChanged(s =>
-                {
-                    difficultyColourBar.Colour = colours.ForStarDifficulty(s.NewValue);
-                }, true);
-
-                starDifficulty = difficultyCache.GetBindableDifficulty(beatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
-                starDifficulty.BindValueChanged(s =>
-                {
-                    starRatingDisplay.FadeIn(transition_duration);
-                    starRatingDisplay.Current.Value = s.NewValue ?? default;
-                });
-
-                // no difficulty means it can't have a status to show
-                if (string.IsNullOrEmpty(beatmapInfo.DifficultyName))
-                    StatusPill.Hide();
-
                 addInfoLabels();
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
+
+                starRatingDisplay.DisplayedStars.BindValueChanged(s =>
+                {
+                    difficultyColourBar.Colour = colours.ForStarDifficulty(s.NewValue);
+                }, true);
+
+                starDifficulty = difficultyCache.GetBindableDifficulty(working.BeatmapInfo, (cancellationSource = new CancellationTokenSource()).Token);
+                starDifficulty.BindValueChanged(s =>
+                {
+                    starRatingDisplay.Current.Value = s.NewValue ?? default;
+
+                    // Don't roll the counter on initial display (but still allow it to roll on applying mods etc.)
+                    if (!starRatingDisplay.IsPresent)
+                        starRatingDisplay.FinishTransforms(true);
+
+                    starRatingDisplay.FadeIn(transition_duration);
+                });
 
                 mods.BindValueChanged(m =>
                 {
@@ -343,12 +349,6 @@ namespace osu.Game.Screens.Select
                     settingChangeTracker = new ModSettingChangeTracker(m.NewValue);
                     settingChangeTracker.SettingChanged += _ => refreshBPMLabel();
                 }, true);
-            }
-
-            private void setMetadata(string source)
-            {
-                ArtistLabel.Text = artistBinding.Value;
-                TitleLabel.Text = string.IsNullOrEmpty(source) ? titleBinding.Value : source + " — " + titleBinding.Value;
             }
 
             private void addInfoLabels()

@@ -10,11 +10,12 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneButtonSystem : OsuTestScene
+    public class TestSceneButtonSystem : OsuManualInputManagerTestScene
     {
         private OsuLogo logo;
         private ButtonSystem buttons;
@@ -62,6 +63,66 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestSmoothExit()
         {
             AddStep("Enter mode", performEnterMode);
+        }
+
+        [TestCase(Key.P, true)]
+        [TestCase(Key.M, true)]
+        [TestCase(Key.L, true)]
+        [TestCase(Key.E, false)]
+        [TestCase(Key.D, false)]
+        [TestCase(Key.Q, false)]
+        [TestCase(Key.O, false)]
+        public void TestShortcutKeys(Key key, bool entersPlay)
+        {
+            int activationCount = -1;
+            AddStep("set up action", () =>
+            {
+                activationCount = 0;
+                void action() => activationCount++;
+
+                switch (key)
+                {
+                    case Key.P:
+                        buttons.OnSolo = action;
+                        break;
+
+                    case Key.M:
+                        buttons.OnMultiplayer = action;
+                        break;
+
+                    case Key.L:
+                        buttons.OnPlaylists = action;
+                        break;
+
+                    case Key.E:
+                        buttons.OnEdit = action;
+                        break;
+
+                    case Key.D:
+                        buttons.OnBeatmapListing = action;
+                        break;
+
+                    case Key.Q:
+                        buttons.OnExit = action;
+                        break;
+
+                    case Key.O:
+                        buttons.OnSettings = action;
+                        break;
+                }
+            });
+
+            AddStep($"press {key}", () => InputManager.Key(key));
+            AddAssert("state is top level", () => buttons.State == ButtonSystemState.TopLevel);
+
+            if (entersPlay)
+            {
+                AddStep("press P", () => InputManager.Key(Key.P));
+                AddAssert("state is play", () => buttons.State == ButtonSystemState.Play);
+            }
+
+            AddStep($"press {key}", () => InputManager.Key(key));
+            AddAssert("action triggered", () => activationCount == 1);
         }
 
         private void performEnterMode()

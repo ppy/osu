@@ -35,20 +35,20 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 transitionFromResults();
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
 
             if (client.Room == null)
                 return;
 
-            if (!(last is MultiplayerPlayerLoader playerLoader))
+            if (!(e.Last is MultiplayerPlayerLoader playerLoader))
                 return;
 
             // If gameplay wasn't finished, then we have a simple path back to the idle state by aborting gameplay.
             if (!playerLoader.GameplayPassed)
             {
-                client.AbortGameplay();
+                client.AbortGameplay().FireAndForget();
                 return;
             }
 

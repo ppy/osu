@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
 
                     case CatchSkinComponents.CatchComboCounter:
                         if (providesComboCounter)
-                            return new LegacyCatchComboCounter(Skin);
+                            return new LegacyCatchComboCounter();
 
                         return null;
 
@@ -90,6 +90,9 @@ namespace osu.Game.Rulesets.Catch.Skinning.Legacy
                             return new LegacyHitExplosion();
 
                         return null;
+
+                    default:
+                        throw new UnsupportedSkinComponentException(component);
                 }
             }
 

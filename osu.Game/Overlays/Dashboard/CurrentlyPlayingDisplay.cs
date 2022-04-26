@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +14,7 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Spectator;
+using osu.Game.Screens;
 using osu.Game.Screens.OnlinePlay.Match.Components;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
@@ -52,21 +54,24 @@ namespace osu.Game.Overlays.Dashboard
             base.LoadComplete();
 
             playingUsers.BindTo(spectatorClient.PlayingUsers);
-            playingUsers.BindCollectionChanged(onUsersChanged, true);
+            playingUsers.BindCollectionChanged(onPlayingUsersChanged, true);
         }
 
-        private void onUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
+        private void onPlayingUsersChanged(object sender, NotifyCollectionChangedEventArgs e) => Schedule(() =>
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    foreach (int id in e.NewItems.OfType<int>().ToArray())
+                    Debug.Assert(e.NewItems != null);
+
+                    foreach (int userId in e.NewItems)
                     {
-                        users.GetUserAsync(id).ContinueWith(task =>
+                        users.GetUserAsync(userId).ContinueWith(task =>
                         {
                             var user = task.GetResultSafely();
 
-                            if (user == null) return;
+                            if (user == null)
+                                return;
 
                             Schedule(() =>
                             {
@@ -82,12 +87,10 @@ namespace osu.Game.Overlays.Dashboard
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (int u in e.OldItems.OfType<int>())
-                        userFlow.FirstOrDefault(card => card.User.Id == u)?.Expire();
-                    break;
+                    Debug.Assert(e.OldItems != null);
 
-                case NotifyCollectionChangedAction.Reset:
-                    userFlow.Clear();
+                    foreach (int userId in e.OldItems)
+                        userFlow.FirstOrDefault(card => card.User.Id == userId)?.Expire();
                     break;
             }
         });
@@ -104,7 +107,7 @@ namespace osu.Game.Overlays.Dashboard
             public readonly APIUser User;
 
             [Resolved(canBeNull: true)]
-            private OsuGame game { get; set; }
+            private IPerformFromScreenRunner performer { get; set; }
 
             public PlayingUserPanel(APIUser user)
             {
@@ -135,10 +138,10 @@ namespace osu.Game.Overlays.Dashboard
                             new PurpleTriangleButton
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Text = "Watch",
+                                Text = "Spectate",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Action = () => game?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
+                                Action = () => performer?.PerformFromScreen(s => s.Push(new SoloSpectator(User))),
                                 Enabled = { Value = User.Id != api.LocalUser.Value.Id }
                             }
                         }
