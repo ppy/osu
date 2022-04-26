@@ -190,7 +190,7 @@ namespace osu.Game.Tests.Gameplay
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
 
-            AddStep($"apply {resultApplied.ToString().ToLower()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
+            AddStep($"apply {resultApplied.ToString().ToLower()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
