@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
     {
         private const double individual_decay_base = 0.125;
         private const double overall_decay_base = 0.30;
+        private const double release_threshold = 24;
 
         protected override double SkillMultiplier => 1;
         protected override double StrainDecayBase => 1;
@@ -37,30 +38,42 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
             var maniaCurrent = (ManiaDifficultyHitObject)current;
             double endTime = maniaCurrent.EndTime;
             int column = maniaCurrent.BaseObject.Column;
+            double closestEndTime = Math.Abs(endTime - maniaCurrent.LastObject.StartTime); // Lowest value we can assume with the current information
 
             double holdFactor = 1.0; // Factor to all additional strains in case something else is held
             double holdAddition = 0; // Addition to the current note in case it's a hold and has to be released awkwardly
+            bool isOverlapping = false;
 
             // Fill up the holdEndTimes array
             for (int i = 0; i < holdEndTimes.Length; ++i)
             {
-                // If there is at least one other overlapping end or note, then we get an addition, buuuuuut...
-                if (Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1))
-                    holdAddition = 1.0;
-
-                // ... this addition only is valid if there is _no_ other note with the same ending. Releasing multiple notes at the same time is just as easy as releasing 1
-                if (Precision.AlmostEquals(endTime, holdEndTimes[i], 1))
-                    holdAddition = 0;
+                // The current note is overlapped if a previous note or end is overlapping the current note body
+                isOverlapping |= Precision.DefinitelyBigger(holdEndTimes[i], maniaCurrent.StartTime, 1) && Precision.DefinitelyBigger(endTime, holdEndTimes[i], 1);
 
                 // We give a slight bonus to everything if something is held meanwhile
                 if (Precision.DefinitelyBigger(holdEndTimes[i], endTime, 1))
                     holdFactor = 1.25;
+
+                closestEndTime = Math.Min(closestEndTime, Math.Abs(endTime - holdEndTimes[i]));
 
                 // Decay individual strains
                 individualStrains[i] = applyDecay(individualStrains[i], current.DeltaTime, individual_decay_base);
             }
 
             holdEndTimes[column] = endTime;
+
+            // The hold addition is given if there was an overlap, however it is only valid if there are no other note with a similar ending.
+            // Releasing multiple notes is just as easy as releasing 1. Nerfs the hold addition by half if the closest release is release_threshold away.
+            // holdAddition
+            //     ^
+            // 1.0 + - - - - - -+-----------
+            //     |           /
+            // 0.5 + - - - - -/   Sigmoid Curve
+            //     |         /|
+            // 0.0 +--------+-+---------------> Release Difference / ms
+            //         release_threshold
+            if (isOverlapping)
+                holdAddition = 1 / (1 + Math.Exp(0.5 * (release_threshold - closestEndTime)));
 
             // Increase individual strain in own column
             individualStrains[column] += 2.0 * holdFactor;
