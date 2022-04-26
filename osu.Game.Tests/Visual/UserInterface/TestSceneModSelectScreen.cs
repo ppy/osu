@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -90,6 +91,27 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestIncompatibilityToggling()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddStep("activate DT", () => getPanelForMod(typeof(OsuModDoubleTime)).TriggerClick());
+            AddAssert("DT active", () => SelectedMods.Value.Single().GetType() == typeof(OsuModDoubleTime));
+
+            AddStep("activate NC", () => getPanelForMod(typeof(OsuModNightcore)).TriggerClick());
+            AddAssert("only NC active", () => SelectedMods.Value.Single().GetType() == typeof(OsuModNightcore));
+
+            AddStep("activate HR", () => getPanelForMod(typeof(OsuModHardRock)).TriggerClick());
+            AddAssert("NC+HR active", () => SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModNightcore))
+                                            && SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModHardRock)));
+
+            AddStep("activate MR", () => getPanelForMod(typeof(OsuModMirror)).TriggerClick());
+            AddAssert("NC+MR active", () => SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModNightcore))
+                                            && SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModMirror)));
+        }
+
+        [Test]
         public void TestCustomisationToggleState()
         {
             createScreen();
@@ -136,5 +158,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert($"customisation toggle is {(disabled ? "" : "not ")}disabled", () => getToggle().Active.Disabled == disabled);
             AddAssert($"customisation toggle is {(active ? "" : "not ")}active", () => getToggle().Active.Value == active);
         }
+
+        private ModPanel getPanelForMod(Type modType)
+            => modSelectScreen.ChildrenOfType<ModPanel>().Single(panel => panel.Mod.GetType() == modType);
     }
 }
