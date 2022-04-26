@@ -394,7 +394,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private class ColumnDimContainer : Container
+        internal class ColumnDimContainer : Container
         {
             public ModColumn Column { get; }
 
