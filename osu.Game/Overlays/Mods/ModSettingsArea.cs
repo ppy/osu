@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Mods
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            SelectedMods.BindValueChanged(_ => updateMods());
+            SelectedMods.BindValueChanged(_ => updateMods(), true);
         }
 
         private void updateMods()
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Mods
         protected override bool OnMouseDown(MouseDownEvent e) => true;
         protected override bool OnHover(HoverEvent e) => true;
 
-        private class ModSettingsColumn : CompositeDrawable
+        internal class ModSettingsColumn : CompositeDrawable
         {
             public ModSettingsColumn(Mod mod, IEnumerable<Drawable> settingsControls)
             {
