@@ -43,8 +43,7 @@ namespace osu.Game.Screens.Play.Break
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            AccuracyDisplay = new PercentageBreakInfoLine(BeatmapsetsStrings.ShowStatsAccuracy),
-
+                            AccuracyDisplay = new PercentageBreakInfoLine(BeatmapsetsStrings.ShowScoreboardHeadersAccuracy),
                             // See https://github.com/ppy/osu/discussions/15185
                             // RankDisplay = new BreakInfoLine<int>("Rank"),
                             GradeDisplay = new BreakInfoLine<ScoreRank>("Grade"),
