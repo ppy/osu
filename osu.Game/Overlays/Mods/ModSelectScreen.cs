@@ -324,15 +324,22 @@ namespace osu.Game.Overlays.Mods
         {
             base.Update();
 
+            // the bounds below represent the horizontal range of scroll items to be considered fully visible/active, in the scroll's internal coordinate space.
+            // note that clamping is applied to the left scroll bound to ensure scrolling past extents does not change the set of active columns.
+            float leftScrollBound = Math.Clamp(columnScroll.Current, 0, columnScroll.ScrollableExtent);
+            float rightScrollBound = leftScrollBound + columnScroll.DrawWidth;
+
             foreach (var column in columnFlow)
             {
                 // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
                 // so we have to manually compensate.
-                var topLeft = column.ToSpaceOfOtherDrawable(new Vector2(-column.DrawHeight * SHEAR, 0), columnScroll);
-                var topRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth, 0), columnScroll);
+                // additionally note that columnFlow.Parent is not columnScroll, but rather it is the scroll's internal container.
+                // this is intentional in order to include margin of the columnFlow in calculations correctly and operate in the "scroll internal content space".
+                var topLeft = column.ToSpaceOfOtherDrawable(new Vector2(-column.DrawHeight * SHEAR, 0), columnFlow.Parent);
+                var topRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth, 0), columnFlow.Parent);
 
-                column.Active.Value = Precision.AlmostBigger(topLeft.X, 0)
-                                      && Precision.DefinitelyBigger(columnScroll.DrawWidth, topRight.X);
+                column.Active.Value = Precision.AlmostBigger(topLeft.X, leftScrollBound)
+                                      && Precision.DefinitelyBigger(rightScrollBound, topRight.X);
             }
         }
 
