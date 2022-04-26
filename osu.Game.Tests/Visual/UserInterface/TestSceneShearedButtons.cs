@@ -17,6 +17,38 @@ namespace osu.Game.Tests.Visual.UserInterface
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Test]
+        public void TestShearedButton()
+        {
+            ShearedButton button = null;
+            bool actionFired = false;
+
+            AddStep("create button", () =>
+            {
+                actionFired = false;
+
+                Child = button = new ShearedButton(200)
+                {
+                    LighterColour = Colour4.FromHex("#FF86DD"),
+                    DarkerColour = Colour4.FromHex("#DE31AE"),
+                    TextColour = Colour4.White,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Text = "Press me",
+                    Height = 80,
+                    Action = () => actionFired = true,
+                };
+            });
+
+            AddStep("set disabled", () => button.Enabled.Value = false);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action not fired", () => !actionFired);
+
+            AddStep("set enabled", () => button.Enabled.Value = true);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action fired", () => actionFired);
+        }
+
+        [Test]
         public void TestShearedToggleButton()
         {
             ShearedToggleButton button = null;
