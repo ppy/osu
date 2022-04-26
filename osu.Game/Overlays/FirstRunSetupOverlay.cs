@@ -310,7 +310,7 @@ namespace osu.Game.Overlays
             if (currentStepIndex == 0)
                 NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
             else if (currentStepIndex < steps.Length - 1)
-                NextButton.Text = FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].Description);
+                NextButton.Text = new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Next, steps[currentStepIndex.Value + 1].Description);
             else
                 NextButton.Text = CommonStrings.Finish;
         }
