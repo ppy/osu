@@ -174,8 +174,9 @@ namespace osu.Game.Tests.Gameplay
             AddAssert("failed", () => processor.HasFailed);
         }
 
-        [Test]
-        public void TestMultipleFailConditions([Values] bool applyFirstCondition)
+        [TestCase(HitResult.Miss)]
+        [TestCase(HitResult.Meh)]
+        public void TestMultipleFailConditions(HitResult resultApplied)
         {
             var beatmap = createBeatmap(0, 1000);
             createProcessor(beatmap);
@@ -189,11 +190,7 @@ namespace osu.Game.Tests.Gameplay
             AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
             AddAssert("not failed", () => !processor.HasFailed);
 
-            if (applyFirstCondition)
-                AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
-            else
-                AddStep("apply meh hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Meh }));
-
+            AddStep($"apply {resultApplied.ToString().ToLower()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
             AddAssert("failed", () => processor.HasFailed);
         }
 
