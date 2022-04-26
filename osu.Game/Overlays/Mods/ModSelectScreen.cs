@@ -407,7 +407,7 @@ namespace osu.Game.Overlays.Mods
                 this.FadeColour(targetColour, 300, Easing.OutQuint);
             }
 
-            protected override bool OnMouseDown(MouseDownEvent e)
+            protected override bool OnClick(ClickEvent e)
             {
                 if (!Active.Value)
                     RequestScroll?.Invoke(this);
