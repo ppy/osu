@@ -333,8 +333,13 @@ namespace osu.Game.Overlays.Mods
 
                 // the bounds below represent the horizontal range of scroll items to be considered fully visible/active, in the scroll's internal coordinate space.
                 // note that clamping is applied to the left scroll bound to ensure scrolling past extents does not change the set of active columns.
-                float leftScrollBound = Math.Clamp(Current, 0, ScrollableExtent);
-                float rightScrollBound = leftScrollBound + DrawWidth;
+                float leftVisibleBound = Math.Clamp(Current, 0, ScrollableExtent);
+                float rightVisibleBound = leftVisibleBound + DrawWidth;
+
+                // if a movement is occurring at this time, the bounds below represent the full range of columns that the scroll movement will encompass.
+                // this will be used to ensure that columns do not change state from active to inactive back and forth until they are fully scrolled past.
+                float leftMovementBound = Math.Min(Current, Target);
+                float rightMovementBound = Math.Max(Current, Target) + DrawWidth;
 
                 foreach (var column in Child)
                 {
@@ -343,8 +348,12 @@ namespace osu.Game.Overlays.Mods
                     var topLeft = column.ToSpaceOfOtherDrawable(new Vector2(-column.DrawHeight * SHEAR, 0), ScrollContent);
                     var topRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth, 0), ScrollContent);
 
-                    column.Active.Value = Precision.AlmostBigger(topLeft.X, leftScrollBound)
-                                          && Precision.DefinitelyBigger(rightScrollBound, topRight.X);
+                    bool isCurrentlyVisible = Precision.AlmostBigger(topLeft.X, leftVisibleBound)
+                                              && Precision.DefinitelyBigger(rightVisibleBound, topRight.X);
+                    bool isBeingScrolledToward = Precision.AlmostBigger(topLeft.X, leftMovementBound)
+                                                 && Precision.DefinitelyBigger(rightMovementBound, topRight.X);
+
+                    column.Active.Value = isCurrentlyVisible || isBeingScrolledToward;
                 }
             }
         }
