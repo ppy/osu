@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
         private readonly FillFlowContainer bottomRightElements;
         private readonly FillFlowContainer topRightElements;
 
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        internal readonly IBindable<bool> IsPlaying = new Bindable<bool>();
 
         private bool holdingForHUD;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
+        private void load(OsuConfigManager config, INotificationOverlay notificationOverlay)
         {
             if (drawableRuleset != null)
             {
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Play
 
             ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, FADE_DURATION, FADE_EASING)));
 
-            IsBreakTime.BindValueChanged(_ => updateVisibility());
+            IsPlaying.BindValueChanged(_ => updateVisibility());
             configVisibilityMode.BindValueChanged(_ => updateVisibility(), true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Play
 
                 case HUDVisibilityMode.HideDuringGameplay:
                     // always show during replay as we want the seek bar to be visible.
-                    ShowHud.Value = replayLoaded.Value || IsBreakTime.Value;
+                    ShowHud.Value = replayLoaded.Value || !IsPlaying.Value;
                     break;
 
                 case HUDVisibilityMode.Always:

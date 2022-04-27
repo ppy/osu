@@ -390,10 +390,14 @@ namespace osu.Game.Skinning
                             return new LegacyJudgementPieceOld(resultComponent.Component, createDrawable);
                     }
 
-                    break;
-            }
+                    return null;
 
-            return this.GetAnimation(component.LookupName, false, false);
+                case SkinnableSprite.SpriteComponent sprite:
+                    return this.GetAnimation(sprite.LookupName, false, false);
+
+                default:
+                    throw new UnsupportedSkinComponentException(component);
+            }
         }
 
         private Texture? getParticleTexture(HitResult result)
@@ -443,7 +447,9 @@ namespace osu.Game.Skinning
                 string lookupName = name.Replace(@"@2x", string.Empty);
 
                 float ratio = 2;
-                var texture = Textures?.Get(@$"{lookupName}@2x", wrapModeS, wrapModeT);
+                string twoTimesFilename = $"{Path.ChangeExtension(lookupName, null)}@2x{Path.GetExtension(lookupName)}";
+
+                var texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
 
                 if (texture == null)
                 {

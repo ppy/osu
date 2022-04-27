@@ -118,6 +118,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MissingLinebreak/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MissingSpace/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MoreSpecificForeachVariableTypeAvailable/@EntryIndexedValue">WARNING</s:String>
+    <s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MoveVariableDeclarationInsideLoopCondition/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MultipleSpaces/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MultipleStatementsOnOneLine/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=MultipleTypeMembersOnOneLine/@EntryIndexedValue">WARNING</s:String>

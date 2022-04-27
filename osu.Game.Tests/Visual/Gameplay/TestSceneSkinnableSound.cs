@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private TestSkinSourceContainer skinSource;
         private PausableSkinnableSound skinnableSound;
 
-        [SetUp]
+        [SetUpSteps]
         public void SetUpSteps()
         {
             AddStep("setup hierarchy", () =>

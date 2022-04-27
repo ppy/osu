@@ -16,20 +16,20 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModAimAssist : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    internal class OsuModMagnetised : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "Aim Assist";
-        public override string Acronym => "AA";
-        public override IconUsage? Icon => FontAwesome.Solid.MousePointer;
+        public override string Name => "Magnetised";
+        public override string Acronym => "MG";
+        public override IconUsage? Icon => FontAwesome.Solid.Magnet;
         public override ModType Type => ModType.Fun;
-        public override string Description => "No need to chase the circle – the circle chases you!";
+        public override string Description => "No need to chase the circles – your cursor is a magnet!";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModAutopilot), typeof(OsuModWiggle), typeof(OsuModTransform), typeof(ModAutoplay), typeof(OsuModRelax) };
 
         private IFrameStableClock gameplayClock;
 
-        [SettingSource("Assist strength", "How much this mod will assist you.", 0)]
-        public BindableFloat AssistStrength { get; } = new BindableFloat(0.5f)
+        [SettingSource("Attraction strength", "How strong the pull is.", 0)]
+        public BindableFloat AttractionStrength { get; } = new BindableFloat(0.5f)
         {
             Precision = 0.05f,
             MinValue = 0.05f,
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private void easeTo(DrawableHitObject hitObject, Vector2 destination)
         {
-            double dampLength = Interpolation.Lerp(3000, 40, AssistStrength.Value);
+            double dampLength = Interpolation.Lerp(3000, 40, AttractionStrength.Value);
 
             float x = (float)Interpolation.DampContinuously(hitObject.X, destination.X, dampLength, gameplayClock.ElapsedFrameTime);
             float y = (float)Interpolation.DampContinuously(hitObject.Y, destination.Y, dampLength, gameplayClock.ElapsedFrameTime);

@@ -29,6 +29,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Components;
@@ -84,10 +85,10 @@ namespace osu.Game.Screens.Edit
         private Storage storage { get; set; }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(canBeNull: true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
@@ -252,7 +253,7 @@ namespace osu.Game.Screens.Edit
                                     {
                                         Items = createFileMenuItems()
                                     },
-                                    new MenuItem("Edit")
+                                    new MenuItem(CommonStrings.ButtonsEdit)
                                     {
                                         Items = new[]
                                         {
@@ -559,16 +560,16 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             dimBackground();
             resetTrack(true);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             dimBackground();
         }
 
@@ -584,7 +585,7 @@ namespace osu.Game.Screens.Edit
             });
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             if (!ExitConfirmed)
             {
@@ -612,12 +613,12 @@ namespace osu.Game.Screens.Edit
 
             refetchBeatmap();
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             clock.Stop();
             refetchBeatmap();
         }

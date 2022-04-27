@@ -290,35 +290,35 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         protected void ShowUserModSelect() => userModsSelectOverlay.Show();
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             beginHandlingTrack();
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             endHandlingTrack();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
-            base.OnResuming(last);
+            base.OnResuming(e);
             updateWorkingBeatmap();
             beginHandlingTrack();
             Scheduler.AddOnce(UpdateMods);
             Scheduler.AddOnce(updateRuleset);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             RoomManager?.PartRoom();
             Mods.Value = Array.Empty<Mod>();
 
             endHandlingTrack();
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         protected void StartPlay()
