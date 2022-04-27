@@ -28,11 +28,6 @@ namespace osu.Game.Beatmaps.Drawables
                 },
                 downloadTracker = new BeatmapDownloadTracker(beatmapSet),
             };
-            AddInternal(progressBar = new ProgressBar(false)
-            {
-                Height = 0,
-                Alpha = 0,
-            });
 
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
