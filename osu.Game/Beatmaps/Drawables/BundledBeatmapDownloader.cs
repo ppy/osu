@@ -1,37 +1,55 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
+using osu.Game.Database;
+using osu.Game.Online;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 
 namespace osu.Game.Beatmaps.Drawables
 {
     public class BundledBeatmapDownloader : CompositeDrawable
     {
-        [Resolved]
-        private BeatmapModelDownloader beatmapDownloader { get; set; }
+        public IEnumerable<BeatmapDownloadTracker> DownloadTrackers => downloadTrackers;
+
+        private readonly List<BeatmapDownloadTracker> downloadTrackers = new List<BeatmapDownloadTracker>();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BeatmapManager beatmapManager, IAPIProvider api, INotificationOverlay notifications)
         {
+            var beatmapDownloader = new BundledBeatmapModelDownloader(beatmapManager, api)
+            {
+                PostNotification = notifications.Post
+            };
+
             foreach (string filename in bundled_beatmap_filenames.OrderBy(_ => RNG.NextSingle()).Take(10))
             {
                 var match = Regex.Match(filename, @"([0-9]*) (.*) - (.*)\.osz");
 
-                beatmapDownloader.Download(new APIBeatmapSet
+                var beatmapSet = new APIBeatmapSet
                 {
                     OnlineID = int.Parse(match.Groups[1].Value),
                     Artist = match.Groups[2].Value,
                     Title = match.Groups[3].Value,
-                });
+                };
+
+                var beatmapDownloadTracker = new BeatmapDownloadTracker(beatmapSet);
+                downloadTrackers.Add(beatmapDownloadTracker);
+                AddInternal(beatmapDownloadTracker);
+
+                beatmapDownloader.Download(beatmapSet);
             }
         }
 
-        private static readonly string[] bundled_beatmap_filenames = new[]
+        private static readonly string[] bundled_beatmap_filenames =
         {
             "682286 Yuyoyuppe - Emerald Galaxy.osz",
             "682287 baker - For a Dead Girl+.osz",
@@ -223,5 +241,26 @@ namespace osu.Game.Beatmaps.Drawables
             "1009907 James Landino & Kabuki - Birdsong.osz",
             "1015169 Thaehan - Insert Coin.osz",
         };
+
+        private class BundledBeatmapModelDownloader : BeatmapModelDownloader
+        {
+            public BundledBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
+                : base(beatmapImporter, api)
+            {
+            }
+
+            protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
+                => new BundledBeatmapDownloadRequest(set, minimiseDownloadSize);
+
+            public class BundledBeatmapDownloadRequest : DownloadBeatmapSetRequest
+            {
+                protected override string Uri => $"https://assets.ppy.sh/client-resources/bundled/{Model.OnlineID}.osz";
+
+                public BundledBeatmapDownloadRequest(IBeatmapSetInfo beatmapSetInfo, bool minimiseDownloadSize)
+                    : base(beatmapSetInfo, minimiseDownloadSize)
+                {
+                }
+            }
+        }
     }
 }
