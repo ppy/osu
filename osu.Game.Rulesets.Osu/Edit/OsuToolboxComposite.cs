@@ -12,7 +12,6 @@ using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.AltPressed && e.Key == Key.D && !e.Repeat)
+            if (e.ControlPressed && e.AltPressed && !e.Repeat)
             {
                 expandingContainer.Expanded.Value = true;
                 distanceSpacingScrollActive = true;
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            if (distanceSpacingScrollActive && (!e.AltPressed || e.Key == Key.D))
+            if (distanceSpacingScrollActive && (!e.AltPressed || !e.ControlPressed))
             {
                 expandingContainer.Expanded.Value = false;
                 distanceSpacingScrollActive = false;

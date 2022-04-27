@@ -95,14 +95,14 @@ namespace osu.Game.Tests.Visual.Editing
 
             AddStep("retrieve original spacing", () => originalSpacing = (float)editorBeatmap.BeatmapInfo.DistanceSpacing);
 
+            AddStep("hold ctrl", () => InputManager.PressKey(Key.LControl));
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
-            AddStep("hold D", () => InputManager.PressKey(Key.D));
 
             AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
             AddAssert("distance spacing increased by 0.5", () => Precision.AlmostEquals(editorBeatmap.BeatmapInfo.DistanceSpacing, originalSpacing + 0.5f));
 
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
-            AddStep("release D", () => InputManager.ReleaseKey(Key.D));
+            AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
         }
 
         public class EditorBeatmapContainer : Container
