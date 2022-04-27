@@ -185,8 +185,7 @@ namespace osu.Game.Screens.Menu
         private void load(AudioManager audio)
         {
             sampleHover = audio.Samples.Get(@"Menu/button-hover");
-            if (!string.IsNullOrEmpty(sampleName))
-                sampleClick = audio.Samples.Get($@"Menu/{sampleName}");
+            sampleClick = audio.Samples.Get(!string.IsNullOrEmpty(sampleName) ? $@"Menu/{sampleName}" : @"UI/button-select");
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

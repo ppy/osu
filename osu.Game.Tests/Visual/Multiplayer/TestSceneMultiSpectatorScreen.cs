@@ -464,16 +464,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMultiSpectatorScreen : MultiSpectatorScreen
         {
-            private readonly double? gameplayStartTime;
+            private readonly double? startTime;
 
-            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? gameplayStartTime = null)
+            public TestMultiSpectatorScreen(Room room, MultiplayerRoomUser[] users, double? startTime = null)
                 : base(room, users)
             {
-                this.gameplayStartTime = gameplayStartTime;
+                this.startTime = startTime;
             }
 
             protected override MasterGameplayClockContainer CreateMasterGameplayClockContainer(WorkingBeatmap beatmap)
-                => new MasterGameplayClockContainer(beatmap, gameplayStartTime ?? 0, gameplayStartTime.HasValue);
+                => new MasterGameplayClockContainer(beatmap, 0) { StartTime = startTime ?? 0 };
         }
     }
 }

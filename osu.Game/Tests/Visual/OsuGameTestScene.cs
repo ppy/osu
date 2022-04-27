@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play;
 using osuTK.Graphics;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
@@ -106,6 +107,11 @@ namespace osu.Game.Tests.Visual
 
         protected void ConfirmAtMainMenu() => AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
 
+        /// <summary>
+        /// Dismisses any notifications pushed which block from interacting with the game (or block screens from loading, e.g. <see cref="Player"/>).
+        /// </summary>
+        protected void DismissAnyNotifications() => Game.Notifications.State.Value = Visibility.Hidden;
+
         public class TestOsuGame : OsuGame
         {
             public new const float SIDE_OVERLAY_OFFSET_RATIO = OsuGame.SIDE_OVERLAY_OFFSET_RATIO;
@@ -156,6 +162,7 @@ namespace osu.Game.Tests.Visual
                 base.LoadComplete();
 
                 LocalConfig.SetValue(OsuSetting.IntroSequence, IntroSequence.Circles);
+                LocalConfig.SetValue(OsuSetting.ShowFirstRunSetup, false);
 
                 API.Login("Rhythm Champion", "osu!");
 

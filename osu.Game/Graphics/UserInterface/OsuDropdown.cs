@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -130,7 +131,22 @@ namespace osu.Game.Graphics.UserInterface
                 BackgroundColourSelected = SelectionColour
             };
 
-            protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
+            protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new DropdownScrollContainer(direction);
+
+            // Hotfix for https://github.com/ppy/osu/issues/17961
+            public class DropdownScrollContainer : OsuScrollContainer
+            {
+                public DropdownScrollContainer(Direction direction)
+                    : base(direction)
+                {
+                }
+
+                protected override bool OnMouseDown(MouseDownEvent e)
+                {
+                    base.OnMouseDown(e);
+                    return true;
+                }
+            }
 
             #region DrawableOsuDropdownMenuItem
 

@@ -115,7 +115,9 @@ namespace osu.Game.Utils
         {
             mods = mods.ToArray();
 
-            CheckCompatibleSet(mods, out invalidMods);
+            // exclude multi mods from compatibility checks.
+            // the loop below automatically marks all multi mods as not valid for gameplay anyway.
+            CheckCompatibleSet(mods.Where(m => !(m is MultiMod)), out invalidMods);
 
             foreach (var mod in mods)
             {

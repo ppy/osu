@@ -26,10 +26,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 var beatmapInfo = CreateBeatmap(rulesetInfo).BeatmapInfo;
                 var score = TestResources.CreateTestScoreInfo(beatmapInfo);
 
-                SortedDictionary<int, BindableInt> teamScores = new SortedDictionary<int, BindableInt>
+                SortedDictionary<int, BindableLong> teamScores = new SortedDictionary<int, BindableLong>
                 {
-                    { 0, new BindableInt(team1Score) },
-                    { 1, new BindableInt(team2Score) }
+                    { 0, new BindableLong(team1Score) },
+                    { 1, new BindableLong(team2Score) }
                 };
 
                 Stack.Push(screen = new MultiplayerTeamResultsScreen(score, 1, new PlaylistItem(beatmapInfo), teamScores));

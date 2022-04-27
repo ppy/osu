@@ -14,7 +14,7 @@ using osu.Game.Audio.Effects;
 
 namespace osu.Game.Overlays
 {
-    public class DialogOverlay : OsuFocusedOverlayContainer
+    public class DialogOverlay : OsuFocusedOverlayContainer, IDialogOverlay
     {
         private readonly Container dialogContainer;
 

@@ -1,15 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Utils;
 
@@ -37,44 +34,18 @@ namespace osu.Game.Overlays.Mods
 
         private void updateIncompatibility()
         {
-            incompatible.Value = selectedMods.Value.Count > 0 && !selectedMods.Value.Contains(Mod) && !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(Mod));
+            incompatible.Value = selectedMods.Value.Count > 0
+                                 && selectedMods.Value.All(selected => selected.GetType() != Mod.GetType())
+                                 && !ModUtils.CheckCompatibleSet(selectedMods.Value.Append(Mod));
         }
+
+        protected override Colour4 BackgroundColour => incompatible.Value ? (Colour4)ColourProvider.Background6 : base.BackgroundColour;
+        protected override Colour4 ForegroundColour => incompatible.Value ? (Colour4)ColourProvider.Background5 : base.ForegroundColour;
 
         protected override void UpdateState()
         {
-            Action = incompatible.Value ? () => { } : (Action)Active.Toggle;
-
-            if (incompatible.Value)
-            {
-                Colour4 backgroundColour = ColourProvider.Background5;
-                Colour4 textBackgroundColour = ColourProvider.Background4;
-
-                Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(backgroundColour, textBackgroundColour), TRANSITION_DURATION, Easing.OutQuint);
-                Background.FadeColour(backgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-
-                SwitchContainer.ResizeWidthTo(IDLE_SWITCH_WIDTH, TRANSITION_DURATION, Easing.OutQuint);
-                SwitchContainer.FadeColour(Colour4.Gray, TRANSITION_DURATION, Easing.OutQuint);
-                MainContentContainer.TransformTo(nameof(Padding), new MarginPadding
-                {
-                    Left = IDLE_SWITCH_WIDTH,
-                    Right = CORNER_RADIUS
-                }, TRANSITION_DURATION, Easing.OutQuint);
-
-                TextBackground.FadeColour(textBackgroundColour, TRANSITION_DURATION, Easing.OutQuint);
-                TextFlow.FadeColour(Colour4.White.Opacity(0.5f), TRANSITION_DURATION, Easing.OutQuint);
-                return;
-            }
-
-            SwitchContainer.FadeColour(Colour4.White, TRANSITION_DURATION, Easing.OutQuint);
             base.UpdateState();
-        }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (incompatible.Value)
-                return true; // bypasses base call purposely in order to not play out the intermediate state animation.
-
-            return base.OnMouseDown(e);
+            SwitchContainer.FadeColour(incompatible.Value ? Colour4.Gray : Colour4.White, TRANSITION_DURATION, Easing.OutQuint);
         }
 
         #region IHasCustomTooltip

@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Collections
             });
 
             Dependencies.Cache(manager);
-            Dependencies.Cache(dialogOverlay);
+            Dependencies.CacheAs<IDialogOverlay>(dialogOverlay);
         }
 
         [SetUp]

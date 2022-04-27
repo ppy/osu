@@ -238,18 +238,18 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
         }
 
         [Resolved(canBeNull: true)]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         private bool exitConfirmed;
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             // the room may not be left immediately after a disconnection due to async flow,
             // so checking the IsConnected status is also required.
             if (client.Room == null || !client.IsConnected.Value)
             {
                 // room has not been created yet; exit immediately.
-                return base.OnExiting(next);
+                return base.OnExiting(e);
             }
 
             if (!exitConfirmed && dialogOverlay != null)
@@ -268,7 +268,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 return true;
             }
 
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         private ModSettingChangeTracker modSettingChangeTracker;
@@ -281,7 +281,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null)
                 return;
 
-            client.ChangeUserMods(mods.NewValue);
+            client.ChangeUserMods(mods.NewValue).FireAndForget();
 
             modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
             modSettingChangeTracker.SettingChanged += onModSettingsChanged;
@@ -296,7 +296,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                 if (client.Room == null)
                     return;
 
-                client.ChangeUserMods(UserMods.Value);
+                client.ChangeUserMods(UserMods.Value).FireAndForget();
             }, 500);
         }
 
@@ -305,7 +305,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (client.Room == null)
                 return;
 
-            client.ChangeBeatmapAvailability(availability.NewValue);
+            client.ChangeBeatmapAvailability(availability.NewValue).FireAndForget();
 
             if (availability.NewValue.State != DownloadState.LocallyAvailable)
             {

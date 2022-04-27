@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
-        public readonly SortedDictionary<int, BindableInt> TeamScores = new SortedDictionary<int, BindableInt>();
+        public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -75,21 +75,27 @@ namespace osu.Game.Screens.Play.HUD
             foreach (var user in playingUsers)
             {
                 var trackedUser = CreateUserData(user, ruleset, scoreProcessor);
+
                 trackedUser.ScoringMode.BindTo(scoringMode);
+                trackedUser.Score.BindValueChanged(_ => Scheduler.AddOnce(updateTotals));
+
                 UserScores[user.UserID] = trackedUser;
 
                 if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
-                    TeamScores.Add(team, new BindableInt());
+                    TeamScores.Add(team, new BindableLong());
             }
 
             userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(task => Schedule(() =>
             {
                 var users = task.GetResultSafely();
 
-                foreach (var user in users)
+                for (int i = 0; i < users.Length; i++)
                 {
-                    if (user == null)
-                        continue;
+                    var user = users[i] ?? new APIUser
+                    {
+                        Id = playingUsers[i].UserID,
+                        Username = "Unknown user",
+                    };
 
                     var trackedUser = UserScores[user.Id];
 
@@ -175,8 +181,6 @@ namespace osu.Game.Screens.Play.HUD
 
             trackedData.Frames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
             trackedData.UpdateScore();
-
-            updateTotals();
         });
 
         private void updateTotals()
