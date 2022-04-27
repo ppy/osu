@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Create downloader", () =>
             {
                 downloader?.Expire();
-                Add(downloader = new BundledBeatmapDownloader());
+                Add(downloader = new BundledBeatmapDownloader(false));
             });
         }
     }

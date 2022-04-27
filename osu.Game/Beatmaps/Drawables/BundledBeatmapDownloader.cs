@@ -22,15 +22,34 @@ namespace osu.Game.Beatmaps.Drawables
 
         private readonly List<BeatmapDownloadTracker> downloadTrackers = new List<BeatmapDownloadTracker>();
 
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmapManager, IAPIProvider api, INotificationOverlay notifications)
-        {
-            var beatmapDownloader = new BundledBeatmapModelDownloader(beatmapManager, api)
-            {
-                PostNotification = notifications.Post
-            };
+        private readonly List<string> downloadableFilenames = new List<string>();
 
-            foreach (string filename in bundled_beatmap_filenames.OrderBy(_ => RNG.NextSingle()).Take(10))
+        private BundledBeatmapModelDownloader beatmapDownloader;
+
+        public BundledBeatmapDownloader(bool onlyTutorial)
+        {
+            if (onlyTutorial)
+                downloadableFilenames.Add(tutorial_filename);
+            else
+                downloadableFilenames.AddRange(bundled_beatmap_filenames);
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var localDependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            localDependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new BundledBeatmapModelDownloader(parent.Get<BeatmapManager>(), parent.Get<IAPIProvider>())
+            {
+                PostNotification = parent.Get<INotificationOverlay>().Post
+            });
+
+            return localDependencies;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            foreach (string filename in downloadableFilenames.OrderBy(_ => RNG.NextSingle()).Take(10))
             {
                 var match = Regex.Match(filename, @"([0-9]*) (.*) - (.*)\.osz");
 
@@ -48,6 +67,8 @@ namespace osu.Game.Beatmaps.Drawables
                 beatmapDownloader.Download(beatmapSet);
             }
         }
+
+        private const string tutorial_filename = "1011011 nekodex - new beginnings.osz";
 
         private static readonly string[] bundled_beatmap_filenames =
         {
