@@ -320,7 +320,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
+        internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
             public ColumnScrollContainer()
                 : base(Direction.Horizontal)
@@ -358,7 +358,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
+        internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
         {
             public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
 
