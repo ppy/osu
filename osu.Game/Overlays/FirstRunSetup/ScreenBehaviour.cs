@@ -74,8 +74,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                     AutoSizeAxes = Axes.Y,
                     Children = new SettingsSection[]
                     {
+                        // This list should be kept in sync with SettingsOverlay.
                         new GeneralSection(),
                         new SkinSection(),
+                        // InputSection is intentionally omitted for now due to its sub-panel being a pain to set up.
                         new UserInterfaceSection(),
                         new GameplaySection(),
                         new RulesetSection(),
