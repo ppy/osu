@@ -1,20 +1,20 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -139,6 +139,52 @@ namespace osu.Game.Screens.Play
 
             AllowSeeking.BindValueChanged(_ => updateBarVisibility(), true);
             ShowGraph.BindValueChanged(_ => updateGraphVisibility(), true);
+
+            migrateSettingFromConfig();
+        }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        [Resolved]
+        private SkinManager skinManager { get; set; }
+
+        /// <summary>
+        /// This setting has been migrated to a per-component level.
+        /// Only take the value from the config if it is in a non-default state (then reset it to default so it only applies once).
+        ///
+        /// Can be removed 20221027.
+        /// </summary>
+        private void migrateSettingFromConfig()
+        {
+            Bindable<bool> configShowGraph = config.GetBindable<bool>(OsuSetting.ShowProgressGraph);
+
+            if (!configShowGraph.IsDefault)
+            {
+                ShowGraph.Value = configShowGraph.Value;
+                configShowGraph.SetDefault();
+
+                // This is pretty ugly, but the only way to make this stick...
+                if (skinManager != null)
+                {
+                    var skinnableTarget = this.FindClosestParent<ISkinnableTarget>();
+
+                    if (skinnableTarget != null)
+                    {
+                        skinManager.EnsureMutableSkin();
+
+                        // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
+                        // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
+                        ScheduleAfterChildren(() =>
+                        {
+                            var skin = skinManager.CurrentSkin.Value;
+                            skin.UpdateDrawableTarget(skinnableTarget);
+
+                            skinManager.Save(skin);
+                        });
+                    }
+                }
+            }
         }
 
         protected override void PopIn()
