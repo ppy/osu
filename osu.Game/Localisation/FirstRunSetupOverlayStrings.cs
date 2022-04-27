@@ -48,11 +48,6 @@ osu! is a very configurable game, and diving straight into the settings can some
         /// </summary>
         public static LocalisableString UIScaleDescription => new TranslatableString(getKey(@"ui_scale_description"), @"The size of the osu! user interface can be adjusted to your liking.");
 
-        /// <summary>
-        /// "Next ({0})"
-        /// </summary>
-        public static LocalisableString Next(LocalisableString nextStepDescription) => new TranslatableString(getKey(@"next"), @"Next ({0})", nextStepDescription);
-
         private static string getKey(string key) => $@"{prefix}:{key}";
     }
 }

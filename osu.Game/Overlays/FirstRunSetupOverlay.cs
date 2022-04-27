@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -133,7 +134,7 @@ namespace osu.Game.Overlays
                     {
                         BackButton = new DangerousTriangleButton
                         {
-                            Width = 200,
+                            Width = 300,
                             Text = CommonStrings.Back,
                             Action = showPreviousStep,
                             Enabled = { Value = false },
@@ -304,11 +305,24 @@ namespace osu.Game.Overlays
             BackButton.Enabled.Value = currentStepIndex > 0;
             NextButton.Enabled.Value = currentStepIndex != null;
 
-            if (currentStepIndex != null)
+            if (currentStepIndex == null)
+                return;
+
+            bool isFirstStep = currentStepIndex == 0;
+            bool isLastStep = currentStepIndex == steps.Length - 1;
+
+            if (isFirstStep)
             {
-                NextButton.Text = currentStepIndex + 1 < steps.Length
-                    ? FirstRunSetupOverlayStrings.Next(steps[currentStepIndex.Value + 1].GetLocalisableDescription())
-                    : CommonStrings.Finish;
+                BackButton.Text = CommonStrings.Back;
+                NextButton.Text = FirstRunSetupOverlayStrings.GetStarted;
+            }
+            else
+            {
+                BackButton.Text = new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Back, steps[currentStepIndex.Value - 1].GetLocalisableDescription());
+
+                NextButton.Text = isLastStep
+                    ? CommonStrings.Finish
+                    : new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Next, steps[currentStepIndex.Value + 1].GetLocalisableDescription());
             }
         }
     }
