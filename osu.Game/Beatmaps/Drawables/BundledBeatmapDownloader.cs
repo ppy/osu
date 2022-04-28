@@ -1,18 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Utils;
 using osu.Game.Database;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
+using osu.Game.Utils;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -29,9 +30,16 @@ namespace osu.Game.Beatmaps.Drawables
         public BundledBeatmapDownloader(bool onlyTutorial)
         {
             if (onlyTutorial)
-                downloadableFilenames.Add(tutorial_filename);
+            {
+                queueDownloads(new[] { tutorial_filename });
+            }
             else
-                downloadableFilenames.AddRange(bundled_beatmap_filenames);
+            {
+                queueDownloads(bundled_osu, 8);
+                queueDownloads(bundled_taiko, 3);
+                queueDownloads(bundled_catch, 3);
+                queueDownloads(bundled_mania, 3);
+            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -49,7 +57,7 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (string filename in downloadableFilenames.OrderBy(_ => RNG.NextSingle()).Take(10))
+            foreach (string filename in downloadableFilenames)
             {
                 var match = Regex.Match(filename, @"([0-9]*) (.*) - (.*)\.osz");
 
@@ -68,9 +76,42 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
+        private void queueDownloads(string[] sourceFilenames, int? limit = null)
+        {
+            try
+            {
+                // Matches osu-stable, in order to provide new users with roughly the same randomised selection of bundled beatmaps.
+                var random = new LegacyRandom(DateTime.UtcNow.Year * 1000 + (DateTime.UtcNow.DayOfYear / 7));
+
+                downloadableFilenames.AddRange(sourceFilenames.OrderBy(x => random.NextDouble()).Take(limit ?? int.MaxValue));
+            }
+            catch { }
+        }
+
+        private class BundledBeatmapModelDownloader : BeatmapModelDownloader
+        {
+            public BundledBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
+                : base(beatmapImporter, api)
+            {
+            }
+
+            protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
+                => new BundledBeatmapDownloadRequest(set, minimiseDownloadSize);
+
+            public class BundledBeatmapDownloadRequest : DownloadBeatmapSetRequest
+            {
+                protected override string Uri => $"https://assets.ppy.sh/client-resources/bundled/{Model.OnlineID}.osz";
+
+                public BundledBeatmapDownloadRequest(IBeatmapSetInfo beatmapSetInfo, bool minimiseDownloadSize)
+                    : base(beatmapSetInfo, minimiseDownloadSize)
+                {
+                }
+            }
+        }
+
         private const string tutorial_filename = "1011011 nekodex - new beginnings.osz";
 
-        private static readonly string[] bundled_beatmap_filenames =
+        private static readonly string[] bundled_osu =
         {
             "682286 Yuyoyuppe - Emerald Galaxy.osz",
             "682287 baker - For a Dead Girl+.osz",
@@ -180,6 +221,10 @@ namespace osu.Game.Beatmaps.Drawables
             "1019827 UNDEAD CORPORATION - Sad Dream.osz",
             "1020213 Creo - Idolize.osz",
             "1021450 Thaehan - Chiptune & Baroque.osz",
+        };
+
+        private static readonly string[] bundled_taiko =
+        {
             "707824 Fractal Dreamers - Fortuna Redux.osz",
             "789553 Cranky - Ran.osz",
             "827822 Function Phantom - Neuronecia.osz",
@@ -227,6 +272,10 @@ namespace osu.Game.Beatmaps.Drawables
             "1023681 Inferi - The Ruin of Mankind.osz",
             "1034358 ALEPH - The Evil Spirit.osz",
             "1037567 ALEPH - Scintillations.osz",
+        };
+
+        private static readonly string[] bundled_catch =
+        {
             "554256 Helblinde - When Time Sleeps.osz",
             "693123 yuki. - Nadeshiko Sensation.osz",
             "767009 OISHII - PIZZA PLAZA.osz",
@@ -251,6 +300,10 @@ namespace osu.Game.Beatmaps.Drawables
             "972887 HyuN - Illusion of Inflict.osz",
             "1008600 LukHash - WHEN AN ANGEL DIES.osz",
             "1032103 LukHash - H8 U.osz",
+        };
+
+        private static readonly string[] bundled_mania =
+        {
             "943516 antiPLUR - Clockwork Spooks.osz",
             "946394 VINXIS - Three Times The Original Charm.osz",
             "966408 antiPLUR - One Life Left to Live.osz",
@@ -262,26 +315,5 @@ namespace osu.Game.Beatmaps.Drawables
             "1009907 James Landino & Kabuki - Birdsong.osz",
             "1015169 Thaehan - Insert Coin.osz",
         };
-
-        private class BundledBeatmapModelDownloader : BeatmapModelDownloader
-        {
-            public BundledBeatmapModelDownloader(IModelImporter<BeatmapSetInfo> beatmapImporter, IAPIProvider api)
-                : base(beatmapImporter, api)
-            {
-            }
-
-            protected override ArchiveDownloadRequest<IBeatmapSetInfo> CreateDownloadRequest(IBeatmapSetInfo set, bool minimiseDownloadSize)
-                => new BundledBeatmapDownloadRequest(set, minimiseDownloadSize);
-
-            public class BundledBeatmapDownloadRequest : DownloadBeatmapSetRequest
-            {
-                protected override string Uri => $"https://assets.ppy.sh/client-resources/bundled/{Model.OnlineID}.osz";
-
-                public BundledBeatmapDownloadRequest(IBeatmapSetInfo beatmapSetInfo, bool minimiseDownloadSize)
-                    : base(beatmapSetInfo, minimiseDownloadSize)
-                {
-                }
-            }
-        }
     }
 }
