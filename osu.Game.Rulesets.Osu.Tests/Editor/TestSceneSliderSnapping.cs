@@ -11,6 +11,7 @@ using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             });
             AddStep("set distance spacing to 1", () =>
             {
-                var distanceSpacing = (BindableDouble)Editor.ChildrenOfType<OsuHitObjectComposer>().Single().DistanceSpacingMultiplier;
+                var distanceSpacing = (BindableDouble)Editor.ChildrenOfType<IDistanceSnapProvider>().Single().DistanceSpacingMultiplier;
                 distanceSpacing.Value = 1;
             });
         }

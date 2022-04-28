@@ -24,13 +24,8 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    [Cached(typeof(IDistanceSnapProvider))]
-    public class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>, IDistanceSnapProvider
+    public class OsuHitObjectComposer : DistancedHitObjectComposer<OsuHitObject>
     {
-        private OsuToolboxComposite osuToolboxComposite;
-
-        public IBindable<double> DistanceSpacingMultiplier => osuToolboxComposite.DistanceSpacing;
-
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
@@ -78,8 +73,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                     RelativeSizeAxes = Axes.Both
                 }
             });
-
-            AddInternal(osuToolboxComposite = new OsuToolboxComposite());
 
             selectedHitObjects = EditorBeatmap.SelectedHitObjects.GetBoundCopy();
             selectedHitObjects.CollectionChanged += (_, __) => updateDistanceSnapGrid();
@@ -134,9 +127,6 @@ namespace osu.Game.Rulesets.Osu.Edit
                     updateDistanceSnapGrid();
             }
         }
-
-        public override float GetBeatSnapDistanceAt(HitObject referenceObject)
-            => (float)(base.GetBeatSnapDistanceAt(referenceObject) * DistanceSpacingMultiplier.Value);
 
         public override SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition)
         {

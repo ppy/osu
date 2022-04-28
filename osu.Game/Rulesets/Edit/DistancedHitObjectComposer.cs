@@ -1,0 +1,158 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings.Sections;
+using osu.Game.Rulesets.Objects;
+using osuTK;
+
+namespace osu.Game.Rulesets.Edit
+{
+    /// <summary>
+    /// Represents a <see cref="HitObjectComposer{TObject}"/> for rulesets with the concept of distances between objects.
+    /// </summary>
+    /// <typeparam name="TObject">The base type of supported objects.</typeparam>
+    [Cached(typeof(IDistanceSnapProvider))]
+    public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider
+        where TObject : HitObject
+    {
+        protected Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
+        {
+            MinValue = 0.1,
+            MaxValue = 6.0,
+            Precision = 0.01,
+        };
+
+        IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
+
+        protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
+
+        private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
+        private bool distanceSpacingScrollActive;
+
+        protected DistancedHitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Child = new EditorToolboxGroup("snapping")
+                {
+                    Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
+                    {
+                        Current = { BindTarget = DistanceSpacingMultiplier },
+                        KeyboardStep = 0.1f,
+                    }
+                }
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
+            DistanceSpacingMultiplier.BindValueChanged(v =>
+            {
+                distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
+                distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
+                EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
+            }, true);
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.ControlPressed && e.AltPressed && !e.Repeat)
+            {
+                RightSideToolboxContainer.Expanded.Value = true;
+                distanceSpacingScrollActive = true;
+                return true;
+            }
+
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            if (distanceSpacingScrollActive && (!e.AltPressed || !e.ControlPressed))
+            {
+                RightSideToolboxContainer.Expanded.Value = false;
+                distanceSpacingScrollActive = false;
+            }
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            if (distanceSpacingScrollActive)
+            {
+                DistanceSpacingMultiplier.Value += e.ScrollDelta.Y * (e.IsPrecise ? 0.01f : 0.1f);
+                return true;
+            }
+
+            return base.OnScroll(e);
+        }
+
+        public virtual float GetBeatSnapDistanceAt(HitObject referenceObject)
+        {
+            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity * DistanceSpacingMultiplier.Value / BeatSnapProvider.BeatDivisor);
+        }
+
+        public virtual float DurationToDistance(HitObject referenceObject, double duration)
+        {
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
+            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
+        }
+
+        public virtual double DistanceToDuration(HitObject referenceObject, float distance)
+        {
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
+            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
+        }
+
+        public virtual double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
+            => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
+
+        public virtual float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
+        {
+            double startTime = referenceObject.StartTime;
+
+            double actualDuration = startTime + DistanceToDuration(referenceObject, distance);
+
+            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, startTime);
+
+            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(startTime);
+
+            // we don't want to exceed the actual duration and snap to a point in the future.
+            // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
+            if (snappedEndTime > actualDuration + 1)
+                snappedEndTime -= beatLength;
+
+            return DurationToDistance(referenceObject, snappedEndTime - startTime);
+        }
+
+        protected class ExpandingToolboxContainer : ExpandingContainer
+        {
+            protected override double HoverExpansionDelay => 250;
+
+            public ExpandingToolboxContainer()
+                : base(130, 250)
+            {
+                RelativeSizeAxes = Axes.Y;
+                Padding = new MarginPadding { Left = 10 };
+
+                FillFlow.Spacing = new Vector2(10);
+            }
+        }
+    }
+}
