@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 {
                     Colour = overlayColourProvider.Content1,
                     Text =
-                        "\"Beatmaps\" are what we call playable levels in osu!.\n\nosu! doesn't come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection.",
+                        "\"Beatmaps\" are what we call playable levels. osu! doesn't come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection.",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     BackgroundColour = colours.Pink3,
-                    Text = "Download tutorial",
+                    Text = "Get the osu! tutorial",
                     Action = downloadTutorial
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     BackgroundColour = colours.Blue3,
-                    Text = "Download beatmap selection",
+                    Text = "Get recommended beatmaps",
                     Action = downloadBundled
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
