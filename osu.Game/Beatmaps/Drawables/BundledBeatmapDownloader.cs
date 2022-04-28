@@ -19,6 +19,8 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class BundledBeatmapDownloader : CompositeDrawable
     {
+        private readonly bool shouldPostNotifications;
+
         public IEnumerable<BeatmapDownloadTracker> DownloadTrackers => downloadTrackers;
 
         private readonly List<BeatmapDownloadTracker> downloadTrackers = new List<BeatmapDownloadTracker>();
@@ -27,8 +29,15 @@ namespace osu.Game.Beatmaps.Drawables
 
         private BundledBeatmapModelDownloader beatmapDownloader;
 
-        public BundledBeatmapDownloader(bool onlyTutorial)
+        /// <summary>
+        /// Construct a new beatmap downloader.
+        /// </summary>
+        /// <param name="onlyTutorial">Whether only the tutorial should be downloaded, instead of bundled beatmaps.</param>
+        /// <param name="shouldPostNotifications">Whether downloads should create tracking notifications.</param>
+        public BundledBeatmapDownloader(bool onlyTutorial, bool shouldPostNotifications = false)
         {
+            this.shouldPostNotifications = shouldPostNotifications;
+
             if (onlyTutorial)
             {
                 queueDownloads(new[] { tutorial_filename });
@@ -48,7 +57,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             localDependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new BundledBeatmapModelDownloader(parent.Get<BeatmapManager>(), parent.Get<IAPIProvider>()));
 
-            if (parent.Get<INotificationOverlay>() is INotificationOverlay notifications)
+            if (shouldPostNotifications && parent.Get<INotificationOverlay>() is INotificationOverlay notifications)
                 beatmapDownloader.PostNotification = notifications.Post;
 
             return localDependencies;
