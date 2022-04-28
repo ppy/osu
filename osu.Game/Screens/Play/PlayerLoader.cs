@@ -368,7 +368,15 @@ namespace osu.Game.Screens.Play
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
-            LoadTask = LoadComponentAsync(CurrentPlayer, _ => MetadataInfo.Loading = false);
+            LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
+            {
+                MetadataInfo.Loading = false;
+                OnPlayerLoaded();
+            });
+        }
+
+        protected virtual void OnPlayerLoaded()
+        {
         }
 
         private void restartRequested()

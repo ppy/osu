@@ -133,9 +133,6 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
                     failAndBail();
                 }
             }), true);
-
-            client.ChangeState(MultiplayerUserState.Loaded)
-                  .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
         }
 
         protected override void LoadComplete()
