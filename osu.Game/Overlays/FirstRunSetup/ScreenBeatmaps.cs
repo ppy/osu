@@ -3,10 +3,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -18,11 +19,10 @@ using osu.Game.Localisation;
 using osu.Game.Online;
 using osuTK;
 using Realms;
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
-    [Description("Obtaining Beatmaps")]
+    [LocalisableDescription(typeof(FirstRunSetupBeatmapScreenStrings), nameof(FirstRunSetupBeatmapScreenStrings.Header))]
     public class ScreenBeatmaps : FirstRunSetupScreen
     {
         private ProgressRoundedButton downloadBundledButton = null!;
@@ -52,8 +52,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text =
-                        "\"Beatmaps\" are what we call playable levels. osu! doesn't come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection.",
+                    Text = FirstRunSetupBeatmapScreenStrings.Description,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
@@ -76,8 +75,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text =
-                        "If you are a new player, we recommend playing through the tutorial to get accustomed to the gameplay.",
+                    Text = FirstRunSetupBeatmapScreenStrings.TutorialDescription,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
@@ -87,13 +85,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     BackgroundColour = colours.Pink3,
-                    Text = "Get the osu! tutorial",
+                    Text = FirstRunSetupBeatmapScreenStrings.TutorialButton,
                     Action = downloadTutorial
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text = "To get you started, we have some recommended beatmaps.",
+                    Text = FirstRunSetupBeatmapScreenStrings.BundledDescription,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
@@ -103,7 +101,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     BackgroundColour = colours.Blue3,
-                    Text = "Get recommended beatmaps",
+                    Text = FirstRunSetupBeatmapScreenStrings.BundledButton,
                     Action = downloadBundled
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
@@ -135,7 +133,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text = "You can also obtain more beatmaps from the main menu \"browse\" button at any time.",
+                    Text = FirstRunSetupBeatmapScreenStrings.ObtainMoreBeatmaps,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
@@ -157,7 +155,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
         {
-            currentlyLoadedBeatmaps.Text = $"You currently have {sender.Count} beatmap(s) loaded!";
+            currentlyLoadedBeatmaps.Text = FirstRunSetupBeatmapScreenStrings.CurrentlyLoadedBeatmaps(sender.Count);
 
             if (sender.Count == 0)
             {
