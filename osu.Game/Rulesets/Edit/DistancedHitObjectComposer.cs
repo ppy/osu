@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Edit
         {
             AddInternal(RightSideToolboxContainer = new ExpandingToolboxContainer
             {
+                Alpha = DistanceSpacingMultiplier.Disabled ? 0 : 1,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Child = new EditorToolboxGroup("snapping")
@@ -62,18 +63,21 @@ namespace osu.Game.Rulesets.Edit
         {
             base.LoadComplete();
 
-            DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
-            DistanceSpacingMultiplier.BindValueChanged(v =>
+            if (!DistanceSpacingMultiplier.Disabled)
             {
-                distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
-                distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
-                EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
-            }, true);
+                DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
+                DistanceSpacingMultiplier.BindValueChanged(v =>
+                {
+                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
+                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
+                    EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
+                }, true);
+            }
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed && e.AltPressed && !e.Repeat)
+            if (!DistanceSpacingMultiplier.Disabled && e.ControlPressed && e.AltPressed && !e.Repeat)
             {
                 RightSideToolboxContainer.Expanded.Value = true;
                 distanceSpacingScrollActive = true;
@@ -85,7 +89,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override void OnKeyUp(KeyUpEvent e)
         {
-            if (distanceSpacingScrollActive && (!e.AltPressed || !e.ControlPressed))
+            if (!DistanceSpacingMultiplier.Disabled && distanceSpacingScrollActive && (!e.AltPressed || !e.ControlPressed))
             {
                 RightSideToolboxContainer.Expanded.Value = false;
                 distanceSpacingScrollActive = false;
