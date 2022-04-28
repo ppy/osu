@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Mods
             {
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
-                RequestScroll = column => columnScroll.ScrollTo(Math.Clamp(column.DrawPosition.X - 70, 0, columnScroll.ScrollableExtent))
+                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140)
             };
 
         protected override void LoadComplete()
