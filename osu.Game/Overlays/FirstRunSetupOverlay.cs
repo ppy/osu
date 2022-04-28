@@ -83,7 +83,7 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 50 },
+                    Padding = new MarginPadding { Horizontal = 70 * 2 },
                     Child = new InputBlockingContainer
                     {
                         Masking = true,
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays
                                 Padding = new MarginPadding
                                 {
                                     Vertical = 20,
-                                    Horizontal = 20,
+                                    Horizontal = 70,
                                 },
                             }
                         },
