@@ -426,7 +426,7 @@ namespace osu.Game.Overlays.Mods
                 else
                     targetColour = IsHovered ? colours.GrayC : colours.Gray8;
 
-                this.FadeColour(targetColour, 300, Easing.OutQuint);
+                this.FadeColour(targetColour, 800, Easing.OutQuint);
             }
 
             protected override bool OnClick(ClickEvent e)
