@@ -441,7 +441,7 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.ControlPressed || e.AltPressed) return false;
+            if (e.ControlPressed || e.AltPressed || e.SuperPressed) return false;
             if (toggleKeys == null) return false;
 
             int index = Array.IndexOf(toggleKeys, e.Key);
