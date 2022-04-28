@@ -3,7 +3,6 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             }));
             AddStep("set beat divisor to 1/1", () =>
             {
-                var beatDivisor = Editor.Dependencies.Get<BindableBeatDivisor>();
+                var beatDivisor = (BindableBeatDivisor)Editor.Dependencies.Get(typeof(BindableBeatDivisor));
                 beatDivisor.Value = 1;
             });
         }

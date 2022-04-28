@@ -117,8 +117,6 @@ namespace osu.Game.Rulesets.Edit
                 },
                 new LeftToolboxFlow
                 {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
                     Children = new Drawable[]
                     {
                         new EditorToolboxGroup("toolbox (1-9)")
@@ -134,7 +132,7 @@ namespace osu.Game.Rulesets.Edit
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(0, 5),
                             },
-                        },
+                        }
                     }
                 },
             };
