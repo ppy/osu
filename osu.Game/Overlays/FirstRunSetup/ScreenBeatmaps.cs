@@ -99,10 +99,10 @@ namespace osu.Game.Overlays.FirstRunSetup
                         importBeatmapsButton.Enabled.Value = false;
                         legacyImportManager?.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() =>
                         {
-                            // TODO: can we know if the import was successful?
-                            // if so we should turn the button green and disable it in that case alone.
-                            // importBeatmapsButton.Enabled.Value = true;
-                            importBeatmapsButton.Complete();
+                            if (t.IsCompletedSuccessfully)
+                                importBeatmapsButton.Complete();
+                            else
+                                importBeatmapsButton.Enabled.Value = true;
                         }));
                     }
                 },
