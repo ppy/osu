@@ -59,6 +59,18 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        protected override bool OnClick(ClickEvent e)
+        {
+            rewindSearch = e.ShiftPressed;
+            return base.OnClick(e);
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            rewindSearch = false;
+            base.OnMouseUp(e);
+        }
+
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             rewindSearch = e.Action == GlobalAction.SelectPreviousRandom;
