@@ -317,11 +317,11 @@ namespace osu.Game.Overlays
             }
             else
             {
-                BackButton.Text = new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Back, steps[currentStepIndex.Value - 1].Description);
+                BackButton.Text = LocalisableString.Interpolate($@"{CommonStrings.Back} ({steps[currentStepIndex.Value - 1].Description})");
 
                 NextButton.Text = isLastStep
                     ? CommonStrings.Finish
-                    : new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Next, steps[currentStepIndex.Value + 1].Description);
+                    : LocalisableString.Interpolate($@"{CommonStrings.Next} ({steps[currentStepIndex.Value + 1].Description})");
             }
         }
 
