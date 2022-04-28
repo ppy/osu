@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
         private readonly Type[] steps =
         {
             typeof(ScreenWelcome),
-            typeof(ScreenBundledBeatmaps),
+            typeof(ScreenBeatmaps),
             typeof(ScreenUIScale)
         };
 
