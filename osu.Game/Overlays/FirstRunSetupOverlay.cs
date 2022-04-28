@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -56,11 +57,11 @@ namespace osu.Game.Overlays
         /// </summary>
         public FirstRunSetupScreen? CurrentScreen => (FirstRunSetupScreen?)stack?.CurrentScreen;
 
-        private readonly FirstRunStep[] steps =
+        private readonly Type[] steps =
         {
-            new FirstRunStep(typeof(ScreenWelcome), FirstRunSetupOverlayStrings.WelcomeTitle),
-            new FirstRunStep(typeof(ScreenUIScale), GraphicsSettingsStrings.UIScaling),
-            new FirstRunStep(typeof(ScreenBehaviour), FirstRunSetupOverlayStrings.Behaviour),
+            typeof(ScreenWelcome),
+            typeof(ScreenUIScale),
+            typeof(ScreenBehaviour),
         };
 
         private Container stackContainer = null!;
@@ -287,7 +288,7 @@ namespace osu.Game.Overlays
 
             if (currentStepIndex < steps.Length)
             {
-                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value].ScreenType));
+                stack.Push((Screen)Activator.CreateInstance(steps[currentStepIndex.Value]));
             }
             else
             {
@@ -318,23 +319,11 @@ namespace osu.Game.Overlays
             }
             else
             {
-                BackButton.Text = new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Back, steps[currentStepIndex.Value - 1].Description);
+                BackButton.Text = LocalisableString.Interpolate($@"{CommonStrings.Back} ({steps[currentStepIndex.Value - 1].GetLocalisableDescription()})");
 
                 NextButton.Text = isLastStep
                     ? CommonStrings.Finish
-                    : new TranslatableString(@"_", @"{0} ({1})", CommonStrings.Next, steps[currentStepIndex.Value + 1].Description);
-            }
-        }
-
-        private class FirstRunStep
-        {
-            public readonly Type ScreenType;
-            public readonly LocalisableString Description;
-
-            public FirstRunStep(Type screenType, LocalisableString description)
-            {
-                ScreenType = screenType;
-                Description = description;
+                    : LocalisableString.Interpolate($@"{CommonStrings.Next} ({steps[currentStepIndex.Value + 1].GetLocalisableDescription()})");
             }
         }
     }

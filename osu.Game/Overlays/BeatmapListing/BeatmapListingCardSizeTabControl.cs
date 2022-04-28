@@ -72,7 +72,8 @@ namespace osu.Game.Overlays.BeatmapListing
                             Size = new Vector2(12),
                             Icon = getIconForCardSize(Value)
                         }
-                    }
+                    },
+                    new HoverClickSounds(HoverSampleSet.TabSelect)
                 };
             }
 
