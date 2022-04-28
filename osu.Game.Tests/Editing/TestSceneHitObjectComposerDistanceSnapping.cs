@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
@@ -70,7 +71,7 @@ namespace osu.Game.Tests.Editing
         [TestCase(2)]
         public void TestSliderMultiplier(float multiplier)
         {
-            AddStep($"set multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
+            AddStep($"set slider multiplier = {multiplier}", () => composer.EditorBeatmap.Difficulty.SliderMultiplier = multiplier);
 
             assertSnapDistance(100 * multiplier);
         }
@@ -86,6 +87,15 @@ namespace osu.Game.Tests.Editing
                     SliderVelocity = multiplier
                 }
             });
+        }
+
+        [TestCase(1)]
+        [TestCase(2)]
+        public void TestDistanceSpacingMultiplier(float multiplier)
+        {
+            AddStep($"set distance spacing = {multiplier}", () => composer.DistanceSpacingMultiplier.Value = multiplier);
+
+            assertSnapDistance(100 * multiplier);
         }
 
         [TestCase(1)]
@@ -221,6 +231,8 @@ namespace osu.Game.Tests.Editing
         private class TestHitObjectComposer : OsuHitObjectComposer
         {
             public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
+
+            public new Bindable<double> DistanceSpacingMultiplier => base.DistanceSpacingMultiplier;
 
             public TestHitObjectComposer()
                 : base(new OsuRuleset())
