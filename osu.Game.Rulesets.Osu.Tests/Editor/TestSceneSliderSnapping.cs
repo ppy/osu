@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
             controlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
             return new TestBeatmap(ruleset, false)
             {
-                ControlPointInfo = controlPointInfo,
-                BeatmapInfo = { DistanceSpacing = 1 },
+                ControlPointInfo = controlPointInfo
             };
         }
 

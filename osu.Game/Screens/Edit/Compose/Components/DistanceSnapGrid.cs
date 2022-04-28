@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject);
+            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * distanceSpacingMultiplier.Value;
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;

@@ -19,10 +19,7 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
     {
         private OsuPlayfield playfield;
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(Ruleset.Value, false)
-        {
-            BeatmapInfo = { DistanceSpacing = 1 }
-        };
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(Ruleset.Value, false);
 
         public override void SetUpSteps()
         {
