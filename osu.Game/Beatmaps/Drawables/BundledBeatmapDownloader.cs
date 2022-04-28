@@ -38,10 +38,10 @@ namespace osu.Game.Beatmaps.Drawables
         {
             var localDependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            localDependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new BundledBeatmapModelDownloader(parent.Get<BeatmapManager>(), parent.Get<IAPIProvider>())
-            {
-                PostNotification = parent.Get<INotificationOverlay>().Post
-            });
+            localDependencies.CacheAs<BeatmapModelDownloader>(beatmapDownloader = new BundledBeatmapModelDownloader(parent.Get<BeatmapManager>(), parent.Get<IAPIProvider>()));
+
+            if (parent.Get<INotificationOverlay>() is INotificationOverlay notifications)
+                beatmapDownloader.PostNotification = notifications.Post;
 
             return localDependencies;
         }
