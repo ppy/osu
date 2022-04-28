@@ -1,10 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
@@ -15,19 +19,33 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         protected FillFlowContainer Content { get; private set; }
 
-        protected FirstRunSetupScreen()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider overlayColourProvider)
         {
+            const float header_size = 40;
+            const float spacing = 20;
+
             InternalChildren = new Drawable[]
             {
                 new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Content = new FillFlowContainer
+                    Children = new Drawable[]
                     {
-                        Spacing = new Vector2(20),
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        new OsuSpriteText
+                        {
+                            Text = this.GetLocalisableDescription(),
+                            Font = OsuFont.Default.With(size: header_size),
+                            Colour = overlayColourProvider.Light1,
+                        },
+                        Content = new FillFlowContainer
+                        {
+                            Y = header_size + spacing,
+                            Spacing = new Vector2(spacing),
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                        }
                     },
                 }
             };
