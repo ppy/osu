@@ -2,10 +2,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -15,6 +17,8 @@ using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Online;
 using osuTK;
+using Realms;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
@@ -25,14 +29,21 @@ namespace osu.Game.Overlays.FirstRunSetup
         private ProgressRoundedButton importBeatmapsButton = null!;
         private ProgressRoundedButton downloadTutorialButton = null!;
 
+        private OsuTextFlowContainer currentlyLoadedBeatmaps = null!;
+
         private BundledBeatmapDownloader? tutorialDownloader;
         private BundledBeatmapDownloader? bundledDownloader;
 
         [Resolved]
         private OsuColour colours { get; set; } = null!;
 
+        [Resolved]
+        private RealmAccess realmAccess { get; set; } = null!;
+
+        private IDisposable? beatmapSubscription;
+
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OverlayColourProvider overlayColourProvider, LegacyImportManager? legacyImportManager)
+        private void load(LegacyImportManager? legacyImportManager)
         {
             Vector2 buttonSize = new Vector2(500, 60);
 
@@ -40,15 +51,31 @@ namespace osu.Game.Overlays.FirstRunSetup
             {
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    Colour = overlayColourProvider.Content1,
+                    Colour = OverlayColourProvider.Content1,
                     Text =
                         "\"Beatmaps\" are what we call playable levels. osu! doesn't come with any beatmaps pre-loaded. This step will help you get started on your beatmap collection.",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 30,
+                    Children = new Drawable[]
+                    {
+                        currentlyLoadedBeatmaps = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 24, weight: FontWeight.SemiBold))
+                        {
+                            Colour = OverlayColourProvider.Content2,
+                            TextAnchor = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                        },
+                    }
+                },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    Colour = overlayColourProvider.Content1,
+                    Colour = OverlayColourProvider.Content1,
                     Text =
                         "If you are a new player, we recommend playing through the tutorial to get accustomed to the gameplay.",
                     RelativeSizeAxes = Axes.X,
@@ -65,7 +92,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    Colour = overlayColourProvider.Content1,
+                    Colour = OverlayColourProvider.Content1,
                     Text = "To get you started, we have some recommended beatmaps.",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
@@ -81,7 +108,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    Colour = overlayColourProvider.Content1,
+                    Colour = OverlayColourProvider.Content1,
                     Text = "If you have an existing osu! install, you can also choose to import your existing beatmap collection.",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
@@ -107,12 +134,36 @@ namespace osu.Game.Overlays.FirstRunSetup
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
-                    Colour = overlayColourProvider.Content1,
+                    Colour = OverlayColourProvider.Content1,
                     Text = "You can also obtain more beatmaps from the main menu \"browse\" button at any time.",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatmapSubscription = realmAccess.RegisterForNotifications(r => r.All<BeatmapSetInfo>().Where(s => !s.DeletePending && !s.Protected), beatmapsChanged);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmapSubscription?.Dispose();
+        }
+
+        private void beatmapsChanged(IRealmCollection<BeatmapSetInfo> sender, ChangeSet? changes, Exception error)
+        {
+            currentlyLoadedBeatmaps.Text = $"You currently have {sender.Count} beatmap(s) loaded!";
+
+            if (changes != null && (changes.DeletedIndices.Any() || changes.InsertedIndices.Any()))
+            {
+                currentlyLoadedBeatmaps.FadeColour(colours.YellowLight).FadeColour(OverlayColourProvider.Content2);
+                currentlyLoadedBeatmaps.ScaleTo(1.1f).ScaleTo(1, 1000, Easing.OutQuint);
+            }
         }
 
         private void downloadTutorial()
