@@ -62,7 +62,6 @@ namespace osu.Game.Tests.Editing
             BeatDivisor.Value = 1;
 
             composer.EditorBeatmap.Difficulty.SliderMultiplier = 1;
-            composer.EditorBeatmap.BeatmapInfo.DistanceSpacing = 1;
             composer.EditorBeatmap.ControlPointInfo.Clear();
             composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });
@@ -87,15 +86,6 @@ namespace osu.Game.Tests.Editing
                     SliderVelocity = multiplier
                 }
             });
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
-        public void TestDistanceSpacingMultiplier(float multiplier)
-        {
-            AddStep($"set distance spacing = {multiplier}", () => composer.DistanceSpacingMultiplier.Value = multiplier);
-
-            assertSnapDistance(100 * multiplier);
         }
 
         [TestCase(1)]
