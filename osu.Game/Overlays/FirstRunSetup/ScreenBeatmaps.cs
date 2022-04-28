@@ -5,7 +5,6 @@
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -129,7 +128,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             downloadTracker.Progress.BindValueChanged(progress =>
             {
-                downloadTutorialButton.Current.Value = progress.NewValue;
+                downloadTutorialButton.SetProgress(progress.NewValue, false);
 
                 if (progress.NewValue == 1)
                     downloadTutorialButton.Complete();
@@ -152,10 +151,10 @@ namespace osu.Game.Overlays.FirstRunSetup
             {
                 double progress = (double)bundledDownloader.DownloadTrackers.Count(t => t.State.Value == DownloadState.LocallyAvailable) / bundledDownloader.DownloadTrackers.Count();
 
-                this.TransformBindableTo(downloadBundledButton.Current, progress, 2000, Easing.OutQuint);
-
                 if (progress == 1)
                     downloadBundledButton.Complete();
+                else
+                    downloadBundledButton.SetProgress(progress, true);
             }
         }
 
@@ -165,8 +164,6 @@ namespace osu.Game.Overlays.FirstRunSetup
             private OsuColour colours { get; set; } = null!;
 
             private ProgressBar progressBar = null!;
-
-            public Bindable<double> Current => progressBar.Current;
 
             protected override void LoadComplete()
             {
@@ -189,7 +186,15 @@ namespace osu.Game.Overlays.FirstRunSetup
                 Background.FadeColour(colours.Green, 500, Easing.OutQuint);
                 progressBar.FillColour = colours.Green;
 
-                this.TransformBindableTo(Current, 1, 500, Easing.OutQuint);
+                this.TransformBindableTo(progressBar.Current, 1, 500, Easing.OutQuint);
+            }
+
+            public void SetProgress(double progress, bool animated)
+            {
+                if (!Enabled.Value)
+                    return;
+
+                this.TransformBindableTo(progressBar.Current, progress, animated ? 500 : 0, Easing.OutQuint);
             }
         }
     }
