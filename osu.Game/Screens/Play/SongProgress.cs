@@ -175,10 +175,15 @@ namespace osu.Game.Screens.Play
                         if (skinManager.EnsureMutableSkin())
                             return;
 
-                        var skin = skinManager.CurrentSkin.Value;
-                        skin.UpdateDrawableTarget(skinnableTarget);
+                        // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
+                        // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
+                        ScheduleAfterChildren(() =>
+                        {
+                            var skin = skinManager.CurrentSkin.Value;
+                            skin.UpdateDrawableTarget(skinnableTarget);
 
-                        skinManager.Save(skin);
+                            skinManager.Save(skin);
+                        });
 
                         configShowGraph.SetDefault();
                     }
