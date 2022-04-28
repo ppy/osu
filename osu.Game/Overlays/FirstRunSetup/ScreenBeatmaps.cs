@@ -5,6 +5,7 @@
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -21,19 +22,18 @@ namespace osu.Game.Overlays.FirstRunSetup
     [Description("Obtaining Beatmaps")]
     public class ScreenBeatmaps : FirstRunSetupScreen
     {
-        private RoundedButton downloadBundledButton = null!;
-        private RoundedButton importBeatmapsButton = null!;
+        private ProgressRoundedButton downloadBundledButton = null!;
+        private ProgressRoundedButton importBeatmapsButton = null!;
+        private ProgressRoundedButton downloadTutorialButton = null!;
 
-        private ProgressBar progressBarBundled = null!;
+        private BundledBeatmapDownloader? tutorialDownloader;
+        private BundledBeatmapDownloader? bundledDownloader;
 
-        private RoundedButton downloadTutorialButton = null!;
-        private ProgressBar progressBarTutorial = null!;
-
-        private BundledBeatmapDownloader tutorialDownloader = null!;
-        private BundledBeatmapDownloader bundledDownloader = null!;
+        [Resolved]
+        private OsuColour colours { get; set; } = null!;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OverlayColourProvider overlayColourProvider, LegacyImportManager? legacyImportManager)
+        private void load(OverlayColourProvider overlayColourProvider, LegacyImportManager? legacyImportManager)
         {
             Vector2 buttonSize = new Vector2(500, 60);
 
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                downloadTutorialButton = new RoundedButton
+                downloadTutorialButton = new ProgressRoundedButton
                 {
                     Size = buttonSize,
                     Anchor = Anchor.TopCentre,
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                downloadBundledButton = new RoundedButton
+                downloadBundledButton = new ProgressRoundedButton
                 {
                     Size = buttonSize,
                     Anchor = Anchor.TopCentre,
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                importBeatmapsButton = new RoundedButton
+                importBeatmapsButton = new ProgressRoundedButton
                 {
                     Size = buttonSize,
                     Anchor = Anchor.TopCentre,
@@ -97,7 +97,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Action = () =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
-                        legacyImportManager?.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() => importBeatmapsButton.Enabled.Value = true));
+                        legacyImportManager?.ImportFromStableAsync(StableContent.Beatmaps).ContinueWith(t => Schedule(() =>
+                        {
+                            // TODO: can we know if the import was successful?
+                            // if so we should turn the button green and disable it in that case alone.
+                            // importBeatmapsButton.Enabled.Value = true;
+                            importBeatmapsButton.Complete();
+                        }));
                     }
                 },
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
@@ -108,27 +114,13 @@ namespace osu.Game.Overlays.FirstRunSetup
                     AutoSizeAxes = Axes.Y
                 },
             };
-            downloadTutorialButton.Add(progressBarTutorial = new ProgressBar(false)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Blending = BlendingParameters.Additive,
-                FillColour = downloadTutorialButton.BackgroundColour,
-                Alpha = 0.5f,
-                Depth = float.MinValue
-            });
-
-            downloadBundledButton.Add(progressBarBundled = new ProgressBar(false)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Blending = BlendingParameters.Additive,
-                FillColour = downloadBundledButton.BackgroundColour,
-                Alpha = 0.5f,
-                Depth = float.MinValue
-            });
         }
 
         private void downloadTutorial()
         {
+            if (tutorialDownloader != null)
+                return;
+
             tutorialDownloader = new BundledBeatmapDownloader(true);
 
             AddInternal(tutorialDownloader);
@@ -137,15 +129,18 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             downloadTracker.Progress.BindValueChanged(progress =>
             {
-                progressBarTutorial.Current.Value = progress.NewValue;
+                downloadTutorialButton.Current.Value = progress.NewValue;
 
                 if (progress.NewValue == 1)
-                    downloadTutorialButton.Enabled.Value = false;
+                    downloadTutorialButton.Complete();
             }, true);
         }
 
         private void downloadBundled()
         {
+            if (bundledDownloader != null)
+                return;
+
             bundledDownloader = new BundledBeatmapDownloader(false);
 
             AddInternal(bundledDownloader);
@@ -157,10 +152,44 @@ namespace osu.Game.Overlays.FirstRunSetup
             {
                 double progress = (double)bundledDownloader.DownloadTrackers.Count(t => t.State.Value == DownloadState.LocallyAvailable) / bundledDownloader.DownloadTrackers.Count();
 
-                this.TransformBindableTo(progressBarBundled.Current, progress, 1000, Easing.OutQuint);
+                this.TransformBindableTo(downloadBundledButton.Current, progress, 2000, Easing.OutQuint);
 
                 if (progress == 1)
-                    downloadBundledButton.Enabled.Value = false;
+                    downloadBundledButton.Complete();
+            }
+        }
+
+        private class ProgressRoundedButton : RoundedButton
+        {
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            private ProgressBar progressBar = null!;
+
+            public Bindable<double> Current => progressBar.Current;
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                Add(progressBar = new ProgressBar(false)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Blending = BlendingParameters.Additive,
+                    FillColour = BackgroundColour,
+                    Alpha = 0.5f,
+                    Depth = float.MinValue
+                });
+            }
+
+            public void Complete()
+            {
+                Enabled.Value = false;
+
+                Background.FadeColour(colours.Green, 500, Easing.OutQuint);
+                progressBar.FillColour = colours.Green;
+
+                this.TransformBindableTo(Current, 1, 500, Easing.OutQuint);
             }
         }
     }
