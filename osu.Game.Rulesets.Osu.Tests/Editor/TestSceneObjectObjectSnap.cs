@@ -3,11 +3,9 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Bindables;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
@@ -21,18 +19,16 @@ namespace osu.Game.Rulesets.Osu.Tests.Editor
     {
         private OsuPlayfield playfield;
 
-        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(Ruleset.Value, false);
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(Ruleset.Value, false)
+        {
+            BeatmapInfo = { DistanceSpacing = 1 }
+        };
 
         public override void SetUpSteps()
         {
             base.SetUpSteps();
             AddStep("get playfield", () => playfield = Editor.ChildrenOfType<OsuPlayfield>().First());
             AddStep("seek to first control point", () => EditorClock.Seek(Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.First().Time));
-            AddStep("set distance spacing to 1", () =>
-            {
-                var distanceSpacing = (BindableDouble)Editor.ChildrenOfType<IDistanceSnapProvider>().Single().DistanceSpacingMultiplier;
-                distanceSpacing.Value = 1;
-            });
         }
 
         [TestCase(true)]
