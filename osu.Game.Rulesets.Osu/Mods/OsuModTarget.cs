@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"Practice keeping up with the beat of the song.";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[]
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
         {
             typeof(IRequiresApproachCircles),
             typeof(OsuModClassic),
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             typeof(OsuModSpunOut),
             typeof(OsuModStrictTracking),
             typeof(OsuModSuddenDeath)
-        };
+        }).ToArray();
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>
