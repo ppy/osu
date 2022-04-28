@@ -175,6 +175,8 @@ csharp_style_prefer_switch_expression = false:none
 #Supressing roslyn built-in analyzers
 # Suppress: EC112
 
+dotnet_diagnostic.OLOC001.words_in_name = 5
+
 #Private method is unused
 dotnet_diagnostic.IDE0051.severity = silent
 #Private member is unused
