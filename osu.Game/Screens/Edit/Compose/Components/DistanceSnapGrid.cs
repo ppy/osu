@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private IBindable<double> distanceSpacingMultiplier;
+        private IBindable<float> distanceSpacingMultiplier;
 
         private readonly LayoutValue gridCache = new LayoutValue(Invalidation.RequiredParentSizeToFit);
         private readonly double? endTime;

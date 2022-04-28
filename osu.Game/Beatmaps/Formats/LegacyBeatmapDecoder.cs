@@ -240,7 +240,7 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"DistanceSpacing":
-                    beatmap.BeatmapInfo.DistanceSpacing = Math.Max(0, Parsing.ParseDouble(pair.Value));
+                    beatmap.BeatmapInfo.DistanceSpacing = Math.Max(0, Parsing.ParseFloat(pair.Value));
                     break;
 
                 case @"BeatDivisor":

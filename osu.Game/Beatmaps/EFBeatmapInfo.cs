@@ -107,7 +107,7 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
-        public double DistanceSpacing { get; set; }
+        public float DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }
         public int GridSize { get; set; }
         public double TimelineZoom { get; set; }
