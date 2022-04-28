@@ -162,7 +162,6 @@ namespace osu.Game.Screens.Play
             if (!configShowGraph.IsDefault)
             {
                 ShowGraph.Value = configShowGraph.Value;
-                configShowGraph.SetDefault();
 
                 // This is pretty ugly, but the only way to make this stick...
                 if (skinManager != null)
@@ -171,17 +170,17 @@ namespace osu.Game.Screens.Play
 
                     if (skinnableTarget != null)
                     {
-                        skinManager.EnsureMutableSkin();
+                        // If the skin is not mutable, a mutable instance will be created, causing this migration logic to run again on the correct skin.
+                        // Therefore we want to avoid resetting the config value on this invocation.
+                        if (skinManager.EnsureMutableSkin())
+                            return;
 
-                        // If `EnsureMutableSkin` actually changed the skin, default layout may take a frame to apply.
-                        // See `SkinnableTargetComponentsContainer`'s use of ScheduleAfterChildren.
-                        ScheduleAfterChildren(() =>
-                        {
-                            var skin = skinManager.CurrentSkin.Value;
-                            skin.UpdateDrawableTarget(skinnableTarget);
+                        var skin = skinManager.CurrentSkin.Value;
+                        skin.UpdateDrawableTarget(skinnableTarget);
 
-                            skinManager.Save(skin);
-                        });
+                        skinManager.Save(skin);
+
+                        configShowGraph.SetDefault();
                     }
                 }
             }
