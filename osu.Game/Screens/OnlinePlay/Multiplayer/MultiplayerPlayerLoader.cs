@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Play;
@@ -27,6 +29,26 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             base.ReadyForGameplay
             // The server is forcefully starting gameplay.
             || multiplayerClient.LocalUser?.State == MultiplayerUserState.Playing;
+
+        protected override void OnPlayerLoaded()
+        {
+            base.OnPlayerLoaded();
+
+            multiplayerClient.ChangeState(MultiplayerUserState.Loaded)
+                             .ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
+        }
+
+        private void failAndBail(string message = null)
+        {
+            if (!string.IsNullOrEmpty(message))
+                Logger.Log(message, LoggingTarget.Runtime, LogLevel.Important);
+
+            Schedule(() =>
+            {
+                if (this.IsCurrentScreen())
+                    this.Exit();
+            });
+        }
 
         public override void OnSuspending(ScreenTransitionEvent e)
         {
