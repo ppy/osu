@@ -159,10 +159,17 @@ namespace osu.Game.Overlays.FirstRunSetup
         {
             currentlyLoadedBeatmaps.Text = $"You currently have {sender.Count} beatmap(s) loaded!";
 
-            if (changes != null && (changes.DeletedIndices.Any() || changes.InsertedIndices.Any()))
+            if (sender.Count == 0)
             {
-                currentlyLoadedBeatmaps.FadeColour(colours.YellowLight).FadeColour(OverlayColourProvider.Content2);
-                currentlyLoadedBeatmaps.ScaleTo(1.1f).ScaleTo(1, 1000, Easing.OutQuint);
+                currentlyLoadedBeatmaps.FadeColour(colours.Red1, 500, Easing.OutQuint);
+            }
+            else if (changes != null && (changes.DeletedIndices.Any() || changes.InsertedIndices.Any()))
+            {
+                currentlyLoadedBeatmaps.FadeColour(colours.Yellow)
+                                       .FadeColour(OverlayColourProvider.Content2, 1500, Easing.OutQuint);
+
+                currentlyLoadedBeatmaps.ScaleTo(1.1f)
+                                       .ScaleTo(1, 1500, Easing.OutQuint);
             }
         }
 
