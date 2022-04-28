@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
@@ -91,15 +90,15 @@ namespace osu.Game.Tests.Visual.Editing
         [Test]
         public void TestDistanceSpacingHotkeys()
         {
-            float originalSpacing = 0;
+            double originalSpacing = 0;
 
-            AddStep("retrieve original spacing", () => originalSpacing = (float)editorBeatmap.BeatmapInfo.DistanceSpacing);
+            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.BeatmapInfo.DistanceSpacing);
 
             AddStep("hold ctrl", () => InputManager.PressKey(Key.LControl));
             AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
 
             AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
-            AddAssert("distance spacing increased by 0.5", () => Precision.AlmostEquals(editorBeatmap.BeatmapInfo.DistanceSpacing, originalSpacing + 0.5f));
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
 
             AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
             AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));

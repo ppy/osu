@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.LoadComplete();
 
-            beatDivisor.BindValueChanged(_ => updateSpacing(), true);
+            beatDivisor.BindValueChanged(_ => updateSpacing());
 
             distanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
             distanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
