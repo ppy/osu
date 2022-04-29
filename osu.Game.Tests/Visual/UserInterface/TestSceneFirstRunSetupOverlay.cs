@@ -66,6 +66,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestBasic()
+        {
+            AddAssert("overlay visible", () => overlay.State.Value == Visibility.Visible);
+        }
+
+        [Test]
         [Ignore("Enable when first run setup is being displayed on first run.")]
         public void TestDoesntOpenOnSecondRun()
         {
