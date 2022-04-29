@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
                 isDefault = value;
 
-                icon.FadeTo(isDefault ? 1 : 0, 200, Easing.OutQuint);
+                icon.Alpha = isDefault ? 1 : 0;
             }
         }
 
@@ -47,7 +47,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Alpha = 0,
-                AlwaysPresent = true,
                 Icon = FontAwesome.Solid.Star,
                 Size = new Vector2(12),
             });
