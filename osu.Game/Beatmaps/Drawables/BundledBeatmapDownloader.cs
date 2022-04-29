@@ -44,6 +44,8 @@ namespace osu.Game.Beatmaps.Drawables
             }
             else
             {
+                queueDownloads(always_bundled_beatmaps);
+
                 queueDownloads(bundled_osu, 8);
                 queueDownloads(bundled_taiko, 3);
                 queueDownloads(bundled_catch, 3);
@@ -119,6 +121,15 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         private const string tutorial_filename = "1011011 nekodex - new beginnings.osz";
+
+        /// <summary>
+        /// Contest winners or other special cases.
+        /// </summary>
+        private static readonly string[] always_bundled_beatmaps =
+        {
+            // This thing is 40mb, I'm not sure we want it here...
+            @"1388906 Raphlesia & BilliumMoto - My Love.osz"
+        };
 
         private static readonly string[] bundled_osu =
         {
