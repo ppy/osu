@@ -17,31 +17,6 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
     public class TestSceneOsuModAlternate : OsuModTestScene
     {
         [Test]
-        public void TestInputAtIntro() => CreateModTest(new ModTestData
-        {
-            Mod = new OsuModAlternate(),
-            PassCondition = () => Player.ScoreProcessor.Combo.Value == 1,
-            Autoplay = false,
-            Beatmap = new Beatmap
-            {
-                HitObjects = new List<HitObject>
-                {
-                    new HitCircle
-                    {
-                        StartTime = 1000,
-                        Position = new Vector2(100),
-                    },
-                },
-            },
-            ReplayFrames = new List<ReplayFrame>
-            {
-                new OsuReplayFrame(500, new Vector2(200), OsuAction.LeftButton),
-                new OsuReplayFrame(501, new Vector2(200)),
-                new OsuReplayFrame(1000, new Vector2(100), OsuAction.LeftButton),
-            }
-        });
-
-        [Test]
         public void TestInputAlternating() => CreateModTest(new ModTestData
         {
             Mod = new OsuModAlternate(),
@@ -116,6 +91,39 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             }
         });
 
+        /// <summary>
+        /// Ensures alternation is reset before the first hitobject after intro.
+        /// </summary>
+        [Test]
+        public void TestInputSingularAtIntro() => CreateModTest(new ModTestData
+        {
+            Mod = new OsuModAlternate(),
+            PassCondition = () => Player.ScoreProcessor.Combo.Value == 1,
+            Autoplay = false,
+            Beatmap = new Beatmap
+            {
+                HitObjects = new List<HitObject>
+                {
+                    new HitCircle
+                    {
+                        StartTime = 1000,
+                        Position = new Vector2(100),
+                    },
+                },
+            },
+            ReplayFrames = new List<ReplayFrame>
+            {
+                // first press during intro.
+                new OsuReplayFrame(500, new Vector2(200), OsuAction.LeftButton),
+                new OsuReplayFrame(501, new Vector2(200)),
+                // press same key at hitobject and ensure it has been hit.
+                new OsuReplayFrame(1000, new Vector2(100), OsuAction.LeftButton),
+            }
+        });
+
+        /// <summary>
+        /// Ensures alternation is reset after a break.
+        /// </summary>
         [Test]
         public void TestInputSingularWithBreak() => CreateModTest(new ModTestData
         {
@@ -144,8 +152,10 @@ namespace osu.Game.Rulesets.Osu.Tests.Mods
             },
             ReplayFrames = new List<ReplayFrame>
             {
+                // first press to start alternate lock.
                 new OsuReplayFrame(500, new Vector2(100), OsuAction.LeftButton),
                 new OsuReplayFrame(501, new Vector2(100)),
+                // press same key at second hitobject and ensure it has been hit.
                 new OsuReplayFrame(2500, new Vector2(100), OsuAction.LeftButton),
                 new OsuReplayFrame(2501, new Vector2(100)),
             }
