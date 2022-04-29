@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5f, 0),
+                    Spacing = new Vector2(4f, 0),
                     Child = icon = new ConstrainedIconContainer
                     {
                         Anchor = Anchor.Centre,
