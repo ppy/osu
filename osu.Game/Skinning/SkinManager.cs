@@ -174,9 +174,10 @@ namespace osu.Game.Skinning
                     // currently this only happens on save.
                     result.PerformRead(skin => Save(skin.CreateInstance(this)));
                     CurrentSkinInfo.Value = result;
+                    return true;
                 }
 
-                return true;
+                return false;
             });
         }
 
