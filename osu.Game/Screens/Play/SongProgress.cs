@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
 
-        [SettingSource("Show difficulty graph", "Whether a graph should show difficulty throughout the beatmap")]
+        [SettingSource("Show difficulty graph", "Whether a graph displaying difficulty throughout the beatmap should be shown")]
         public Bindable<bool> ShowGraph { get; } = new BindableBool(true);
 
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
