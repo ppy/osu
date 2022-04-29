@@ -222,7 +222,7 @@ namespace osu.Game.Tests.Editing
         {
             public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
 
-            public new Bindable<float> DistanceSpacingMultiplier => base.DistanceSpacingMultiplier;
+            public new Bindable<double> DistanceSpacingMultiplier => base.DistanceSpacingMultiplier;
 
             public TestHitObjectComposer()
                 : base(new OsuRuleset())
