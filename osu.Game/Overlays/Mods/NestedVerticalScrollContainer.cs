@@ -14,13 +14,13 @@ namespace osu.Game.Overlays.Mods
     /// </summary>
     public class NestedVerticalScrollContainer : OsuScrollContainer
     {
-        private OsuScrollContainer? parentScrollContainer;
+        private ModSelectScreen.ColumnScrollContainer? parentScrollContainer;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            parentScrollContainer = this.FindClosestParent<OsuScrollContainer>();
+            parentScrollContainer = this.FindClosestParent<ModSelectScreen.ColumnScrollContainer>();
         }
 
         protected override bool OnScroll(ScrollEvent e)

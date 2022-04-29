@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
                 },
                 Children = new Drawable[]
                 {
-                    underlayContainer = new Container
+                    underlayContainer = new InputBlockingContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = HEIGHT,

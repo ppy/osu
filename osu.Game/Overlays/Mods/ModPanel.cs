@@ -203,20 +203,24 @@ namespace osu.Game.Overlays.Mods
             base.OnMouseUp(e);
         }
 
+        protected virtual Colour4 BackgroundColour => Active.Value ? activeColour.Darken(0.3f) : (Colour4)ColourProvider.Background3;
+        protected virtual Colour4 ForegroundColour => Active.Value ? activeColour : (Colour4)ColourProvider.Background2;
+        protected virtual Colour4 TextColour => Active.Value ? (Colour4)ColourProvider.Background6 : Colour4.White;
+
         protected virtual void UpdateState()
         {
             float targetWidth = Active.Value ? EXPANDED_SWITCH_WIDTH : IDLE_SWITCH_WIDTH;
             double transitionDuration = TRANSITION_DURATION;
 
-            Colour4 textBackgroundColour = Active.Value ? activeColour : (Colour4)ColourProvider.Background2;
-            Colour4 mainBackgroundColour = Active.Value ? activeColour.Darken(0.3f) : (Colour4)ColourProvider.Background3;
-            Colour4 textColour = Active.Value ? (Colour4)ColourProvider.Background6 : Colour4.White;
+            Colour4 backgroundColour = BackgroundColour;
+            Colour4 foregroundColour = ForegroundColour;
+            Colour4 textColour = TextColour;
 
             // Hover affects colour of button background
             if (IsHovered)
             {
-                textBackgroundColour = textBackgroundColour.Lighten(0.1f);
-                mainBackgroundColour = mainBackgroundColour.Lighten(0.1f);
+                backgroundColour = backgroundColour.Lighten(0.1f);
+                foregroundColour = foregroundColour.Lighten(0.1f);
             }
 
             // Mouse down adds a halfway tween of the movement
@@ -226,15 +230,15 @@ namespace osu.Game.Overlays.Mods
                 transitionDuration *= 4;
             }
 
-            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(mainBackgroundColour, textBackgroundColour), transitionDuration, Easing.OutQuint);
-            Background.FadeColour(mainBackgroundColour, transitionDuration, Easing.OutQuint);
+            Content.TransformTo(nameof(BorderColour), ColourInfo.GradientVertical(backgroundColour, foregroundColour), transitionDuration, Easing.OutQuint);
+            Background.FadeColour(backgroundColour, transitionDuration, Easing.OutQuint);
             SwitchContainer.ResizeWidthTo(targetWidth, transitionDuration, Easing.OutQuint);
             MainContentContainer.TransformTo(nameof(Padding), new MarginPadding
             {
                 Left = targetWidth,
                 Right = CORNER_RADIUS
             }, transitionDuration, Easing.OutQuint);
-            TextBackground.FadeColour(textBackgroundColour, transitionDuration, Easing.OutQuint);
+            TextBackground.FadeColour(foregroundColour, transitionDuration, Easing.OutQuint);
             TextFlow.FadeColour(textColour, transitionDuration, Easing.OutQuint);
         }
 

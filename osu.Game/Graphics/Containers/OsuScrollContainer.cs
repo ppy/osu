@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -55,6 +56,26 @@ namespace osu.Game.Graphics.Containers
         public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
             : base(scrollDirection)
         {
+        }
+
+        /// <summary>
+        /// Scrolls a <see cref="Drawable"/> into view.
+        /// </summary>
+        /// <param name="d">The <see cref="Drawable"/> to scroll into view.</param>
+        /// <param name="animated">Whether to animate the movement.</param>
+        /// <param name="extraScroll">An added amount to scroll beyond the requirement to bring the target into view.</param>
+        public void ScrollIntoView(Drawable d, bool animated = true, float extraScroll = 0)
+        {
+            float childPos0 = GetChildPosInContent(d);
+            float childPos1 = GetChildPosInContent(d, d.DrawSize);
+
+            float minPos = Math.Min(childPos0, childPos1);
+            float maxPos = Math.Max(childPos0, childPos1);
+
+            if (minPos < Current || (minPos > Current && d.DrawSize[ScrollDim] > DisplayableContent))
+                ScrollTo(minPos - extraScroll, animated);
+            else if (maxPos > Current + DisplayableContent)
+                ScrollTo(maxPos - DisplayableContent + extraScroll, animated);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
