@@ -61,7 +61,8 @@ namespace osu.Game.Overlays
         {
             typeof(ScreenWelcome),
             typeof(ScreenBeatmaps),
-            typeof(ScreenUIScale)
+            typeof(ScreenUIScale),
+            typeof(ScreenBehaviour),
         };
 
         private Container stackContainer = null!;
