@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -73,13 +74,27 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnClick(ClickEvent e)
         {
-            rewindSearch = e.ShiftPressed;
-            return base.OnClick(e);
+            try
+            {
+                // this uses OR to handle rewinding when clicks are triggered by other sources (i.e. right button in OnMouseUp).
+                rewindSearch |= e.ShiftPressed;
+                return base.OnClick(e);
+            }
+            finally
+            {
+                rewindSearch = false;
+            }
         }
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            rewindSearch = false;
+            if (e.Button == MouseButton.Right)
+            {
+                rewindSearch = true;
+                TriggerClick();
+                return;
+            }
+
             base.OnMouseUp(e);
         }
 
