@@ -29,9 +29,15 @@ namespace osu.Game.Online.Multiplayer
         WaitingForLoad,
 
         /// <summary>
-        /// The user's client has marked itself as loaded and ready to begin gameplay.
+        /// The user has marked itself as loaded, but may still be adjusting settings prior to being ready for gameplay.
+        /// Players remaining in this state for an extended period of time will be automatically transitioned to the <see cref="Playing"/> state by the server.
         /// </summary>
         Loaded,
+
+        /// <summary>
+        /// The user has finished adjusting settings and is ready to start gameplay.
+        /// </summary>
+        ReadyForGameplay,
 
         /// <summary>
         /// The user is currently playing in a game. This is a reserved state, and is set by the server.

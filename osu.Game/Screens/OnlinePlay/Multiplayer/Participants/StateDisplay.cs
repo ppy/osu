@@ -112,6 +112,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Participants
                     break;
 
                 case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
                     text.Text = "loaded";
                     icon.Icon = FontAwesome.Solid.DotCircle;
                     icon.Colour = colours.YellowLight;
