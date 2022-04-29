@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneProfileRulesetSelector : OsuTestScene
     {
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public TestSceneProfileRulesetSelector()
         {
@@ -37,9 +37,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set mania as default", () => selector.SetDefaultRuleset(new ManiaRuleset().RulesetInfo));
 
             AddStep("User with osu as default", () => user.Value = new APIUser { Id = 0, PlayMode = "osu" });
-            AddStep("User with taiko as default", () => user.Value = new APIUser { Id = 2, PlayMode = "taiko" });
-            AddStep("User with catch as default", () => user.Value = new APIUser { Id = 3, PlayMode = "fruits" });
-            AddStep("User with mania as default", () => user.Value = new APIUser { Id = 1, PlayMode = "mania" });
+            AddStep("User with taiko as default", () => user.Value = new APIUser { Id = 1, PlayMode = "taiko" });
+            AddStep("User with catch as default", () => user.Value = new APIUser { Id = 2, PlayMode = "fruits" });
+            AddStep("User with mania as default", () => user.Value = new APIUser { Id = 3, PlayMode = "mania" });
             AddStep("null user", () => user.Value = null);
         }
     }
