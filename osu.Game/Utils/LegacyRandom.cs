@@ -2,27 +2,36 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Utils;
 
-namespace osu.Game.Rulesets.Catch.MathUtils
+namespace osu.Game.Utils
 {
     /// <summary>
     /// A PRNG specified in http://heliosphan.org/fastrandom.html.
+    /// Should only be used to match legacy behaviour. See <see cref="RNG"/> for a newer alternative.
     /// </summary>
-    public class FastRandom
+    /// <remarks>
+    /// Known in osu-stable code as `FastRandom`.
+    /// </remarks>
+    public class LegacyRandom
     {
         private const double int_to_real = 1.0 / (int.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
-        private const uint y_initial = 842502087;
-        private const uint z_initial = 3579807591;
-        private const uint w_initial = 273326509;
-        private uint x, y = y_initial, z = z_initial, w = w_initial;
+        private const uint y = 842502087;
+        private const uint z = 3579807591;
+        private const uint w = 273326509;
 
-        public FastRandom(int seed)
+        public uint X { get; private set; }
+        public uint Y { get; private set; } = y;
+        public uint Z { get; private set; } = z;
+        public uint W { get; private set; } = w;
+
+        public LegacyRandom(int seed)
         {
-            x = (uint)seed;
+            X = (uint)seed;
         }
 
-        public FastRandom()
+        public LegacyRandom()
             : this(Environment.TickCount)
         {
         }
@@ -33,11 +42,11 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = x ^ (x << 11);
-            x = y;
-            y = z;
-            z = w;
-            return w = w ^ (w >> 19) ^ t ^ (t >> 8);
+            uint t = X ^ (X << 11);
+            X = Y;
+            Y = Z;
+            Z = W;
+            return W = W ^ (W >> 19) ^ t ^ (t >> 8);
         }
 
         /// <summary>

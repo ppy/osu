@@ -8,16 +8,16 @@ using osu.Game.Overlays.FirstRunSetup;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneFirstRunScreenUIScale : OsuManualInputManagerTestScene
+    public class TestSceneFirstRunScreenBehaviour : OsuManualInputManagerTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
-        public TestSceneFirstRunScreenUIScale()
+        public TestSceneFirstRunScreenBehaviour()
         {
             AddStep("load screen", () =>
             {
-                Child = new ScreenStack(new ScreenUIScale());
+                Child = new ScreenStack(new ScreenBehaviour());
             });
         }
     }
