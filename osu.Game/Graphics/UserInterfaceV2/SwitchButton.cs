@@ -4,6 +4,8 @@
 #nullable enable
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -30,6 +32,9 @@ namespace osu.Game.Graphics.UserInterfaceV2
 
         private Color4 enabledColour;
         private Color4 disabledColour;
+
+        private Sample? sampleChecked;
+        private Sample? sampleUnchecked;
 
         public SwitchButton()
         {
@@ -70,13 +75,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OverlayColourProvider? colourProvider, OsuColour colours)
+        private void load(OverlayColourProvider? colourProvider, OsuColour colours, AudioManager audio)
         {
             enabledColour = colourProvider?.Highlight1 ?? colours.BlueDark;
             disabledColour = colourProvider?.Background3 ?? colours.Gray3;
 
             switchContainer.Colour = enabledColour;
             fill.Colour = disabledColour;
+
+            sampleChecked = audio.Samples.Get(@"UI/check-on");
+            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override void LoadComplete()
@@ -105,6 +113,16 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             updateBorder();
             base.OnHoverLost(e);
+        }
+
+        protected override void OnUserChange(bool value)
+        {
+            base.OnUserChange(value);
+
+            if (value)
+                sampleChecked?.Play();
+            else
+                sampleUnchecked?.Play();
         }
 
         private void updateBorder()
