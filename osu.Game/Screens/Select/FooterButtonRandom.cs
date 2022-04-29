@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"random";
+            updateText();
 
             Action = () =>
             {
@@ -57,6 +57,18 @@ namespace osu.Game.Screens.Select
                     NextRandom.Invoke();
                 }
             };
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            updateText(e.ShiftPressed);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            updateText(e.ShiftPressed);
+            base.OnKeyUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -91,5 +103,7 @@ namespace osu.Game.Screens.Select
                 rewindSearch = false;
             }
         }
+
+        private void updateText(bool rewind = false) => Text = rewind ? "rewind" : "random";
     }
 }
