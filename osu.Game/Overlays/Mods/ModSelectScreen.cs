@@ -13,7 +13,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Layout;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Mods;
@@ -59,7 +61,8 @@ namespace osu.Game.Overlays.Mods
 
         private DifficultyMultiplierDisplay? multiplierDisplay;
         private ModSettingsArea modSettingsArea = null!;
-        private FillFlowContainer<ModColumn> columnFlow = null!;
+        private ColumnScrollContainer columnScroll = null!;
+        private ColumnFlowContainer columnFlow = null!;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -95,27 +98,27 @@ namespace osu.Game.Overlays.Mods
                     RelativePositionAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new OsuScrollContainer(Direction.Horizontal)
+                        columnScroll = new ColumnScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = false,
                             ClampExtension = 100,
                             ScrollbarOverlapsContent = false,
-                            Child = columnFlow = new ModColumnContainer
+                            Child = columnFlow = new ColumnFlowContainer
                             {
                                 Direction = FillDirection.Horizontal,
                                 Shear = new Vector2(SHEAR, 0),
                                 RelativeSizeAxes = Axes.Y,
                                 AutoSizeAxes = Axes.X,
                                 Spacing = new Vector2(10, 0),
-                                Margin = new MarginPadding { Right = 70 },
+                                Margin = new MarginPadding { Horizontal = 70 },
                                 Children = new[]
                                 {
-                                    CreateModColumn(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
-                                    CreateModColumn(ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
-                                    CreateModColumn(ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
-                                    CreateModColumn(ModType.Conversion),
-                                    CreateModColumn(ModType.Fun)
+                                    createModColumnContent(ModType.DifficultyReduction, new[] { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P }),
+                                    createModColumnContent(ModType.DifficultyIncrease, new[] { Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L }),
+                                    createModColumnContent(ModType.Automation, new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M }),
+                                    createModColumnContent(ModType.Conversion),
+                                    createModColumnContent(ModType.Fun)
                                 }
                             }
                         }
@@ -153,6 +156,14 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        private ColumnDimContainer createModColumnContent(ModType modType, Key[]? toggleKeys = null)
+            => new ColumnDimContainer(CreateModColumn(modType, toggleKeys))
+            {
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                RequestScroll = column => columnScroll.ScrollIntoView(column, extraScroll: 140)
+            };
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -166,9 +177,9 @@ namespace osu.Game.Overlays.Mods
                 updateSelectionFromBindable();
             }, true);
 
-            foreach (var column in columnFlow)
+            foreach (var column in columnFlow.Columns)
             {
-                column.SelectedMods.BindValueChanged(_ => updateBindableFromSelection());
+                column.SelectedMods.BindValueChanged(updateBindableFromSelection);
             }
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
@@ -191,7 +202,7 @@ namespace osu.Game.Overlays.Mods
 
         private void updateAvailableMods()
         {
-            foreach (var column in columnFlow)
+            foreach (var column in columnFlow.Columns)
                 column.Filter = isValidMod;
         }
 
@@ -237,32 +248,35 @@ namespace osu.Game.Overlays.Mods
             TopLevelContent.MoveToY(-modAreaHeight, transition_duration, Easing.InOutCubic);
         }
 
-        private bool selectionBindableSyncInProgress;
-
         private void updateSelectionFromBindable()
         {
-            if (selectionBindableSyncInProgress)
-                return;
-
-            selectionBindableSyncInProgress = true;
-
-            foreach (var column in columnFlow)
+            // note that selectionBindableSyncInProgress is purposefully not checked here.
+            // this is because in the case of mod selection in solo gameplay, a user selection of a mod can actually lead to deselection of other incompatible mods.
+            // to synchronise state correctly, updateBindableFromSelection() computes the final mods (including incompatibility rules) and updates SelectedMods,
+            // and this method then runs unconditionally again to make sure the new visual selection accurately reflects the final set of selected mods.
+            // selectionBindableSyncInProgress ensures that mutual infinite recursion does not happen after that unconditional call.
+            foreach (var column in columnFlow.Columns)
                 column.SelectedMods.Value = SelectedMods.Value.Where(mod => mod.Type == column.ModType).ToArray();
-
-            selectionBindableSyncInProgress = false;
         }
 
-        private void updateBindableFromSelection()
+        private bool selectionBindableSyncInProgress;
+
+        private void updateBindableFromSelection(ValueChangedEvent<IReadOnlyList<Mod>> modSelectionChange)
         {
             if (selectionBindableSyncInProgress)
                 return;
 
             selectionBindableSyncInProgress = true;
 
-            SelectedMods.Value = columnFlow.SelectMany(column => column.SelectedMods.Value).ToArray();
+            SelectedMods.Value = ComputeNewModsFromSelection(
+                modSelectionChange.NewValue.Except(modSelectionChange.OldValue),
+                modSelectionChange.OldValue.Except(modSelectionChange.NewValue));
 
             selectionBindableSyncInProgress = false;
         }
+
+        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IEnumerable<Mod> addedMods, IEnumerable<Mod> removedMods)
+            => columnFlow.Columns.SelectMany(column => column.SelectedMods.Value).ToArray();
 
         protected override void PopIn()
         {
@@ -277,7 +291,8 @@ namespace osu.Game.Overlays.Mods
 
             for (int i = 0; i < columnFlow.Count; i++)
             {
-                columnFlow[i].TopLevelContent
+                columnFlow[i].Column
+                             .TopLevelContent
                              .Delay(i * 30)
                              .MoveToY(0, fade_in_duration, Easing.OutQuint)
                              .FadeIn(fade_in_duration, Easing.OutQuint);
@@ -298,27 +313,68 @@ namespace osu.Game.Overlays.Mods
             {
                 const float distance = 700;
 
-                columnFlow[i].TopLevelContent
+                columnFlow[i].Column
+                             .TopLevelContent
                              .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
                              .FadeOut(fade_out_duration, Easing.OutQuint);
             }
         }
 
-        private class ModColumnContainer : FillFlowContainer<ModColumn>
+        internal class ColumnScrollContainer : OsuScrollContainer<ColumnFlowContainer>
         {
+            public ColumnScrollContainer()
+                : base(Direction.Horizontal)
+            {
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                // the bounds below represent the horizontal range of scroll items to be considered fully visible/active, in the scroll's internal coordinate space.
+                // note that clamping is applied to the left scroll bound to ensure scrolling past extents does not change the set of active columns.
+                float leftVisibleBound = Math.Clamp(Current, 0, ScrollableExtent);
+                float rightVisibleBound = leftVisibleBound + DrawWidth;
+
+                // if a movement is occurring at this time, the bounds below represent the full range of columns that the scroll movement will encompass.
+                // this will be used to ensure that columns do not change state from active to inactive back and forth until they are fully scrolled past.
+                float leftMovementBound = Math.Min(Current, Target);
+                float rightMovementBound = Math.Max(Current, Target) + DrawWidth;
+
+                foreach (var column in Child)
+                {
+                    // DrawWidth/DrawPosition do not include shear effects, and we want to know the full extents of the columns post-shear,
+                    // so we have to manually compensate.
+                    var topLeft = column.ToSpaceOfOtherDrawable(Vector2.Zero, ScrollContent);
+                    var bottomRight = column.ToSpaceOfOtherDrawable(new Vector2(column.DrawWidth - column.DrawHeight * SHEAR, 0), ScrollContent);
+
+                    bool isCurrentlyVisible = Precision.AlmostBigger(topLeft.X, leftVisibleBound)
+                                              && Precision.DefinitelyBigger(rightVisibleBound, bottomRight.X);
+                    bool isBeingScrolledToward = Precision.AlmostBigger(topLeft.X, leftMovementBound)
+                                                 && Precision.DefinitelyBigger(rightMovementBound, bottomRight.X);
+
+                    column.Active.Value = isCurrentlyVisible || isBeingScrolledToward;
+                }
+            }
+        }
+
+        internal class ColumnFlowContainer : FillFlowContainer<ColumnDimContainer>
+        {
+            public IEnumerable<ModColumn> Columns => Children.Select(dimWrapper => dimWrapper.Column);
+
             private readonly LayoutValue drawSizeLayout = new LayoutValue(Invalidation.DrawSize);
 
-            public ModColumnContainer()
+            public ColumnFlowContainer()
             {
                 AddLayout(drawSizeLayout);
             }
 
-            public override void Add(ModColumn column)
+            public override void Add(ColumnDimContainer dimContainer)
             {
-                base.Add(column);
+                base.Add(dimContainer);
 
-                Debug.Assert(column != null);
-                column.Shear = Vector2.Zero;
+                Debug.Assert(dimContainer != null);
+                dimContainer.Column.Shear = Vector2.Zero;
             }
 
             protected override void Update()
@@ -335,6 +391,63 @@ namespace osu.Game.Overlays.Mods
 
                     drawSizeLayout.Validate();
                 }
+            }
+        }
+
+        internal class ColumnDimContainer : Container
+        {
+            public ModColumn Column { get; }
+
+            public readonly Bindable<bool> Active = new BindableBool();
+            public Action<ColumnDimContainer>? RequestScroll { get; set; }
+
+            [Resolved]
+            private OsuColour colours { get; set; } = null!;
+
+            public ColumnDimContainer(ModColumn column)
+            {
+                Child = Column = column;
+                column.Active.BindTo(Active);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Active.BindValueChanged(_ => updateDim(), true);
+                FinishTransforms();
+            }
+
+            private void updateDim()
+            {
+                Colour4 targetColour;
+
+                if (Active.Value)
+                    targetColour = Colour4.White;
+                else
+                    targetColour = IsHovered ? colours.GrayC : colours.Gray8;
+
+                this.FadeColour(targetColour, 800, Easing.OutQuint);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (!Active.Value)
+                    RequestScroll?.Invoke(this);
+
+                return true;
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                base.OnHover(e);
+                updateDim();
+                return Active.Value;
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                base.OnHoverLost(e);
+                updateDim();
             }
         }
 

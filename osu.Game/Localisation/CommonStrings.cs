@@ -15,6 +15,11 @@ namespace osu.Game.Localisation
         public static LocalisableString Back => new TranslatableString(getKey(@"back"), @"Back");
 
         /// <summary>
+        /// "Next"
+        /// </summary>
+        public static LocalisableString Next => new TranslatableString(getKey(@"next"), @"Next");
+
+        /// <summary>
         /// "Finish"
         /// </summary>
         public static LocalisableString Finish => new TranslatableString(getKey(@"finish"), @"Finish");

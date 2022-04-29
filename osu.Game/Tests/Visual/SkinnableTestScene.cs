@@ -74,10 +74,14 @@ namespace osu.Game.Tests.Visual
 
             createdDrawables.Add(created);
 
-            SkinProvidingContainer mainProvider;
             Container childContainer;
             OutlineBox outlineBox;
             SkinProvidingContainer skinProvider;
+
+            ISkin provider = skin;
+
+            if (provider is LegacySkin legacyProvider)
+                provider = Ruleset.Value.CreateInstance().CreateLegacySkinProvider(legacyProvider, beatmap);
 
             var children = new Container
             {
@@ -107,12 +111,10 @@ namespace osu.Game.Tests.Visual
                         Children = new Drawable[]
                         {
                             outlineBox = new OutlineBox(),
-                            (mainProvider = new SkinProvidingContainer(skin)).WithChild(
-                                skinProvider = new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider, beatmap))
-                                {
-                                    Child = created,
-                                }
-                            )
+                            skinProvider = new SkinProvidingContainer(provider)
+                            {
+                                Child = created,
+                            }
                         }
                     },
                 }
@@ -130,7 +132,7 @@ namespace osu.Game.Tests.Visual
             {
                 bool autoSize = created.RelativeSizeAxes == Axes.None;
 
-                foreach (var c in new[] { mainProvider, childContainer, skinProvider })
+                foreach (var c in new[] { childContainer, skinProvider })
                 {
                     c.RelativeSizeAxes = Axes.None;
                     c.AutoSizeAxes = Axes.None;
