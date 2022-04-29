@@ -21,18 +21,18 @@ namespace osu.Game.Rulesets.Edit
     public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider
         where TObject : HitObject
     {
-        protected Bindable<float> DistanceSpacingMultiplier { get; } = new BindableFloat(1.0f)
+        protected Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
         {
-            MinValue = 0.1f,
-            MaxValue = 6.0f,
-            Precision = 0.01f,
+            MinValue = 0.1,
+            MaxValue = 6.0,
+            Precision = 0.01,
         };
 
-        IBindable<float> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
+        IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => DistanceSpacingMultiplier;
 
         protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
 
-        private ExpandableSlider<float, SizeSlider> distanceSpacingSlider;
+        private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
         private bool distanceSpacingScrollActive;
 
         protected DistancedHitObjectComposer(Ruleset ruleset)
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Edit
                 Origin = Anchor.TopRight,
                 Child = new EditorToolboxGroup("snapping")
                 {
-                    Child = distanceSpacingSlider = new ExpandableSlider<float, SizeSlider>
+                    Child = distanceSpacingSlider = new ExpandableSlider<double, SizeSlider<double>>
                     {
                         Current = { BindTarget = DistanceSpacingMultiplier },
                         KeyboardStep = 0.1f,

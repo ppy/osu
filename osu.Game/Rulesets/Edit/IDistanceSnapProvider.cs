@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Edit
         /// The spacing multiplier applied to beat snap distances.
         /// </summary>
         /// <seealso cref="BeatmapInfo.DistanceSpacing"/>
-        IBindable<float> DistanceSpacingMultiplier { get; }
+        IBindable<double> DistanceSpacingMultiplier { get; }
 
         /// <summary>
         /// Retrieves the distance between two points within a timing point that are one beat length apart.

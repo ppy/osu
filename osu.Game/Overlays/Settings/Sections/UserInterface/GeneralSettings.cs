@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
-                new SettingsSlider<float, SizeSlider>
+                new SettingsSlider<float, SizeSlider<float>>
                 {
                     LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
