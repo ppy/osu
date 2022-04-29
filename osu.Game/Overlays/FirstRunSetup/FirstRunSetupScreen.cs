@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ScrollbarOverlapsContent = false,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText

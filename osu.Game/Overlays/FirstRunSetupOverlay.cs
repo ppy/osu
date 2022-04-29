@@ -60,7 +60,8 @@ namespace osu.Game.Overlays
         private readonly Type[] steps =
         {
             typeof(ScreenWelcome),
-            typeof(ScreenUIScale)
+            typeof(ScreenUIScale),
+            typeof(ScreenBehaviour),
         };
 
         private Container stackContainer = null!;
