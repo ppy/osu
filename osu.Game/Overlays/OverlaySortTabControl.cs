@@ -149,7 +149,7 @@ namespace osu.Game.Overlays
                     }
                 });
 
-                AddInternal(new HoverClickSounds());
+                AddInternal(new HoverClickSounds(HoverSampleSet.TabSelect));
             }
 
             protected override void LoadComplete()

@@ -11,8 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
-using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Utils;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private readonly int originalTargetColumns;
 
         // Internal for testing purposes
-        internal FastRandom Random { get; private set; }
+        internal LegacyRandom Random { get; private set; }
 
         private Pattern lastPattern = new Pattern();
 
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             IBeatmapDifficultyInfo difficulty = original.Difficulty;
 
             int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
-            Random = new FastRandom(seed);
+            Random = new LegacyRandom(seed);
 
             return base.ConvertBeatmap(original, cancellationToken);
         }
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
-            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
+            public SpecificBeatmapPatternGenerator(LegacyRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, IBeatmap originalBeatmap)
                 : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
             {
             }

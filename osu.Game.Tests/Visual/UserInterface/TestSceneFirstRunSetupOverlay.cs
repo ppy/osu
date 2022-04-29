@@ -178,7 +178,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("step to next", () => overlay.NextButton.TriggerClick());
 
-            AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenUIScale);
+            AddAssert("is at known screen", () => overlay.CurrentScreen is ScreenBeatmaps);
 
             AddStep("hide", () => overlay.Hide());
             AddAssert("overlay hidden", () => overlay.State.Value == Visibility.Hidden);
@@ -188,7 +188,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("run notification action", () => lastNotification.Activated());
 
             AddAssert("overlay shown", () => overlay.State.Value == Visibility.Visible);
-            AddAssert("is resumed", () => overlay.CurrentScreen is ScreenUIScale);
+            AddAssert("is resumed", () => overlay.CurrentScreen is ScreenBeatmaps);
         }
     }
 }
