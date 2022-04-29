@@ -405,6 +405,8 @@ namespace osu.Game.Screens.Menu
 
         private class DragContainer : Container
         {
+            public override bool DragBlocksClick => false;
+
             protected override bool OnDragStart(DragStartEvent e) => true;
 
             protected override void OnDrag(DragEvent e)
