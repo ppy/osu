@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Select;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -36,6 +37,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 PreviousRandom = () => previousRandomCalled = true,
             }, null);
             footer.AddButton(new FooterButtonOptions(), null);
+
+            InputManager.MoveMouseTo(Vector2.Zero);
         });
 
         [Test]
@@ -70,7 +73,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestFooterRewindViaMouse()
+        public void TestFooterRewindViaShiftMouseLeft()
         {
             AddStep("shift + click button", () =>
             {
@@ -78,6 +81,17 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.MoveMouseTo(randomButton);
                 InputManager.Click(MouseButton.Left);
                 InputManager.ReleaseKey(Key.LShift);
+            });
+            AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
+        }
+
+        [Test]
+        public void TestFooterRewindViaMouseRight()
+        {
+            AddStep("right click button", () =>
+            {
+                InputManager.MoveMouseTo(randomButton);
+                InputManager.Click(MouseButton.Right);
             });
             AddAssert("previous random invoked", () => previousRandomCalled && !nextRandomCalled);
         }
