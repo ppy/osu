@@ -10,11 +10,13 @@ using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayRulesetTabItem : TabItem<RulesetInfo>
+    public class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasTooltip
     {
         private Color4 accentColour;
 
@@ -34,6 +36,8 @@ namespace osu.Game.Overlays
         private OverlayColourProvider colourProvider { get; set; }
 
         private readonly Drawable icon;
+
+        public LocalisableString TooltipText => Value.Name;
 
         public OverlayRulesetTabItem(RulesetInfo value)
             : base(value)
