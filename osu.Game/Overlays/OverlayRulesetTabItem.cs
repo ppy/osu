@@ -71,7 +71,7 @@ namespace osu.Game.Overlays
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
+        public override bool PropagatePositionalInputSubTree => Enabled.Value && base.PropagatePositionalInputSubTree;
 
         protected override bool OnHover(HoverEvent e)
         {
