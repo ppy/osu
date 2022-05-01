@@ -185,16 +185,17 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Join channel 1", () => channelManager.JoinChannel(testChannel1));
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Open chat with user", () => channelManager.PostCommand($"chat {testUser.Username}"));
-            AddAssert("PM channel is selected", () => channelManager.CurrentChannel.Value == testPMChannel);
-            AddAssert("PM channel is visibile", () => currentDrawableChannel.Channel == testPMChannel);
+            AddAssert("PM channel is selected", () =>
+                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single() == testUser);
             AddStep("Open chat with non-existent user", () => channelManager.PostCommand("chat user_doesnt_exist"));
             AddAssert("Last message is error", () => channelManager.CurrentChannel.Value.Messages.Last() is ErrorMessage);
+
             // Make sure no unnecessary requests are made when the PM channel is already open.
             AddStep("Select channel 1", () => clickDrawable(getChannelListItem(testChannel1)));
             AddStep("Unregister request handling", () => ((DummyAPIAccess)API).HandleRequest = null);
             AddStep("Open chat with user", () => channelManager.PostCommand($"chat {testUser.Username}"));
-            AddAssert("PM channel is selected", () => channelManager.CurrentChannel.Value == testPMChannel);
-            AddAssert("PM channel is visibile", () => currentDrawableChannel.Channel == testPMChannel);
+            AddAssert("PM channel is selected", () =>
+                channelManager.CurrentChannel.Value.Type == ChannelType.PM && channelManager.CurrentChannel.Value.Users.Single() == testUser);
         }
 
         [Test]
