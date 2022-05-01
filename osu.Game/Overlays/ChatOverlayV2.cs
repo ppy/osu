@@ -290,4 +290,3 @@ namespace osu.Game.Overlays
         }
     }
 }
-
