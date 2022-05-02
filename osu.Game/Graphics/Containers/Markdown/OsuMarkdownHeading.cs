@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Markdig.Syntax;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Framework.Graphics.Sprites;
@@ -64,6 +65,7 @@ namespace osu.Game.Graphics.Containers.Markdown
             }
         }
 
+        [Cached(typeof(IMarkdownTextComponent))]
         private class HeadingTextFlowContainer : OsuMarkdownTextFlowContainer
         {
             public float FontSize;
