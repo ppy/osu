@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Online
     public class TestSceneProfileRulesetSelector : OsuTestScene
     {
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public TestSceneProfileRulesetSelector()
         {
@@ -32,14 +32,14 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             AddStep("set osu! as default", () => selector.SetDefaultRuleset(new OsuRuleset().RulesetInfo));
-            AddStep("set mania as default", () => selector.SetDefaultRuleset(new ManiaRuleset().RulesetInfo));
             AddStep("set taiko as default", () => selector.SetDefaultRuleset(new TaikoRuleset().RulesetInfo));
             AddStep("set catch as default", () => selector.SetDefaultRuleset(new CatchRuleset().RulesetInfo));
+            AddStep("set mania as default", () => selector.SetDefaultRuleset(new ManiaRuleset().RulesetInfo));
 
-            AddStep("User with osu as default", () => user.Value = new APIUser { PlayMode = "osu" });
-            AddStep("User with mania as default", () => user.Value = new APIUser { PlayMode = "mania" });
-            AddStep("User with taiko as default", () => user.Value = new APIUser { PlayMode = "taiko" });
-            AddStep("User with catch as default", () => user.Value = new APIUser { PlayMode = "fruits" });
+            AddStep("User with osu as default", () => user.Value = new APIUser { Id = 0, PlayMode = "osu" });
+            AddStep("User with taiko as default", () => user.Value = new APIUser { Id = 1, PlayMode = "taiko" });
+            AddStep("User with catch as default", () => user.Value = new APIUser { Id = 2, PlayMode = "fruits" });
+            AddStep("User with mania as default", () => user.Value = new APIUser { Id = 3, PlayMode = "mania" });
             AddStep("null user", () => user.Value = null);
         }
     }
