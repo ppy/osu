@@ -104,17 +104,25 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("activate DT", () => getPanelForMod(typeof(OsuModDoubleTime)).TriggerClick());
             AddAssert("DT active", () => SelectedMods.Value.Single().GetType() == typeof(OsuModDoubleTime));
+            AddAssert("DT panel active", () => getPanelForMod(typeof(OsuModDoubleTime)).Active.Value);
 
             AddStep("activate NC", () => getPanelForMod(typeof(OsuModNightcore)).TriggerClick());
             AddAssert("only NC active", () => SelectedMods.Value.Single().GetType() == typeof(OsuModNightcore));
+            AddAssert("DT panel not active", () => !getPanelForMod(typeof(OsuModDoubleTime)).Active.Value);
+            AddAssert("NC panel active", () => getPanelForMod(typeof(OsuModNightcore)).Active.Value);
 
             AddStep("activate HR", () => getPanelForMod(typeof(OsuModHardRock)).TriggerClick());
             AddAssert("NC+HR active", () => SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModNightcore))
                                             && SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModHardRock)));
+            AddAssert("NC panel active", () => getPanelForMod(typeof(OsuModNightcore)).Active.Value);
+            AddAssert("HR panel active", () => getPanelForMod(typeof(OsuModHardRock)).Active.Value);
 
             AddStep("activate MR", () => getPanelForMod(typeof(OsuModMirror)).TriggerClick());
             AddAssert("NC+MR active", () => SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModNightcore))
                                             && SelectedMods.Value.Any(mod => mod.GetType() == typeof(OsuModMirror)));
+            AddAssert("NC panel active", () => getPanelForMod(typeof(OsuModNightcore)).Active.Value);
+            AddAssert("HR panel not active", () => !getPanelForMod(typeof(OsuModHardRock)).Active.Value);
+            AddAssert("MR panel active", () => getPanelForMod(typeof(OsuModMirror)).Active.Value);
         }
 
         [Test]
