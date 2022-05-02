@@ -141,7 +141,8 @@ namespace osu.Game.Tests.Visual.Collections
         {
             AddStep("add dropdown", () =>
             {
-                Add(new CollectionFilterDropdown
+                Add(
+                    new CollectionFilterDropdown
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
