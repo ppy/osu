@@ -115,7 +115,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             if (!ValidForResume)
                 return; // token retrieval may have failed.
 
-            client.MatchStarted += onMatchStarted;
+            client.GameplayStarted += onGameplayStarted;
             client.ResultsReady += onResultsReady;
 
             ScoreProcessor.HasCompleted.BindValueChanged(completed =>
@@ -144,10 +144,12 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
         protected override void StartGameplay()
         {
-            // block base call, but let the server know we are ready to start.
-            loadingDisplay.Show();
-
-            client.ChangeState(MultiplayerUserState.Loaded).ContinueWith(task => failAndBail(task.Exception?.Message ?? "Server error"), TaskContinuationOptions.NotOnRanToCompletion);
+            if (client.LocalUser?.State == MultiplayerUserState.Loaded)
+            {
+                // block base call, but let the server know we are ready to start.
+                loadingDisplay.Show();
+                client.ChangeState(MultiplayerUserState.ReadyForGameplay);
+            }
         }
 
         private void failAndBail(string message = null)
@@ -175,7 +177,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
             leaderboardFlow.Position = new Vector2(padding, padding + HUDOverlay.TopScoringElementsHeight);
         }
 
-        private void onMatchStarted() => Scheduler.Add(() =>
+        private void onGameplayStarted() => Scheduler.Add(() =>
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -223,7 +225,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer
 
             if (client != null)
             {
-                client.MatchStarted -= onMatchStarted;
+                client.GameplayStarted -= onGameplayStarted;
                 client.ResultsReady -= onResultsReady;
             }
         }

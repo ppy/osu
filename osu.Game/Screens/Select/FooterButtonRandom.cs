@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Select
 {
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"random";
+            updateText();
 
             Action = () =>
             {
@@ -59,6 +60,44 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            updateText(e.ShiftPressed);
+            return base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyUpEvent e)
+        {
+            updateText(e.ShiftPressed);
+            base.OnKeyUp(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            try
+            {
+                // this uses OR to handle rewinding when clicks are triggered by other sources (i.e. right button in OnMouseUp).
+                rewindSearch |= e.ShiftPressed;
+                return base.OnClick(e);
+            }
+            finally
+            {
+                rewindSearch = false;
+            }
+        }
+
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            if (e.Button == MouseButton.Right)
+            {
+                rewindSearch = true;
+                TriggerClick();
+                return;
+            }
+
+            base.OnMouseUp(e);
+        }
+
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
             rewindSearch = e.Action == GlobalAction.SelectPreviousRandom;
@@ -79,5 +118,7 @@ namespace osu.Game.Screens.Select
                 rewindSearch = false;
             }
         }
+
+        private void updateText(bool rewind = false) => Text = rewind ? "rewind" : "random";
     }
 }

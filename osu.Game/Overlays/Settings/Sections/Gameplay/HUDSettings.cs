@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    ClassicDefault = false,
                     LabelText = GameplaySettingsStrings.ShowHealthDisplayWhenCantFail,
                     Current = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                     Keywords = new[] { "hp", "bar" }
