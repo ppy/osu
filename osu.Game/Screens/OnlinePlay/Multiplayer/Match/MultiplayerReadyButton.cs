@@ -106,7 +106,7 @@ namespace osu.Game.Screens.OnlinePlay.Multiplayer.Match
             {
                 updateButtonText();
 
-                int secondsRemaining = countdownTimeRemaining.Seconds;
+                int secondsRemaining = (int)countdownTimeRemaining.TotalSeconds;
 
                 playTickSound(secondsRemaining);
 
