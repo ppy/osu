@@ -68,6 +68,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return Precision.AlmostEquals(multiplier, modSelectScreen.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
+            AddAssert("setting items created", () => modSelectScreen.ChildrenOfType<ISettingsItem>().Any());
         }
 
         [Test]
@@ -82,6 +83,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 return Precision.AlmostEquals(multiplier, modSelectScreen.ChildrenOfType<DifficultyMultiplierDisplay>().Single().Current.Value);
             });
             assertCustomisationToggleState(disabled: false, active: false);
+            AddAssert("setting items created", () => modSelectScreen.ChildrenOfType<ISettingsItem>().Any());
         }
 
         [Test]
