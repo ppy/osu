@@ -126,13 +126,9 @@ namespace osu.Game.Overlays.Chat.ChannelList
         {
             base.LoadComplete();
 
-            selectedChannel.BindValueChanged(_ => updateSelectState(), true);
-            SelectorActive.BindValueChanged(_ => updateSelectState(), true);
-
-            Unread.BindValueChanged(change =>
-            {
-                text.FadeColour(change.NewValue ? colourProvider.Content1 : colourProvider.Light3, 300, Easing.OutQuint);
-            }, true);
+            selectedChannel.BindValueChanged(_ => updateState(), true);
+            SelectorActive.BindValueChanged(_ => updateState(), true);
+            Unread.BindValueChanged(_ => updateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -165,12 +161,21 @@ namespace osu.Game.Overlays.Chat.ChannelList
             };
         }
 
-        private void updateSelectState()
+        private void updateState()
         {
-            if (selectedChannel.Value == Channel && !SelectorActive.Value)
+            if (showSelected)
                 selectBox.FadeIn(300, Easing.OutQuint);
             else
                 selectBox.FadeOut(200, Easing.OutQuint);
+
+            if (showUnread || showSelected)
+                text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
+            else
+                text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
+
+        private bool showUnread => Unread.Value;
+
+        private bool showSelected => selectedChannel.Value == Channel && !SelectorActive.Value;
     }
 }
