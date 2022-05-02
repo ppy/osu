@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Text = "Add More Channels",
+                        Text = "Add more channels",
                         Font = OsuFont.Torus.With(size: 17, weight: FontWeight.SemiBold),
                         Colour = colourProvider.Light3,
                         Margin = new MarginPadding { Bottom = 2 },
