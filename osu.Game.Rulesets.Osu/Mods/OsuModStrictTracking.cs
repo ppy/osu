@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"Follow circles just got serious...";
         public override double ScoreMultiplier => 1.0;
-        public override Type[] IncompatibleMods => new[] { typeof(ModClassic) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModClassic), typeof(OsuModTarget) };
 
         public void ApplyToDrawableHitObject(DrawableHitObject drawable)
         {
