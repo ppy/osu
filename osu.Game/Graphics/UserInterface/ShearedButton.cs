@@ -176,8 +176,8 @@ namespace osu.Game.Graphics.UserInterface
 
             if (!Enabled.Value)
             {
-                colourDark = colourDark.Darken(0.3f);
-                colourLight = colourLight.Darken(0.3f);
+                colourDark = colourDark.Darken(1f);
+                colourLight = colourLight.Darken(1f);
             }
             else if (IsHovered)
             {
