@@ -65,5 +65,21 @@ namespace osu.Game.Online.Multiplayer
         }
 
         public override int GetHashCode() => UserID.GetHashCode();
+
+        /// <summary>
+        /// Whether this user has finished loading and can start gameplay.
+        /// </summary>
+        public bool CanStartGameplay()
+        {
+            switch (State)
+            {
+                case MultiplayerUserState.Loaded:
+                case MultiplayerUserState.ReadyForGameplay:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
     }
 }

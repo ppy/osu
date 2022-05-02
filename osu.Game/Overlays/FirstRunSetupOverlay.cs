@@ -25,7 +25,6 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.OnlinePlay.Match.Components;
 
 namespace osu.Game.Overlays
 {
@@ -45,8 +44,8 @@ namespace osu.Game.Overlays
 
         private ScreenStack? stack;
 
-        public PurpleTriangleButton NextButton = null!;
-        public DangerousTriangleButton BackButton = null!;
+        public ShearedButton NextButton = null!;
+        public ShearedButton BackButton = null!;
 
         private readonly Bindable<bool> showFirstRunSetup = new Bindable<bool>();
 
@@ -72,7 +71,7 @@ namespace osu.Game.Overlays
         private Container content = null!;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Header.Title = FirstRunSetupOverlayStrings.FirstRunSetupTitle;
             Header.Description = FirstRunSetupOverlayStrings.FirstRunSetupDescription;
@@ -84,7 +83,11 @@ namespace osu.Game.Overlays
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 70 * 1.2f },
+                    Padding = new MarginPadding
+                    {
+                        Horizontal = 70 * 1.2f,
+                        Bottom = 20,
+                    },
                     Child = new InputBlockingContainer
                     {
                         Masking = true,
@@ -117,14 +120,15 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Width = 0.98f,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Margin = new MarginPadding { Vertical = PADDING },
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
                 ColumnDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.AutoSize),
                     new Dimension(GridSizeMode.Absolute, 10),
+                    new Dimension(GridSizeMode.AutoSize),
                     new Dimension(),
+                    new Dimension(GridSizeMode.Absolute, 10),
                 },
                 RowDimensions = new[]
                 {
@@ -134,21 +138,25 @@ namespace osu.Game.Overlays
                 {
                     new[]
                     {
-                        BackButton = new DangerousTriangleButton
+                        Empty(),
+                        BackButton = new ShearedButton(300)
                         {
-                            Width = 300,
                             Text = CommonStrings.Back,
                             Action = showPreviousStep,
                             Enabled = { Value = false },
+                            DarkerColour = colours.Pink2,
+                            LighterColour = colours.Pink1,
                         },
-                        Empty(),
-                        NextButton = new PurpleTriangleButton
+                        NextButton = new ShearedButton(0)
                         {
                             RelativeSizeAxes = Axes.X,
                             Width = 1,
                             Text = FirstRunSetupOverlayStrings.GetStarted,
+                            DarkerColour = ColourProvider.Colour2,
+                            LighterColour = ColourProvider.Colour1,
                             Action = showNextStep
-                        }
+                        },
+                        Empty(),
                     },
                 }
             });
