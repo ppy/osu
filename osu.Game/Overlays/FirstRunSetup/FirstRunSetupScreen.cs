@@ -19,8 +19,11 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         protected FillFlowContainer Content { get; private set; }
 
+        [Resolved]
+        protected OverlayColourProvider OverlayColourProvider { get; private set; }
+
         [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider overlayColourProvider)
+        private void load()
         {
             const float header_size = 40;
             const float spacing = 20;
@@ -30,13 +33,14 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuScrollContainer(Direction.Vertical)
                 {
                     RelativeSizeAxes = Axes.Both,
+                    ScrollbarOverlapsContent = false,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
                             Text = this.GetLocalisableDescription(),
                             Font = OsuFont.Default.With(size: header_size),
-                            Colour = overlayColourProvider.Light1,
+                            Colour = OverlayColourProvider.Light1,
                         },
                         Content = new FillFlowContainer
                         {
