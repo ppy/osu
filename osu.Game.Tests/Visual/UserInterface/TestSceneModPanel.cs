@@ -47,12 +47,22 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             IncompatibilityDisplayingModPanel panel = null;
 
-            AddStep("create panel with DT", () => Child = panel = new IncompatibilityDisplayingModPanel(new OsuModDoubleTime())
+            AddStep("create panel with DT", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.None,
-                Width = 300
+                Child = panel = new IncompatibilityDisplayingModPanel(new OsuModDoubleTime())
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.None,
+                    Width = 300,
+                };
+
+                panel.Active.BindValueChanged(active =>
+                {
+                    SelectedMods.Value = active.NewValue
+                        ? Array.Empty<Mod>()
+                        : new[] { panel.Mod };
+                });
             });
 
             clickPanel();
@@ -62,11 +72,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("panel not active", () => !panel.Active.Value);
 
             AddStep("set incompatible mod", () => SelectedMods.Value = new[] { new OsuModHalfTime() });
-
-            clickPanel();
-            AddAssert("panel not active", () => !panel.Active.Value);
-
-            AddStep("reset mods", () => SelectedMods.Value = Array.Empty<Mod>());
 
             clickPanel();
             AddAssert("panel active", () => panel.Active.Value);

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -20,6 +19,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Judgements;
@@ -80,13 +80,16 @@ namespace osu.Game.Screens.Play.HUD
                 difficultyCache.GetTimedDifficultyAttributesAsync(gameplayWorkingBeatmap, gameplayState.Ruleset, clonedMods, loadCancellationSource.Token)
                                .ContinueWith(task => Schedule(() =>
                                {
+                                   if (task.Exception != null)
+                                       return;
+
                                    timedAttributes = task.GetResultSafely();
 
                                    IsValid = true;
 
                                    if (lastJudgement != null)
                                        onJudgementChanged(lastJudgement);
-                               }), TaskContinuationOptions.OnlyOnRanToCompletion);
+                               }));
             }
         }
 
@@ -198,7 +201,7 @@ namespace osu.Game.Screens.Play.HUD
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Text = @"pp",
+                            Text = BeatmapsetsStrings.ShowScoreboardHeaderspp,
                             Font = OsuFont.Numeric.With(size: 8),
                             Padding = new MarginPadding { Bottom = 1.5f }, // align baseline better
                         }

@@ -158,7 +158,7 @@ namespace osu.Game.Collections
             public Func<Vector2, bool> IsTextBoxHovered;
 
             [Resolved(CanBeNull = true)]
-            private DialogOverlay dialogOverlay { get; set; }
+            private IDialogOverlay dialogOverlay { get; set; }
 
             [Resolved(CanBeNull = true)]
             private CollectionManager collectionManager { get; set; }

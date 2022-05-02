@@ -99,8 +99,8 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 public override LocalisableString TooltipText =>
                     Current.Value == 0
-                        ? new TranslatableString("_", @"{0} ms", base.TooltipText)
-                        : new TranslatableString("_", @"{0} ms {1}", base.TooltipText, getEarlyLateText(Current.Value));
+                        ? LocalisableString.Interpolate($@"{base.TooltipText} ms")
+                        : LocalisableString.Interpolate($@"{base.TooltipText} ms {getEarlyLateText(Current.Value)}");
 
                 private LocalisableString getEarlyLateText(double value)
                 {

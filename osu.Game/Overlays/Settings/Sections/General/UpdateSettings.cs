@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private SettingsButton checkForUpdatesButton;
 
         [Resolved(CanBeNull = true)]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
         private void load(Storage storage, OsuConfigManager config, OsuGame game)

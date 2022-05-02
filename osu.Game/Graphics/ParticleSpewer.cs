@@ -109,6 +109,9 @@ namespace osu.Game.Graphics
             {
                 foreach (var p in particles)
                 {
+                    if (p.Duration == 0)
+                        continue;
+
                     float timeSinceStart = currentTime - p.StartTime;
 
                     // ignore particles from the future.

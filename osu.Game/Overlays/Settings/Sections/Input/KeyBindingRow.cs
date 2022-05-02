@@ -21,7 +21,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
-using osu.Game.Localisation;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
@@ -402,7 +402,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public CancelButton()
             {
-                Text = CommonStrings.Cancel;
+                Text = CommonStrings.ButtonsCancel;
                 Size = new Vector2(80, 20);
             }
         }
@@ -411,7 +411,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             public ClearButton()
             {
-                Text = CommonStrings.Clear;
+                Text = CommonStrings.ButtonsClear;
                 Size = new Vector2(80, 20);
             }
         }

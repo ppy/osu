@@ -26,14 +26,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Label="Project">
-    <!--
-    NU1701:
-      DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
-      This is required due to https://github.com/NuGet/Home/issues/5740
-    -->
-    <NoWarn>$(NoWarn);NU1701</NoWarn>
-  </PropertyGroup>
   <PropertyGroup Label="Nuget">
     <IsPackable>false</IsPackable>
     <Authors>ppy Pty Ltd</Authors>
@@ -42,7 +34,7 @@
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
     <Company>ppy Pty Ltd</Company>
-    <Copyright>Copyright (c) 2021 ppy Pty Ltd</Copyright>
+    <Copyright>Copyright (c) 2022 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
 </Project>

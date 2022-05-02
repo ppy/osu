@@ -457,7 +457,7 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value && !GameplayState.HasFailed;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             localUserPlaying.Value = inGameplay;
         }
@@ -607,30 +607,25 @@ namespace osu.Game.Screens.Play
         private ScheduledDelegate frameStablePlaybackResetDelegate;
 
         /// <summary>
-        /// Seeks to a specific time in gameplay, bypassing frame stability.
+        /// Specify and seek to a custom start time from which gameplay should be observed.
         /// </summary>
         /// <remarks>
-        /// Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
+        /// This performs a non-frame-stable seek. Intermediate hitobject judgements may not be applied or reverted correctly during this seek.
         /// </remarks>
         /// <param name="time">The destination time to seek to.</param>
-        internal void NonFrameStableSeek(double time)
+        protected void SetGameplayStartTime(double time)
         {
-            // TODO: This schedule should not be required and is a temporary hotfix.
-            // See https://github.com/ppy/osu/issues/17267 for the issue.
-            // See https://github.com/ppy/osu/pull/17302 for a better fix which needs some more time.
-            ScheduleAfterChildren(() =>
-            {
-                if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
-                    frameStablePlaybackResetDelegate.RunTask();
+            if (frameStablePlaybackResetDelegate?.Cancelled == false && !frameStablePlaybackResetDelegate.Completed)
+                frameStablePlaybackResetDelegate.RunTask();
 
-                bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
-                DrawableRuleset.FrameStablePlayback = false;
+            bool wasFrameStable = DrawableRuleset.FrameStablePlayback;
+            DrawableRuleset.FrameStablePlayback = false;
 
-                Seek(time);
+            GameplayClockContainer.StartTime = time;
+            GameplayClockContainer.Reset();
 
-                // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
-                frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
-            });
+            // Delay resetting frame-stable playback for one frame to give the FrameStabilityContainer a chance to seek.
+            frameStablePlaybackResetDelegate = ScheduleAfterChildren(() => DrawableRuleset.FrameStablePlayback = wasFrameStable);
         }
 
         /// <summary>
@@ -817,6 +812,8 @@ namespace osu.Game.Screens.Play
             GameplayState.HasFailed = true;
             Score.ScoreInfo.Passed = false;
 
+            updateGameplayState();
+
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
@@ -922,9 +919,9 @@ namespace osu.Game.Screens.Play
 
         #region Screen Logic
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
 
             if (!LoadedBeatmapSuccessfully)
                 return;
@@ -950,7 +947,7 @@ namespace osu.Game.Screens.Play
                 failAnimationLayer.Background = b;
             });
 
-            HUDOverlay.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            HUDOverlay.IsPlaying.BindTo(localUserPlaying);
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -987,18 +984,18 @@ namespace osu.Game.Screens.Play
             if (GameplayClockContainer.GameplayClock.IsRunning)
                 throw new InvalidOperationException($"{nameof(StartGameplay)} should not be called when the gameplay clock is already running");
 
-            GameplayClockContainer.Reset();
+            GameplayClockContainer.Reset(true);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
 
             fadeOut();
-            base.OnSuspending(next);
+            base.OnSuspending(e);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
             screenSuspension?.RemoveAndDisposeImmediately();
             failAnimationLayer?.RemoveFilters();
@@ -1029,7 +1026,7 @@ namespace osu.Game.Screens.Play
             musicController.ResetTrackAdjustments();
 
             fadeOut();
-            return base.OnExiting(next);
+            return base.OnExiting(e);
         }
 
         /// <summary>

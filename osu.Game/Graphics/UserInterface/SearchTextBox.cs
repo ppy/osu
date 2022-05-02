@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
 using osuTK.Input;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             TextFlow.Padding = new MarginPadding { Right = 35 };
-            PlaceholderText = "type to search";
+            PlaceholderText = HomeStrings.SearchPlaceholder;
         }
 
         public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)

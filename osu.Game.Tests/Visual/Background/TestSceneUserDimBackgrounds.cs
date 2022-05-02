@@ -359,9 +359,9 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() =>
                 new FadeAccessibleBackground(Beatmap.Value);
 
-            public override void OnEntering(IScreen last)
+            public override void OnEntering(ScreenTransitionEvent e)
             {
-                base.OnEntering(last);
+                base.OnEntering(e);
 
                 ApplyToBackground(b => ReplacesBackground.BindTo(b.StoryboardReplacesBackground));
             }

@@ -10,19 +10,19 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestScenePopupScreenTitle : OsuTestScene
+    public class TestSceneShearedOverlayHeader : OsuTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Test]
-        public void TestPopupScreenTitle()
+        public void TestShearedOverlayHeader()
         {
             AddStep("create content", () =>
             {
-                Child = new PopupScreenTitle
+                Child = new ShearedOverlayHeader
                 {
-                    Title = "Popup Screen Title",
+                    Title = "Sheared overlay header",
                     Description = string.Join(" ", Enumerable.Repeat("This is a description.", 20)),
                     Close = () => { }
                 };
@@ -34,9 +34,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create content", () =>
             {
-                Child = new PopupScreenTitle
+                Child = new ShearedOverlayHeader
                 {
-                    Title = "Popup Screen Title",
+                    Title = "Sheared overlay header",
                     Description = "This is a description."
                 };
             });

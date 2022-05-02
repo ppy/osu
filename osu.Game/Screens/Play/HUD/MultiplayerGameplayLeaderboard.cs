@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play.HUD
     {
         protected readonly Dictionary<int, TrackedUserData> UserScores = new Dictionary<int, TrackedUserData>();
 
-        public readonly SortedDictionary<int, BindableInt> TeamScores = new SortedDictionary<int, BindableInt>();
+        public readonly SortedDictionary<int, BindableLong> TeamScores = new SortedDictionary<int, BindableLong>();
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -75,21 +75,27 @@ namespace osu.Game.Screens.Play.HUD
             foreach (var user in playingUsers)
             {
                 var trackedUser = CreateUserData(user, ruleset, scoreProcessor);
+
                 trackedUser.ScoringMode.BindTo(scoringMode);
+                trackedUser.Score.BindValueChanged(_ => Scheduler.AddOnce(updateTotals));
+
                 UserScores[user.UserID] = trackedUser;
 
                 if (trackedUser.Team is int team && !TeamScores.ContainsKey(team))
-                    TeamScores.Add(team, new BindableInt());
+                    TeamScores.Add(team, new BindableLong());
             }
 
             userLookupCache.GetUsersAsync(playingUsers.Select(u => u.UserID).ToArray()).ContinueWith(task => Schedule(() =>
             {
                 var users = task.GetResultSafely();
 
-                foreach (var user in users)
+                for (int i = 0; i < users.Length; i++)
                 {
-                    if (user == null)
-                        continue;
+                    var user = users[i] ?? new APIUser
+                    {
+                        Id = playingUsers[i].UserID,
+                        Username = "Unknown user",
+                    };
 
                     var trackedUser = UserScores[user.Id];
 
@@ -175,8 +181,6 @@ namespace osu.Game.Screens.Play.HUD
 
             trackedData.Frames.Add(new TimedFrame(bundle.Frames.First().Time, bundle.Header));
             trackedData.UpdateScore();
-
-            updateTotals();
         });
 
         private void updateTotals()
@@ -227,14 +231,14 @@ namespace osu.Game.Screens.Play.HUD
 
             public int? Team => (User.MatchState as TeamVersusUserState)?.TeamID;
 
-            private readonly RulesetInfo ruleset;
+            private readonly ScoreInfo scoreInfo;
 
             public TrackedUserData(MultiplayerRoomUser user, RulesetInfo ruleset, ScoreProcessor scoreProcessor)
             {
-                this.ruleset = ruleset;
-
                 User = user;
                 ScoreProcessor = scoreProcessor;
+
+                scoreInfo = new ScoreInfo { Ruleset = ruleset };
 
                 ScoringMode.BindValueChanged(_ => UpdateScore());
             }
@@ -253,12 +257,10 @@ namespace osu.Game.Screens.Play.HUD
             {
                 var header = frame.Header;
 
-                Score.Value = ScoreProcessor.ComputePartialScore(ScoringMode.Value, new ScoreInfo
-                {
-                    Ruleset = ruleset,
-                    MaxCombo = header.MaxCombo,
-                    Statistics = header.Statistics
-                });
+                scoreInfo.MaxCombo = header.MaxCombo;
+                scoreInfo.Statistics = header.Statistics;
+
+                Score.Value = ScoreProcessor.ComputePartialScore(ScoringMode.Value, scoreInfo);
 
                 Accuracy.Value = header.Accuracy;
                 CurrentCombo.Value = header.Combo;

@@ -87,31 +87,33 @@ namespace osu.Game.Screens.Ranking
                     });
                 }
 
-                button.Enabled.Value = replayAvailability != ReplayAvailability.NotAvailable;
-                updateTooltip();
+                updateState();
             }, true);
 
             State.BindValueChanged(state =>
             {
                 button.State.Value = state.NewValue;
-                updateTooltip();
+                updateState();
             }, true);
         }
 
-        private void updateTooltip()
+        private void updateState()
         {
             switch (replayAvailability)
             {
                 case ReplayAvailability.Local:
                     button.TooltipText = @"watch replay";
+                    button.Enabled.Value = true;
                     break;
 
                 case ReplayAvailability.Online:
                     button.TooltipText = @"download replay";
+                    button.Enabled.Value = true;
                     break;
 
                 default:
                     button.TooltipText = @"replay unavailable";
+                    button.Enabled.Value = false;
                     break;
             }
         }

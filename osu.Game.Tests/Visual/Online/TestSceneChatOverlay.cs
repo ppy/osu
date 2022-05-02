@@ -534,11 +534,33 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddStep("Highlight message and open chat", () =>
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
+        }
+
+        [Test]
+        public void TestHighlightWithNullChannel()
+        {
+            Message message = null;
+
+            AddStep("Join channel 1", () => channelManager.JoinChannel(channel1));
+
+            AddStep("Send message in channel 1", () =>
             {
-                chatOverlay.HighlightMessage(message, channel1);
-                chatOverlay.Show();
+                channel1.AddNewMessages(message = new Message
+                {
+                    ChannelId = channel1.Id,
+                    Content = "Message to highlight!",
+                    Timestamp = DateTimeOffset.Now,
+                    Sender = new APIUser
+                    {
+                        Id = 2,
+                        Username = "Someone",
+                    }
+                });
             });
+
+            AddStep("Set null channel", () => channelManager.CurrentChannel.Value = null);
+            AddStep("Highlight message", () => chatOverlay.HighlightMessage(message, channel1));
         }
 
         private void pressChannelHotkey(int number)

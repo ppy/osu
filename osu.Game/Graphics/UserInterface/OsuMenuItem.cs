@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         {
         }
 
-        public OsuMenuItem(string text, MenuItemType type, Action action)
+        public OsuMenuItem(LocalisableString text, MenuItemType type, Action action)
             : base(text, action)
         {
             Type = type;

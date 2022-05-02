@@ -25,7 +25,7 @@ namespace osu.Game.Online.Rooms
     /// This differs from a regular download tracking composite as this accounts for the
     /// databased beatmap set's checksum, to disallow from playing with an altered version of the beatmap.
     /// </summary>
-    public sealed class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
+    public class OnlinePlayBeatmapAvailabilityTracker : CompositeDrawable
     {
         public readonly IBindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -41,7 +41,7 @@ namespace osu.Game.Online.Rooms
         /// <summary>
         /// The availability state of the currently selected playlist item.
         /// </summary>
-        public IBindable<BeatmapAvailability> Availability => availability;
+        public virtual IBindable<BeatmapAvailability> Availability => availability;
 
         private readonly Bindable<BeatmapAvailability> availability = new Bindable<BeatmapAvailability>(BeatmapAvailability.NotDownloaded());
 

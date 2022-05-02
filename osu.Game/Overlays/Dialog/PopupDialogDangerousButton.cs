@@ -12,36 +12,37 @@ namespace osu.Game.Overlays.Dialog
 {
     public class PopupDialogDangerousButton : PopupDialogButton
     {
+        private Box progressBox;
+        private DangerousConfirmContainer confirmContainer;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             ButtonColour = colours.Red3;
 
-            ColourContainer.Add(new ConfirmFillBox
+            ColourContainer.Add(progressBox = new Box
             {
-                Action = () => Action(),
                 RelativeSizeAxes = Axes.Both,
                 Blending = BlendingParameters.Additive,
             });
+
+            AddInternal(confirmContainer = new DangerousConfirmContainer
+            {
+                Action = () => Action(),
+                RelativeSizeAxes = Axes.Both,
+            });
         }
 
-        private class ConfirmFillBox : HoldToConfirmContainer
+        protected override void LoadComplete()
         {
-            private Box box;
+            base.LoadComplete();
 
+            confirmContainer.Progress.BindValueChanged(progress => progressBox.Width = (float)progress.NewValue, true);
+        }
+
+        private class DangerousConfirmContainer : HoldToConfirmContainer
+        {
             protected override double? HoldActivationDelay => 500;
-
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                Child = box = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                };
-
-                Progress.BindValueChanged(progress => box.Width = (float)progress.NewValue, true);
-            }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {

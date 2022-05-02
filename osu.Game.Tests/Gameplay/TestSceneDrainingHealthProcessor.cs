@@ -161,6 +161,40 @@ namespace osu.Game.Tests.Gameplay
         }
 
         [Test]
+        public void TestFailConditions()
+        {
+            var beatmap = createBeatmap(0, 1000);
+            createProcessor(beatmap);
+
+            AddStep("setup fail conditions", () => processor.FailConditions += ((_, result) => result.Type == HitResult.Miss));
+
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddAssert("not failed", () => !processor.HasFailed);
+            AddStep("apply miss hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Miss }));
+            AddAssert("failed", () => processor.HasFailed);
+        }
+
+        [TestCase(HitResult.Miss)]
+        [TestCase(HitResult.Meh)]
+        public void TestMultipleFailConditions(HitResult resultApplied)
+        {
+            var beatmap = createBeatmap(0, 1000);
+            createProcessor(beatmap);
+
+            AddStep("setup multiple fail conditions", () =>
+            {
+                processor.FailConditions += ((_, result) => result.Type == HitResult.Miss);
+                processor.FailConditions += ((_, result) => result.Type == HitResult.Meh);
+            });
+
+            AddStep("apply perfect hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = HitResult.Perfect }));
+            AddAssert("not failed", () => !processor.HasFailed);
+
+            AddStep($"apply {resultApplied.ToString().ToLower()} hit result", () => processor.ApplyResult(new JudgementResult(beatmap.HitObjects[0], new Judgement()) { Type = resultApplied }));
+            AddAssert("failed", () => processor.HasFailed);
+        }
+
+        [Test]
         public void TestBonusObjectsExcludedFromDrain()
         {
             var beatmap = new Beatmap
