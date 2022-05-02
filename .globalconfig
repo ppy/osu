@@ -1,0 +1,55 @@
+is_global = true
+
+# .NET Code Style
+# IDE styles reference: https://docs.microsoft.com/dotnet/fundamentals/code-analysis/style-rules/
+
+# IDE0001: Simplify names
+dotnet_diagnostic.IDE0001.severity = warning
+
+# IDE0002: Simplify member access
+dotnet_diagnostic.IDE0002.severity = warning
+
+# IDE0003: Remove qualification
+dotnet_diagnostic.IDE0003.severity = warning
+
+# IDE0004: Remove unnecessary cast
+dotnet_diagnostic.IDE0004.severity = warning
+
+# IDE0005: Remove unnecessary imports
+dotnet_diagnostic.IDE0005.severity = warning
+
+# IDE0034: Simplify default literal
+dotnet_diagnostic.IDE0034.severity = warning
+
+# IDE0036: Sort modifiers
+dotnet_diagnostic.IDE0036.severity = warning
+
+# IDE0040: Add accessibility modifier
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0049: Use keyword for type name
+dotnet_diagnostic.IDE0040.severity = warning
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = warning
+
+# IDE0051: Private method is unused
+dotnet_diagnostic.IDE0051.severity = silent
+
+# IDE0052: Private member is unused
+dotnet_diagnostic.IDE0052.severity = warning
+
+# IDE0073: File header
+dotnet_diagnostic.IDE0073.severity = warning
+
+# IDE0130: Namespace mismatch with folder
+dotnet_diagnostic.IDE0130.severity = warning
+
+# IDE1006: Naming style
+dotnet_diagnostic.IDE1006.severity = warning
+
+#Disable operator overloads requiring alternate named methods
+dotnet_diagnostic.CA2225.severity = none
+
+# Banned APIs
+dotnet_diagnostic.RS0030.severity = error
