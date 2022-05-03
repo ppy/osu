@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                 new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 20))
                 {
                     Colour = OverlayColourProvider.Content1,
-                    Text = "If you have an existing osu! install, you can also choose to import your existing beatmap collection.",
+                    Text = "如果您的设备上装有稳定版，您也可以选择导入这些谱面。",
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },

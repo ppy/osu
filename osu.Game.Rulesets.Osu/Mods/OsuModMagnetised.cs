@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModMagnetised : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "自瞄";
+        public override string Name => "磁铁";
         public override string Acronym => "MG";
         public override IconUsage? Icon => FontAwesome.Solid.Magnet;
         public override ModType Type => ModType.Fun;
