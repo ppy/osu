@@ -42,7 +42,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"练习跟上歌曲的节奏!";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(IRequiresApproachCircles) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[]
+        {
+            typeof(IRequiresApproachCircles),
+            typeof(OsuModRandom),
+            typeof(OsuModSpunOut),
+            typeof(OsuModStrictTracking),
+            typeof(OsuModSuddenDeath)
+        }).ToArray();
 
         [SettingSource("Seed", "Use a custom seed instead of a random one", SettingControlType = typeof(SettingsNumberBox))]
         public Bindable<int?> Seed { get; } = new Bindable<int?>

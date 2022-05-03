@@ -37,6 +37,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
+                    ClassicDefault = false,
                     LabelText = "渐出滑条",
                     Current = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },

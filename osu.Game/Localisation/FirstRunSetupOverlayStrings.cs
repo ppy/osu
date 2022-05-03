@@ -17,7 +17,8 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Click to resume first-run setup at any point"
         /// </summary>
-        public static LocalisableString ClickToResumeFirstRunSetupAtAnyPoint => new TranslatableString(getKey(@"click_to_resume_first_run_setup_at_any_point"), @"点击这里即可继续设置");
+        public static LocalisableString ClickToResumeFirstRunSetupAtAnyPoint =>
+            new TranslatableString(getKey(@"click_to_resume_first_run_setup_at_any_point"), @"Click to resume first-run setup at any point");
 
         /// <summary>
         /// "First-run setup"
@@ -49,9 +50,29 @@ osu!是一款高度可自定义的游戏，直接点开设置有时可能会让�
         public static LocalisableString UIScaleDescription => new TranslatableString(getKey(@"ui_scale_description"), @"osu!的界面大小可以根据你的喜好自由调整");
 
         /// <summary>
-        /// "Next ({0})"
+        /// "Behaviour"
         /// </summary>
-        public static LocalisableString Next(LocalisableString nextStepDescription) => new TranslatableString(getKey(@"next"), @"下一步 ({0})", nextStepDescription);
+        public static LocalisableString Behaviour => new TranslatableString(getKey(@"behaviour"), @"Behaviour");
+
+        /// <summary>
+        /// "Some new defaults for game behaviours have been implemented, with the aim of improving the game experience and making it more accessible to everyone.
+        ///
+        /// We recommend you give the new defaults a try, but if you&#39;d like to have things feel more like classic versions of osu!, you can easily apply some sane defaults below."
+        /// </summary>
+        public static LocalisableString BehaviourDescription => new TranslatableString(getKey(@"behaviour_description"),
+            @"Some new defaults for game behaviours have been implemented, with the aim of improving the game experience and making it more accessible to everyone.
+
+We recommend you give the new defaults a try, but if you'd like to have things feel more like classic versions of osu!, you can easily apply some sane defaults below.");
+
+        /// <summary>
+        /// "New defaults"
+        /// </summary>
+        public static LocalisableString NewDefaults => new TranslatableString(getKey(@"new_defaults"), @"New defaults");
+
+        /// <summary>
+        /// "Classic defaults"
+        /// </summary>
+        public static LocalisableString ClassicDefaults => new TranslatableString(getKey(@"classic_defaults"), @"Classic defaults");
 
         private static string getKey(string key) => $@"{prefix}:{key}";
     }

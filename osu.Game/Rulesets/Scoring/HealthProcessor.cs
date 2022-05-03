@@ -43,11 +43,11 @@ namespace osu.Game.Rulesets.Scoring
 
             Health.Value += GetHealthIncreaseFor(result);
 
-            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
-                return;
-
-            if (Failed?.Invoke() != false)
-                HasFailed = true;
+            if (meetsAnyFailCondition(result))
+            {
+                if (Failed?.Invoke() != false)
+                    HasFailed = true;
+            }
         }
 
         protected override void RevertResultInternal(JudgementResult result)
@@ -68,6 +68,28 @@ namespace osu.Game.Rulesets.Scoring
         /// The default conditions for failing.
         /// </summary>
         protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
+
+        /// <summary>
+        /// Whether the current state of <see cref="HealthProcessor"/> or the provided <paramref name="result"/> meets any fail condition.
+        /// </summary>
+        /// <param name="result">The judgement result.</param>
+        private bool meetsAnyFailCondition(JudgementResult result)
+        {
+            if (DefaultFailCondition)
+                return true;
+
+            if (FailConditions != null)
+            {
+                foreach (var condition in FailConditions.GetInvocationList())
+                {
+                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result });
+                    if (conditionResult)
+                        return true;
+                }
+            }
+
+            return false;
+        }
 
         protected override void Reset(bool storeResults)
         {

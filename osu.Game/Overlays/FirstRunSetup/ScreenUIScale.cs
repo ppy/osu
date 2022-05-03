@@ -27,6 +27,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.FirstRunSetup
 {
+    [LocalisableDescription(typeof(GraphicsSettingsStrings), nameof(GraphicsSettingsStrings.UIScaling))]
     public class ScreenUIScale : FirstRunSetupScreen
     {
         [BackgroundDependencyLoader]
@@ -98,6 +99,8 @@ namespace osu.Game.Overlays.FirstRunSetup
         private class NestedSongSelect : PlaySongSelect
         {
             protected override bool ControlGlobalMusic => false;
+
+            public override bool? AllowTrackAdjustments => false;
         }
 
         private class PinnedMainMenu : MainMenu

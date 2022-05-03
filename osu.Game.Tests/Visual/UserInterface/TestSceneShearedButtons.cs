@@ -11,10 +11,61 @@ using osuTK.Input;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneShearedToggleButton : OsuManualInputManagerTestScene
+    public class TestSceneShearedButtons : OsuManualInputManagerTestScene
     {
         [Cached]
         private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestShearedButton(bool bigButton)
+        {
+            ShearedButton button = null;
+            bool actionFired = false;
+
+            AddStep("create button", () =>
+            {
+                actionFired = false;
+
+                if (bigButton)
+                {
+                    Child = button = new ShearedButton(400)
+                    {
+                        LighterColour = Colour4.FromHex("#FFFFFF"),
+                        DarkerColour = Colour4.FromHex("#FFCC22"),
+                        TextColour = Colour4.Black,
+                        TextSize = 36,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "Let's GO!",
+                        Height = 80,
+                        Action = () => actionFired = true,
+                    };
+                }
+                else
+                {
+                    Child = button = new ShearedButton(200)
+                    {
+                        LighterColour = Colour4.FromHex("#FF86DD"),
+                        DarkerColour = Colour4.FromHex("#DE31AE"),
+                        TextColour = Colour4.White,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Text = "Press me",
+                        Height = 80,
+                        Action = () => actionFired = true,
+                    };
+                }
+            });
+
+            AddStep("set disabled", () => button.Enabled.Value = false);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action not fired", () => !actionFired);
+
+            AddStep("set enabled", () => button.Enabled.Value = true);
+            AddStep("press button", () => button.TriggerClick());
+            AddAssert("action fired", () => actionFired);
+        }
 
         [Test]
         public void TestShearedToggleButton()

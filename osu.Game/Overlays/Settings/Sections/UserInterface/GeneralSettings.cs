@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     LabelText = UserInterfaceStrings.CursorRotation,
                     Current = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
-                new SettingsSlider<float, SizeSlider>
+                new SettingsSlider<float, SizeSlider<float>>
                 {
                     LabelText = UserInterfaceStrings.MenuCursorSize,
                     Current = config.GetBindable<float>(OsuSetting.MenuCursorSize),
@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
+                    ClassicDefault = 0,
                     LabelText = UserInterfaceStrings.HoldToConfirmActivationTime,
                     Current = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay),
                     Keywords = new[] { @"delay" },
