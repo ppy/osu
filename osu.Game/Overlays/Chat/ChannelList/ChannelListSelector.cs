@@ -21,6 +21,10 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private Box hoverBox = null!;
         private Box selectBox = null!;
+        private OsuSpriteText text = null!;
+
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -46,7 +50,7 @@ namespace osu.Game.Overlays.Chat.ChannelList
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Left = 18, Right = 10 },
-                    Child = new OsuSpriteText
+                    Child = text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -68,9 +72,15 @@ namespace osu.Game.Overlays.Chat.ChannelList
             SelectorActive.BindValueChanged(selector =>
             {
                 if (selector.NewValue)
+                {
+                    text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
                     selectBox.FadeIn(300, Easing.OutQuint);
+                }
                 else
+                {
+                    text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
                     selectBox.FadeOut(200, Easing.OutQuint);
+                }
             }, true);
 
             Action = () => SelectorActive.Value = true;
