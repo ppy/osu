@@ -181,7 +181,7 @@ namespace osu.Game.Overlays.Chat.Selection
             base.PopOut();
         }
 
-        private class HeaderSearchTextBox : SearchTextBox
+        private class HeaderSearchTextBox : BasicSearchTextBox
         {
             [BackgroundDependencyLoader]
             private void load()
