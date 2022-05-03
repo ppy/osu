@@ -27,7 +27,6 @@ namespace osu.Game.Extensions
             {
                 child.RotateTo(-parentRotation);
 
-                // Checking rotations idea taken from https://github.com/ppy/osu/pull/15347/files
                 int parentRotationInQuarterTurns = (int)Math.Floor(parentRotation / 90);
                 if (parentRotationInQuarterTurns % 2 != 0)
                     child.ScaleTo(new Vector2(parentScale.Y, parentScale.X));
