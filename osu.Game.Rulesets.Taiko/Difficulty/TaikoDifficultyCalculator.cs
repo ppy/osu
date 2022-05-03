@@ -141,7 +141,13 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 double colourPeak = colourPeaks[i] * colour_skill_multiplier;
                 double rhythmPeak = rhythmPeaks[i] * rhythm_skill_multiplier;
                 double staminaPeak = (staminaRightPeaks[i] + staminaLeftPeaks[i]) * stamina_skill_multiplier * staminaPenalty;
-                peaks.Add(norm(2, colourPeak, rhythmPeak, staminaPeak));
+
+                double peak = norm(2, colourPeak, rhythmPeak, staminaPeak);
+
+                // Sections with 0 strain are excluded to avoid worst-case time complexity of the following sort (e.g. /b/2351871).
+                // These sections will not contribute to the difficulty.
+                if (peak > 0)
+                    peaks.Add(peak);
             }
 
             double difficulty = 0;
