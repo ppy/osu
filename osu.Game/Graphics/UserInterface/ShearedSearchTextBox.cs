@@ -8,14 +8,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -113,9 +110,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool HandleNonPositionalInput => TextBox.HandleNonPositionalInput;
 
-        private class SearchTextBox : FocusedTextBox
+        private class InnerSearchTextBox : SearchTextBox
         {
-            protected virtual bool AllowCommit => false;
 
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
@@ -136,58 +132,6 @@ namespace osu.Game.Graphics.UserInterface
                 AutoSizeAxes = Axes.Both,
                 Child = new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold) },
             };
-
-            public override bool OnPressed(KeyBindingPressEvent<PlatformAction> e)
-            {
-                switch (e.Action)
-                {
-                    case PlatformAction.MoveBackwardLine:
-                    case PlatformAction.MoveForwardLine:
-                    // Shift+delete is handled via PlatformAction on macOS. this is not so useful in the context of a SearchTextBox
-                    // as we do not allow arrow key navigation in the first place (ie. the caret should always be at the end of text)
-                    // Avoid handling it here to allow other components to potentially consume the shortcut.
-                    case PlatformAction.DeleteForwardChar:
-                        return false;
-                }
-
-                return base.OnPressed(e);
-            }
-
-            protected override bool OnKeyDown(KeyDownEvent e)
-            {
-                if (!e.ControlPressed && !e.ShiftPressed)
-                {
-                    switch (e.Key)
-                    {
-                        case Key.Left:
-                        case Key.Right:
-                        case Key.Up:
-                        case Key.Down:
-                            return false;
-                    }
-                }
-
-                if (!AllowCommit)
-                {
-                    switch (e.Key)
-                    {
-                        case Key.KeypadEnter:
-                        case Key.Enter:
-                            return false;
-                    }
-                }
-
-                if (e.ShiftPressed)
-                {
-                    switch (e.Key)
-                    {
-                        case Key.Delete:
-                            return false;
-                    }
-                }
-
-                return base.OnKeyDown(e);
-            }
         }
     }
 }
