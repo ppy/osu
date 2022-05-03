@@ -11,8 +11,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
+using osu.Game.Resources.Localisation.Web;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -132,14 +132,29 @@ namespace osu.Game.Graphics.UserInterface
             {
                 BackgroundFocused = colourProvider.Background4;
                 BackgroundUnfocused = colourProvider.Background4;
-                Placeholder.Colour = Color4.White;
-                PlaceholderText = @"Search";
+
+                Placeholder.Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.SemiBold);
+                PlaceholderText = CommonStrings.InputSearch;
             }
 
-            protected override SpriteText CreatePlaceholder() => new OsuSpriteText
+            protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();
+
+            internal class SearchPlaceholder : SpriteText
             {
-                Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold)
-            };
+                public override void Show()
+                {
+                    this
+                        .MoveToY(0, 250, Easing.OutQuint)
+                        .FadeIn(250, Easing.OutQuint);
+                }
+
+                public override void Hide()
+                {
+                    this
+                        .MoveToY(3, 250, Easing.OutQuint)
+                        .FadeOut(250, Easing.OutQuint);
+                }
+            }
 
             protected override Drawable GetDrawableCharacter(char c) => new FallingDownContainer
             {
