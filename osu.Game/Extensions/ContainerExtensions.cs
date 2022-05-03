@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osuTK;
 
 namespace osu.Game.Extensions
@@ -19,10 +19,16 @@ namespace osu.Game.Extensions
         {
             float parentRotation = parent.Rotation;
             Vector2 parentScale = parent.Scale;
+
             foreach (Drawable child in target)
             {
                 child.RotateTo(-parentRotation);
-                child.ScaleTo(parentScale);
+
+                int parentRotationInQuarterTurns = (int)Math.Floor(parentRotation / 90);
+                if (parentRotationInQuarterTurns % 2 != 0)
+                    child.ScaleTo(new Vector2(parentScale.Y, parentScale.X));
+                else
+                    child.ScaleTo(parentScale);
             }
         }
     }
