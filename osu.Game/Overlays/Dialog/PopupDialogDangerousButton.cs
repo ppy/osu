@@ -12,6 +12,8 @@ namespace osu.Game.Overlays.Dialog
 {
     public class PopupDialogDangerousButton : PopupDialogButton
     {
+        public const double DANGEROUS_HOLD_ACTIVATION_DELAY = 500;
+
         private Box progressBox;
         private DangerousConfirmContainer confirmContainer;
 
@@ -42,7 +44,7 @@ namespace osu.Game.Overlays.Dialog
 
         private class DangerousConfirmContainer : HoldToConfirmContainer
         {
-            protected override double? HoldActivationDelay => 500;
+            protected override double? HoldActivationDelay => DANGEROUS_HOLD_ACTIVATION_DELAY;
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {

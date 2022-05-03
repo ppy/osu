@@ -40,9 +40,13 @@ namespace osu.Game.Graphics.Containers
 
         private Bindable<double> holdActivationDelay;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             holdActivationDelay = HoldActivationDelay != null
                 ? new Bindable<double>(HoldActivationDelay.Value)
                 : config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
