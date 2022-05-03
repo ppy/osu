@@ -22,17 +22,27 @@ namespace osu.Game.Graphics.UserInterface
         private const float corner_radius = 7;
         private const float height = 42;
         private readonly Vector2 shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
-
-        public FocusedTextBox TextBox;
+        private readonly Box background;
+        private readonly Box searchBoxBackground;
+        private readonly SearchTextBox textBox;
 
         public Bindable<string> Current
         {
-            get => TextBox.Current;
-            set => TextBox.Current = value;
+            get => textBox.Current;
+            set => textBox.Current = value;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
+        public bool HoldFocus
+        {
+            get => textBox.HoldFocus;
+            set => textBox.HoldFocus = value;
+        }
+
+        public void TakeFocus() => textBox.TakeFocus();
+
+        public void KillFocus() => textBox.KillFocus();
+
+        public ShearedSearchTextBox()
         {
             Height = height;
             Shear = shear;
@@ -43,9 +53,8 @@ namespace osu.Game.Graphics.UserInterface
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
-                        Colour = colourProvider.Background3,
                         RelativeSizeAxes = Axes.Both
                     },
                     new GridContainer
@@ -63,12 +72,11 @@ namespace osu.Game.Graphics.UserInterface
                                     Masking = true,
                                     Children = new Drawable[]
                                     {
-                                        new Box
+                                        searchBoxBackground = new Box
                                         {
-                                            Colour = colourProvider.Background4,
                                             RelativeSizeAxes = Axes.Both
                                         },
-                                        TextBox = new SearchTextBox
+                                        textBox = new InnerSearchTextBox
                                         {
                                             Shear = -shear,
                                             Anchor = Anchor.CentreLeft,
@@ -108,11 +116,17 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public override bool HandleNonPositionalInput => TextBox.HandleNonPositionalInput;
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
+        {
+            background.Colour = colourProvider.Background3;
+            searchBoxBackground.Colour = colourProvider.Background4;
+        }
+
+        public override bool HandleNonPositionalInput => textBox.HandleNonPositionalInput;
 
         private class InnerSearchTextBox : SearchTextBox
         {
-
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
