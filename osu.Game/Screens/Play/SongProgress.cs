@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
 
-        private float previousUpdateRotation;
-        private Vector2 previousUpdateScale;
+        private float previousUpdateRotation = 0;
+        private Vector2 previousUpdateScale = new Vector2(1);
 
         public Action<double> RequestSeek;
 
@@ -135,9 +135,6 @@ namespace osu.Game.Screens.Play
             }
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
-
-            previousUpdateRotation = Rotation;
-            previousUpdateScale = Scale;
         }
 
         protected override void LoadComplete()
