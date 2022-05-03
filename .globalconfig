@@ -37,7 +37,7 @@ dotnet_diagnostic.IDE0055.severity = warning
 dotnet_diagnostic.IDE0051.severity = silent
 
 # IDE0052: Private member is unused
-dotnet_diagnostic.IDE0052.severity = warning
+dotnet_diagnostic.IDE0052.severity = silent
 
 # IDE0073: File header
 dotnet_diagnostic.IDE0073.severity = warning
