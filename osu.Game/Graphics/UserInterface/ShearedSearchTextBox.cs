@@ -66,31 +66,20 @@ namespace osu.Game.Graphics.UserInterface
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One
                             },
-                            new Container
+                            new SpriteIcon
                             {
-                                Name = @"Icon container",
-                                RelativeSizeAxes = Axes.Y,
-                                Width = 50,
-                                Origin = Anchor.CentreRight,
-                                Anchor = Anchor.CentreRight,
-                                Children = new Drawable[]
-                                {
-                                    new SpriteIcon
-                                    {
-                                        Icon = FontAwesome.Solid.Search,
-                                        Origin = Anchor.Centre,
-                                        Anchor = Anchor.Centre,
-                                        Size = new Vector2(16),
-                                        Shear = -Shear
-                                    }
-                                }
+                                Icon = FontAwesome.Solid.Search,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                Size = new Vector2(16),
+                                Shear = -Shear
                             }
                         }
                     },
                     ColumnDimensions = new[]
                     {
                         new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize)
+                        new Dimension(GridSizeMode.Absolute, 50),
                     }
                 }
             };
