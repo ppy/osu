@@ -3,14 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System;
 
 namespace osu.Game.Screens.Play
 {
-    public class SongProgressInfo : Container
+    public class SongProgressInfo : AlwaysUprightContainer
     {
         private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;

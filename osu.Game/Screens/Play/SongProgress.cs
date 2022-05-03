@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
-using osu.Game.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -35,9 +34,6 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
-
-        private float previousUpdateRotation = 0;
-        private Vector2 previousUpdateScale = new Vector2(1);
 
         public Action<double> RequestSeek;
 
@@ -221,10 +217,6 @@ namespace osu.Game.Screens.Play
             graph.Progress = (int)(graph.ColumnCount * progress);
 
             Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
-
-            info.KeepChildrenUpright(this, previousUpdateRotation, previousUpdateScale);
-            previousUpdateRotation = Rotation;
-            previousUpdateScale = Scale;
         }
 
         private void updateBarVisibility()

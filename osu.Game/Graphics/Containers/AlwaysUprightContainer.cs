@@ -7,23 +7,24 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Extensions
+namespace osu.Game.Graphics.Containers
 {
-    public static class ContainerExtensions
+    /// <summary>
+    /// A container whose children stay upright, even as the container's parent transforms.
+    /// </summary>
+    public class AlwaysUprightContainer : Container
     {
-        /// <summary>
-        /// Prevents this container's children from transforming when the container transforms.
-        /// </summary>
-        /// <param name="target">The target to prevent its children from transforming.</param>
-        /// <param name="parent">The parent of the target.</param>
-        /// <param name="previousParentRotation">The parent's rotation in the previous update cycle.</param>
-        /// <param name="previousParentScale">The parent's scale in the previous update cycle.</param>
-        public static void KeepChildrenUpright(this Container target, Container parent, float previousParentRotation, Vector2 previousParentScale)
-        {
-            float parentRotation = parent.Rotation;
-            Vector2 parentScale = parent.Scale;
+        private float previousParentRotation;
+        private Vector2 previousParentScale = new Vector2(1);
 
-            foreach (Drawable child in target)
+        protected override void Update()
+        {
+            base.Update();
+
+            float parentRotation = Parent.Rotation;
+            Vector2 parentScale = Parent.Scale;
+
+            foreach (Drawable child in Children)
             {
                 child.RotateTo(-parentRotation);
 
@@ -75,9 +76,12 @@ namespace osu.Game.Extensions
                         child.Origin = flipAnchorY(child.Origin);
                 }
             }
+
+            previousParentRotation = parentRotation;
+            previousParentScale = parentScale;
         }
 
-        private static Anchor rotateAnchor90(Anchor anchor, bool clockwise)
+        private Anchor rotateAnchor90(Anchor anchor, bool clockwise)
         {
             switch (anchor)
             {
@@ -128,7 +132,7 @@ namespace osu.Game.Extensions
             return anchor;
         }
 
-        private static Anchor flipAnchorXY(Anchor anchor)
+        private Anchor flipAnchorXY(Anchor anchor)
         {
             anchor = flipAnchorX(anchor);
             anchor = flipAnchorY(anchor);
@@ -136,7 +140,7 @@ namespace osu.Game.Extensions
             return anchor;
         }
 
-        private static Anchor flipAnchorX(Anchor anchor)
+        private Anchor flipAnchorX(Anchor anchor)
         {
             Anchor anchorX = getAnchorX(anchor);
             Anchor anchorY = getAnchorY(anchor);
@@ -163,7 +167,7 @@ namespace osu.Game.Extensions
             return flippedAnchorX | anchorY;
         }
 
-        private static Anchor flipAnchorY(Anchor anchor)
+        private Anchor flipAnchorY(Anchor anchor)
         {
             Anchor anchorX = getAnchorX(anchor);
             Anchor anchorY = getAnchorY(anchor);
@@ -190,7 +194,7 @@ namespace osu.Game.Extensions
             return anchorX | flippedAnchorY;
         }
 
-        private static Anchor getAnchorX(Anchor anchor)
+        private Anchor getAnchorX(Anchor anchor)
         {
             if (anchor.HasFlagFast(Anchor.x0)) return Anchor.x0;
 
@@ -201,7 +205,7 @@ namespace osu.Game.Extensions
             throw new ArgumentOutOfRangeException();
         }
 
-        private static Anchor getAnchorY(Anchor anchor)
+        private Anchor getAnchorY(Anchor anchor)
         {
             if (anchor.HasFlagFast(Anchor.y0)) return Anchor.y0;
 
