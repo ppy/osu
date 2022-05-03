@@ -11,9 +11,9 @@ namespace osu.Game.Extensions
     public static class ContainerExtensions
     {
         /// <summary>
-        /// Keeps the transformations of this container's children upright relative to the container's parent.
+        /// Prevents this container's children from transforming when the container transforms.
         /// </summary>
-        /// <param name="target">The target to prevent keep its childrens' transformation.</param>
+        /// <param name="target">The target to prevent its children from transforming.</param>
         /// <param name="parent">The parent of the target.</param>
         public static void KeepChildrenUpright(this Container target, Container parent)
         {
