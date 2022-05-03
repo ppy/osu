@@ -68,6 +68,7 @@ namespace osu.Game.Overlays.Chat
                                 RelativeSizeAxes = Axes.Y,
                                 Width = chatting_text_width,
                                 Masking = true,
+                                Padding = new MarginPadding { Right = 5 },
                                 Child = chattingText = new OsuSpriteText
                                 {
                                     Font = OsuFont.Torus.With(size: 20),
