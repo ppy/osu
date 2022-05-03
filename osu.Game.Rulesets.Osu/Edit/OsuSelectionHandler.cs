@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Edit
     public class OsuSelectionHandler : EditorSelectionHandler
     {
         [Resolved(CanBeNull = true)]
-        private IPositionSnapProvider? positionSnapProvider { get; set; }
+        private IDistanceSnapProvider? snapProvider { get; set; }
 
         /// <summary>
         /// During a transform, the initial origin is stored so it can be used throughout the operation.
@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             // Snap the slider's length to the current beat divisor
             // to calculate the final resulting duration / bounding box before the final checks.
-            slider.SnapTo(positionSnapProvider);
+            slider.SnapTo(snapProvider);
 
             //if sliderhead or sliderend end up outside playfield, revert scaling.
             Quad scaledQuad = getSurroundingQuad(new OsuHitObject[] { slider });
@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 point.Position = oldControlPoints.Dequeue();
 
             // Snap the slider's length again to undo the potentially-invalid length applied by the previous snap.
-            slider.SnapTo(positionSnapProvider);
+            slider.SnapTo(snapProvider);
         }
 
         private void scaleHitObjects(OsuHitObject[] hitObjects, Anchor reference, Vector2 scale)

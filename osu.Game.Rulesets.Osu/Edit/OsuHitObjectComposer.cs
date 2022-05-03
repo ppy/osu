@@ -24,7 +24,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>
+    public class OsuHitObjectComposer : DistancedHitObjectComposer<OsuHitObject>
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)

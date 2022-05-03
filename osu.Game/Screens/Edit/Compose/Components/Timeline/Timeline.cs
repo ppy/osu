@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
@@ -316,15 +315,5 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private double getTimeFromPosition(Vector2 localPosition) =>
             (localPosition.X / Content.DrawWidth) * track.Length;
-
-        public float GetBeatSnapDistanceAt(HitObject referenceObject) => throw new NotImplementedException();
-
-        public float DurationToDistance(HitObject referenceObject, double duration) => throw new NotImplementedException();
-
-        public double DistanceToDuration(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
-
-        public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance) => throw new NotImplementedException();
     }
 }
