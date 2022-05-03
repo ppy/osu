@@ -65,6 +65,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         private void saveCurrentPeak()
         {
+            // Ignore sections with 0 strain to avoid edge cases of long maps with a lot of spacing between objects (e.g. /b/2351871).
+            if (currentSectionPeak == 0)
+                return;
+
             strainPeaks.Add(currentSectionPeak);
         }
 
