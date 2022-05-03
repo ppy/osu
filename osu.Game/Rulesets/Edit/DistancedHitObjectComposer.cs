@@ -3,12 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -36,6 +40,9 @@ namespace osu.Game.Rulesets.Edit
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
         private bool distanceSpacingScrollActive;
+
+        [Resolved]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         protected DistancedHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -72,6 +79,10 @@ namespace osu.Game.Rulesets.Edit
                 {
                     distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
                     distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
+
+                    if (v.NewValue != v.OldValue)
+                        onScreenDisplay.Display(new DistanceSpacingToast(v.NewValue.ToLocalisableString(@"0.##x")));
+
                     EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
                 }, true);
             }
@@ -81,7 +92,6 @@ namespace osu.Game.Rulesets.Edit
         {
             if (!DistanceSpacingMultiplier.Disabled && e.Action == GlobalAction.EditorDistanceSpacing)
             {
-                RightSideToolboxContainer.Expanded.Value = true;
                 distanceSpacingScrollActive = true;
                 return true;
             }
@@ -92,10 +102,7 @@ namespace osu.Game.Rulesets.Edit
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
             if (!DistanceSpacingMultiplier.Disabled && e.Action == GlobalAction.EditorDistanceSpacing)
-            {
-                RightSideToolboxContainer.Expanded.Value = false;
                 distanceSpacingScrollActive = false;
-            }
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -158,6 +165,14 @@ namespace osu.Game.Rulesets.Edit
                 Padding = new MarginPadding { Left = 10 };
 
                 FillFlow.Spacing = new Vector2(10);
+            }
+        }
+
+        private class DistanceSpacingToast : Toast
+        {
+            public DistanceSpacingToast(LocalisableString value)
+                : base("Distance Spacing", value, string.Empty)
+            {
             }
         }
     }
