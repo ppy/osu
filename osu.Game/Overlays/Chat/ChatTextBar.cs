@@ -26,6 +26,10 @@ namespace osu.Game.Overlays.Chat
 
         public event Action<string>? OnSearchTermsChanged;
 
+        public void TextBoxTakeFocus() => chatTextBox.TakeFocus();
+
+        public void TextBoxKillFocus() => chatTextBox.KillFocus();
+
         [Resolved]
         private Bindable<Channel> currentChannel { get; set; } = null!;
 
