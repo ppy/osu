@@ -18,10 +18,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ShearedSearchTextBox : CompositeDrawable, IHasCurrentValue<string>
     {
-        private const float icon_container_width = 50;
         private const float corner_radius = 7;
-        private const float height = 42;
-        private readonly Vector2 shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
+
         private readonly Box background;
         private readonly Box searchBoxBackground;
         private readonly SearchTextBox textBox;
@@ -44,8 +42,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public ShearedSearchTextBox()
         {
-            Height = height;
-            Shear = shear;
+            Height = 42;
+            Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
             Masking = true;
             CornerRadius = corner_radius;
             InternalChild = new Container
@@ -78,13 +76,13 @@ namespace osu.Game.Graphics.UserInterface
                                         },
                                         textBox = new InnerSearchTextBox
                                         {
-                                            Shear = -shear,
+                                            Shear = -new Vector2(ShearedOverlayContainer.SHEAR, 0),
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
                                             RelativeSizeAxes = Axes.X,
                                             Padding = new MarginPadding
                                             {
-                                                Horizontal = corner_radius + shear.X
+                                                Horizontal = corner_radius + new Vector2(ShearedOverlayContainer.SHEAR, 0).X
                                             }
                                         }
                                     }
@@ -93,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
                                 {
                                     Name = @"Icon container",
                                     RelativeSizeAxes = Axes.Y,
-                                    Width = icon_container_width,
+                                    Width = 50,
                                     Origin = Anchor.CentreRight,
                                     Anchor = Anchor.CentreRight,
                                     Children = new Drawable[]
@@ -104,13 +102,17 @@ namespace osu.Game.Graphics.UserInterface
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.Centre,
                                             Size = new Vector2(16),
-                                            Shear = -shear
+                                            Shear = -new Vector2(ShearedOverlayContainer.SHEAR, 0)
                                         }
                                     }
                                 }
                             }
                         },
-                        ColumnDimensions = new[] { new Dimension(), new Dimension(GridSizeMode.AutoSize) }
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(),
+                            new Dimension(GridSizeMode.AutoSize)
+                        }
                     }
                 }
             };
