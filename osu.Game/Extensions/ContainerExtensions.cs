@@ -80,44 +80,42 @@ namespace osu.Game.Extensions
 
         private static Anchor rotateAnchor90(Anchor anchor, bool clockwise)
         {
-            Anchor rotatedAnchor;
-
             switch (anchor)
             {
                 case Anchor.TopLeft:
-                    rotatedAnchor = Anchor.TopRight;
+                    anchor = Anchor.TopRight;
                     break;
 
                 case Anchor.TopCentre:
-                    rotatedAnchor = Anchor.CentreRight;
+                    anchor = Anchor.CentreRight;
                     break;
 
                 case Anchor.TopRight:
-                    rotatedAnchor = Anchor.BottomRight;
+                    anchor = Anchor.BottomRight;
                     break;
 
                 case Anchor.CentreLeft:
-                    rotatedAnchor = Anchor.TopCentre;
+                    anchor = Anchor.TopCentre;
                     break;
 
                 case Anchor.Centre:
-                    rotatedAnchor = Anchor.Centre;
+                    anchor = Anchor.Centre;
                     break;
 
                 case Anchor.CentreRight:
-                    rotatedAnchor = Anchor.BottomCentre;
+                    anchor = Anchor.BottomCentre;
                     break;
 
                 case Anchor.BottomLeft:
-                    rotatedAnchor = Anchor.TopLeft;
+                    anchor = Anchor.TopLeft;
                     break;
 
                 case Anchor.BottomCentre:
-                    rotatedAnchor = Anchor.CentreLeft;
+                    anchor = Anchor.CentreLeft;
                     break;
 
                 case Anchor.BottomRight:
-                    rotatedAnchor = Anchor.BottomLeft;
+                    anchor = Anchor.BottomLeft;
                     break;
 
                 default: throw new ArgumentOutOfRangeException();
@@ -125,10 +123,10 @@ namespace osu.Game.Extensions
 
             if (!clockwise)
             {
-                rotatedAnchor = flipAnchorXY(rotatedAnchor);
+                anchor = flipAnchorXY(anchor);
             }
 
-            return rotatedAnchor;
+            return anchor;
         }
 
         private static Anchor flipAnchorXY(Anchor anchor)
