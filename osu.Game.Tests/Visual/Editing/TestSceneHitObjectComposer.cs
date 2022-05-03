@@ -21,6 +21,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Editing
 {
@@ -84,6 +85,23 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
             AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
             AddAssert("Tool changed", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is HitCircleCompositionTool);
+        }
+
+        [Test]
+        public void TestDistanceSpacingHotkeys()
+        {
+            double originalSpacing = 0;
+
+            AddStep("retrieve original spacing", () => originalSpacing = editorBeatmap.BeatmapInfo.DistanceSpacing);
+
+            AddStep("hold ctrl", () => InputManager.PressKey(Key.LControl));
+            AddStep("hold alt", () => InputManager.PressKey(Key.LAlt));
+
+            AddStep("scroll mouse 5 steps", () => InputManager.ScrollVerticalBy(5));
+            AddAssert("distance spacing increased by 0.5", () => editorBeatmap.BeatmapInfo.DistanceSpacing == originalSpacing + 0.5);
+
+            AddStep("release alt", () => InputManager.ReleaseKey(Key.LAlt));
+            AddStep("release ctrl", () => InputManager.ReleaseKey(Key.LControl));
         }
 
         public class EditorBeatmapContainer : Container
