@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays.Dialog;
 using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
@@ -36,6 +37,14 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private readonly OsuSpriteText text;
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
+
+        private readonly Bindable<double> activationDelay = new Bindable<double>();
 
         public HoldForMenuButton()
         {
@@ -60,14 +69,15 @@ namespace osu.Game.Screens.Play.HUD
             AutoSizeAxes = Axes.Both;
         }
 
-        [Resolved]
-        private OsuConfigManager config { get; set; }
-
-        private Bindable<double> activationDelay;
-
         protected override void LoadComplete()
         {
-            activationDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
+            if (player?.Configuration.AllowRestart == false)
+            {
+                activationDelay.Value = PopupDialogDangerousButton.DANGEROUS_HOLD_ACTIVATION_DELAY;
+            }
+            else
+                config.BindWith(OsuSetting.UIHoldActivationDelay, activationDelay);
+
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
@@ -114,6 +124,11 @@ namespace osu.Game.Screens.Play.HUD
 
             public Action HoverGained;
             public Action HoverLost;
+
+            [Resolved(canBeNull: true)]
+            private Player player { get; set; }
+
+            protected override double? HoldActivationDelay => player?.Configuration.AllowRestart == false ? PopupDialogDangerousButton.DANGEROUS_HOLD_ACTIVATION_DELAY : (double?)null;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
