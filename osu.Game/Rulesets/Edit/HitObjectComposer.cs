@@ -381,44 +381,6 @@ namespace osu.Game.Rulesets.Edit
             return new SnapResult(screenSpacePosition, targetTime, playfield);
         }
 
-        public override float GetBeatSnapDistanceAt(HitObject referenceObject)
-        {
-            return (float)(100 * EditorBeatmap.Difficulty.SliderMultiplier * referenceObject.DifficultyControlPoint.SliderVelocity / BeatSnapProvider.BeatDivisor);
-        }
-
-        public override float DurationToDistance(HitObject referenceObject, double duration)
-        {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceObject));
-        }
-
-        public override double DistanceToDuration(HitObject referenceObject, float distance)
-        {
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(referenceObject.StartTime);
-            return distance / GetBeatSnapDistanceAt(referenceObject) * beatLength;
-        }
-
-        public override double GetSnappedDurationFromDistance(HitObject referenceObject, float distance)
-            => BeatSnapProvider.SnapTime(referenceObject.StartTime + DistanceToDuration(referenceObject, distance), referenceObject.StartTime) - referenceObject.StartTime;
-
-        public override float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
-        {
-            double startTime = referenceObject.StartTime;
-
-            double actualDuration = startTime + DistanceToDuration(referenceObject, distance);
-
-            double snappedEndTime = BeatSnapProvider.SnapTime(actualDuration, startTime);
-
-            double beatLength = BeatSnapProvider.GetBeatLengthAtTime(startTime);
-
-            // we don't want to exceed the actual duration and snap to a point in the future.
-            // as we are snapping to beat length via SnapTime (which will round-to-nearest), check for snapping in the forward direction and reverse it.
-            if (snappedEndTime > actualDuration + 1)
-                snappedEndTime -= beatLength;
-
-            return DurationToDistance(referenceObject, snappedEndTime - startTime);
-        }
-
         #endregion
 
         private class LeftToolboxFlow : ExpandingButtonContainer
@@ -470,16 +432,6 @@ namespace osu.Game.Rulesets.Edit
 
         public virtual SnapResult SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) =>
             new SnapResult(screenSpacePosition, null);
-
-        public abstract float GetBeatSnapDistanceAt(HitObject referenceObject);
-
-        public abstract float DurationToDistance(HitObject referenceObject, double duration);
-
-        public abstract double DistanceToDuration(HitObject referenceObject, float distance);
-
-        public abstract double GetSnappedDurationFromDistance(HitObject referenceObject, float distance);
-
-        public abstract float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance);
 
         #endregion
     }
