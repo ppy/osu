@@ -36,9 +36,7 @@ namespace osu.Game.Extensions
                 int previousParentRotationInQuarterTurns = (int)Math.Floor(previousParentRotation / 90);
                 int rotationsNeeded = parentRotationInQuarterTurns - previousParentRotationInQuarterTurns;
                 if (rotationsNeeded < 0)
-                {
-                    rotationsNeeded = (-rotationsNeeded) + 4;
-                }
+                    rotationsNeeded += 4;
 
                 switch (rotationsNeeded)
                 {
@@ -52,7 +50,7 @@ namespace osu.Game.Extensions
                         child.Origin = flipBothAnchors(child.Origin);
                         break;
 
-                    // Rotated by -90
+                    // Rotated by 270
                     case 3:
                         child.Origin = rotateAnchor90(child.Origin, false);
                         break;
