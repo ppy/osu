@@ -16,8 +16,9 @@ namespace osu.Game.Extensions
         /// </summary>
         /// <param name="target">The target to prevent its children from transforming.</param>
         /// <param name="parent">The parent of the target.</param>
-        /// <param name="previousParentRotation">The parent's rotation in the previous update.</param>
-        public static void KeepChildrenUpright(this Container target, Container parent, float previousParentRotation)
+        /// <param name="previousParentRotation">The parent's rotation in the previous update cycle.</param>
+        /// <param name="previousParentScale">The parent's scale in the previous update cycle.</param>
+        public static void KeepChildrenUpright(this Container target, Container parent, float previousParentRotation, Vector2 previousParentScale)
         {
             float parentRotation = parent.Rotation;
             Vector2 parentScale = parent.Scale;
@@ -47,7 +48,7 @@ namespace osu.Game.Extensions
 
                     // Rotated by 180
                     case 2:
-                        child.Origin = flipBothAnchors(child.Origin);
+                        child.Origin = flipAnchorXY(child.Origin);
                         break;
 
                     // Rotated by 270
@@ -57,6 +58,22 @@ namespace osu.Game.Extensions
 
                     default:
                         break;
+                }
+
+                if (Math.Sign(parentScale.X) != Math.Sign(previousParentScale.X))
+                {
+                    if (parentRotationInQuarterTurns % 2 != 0)
+                        child.Origin = flipAnchorY(child.Origin);
+                    else
+                        child.Origin = flipAnchorX(child.Origin);
+                }
+
+                if (Math.Sign(parentScale.Y) != Math.Sign(previousParentScale.Y))
+                {
+                    if (parentRotationInQuarterTurns % 2 != 0)
+                        child.Origin = flipAnchorX(child.Origin);
+                    else
+                        child.Origin = flipAnchorY(child.Origin);
                 }
             }
         }
@@ -108,19 +125,72 @@ namespace osu.Game.Extensions
 
             if (!clockwise)
             {
-                // Correct if rotating by 270 instead of 90
-                rotatedAnchor = flipBothAnchors(rotatedAnchor);
+                rotatedAnchor = flipAnchorXY(rotatedAnchor);
             }
 
             return rotatedAnchor;
         }
 
-        private static Anchor flipBothAnchors(Anchor anchor)
+        private static Anchor flipAnchorXY(Anchor anchor)
+        {
+            anchor = flipAnchorX(anchor);
+            anchor = flipAnchorY(anchor);
+
+            return anchor;
+        }
+
+        private static Anchor flipAnchorX(Anchor anchor)
         {
             Anchor anchorX = getAnchorX(anchor);
             Anchor anchorY = getAnchorY(anchor);
 
-            return flipAnchorX(anchorX) | flipAnchorY(anchorY);
+            Anchor flippedAnchorX;
+
+            switch (anchorX)
+            {
+                case Anchor.x0:
+                    flippedAnchorX = Anchor.x2;
+                    break;
+
+                case Anchor.x1:
+                    flippedAnchorX = Anchor.x1;
+                    break;
+
+                case Anchor.x2:
+                    flippedAnchorX = Anchor.x0;
+                    break;
+
+                default: throw new ArgumentOutOfRangeException();
+            }
+
+            return flippedAnchorX | anchorY;
+        }
+
+        private static Anchor flipAnchorY(Anchor anchor)
+        {
+            Anchor anchorX = getAnchorX(anchor);
+            Anchor anchorY = getAnchorY(anchor);
+
+            Anchor flippedAnchorY;
+
+            switch (anchorY)
+            {
+                case Anchor.y0:
+                    flippedAnchorY = Anchor.y2;
+                    break;
+
+                case Anchor.y1:
+                    flippedAnchorY = Anchor.y1;
+                    break;
+
+                case Anchor.y2:
+                    flippedAnchorY = Anchor.y0;
+                    break;
+
+                default: throw new ArgumentOutOfRangeException();
+            }
+
+            return anchorX | flippedAnchorY;
         }
 
         private static Anchor getAnchorX(Anchor anchor)
@@ -143,34 +213,6 @@ namespace osu.Game.Extensions
             if (anchor.HasFlagFast(Anchor.y2)) return Anchor.y2;
 
             throw new ArgumentOutOfRangeException();
-        }
-
-        private static Anchor flipAnchorX(Anchor anchor)
-        {
-            switch (anchor)
-            {
-                case Anchor.x0: return Anchor.x2;
-
-                case Anchor.x1: return Anchor.x1;
-
-                case Anchor.x2: return Anchor.x0;
-
-                default: throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private static Anchor flipAnchorY(Anchor anchor)
-        {
-            switch (anchor)
-            {
-                case Anchor.y0: return Anchor.y2;
-
-                case Anchor.y1: return Anchor.y1;
-
-                case Anchor.y2: return Anchor.y0;
-
-                default: throw new ArgumentOutOfRangeException();
-            }
         }
     }
 }
