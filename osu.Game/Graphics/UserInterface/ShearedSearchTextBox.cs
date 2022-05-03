@@ -46,73 +46,70 @@ namespace osu.Game.Graphics.UserInterface
             Shear = new Vector2(ShearedOverlayContainer.SHEAR, 0);
             Masking = true;
             CornerRadius = corner_radius;
-            InternalChild = new Container
+
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                background = new Box
                 {
-                    background = new Box
+                    RelativeSizeAxes = Axes.Both
+                },
+                new GridContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Content = new[]
                     {
-                        RelativeSizeAxes = Axes.Both
-                    },
-                    new GridContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Content = new[]
+                        new Drawable[]
                         {
-                            new Drawable[]
+                            new Container
                             {
-                                new Container
+                                Name = @"Search box container",
+                                RelativeSizeAxes = Axes.Both,
+                                CornerRadius = corner_radius,
+                                Masking = true,
+                                Children = new Drawable[]
                                 {
-                                    Name = @"Search box container",
-                                    RelativeSizeAxes = Axes.Both,
-                                    CornerRadius = corner_radius,
-                                    Masking = true,
-                                    Children = new Drawable[]
+                                    searchBoxBackground = new Box
                                     {
-                                        searchBoxBackground = new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both
-                                        },
-                                        textBox = new InnerSearchTextBox
-                                        {
-                                            Shear = -new Vector2(ShearedOverlayContainer.SHEAR, 0),
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            RelativeSizeAxes = Axes.X,
-                                            Padding = new MarginPadding
-                                            {
-                                                Horizontal = corner_radius + new Vector2(ShearedOverlayContainer.SHEAR, 0).X
-                                            }
-                                        }
-                                    }
-                                },
-                                new Container
-                                {
-                                    Name = @"Icon container",
-                                    RelativeSizeAxes = Axes.Y,
-                                    Width = 50,
-                                    Origin = Anchor.CentreRight,
-                                    Anchor = Anchor.CentreRight,
-                                    Children = new Drawable[]
+                                        RelativeSizeAxes = Axes.Both
+                                    },
+                                    textBox = new InnerSearchTextBox
                                     {
-                                        new SpriteIcon
+                                        Shear = -Shear,
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        RelativeSizeAxes = Axes.X,
+                                        Padding = new MarginPadding
                                         {
-                                            Icon = FontAwesome.Solid.Search,
-                                            Origin = Anchor.Centre,
-                                            Anchor = Anchor.Centre,
-                                            Size = new Vector2(16),
-                                            Shear = -new Vector2(ShearedOverlayContainer.SHEAR, 0)
+                                            Horizontal = corner_radius + Shear.X
                                         }
                                     }
                                 }
+                            },
+                            new Container
+                            {
+                                Name = @"Icon container",
+                                RelativeSizeAxes = Axes.Y,
+                                Width = 50,
+                                Origin = Anchor.CentreRight,
+                                Anchor = Anchor.CentreRight,
+                                Children = new Drawable[]
+                                {
+                                    new SpriteIcon
+                                    {
+                                        Icon = FontAwesome.Solid.Search,
+                                        Origin = Anchor.Centre,
+                                        Anchor = Anchor.Centre,
+                                        Size = new Vector2(16),
+                                        Shear = -Shear
+                                    }
+                                }
                             }
-                        },
-                        ColumnDimensions = new[]
-                        {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.AutoSize)
                         }
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize)
                     }
                 }
             };
