@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Play
         private readonly SongProgressGraph graph;
         private readonly SongProgressInfo info;
 
+        private float previousUpdateRotation;
+
         public Action<double> RequestSeek;
 
         /// <summary>
@@ -132,6 +134,8 @@ namespace osu.Game.Screens.Play
             }
 
             graph.FillColour = bar.FillColour = colours.BlueLighter;
+
+            previousUpdateRotation = Rotation;
         }
 
         protected override void LoadComplete()
@@ -219,7 +223,8 @@ namespace osu.Game.Screens.Play
 
             Height = bottom_bar_height + graph_height + handle_size.Y + info_height - graph.Y;
 
-            info.KeepChildrenUpright(this);
+            info.KeepChildrenUpright(this, previousUpdateRotation);
+            previousUpdateRotation = Rotation;
         }
 
         private void updateBarVisibility()

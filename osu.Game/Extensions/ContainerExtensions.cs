@@ -16,7 +16,8 @@ namespace osu.Game.Extensions
         /// </summary>
         /// <param name="target">The target to prevent its children from transforming.</param>
         /// <param name="parent">The parent of the target.</param>
-        public static void KeepChildrenUpright(this Container target, Container parent)
+        /// <param name="previousParentRotation">The parent's rotation in the previous update.</param>
+        public static void KeepChildrenUpright(this Container target, Container parent, float previousParentRotation)
         {
             float parentRotation = parent.Rotation;
             Vector2 parentScale = parent.Scale;
@@ -32,10 +33,14 @@ namespace osu.Game.Extensions
                 else
                     child.ScaleTo(parentScale);
 
-                int parentRotationInQuarterTurnsModFour = parentRotationInQuarterTurns % 4;
-                if (parentRotationInQuarterTurnsModFour < 0) parentRotationInQuarterTurnsModFour += 4;
+                int previousParentRotationInQuarterTurns = (int)Math.Floor(previousParentRotation / 90);
+                int rotationsNeeded = parentRotationInQuarterTurns - previousParentRotationInQuarterTurns;
+                if (rotationsNeeded < 0)
+                {
+                    rotationsNeeded = (-rotationsNeeded) + 4;
+                }
 
-                switch (parentRotationInQuarterTurnsModFour)
+                switch (rotationsNeeded)
                 {
                     // Rotated by 90
                     case 1:
@@ -47,7 +52,7 @@ namespace osu.Game.Extensions
                         child.Origin = flipBothAnchors(child.Origin);
                         break;
 
-                    // Rotated by 270
+                    // Rotated by -90
                     case 3:
                         child.Origin = rotateAnchor90(child.Origin, false);
                         break;
