@@ -4,9 +4,11 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -18,7 +20,7 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
     [Cached(typeof(IDistanceSnapProvider))]
-    public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider
+    public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
     {
         protected Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
@@ -75,21 +77,21 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (!DistanceSpacingMultiplier.Disabled && e.ControlPressed && e.AltPressed && !e.Repeat)
+            if (!DistanceSpacingMultiplier.Disabled && e.Action == GlobalAction.EditorDistanceSpacing)
             {
                 RightSideToolboxContainer.Expanded.Value = true;
                 distanceSpacingScrollActive = true;
                 return true;
             }
 
-            return base.OnKeyDown(e);
+            return false;
         }
 
-        protected override void OnKeyUp(KeyUpEvent e)
+        public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            if (!DistanceSpacingMultiplier.Disabled && distanceSpacingScrollActive && (!e.AltPressed || !e.ControlPressed))
+            if (!DistanceSpacingMultiplier.Disabled && e.Action == GlobalAction.EditorDistanceSpacing)
             {
                 RightSideToolboxContainer.Expanded.Value = false;
                 distanceSpacingScrollActive = false;
