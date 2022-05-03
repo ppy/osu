@@ -336,8 +336,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("mod instance doesn't match", () => external != overlayButtonMod);
 
             AddAssert("one mod present in global selected", () => SelectedMods.Value.Count == 1);
-            AddAssert("globally selected matches button's mod instance", () => SelectedMods.Value.Contains(overlayButtonMod));
-            AddAssert("globally selected doesn't contain original external change", () => !SelectedMods.Value.Contains(external));
+            AddAssert("globally selected matches button's mod instance", () => SelectedMods.Value.Any(mod => ReferenceEquals(mod, overlayButtonMod)));
+            AddAssert("globally selected doesn't contain original external change", () => !SelectedMods.Value.Any(mod => ReferenceEquals(mod, external)));
         }
 
         [Test]
