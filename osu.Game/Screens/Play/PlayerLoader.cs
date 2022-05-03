@@ -104,11 +104,15 @@ namespace osu.Game.Screens.Play
             !playerConsumed
             // don't push unless the player is completely loaded
             && CurrentPlayer?.LoadState == LoadState.Ready
-            // don't push if the user is hovering one of the panes, unless they are idle.
-            && (IsHovered || idleTracker.IsIdle.Value)
-            // don't push if the user is dragging a slider or otherwise.
+            // don't push unless the player is ready to start gameplay
+            && ReadyForGameplay;
+
+        protected virtual bool ReadyForGameplay =>
+            // not ready if the user is hovering one of the panes, unless they are idle.
+            (IsHovered || idleTracker.IsIdle.Value)
+            // not ready if the user is dragging a slider or otherwise.
             && inputManager.DraggedDrawable == null
-            // don't push if a focused overlay is visible, like settings.
+            // not ready if a focused overlay is visible, like settings.
             && inputManager.FocusedDrawable == null;
 
         private readonly Func<Player> createPlayer;
@@ -395,7 +399,15 @@ namespace osu.Game.Screens.Play
             CurrentPlayer.RestartCount = restartCount++;
             CurrentPlayer.RestartRequested = restartRequested;
 
-            LoadTask = LoadComponentAsync(CurrentPlayer, _ => MetadataInfo.Loading = false);
+            LoadTask = LoadComponentAsync(CurrentPlayer, _ =>
+            {
+                MetadataInfo.Loading = false;
+                OnPlayerLoaded();
+            });
+        }
+
+        protected virtual void OnPlayerLoaded()
+        {
         }
 
         private void restartRequested()

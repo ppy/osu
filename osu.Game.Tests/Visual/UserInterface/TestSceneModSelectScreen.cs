@@ -112,6 +112,33 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
+        public void TestDimmedState()
+        {
+            createScreen();
+            changeRuleset(0);
+
+            AddUntilStep("any column dimmed", () => this.ChildrenOfType<ModColumn>().Any(column => !column.Active.Value));
+
+            ModColumn lastColumn = null;
+
+            AddAssert("last column dimmed", () => !this.ChildrenOfType<ModColumn>().Last().Active.Value);
+            AddStep("request scroll to last column", () =>
+            {
+                var lastDimContainer = this.ChildrenOfType<ModSelectScreen.ColumnDimContainer>().Last();
+                lastColumn = lastDimContainer.Column;
+                lastDimContainer.RequestScroll?.Invoke(lastDimContainer);
+            });
+            AddUntilStep("column undimmed", () => lastColumn.Active.Value);
+
+            AddStep("click panel", () =>
+            {
+                InputManager.MoveMouseTo(lastColumn.ChildrenOfType<ModPanel>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+            AddUntilStep("panel selected", () => lastColumn.ChildrenOfType<ModPanel>().First().Active.Value);
+        }
+
+        [Test]
         public void TestCustomisationToggleState()
         {
             createScreen();

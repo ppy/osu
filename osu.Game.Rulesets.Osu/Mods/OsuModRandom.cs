@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => "打个措手不及！";
 
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModTarget)).ToArray();
+
         private static readonly float playfield_diagonal = OsuPlayfield.BASE_SIZE.LengthFast;
 
         private Random? rng;

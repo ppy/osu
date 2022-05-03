@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModClassic : ModClassic, IApplicableToHitObject, IApplicableToDrawableHitObject, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModStrictTracking) };
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModStrictTracking)).ToArray();
 
         [SettingSource("去除滑条头的准确率要求", "滑条分数与其命中的滑条刻成比例。")]
         public Bindable<bool> NoSliderHeadAccuracy { get; } = new BindableBool(true);

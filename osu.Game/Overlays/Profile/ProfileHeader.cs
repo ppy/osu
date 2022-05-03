@@ -32,7 +32,9 @@ namespace osu.Game.Overlays.Profile
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem(LayoutStrings.HeaderUsersShow);
-            TabControl.AddItem(LayoutStrings.HeaderUsersModding);
+
+            // todo: pending implementation.
+            // TabControl.AddItem(LayoutStrings.HeaderUsersModding);
 
             //topheaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }

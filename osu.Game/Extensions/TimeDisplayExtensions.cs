@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using Humanizer;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Localisation;
 
 namespace osu.Game.Extensions
@@ -40,12 +42,12 @@ namespace osu.Game.Extensions
         public static LocalisableString ToFormattedDuration(this TimeSpan timeSpan)
         {
             if (timeSpan.TotalDays >= 1)
-                return new LocalisableFormattableString(timeSpan, @"dd\:hh\:mm\:ss");
+                return timeSpan.ToLocalisableString(@"dd\:hh\:mm\:ss");
 
             if (timeSpan.TotalHours >= 1)
-                return new LocalisableFormattableString(timeSpan, @"hh\:mm\:ss");
+                return timeSpan.ToLocalisableString(@"hh\:mm\:ss");
 
-            return new LocalisableFormattableString(timeSpan, @"mm\:ss");
+            return timeSpan.ToLocalisableString(@"mm\:ss");
         }
 
         /// <summary>

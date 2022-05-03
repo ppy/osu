@@ -9,7 +9,7 @@
     <Product>osu!(lazer)</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>2022.426.0</Version>
+    <Version>2022.503.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -26,7 +26,6 @@
     <ProjectReference Include="..\Mvis.Plugin.CollectionSupport\Mvis.Plugin.CollectionSupport.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.CloudMusicSupport\Mvis.Plugin.CloudMusicSupport.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.SandboxToPanel\Mvis.Plugin.SandboxToPanel.csproj" />
-    <ProjectReference Include="..\Mvis.Plugin.FakeEditor\Mvis.Plugin.FakeEditor.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.Yasp\Mvis.Plugin.Yasp.csproj" />
     <ProjectReference Include="..\Mvis.Plugin.BottomBar\Mvis.Plugin.BottomBar.csproj" />
   </ItemGroup>

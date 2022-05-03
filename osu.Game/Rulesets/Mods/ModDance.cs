@@ -4,24 +4,11 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModDance<T> : ModDance, IApplicableToDrawableRuleset<T>
-        where T : HitObject
-    {
-        //Copied from ModAutoplay.cs
-        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
-        {
-            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap, drawableRuleset.Mods));
-        }
-        //Copy end
-    }
-
-    public abstract class ModDance : Mod
+    public abstract class ModDance : Mod, ICreateReplayData, IApplicableFailOverride
     {
         public override Type[] IncompatibleMods => new[]
         {
@@ -32,6 +19,8 @@ namespace osu.Game.Rulesets.Mods
 
         [SettingSource("保存Dance回放")]
         public Bindable<bool> SaveScore { get; } = new BindableBool();
+
+        public override bool UserPlayable => false;
 
         public override ModType Type => ModType.Automation;
 
@@ -45,5 +34,24 @@ namespace osu.Game.Rulesets.Mods
         public virtual Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => CreateReplayScore(beatmap);
 #pragma warning restore 618
         //Copy end
+
+        public ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+        {
+            var score = CreateReplayScore(beatmap, mods);
+            return new ModReplayData(score.Replay, new ModCreatedUser{ Username = score.ScoreInfo.User.Username });
+        }
+
+        public bool PerformFail() => false;
+
+        public bool RestartOnFail => false;
+
+        /// <summary>
+        /// 表示是否是事实生成的回放<br/>
+        /// 如果是，去除ENDCHAR并记录<br/>
+        /// 如果不是，则不要记录
+        /// </summary>
+        public readonly string ENDCHAR = "　";
+
+        public readonly string ENDCHARREPLACE = "";
     }
 }

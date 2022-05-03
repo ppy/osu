@@ -62,7 +62,7 @@ namespace osu.Game.Localisation
         /// <summary>
         /// "Run setup wizard"
         /// </summary>
-        public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"run_setup_wizard"), @"Run setup wizard");
+        public static LocalisableString RunSetupWizard => new TranslatableString(getKey(@"llin_run_setup_wizard"), @"打开设置向导");
 
         private static string getKey(string key) => $"{prefix}:{key}";
     }

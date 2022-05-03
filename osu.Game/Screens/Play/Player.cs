@@ -457,7 +457,7 @@ namespace osu.Game.Screens.Play
 
         private void updateGameplayState()
         {
-            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value;
+            bool inGameplay = !DrawableRuleset.HasReplayLoaded.Value && !DrawableRuleset.IsPaused.Value && !breakTracker.IsBreakTime.Value && !GameplayState.HasFailed;
             OverlayActivationMode.Value = inGameplay ? OverlayActivation.Disabled : OverlayActivation.UserTriggered;
             localUserPlaying.Value = inGameplay;
         }
@@ -813,6 +813,8 @@ namespace osu.Game.Screens.Play
             GameplayState.HasFailed = true;
             Score.ScoreInfo.Passed = false;
 
+            updateGameplayState();
+
             // There is a chance that we could be in a paused state as the ruleset's internal clock (see FrameStabilityContainer)
             // could process an extra frame after the GameplayClock is stopped.
             // In such cases we want the fail state to precede a user triggered pause.
@@ -946,7 +948,7 @@ namespace osu.Game.Screens.Play
                 failAnimationLayer.Background = b;
             });
 
-            HUDOverlay.IsBreakTime.BindTo(breakTracker.IsBreakTime);
+            HUDOverlay.IsPlaying.BindTo(localUserPlaying);
             DimmableStoryboard.IsBreakTime.BindTo(breakTracker.IsBreakTime);
 
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -1042,12 +1044,12 @@ namespace osu.Game.Screens.Play
         /// Imports the player's <see cref="Scoring.Score"/> to the local database.
         /// </summary>
         /// <param name="score">The <see cref="Scoring.Score"/> to import.</param>
-        /// <param name="bypassCheck">绕过分数检查，用于DanceMod</param>
+        /// <param name="haveDanceMod">绕过分数检查，用于DanceMod</param>
         /// <returns>The imported score.</returns>
-        protected virtual Task ImportScore(Score score, bool bypassCheck = false)
+        protected virtual Task ImportScore(Score score, bool haveDanceMod = false)
         {
             // Replays are already populated and present in the game's database, so should not be re-imported.
-            if (DrawableRuleset.ReplayScore != null || bypassCheck)
+            if (DrawableRuleset.ReplayScore != null && !haveDanceMod)
                 return Task.CompletedTask;
 
             LegacyByteArrayReader replayReader;

@@ -23,6 +23,7 @@ namespace osu.Game.Overlays
 
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
+            // This list should be kept in sync with ScreenBehaviour.
             new MfSection(createSubPanel(new MfSettingsPanel())),
             new GeneralSection(),
             new SkinSection(),
