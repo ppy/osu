@@ -195,8 +195,6 @@ namespace osu.Desktop
             desktopWindow.SetIconFromStream(iconStream);
             desktopWindow.Title = Name;
             desktopWindow.DragDrop += f => fileDrop(new[] { f });
-
-            desktopWindow.MinimumSize = new Size(800, 600);
         }
 
         private readonly List<string> importableFiles = new List<string>();
