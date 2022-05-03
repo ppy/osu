@@ -21,7 +21,6 @@ namespace osu.Game.Graphics.UserInterface
         private const float corner_radius = 7;
 
         private readonly Box background;
-        private readonly Box searchBoxBackground;
         private readonly SearchTextBox textBox;
 
         public Bindable<string> Current
@@ -60,30 +59,12 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new Drawable[]
                         {
-                            new Container
+                            textBox = new InnerSearchTextBox
                             {
-                                Name = @"Search box container",
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
                                 RelativeSizeAxes = Axes.Both,
-                                CornerRadius = corner_radius,
-                                Masking = true,
-                                Children = new Drawable[]
-                                {
-                                    searchBoxBackground = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both
-                                    },
-                                    textBox = new InnerSearchTextBox
-                                    {
-                                        Shear = -Shear,
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        RelativeSizeAxes = Axes.X,
-                                        Padding = new MarginPadding
-                                        {
-                                            Horizontal = corner_radius + Shear.X
-                                        }
-                                    }
-                                }
+                                Size = Vector2.One
                             },
                             new Container
                             {
@@ -119,7 +100,6 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OverlayColourProvider colourProvider)
         {
             background.Colour = colourProvider.Background3;
-            searchBoxBackground.Colour = colourProvider.Background4;
         }
 
         public override bool HandleNonPositionalInput => textBox.HandleNonPositionalInput;
@@ -134,6 +114,9 @@ namespace osu.Game.Graphics.UserInterface
 
                 Placeholder.Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.SemiBold);
                 PlaceholderText = CommonStrings.InputSearch;
+
+                CornerRadius = corner_radius;
+                TextContainer.Shear = new Vector2(-ShearedOverlayContainer.SHEAR, 0);
             }
 
             protected override SpriteText CreatePlaceholder() => new SearchPlaceholder();
