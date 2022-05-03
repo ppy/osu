@@ -214,16 +214,22 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
-            base.PopIn();
+
+            textBar.TextBoxTakeFocus();
         }
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             this.MoveToY(Height, transition_length, Easing.InSine);
             this.FadeOut(transition_length, Easing.InSine);
-            base.PopOut();
+
+            textBar.TextBoxKillFocus();
         }
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
