@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Edit
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
         private bool distanceSpacingScrollActive;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         protected DistancedHitObjectComposer(Ruleset ruleset)
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Edit
                     distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
 
                     if (v.NewValue != v.OldValue)
-                        onScreenDisplay.Display(new DistanceSpacingToast(v.NewValue.ToLocalisableString(@"0.##x")));
+                        onScreenDisplay?.Display(new DistanceSpacingToast(v.NewValue.ToLocalisableString(@"0.##x")));
 
                     EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
                 }, true);
