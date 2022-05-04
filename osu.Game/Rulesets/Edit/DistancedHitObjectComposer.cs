@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 case GlobalAction.EditorIncreaseDistanceSpacing:
                 case GlobalAction.EditorDecreaseDistanceSpacing:
-                    return adjustDistanceSpacing(e.Action, e.IsPrecise ? 0.01f : 0.1f);
+                    return adjustDistanceSpacing(e.Action, e.ScrollAmount * (e.IsPrecise ? 0.01f : 0.1f));
             }
 
             return false;
