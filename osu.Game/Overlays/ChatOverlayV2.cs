@@ -218,8 +218,6 @@ namespace osu.Game.Overlays
 
             this.MoveToY(0, transition_length, Easing.OutQuint);
             this.FadeIn(transition_length, Easing.OutQuint);
-
-            textBar.TextBoxTakeFocus();
         }
 
         protected override void PopOut()
@@ -230,6 +228,12 @@ namespace osu.Game.Overlays
             this.FadeOut(transition_length, Easing.InSine);
 
             textBar.TextBoxKillFocus();
+        }
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            textBar.TextBoxTakeFocus();
+            base.OnFocus(e);
         }
 
         private void currentChannelChanged(ValueChangedEvent<Channel> e)
