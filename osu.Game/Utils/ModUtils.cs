@@ -112,7 +112,16 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidForGameplay(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && !(m is MultiMod), out invalidMods, true);
+        {
+            mods = mods.ToArray();
+
+            // exclude multi mods from compatibility checks.
+            // the loop below automatically marks all multi mods as not valid for gameplay anyway.
+            if (!CheckCompatibleSet(mods.Where(m => !(m is MultiMod)), out invalidMods))
+                return false;
+
+            return checkValid(mods, m => m.Type != ModType.System && m.HasImplementation && !(m is MultiMod), out invalidMods);
+        }
 
         /// <summary>
         /// Checks that all <see cref="Mod"/>s in a combination are valid as "required mods" in a multiplayer match session.
@@ -121,7 +130,14 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidRequiredModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerGlobal), out invalidMods, true);
+        {
+            mods = mods.ToArray();
+
+            if (!CheckCompatibleSet(mods, out invalidMods))
+                return false;
+
+            return checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerGlobal), out invalidMods);
+        }
 
         /// <summary>
         /// Checks that all <see cref="Mod"/>s in a combination are valid as "free mods" in a multiplayer match session.
@@ -130,19 +146,12 @@ namespace osu.Game.Utils
         /// <param name="invalidMods">Invalid mods, if any were found. Will be null if all mods were valid.</param>
         /// <returns>Whether the input mods were all valid. If false, <paramref name="invalidMods"/> will contain all invalid entries.</returns>
         public static bool CheckValidFreeModsForMultiplayer(IEnumerable<Mod> mods, [NotNullWhen(false)] out List<Mod>? invalidMods)
-            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerLocal), out invalidMods, false);
+            => checkValid(mods, m => m.IsPlayable(ModUsage.MultiplayerLocal), out invalidMods);
 
-        private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods, bool checkCompatibility)
+        private static bool checkValid(IEnumerable<Mod> mods, Predicate<Mod> valid, [NotNullWhen(false)] out List<Mod>? invalidMods)
         {
             mods = mods.ToArray();
             invalidMods = null;
-
-            if (checkCompatibility)
-            {
-                // exclude multi mods from compatibility checks.
-                // the loop below automatically marks all multi mods as not valid for gameplay anyway.
-                CheckCompatibleSet(mods.Where(m => !(m is MultiMod)), out invalidMods);
-            }
 
             foreach (var mod in mods)
             {
