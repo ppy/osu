@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A grid which takes user input and returns a quantized ("snapped") position and time.
     /// </summary>
-    public abstract class DistanceSnapGrid : CompositeDrawable
+    public abstract class DistanceSnapGrid : CompositeDrawable, IDistanceSnapProvider
     {
         /// <summary>
         /// The spacing between each tick of the beat snapping grid.
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
-        protected IDistanceSnapProvider SnapProvider { get; private set; }
+        private IDistanceSnapProvider snapProvider { get; set; }
 
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -86,13 +86,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             beatDivisor.BindValueChanged(_ => updateSpacing());
 
-            distanceSpacingMultiplier = SnapProvider.DistanceSpacingMultiplier.GetBoundCopy();
+            distanceSpacingMultiplier = snapProvider.DistanceSpacingMultiplier.GetBoundCopy();
             distanceSpacingMultiplier.BindValueChanged(_ => updateSpacing(), true);
         }
 
         private void updateSpacing()
         {
-            DistanceSpacing = (float)(SnapProvider.GetBeatSnapDistanceAt(ReferenceObject) * distanceSpacingMultiplier.Value);
+            DistanceSpacing = GetBeatSnapDistanceAt(ReferenceObject);
 
             if (endTime == null)
                 MaxIntervals = int.MaxValue;
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
                 double maxDuration = endTime.Value - StartTime + 1;
-                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(ReferenceObject, DistanceSpacing));
+                MaxIntervals = (int)(maxDuration / DistanceToDuration(ReferenceObject, DistanceSpacing));
             }
 
             gridCache.Invalidate();
@@ -146,5 +146,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
             int repeatIndex = placementIndex / beatDivisor.Value;
             return ColourInfo.SingleColour(colour).MultiplyAlpha(0.5f / (repeatIndex + 1));
         }
+
+        public float GetBeatSnapDistanceAt(HitObject referenceObject) => (float)(snapProvider.GetBeatSnapDistanceAt(referenceObject) * distanceSpacingMultiplier.Value);
+        public float DurationToDistance(HitObject referenceObject, double duration) => (float)(snapProvider.DurationToDistance(referenceObject, duration) * distanceSpacingMultiplier.Value);
+        public double DistanceToDuration(HitObject referenceObject, float distance) => snapProvider.DistanceToDuration(referenceObject, (float)(distance / distanceSpacingMultiplier.Value));
+        public double GetSnappedDurationFromDistance(HitObject referenceObject, float distance) => snapProvider.GetSnappedDurationFromDistance(referenceObject, (float)(distance / distanceSpacingMultiplier.Value));
+
+        public float GetSnappedDistanceFromDistance(HitObject referenceObject, float distance)
+        {
+            float snappedDistance = snapProvider.GetSnappedDistanceFromDistance(referenceObject, (float)(distance / distanceSpacingMultiplier.Value));
+            return (float)(snappedDistance * distanceSpacingMultiplier.Value);
+        }
+
+        IBindable<double> IDistanceSnapProvider.DistanceSpacingMultiplier => throw new NotImplementedException();
+        SnapResult IPositionSnapProvider.SnapScreenSpacePositionToValidTime(Vector2 screenSpacePosition) => throw new NotImplementedException();
+        SnapResult IPositionSnapProvider.SnapScreenSpacePositionToValidPosition(Vector2 screenSpacePosition) => throw new NotImplementedException();
     }
 }
