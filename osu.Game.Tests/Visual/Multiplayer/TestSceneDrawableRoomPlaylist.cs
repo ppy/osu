@@ -148,6 +148,40 @@ namespace osu.Game.Tests.Visual.Multiplayer
         }
 
         [Test]
+        public void KeyboardSelection()
+        {
+            createPlaylist(p => p.AllowSelection = true);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("item 1 is selected", () => playlist.SelectedItem.Value == playlist.Items[1]);
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
+
+            AddUntilStep("navigate to last item via keyboard", () =>
+            {
+                InputManager.Key(Key.Down);
+                return playlist.SelectedItem.Value == playlist.Items.Last();
+            });
+            AddAssert("last item is selected", () => playlist.SelectedItem.Value == playlist.Items.Last());
+            AddUntilStep("last item is scrolled into view", () =>
+            {
+                var drawableItem = playlist.ItemMap[playlist.Items.Last()];
+                return playlist.ScreenSpaceDrawQuad.Contains(drawableItem.ScreenSpaceDrawQuad.TopLeft)
+                       && playlist.ScreenSpaceDrawQuad.Contains(drawableItem.ScreenSpaceDrawQuad.BottomRight);
+            });
+
+            AddStep("press down", () => InputManager.Key(Key.Down));
+            AddAssert("last item is selected", () => playlist.SelectedItem.Value == playlist.Items.Last());
+
+            AddStep("press up", () => InputManager.Key(Key.Up));
+            AddAssert("second last item is selected", () => playlist.SelectedItem.Value == playlist.Items.Reverse().ElementAt(1));
+        }
+
+        [Test]
         public void TestDownloadButtonHiddenWhenBeatmapExists()
         {
             var beatmap = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo;
