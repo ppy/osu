@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var column in columnFlow.Columns)
             {
-                column.SelectedMods.BindValueChanged(updateBindableFromSelection);
+                column.SelectionChangedByUser += updateBindableFromSelection;
             }
 
             customisationVisible.BindValueChanged(_ => updateCustomisationVisualState(), true);
@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Mods
         private void updateAvailableMods()
         {
             foreach (var column in columnFlow.Columns)
-                column.Filter = isValidMod;
+                column.Filter = m => m.HasImplementation && isValidMod.Invoke(m);
         }
 
         private void updateCustomisation(ValueChangedEvent<IReadOnlyList<Mod>> valueChangedEvent)
@@ -250,33 +250,26 @@ namespace osu.Game.Overlays.Mods
 
         private void updateSelectionFromBindable()
         {
-            // note that selectionBindableSyncInProgress is purposefully not checked here.
-            // this is because in the case of mod selection in solo gameplay, a user selection of a mod can actually lead to deselection of other incompatible mods.
-            // to synchronise state correctly, updateBindableFromSelection() computes the final mods (including incompatibility rules) and updates SelectedMods,
-            // and this method then runs unconditionally again to make sure the new visual selection accurately reflects the final set of selected mods.
-            // selectionBindableSyncInProgress ensures that mutual infinite recursion does not happen after that unconditional call.
+            // `SelectedMods` may contain mod references that come from external sources.
+            // to ensure isolation, first pull in the potentially-external change into the mod columns...
             foreach (var column in columnFlow.Columns)
-                column.SelectedMods.Value = SelectedMods.Value.Where(mod => mod.Type == column.ModType).ToArray();
+                column.SetSelection(SelectedMods.Value);
+
+            // and then, when done, replace the potentially-external mod references in `SelectedMods` with ones we own.
+            updateBindableFromSelection();
         }
 
-        private bool selectionBindableSyncInProgress;
-
-        private void updateBindableFromSelection(ValueChangedEvent<IReadOnlyList<Mod>> modSelectionChange)
+        private void updateBindableFromSelection()
         {
-            if (selectionBindableSyncInProgress)
+            var candidateSelection = columnFlow.Columns.SelectMany(column => column.SelectedMods).ToArray();
+
+            if (candidateSelection.SequenceEqual(SelectedMods.Value))
                 return;
 
-            selectionBindableSyncInProgress = true;
-
-            SelectedMods.Value = ComputeNewModsFromSelection(
-                modSelectionChange.NewValue.Except(modSelectionChange.OldValue),
-                modSelectionChange.OldValue.Except(modSelectionChange.NewValue));
-
-            selectionBindableSyncInProgress = false;
+            SelectedMods.Value = ComputeNewModsFromSelection(SelectedMods.Value, candidateSelection);
         }
 
-        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IEnumerable<Mod> addedMods, IEnumerable<Mod> removedMods)
-            => columnFlow.Columns.SelectMany(column => column.SelectedMods.Value).ToArray();
+        protected virtual IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection) => newSelection;
 
         protected override void PopIn()
         {
@@ -313,10 +306,12 @@ namespace osu.Game.Overlays.Mods
             {
                 const float distance = 700;
 
-                columnFlow[i].Column
-                             .TopLevelContent
-                             .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
-                             .FadeOut(fade_out_duration, Easing.OutQuint);
+                var column = columnFlow[i].Column;
+
+                column.FlushPendingSelections();
+                column.TopLevelContent
+                      .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
+                      .FadeOut(fade_out_duration, Easing.OutQuint);
             }
         }
 
