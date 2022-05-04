@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Components.TernaryButtons;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 using osuTK.Input;
@@ -85,6 +86,65 @@ namespace osu.Game.Tests.Visual.Editing
             AddAssert("Hitcircle button is clickable", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").Enabled.Value);
             AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
             AddAssert("Tool changed", () => hitObjectComposer.ChildrenOfType<ComposeBlueprintContainer>().First().CurrentTool is HitCircleCompositionTool);
+        }
+
+        [Test]
+        public void TestPlacementFailsWhenClickingButton()
+        {
+            AddStep("clear all control points and hitobjects", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.Clear();
+            });
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+
+            AddStep("move mouse to overlapping toggle button", () =>
+            {
+                var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
+                var button = hitObjectComposer
+                             .ChildrenOfType<ExpandingToolboxContainer>().First()
+                             .ChildrenOfType<DrawableTernaryButton>().First(b => playfield.Contains(b.ScreenSpaceDrawQuad.Centre));
+
+                InputManager.MoveMouseTo(button);
+            });
+
+            AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+
+            AddStep("attempt place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+        }
+
+        [Test]
+        public void TestPlacementWithinToolboxScrollArea()
+        {
+            AddStep("clear all control points and hitobjects", () =>
+            {
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.Clear();
+            });
+
+            AddStep("Add timing point", () => editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint()));
+
+            AddStep("Change to hitcircle", () => hitObjectComposer.ChildrenOfType<EditorRadioButton>().First(d => d.Button.Label == "HitCircle").TriggerClick());
+
+            AddStep("move mouse to scroll area", () =>
+            {
+                // Specifically wanting to test the area of overlap between the left expanding toolbox container
+                // and the playfield/composer.
+                var scrollArea = hitObjectComposer.ChildrenOfType<ExpandingToolboxContainer>().First().ScreenSpaceDrawQuad;
+                var playfield = hitObjectComposer.Playfield.ScreenSpaceDrawQuad;
+                InputManager.MoveMouseTo(new Vector2(scrollArea.TopLeft.X, playfield.Centre.Y));
+            });
+
+            AddAssert("no circles placed", () => editorBeatmap.HitObjects.Count == 0);
+
+            AddStep("place circle", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("circle placed", () => editorBeatmap.HitObjects.Count == 1);
         }
 
         [Test]
