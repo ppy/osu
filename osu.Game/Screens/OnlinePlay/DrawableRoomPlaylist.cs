@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -172,6 +173,21 @@ namespace osu.Game.Screens.OnlinePlay
         });
 
         protected virtual DrawableRoomPlaylistItem CreateDrawablePlaylistItem(PlaylistItem item) => new DrawableRoomPlaylistItem(item);
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            SelectedItem.BindValueChanged(_ => scrollToSelection(), true);
+        }
+
+        private void scrollToSelection()
+        {
+            if (SelectedItem.Value == null) return;
+
+            Debug.Assert(ItemMap.TryGetValue(SelectedItem.Value, out var drawableItem));
+            ScrollContainer.ScrollIntoView(drawableItem);
+        }
 
         #region Key selection logic (shared with BeatmapCarousel and RoomsContainer)
 
