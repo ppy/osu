@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     /// <typeparam name="TObject">The base type of supported objects.</typeparam>
     [Cached(typeof(IDistanceSnapProvider))]
-    public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IKeyBindingHandler<GlobalAction>
+    public abstract class DistancedHitObjectComposer<TObject> : HitObjectComposer<TObject>, IDistanceSnapProvider, IScrollBindingHandler<GlobalAction>
         where TObject : HitObject
     {
         protected Bindable<double> DistanceSpacingMultiplier { get; } = new BindableDouble(1.0)
@@ -35,7 +35,6 @@ namespace osu.Game.Rulesets.Edit
         protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
-        private bool distanceSpacingScrollActive;
 
         protected DistancedHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -79,11 +78,11 @@ namespace osu.Game.Rulesets.Edit
 
         public bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
         {
-            if (!DistanceSpacingMultiplier.Disabled && e.Action == GlobalAction.EditorDistanceSpacing)
+            switch (e.Action)
             {
-                RightSideToolboxContainer.Expanded.Value = true;
-                distanceSpacingScrollActive = true;
-                return true;
+                case GlobalAction.EditorIncreaseDistanceSpacing:
+                case GlobalAction.EditorDecreaseDistanceSpacing:
+                    return adjustDistanceSpacing(e.Action, 0.1f);
             }
 
             return false;
@@ -91,22 +90,31 @@ namespace osu.Game.Rulesets.Edit
 
         public void OnReleased(KeyBindingReleaseEvent<GlobalAction> e)
         {
-            if (!DistanceSpacingMultiplier.Disabled && e.Action == GlobalAction.EditorDistanceSpacing)
-            {
-                RightSideToolboxContainer.Expanded.Value = false;
-                distanceSpacingScrollActive = false;
-            }
         }
 
-        protected override bool OnScroll(ScrollEvent e)
+        public bool OnScroll(KeyBindingScrollEvent<GlobalAction> e)
         {
-            if (distanceSpacingScrollActive)
+            switch (e.Action)
             {
-                DistanceSpacingMultiplier.Value += e.ScrollDelta.Y * (e.IsPrecise ? 0.01f : 0.1f);
-                return true;
+                case GlobalAction.EditorIncreaseDistanceSpacing:
+                case GlobalAction.EditorDecreaseDistanceSpacing:
+                    return adjustDistanceSpacing(e.Action, e.IsPrecise ? 0.01f : 0.1f);
             }
 
-            return base.OnScroll(e);
+            return false;
+        }
+
+        private bool adjustDistanceSpacing(GlobalAction action, float amount)
+        {
+            if (DistanceSpacingMultiplier.Disabled)
+                return false;
+
+            if (action == GlobalAction.EditorIncreaseDistanceSpacing)
+                DistanceSpacingMultiplier.Value += amount;
+            else if (action == GlobalAction.EditorDecreaseDistanceSpacing)
+                DistanceSpacingMultiplier.Value -= amount;
+
+            return true;
         }
 
         public virtual float GetBeatSnapDistanceAt(HitObject referenceObject)
