@@ -127,14 +127,14 @@ namespace osu.Game.Graphics.Containers
                     if (didChange)
                         samplePopIn?.Play();
 
-                    if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
+                    if (BlockScreenWideMouse && DimMainContent) game?.ShowBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
                     if (didChange)
                         samplePopOut?.Play();
 
-                    if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
+                    if (BlockScreenWideMouse) game?.HideBlockingOverlay(this);
                     break;
             }
 
@@ -150,7 +150,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            game?.RemoveBlockingOverlay(this);
+            game?.HideBlockingOverlay(this);
         }
     }
 }
