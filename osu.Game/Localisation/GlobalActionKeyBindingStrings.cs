@@ -240,14 +240,14 @@ namespace osu.Game.Localisation
         public static LocalisableString EditorFlipVertically => new TranslatableString(getKey(@"editor_flip_vertically"), @"Flip selection vertically");
 
         /// <summary>
-        /// "Increase distance grid spacing"
+        /// "Increase distance spacing"
         /// </summary>
-        public static LocalisableString EditorIncreaseDistanceSpacing => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"Increase distance grid spacing");
+        public static LocalisableString EditorIncreaseDistanceSpacing => new TranslatableString(getKey(@"editor_increase_distance_spacing"), @"Increase distance spacing");
 
         /// <summary>
-        /// "Decrease distance grid spacing"
+        /// "Decrease distance spacing"
         /// </summary>
-        public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance grid spacing");
+        public static LocalisableString EditorDecreaseDistanceSpacing => new TranslatableString(getKey(@"editor_decrease_distance_spacing"), @"Decrease distance spacing");
 
         /// <summary>
         /// "Toggle skin editor"
