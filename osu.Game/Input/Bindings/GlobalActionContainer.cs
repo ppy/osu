@@ -79,6 +79,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.F5 }, GlobalAction.EditorTestGameplay),
             new KeyBinding(new[] { InputKey.Control, InputKey.H }, GlobalAction.EditorFlipHorizontally),
             new KeyBinding(new[] { InputKey.Control, InputKey.J }, GlobalAction.EditorFlipVertically),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelDown }, GlobalAction.EditorDecreaseDistanceSpacing),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.MouseWheelUp }, GlobalAction.EditorIncreaseDistanceSpacing),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -301,5 +303,11 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipVertically))]
         EditorFlipVertically,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorIncreaseDistanceSpacing))]
+        EditorIncreaseDistanceSpacing,
+
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorDecreaseDistanceSpacing))]
+        EditorDecreaseDistanceSpacing,
     }
 }
