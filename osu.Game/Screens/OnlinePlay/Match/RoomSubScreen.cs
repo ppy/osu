@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -58,6 +59,9 @@ namespace osu.Game.Screens.OnlinePlay.Match
         protected readonly IBindable<long?> RoomId = new Bindable<long?>();
 
         [Resolved]
+        private OsuGame game { get; set; }
+
+        [Resolved]
         private MusicController music { get; set; }
 
         [Resolved]
@@ -77,7 +81,11 @@ namespace osu.Game.Screens.OnlinePlay.Match
         public readonly Room Room;
         private readonly bool allowEdit;
 
-        private ModSelectOverlay userModsSelectOverlay;
+        private ModSelectScreen userModsSelectOverlay;
+
+        [CanBeNull]
+        private IDisposable userModsSelectOverlayRegistration;
+
         private RoomSettingsOverlay settingsOverlay;
         private Drawable mainContent;
 
@@ -180,11 +188,6 @@ namespace osu.Game.Screens.OnlinePlay.Match
                                                                 Origin = Anchor.BottomLeft,
                                                                 RelativeSizeAxes = Axes.X,
                                                                 AutoSizeAxes = Axes.Y,
-                                                                Child = userModsSelectOverlay = new UserModSelectOverlay
-                                                                {
-                                                                    SelectedMods = { BindTarget = UserMods },
-                                                                    IsValidMod = _ => false
-                                                                }
                                                             },
                                                         }
                                                     }
@@ -227,6 +230,12 @@ namespace osu.Game.Screens.OnlinePlay.Match
                     }
                 }
             };
+
+            LoadComponent(userModsSelectOverlay = new UserModSelectScreen(OverlayColourScheme.Plum)
+            {
+                SelectedMods = { BindTarget = UserMods },
+                IsValidMod = _ => false
+            });
         }
 
         protected override void LoadComplete()
@@ -254,6 +263,8 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
             beatmapAvailabilityTracker.SelectedItem.BindTo(SelectedItem);
             beatmapAvailabilityTracker.Availability.BindValueChanged(_ => updateWorkingBeatmap());
+
+            userModsSelectOverlayRegistration = game?.RegisterBlockingOverlay(userModsSelectOverlay);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -458,6 +469,13 @@ namespace osu.Game.Screens.OnlinePlay.Match
 
         public class UserModSelectButton : PurpleTriangleButton
         {
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            userModsSelectOverlayRegistration?.Dispose();
         }
     }
 }
