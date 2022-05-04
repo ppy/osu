@@ -59,6 +59,9 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Up, GlobalAction.SelectPrevious),
             new KeyBinding(InputKey.Down, GlobalAction.SelectNext),
 
+            new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousGroup),
+            new KeyBinding(InputKey.Right, GlobalAction.SelectNextGroup),
+
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
             new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
@@ -100,8 +103,6 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> SongSelectKeyBindings => new[]
         {
-            new KeyBinding(InputKey.Left, GlobalAction.SelectPreviousBeatmap),
-            new KeyBinding(InputKey.Right, GlobalAction.SelectNextBeatmap),
             new KeyBinding(InputKey.F1, GlobalAction.ToggleModSelection),
             new KeyBinding(InputKey.F2, GlobalAction.SelectNextRandom),
             new KeyBinding(new[] { InputKey.Shift, InputKey.F2 }, GlobalAction.SelectPreviousRandom),
@@ -304,10 +305,10 @@ namespace osu.Game.Input.Bindings
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.EditorFlipVertically))]
         EditorFlipVertically,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousBeatmap))]
-        SelectPreviousBeatmap,
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectPreviousGroup))]
+        SelectPreviousGroup,
 
-        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextBeatmap))]
-        SelectNextBeatmap,
+        [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.SelectNextGroup))]
+        SelectNextGroup,
     }
 }

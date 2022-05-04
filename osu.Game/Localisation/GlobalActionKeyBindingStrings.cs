@@ -130,6 +130,16 @@ namespace osu.Game.Localisation
         public static LocalisableString SelectNext => new TranslatableString(getKey(@"select_next"), @"Next selection");
 
         /// <summary>
+        /// "Previous group selection"
+        /// </summary>
+        public static LocalisableString SelectPreviousGroup => new TranslatableString(getKey(@"select_previous_group"), @"Previous group selection");
+
+        /// <summary>
+        /// "Next group selection"
+        /// </summary>
+        public static LocalisableString SelectNextGroup => new TranslatableString(getKey(@"select_next_group"), @"Next group selection");
+
+        /// <summary>
         /// "Home"
         /// </summary>
         public static LocalisableString Home => new TranslatableString(getKey(@"home"), @"Home");
@@ -193,16 +203,6 @@ namespace osu.Game.Localisation
         /// "Toggle in-game interface"
         /// </summary>
         public static LocalisableString ToggleInGameInterface => new TranslatableString(getKey(@"toggle_in_game_interface"), @"Toggle in-game interface");
-
-        /// <summary>
-        /// "Previous beatmap selection"
-        /// </summary>
-        public static LocalisableString SelectPreviousBeatmap => new TranslatableString(getKey(@"select_previous_beatmap"), @"Previous beatmap selection");
-
-        /// <summary>
-        /// "Next beatmap selection"
-        /// </summary>
-        public static LocalisableString SelectNextBeatmap => new TranslatableString(getKey(@"select_next_beatmap"), @"Next beatmap selection");
 
         /// <summary>
         /// "Toggle Mod Select"
