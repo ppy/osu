@@ -369,7 +369,7 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var section in ModSectionsContainer)
             {
-                section.FlushAnimation();
+                section.FlushPendingSelections();
             }
 
             FooterContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);
