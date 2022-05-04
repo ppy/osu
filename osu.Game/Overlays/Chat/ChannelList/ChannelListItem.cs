@@ -163,19 +163,17 @@ namespace osu.Game.Overlays.Chat.ChannelList
 
         private void updateState()
         {
-            if (showSelected)
+            bool selected = selectedChannel.Value == Channel && !SelectorActive.Value;
+
+            if (selected)
                 selectBox.FadeIn(300, Easing.OutQuint);
             else
                 selectBox.FadeOut(200, Easing.OutQuint);
 
-            if (showUnread || showSelected)
+            if (Unread.Value || selected)
                 text.FadeColour(colourProvider.Content1, 300, Easing.OutQuint);
             else
                 text.FadeColour(colourProvider.Light3, 200, Easing.OutQuint);
         }
-
-        private bool showUnread => Unread.Value;
-
-        private bool showSelected => selectedChannel.Value == Channel && !SelectorActive.Value;
     }
 }
