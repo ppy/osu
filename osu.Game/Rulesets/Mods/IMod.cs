@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mods
         /// Whether this mod is playable by an end user.
         /// Should be <c>false</c> for cases where the user is not interacting with the game (so it can be excluded from multiplayer selection, for example).
         /// </summary>
-        [Obsolete("Override IsPlayable instead.")] // Can be removed 20220918
+        [Obsolete("Override IsPlayable instead.")] // Can be removed 20221104
         bool UserPlayable { get; }
 
         /// <summary>

@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mods
 #pragma warning restore 618
 
         [JsonIgnore]
-        [Obsolete("Override IsPlayable instead.")] // Can be removed 20220918
+        [Obsolete("Override IsPlayable instead.")] // Can be removed 20221104
         public virtual bool UserPlayable => true;
 
         [Obsolete("Going forward, the concept of \"ranked\" doesn't exist. The only exceptions are automation mods, which should now override IsPlayable to false.")] // Can be removed 20211009
