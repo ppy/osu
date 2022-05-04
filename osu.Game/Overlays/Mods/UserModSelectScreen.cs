@@ -12,6 +12,11 @@ namespace osu.Game.Overlays.Mods
 {
     public class UserModSelectScreen : ModSelectScreen
     {
+        public UserModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+            : base(colourScheme)
+        {
+        }
+
         protected override ModColumn CreateModColumn(ModType modType, Key[] toggleKeys = null) => new UserModColumn(modType, false, toggleKeys);
 
         protected override IReadOnlyList<Mod> ComputeNewModsFromSelection(IReadOnlyList<Mod> oldSelection, IReadOnlyList<Mod> newSelection)
