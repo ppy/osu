@@ -26,13 +26,13 @@ namespace osu.Game.Graphics.Containers
 
             foreach (Drawable child in Children)
             {
-                child.RotateTo(-parentRotation);
+                child.Rotation = -parentRotation;
 
                 int parentRotationInQuarterTurns = (int)Math.Floor(parentRotation / 90);
                 if (parentRotationInQuarterTurns % 2 != 0)
-                    child.ScaleTo(new Vector2(parentScale.Y, parentScale.X));
+                    child.Scale = new Vector2(parentScale.Y, parentScale.X);
                 else
-                    child.ScaleTo(parentScale);
+                    child.Scale = parentScale;
 
                 int previousParentRotationInQuarterTurns = (int)Math.Floor(previousParentRotation / 90);
                 int rotationsNeeded = parentRotationInQuarterTurns - previousParentRotationInQuarterTurns;
@@ -58,14 +58,10 @@ namespace osu.Game.Graphics.Containers
                 }
 
                 if (Math.Sign(parentScale.X) != Math.Sign(previousParentScale.X))
-                {
                     child.Origin = (parentRotationInQuarterTurns % 2 != 0) ? flipAnchorY(child.Origin) : flipAnchorX(child.Origin);
-                }
 
                 if (Math.Sign(parentScale.Y) != Math.Sign(previousParentScale.Y))
-                {
                     child.Origin = (parentRotationInQuarterTurns % 2 != 0) ? flipAnchorX(child.Origin) : flipAnchorY(child.Origin);
-                }
             }
 
             previousParentRotation = parentRotation;
