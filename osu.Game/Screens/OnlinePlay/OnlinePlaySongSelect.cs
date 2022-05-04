@@ -14,6 +14,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Rooms;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -153,7 +154,7 @@ namespace osu.Game.Screens.OnlinePlay
             return base.OnExiting(e);
         }
 
-        protected override ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen
+        protected override ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen(OverlayColourScheme.Plum)
         {
             IsValidMod = IsValidMod
         };

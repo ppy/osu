@@ -27,8 +27,6 @@ namespace osu.Game.Overlays.Mods
 {
     public abstract class ModSelectScreen : ShearedOverlayContainer
     {
-        protected override OverlayColourScheme ColourScheme => OverlayColourScheme.Green;
-
         [Cached]
         public Bindable<IReadOnlyList<Mod>> SelectedMods { get; private set; } = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -64,6 +62,11 @@ namespace osu.Game.Overlays.Mods
         private ModSettingsArea modSettingsArea = null!;
         private ColumnScrollContainer columnScroll = null!;
         private ColumnFlowContainer columnFlow = null!;
+
+        protected ModSelectScreen(OverlayColourScheme colourScheme = OverlayColourScheme.Green)
+            : base(colourScheme)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load()
