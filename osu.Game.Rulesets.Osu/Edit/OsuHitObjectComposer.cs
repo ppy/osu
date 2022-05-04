@@ -59,11 +59,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
             LayerBelowRuleset.AddRange(new Drawable[]
             {
-                new PlayfieldBorder
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    PlayfieldBorderStyle = { Value = PlayfieldBorderStyle.Corners }
-                },
                 distanceSnapGridContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both
