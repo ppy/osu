@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <LangVersion>8.0</LangVersion>
     <OutputPath>bin\$(Configuration)</OutputPath>
@@ -19,6 +19,7 @@
     <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <ErrorReport>prompt</ErrorReport>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugSymbols>True</DebugSymbols>
