@@ -171,6 +171,7 @@ namespace osu.Game
         private readonly string[] args;
 
         private readonly List<OsuFocusedOverlayContainer> focusedOverlays = new List<OsuFocusedOverlayContainer>();
+        private readonly List<OverlayContainer> externalOverlays = new List<OverlayContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
@@ -186,18 +187,58 @@ namespace osu.Game
         private void updateBlockingOverlayFade() =>
             ScreenContainer.FadeColour(visibleBlockingOverlays.Any() ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
 
-        public void AddBlockingOverlay(OverlayContainer overlay)
+        /// <summary>
+        /// Registers a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself for later use.
+        /// </summary>
+        /// <remarks>
+        /// The goal of this method is to allow child screens, like <see cref="SongSelect"/> to register their own full-screen blocking overlays
+        /// with background dim.
+        /// In those cases, for the dim to work correctly, the overlays need to be added at the `OsuGame` level directly, rather as children of the screens.
+        /// </remarks>
+        /// <returns>
+        /// An <see cref="IDisposable"/> that should be disposed of when the <paramref name="overlayContainer"/> should be unregistered.
+        /// Disposing of this <see cref="IDisposable"/> will automatically expire the <paramref name="overlayContainer"/>.
+        /// </returns>
+        internal IDisposable RegisterBlockingOverlay(OverlayContainer overlayContainer)
+        {
+            if (overlayContainer.Parent != null)
+                throw new ArgumentException($@"Overlays registered via {nameof(RegisterBlockingOverlay)} should not be added to the scene graph.");
+
+            if (externalOverlays.Contains(overlayContainer))
+                throw new ArgumentException($@"{overlayContainer} has already been registered via {nameof(RegisterBlockingOverlay)} once.");
+
+            externalOverlays.Add(overlayContainer);
+            overlayContent.Add(overlayContainer);
+            return new InvokeOnDisposal(() => unregisterBlockingOverlay(overlayContainer));
+        }
+
+        /// <summary>
+        /// Should be called when <paramref name="overlay"/> has been shown and should begin blocking background input.
+        /// </summary>
+        internal void ShowBlockingOverlay(OverlayContainer overlay)
         {
             if (!visibleBlockingOverlays.Contains(overlay))
                 visibleBlockingOverlays.Add(overlay);
             updateBlockingOverlayFade();
         }
 
-        public void RemoveBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
+        /// <summary>
+        /// Should be called when a blocking <paramref name="overlay"/> has been hidden and should stop blocking background input.
+        /// </summary>
+        internal void HideBlockingOverlay(OverlayContainer overlay) => Schedule(() =>
         {
             visibleBlockingOverlays.Remove(overlay);
             updateBlockingOverlayFade();
         });
+
+        /// <summary>
+        /// Unregisters a blocking <see cref="OverlayContainer"/> that was not created by <see cref="OsuGame"/> itself.
+        /// </summary>
+        private void unregisterBlockingOverlay(OverlayContainer overlayContainer)
+        {
+            externalOverlays.Remove(overlayContainer);
+            overlayContainer.Expire();
+        }
 
         /// <summary>
         /// Close all game-wide overlays.
