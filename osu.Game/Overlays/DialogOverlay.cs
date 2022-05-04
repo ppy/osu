@@ -47,6 +47,12 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
+            if (!IsLoaded)
+            {
+                Schedule(() => Push(dialog));
+                return;
+            }
+
             if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
 
             // if any existing dialog is being displayed, dismiss it before showing a new one.
@@ -60,7 +66,7 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        public override bool IsPresent => dialogContainer.Children.Count > 0;
+        public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -88,16 +94,14 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
+            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
+
+            // PopOut is called as part of VisibilityContainer's initialisation logic, but we don't want it to interact with a potentially waiting dialog.
+            if (!IsLoaded) return;
 
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
-            if (CurrentDialog?.State.Value == Visibility.Visible)
-            {
-                CurrentDialog.Hide();
-                return;
-            }
-
-            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
+            if (CurrentDialog?.State.Value == Visibility.Visible) CurrentDialog.Hide();
         }
 
         public override bool OnPressed(KeyBindingPressEvent<GlobalAction> e)
