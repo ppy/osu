@@ -55,25 +55,16 @@ namespace osu.Game.Graphics.Containers
                     case 3:
                         child.Origin = rotateAnchor90(child.Origin, false);
                         break;
-
-                    default:
-                        break;
                 }
 
                 if (Math.Sign(parentScale.X) != Math.Sign(previousParentScale.X))
                 {
-                    if (parentRotationInQuarterTurns % 2 != 0)
-                        child.Origin = flipAnchorY(child.Origin);
-                    else
-                        child.Origin = flipAnchorX(child.Origin);
+                    child.Origin = (parentRotationInQuarterTurns % 2 != 0) ? flipAnchorY(child.Origin) : flipAnchorX(child.Origin);
                 }
 
                 if (Math.Sign(parentScale.Y) != Math.Sign(previousParentScale.Y))
                 {
-                    if (parentRotationInQuarterTurns % 2 != 0)
-                        child.Origin = flipAnchorX(child.Origin);
-                    else
-                        child.Origin = flipAnchorY(child.Origin);
+                    child.Origin = (parentRotationInQuarterTurns % 2 != 0) ? flipAnchorX(child.Origin) : flipAnchorY(child.Origin);
                 }
             }
 
@@ -83,53 +74,17 @@ namespace osu.Game.Graphics.Containers
 
         private Anchor rotateAnchor90(Anchor anchor, bool clockwise)
         {
-            switch (anchor)
-            {
-                case Anchor.TopLeft:
-                    anchor = Anchor.TopRight;
-                    break;
+            Anchor result = 0;
 
-                case Anchor.TopCentre:
-                    anchor = Anchor.CentreRight;
-                    break;
+            if (anchor.HasFlagFast(Anchor.x0)) result |= Anchor.y0;
+            if (anchor.HasFlagFast(Anchor.x1)) result |= Anchor.y1;
+            if (anchor.HasFlagFast(Anchor.x2)) result |= Anchor.y2;
 
-                case Anchor.TopRight:
-                    anchor = Anchor.BottomRight;
-                    break;
+            if (anchor.HasFlagFast(Anchor.y0)) result |= Anchor.x2;
+            if (anchor.HasFlagFast(Anchor.y1)) result |= Anchor.x1;
+            if (anchor.HasFlagFast(Anchor.y2)) result |= Anchor.x0;
 
-                case Anchor.CentreLeft:
-                    anchor = Anchor.TopCentre;
-                    break;
-
-                case Anchor.Centre:
-                    anchor = Anchor.Centre;
-                    break;
-
-                case Anchor.CentreRight:
-                    anchor = Anchor.BottomCentre;
-                    break;
-
-                case Anchor.BottomLeft:
-                    anchor = Anchor.TopLeft;
-                    break;
-
-                case Anchor.BottomCentre:
-                    anchor = Anchor.CentreLeft;
-                    break;
-
-                case Anchor.BottomRight:
-                    anchor = Anchor.BottomLeft;
-                    break;
-
-                default: throw new ArgumentOutOfRangeException();
-            }
-
-            if (!clockwise)
-            {
-                anchor = flipAnchorXY(anchor);
-            }
-
-            return anchor;
+            return clockwise ? result : flipAnchorXY(result);
         }
 
         private Anchor flipAnchorXY(Anchor anchor)
@@ -140,80 +95,8 @@ namespace osu.Game.Graphics.Containers
             return anchor;
         }
 
-        private Anchor flipAnchorX(Anchor anchor)
-        {
-            Anchor anchorX = getAnchorX(anchor);
-            Anchor anchorY = getAnchorY(anchor);
+        private Anchor flipAnchorX(Anchor anchor) => anchor ^ (Anchor.x0 | Anchor.x2);
 
-            Anchor flippedAnchorX;
-
-            switch (anchorX)
-            {
-                case Anchor.x0:
-                    flippedAnchorX = Anchor.x2;
-                    break;
-
-                case Anchor.x1:
-                    flippedAnchorX = Anchor.x1;
-                    break;
-
-                case Anchor.x2:
-                    flippedAnchorX = Anchor.x0;
-                    break;
-
-                default: throw new ArgumentOutOfRangeException();
-            }
-
-            return flippedAnchorX | anchorY;
-        }
-
-        private Anchor flipAnchorY(Anchor anchor)
-        {
-            Anchor anchorX = getAnchorX(anchor);
-            Anchor anchorY = getAnchorY(anchor);
-
-            Anchor flippedAnchorY;
-
-            switch (anchorY)
-            {
-                case Anchor.y0:
-                    flippedAnchorY = Anchor.y2;
-                    break;
-
-                case Anchor.y1:
-                    flippedAnchorY = Anchor.y1;
-                    break;
-
-                case Anchor.y2:
-                    flippedAnchorY = Anchor.y0;
-                    break;
-
-                default: throw new ArgumentOutOfRangeException();
-            }
-
-            return anchorX | flippedAnchorY;
-        }
-
-        private Anchor getAnchorX(Anchor anchor)
-        {
-            if (anchor.HasFlagFast(Anchor.x0)) return Anchor.x0;
-
-            if (anchor.HasFlagFast(Anchor.x1)) return Anchor.x1;
-
-            if (anchor.HasFlagFast(Anchor.x2)) return Anchor.x2;
-
-            throw new ArgumentOutOfRangeException();
-        }
-
-        private Anchor getAnchorY(Anchor anchor)
-        {
-            if (anchor.HasFlagFast(Anchor.y0)) return Anchor.y0;
-
-            if (anchor.HasFlagFast(Anchor.y1)) return Anchor.y1;
-
-            if (anchor.HasFlagFast(Anchor.y2)) return Anchor.y2;
-
-            throw new ArgumentOutOfRangeException();
-        }
+        private Anchor flipAnchorY(Anchor anchor) => anchor ^ (Anchor.y0 | Anchor.y2);
     }
 }
