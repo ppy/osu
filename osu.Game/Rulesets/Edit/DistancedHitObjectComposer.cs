@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Edit
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                ShortcutText.Text = config.LookupKeyBindings(getAction(change));
+                ShortcutText.Text = config.LookupKeyBindings(getAction(change)).ToUpper();
             }
 
             private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0
