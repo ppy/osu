@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -76,12 +78,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Make lines the same width independent of display resolution.
             float lineWidth = DrawWidth / ScreenSpaceDrawQuad.Width;
 
+            List<Box> generatedLines = new List<Box>();
+
             while (Precision.AlmostBigger((endPosition - currentPosition) * Math.Sign(step), 0))
             {
                 var gridLine = new Box
                 {
                     Colour = Colour4.White,
-                    Alpha = index == 0 ? 0.3f : 0.1f,
+                    Alpha = 0.1f,
                 };
 
                 if (direction == Direction.Horizontal)
@@ -99,11 +103,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     gridLine.X = currentPosition;
                 }
 
-                AddInternal(gridLine);
+                generatedLines.Add(gridLine);
 
                 index += 1;
                 currentPosition = startPosition + index * step;
             }
+
+            if (generatedLines.Count == 0)
+                return;
+
+            generatedLines.First().Alpha = 0.3f;
+            generatedLines.Last().Alpha = 0.3f;
+
+            AddRangeInternal(generatedLines);
         }
 
         public Vector2 GetSnappedPosition(Vector2 original)
