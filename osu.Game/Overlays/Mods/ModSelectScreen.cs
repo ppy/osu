@@ -308,7 +308,7 @@ namespace osu.Game.Overlays.Mods
 
                 var column = columnFlow[i].Column;
 
-                column.FlushAnimation();
+                column.FlushPendingSelections();
                 column.TopLevelContent
                       .MoveToY(i % 2 == 0 ? -distance : distance, fade_out_duration, Easing.OutQuint)
                       .FadeOut(fade_out_duration, Easing.OutQuint);
