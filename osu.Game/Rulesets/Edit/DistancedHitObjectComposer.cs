@@ -3,11 +3,13 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
@@ -80,7 +82,7 @@ namespace osu.Game.Rulesets.Edit
                     distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
 
                     if (v.NewValue != v.OldValue)
-                        onScreenDisplay?.Display(new DistanceSpacingToast(v.NewValue.ToLocalisableString(@"0.##x")));
+                        onScreenDisplay?.Display(new DistanceSpacingToast(v.NewValue.ToLocalisableString(@"0.##x"), v));
 
                     EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
                 }, true);
@@ -182,10 +184,23 @@ namespace osu.Game.Rulesets.Edit
 
         private class DistanceSpacingToast : Toast
         {
-            public DistanceSpacingToast(LocalisableString value)
-                : base("Distance Spacing", value, string.Empty)
+            private readonly ValueChangedEvent<double> change;
+
+            public DistanceSpacingToast(LocalisableString value, ValueChangedEvent<double> change)
+                : base(getAction(change).GetLocalisableDescription(), value, string.Empty)
             {
+                this.change = change;
             }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                ShortcutText.Text = config.LookupKeyBindings(getAction(change));
+            }
+
+            private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0
+                ? GlobalAction.EditorIncreaseDistanceSpacing
+                : GlobalAction.EditorDecreaseDistanceSpacing;
         }
     }
 }
