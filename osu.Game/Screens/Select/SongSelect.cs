@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Select
         [Resolved(CanBeNull = true)]
         private LegacyImportManager legacyImportManager { get; set; }
 
-        protected ModSelectOverlay ModSelect { get; private set; }
+        protected ModSelectScreen ModSelect { get; private set; }
 
         protected Sample SampleConfirm { get; private set; }
 
@@ -252,35 +252,19 @@ namespace osu.Game.Screens.Select
             {
                 AddRangeInternal(new Drawable[]
                 {
-                    new GridContainer // used for max height implementation
+                    FooterPanels = new Container
                     {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.Both,
-                        RowDimensions = new[]
+                        Padding = new MarginPadding { Bottom = Footer.HEIGHT },
+                        Children = new Drawable[]
                         {
-                            new Dimension(),
-                            new Dimension(GridSizeMode.Relative, 1f, maxSize: ModSelectOverlay.HEIGHT + Footer.HEIGHT),
-                        },
-                        Content = new[]
-                        {
-                            null,
-                            new Drawable[]
-                            {
-                                FooterPanels = new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Bottom = Footer.HEIGHT },
-                                    Children = new Drawable[]
-                                    {
-                                        BeatmapOptions = new BeatmapOptionsOverlay(),
-                                        ModSelect = CreateModSelectOverlay()
-                                    }
-                                }
-                            }
+                            BeatmapOptions = new BeatmapOptionsOverlay(),
                         }
                     },
-                    Footer = new Footer()
+                    Footer = new Footer(),
+                    ModSelect = CreateModSelectOverlay()
                 });
             }
 
@@ -332,7 +316,7 @@ namespace osu.Game.Screens.Select
             (new FooterButtonOptions(), BeatmapOptions)
         };
 
-        protected virtual ModSelectOverlay CreateModSelectOverlay() => new UserModSelectOverlay();
+        protected virtual ModSelectScreen CreateModSelectOverlay() => new UserModSelectScreen();
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
