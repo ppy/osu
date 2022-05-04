@@ -128,7 +128,7 @@ jobs:
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
       - name: Build
-        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug
+        run: msbuild osu.Android/osu.Android.csproj /restore /p:Configuration=Debug /p:EnforceCodeStyleInBuild=false
 
   build-only-ios:
     name: Build only (iOS)
@@ -147,4 +147,4 @@ jobs:
       # cannot accept .sln(f) files as arguments.
       # Build just the main game for now.
       - name: Build
-        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug
+        run: msbuild osu.iOS/osu.iOS.csproj /restore /p:Configuration=Debug /p:EnforceCodeStyleInBuild=false
