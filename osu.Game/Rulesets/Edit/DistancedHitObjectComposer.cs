@@ -3,11 +3,17 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Rulesets.Objects;
 
@@ -33,6 +39,9 @@ namespace osu.Game.Rulesets.Edit
         protected ExpandingToolboxContainer RightSideToolboxContainer { get; private set; }
 
         private ExpandableSlider<double, SizeSlider<double>> distanceSpacingSlider;
+
+        [Resolved(canBeNull: true)]
+        private OnScreenDisplay onScreenDisplay { get; set; }
 
         protected DistancedHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -66,11 +75,15 @@ namespace osu.Game.Rulesets.Edit
             if (!DistanceSpacingMultiplier.Disabled)
             {
                 DistanceSpacingMultiplier.Value = EditorBeatmap.BeatmapInfo.DistanceSpacing;
-                DistanceSpacingMultiplier.BindValueChanged(v =>
+                DistanceSpacingMultiplier.BindValueChanged(multiplier =>
                 {
-                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({v.NewValue:0.##x})";
-                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({v.NewValue:0.##x})";
-                    EditorBeatmap.BeatmapInfo.DistanceSpacing = v.NewValue;
+                    distanceSpacingSlider.ContractedLabelText = $"D. S. ({multiplier.NewValue:0.##x})";
+                    distanceSpacingSlider.ExpandedLabelText = $"Distance Spacing ({multiplier.NewValue:0.##x})";
+
+                    if (multiplier.NewValue != multiplier.OldValue)
+                        onScreenDisplay?.Display(new DistanceSpacingToast(multiplier.NewValue.ToLocalisableString(@"0.##x"), multiplier));
+
+                    EditorBeatmap.BeatmapInfo.DistanceSpacing = multiplier.NewValue;
                 }, true);
             }
         }
@@ -152,6 +165,27 @@ namespace osu.Game.Rulesets.Edit
                 snappedEndTime -= beatLength;
 
             return DurationToDistance(referenceObject, snappedEndTime - startTime);
+        }
+
+        private class DistanceSpacingToast : Toast
+        {
+            private readonly ValueChangedEvent<double> change;
+
+            public DistanceSpacingToast(LocalisableString value, ValueChangedEvent<double> change)
+                : base(getAction(change).GetLocalisableDescription(), value, string.Empty)
+            {
+                this.change = change;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                ShortcutText.Text = config.LookupKeyBindings(getAction(change)).ToUpper();
+            }
+
+            private static GlobalAction getAction(ValueChangedEvent<double> change) => change.NewValue - change.OldValue > 0
+                ? GlobalAction.EditorIncreaseDistanceSpacing
+                : GlobalAction.EditorDecreaseDistanceSpacing;
         }
     }
 }
