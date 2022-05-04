@@ -3,11 +3,13 @@
 
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using osu.Framework.Extensions.LocalisationExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Containers.Markdown;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 
 namespace osu.Game.Overlays.Wiki
 {
@@ -24,7 +26,7 @@ namespace osu.Game.Overlays.Wiki
             {
                 new OsuSpriteText
                 {
-                    Text = "CONTENTS",
+                    Text = WikiStrings.ShowToc.ToUpper(),
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                     Margin = new MarginPadding { Bottom = 5 },
                 },

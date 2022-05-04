@@ -1,67 +1,68 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
+using Moq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Rooms;
 using osu.Game.Screens.OnlinePlay.Lounge.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneRankRangePill : MultiplayerTestScene
+    public class TestSceneRankRangePill : OsuTestScene
     {
-        [SetUp]
-        public new void Setup() => Schedule(() =>
+        private readonly Mock<MultiplayerClient> multiplayerClient = new Mock<MultiplayerClient>();
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            // not used directly in component, but required due to it inheriting from OnlinePlayComposite.
+            new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
+            Dependencies.CacheAs(multiplayerClient.Object);
+
             Child = new RankRangePill
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
-        });
+        }
 
         [Test]
         public void TestSingleUser()
         {
-            AddStep("add user", () =>
+            setupRoomWithUsers(new APIUser
             {
-                MultiplayerClient.AddUser(new APIUser
-                {
-                    Id = 2,
-                    Statistics = { GlobalRank = 1234 }
-                });
-
-                // Remove the local user so only the one above is displayed.
-                MultiplayerClient.RemoveUser(API.LocalUser.Value);
+                Id = 2,
+                Statistics = { GlobalRank = 1234 }
             });
         }
 
         [Test]
         public void TestMultipleUsers()
         {
-            AddStep("add users", () =>
-            {
-                MultiplayerClient.AddUser(new APIUser
+            setupRoomWithUsers(
+                new APIUser
                 {
                     Id = 2,
                     Statistics = { GlobalRank = 1234 }
-                });
-
-                MultiplayerClient.AddUser(new APIUser
+                },
+                new APIUser
                 {
                     Id = 3,
                     Statistics = { GlobalRank = 3333 }
-                });
-
-                MultiplayerClient.AddUser(new APIUser
+                },
+                new APIUser
                 {
                     Id = 4,
                     Statistics = { GlobalRank = 4321 }
                 });
-
-                // Remove the local user so only the ones above are displayed.
-                MultiplayerClient.RemoveUser(API.LocalUser.Value);
-            });
         }
 
         [TestCase(1, 10)]
@@ -73,22 +74,29 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [TestCase(1000000, 10000000)]
         public void TestRange(int min, int max)
         {
-            AddStep("add users", () =>
-            {
-                MultiplayerClient.AddUser(new APIUser
+            setupRoomWithUsers(
+                new APIUser
                 {
                     Id = 2,
                     Statistics = { GlobalRank = min }
-                });
-
-                MultiplayerClient.AddUser(new APIUser
+                },
+                new APIUser
                 {
                     Id = 3,
                     Statistics = { GlobalRank = max }
                 });
+        }
 
-                // Remove the local user so only the ones above are displayed.
-                MultiplayerClient.RemoveUser(API.LocalUser.Value);
+        private void setupRoomWithUsers(params APIUser[] users)
+        {
+            AddStep("setup room", () =>
+            {
+                multiplayerClient.SetupGet(m => m.Room).Returns(new MultiplayerRoom(0)
+                {
+                    Users = new List<MultiplayerRoomUser>(users.Select(apiUser => new MultiplayerRoomUser(apiUser.Id) { User = apiUser }))
+                });
+
+                multiplayerClient.Raise(m => m.RoomUpdated -= null);
             });
         }
     }

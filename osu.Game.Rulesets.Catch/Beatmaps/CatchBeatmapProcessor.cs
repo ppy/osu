@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         public void ApplyPositionOffsets(IBeatmap beatmap)
         {
-            var rng = new FastRandom(RNG_SEED);
+            var rng = new LegacyRandom(RNG_SEED);
 
             float? lastPosition = null;
             double lastStartTime = 0;
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             initialiseHyperDash(beatmap);
         }
 
-        private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, FastRandom rng)
+        private static void applyHardRockOffset(CatchHitObject hitObject, ref float? lastPosition, ref double lastStartTime, LegacyRandom rng)
         {
             float offsetPosition = hitObject.OriginalX;
             double startTime = hitObject.StartTime;
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
         /// <param name="position">The position which the offset should be applied to.</param>
         /// <param name="maxOffset">The maximum offset, cannot exceed 20px.</param>
         /// <param name="rng">The random number generator.</param>
-        private static void applyRandomOffset(ref float position, double maxOffset, FastRandom rng)
+        private static void applyRandomOffset(ref float position, double maxOffset, LegacyRandom rng)
         {
             bool right = rng.NextBool();
             float rand = Math.Min(20, (float)rng.Next(0, Math.Max(0, maxOffset)));

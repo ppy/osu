@@ -166,20 +166,10 @@ namespace osu.Game.Rulesets.Scoring
             if (!result.Type.IsScorable())
                 return;
 
-            if (result.Type.AffectsCombo())
-            {
-                switch (result.Type)
-                {
-                    case HitResult.Miss:
-                    case HitResult.LargeTickMiss:
-                        Combo.Value = 0;
-                        break;
-
-                    default:
-                        Combo.Value++;
-                        break;
-                }
-            }
+            if (result.Type.IncreasesCombo())
+                Combo.Value++;
+            else if (result.Type.BreaksCombo())
+                Combo.Value = 0;
 
             double scoreIncrease = result.Type.IsHit() ? result.Judgement.NumericResultFor(result) : 0;
 
@@ -385,13 +375,13 @@ namespace osu.Game.Rulesets.Scoring
         {
             if (acc == 1)
                 return ScoreRank.X;
-            if (acc > 0.95)
+            if (acc >= 0.95)
                 return ScoreRank.S;
-            if (acc > 0.9)
+            if (acc >= 0.9)
                 return ScoreRank.A;
-            if (acc > 0.8)
+            if (acc >= 0.8)
                 return ScoreRank.B;
-            if (acc > 0.7)
+            if (acc >= 0.7)
                 return ScoreRank.C;
 
             return ScoreRank.D;

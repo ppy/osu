@@ -88,9 +88,13 @@ namespace osu.Game.Overlays.Dialog
                         if (actionInvoked) return;
 
                         actionInvoked = true;
-                        action?.Invoke();
 
+                        // Hide the dialog before running the action.
+                        // This is important as the code which is performed may check for a dialog being present (ie. `OsuGame.PerformFromScreen`)
+                        // and we don't want it to see the already dismissed dialog.
                         Hide();
+
+                        action?.Invoke();
                     };
                 }
             }
@@ -212,14 +216,19 @@ namespace osu.Game.Overlays.Dialog
             };
 
             // It's important we start in a visible state so our state fires on hide, even before load.
-            // This is used by the DialogOverlay to know when the dialog was dismissed.
+            // This is used by the dialog overlay to know when the dialog was dismissed.
             Show();
         }
 
         /// <summary>
         /// Programmatically clicks the first <see cref="PopupDialogOkButton"/>.
         /// </summary>
-        public void PerformOkAction() => Buttons.OfType<PopupDialogOkButton>().First().TriggerClick();
+        public void PerformOkAction() => PerformAction<PopupDialogOkButton>();
+
+        /// <summary>
+        /// Programmatically clicks the first button of the provided type.
+        /// </summary>
+        public void PerformAction<T>() where T : PopupDialogButton => Buttons.OfType<T>().First().TriggerClick();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

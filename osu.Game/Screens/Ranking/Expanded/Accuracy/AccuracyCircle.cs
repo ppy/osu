@@ -212,12 +212,12 @@ namespace osu.Game.Screens.Ranking.Expanded.Accuracy
                     Padding = new MarginPadding { Vertical = -15, Horizontal = -20 },
                     Children = new[]
                     {
-                        new RankBadge(1f, getRank(ScoreRank.X)),
-                        new RankBadge(0.95f, getRank(ScoreRank.S)),
-                        new RankBadge(0.9f, getRank(ScoreRank.A)),
-                        new RankBadge(0.8f, getRank(ScoreRank.B)),
-                        new RankBadge(0.7f, getRank(ScoreRank.C)),
-                        new RankBadge(0.35f, getRank(ScoreRank.D)),
+                        new RankBadge(1, getRank(ScoreRank.X)),
+                        new RankBadge(0.95, getRank(ScoreRank.S)),
+                        new RankBadge(0.9, getRank(ScoreRank.A)),
+                        new RankBadge(0.8, getRank(ScoreRank.B)),
+                        new RankBadge(0.7, getRank(ScoreRank.C)),
+                        new RankBadge(0.35, getRank(ScoreRank.D)),
                     }
                 },
                 rankText = new RankText(score.Rank)

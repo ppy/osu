@@ -21,7 +21,7 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public bool OpenOnClick
         {
-            set => clickableArea.Enabled.Value = value;
+            set => clickableArea.Enabled.Value = clickableArea.Action != null && value;
         }
 
         /// <summary>
@@ -52,8 +52,10 @@ namespace osu.Game.Users.Drawables
             Add(clickableArea = new ClickableArea
             {
                 RelativeSizeAxes = Axes.Both,
-                Action = openProfile
             });
+
+            if (user?.Id != APIUser.SYSTEM_USER_ID)
+                clickableArea.Action = openProfile;
         }
 
         [BackgroundDependencyLoader]

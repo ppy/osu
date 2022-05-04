@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsButton
                 {
                     Text = SkinSettingsStrings.SkinLayoutEditor,
-                    Action = () => skinEditor?.Toggle(),
+                    Action = () => skinEditor?.ToggleVisibility(),
                 },
                 new ExportSkinButton(),
             };

@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Gameplay
         [Test]
         public void TestSampleHasLifetimeEndWithInitialClockTime()
         {
-            GameplayClockContainer gameplayContainer = null;
+            MasterGameplayClockContainer gameplayContainer = null;
             DrawableStoryboardSample sample = null;
 
             AddStep("create container", () =>
@@ -96,8 +96,11 @@ namespace osu.Game.Tests.Gameplay
                 var working = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
                 working.LoadTrack();
 
-                Add(gameplayContainer = new MasterGameplayClockContainer(working, 1000, true)
+                const double start_time = 1000;
+
+                Add(gameplayContainer = new MasterGameplayClockContainer(working, start_time)
                 {
+                    StartTime = start_time,
                     IsPaused = { Value = true },
                     Child = new FrameStabilityContainer
                     {
@@ -148,7 +151,7 @@ namespace osu.Game.Tests.Gameplay
         private class TestSkin : LegacySkin
         {
             public TestSkin(string resourceName, IStorageResourceProvider resources)
-                : base(DefaultLegacySkin.CreateInfo(), new TestResourceStore(resourceName), resources, "skin.ini")
+                : base(DefaultLegacySkin.CreateInfo(), resources, new TestResourceStore(resourceName))
             {
             }
         }

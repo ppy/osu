@@ -16,6 +16,7 @@ using osu.Framework.Threading;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Resources.Localisation.Web;
 using APIUser = osu.Game.Online.API.Requests.Responses.APIUser;
 
 namespace osu.Game.Overlays.Comments
@@ -328,7 +329,7 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Margin = new MarginPadding { Left = 50 },
-                        Text = @"No comments yet."
+                        Text = CommentsStrings.Empty
                     }
                 });
             }

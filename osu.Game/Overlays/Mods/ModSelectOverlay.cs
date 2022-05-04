@@ -20,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input.Bindings;
+using osu.Game.Resources.Localisation.Web;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens;
 using osu.Game.Utils;
@@ -317,7 +318,7 @@ namespace osu.Game.Overlays.Mods
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Close",
+                                                Text = CommonStrings.ButtonsClose,
                                                 Action = Hide,
                                                 Origin = Anchor.CentreLeft,
                                                 Anchor = Anchor.CentreLeft,
@@ -368,7 +369,7 @@ namespace osu.Game.Overlays.Mods
 
             foreach (var section in ModSectionsContainer)
             {
-                section.FlushAnimation();
+                section.FlushPendingSelections();
             }
 
             FooterContainer.MoveToX(content_width, WaveContainer.DISAPPEAR_DURATION, Easing.InSine);

@@ -351,7 +351,7 @@ namespace osu.Game.Stores
 
                             using (var transaction = realm.BeginWrite())
                             {
-                                existing.DeletePending = false;
+                                UndeleteForReuse(existing);
                                 transaction.Commit();
                             }
 
@@ -387,7 +387,7 @@ namespace osu.Game.Stores
                             {
                                 LogForModel(item, @$"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
 
-                                existing.DeletePending = false;
+                                UndeleteForReuse(existing);
                                 transaction.Commit();
 
                                 return existing.ToLive(Realm);
@@ -526,6 +526,19 @@ namespace osu.Game.Stores
 
         private bool checkAllFilesExist(TModel model) =>
             model.Files.All(f => Files.Storage.Exists(f.File.GetStoragePath()));
+
+        /// <summary>
+        /// Called when an existing model is in a soft deleted state but being recovered.
+        /// </summary>
+        /// <param name="existing">The existing model.</param>
+        protected virtual void UndeleteForReuse(TModel existing)
+        {
+            if (!existing.DeletePending)
+                return;
+
+            LogForModel(existing, $@"Existing {HumanisedModelName}'s deletion flag has been removed to allow for reuse.");
+            existing.DeletePending = false;
+        }
 
         /// <summary>
         /// Whether this specified path should be removed after successful import.

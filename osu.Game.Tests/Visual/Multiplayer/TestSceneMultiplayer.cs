@@ -41,6 +41,7 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Screens.Spectate;
 using osu.Game.Tests.Resources;
 using osuTK.Input;
+using ReadyButton = osu.Game.Screens.OnlinePlay.Components.ReadyButton;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
@@ -424,7 +425,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("Beatmap doesn't match current item", () => Beatmap.Value.BeatmapInfo.OnlineID != multiplayerClient.Room?.Playlist.First().BeatmapID);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
@@ -462,7 +463,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("Ruleset doesn't match current item", () => Ruleset.Value.OnlineID != multiplayerClient.Room?.Playlist.First().RulesetID);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
@@ -494,17 +495,20 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for song select", () => this.ChildrenOfType<MultiplayerMatchSongSelect>().FirstOrDefault()?.BeatmapSetsLoaded == true);
 
-            AddAssert("Mods match current item", () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+            AddAssert("Mods match current item",
+                () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
 
             AddStep("Switch required mods", () => ((MultiplayerMatchSongSelect)multiplayerComponents.MultiplayerScreen.CurrentSubScreen).Mods.Value = new Mod[] { new OsuModDoubleTime() });
 
-            AddAssert("Mods don't match current item", () => !SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+            AddAssert("Mods don't match current item",
+                () => !SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddUntilStep("play started", () => multiplayerComponents.CurrentScreen is Player);
 
-            AddAssert("Mods match current item", () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
+            AddAssert("Mods match current item",
+                () => SelectedMods.Value.Select(m => m.Acronym).SequenceEqual(multiplayerClient.Room.AsNonNull().Playlist.First().RequiredMods.Select(m => m.Acronym)));
         }
 
         [Test]
@@ -535,7 +539,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for spectating user state", () => multiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddAssert("play not started", () => multiplayerComponents.IsCurrentScreen());
         }
@@ -568,7 +572,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
             AddUntilStep("wait for spectating user state", () => multiplayerClient.LocalUser?.State == MultiplayerUserState.Spectating);
 
-            AddStep("start match externally", () => multiplayerClient.StartMatch());
+            AddStep("start match externally", () => multiplayerClient.StartMatch().WaitSafely());
 
             AddStep("restore beatmap", () =>
             {
@@ -662,6 +666,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
             }
 
             AddUntilStep("wait for results", () => multiplayerComponents.CurrentScreen is ResultsScreen);
+        }
+
+        [Test]
+        public void TestGameplayDoesntStartWithNonLoadedUser()
+        {
+            createRoom(() => new Room
+            {
+                Name = { Value = "Test Room" },
+                Playlist =
+                {
+                    new PlaylistItem(beatmaps.GetWorkingBeatmap(importedSet.Beatmaps.First(b => b.Ruleset.OnlineID == 0)).BeatmapInfo)
+                    {
+                        RulesetID = new OsuRuleset().RulesetInfo.OnlineID,
+                    }
+                }
+            });
+
+            pressReadyButton();
+
+            AddStep("join other user and ready", () =>
+            {
+                multiplayerClient.AddUser(new APIUser { Id = 1234 });
+                multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready);
+            });
+
+            AddStep("start match", () =>
+            {
+                multiplayerClient.StartMatch();
+            });
+
+            AddUntilStep("wait for player", () => multiplayerComponents.CurrentScreen is Player);
+
+            AddWaitStep("wait some", 20);
+
+            AddAssert("ensure gameplay hasn't started", () => this.ChildrenOfType<GameplayClockContainer>().SingleOrDefault()?.IsRunning == false);
         }
 
         [Test]
@@ -883,7 +922,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 AddStep("start match by other user", () =>
                 {
                     multiplayerClient.ChangeUserState(1234, MultiplayerUserState.Ready);
-                    multiplayerClient.StartMatch();
+                    multiplayerClient.StartMatch().WaitSafely();
                 });
 
                 AddUntilStep("wait for loading", () => multiplayerClient.Room?.State == MultiplayerRoomState.WaitingForLoad);

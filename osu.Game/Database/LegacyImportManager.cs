@@ -40,7 +40,7 @@ namespace osu.Game.Database
         private OsuGame game { get; set; }
 
         [Resolved]
-        private DialogOverlay dialogOverlay { get; set; }
+        private IDialogOverlay dialogOverlay { get; set; }
 
         [Resolved(CanBeNull = true)]
         private DesktopGameHost desktopGameHost { get; set; }

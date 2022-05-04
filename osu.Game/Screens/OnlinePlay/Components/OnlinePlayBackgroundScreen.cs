@@ -91,15 +91,15 @@ namespace osu.Game.Screens.OnlinePlay.Components
             AddInternal(background = newBackground);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             this.MoveToX(0, TRANSITION_LENGTH);
         }
 
-        public override bool OnExiting(IScreen next)
+        public override bool OnExiting(ScreenExitEvent e)
         {
-            bool result = base.OnExiting(next);
+            bool result = base.OnExiting(e);
             this.MoveToX(0);
             return result;
         }

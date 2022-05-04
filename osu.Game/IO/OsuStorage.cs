@@ -36,15 +36,15 @@ namespace osu.Game.IO
         public override string[] IgnoreDirectories => new[]
         {
             "cache",
-            "client.realm.management"
+            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.management",
         };
 
         public override string[] IgnoreFiles => new[]
         {
             "framework.ini",
             "storage.ini",
-            "client.realm.note",
-            "client.realm.lock",
+            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.note",
+            $"{OsuGameBase.CLIENT_DATABASE_FILENAME}.lock",
         };
 
         public OsuStorage(GameHost host, Storage defaultStorage)
@@ -64,10 +64,20 @@ namespace osu.Game.IO
         /// </summary>
         public void ResetCustomStoragePath()
         {
-            storageConfig.SetValue(StorageConfig.FullPath, string.Empty);
-            storageConfig.Save();
+            ChangeDataPath(string.Empty);
 
             ChangeTargetStorage(defaultStorage);
+        }
+
+        /// <summary>
+        /// Updates the target data path without immediately switching.
+        /// This does NOT migrate any data.
+        /// The game should immediately be restarted after calling this.
+        /// </summary>
+        public void ChangeDataPath(string newPath)
+        {
+            storageConfig.SetValue(StorageConfig.FullPath, newPath);
+            storageConfig.Save();
         }
 
         /// <summary>
@@ -117,8 +127,7 @@ namespace osu.Game.IO
         {
             bool cleanupSucceeded = base.Migrate(newStorage);
 
-            storageConfig.SetValue(StorageConfig.FullPath, newStorage.GetFullPath("."));
-            storageConfig.Save();
+            ChangeDataPath(newStorage.GetFullPath("."));
 
             return cleanupSucceeded;
         }

@@ -175,7 +175,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private class TestLegacySkin : LegacySkin
         {
             public TestLegacySkin(IResourceStore<byte[]> storage, string fileName)
-                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, storage, null, fileName)
+                : base(new SkinInfo { Name = "Test Skin", Creator = "Craftplacer" }, null, storage, fileName)
             {
             }
         }

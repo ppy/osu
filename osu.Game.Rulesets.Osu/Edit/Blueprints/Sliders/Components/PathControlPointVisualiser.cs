@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<List<PathControlPoint>> RemoveControlPointsRequested;
 
         [Resolved(CanBeNull = true)]
-        private IPositionSnapProvider snapProvider { get; set; }
+        private IDistanceSnapProvider snapProvider { get; set; }
 
         public PathControlPointVisualiser(Slider slider, bool allowSelection)
         {

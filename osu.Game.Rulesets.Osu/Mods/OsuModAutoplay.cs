@@ -5,21 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModAutoplay : ModAutoplay
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAimAssist), typeof(OsuModAutopilot), typeof(OsuModSpunOut) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModMagnetised), typeof(OsuModAutopilot), typeof(OsuModSpunOut) }).ToArray();
 
-        public override Score CreateReplayScore(IBeatmap beatmap, IReadOnlyList<Mod> mods) => new Score
-        {
-            ScoreInfo = new ScoreInfo { User = new APIUser { Username = "Autoplay" } },
-            Replay = new OsuAutoGenerator(beatmap, mods).Generate()
-        };
+        public override ModReplayData CreateReplayData(IBeatmap beatmap, IReadOnlyList<Mod> mods)
+            => new ModReplayData(new OsuAutoGenerator(beatmap, mods).Generate(), new ModCreatedUser { Username = "Autoplay" });
     }
 }

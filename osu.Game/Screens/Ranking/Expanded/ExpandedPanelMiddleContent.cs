@@ -65,10 +65,12 @@ namespace osu.Game.Screens.Ranking.Expanded
             var metadata = beatmap.BeatmapSet?.Metadata ?? beatmap.Metadata;
             string creator = metadata.Author.Username;
 
+            int? beatmapMaxCombo = scoreManager.GetMaximumAchievableComboAsync(score).GetResultSafely();
+
             var topStatistics = new List<StatisticDisplay>
             {
                 new AccuracyStatistic(score.Accuracy),
-                new ComboStatistic(score.MaxCombo, !score.Statistics.TryGetValue(HitResult.Miss, out int missCount) || missCount == 0),
+                new ComboStatistic(score.MaxCombo, beatmapMaxCombo),
                 new PerformanceStatistic(score),
             };
 
@@ -79,8 +81,6 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             statisticDisplays.AddRange(topStatistics);
             statisticDisplays.AddRange(bottomStatistics);
-
-            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
 
             AddInternal(new FillFlowContainer
             {
@@ -223,6 +223,8 @@ namespace osu.Game.Screens.Ranking.Expanded
 
             if (score.Date != default)
                 AddInternal(new PlayedOnText(score.Date));
+
+            var starDifficulty = beatmapDifficultyCache.GetDifficultyAsync(beatmap, score.Ruleset, score.Mods).GetResultSafely();
 
             if (starDifficulty != null)
             {

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// <summary>
         /// Default size of a drawable taiko hit object.
         /// </summary>
-        public const float DEFAULT_SIZE = 0.45f;
+        public const float DEFAULT_SIZE = 0.475f;
 
         public override Judgement CreateJudgement() => new TaikoJudgement();
 

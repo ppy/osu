@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Menu
 
             bool loadThemedIntro()
             {
-                var setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+                var setInfo = beatmaps.QueryBeatmapSet(b => b.Protected && b.Hash == BeatmapHash);
 
                 if (setInfo == null)
                     return false;
@@ -164,14 +164,14 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public override void OnEntering(ScreenTransitionEvent e)
         {
-            base.OnEntering(last);
+            base.OnEntering(e);
             ensureEventuallyArrivingAtMenu();
         }
 
         [Resolved]
-        private NotificationOverlay notifications { get; set; }
+        private INotificationOverlay notifications { get; set; }
 
         private void ensureEventuallyArrivingAtMenu()
         {
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Menu
             }, 5000);
         }
 
-        public override void OnResuming(IScreen last)
+        public override void OnResuming(ScreenTransitionEvent e)
         {
             this.FadeIn(300);
 
@@ -237,12 +237,12 @@ namespace osu.Game.Screens.Menu
             //don't want to fade out completely else we will stop running updates.
             Game.FadeTo(0.01f, fadeOutTime).OnComplete(_ => this.Exit());
 
-            base.OnResuming(last);
+            base.OnResuming(e);
         }
 
-        public override void OnSuspending(IScreen next)
+        public override void OnSuspending(ScreenTransitionEvent e)
         {
-            base.OnSuspending(next);
+            base.OnSuspending(e);
             initialBeatmap = null;
         }
 

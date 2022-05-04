@@ -123,7 +123,12 @@ namespace osu.Desktop
                 tools.RemoveUninstallerRegistryEntry();
             }, onEveryRun: (version, tools, firstRun) =>
             {
-                tools.SetProcessAppUserModelId();
+                // While setting the `ProcessAppUserModelId` fixes duplicate icons/shortcuts on the taskbar, it currently
+                // causes the right-click context menu to function incorrectly.
+                //
+                // This may turn out to be non-required after an alternative solution is implemented.
+                // see https://github.com/clowd/Clowd.Squirrel/issues/24
+                // tools.SetProcessAppUserModelId();
             });
         }
 

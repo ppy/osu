@@ -88,7 +88,8 @@ namespace osu.Game.Tests.Visual.Spectator
         /// </summary>
         /// <param name="userId">The user to send frames for.</param>
         /// <param name="count">The total number of frames to send.</param>
-        public void SendFramesFromUser(int userId, int count)
+        /// <param name="startTime">The time to start gameplay frames from.</param>
+        public void SendFramesFromUser(int userId, int count, double startTime = 0)
         {
             var frames = new List<LegacyReplayFrame>();
 
@@ -102,7 +103,7 @@ namespace osu.Game.Tests.Visual.Spectator
                     flush();
 
                 var buttonState = currentFrameIndex == lastFrameIndex ? ReplayButtonState.None : ReplayButtonState.Left1;
-                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
+                frames.Add(new LegacyReplayFrame(currentFrameIndex * 100 + startTime, RNG.Next(0, 512), RNG.Next(0, 512), buttonState));
             }
 
             flush();
