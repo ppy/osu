@@ -47,23 +47,23 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
-            if (!IsLoaded)
-            {
-                Schedule(() => Push(dialog));
-                return;
-            }
-
             if (dialog == CurrentDialog || dialog.State.Value != Visibility.Visible) return;
 
-            // if any existing dialog is being displayed, dismiss it before showing a new one.
-            CurrentDialog?.Hide();
-
+            var lastDialog = CurrentDialog;
             CurrentDialog = dialog;
-            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
 
-            dialogContainer.Add(CurrentDialog);
+            Scheduler.Add(() =>
+            {
+                // if any existing dialog is being displayed, dismiss it before showing a new one.
+                lastDialog?.Hide();
 
-            Show();
+                CurrentDialog = dialog;
+                CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+
+                dialogContainer.Add(CurrentDialog);
+
+                Show();
+            }, false);
         }
 
         public override bool IsPresent => Scheduler.HasPendingTasks || dialogContainer.Children.Count > 0;
@@ -95,9 +95,6 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
             this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
-
-            // PopOut is called as part of VisibilityContainer's initialisation logic, but we don't want it to interact with a potentially waiting dialog.
-            if (!IsLoaded) return;
 
             lowPassFilter.CutoffTo(AudioFilter.MAX_LOWPASS_CUTOFF, 100, Easing.InCubic);
 
