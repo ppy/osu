@@ -105,8 +105,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 });
             });
 
-            AddAssert("dialog not displayed", () => overlay.CurrentDialog != dialog);
-
             AddStep("complete load", () => ((SlowLoadingDialogOverlay)overlay).LoadEvent.Set());
 
             AddUntilStep("wait for load", () => overlay.IsLoaded);
